@@ -1,0 +1,76 @@
+server:
+    port: 8080
+    tomcat:
+        access-log-enabled: true
+        basedir: .
+
+spring:
+    profiles:
+        active: prod
+    datasource:
+        dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
+        url: jdbc:postgresql://pgformazione:5432/formazione
+        databaseName: formazione
+        serverName: pgformazione
+        username: formazione
+        password: formazionepw
+
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQL82Dialect
+        database: POSTGRESQL
+        openInView: false
+        show_sql: false
+        generate-ddl: false
+        hibernate:
+            ddl-auto: none
+            naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
+        properties:
+            hibernate.cache.use_second_level_cache: false
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: false
+            hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+            hibernate.cache.use_minimal_puts: true
+            hibernate.cache.hazelcast.use_lite_member: true
+
+    mail:
+        baseUrl: http://localhost:8080
+
+    thymeleaf:
+        mode: XHTML
+        cache: true
+
+    ldap:
+            userSearchBase: o=cnr, c=it
+            userSearchFilter: uid={0}
+            url: ldap://virtest1.si.cnr.it:389
+            managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+            managerPassword: pippa
+
+metrics:
+    jmx.enabled: true
+    spark:
+        enabled: false
+        host: localhost
+        port: 9999
+    graphite:
+        enabled: false
+        host: localhost
+        port: 2003
+        prefix: sprint
+
+cache:
+    timeToLiveSeconds: 3600
+    hazelcast:
+        debug: false
+        stickySession: false
+        backupCount: 1
+        members: 127.0.0.1
+        name: formazione
+
+
+authentication:
+    oauth:
+        clientid: sprintapp
+        secret: mySecretOAuthSecret
+        # Token is valid 60 minutes
+        tokenValidityInSeconds: 3600
