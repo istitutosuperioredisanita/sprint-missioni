@@ -32,18 +32,18 @@ missioniApp.factory('Activate', function ($resource) {
     });
 
 missioniApp.factory('Account', function ($resource) {
-        return $resource('app/rest/account', {}, {
+        return $resource('api/siper-account', {}, {
         });
     });
 
 missioniApp.factory('AccountFromToken', function ($resource) {
-        return $resource('app/rest/ldap/account/token', {}, {
+        return $resource('api/siper-account', {}, {
             'get': { method: 'GET', params: {}, isArray: false}
         });
     });
 
 missioniApp.factory('AccountLDAP', function ($resource) {
-        return $resource('app/rest/ldap', {}, {
+        return $resource('api/siper-account', {}, {
         });
     });
 
@@ -225,12 +225,11 @@ missioniApp.factory('Session', function () {
 missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage) {
         return {
             login: function (param) {
-                var data = "username=" + param.username + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=missioniapp";
+                var data = "username=" + param.username + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
                 $http.post('oauth/token', data, {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
-                        "Accept": "application/json",
-                        "Authorization": "Basic " + Base64Service.encode("missioniapp" + ':' + "mySecretOAuthSecret")
+                        "Accept": "application/json"
                     },
                     ignoreAuthModule: 'ignoreAuthModule'
                 }).success(function (data, status, headers, config) {
@@ -255,7 +254,7 @@ missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, 
                             });
                         } else {
                             Account.get(function(data) {
-                                Session.create(data.login, null, data.firstName, data.lastName, data.email, data.roles);
+                                Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                 $rootScope.account = Session;
                                 $sessionStorage.account = Session;
                                 authService.loginConfirmed(data);
@@ -288,7 +287,7 @@ missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, 
                         AccountLDAP.get(function(data) {
                             if (!data.isLDAPAccount) {
                                 Account.get(function(data) {
-                                    Session.create(data.login, null, data.firstName, data.lastName, data.email, data.roles);
+                                    Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
                                     if (!$rootScope.isAuthorized(authorizedRoles)) {
