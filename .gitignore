@@ -1,0 +1,6 @@
+/logs/
+/node_modules/
+/target/
+dist/
+/.tmp/
+bower_components/
