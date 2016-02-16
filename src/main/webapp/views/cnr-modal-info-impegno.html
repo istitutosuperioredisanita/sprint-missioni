@@ -1,0 +1,14 @@
+<button type="button" ng-disabled="!annoImpegno || !numero" class="btn-sm glyphicon glyphicon-info-sign" ng-click="validateImpegno()" title="{{'ordine-missione.form.info-disponibilita' | translate}}"></button>
+
+<div modal-show="descrizione" class="modal fade" modal-title="{{'ordine-missione.form.info-disponibilita' | translate}}" tabindex="-1"> 
+	<div>
+    	<strong>{{'modal-dettagli-impegno.anno' | translate}}</strong>: {{annoImpegno}}    
+	    <strong>  {{'modal-dettagli-impegno.numero' | translate}}</strong>: {{numero}}<p>
+	    <p><strong>{{'modal-dettagli-impegno.descrizione' | translate}}</strong>: {{descrizione}}</p>
+		<div ng-show="gae">
+		    <p><strong>{{'modal-dettagli-impegno.gae' | translate}}</strong>: {{gae}}</p>
+		</div>
+	    <p><strong>{{'modal-dettagli-impegno.disponibilita' | translate}}</strong>: {{disponibilita}}</p>
+    	<br>
+	</div>
+</div>

@@ -1,0 +1,77 @@
+<div class="container-fluid">
+  <h4 center translate="ordine-missione-anticipo.title" translate-values="{numeroOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Ordine di missione</b></h4>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-success" ng-show="success" translate="global.messages.success">
+                <strong>Anticipo salvato con successo!</strong>
+            </div>
+            <div class="alert alert-success" ng-show="delSuccess" translate="global.messages.delSuccess">
+                <strong>Cancellazione Effettuata</strong>
+            </div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading color-celeste-avion text-center">
+    <h3 class="panel-title color-celeste-avion" translate="ordine-missione.form.box-info">Informazioni anagrafiche</h3>
+  </div>
+          <div class="panel-body my-panel-body">
+            <info-account account="accountModel"></info-account>
+          </div>
+</div>
+
+<div class="panel panel-success">
+  <div class="panel-heading color-verde-scuro text-center">
+    <h3 class="panel-title color-verde-scuro" translate="ordine-missione-anticipo.form.box-dati">Dati Generali</h3>
+  </div>
+  <div class="panel-body my-panel-body">
+          <form name="form" role="form" novalidate ng-submit="save()" show-validation>
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-5">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="ordine-missione-anticipo.form.importo">importo</span>
+                          <input type="text" class="input-sm form-control" required style="text-align:right" ng-currency name="importo" ng-model="anticipoOrdineMissioneModel.importo">
+                        </span>
+                    </p>
+            </form>
+
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-anticipo.form.note">note</span>
+                            <textarea
+                              class="input-sm form-control" placeholder="{{'ordine-missione-anticipo.form.note.placeholder' | translate}}" name="note" ng-model="anticipoOrdineMissioneModel.note" rows = "3">
+                            </textarea> 
+                        </span>
+                </p>
+            </form>
+          </form>
+  </div>
+</div>
+
+            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
+                    <div class="col-md-4">
+                            <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="confirm()">
+                    <div class="col-md-4" ng-show="anticipoOrdineMissioneModel.id && isOrdineMissioneConfermato">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                    </div>
+            </form>
+             <div class="col-md-3" ng-show="anticipoOrdineMissioneModel.id">
+                 <a target="_blank" href="app/rest/public/printOrdineMissioneAnticipo?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-anticipo.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+             </div>
+            <form name="form-inline" role="form" ng-submit="confirmDelete()">
+                    <div class="col-md-1" ng-show="anticipoOrdineMissioneModel.id">
+                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
+                    </div>
+            </form>
+
+  <div class="col-md-11">
+    <ul class="pager">
+      <li class="previous"><a ng-click="previousPage()" translate="global.button.close"></a></li>
+    </ul>
+  </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+<div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+
+            <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
+                <strong>Authentication failed!</strong> Please check your credentials and try again.
+            </div>
+            <form class="form-signin ng-pristine ng-valid ng-valid-required" role="form" name="userInsert">
+                <h2 class="form-signin-heading" translate="login.title">Authentication</h2>
+                <form autocomplete="off">
+                    <input required type="text" class="form-control input-lg row-empty-after ng-pristine ng-valid ng-valid-required ng-touched" id="username" placeholder="{{'login.form.userid.placeholder' | translate}}" autofocus ng-model="username"> </input>
+                </form>
+                <form name="pwdInsert">
+                    <input required type="password" class="form-control input-lg row-empty-after ng-pristine ng-valid ng-valid-required ng-touched" id="password" placeholder="{{'login.form.password.placeholder' | translate}}" ng-model="password" >
+                    <button type="submit" ng-disabled="userInsert.$error.required || pwdInsert.$error.required" class="btn btn-success btn-lg btn-block row-empty-after" ng-click="login()" >{{"login.form.button" | translate}}  <span class="glyphicon glyphicon-log-in"></span>
+                    </button>
+                </form>
+            </form>
+            <p></p>
+        </div>
+    </div>
+</div>

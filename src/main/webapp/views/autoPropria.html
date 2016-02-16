@@ -1,0 +1,121 @@
+<div>
+    <div class="row">
+        <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
+               <p class="col-md-12">
+                  <span class="input-group">
+                  <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-userid-missione">uo</span>
+                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
+                   </span>
+               </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
+                <p class="col-md-12">
+                    <span class="input-group">
+                    <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.userid-missione">user</span>
+                       <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
+                    </span>
+                </p>
+            </form>
+    </div>
+    <div ng-show="accountModel">
+  <h2 translate="autoPropria.title" translate-values="{lastname: '{{accountModel.lastName}}', firstname: '{{accountModel.firstName}}'}">Auto di <b>{{settingsAccount.LastName}} {{settingsAccount.firstName}}</b></h2>
+              <button ng-disabled="addRigaAutoPropria" class="btn btn-sm btn-success row-empty-after" data-toggle="tooltip" title="{{'autoPropria.form.addAuto' | translate}}" ng-click="addAutoPropria()"><span class="glyphicon glyphicon-plus"></span></button> 
+    <br>
+    <div class="row">
+      <div class="col-md-12 col-md-offset-0">
+        <div class="alert alert-success" ng-show="success" translate="global.messages.success">
+                <strong>Salvataggio Effettuato</strong>
+        </div>
+        <div class="alert alert-success" ng-show="delSuccess" translate="global.messages.delSuccess">
+                <strong>Cancellazione Effettuata</strong>
+        </div>
+        <div class="alert alert-danger" ng-show="errorTargaExists" translate="autoPropria.messages.error.targaExists">
+               <strong>Esiste già una targa uguale!</strong> Indicarne una.
+        </div>
+        <table class="table table-condensed table-striped table-bordered table-responsive">
+          <tr>
+            <th>{{'autoPropria.form.marca' | translate}}</th>
+            <th>{{'autoPropria.form.modello' | translate}}</th>
+            <th>{{'autoPropria.form.targa' | translate}}</th>
+            <th>{{'autoPropria.form.cartaCircolazione' | translate}}</th>
+            <th>{{'autoPropria.form.polizzaAssicurativa' | translate}}</th>
+          </tr>
+          <tbody id ="missioni">
+            <tr ng-repeat="rigaAutoPropria in autoProprie">
+              <td ng-hide="rigaAutoPropria.editing" class="col-md-2" style="text-align: left" >{{rigaAutoPropria.marca}}</td>
+              <td ng-show="rigaAutoPropria.editing" class="col-xs-2" style="text-align:left">
+                <input class="form-control" ng-model="rigaAutoPropria.marca" required maxlength="50"></input>
+              </td>
+              <td ng-hide="rigaAutoPropria.editing" class="col-md-3" style="text-align: left">{{rigaAutoPropria.modello}}</td>
+              <td ng-show="rigaAutoPropria.editing" class="col-xs-3" style="text-align:left">
+                <input class="form-control" ng-model="rigaAutoPropria.modello" required maxlength="100"></input>
+              </td>
+
+              <td ng-hide="rigaAutoPropria.editing" class="col-md-2" style="text-align: left">{{rigaAutoPropria.targa}}</td>
+              <td ng-show="rigaAutoPropria.editing" class="col-xs-2" style="text-align:left">
+                <input class="form-control" ng-model="rigaAutoPropria.targa" required maxlength="50"></input>
+              </td>
+
+              <td ng-hide="rigaAutoPropria.editing" class="col-md-3" style="text-align: left">{{rigaAutoPropria.cartaCircolazione}}</td>
+              <td ng-show="rigaAutoPropria.editing" class="col-xs-3" style="text-align:left">
+                <input class="form-control" ng-model="rigaAutoPropria.cartaCircolazione" required maxlength="100"></input>
+              </td>
+
+              <td ng-hide="rigaAutoPropria.editing" class="col-md-3" style="text-align: left">{{rigaAutoPropria.polizzaAssicurativa}}</td>
+              <td ng-show="rigaAutoPropria.editing" class="col-xs-3" style="text-align:left">
+                <input class="form-control" ng-model="rigaAutoPropria.polizzaAssicurativa" required maxlength="100"></input>
+              </td>
+
+              <td ng-hide="rigaAutoPropria.editing">
+                <button class="btn btn-sm btn-link" ng-click="edit(rigaAutoPropria)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+              </td>
+              <td ng-hide="rigaAutoPropria.editing">
+                <button class="btn btn-sm btn-link" ng-click="confirmDelete($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              </td>
+              <td ng-show="rigaAutoPropria.editing">
+                <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(rigaAutoPropria)" ng-click="modifyAutoPropria(rigaAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+              </td>
+              <td ng-show="rigaAutoPropria.editing">
+                <button class="btn btn-sm btn-link" ng-click="undo(rigaAutoPropria)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+              </td>
+            </tr>
+
+
+          <tr ng-show="addRigaAutoPropria" id="rigaAddAutoPropria">
+
+            <td class="col-xs-2">
+              <input class="form-control" ng-model="newAutoPropria.marca" maxlength="50"/>
+            </td>
+            <td class="col-xs-3">
+              <input class="form-control" ng-model="newAutoPropria.modello" maxlength="100"/>
+            </td>
+            <td class="col-xs-2">
+              <input class="form-control" ng-model="newAutoPropria.targa" maxlength="50"/>
+            </td>
+            <td class="col-xs-3">
+              <input class="form-control" ng-model="newAutoPropria.cartaCircolazione" maxlength="100"></input>
+            </td>
+            <td class="col-xs-3">
+              <input class="form-control" ng-model="newAutoPropria.polizzaAssicurativa" maxlength="100"></input>
+            </td>
+            <td style="text-align: left">
+              <form class="form-inline" role="form">
+                <div class="form-group btn-group">
+                  <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newAutoPropria)" ng-click="insertAutoPropria(newAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                </div>
+              </form>
+            </td>
+            <td style="text-align: left">
+              <form class="form-inline" role="form">
+                <div class="form-group btn-group">
+                  <button class="btn btn-sm btn-link" ng-click="undoAddAutoPropria()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                </div>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
