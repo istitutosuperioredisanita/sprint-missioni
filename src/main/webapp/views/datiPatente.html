@@ -1,0 +1,106 @@
+<div>
+    <div class="row">
+        <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
+               <p class="col-md-12">
+                  <span class="input-group">
+                  <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-userid-missione">uo</span>
+                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
+                   </span>
+               </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
+                <p class="col-md-12">
+                    <span class="input-group">
+                    <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.userid-missione">user</span>
+                       <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
+                    </span>
+                </p>
+            </form>
+    </div>
+    <div class="row" ng-show="accountModel">
+        <div class="col-md-8 col-md-offset-2">
+            <h2 translate="datiPatente.title" translate-values="{lastname: '{{accountModel.lastName}}', firstname: '{{accountModel.firstName}}'}">Auto di <b>{{settingsAccount.LastName}} {{settingsAccount.firstName}}</b></h2>
+            <div class="alert alert-success" ng-show="success" translate="datiPatente.messages.success">
+                <strong>Dati patente salvati!</strong>
+            </div>
+            <div class="alert alert-danger" ng-show="errorNumeroExists" translate="datiPatente.messages.error.numeroexists">
+                <strong>Il numero patente esiste già</strong> sceglierne uno nuovo.
+            </div>
+
+            <form name="form" role="form" novalidate ng-submit="save()" show-validation>
+
+                <div class="form-group">
+                    <label translate="datiPatente.form.numero">Numero Patente</label>
+                    <input type="text" class="form-control" name="numero" placeholder="{{'datiPatente.form.numero.placeholder' | translate}}"
+                           ng-model="datiPatenteModel.numero" ng-minlength=1 ng-maxlength=50 required maxlength="50">
+                    <div ng-show="form.numero.$dirty && form.numero.$invalid">
+                        <p class="help-block"
+                               ng-show="form.numero.$error.required" translate="datiPatente.messages.validate.numero.required">
+                            Il numero patente è obbligatorio.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.numero.$error.minlength" translate="datiPatente.messages.validate.numero.minlength">
+                            E' obbligatoria la lunghezza minima di 1 carattere
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.numero.$error.maxlength" translate="datiPatente.messages.validate.numero.maxlength">
+                            Your first name cannot be longer than 50 characters
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label translate="datiPatente.form.dataRilascio">data rilascio</label>
+<cnr-widget-date date-name="dataRilascio" ng-model-date="datiPatenteModel.dataRilascio"></cnr-widget-datetime-range>
+                    <div ng-show="form.dataRilascio.$dirty && form.dataRilascio.$invalid">
+                        <div class="help-block"
+                               ng-show="form.dataRilascio.$error.required" translate="datiPatente.messages.validate.dataRilascio.required">
+                            La data rilascio patente è obbligatoria.
+                        </div>
+                        <p class="help-block"
+                               ng-show="form.dataRilascio.$error.minlength" translate="datiPatente.messages.validate.dataRilascio.minlength">
+                            La data rilascio deve avere un formato gg/mm/yyyy
+                        </p>
+                     
+                    </div>
+                </div>
+                  <div class="form-group">
+                    <label translate="datiPatente.form.dataScadenza">data scadenza</label>
+<cnr-widget-date date-name="dataScadenza" ng-model-date="datiPatenteModel.dataScadenza"></cnr-widget-datetime-range>
+                    <div ng-show="form.dataScadenza.$dirty && form.dataScadenza.$invalid">
+                        <p class="help-block"
+                               ng-show="form.dataScadenza.$error.required" translate="datiPatente.messages.validate.dataScadenza.required">
+                            La data scadenza patente è obbligatoria.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.dataScadenza.$error.minlength" translate="datiPatente.messages.validate.dataScadenza.minlength">
+                            La data scadenza deve avere un formato gg/mm/yyyy
+                        </p>
+                     
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label translate="datiPatente.form.ente">Ente</label>
+                    <input type="text" class="form-control" name="Ente" placeholder="{{'datiPatente.form.ente.placeholder' | translate}}"
+                           ng-model="datiPatenteModel.ente" ng-minlength=1 ng-maxlength=100 required maxlength="100">
+                    <div ng-show="form.ente.$dirty && form.ente.$invalid">
+                        <p class="help-block"
+                               ng-show="form.ente.$error.required" translate="global.messages.validate.ente.required">
+                            L'ente di rilascio è obbligatorio.
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.ente.$error.minlength" translate="global.messages.validate.ente.minlength">
+                            Per il campo Ente di rilascio specificare almeno 1 carattere
+                        </p>
+                        <p class="help-block"
+                               ng-show="form.ente.$error.maxlength" translate="global.messages.validate.ente.maxlength">
+                            La lunghezza massimo del campo Ente è di 100 caratteri
+                        </p>
+                    </div>
+                </div>
+
+                <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" translate="datiPatente.form.button">Save</button>
+            </form>
+        </div>
+    </div>
+
+</div>

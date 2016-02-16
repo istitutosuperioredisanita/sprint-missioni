@@ -1,0 +1,162 @@
+#missioni span{
+  border-width: 1px;
+}
+
+#missioni td{
+  font-size: 12px;
+  vertical-align: middle;  
+}
+
+.banner-missioni {
+    background-image: url('../images/missioni.png');
+    height: 285px;
+    margin-bottom: 0px;
+    width: 1140px
+}
+
+.progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}
+
+.progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}
+
+.color-rosso-bruno {
+  background-color: #b27b60 !important;
+  border-color: #b27b60 !important;
+  color: #fff;
+}
+
+.color-verde-scuro {
+  background-color: #6ca25a !important;
+  border-color: #6ca25a !important;
+  color: #fff;
+}
+
+.color-rosso-mattone {
+  background-color: #cc8664 !important;
+  border-color: #cc8664 !important;
+  color: #fff;
+}
+
+.color-verde-giada {
+  background-color: #77a863 !important;
+  border-color: #77a863 !important;
+  color: #fff;
+}
+
+.color-celeste-avion {
+  background-color: #b0b2ff !important;
+  border-color: #b0b2ff !important;
+  color: #fff;
+}
+
+.align-left {
+  text-align: left !important;
+  width: 110px !important;
+}
+
+.button-info-missioni {
+  background-color: #7BB068;
+}
+
+.button-standard-missioni {
+  background-color: #247F1C;
+}
+
+.column-in-column {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  background-color: #fff !important;
+  color: #fff !important;
+}
+
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#missioni select{
+  font-size: 12px;
+  height: 30px;
+  vertical-align: middle;  
+}
+
+#missioni input{
+  font-size: 12px;
+  height: 30px;
+  vertical-align: middle;  
+}
+1px 0
+#missioni selectize-input{
+  padding: 0px 8px !important;
+}
+
+.selectize-missioni{
+  padding: 0px 8px !important;
+}
+
+#missioni cnr-widget-select{
+  font-size: 12px;
+  height: 30px;
+  vertical-align: middle;  
+}
+
+#missioni label{
+  padding-left: 6px;
+}
+
+.label-input-group-for-select {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.my-panel-body {
+  background: #F5F5F5;
+}
+
+.select2-drop-mask {
+  font-size: 12px;
+}
+
+.row-empty-after {
+  margin-bottom: 10px;  
+}
+
+.float-right{
+  float: right;
+}
+
+.row-trim-after {
+  margin-bottom: 2px !important;
+}
+
+.missioni a { cursor: pointer; }
+
+.missioni .table-selected  td{
+  cursor: pointer;
+}
+
+.date-height {
+  line-height: 22px;  
+}
+
+.message-working {
+    background: rgba(0,0,0,.5);
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    tabindex: -1;
+    z-index: 1100;
+}
+
+.bar-message {
+    width: 800px;
+    height: 40px;
+    margin: 0 auto;
+    margin-top: 400px;
+}
