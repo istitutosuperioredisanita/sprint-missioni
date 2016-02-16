@@ -116,3 +116,6 @@ Desktop.ini
 *.*~
 *~
 .merge_file*
+
+
+/bower_components/
