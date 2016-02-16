@@ -1,0 +1,18 @@
+{
+  "generator-jhipster": {
+    "baseName": "missioni",
+    "packageName": "it.cnr.si.missioni",
+    "packageFolder": "it/cnr/si/missioni",
+    "authenticationType": "token",
+    "hibernateCache": "hazelcast",
+    "clusteredHttpSession": "no",
+    "websocket": "no",
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "prodDatabaseType": "postgresql",
+    "useCompass": false,
+    "buildTool": "maven",
+    "frontendBuilder": "grunt",
+    "javaVersion": "7"
+  }
+}
