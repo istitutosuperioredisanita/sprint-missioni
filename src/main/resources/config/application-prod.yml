@@ -20,10 +20,10 @@ spring:
             enabled: false
     datasource:
         driver-class-name: org.postgresql.ds.PGSimpleDataSource
-        url: jdbc:postgresql://pgformazione:5432/formazione
+        url: jdbc:postgresql://pgformazione:5432/pippo
         name:
-        username: formazione
-        password: formazionepw
+        username: pippo
+        password: pippo
     jpa:
         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
@@ -73,7 +73,7 @@ jhipster:
         hazelcast:
             backupCount: 1
     mail: # specific JHipster mail property, for standard properties see MailProperties
-        from: formazioneqa@cnr.it
+        from: missioni@cnr.it
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx.enabled: true
         spark:
@@ -98,5 +98,5 @@ siper:
 
 info:
     app:
-        name: formazione
+        name: missioni
         version: @project.version@
