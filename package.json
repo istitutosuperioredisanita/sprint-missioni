@@ -7,7 +7,6 @@
   },
   "devDependencies": {
     "event-stream": "3.1.5",
-    "generator-jhipster": "1.9.0",
     "grunt": "0.4.5",
     "grunt-autoprefixer": "0.7.5",
     "grunt-build-control": "0.1.3",
