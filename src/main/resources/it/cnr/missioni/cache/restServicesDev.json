@@ -1,0 +1,85 @@
+{
+    "restService": [
+        {
+            "app": "SIGLA",
+            "url": "ConsUnitaOrganizzativaAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativaJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_padre",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio_fine",
+                    "operator": ">=",
+                    "fieldValue": ""
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_unita_organizzativa",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsCdSAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.CdsJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Cds",
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio_fine",
+                    "operator": ">=",
+                    "fieldValue": "",
+                    "specialValue": "ANNO_CORRENTE"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_proprio_unita",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsNazioneAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.NazioneJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Nazione",
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_nazione",
+                    "operator": "!=",
+                    "fieldValue": "I"
+                }
+            ],
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "pg_nazione",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "order": [
+                {
+                    "name": "ds_nazione",
+                    "type": "ASC"
+                }
+            ]
+        }
+    ]
+}
