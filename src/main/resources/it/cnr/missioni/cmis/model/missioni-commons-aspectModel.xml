@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+	<!-- Definition of new Model -->
+<model name="missioni_commons_aspect:missioni_commons_aspectModel" 
+	xmlns="http://www.alfresco.org/model/dictionary/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd">
+
+	<!-- Optional meta-data about the model -->
+	<description>Missioni extension Content Model - Dati Comuni</description>
+	<author>Gianfranco Gasparro</author>
+	<version>1.0</version>
+
+	<!--
+		Imports are required to allow references to definitions in other
+		models
+	-->
+	<imports>
+		<!-- Import Alfresco Dictionary Definitions -->
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+		<!-- Import Alfresco Content Domain Model Definitions -->
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+	</imports>
+
+	<!-- Introduction of new namespaces defined by this model -->
+	<namespaces>
+		<namespace uri="http://www.cnr.it/model/missioni/commons_aspect/" prefix="missioni_commons_aspect" />
+	</namespaces>
+	<aspects>
+		<aspect name="missioni_commons_aspect:utente_applicativo_missioni">
+			<title>Utente Applicativo</title>
+			<properties>
+				<property name="missioni_commons_aspect:utente_applicativo">
+					<title>Utente Applicativo</title>
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+	</aspects>
+</model>

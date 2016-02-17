@@ -1,0 +1,268 @@
+{
+    "restService": [
+        {
+            "app": "SIGLA",
+            "url": "ConsUnitaOrganizzativaAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativaJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_padre",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio_fine",
+                    "operator": ">=",
+                    "fieldValue": ""
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_unita_organizzativa",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsCdSAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.CdsJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Cds",
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio_fine",
+                    "operator": ">=",
+                    "fieldValue": "",
+                    "specialValue": "ANNO_CORRENTE"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_proprio_unita",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsNazioneAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.NazioneJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Nazione",
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_nazione",
+                    "operator": "!=",
+                    "fieldValue": "I"
+                }
+            ],
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "pg_nazione",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "order": [
+                {
+                    "name": "ds_nazione",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsCdRAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.CdrJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Cdr",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+								{
+                    "condition": "AND",
+                    "fieldName": "cd_centro_responsabilita",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_centro_responsabilita",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsCapitoloAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.VoceJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Voce",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_elemento_voce",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "fl_solo_residuo",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_gestione",
+                    "operator": "=",
+                    "fieldValue": "S"
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_elemento_voce",
+                    "operator": "=",
+                    "fieldValue": "C"
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_appartenenza",
+                    "operator": "=",
+                    "fieldValue": "D"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_elemento_voce",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsGAEAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.GaeJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Gae",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_linea_attivita",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio_inizio",
+                    "operator": "<=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio_fine",
+                    "operator": ">=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_centro_responsabilita",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "pg_progetto",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_gestione",
+                    "operator": "=",
+                    "fieldValue": "S"
+                }
+            ],
+            "clauseToIterate": [
+                {	
+                    "type": "callRestForGetValuesForFilter",
+                    "condition": "AND",
+                    "fieldName": "cd_centro_responsabilita",
+                    "operator": "LIKE",
+                    "urlInCache": "ConsCdSAction.json",
+                    "fieldGetForSpecialValue": "cd_proprio_unita"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_linea_attivita",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsProgettiAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.ProgettoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Progetto",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "pg_progetto",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "livello",
+                    "operator": "=",
+                    "fieldValue": 3
+                }
+            ],
+            "clauseToIterate": [
+                {
+                    "type": "calculateValues",
+                    "condition": "AND",
+                    "fieldName": "esercizio",
+                    "fromValue": 2012,
+                    "toSpecialValue": "ANNO_CORRENTE"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_progetto",
+                    "type": "ASC"
+                }
+            ]
+        }
+    ]
+}

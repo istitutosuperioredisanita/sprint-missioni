@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="missioni_ordine_attachment:missioni_ordine_attachmentModel" 
+	xmlns="http://www.alfresco.org/model/dictionary/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd">
+	<description>Sigla Dynamic Model</description>
+	<author>gianfranco.gasparro</author>
+	<version>1.0</version>
+	<imports>
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+	</imports>
+	<namespaces>
+		<namespace uri="http://www.cnr.it/model/missioni/ordine/attachment/cmis" prefix="missioni_ordine_attachment" />
+	</namespaces>
+	<types>
+		<type name="missioni_ordine_attachment:document">
+			<title>Allegati all'Ordine di Missione</title>
+			<description>Allegati all'Ordine di Missione</description>
+			<parent>cm:content</parent>
+			<properties>
+				<property name="missioni_ordine_attachment:original_name">
+					<title>Nome Originale del File</title>
+					<description>Nome Originale del File</description>
+					<type>d:text</type>
+				</property>
+			</properties>
+		</type>
+	</types>
+	<aspects>
+		<aspect name="missioni_ordine_attachment:allegati">
+			<title>Allegati all'Ordine di Missione</title>
+			<description>Allegati all'Ordine di Missione</description>
+		</aspect>
+		<aspect name="missioni_ordine_attachment:richiesta_anticipo">
+			<title>Richiesta Anticipo per l'Ordine di Missione</title>
+			<description>Richiesta Anticipo per l'Ordine di Missione</description>
+		</aspect>
+		<aspect name="missioni_ordine_attachment:uso_auto_propria">
+			<title>Richiesta Utilizzo Auto Propria per l'Ordine di Missione</title>
+			<description>Richiesta Utilizzo Auto Propria per l'Ordine di Missione</description>
+		</aspect>
+		<aspect name="missioni_ordine_attachment:ordine">
+			<title>Ordine di Missione</title>
+			<description>Ordine di Missione</description>
+		</aspect>
+	</aspects>
+</model>
