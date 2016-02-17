@@ -19,15 +19,21 @@ spring:
         livereload:
             enabled: false
     datasource:
-        driver-class-name: org.postgresql.ds.PGSimpleDataSource
-        url: jdbc:postgresql://pgformazione:5432/pippo
-        name:
-        username: pippo
-        password: pippo
+        dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
+        url: 
+        databaseName: missioni
+        serverName: localhost
+        username: missioni
+        password: 
     jpa:
-        database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
         database: POSTGRESQL
+        openInView: false
         show_sql: false
+        generate-ddl: false
+        hibernate:
+            ddl-auto: none
+            naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
         properties:
             hibernate.cache.use_second_level_cache: true
             hibernate.cache.use_query_cache: false
@@ -42,14 +48,41 @@ spring:
         password:
         tls: false
         auth: false
-    thymeleaf:
-        cache: true
+    proxy:
+        SIGLA:
+            url: http://test15.si.cnr.it:8180/SIGLA/
+            username: MISSIONI
+            password: M15510N1
+            context:
+                cd_unita_organizzativa: "999.000"
+                cd_cds: "999"
+                cd_cdr: "999.000.000"
+        SIPER:
+            url: https://siper.cnr.it/siper/
+            username: app.selezioni
+            password: pentagono
     ldap:
         userSearchBase: o=cnr, c=it
         userSearchFilter: uid={0}
         url: ldap://virtest1.si.cnr.it:389
         managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
         managerPassword: pippa
+    cmis:
+        repository.base.url: http://as1dock.si.cnr.it:8080/alfresco/
+        org.apache.chemistry.opencmis.binding.atompub.url: api/-default-/public/cmis/versions/1.1/atom
+        org.apache.chemistry.opencmis.binding.spi.type: atompub
+        org.apache.chemistry.opencmis.binding.connecttimeout: 50000
+        org.apache.chemistry.opencmis.binding.readtimeout: 3000000
+        org.apache.chemistry.opencmis.binding.httpinvoker.classname: org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker
+
+        user.admin.username: app.missioni
+        user.admin.password: bubbazza
+        folder_path: /Missioni
+        folder_path_config: /Config
+    thymeleaf:
+        cache: true
+    print:
+        baseDir: /it/cnr/missioni/print/
 
 liquibase:
     contexts: prod

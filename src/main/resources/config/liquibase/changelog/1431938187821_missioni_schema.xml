@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+<changeSet id="1431938187821" author="missioni">
+        <createTable tableName="AUTO_PROPRIA">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="TARGA" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CARTA_CIRCOLAZIONE" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="POLIZZA_ASSICURATIVA" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MARCA" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MODELLO" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UID" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="DATI_PATENTE">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="NUMERO" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_RILASCIO" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_SCADENZA" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ENTE" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UID" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="ORDINE_MISSIONE">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="UID" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ANNO" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="NUMERO" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DATA_INSERIMENTO" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="COMUNE_RESIDENZA_RICH" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="INDIRIZZO_RESIDENZA_RICH" type="varchar(80)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DOMICILIO_FISCALE_RICH" type="varchar(80)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="COMUNE_DOMICILIO_FISCALE_RICH" type="varchar(40)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DATORE_LAVORO_RICH" type="varchar(250)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="CONTRATTO_RICH" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="QUALIFICA_RICH" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LIVELLO_RICH" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="OGGETTO" type="varchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESTINAZIONE" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAZIONE" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TIPO_MISSIONE" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TRATTAMENTO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_INIZIO_MISSIONE" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_FINE_MISSIONE" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OBBLIGO_RIENTRO" type="varchar(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARTENZA_DA" type="varchar(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DISTANZA_DALLA_SEDE" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="NOTE" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="VOCE" type="varchar(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="GAE" type="varchar(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="CDR_RICH" type="varchar(30)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="UO_RICH" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CDR_SPESA" type="varchar(30)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="UO_SPESA" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MODULO" type="varchar(30)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="STATO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IMPORTO_PRESUNTO" type="numeric(17,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="CDS_SPESA" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CDS_RICH" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_PROGETTO" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="CD_CDS_OBBLIGAZIONE" type="varchar(30)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ESERCIZIO_OBBLIGAZIONE" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ESERCIZIO_ORIGINALE_OBBLIGAZIONE" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="PG_OBBLIGAZIONE" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="PRIORITA" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTILIZZO_TAXI" type="varchar(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTILIZZO_AUTO_NOLEGGIO" type="varchar(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NOTE_UTILIZZO_TAXI_NOLEGGIO" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ID_FLUSSO" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="STATO_FLUSSO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UID_INSERT" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="DATI_ISTITUTO">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ANNO" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ISTITUTO" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCR_ISTITUTO" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PROGRESSIVO_ORDINE" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="GESTIONE_RESP_MODULO" type="varchar(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="ORDINE_MISSIONE_AUTO_PROPRIA">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ID_ORDINE_MISSIONE" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UID" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TARGA" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CARTA_CIRCOLAZIONE" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="POLIZZA_ASSICURATIVA" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MARCA" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MODELLO" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NUMERO_PATENTE" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_RILASCIO_PATENTE" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_SCADENZA_PATENTE" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ENTE_PATENTE" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="SPOSTAMENTI_AUTO_PROPRIA">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ID_ORDINE_MISSIONE_AUTO_PROPRIA" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RIGA" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UID" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PERCORSO_DA" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PERCORSO_A" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="ORDINE_MISSIONE_ANTICIPO">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ID_ORDINE_MISSIONE" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UID" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DATA_RICHIESTA" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="IMPORTO" type="numeric(17,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NOTE" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="STATO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ID_FLUSSO" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="STATO_FLUSSO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
