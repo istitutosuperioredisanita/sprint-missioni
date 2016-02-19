@@ -2,12 +2,13 @@ package it.cnr.si.missioni.util.proxy.json;
 
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class JSONBody implements Cloneable{
+public class JSONBody implements Cloneable, Serializable{
 	private Integer activePage;
 	private Integer maxItemsPerPage;
 	private List<JSONOrderBy> orderBy;

@@ -1,8 +1,10 @@
 package it.cnr.si.missioni.util.proxy.json.object.sigla;
 
+import java.io.Serializable;
+
 import it.cnr.si.missioni.util.DateUtils;
 
-public class Context {
+public class Context  implements Serializable{
 	private int esercizio = DateUtils.getCurrentYear();
 	private String cd_unita_organizzativa;
 	private String cd_cds;

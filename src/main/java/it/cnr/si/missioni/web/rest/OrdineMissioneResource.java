@@ -7,9 +7,9 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.OrdineMissioneFilter;
-import it.cnr.si.security.SecurityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.util.StringUtils;
@@ -71,7 +72,7 @@ public class OrdineMissioneResource {
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissione(HttpServletRequest request,
     		OrdineMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
-        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione((Principal) SecurityUtils.getCurrentUser(), filter, true);
+        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
         		ordiniMissione,
         		HttpStatus.OK);
@@ -87,7 +88,7 @@ public class OrdineMissioneResource {
     @Timed
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneDaValidare(HttpServletRequest request, OrdineMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
-        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows((Principal) SecurityUtils.getCurrentUser(), filter, true);
+        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
         		ordiniMissione,
         		HttpStatus.OK);
@@ -146,9 +147,9 @@ public class OrdineMissioneResource {
     public ResponseEntity<?> modifyOrdineMissione(@RequestBody OrdineMissione ordineMissione, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (ordineMissione.getId() != null){
-            
+    		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
-				ordineMissione = ordineMissioneService.updateOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ordineMissione);
+				ordineMissione = ordineMissioneService.updateOrdineMissione(principal, ordineMissione);
     		} catch (AwesomeException e) {
     			return e.getResponse();
     		} catch (ComponentException e) {

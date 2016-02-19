@@ -29,7 +29,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.OrdineMissioneFilter;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.missioni.util.SecurityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

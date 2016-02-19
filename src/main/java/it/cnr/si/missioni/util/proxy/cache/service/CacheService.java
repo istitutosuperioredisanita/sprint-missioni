@@ -19,7 +19,6 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,9 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -154,8 +151,7 @@ public class CacheService {
 	private CallCache prepareCallForCache(RestService rest, JSONBody jBody) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
-		String body = proxyService.prepareBodyForRest(jBody, mapper);
-		CallCache callCache = new CallCache(HttpMethod.POST, body, rest.getApp(), rest.getUrl(), "proxyURL="+rest.getUrl(), null, rest.getClasseJson());
+		CallCache callCache = new CallCache(HttpMethod.POST, jBody, rest.getApp(), rest.getUrl(), "proxyURL="+rest.getUrl(), null, rest.getClasseJson());
 		return callCache;
 	}
 
@@ -227,7 +223,7 @@ public class CacheService {
 		return clause;
 	}
 
-	public ResultCacheProxy manageCache(String url, String body) throws AwesomeException{
+	public ResultCacheProxy manageCache(String url, JSONBody bodyRequest) throws AwesomeException{
 		List<JSONClause> listClausesDeleted = new ArrayList<JSONClause>();
 		RestService restService = null;
 		boolean isUrlToCache = false;
@@ -237,45 +233,32 @@ public class CacheService {
 				if (rest.getUrl() != null && url != null && url.equals(rest.getUrl())){
 					isUrlToCache = true;
 					restService = rest;
-					try {
-						JSONBody bodyRequest = new ObjectMapper().readValue(body, JSONBody.class);
-						bodyRequest.setMaxItemsPerPage(Costanti.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE);
-						if (bodyRequest.getClauses() != null && !bodyRequest.getClauses().isEmpty() &&
-								rest.getClauseVariable() != null && !rest.getClauseVariable().isEmpty()){
-							List<JSONClause> listNewClauses = new ArrayList<JSONClause>();
-							for (Iterator<JSONClause> iterator = bodyRequest.getClauses().iterator(); iterator.hasNext();){
-								JSONClause clause = iterator.next();
-								boolean clauseTrovata = existsClause(rest.getClauseVariable(), clause);
-								if (!clauseTrovata){
-									listNewClauses.add(clause);
-								} else {
-									listClausesDeleted.add(clause);
-								}
-							}
-							if (listNewClauses != null && !listNewClauses.isEmpty()){
-								bodyRequest.setClauses(listNewClauses);
+					bodyRequest.setMaxItemsPerPage(Costanti.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE);
+					if (bodyRequest.getClauses() != null && !bodyRequest.getClauses().isEmpty() &&
+							rest.getClauseVariable() != null && !rest.getClauseVariable().isEmpty()){
+						List<JSONClause> listNewClauses = new ArrayList<JSONClause>();
+						for (Iterator<JSONClause> iterator = bodyRequest.getClauses().iterator(); iterator.hasNext();){
+							JSONClause clause = iterator.next();
+							boolean clauseTrovata = existsClause(rest.getClauseVariable(), clause);
+							if (!clauseTrovata){
+								listNewClauses.add(clause);
 							} else {
-								bodyRequest.setClauses(null);
+								listClausesDeleted.add(clause);
 							}
 						}
-						//						}
-					body = 	proxyService.prepareBodyForRest(bodyRequest, new ObjectMapper());
+						if (listNewClauses != null && !listNewClauses.isEmpty()){
+							bodyRequest.setClauses(listNewClauses);
+						} else {
+							bodyRequest.setClauses(null);
+						}
+					}
+					//						}
 					ResultCacheProxy resultCacheProxy = new ResultCacheProxy();
 					resultCacheProxy.setListClausesDeleted(listClausesDeleted);
 					resultCacheProxy.setRestService(restService);
 					resultCacheProxy.setUrlToCache(isUrlToCache);
-					resultCacheProxy.setBody(body);
+					resultCacheProxy.setBody(bodyRequest);
 					return resultCacheProxy;
-					} catch (JsonParseException e) {
-						e.printStackTrace();
-						throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
-					} catch (JsonMappingException e) {
-						e.printStackTrace();
-						throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
-					} catch (IOException e) {
-						e.printStackTrace();
-						throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
-					}
 				}
 			} 
 		}

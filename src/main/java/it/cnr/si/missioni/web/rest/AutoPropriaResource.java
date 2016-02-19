@@ -8,7 +8,7 @@ import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.service.AutoPropriaService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.missioni.util.SecurityUtils;
 
 import java.security.Principal;
 import java.util.List;

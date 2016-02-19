@@ -8,7 +8,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.missioni.util.SecurityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

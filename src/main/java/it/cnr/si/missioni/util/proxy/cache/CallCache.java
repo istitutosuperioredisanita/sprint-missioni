@@ -1,15 +1,17 @@
 package it.cnr.si.missioni.util.proxy.cache;
 
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
+
 import java.io.Serializable;
 
 import org.springframework.http.HttpMethod;
 
 public class CallCache implements Serializable {
 	private HttpMethod httpMethod;
-	private String body;
+	private JSONBody body;
 	private String app;
 	private String classeJson;
-	public CallCache(HttpMethod httpMethod, String body, String app,
+	public CallCache(HttpMethod httpMethod, JSONBody body, String app,
 			String url, String queryString, String authorization, String classeJson) {
 		super();
 		this.httpMethod = httpMethod;
@@ -29,10 +31,10 @@ public class CallCache implements Serializable {
 	public void setHttpMethod(HttpMethod httpMethod) {
 		this.httpMethod = httpMethod;
 	}
-	public String getBody() {
+	public JSONBody getBody() {
 		return body;
 	}
-	public void setBody(String body) {
+	public void setBody(JSONBody body) {
 		this.body = body;
 	}
 	public String getApp() {
@@ -67,7 +69,7 @@ public class CallCache implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "CallCache [httpMethod=" + httpMethod + ", body=" + body
+		return "CallCache [httpMethod=" + httpMethod + ", body=" + body.toString()
 				+ ", app=" + app + ", classeJson=" + classeJson + ", url="
 				+ url + ", queryString=" + queryString + ", authorization="
 				+ authorization + "]";

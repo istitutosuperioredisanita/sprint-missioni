@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.cmis;
 
+import it.cnr.si.config.AlfrescoConfiguration;
 import it.cnr.si.missioni.cmis.acl.ACLType;
 import it.cnr.si.missioni.cmis.acl.Permission;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -14,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,18 +29,11 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
-import org.apache.chemistry.opencmis.client.api.SessionFactory;
-import org.apache.chemistry.opencmis.client.bindings.CmisBindingFactory;
 import org.apache.chemistry.opencmis.client.bindings.impl.CmisBindingsHelper;
-import org.apache.chemistry.opencmis.client.bindings.impl.SessionImpl;
-import org.apache.chemistry.opencmis.client.bindings.spi.AbstractAuthenticationProvider;
 import org.apache.chemistry.opencmis.client.bindings.spi.BindingSession;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
-import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
-import org.apache.chemistry.opencmis.client.util.OperationContextUtils;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
@@ -61,6 +54,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
@@ -68,16 +62,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 @Component
 public class MissioniCMISService {
-	private static String REPOSITORY_URL = "repository.base.url";
-	private static String CHEMISTRY_ATOMPUB_URL = "org.apache.chemistry.opencmis.binding.atompub.url";
-	private static String CHEMISTRY_TYPE = "org.apache.chemistry.opencmis.binding.spi.type";
-	private static String CHEMISTRY_CONN_TIMEOUT = "org.apache.chemistry.opencmis.binding.connecttimeout";
-	private static String CHEMISTRY_READ_TIMEOUT = "org.apache.chemistry.opencmis.binding.readtimeout";
-	private static String CHEMISTRY_HTTP_CLASSNAME = "org.apache.chemistry.opencmis.binding.httpinvoker.classname";
-	private static String USERNAME = "user.admin.username";
-	private static String PASSWORD = "user.admin.password";
-	private static String ROOT_CONFIGURATION_CMIS = "spring.cmis.";
-	
 	private transient static final Log logger = LogFactory.getLog(MissioniCMISService.class);
 
 //	@Autowired
@@ -85,12 +69,6 @@ public class MissioniCMISService {
 
 	@Autowired
 	private ApplicationContext appContext;
-	
-	@Inject	
-	private Environment env;
-
-	private RelaxedPropertyResolver propertyResolver;	
-	
 	
 	public static final String ASPECT_TITLED = "P:cm:titled",
 			ASPECT_FLUSSO = "P:wfcnr:parametriFlusso",
@@ -105,103 +83,21 @@ public class MissioniCMISService {
 			PROPERTY_FOLDER = "cmis:folder",
 			PATH_SERVICE_PERMISSIONS = "service/cnr/nodes/permissions/";
 
+	@Value("${cmis.alfresco}")
 	private String baseURL;
-	private Map<String, String> serverParameters = new HashMap<String, String>();
-	
-	protected Session missioniSession;
-	protected BindingSession missioniBindingSession;
-	
+
+    @Autowired
+    private Session session;
+
+    @Autowired
+    private BindingSession bindingSession;
+
+    @Autowired
+    private AlfrescoConfiguration alfrescoConfiguration;
+
 	public void setBaseURL(String baseURL) {
 		this.baseURL = baseURL;
 	}
-
-	public void setServerParameters(Map<String, String> serverParameters) {
-		this.serverParameters = serverParameters;
-	}
-
-	@PostConstruct
-	public void init(){
-    	loadCMISConfiguration();
-
-    	missioniSession = createSession();
-		OperationContext operationContext = OperationContextUtils.createMaximumOperationContext();
-		operationContext.setMaxItemsPerPage(Integer.MAX_VALUE);
-		missioniSession.setDefaultContext(operationContext);
-		missioniBindingSession = createBindingSession();
-	}
-
-	private void loadCMISConfiguration() {
-		this.propertyResolver = new RelaxedPropertyResolver(env, ROOT_CONFIGURATION_CMIS);
-    	if (propertyResolver != null && propertyResolver.getProperty(REPOSITORY_URL) != null) {
-    		baseURL = propertyResolver.getProperty(REPOSITORY_URL);
-    		serverParameters.put(CHEMISTRY_ATOMPUB_URL, baseURL+propertyResolver.getProperty(CHEMISTRY_ATOMPUB_URL));
-    		serverParameters.put(CHEMISTRY_TYPE, propertyResolver.getProperty(CHEMISTRY_TYPE));
-    		serverParameters.put(CHEMISTRY_CONN_TIMEOUT, propertyResolver.getProperty(CHEMISTRY_CONN_TIMEOUT));
-    		serverParameters.put(CHEMISTRY_READ_TIMEOUT, propertyResolver.getProperty(CHEMISTRY_READ_TIMEOUT));
-    		serverParameters.put(CHEMISTRY_HTTP_CLASSNAME, propertyResolver.getProperty(CHEMISTRY_HTTP_CLASSNAME));
-    		serverParameters.put(USERNAME, propertyResolver.getProperty(USERNAME));
-    		serverParameters.put(PASSWORD, propertyResolver.getProperty(PASSWORD));
-    	}
-	}
-
-    private Session createSession(){
-    	return createSession(serverParameters.get(USERNAME), serverParameters.get(PASSWORD));
-    }
-
-    private Session createSession(String userName, String password){
-    	SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
-        Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.putAll(serverParameters);
-        sessionParameters.put(SessionParameter.USER, userName);
-        sessionParameters.put(SessionParameter.PASSWORD, password);
-
-        sessionParameters.put(SessionParameter.REPOSITORY_ID, sessionFactory.getRepositories(sessionParameters).get(0).getId());
-        sessionParameters.put(SessionParameter.LOCALE_ISO3166_COUNTRY, Locale.ITALY.getCountry());
-        sessionParameters.put(SessionParameter.LOCALE_ISO639_LANGUAGE, Locale.ITALY.getLanguage());
-        sessionParameters.put(SessionParameter.LOCALE_VARIANT, Locale.ITALY.getVariant());
-
-    	return sessionFactory.createSession(sessionParameters);
-    }
-
-	private BindingSession createBindingSession(){
-    	BindingSession session = new SessionImpl();
-        if (serverParameters == null){
-            return null;
-        }
-        Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.putAll(serverParameters);
-        sessionParameters.put(SessionParameter.USER, serverParameters.get(USERNAME));
-        sessionParameters.put(SessionParameter.PASSWORD, serverParameters.get(PASSWORD));
-        if (!sessionParameters.containsKey(SessionParameter.AUTHENTICATION_PROVIDER_CLASS)) {
-            sessionParameters.put(SessionParameter.AUTHENTICATION_PROVIDER_CLASS, CmisBindingFactory.STANDARD_AUTHENTICATION_PROVIDER);
-        }
-        sessionParameters.put(SessionParameter.AUTH_HTTP_BASIC, "true");
-        sessionParameters.put(SessionParameter.AUTH_SOAP_USERNAMETOKEN, "false");
-        for (Map.Entry<String, String> entry : sessionParameters.entrySet()) {
-            session.put(entry.getKey(), entry.getValue());
-        }
-        // create authentication provider and add it session
-        String authProvider = sessionParameters.get(SessionParameter.AUTHENTICATION_PROVIDER_CLASS);
-        if (authProvider != null) {
-            Object authProviderObj = null;
-
-            try {
-                authProviderObj = Class.forName(authProvider).newInstance();
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Could not load authentication provider: " + e, e);
-            }
-
-            if (!(authProviderObj instanceof AbstractAuthenticationProvider)) {
-                throw new IllegalArgumentException(
-                        "Authentication provider does not extend AbstractAuthenticationProvider!");
-            }
-
-            session.put(CmisBindingsHelper.AUTHENTICATION_PROVIDER_OBJECT,
-                    (AbstractAuthenticationProvider) authProviderObj);
-            ((AbstractAuthenticationProvider) authProviderObj).setSession(session);
-        }
-    	return session;
-    }
 
 	public void makeVersionable(CmisObject node){
 		addAutoVersion((Document) node, false);
@@ -240,15 +136,15 @@ public class MissioniCMISService {
 	}
 
 	public CmisObject getNodeByPath(String path){
-		return missioniSession.getObjectByPath(path);
+		return session.getObjectByPath(path);
 	}
 	
 	public CmisObject getNodeByNodeRef(String nodeRef){
-		return missioniSession.getObject(nodeRef);
+		return session.getObject(nodeRef);
 	}
 
 	public CmisObject getNodeByNodeRef(String nodeRef, UsernamePasswordCredentials usernamePasswordCredentials){
-		return createSession(usernamePasswordCredentials.getUserName(), usernamePasswordCredentials.getPassword()).getObject(nodeRef);
+		return session.getObject(nodeRef);
 	}
 	
 	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, String folderName){
@@ -273,7 +169,7 @@ public class MissioniCMISService {
 		CmisObject cmisObject = getNodeByPath(cmisPath);
 		try{
 			metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspectsToAdd);
-			Folder folder = (Folder) getNodeByNodeRef(missioniSession.createFolder(metadataProperties, cmisObject).getId());
+			Folder folder = (Folder) getNodeByNodeRef(session.createFolder(metadataProperties, cmisObject).getId());
 			return CmisPath.construct(folder.getPath());
 		}catch(CmisContentAlreadyExistsException _ex){
 				Folder folder = (Folder) getNodeByPath(cmisPath.getPath()+(cmisPath.getPath().equals("/")?"":"/")+sanitizeFilename(folderName).toLowerCase());
@@ -292,7 +188,7 @@ public class MissioniCMISService {
 		if (cmisObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER))
 			((Folder)cmisObject).deleteTree(true, UnfileObject.DELETE, false);
 		else	
-			missioniSession.delete(cmisObject);
+			session.delete(cmisObject);
 	}
 	
 	public InputStream getResource(CmisObject cmisObject){
@@ -324,11 +220,11 @@ public class MissioniCMISService {
 					contentType,
 					inputStream);			
 			Document node = (Document) getNodeByNodeRef(
-					missioniSession.createDocument(metadataProperties, parentNode, contentStream, VersioningState.MAJOR).getId());
+					session.createDocument(metadataProperties, parentNode, contentStream, VersioningState.MAJOR).getId());
 			if (permissions.length > 0 ){
-				setInheritedPermission(missioniBindingSession, node.getProperty(ALFCMIS_NODEREF).getValueAsString(), Boolean.FALSE);
+				setInheritedPermission(bindingSession, node.getProperty(ALFCMIS_NODEREF).getValueAsString(), Boolean.FALSE);
 				if (permissions != null && permissions.length > 0) {
-					addAcl(missioniBindingSession, node.getProperty(ALFCMIS_NODEREF).getValueAsString(), Permission.convert(permissions));
+					addAcl(bindingSession, node.getProperty(ALFCMIS_NODEREF).getValueAsString(), Permission.convert(permissions));
 				}
 			}
 			if (makeVersionable)
@@ -385,7 +281,7 @@ public class MissioniCMISService {
 		try {
 			if (node.getBaseTypeId().equals(BaseTypeId.CMIS_DOCUMENT)) {
 				node = ((Document)node).getObjectOfLatestVersion(false);
-				node = missioniSession.getObject(node);
+				node = session.getObject(node);
 				node.refresh();
 			}
 			node.updateProperties(metadataProperties, true);
@@ -414,11 +310,11 @@ public class MissioniCMISService {
 	}
 	
 	public ItemIterable<QueryResult> search(StringBuffer query){
-		return search(query, missioniSession.getDefaultContext());
+		return search(query, session.getDefaultContext());
 	}
 
 	public ItemIterable<QueryResult> search(StringBuffer query, OperationContext operationContext){
-		return missioniSession.query(query.toString(), false, operationContext);
+		return session.query(query.toString(), false, operationContext);
 	}
 	
 	public List<CmisObject> searchAndFetchNode(StringBuffer query){
@@ -448,7 +344,7 @@ public class MissioniCMISService {
 	}
 	
 	public void setInheritedPermission(CmisPath cmisPath, Boolean inheritedPermission){
-		setInheritedPermission(missioniBindingSession, getNodeByPath(cmisPath).getProperty(ALFCMIS_NODEREF).getValueAsString(), inheritedPermission);
+		setInheritedPermission(bindingSession, getNodeByPath(cmisPath).getProperty(ALFCMIS_NODEREF).getValueAsString(), inheritedPermission);
 	}
 		
 	private void setInheritedPermission(BindingSession cmisSession,
@@ -521,7 +417,7 @@ public class MissioniCMISService {
 				"service/api/metadata/node/");
 		link = link.concat(doc.getProperty(ALFCMIS_NODEREF).getValueAsString().replace(":/", ""));
 		UrlBuilder url = new UrlBuilder(link);
-		Response resp = CmisBindingsHelper.getHttpInvoker(missioniBindingSession).invokePOST(url,
+		Response resp = CmisBindingsHelper.getHttpInvoker(bindingSession).invokePOST(url,
 				MimeTypes.JSON.mimetype(), new Output() {
 					public void write(OutputStream out) throws Exception {
 						JSONObject jsonObject = new JSONObject();
@@ -532,7 +428,7 @@ public class MissioniCMISService {
 						jsonObject.put("properties", jsonObjectProp);
 						out.write(jsonObject.toString().getBytes());
 					}
-				}, missioniBindingSession);
+				}, bindingSession);
 		int status = resp.getResponseCode();
 		if (status == HttpStatus.SC_NOT_FOUND
 				|| status == HttpStatus.SC_BAD_REQUEST
@@ -542,29 +438,29 @@ public class MissioniCMISService {
 	}
 
 	public Response invokeGET(UrlBuilder url) {
-		return CmisBindingsHelper.getHttpInvoker(missioniBindingSession).invokeGET(url, missioniBindingSession);		
+		return CmisBindingsHelper.getHttpInvoker(bindingSession).invokeGET(url, bindingSession);		
 	}
 	 
 	public Response invokePOST(UrlBuilder url, MimeTypes mimeType, final byte[] content) {
 		if (logger.isDebugEnabled())
 			logger.debug("Invoke URL:" + url);
-		return CmisBindingsHelper.getHttpInvoker(missioniBindingSession).invokePOST(url, mimeType.mimetype(),
+		return CmisBindingsHelper.getHttpInvoker(bindingSession).invokePOST(url, mimeType.mimetype(),
 				new Output() {
 					public void write(OutputStream out) throws Exception {
             			out.write(content);
             		}
-        		}, missioniBindingSession);
+        		}, bindingSession);
 	}
 
 	public Response invokePUT(UrlBuilder url, MimeTypes mimeType, final byte[] content, Map<String, String> headers) {
 		if (logger.isDebugEnabled())
 			logger.debug("Invoke URL:" + url);
-		return CmisBindingsHelper.getHttpInvoker(missioniBindingSession).invokePUT(url, mimeType.mimetype(), headers, 
+		return CmisBindingsHelper.getHttpInvoker(bindingSession).invokePUT(url, mimeType.mimetype(), headers, 
 				new Output() {
 					public void write(OutputStream out) throws Exception {
             			out.write(content);
             		}
-        		}, missioniBindingSession);
+        		}, bindingSession);
 	}
 
     public String recuperoNodeRefUtente(String username){
