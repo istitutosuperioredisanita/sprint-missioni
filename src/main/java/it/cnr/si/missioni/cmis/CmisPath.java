@@ -13,10 +13,14 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class CmisPath {
 	
-	@Value("${spring.cmis.folder_path}")
+	private final String CMIS_YML = "cmis";
+	private final String FOLDER_PATH_YML = "folder_path";
+	private final String FOLDER_PATH_CONFIG_YML = "folder_path_config";
+	
+	@Value("${cmis.folder_path}")
 	private String path;
 
-	@Value("${spring.cmis.folder_path_config}")
+	@Value("${cmis.folder_path_config}")
 	private String folderConfig;
 
 	@Autowired
@@ -56,12 +60,12 @@ public class CmisPath {
 	
 	@PostConstruct
 	public void init(){
-		this.propertyResolver = new RelaxedPropertyResolver(env, "spring.cmis.");
-    	if (propertyResolver != null && propertyResolver.getProperty("folder_path") != null) {
-    		path = propertyResolver.getProperty("folder_path");
+		this.propertyResolver = new RelaxedPropertyResolver(env, CMIS_YML+".");
+    	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_YML) != null) {
+    		path = propertyResolver.getProperty(FOLDER_PATH_YML);
     	}
-    	if (propertyResolver != null && propertyResolver.getProperty("folder_path_config") != null) {
-    		folderConfig = propertyResolver.getProperty("folder_path_config");
+    	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_CONFIG_YML) != null) {
+    		folderConfig = propertyResolver.getProperty(FOLDER_PATH_CONFIG_YML);
     	}
 	}
 

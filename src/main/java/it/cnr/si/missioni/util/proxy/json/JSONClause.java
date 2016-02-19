@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.util.proxy.json;
 
-public class JSONClause {
+import java.io.Serializable;
+
+public class JSONClause  implements Serializable{
 	private String condition;
 	private String fieldName;
 	private String operator;

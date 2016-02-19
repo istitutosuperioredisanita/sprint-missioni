@@ -19,12 +19,12 @@ spring:
         livereload:
             enabled: false
     datasource:
-        dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
-        url: 
+        driver-class-name: org.postgresql.ds.PGSimpleDataSource
+        url: jdbc:postgresql://as2dock.si.cnr.it:54321/missioni
         databaseName: missioni
-        serverName: localhost
+        name: missioni
         username: missioni
-        password: 
+        password: missioni
     jpa:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         database: POSTGRESQL
@@ -67,18 +67,6 @@ spring:
         url: ldap://virtest1.si.cnr.it:389
         managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
         managerPassword: pippa
-    cmis:
-        repository.base.url: http://as1dock.si.cnr.it:8080/alfresco/
-        org.apache.chemistry.opencmis.binding.atompub.url: api/-default-/public/cmis/versions/1.1/atom
-        org.apache.chemistry.opencmis.binding.spi.type: atompub
-        org.apache.chemistry.opencmis.binding.connecttimeout: 50000
-        org.apache.chemistry.opencmis.binding.readtimeout: 3000000
-        org.apache.chemistry.opencmis.binding.httpinvoker.classname: org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker
-
-        user.admin.username: app.missioni
-        user.admin.password: bubbazza
-        folder_path: /Missioni
-        folder_path_config: /Config
     thymeleaf:
         cache: true
     print:
@@ -133,3 +121,15 @@ info:
     app:
         name: missioni
         version: @project.version@
+cmis:
+    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
+    url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
+    username: app.missioni
+    password: bubbazza
+    maxItemsPerPage: 10
+    folder_path: /Missioni
+    folder_path_config: /Config
+
+cache:
+    init_cache: true
+    hazelcast.packages: it.cnr.si.missioni.domain.*,it.cnr.si.missioni.service.*
