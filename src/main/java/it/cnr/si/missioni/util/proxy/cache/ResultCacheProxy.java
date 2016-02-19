@@ -1,16 +1,15 @@
 package it.cnr.si.missioni.util.proxy.cache;
 
 import it.cnr.si.missioni.util.proxy.cache.json.RestService;
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
-import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
-import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 
 import java.util.List;
 
 public class ResultCacheProxy {
 	List<JSONClause> listClausesDeleted;
 	RestService restService;
-	String body;
+	JSONBody body;
 	boolean isUrlToCache;
 	public List<JSONClause> getListClausesDeleted() {
 		return listClausesDeleted;
@@ -30,10 +29,10 @@ public class ResultCacheProxy {
 	public void setUrlToCache(boolean isUrlToCache) {
 		this.isUrlToCache = isUrlToCache;
 	}
-	public String getBody() {
+	public JSONBody getBody() {
 		return body;
 	}
-	public void setBody(String body) {
+	public void setBody(JSONBody body) {
 		this.body = body;
 	}
 

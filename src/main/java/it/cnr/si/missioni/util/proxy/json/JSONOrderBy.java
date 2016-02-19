@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.util.proxy.json;
 
-public class JSONOrderBy {
+import java.io.Serializable;
+
+public class JSONOrderBy implements Serializable{
 	public JSONOrderBy(String name, String type) {
 		super();
 		this.name = name;

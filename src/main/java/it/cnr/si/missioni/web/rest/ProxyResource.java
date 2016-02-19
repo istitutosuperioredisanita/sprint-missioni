@@ -11,12 +11,13 @@ import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.cache.ResultCacheProxy;
 import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.missioni.util.SecurityUtils;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +58,7 @@ public class ProxyResource {
     private CacheService cacheService;
     
     @RequestMapping(method = RequestMethod.GET,
-            produces = MediaType.ALL_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed(AuthoritiesConstants.USER)
     public ResponseEntity<String> get(@PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
@@ -66,9 +67,10 @@ public class ProxyResource {
     }
 
     @RequestMapping(method = RequestMethod.POST,
-            produces = MediaType.ALL_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed(AuthoritiesConstants.USER)
-    public ResponseEntity<String> post(@RequestBody String body, @PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> post(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
     		log.debug("POST from app: " + app + " with proxyURL: " + url);
     	try {
@@ -81,7 +83,7 @@ public class ProxyResource {
     @RequestMapping(method = RequestMethod.PUT,
             produces = MediaType.ALL_VALUE)
     @RolesAllowed(AuthoritiesConstants.USER)    
-    public ResponseEntity<String> put(@RequestBody String body, @PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> put(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
     		log.debug("PUT from app: " + app + " with proxyURL: " + url);
     	try {
@@ -102,7 +104,7 @@ public class ProxyResource {
     	return process(HttpMethod.DELETE, null, app, url, request, response);
     }
     
-    private ResponseEntity<String> process(HttpMethod httpMethod, String body, String app, String url, HttpServletRequest request, HttpServletResponse response) {
+    private ResponseEntity<String> process(HttpMethod httpMethod, JSONBody body, String app, String url, HttpServletRequest request, HttpServletResponse response) {
 		ResultProxy result = null;
 		ResultCacheProxy resultCacheProxy = cacheService.manageCache(url, body);
 		String existsClauseVariable = existsClauseVariable(resultCacheProxy);

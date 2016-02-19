@@ -7,7 +7,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.DatiPatente;
 import it.cnr.si.missioni.service.DatiPatenteService;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.missioni.util.SecurityUtils;
 
 import java.security.Principal;
 

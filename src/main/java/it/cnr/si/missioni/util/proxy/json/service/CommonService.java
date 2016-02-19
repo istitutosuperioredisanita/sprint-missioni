@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
 public class CommonService {
 
@@ -60,9 +58,7 @@ public class CommonService {
 			JSONBody jBody = null;
 			jBody = proxyService.inizializzaJson();
 			jBody.setClauses(clauses);
-			ObjectMapper mapper = new ObjectMapper();
-			String body = proxyService.prepareBodyForRest(jBody, mapper);
-			ResultProxy result = proxyService.process(HttpMethod.POST, body, app, url, "proxyURL="+url, null);
+			ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null);
 			risposta = result.getBody();
 		}
 		return risposta;

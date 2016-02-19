@@ -35,7 +35,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
 
 /**
  * Service for proxy to other application.
@@ -102,7 +101,7 @@ public class ProxyService implements EnvironmentAware{
     	return resultProxy;
 	}
     
-    public ResultProxy process(HttpMethod httpMethod, String body, String app, String url, String queryString, String authorization) {
+    public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization) {
         log.debug("REST request from app ", app);
         String appUrl = propertyResolver.getProperty(app + ".url");
         if (appUrl == null) {
@@ -126,29 +125,29 @@ public class ProxyService implements EnvironmentAware{
         	
         	String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
         	if (!StringUtils.isEmpty(uoContext)){
-        		try {
-        			ObjectMapper mapper = new ObjectMapper();
-            		JSONBody jsonBody = mapper.readValue(body, JSONBody.class);
-            		Context context = jsonBody.getContext();
-            		if (context == null){
-                		context = new Context();
-            		}
-            		if (StringUtils.isEmpty(context.getCd_unita_organizzativa())){
-                		context.setCd_unita_organizzativa(uoContext);
-            		}
-            		if (StringUtils.isEmpty(context.getCd_cds())){
-                		context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
-            		}
-            		if (StringUtils.isEmpty(context.getCd_cdr())){
-                		context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
-            		}
-            		jsonBody.setContext(context);
-        			body = mapper.writeValueAsString(jsonBody);
-        		} catch (Exception ex) {
-        			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+        		Context context = jsonBody.getContext();
+        		if (context == null){
+        			context = new Context();
         		}
+        		if (StringUtils.isEmpty(context.getCd_unita_organizzativa())){
+        			context.setCd_unita_organizzativa(uoContext);
+        		}
+        		if (StringUtils.isEmpty(context.getCd_cds())){
+        			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
+        		}
+        		if (StringUtils.isEmpty(context.getCd_cdr())){
+        			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
+        		}
+        		jsonBody.setContext(context);
         	}
-        	
+
+    		String body = null;
+        	try {
+        		ObjectMapper mapper = new ObjectMapper();
+        		body = mapper.writeValueAsString(jsonBody);
+        	} catch (Exception ex) {
+        		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+        	}
         	String proxyURL = appUrl.concat(url);
     		if (queryString != null)
     			proxyURL = proxyURL.concat("?").concat(queryString);        	
@@ -178,16 +177,6 @@ public class ProxyService implements EnvironmentAware{
         this.environment = environment;
         this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.proxy.");
         this.restTemplateMap = new HashMap<String, RestTemplate>();
-	}
-
-	public String prepareBodyForRest(JSONBody jBody, ObjectMapper mapper) {
-		String body = null;
-		try {
-			body = mapper.writeValueAsString(jBody);
-		} catch (Exception ex) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella generazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
-		}
-		return body;
 	}
 
 	public JSONBody inizializzaJson() {
