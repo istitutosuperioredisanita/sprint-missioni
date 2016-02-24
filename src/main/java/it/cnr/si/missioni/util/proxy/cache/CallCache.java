@@ -1,10 +1,18 @@
 package it.cnr.si.missioni.util.proxy.cache;
 
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.springframework.http.HttpMethod;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CallCache implements Serializable {
 	private HttpMethod httpMethod;
@@ -69,9 +77,28 @@ public class CallCache implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "CallCache [httpMethod=" + httpMethod + ", body=" + body.toString()
+		String jsonBody = null;
+    	try {
+    		ObjectMapper mapper = new ObjectMapper();
+    		jsonBody = mapper.writeValueAsString(body);
+    	} catch (Exception ex) {
+    		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+    	}
+		return "CallCache [httpMethod=" + httpMethod + ", body=" + jsonBody.toString()
 				+ ", app=" + app + ", classeJson=" + classeJson + ", url="
 				+ url + ", queryString=" + queryString + ", authorization="
 				+ authorization + "]";
+	}
+	public String getMd5() {
+		String objectToString = toString();
+		MessageDigest m = null;
+		try {
+			m = MessageDigest.getInstance("MD5");
+		    m.update(objectToString.getBytes(),0,objectToString.length());
+		    return new BigInteger(1,m.digest()).toString(16);
+		} catch (NoSuchAlgorithmException e) {
+			new AwesomeException("Errore nel recupero dell'algoritmo MD5 "+e.getMessage());
+		}
+		return "";
 	}
 }

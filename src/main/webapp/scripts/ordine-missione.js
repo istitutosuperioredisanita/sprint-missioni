@@ -279,6 +279,37 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     };
 
+    var caricaCdsCompetenza = function(cds, listaCds){
+        if (listaCds){
+            if (listaCds.length === 1){
+                $scope.ordineMissioneModel.cdsCompetenza = $scope.formatResultCds(listaCds[0]);
+            } else {
+                if (cds){
+                    $scope.elencoCdsCompetenza = [];
+                    var ind = 0;
+                    for (var i=0; i<listaCds.length; i++) {
+                        if (listaCds[i].cd_proprio_unita === cds){
+                            $scope.elencoCdsCompetenza[0] = $scope.formatResultCds(listaCds[i]);
+//                            $scope.elencoCds[0].selected = true;
+//                            $scope.elencoCds[0] = listaCds[i];
+                        } else {
+                            ind ++;
+                            $scope.elencoCdsCompetenza[ind] = $scope.formatResultCds(listaCds[i]);
+                        }
+                    }
+                    if ($scope.ordineMissioneModel){
+                        $scope.ordineMissioneModel.cdsCompetenza = cds;
+                    }
+                } else {
+                    $scope.elencoCdsCompetenza = listaCds;
+                }
+            }
+        } else {
+            $scope.elencoCdsCompetenza = [];
+        }
+    
+    };
+
     $scope.restCds = function(anno, cdsRich){
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.CDS;
@@ -287,6 +318,27 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         var objectPostCds = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostCdsOrderBy, clauses:objectPostCdsClauses}
         $http.post(urlRestProxy + app+'/', objectPostCds, {params: {proxyURL: url}}).success(function (data) {
             caricaCds(cdsRich, data.elements);
+        }).error(function (data) {
+                ui.error(data);
+        });
+        var a = 1;
+    }
+
+    $scope.restCdsCompetenza = function(anno, cds){
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.CDS;
+        var objectPostCdsOrderBy = [{name: 'cd_proprio_unita', type: 'ASC'}];
+        var objectPostCdsClauses = [{condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
+        var objectPostCds = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostCdsOrderBy, clauses:objectPostCdsClauses}
+        $http.post(urlRestProxy + app+'/', objectPostCds, {params: {proxyURL: url}}).success(function (data) {
+                if (data){
+                    if (data.elements){
+                        $scope.elencoCdsCompetenza = data.elements;
+                    } else {
+                        $scope.elencoCdsCompetenza = [];
+                    }
+                }
+//            caricaCdsCompetenza(cds, data.elements);
         }).error(function (data) {
                 ui.error(data);
         });
@@ -319,6 +371,24 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 		        $scope.elencoUo = [];
         	}
         });
+    }
+    
+    $scope.restUoCompetenza = function(anno, cds, uo){
+        $scope.elencoUoCompetenza = [];
+        if (cds){
+            var uos = ProxyService.getUos(anno, cds, uo).then(function(result){
+                if (result && result.data){
+                    $scope.elencoUoCompetenza = result.data.elements;
+                    if ($scope.elencoUoCompetenza){
+                        if ($scope.elencoUoCompetenza.length === 1){
+                            $scope.ordineMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0];
+                        }
+                    }
+                } else {
+                    $scope.elencoUoCompetenza = [];
+                }
+            });
+        }
     }
     
     $scope.restCdr = function(uo){
@@ -544,6 +614,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
       $scope.restUo($scope.ordineMissioneModel.anno, cds, $scope.ordineMissioneModel.uoRich);
     }
 
+    $scope.reloadCdsCompetenza = function(cds) {
+      $scope.ordineMissioneModel.uoCompetenza = null;
+      $scope.restUoCompetenza($scope.ordineMissioneModel.anno, cds, null);
+    }
+
     $scope.reloadUoWork = function(uo){
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
@@ -658,6 +733,10 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         } else {
             $scope.missioneEstera = null;
         }
+        if ($scope.validazione === 'S') {
+            $scope.ordineMissioneModel.daValidazione = "S";
+        }
+
         dateInizioFineDiverse();
     }
 
@@ -673,7 +752,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
                                         indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
-                                        dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, 
+                                        dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
             uoRich:ProxyService.buildUoRichiedenteSiglaFromUoSiper(account), cdsRich:$scope.estraiCdsRichFromAccount(account)};
         $scope.missioneEstera = null;
@@ -773,7 +852,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.goAutoPropria = function () {
       if ($scope.ordineMissioneModel.id){
-        $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id);
+        $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
       } else {
         ui.error("Per poter inserire i dati dell'auto propria è necessario prima salvare l'ordine di missione");
       }
@@ -781,7 +860,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.goAnticipo = function () {
       if ($scope.ordineMissioneModel.id){
-        $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id);
+        $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
       } else {
         ui.error("Per poter inserire i dati dell'anticipo è necessario prima salvare l'ordine di missione");
       }
@@ -850,6 +929,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     $scope.idMissione = $routeParams.idMissione;
+    $scope.validazione = $routeParams.validazione;
     $scope.accessToken = AccessToken.get();
     $sessionStorage.accountWork = null;
 
@@ -868,17 +948,17 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         }
                     });
                 }
-                if (model){
-                    $scope.restNazioni();
-                    $scope.restCds(model.anno, model.cdsSpesa);
-                    $scope.restUo(model.anno, model.cdsSpesa, model.uoSpesa);
-                    $scope.restCdr(model.uoSpesa);
-                    $scope.restModuli(model.anno, model.uoSpesa);
-                    $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
-                    $scope.restCapitoli(model.anno);
-                    $scope.ordineMissioneModel = model;
-                    $scope.inizializzaFormPerModifica();
-                }
+                $scope.restNazioni();
+                $scope.restCds(model.anno, model.cdsSpesa);
+                $scope.restCdsCompetenza(model.anno, model.cdsCompetenza);
+                $scope.restUo(model.anno, model.cdsSpesa, model.uoSpesa);
+                $scope.restUoCompetenza(model.anno, model.cdsCompetenza, model.uoCompetenza);
+                $scope.restCdr(model.uoSpesa);
+                $scope.restModuli(model.anno, model.uoSpesa);
+                $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
+                $scope.restCapitoli(model.anno);
+                $scope.ordineMissioneModel = model;
+                $scope.inizializzaFormPerModifica();
             }
         });
     } else {

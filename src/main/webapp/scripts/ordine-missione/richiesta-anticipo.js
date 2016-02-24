@@ -8,6 +8,7 @@ missioniApp.factory('RichiestaAnticipoService', function ($resource) {
 
 missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, RichiestaAnticipoService, ElencoOrdiniMissioneService, ui, COSTANTI, AccessToken) {
     
+    $scope.validazione = $routeParams.validazione;
     $scope.idOrdineMissione = $routeParams.idOrdineMissione;
     $scope.accessToken = AccessToken.get();
     $scope.accountModel = $sessionStorage.accountWork;

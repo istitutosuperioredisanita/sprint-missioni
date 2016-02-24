@@ -13,6 +13,7 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
@@ -42,7 +43,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
+import net.bzdyl.ejb3.criteria.Criterion;
 import net.bzdyl.ejb3.criteria.Order;
+import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
 
 import org.apache.commons.io.IOUtils;
@@ -72,6 +75,9 @@ public class OrdineMissioneService {
 
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
+
+    @Autowired
+    private UoService uoService;
 
     @Inject
     private UnitaOrganizzativaService unitaOrganizzativaService;
@@ -217,7 +223,11 @@ public class OrdineMissioneService {
         			}
     			} else {
     				if (ordineMissione.isMissioneInserita()){
-    					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_CONFERMARE_PER_HOME);
+    					if (ordineMissione.isMissioneDaValidare()){
+        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
+    					} else {
+        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_CONFERMARE_PER_HOME);
+    					}
     					listaNew.add(ordineMissione);
     				}
     			}
@@ -290,11 +300,28 @@ public class OrdineMissioneService {
 				if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
 					if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
 						isUserSpecial = true;
+						boolean esisteUoConValidazioneConUserNonAbilitato = false;
+						Disjunction condizioneOr = Restrictions.disjunction();
 						List<String> listaUoUtente = new ArrayList<String>();
-				    	for (UoForUsersSpecial uo : userSpecial.getUoForUsersSpecials()){
-				    		listaUoUtente.add(uo.getCodice_uo().substring(0,3)+"."+uo.getCodice_uo().substring(3,6));
+				    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
+				    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
+				    		if (uo != null){
+					    		listaUoUtente.add(getUoSigla(uoUser));
+					    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
+					    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
+						    			condizioneOr.add(Restrictions.eq("uoRich", getUoSigla(uoUser)));
+						    		} else {
+						    			esisteUoConValidazioneConUserNonAbilitato = true;
+						    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", getUoSigla(uoUser))).add(Restrictions.eq("validato", "S")));
+					    			}
+					    		}
+				    		}
 				    	}
-						criterionList.add(Restrictions.in("uoRich", listaUoUtente));
+				    	if (esisteUoConValidazioneConUserNonAbilitato){
+					    	criterionList.add(condizioneOr);
+				    	} else {
+					    	criterionList.add(Restrictions.in("uoRich", listaUoUtente));
+				    	}
 					} else {
 						criterionList.add(Restrictions.eq("uid", principal.getName()));
 					}
@@ -308,7 +335,10 @@ public class OrdineMissioneService {
 		List<OrdineMissione> ordineMissioneList=null;
 		if (isServiceRest) {
 			if (isForValidateFlows){
-				criterionList.add(Restrictions.conjunction().add(Restrictions.disjunction().add(Restrictions.eq("statoFlusso", Costanti.STATO_INVIATO_FLUSSO)).add(Restrictions.disjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
+				List<String> listaStatiFlusso = new ArrayList<String>();
+				listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+				listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
+				criterionList.add(Restrictions.conjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.disjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 			}
 			ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"));
 		} else
@@ -316,6 +346,10 @@ public class OrdineMissioneService {
 
 		return ordineMissioneList;
     }
+
+	private String getUoSigla(UoForUsersSpecial uo) {
+		return uo.getCodice_uo().substring(0,3)+"."+uo.getCodice_uo().substring(3,6);
+	}
 
 //    @Transactional(readOnly = true)
 //    public AutoPropria getAutoPropria(String targa) {
@@ -356,6 +390,14 @@ public class OrdineMissioneService {
     	if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())){
     		ordineMissione.setUtilizzoTaxi("N");
     	}
+    	
+    	Uo uo = uoService.recuperoUo(ordineMissione.getUoRich());
+    	if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("N")){
+    		ordineMissione.setValidato("S");
+    	} else {
+    		ordineMissione.setValidato("N");
+    	}
+    	
     	ordineMissione.setStato(Costanti.STATO_INSERITO);
     	ordineMissione.setStatoFlusso(Costanti.STATO_INSERITO);
     	ordineMissione.setToBeCreated();
@@ -399,36 +441,55 @@ public class OrdineMissioneService {
 			}
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare l'ordine di missione. E' già stato avviato il flusso di approvazione.");
 		}
-		ordineMissioneDB.setStato(ordineMissione.getStato());
-		ordineMissioneDB.setStatoFlusso(ordineMissione.getStatoFlusso());
-		ordineMissioneDB.setCdrSpesa(ordineMissione.getCdrSpesa());
-		ordineMissioneDB.setCdsSpesa(ordineMissione.getCdsSpesa());
-		ordineMissioneDB.setUoSpesa(ordineMissione.getUoSpesa());
-		ordineMissioneDB.setDomicilioFiscaleRich(ordineMissione.getDomicilioFiscaleRich());
-		ordineMissioneDB.setDataInizioMissione(ordineMissione.getDataInizioMissione());
-		ordineMissioneDB.setDataFineMissione(ordineMissione.getDataFineMissione());
-		ordineMissioneDB.setDestinazione(ordineMissione.getDestinazione());
-		ordineMissioneDB.setDistanzaDallaSede(ordineMissione.getDistanzaDallaSede());
-		ordineMissioneDB.setGae(ordineMissione.getGae());
-		ordineMissioneDB.setImportoPresunto(ordineMissione.getImportoPresunto());
-		ordineMissioneDB.setModulo(ordineMissione.getModulo());
-		ordineMissioneDB.setNote(ordineMissione.getNote());
-		ordineMissioneDB.setObbligoRientro(ordineMissione.getObbligoRientro());
-		ordineMissioneDB.setOggetto(ordineMissione.getOggetto());
-		ordineMissioneDB.setPartenzaDa(ordineMissione.getPartenzaDa());
-		ordineMissioneDB.setPriorita(ordineMissione.getPriorita());
-		ordineMissioneDB.setTipoMissione(ordineMissione.getTipoMissione());
-		ordineMissioneDB.setVoce(ordineMissione.getVoce());
-		ordineMissioneDB.setTrattamento(ordineMissione.getTrattamento());
-		ordineMissioneDB.setNazione(ordineMissione.getNazione());
+		
+		if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("S")){
+			if (!ordineMissioneDB.isMissioneDaValidare()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
+			}
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissioneDB.getUoRich())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione.");
+			}
+			
+			if (!confirm){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
+			}
+			ordineMissioneDB.setValidato("S");
+		} else {
+			ordineMissioneDB.setStato(ordineMissione.getStato());
+			ordineMissioneDB.setStatoFlusso(ordineMissione.getStatoFlusso());
+			ordineMissioneDB.setCdrSpesa(ordineMissione.getCdrSpesa());
+			ordineMissioneDB.setCdsSpesa(ordineMissione.getCdsSpesa());
+			ordineMissioneDB.setUoSpesa(ordineMissione.getUoSpesa());
+			ordineMissioneDB.setCdsCompetenza(ordineMissione.getCdsCompetenza());
+			ordineMissioneDB.setUoCompetenza(ordineMissione.getUoCompetenza());
+			ordineMissioneDB.setDomicilioFiscaleRich(ordineMissione.getDomicilioFiscaleRich());
+			ordineMissioneDB.setDataInizioMissione(ordineMissione.getDataInizioMissione());
+			ordineMissioneDB.setDataFineMissione(ordineMissione.getDataFineMissione());
+			ordineMissioneDB.setDestinazione(ordineMissione.getDestinazione());
+			ordineMissioneDB.setDistanzaDallaSede(ordineMissione.getDistanzaDallaSede());
+			ordineMissioneDB.setGae(ordineMissione.getGae());
+			ordineMissioneDB.setImportoPresunto(ordineMissione.getImportoPresunto());
+			ordineMissioneDB.setModulo(ordineMissione.getModulo());
+			ordineMissioneDB.setNote(ordineMissione.getNote());
+			ordineMissioneDB.setObbligoRientro(ordineMissione.getObbligoRientro());
+			ordineMissioneDB.setValidato(ordineMissione.getValidato());
+			ordineMissioneDB.setOggetto(ordineMissione.getOggetto());
+			ordineMissioneDB.setPartenzaDa(ordineMissione.getPartenzaDa());
+			ordineMissioneDB.setPriorita(ordineMissione.getPriorita());
+			ordineMissioneDB.setTipoMissione(ordineMissione.getTipoMissione());
+			ordineMissioneDB.setVoce(ordineMissione.getVoce());
+			ordineMissioneDB.setTrattamento(ordineMissione.getTrattamento());
+			ordineMissioneDB.setNazione(ordineMissione.getNazione());
 
-		ordineMissioneDB.setNoteUtilizzoTaxiNoleggio(ordineMissione.getNoteUtilizzoTaxiNoleggio());
-		ordineMissioneDB.setUtilizzoAutoNoleggio(ordineMissione.getUtilizzoAutoNoleggio());
-		ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
-		ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
-		ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
-		ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
-		ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
+			ordineMissioneDB.setNoteUtilizzoTaxiNoleggio(ordineMissione.getNoteUtilizzoTaxiNoleggio());
+			ordineMissioneDB.setUtilizzoAutoNoleggio(ordineMissione.getUtilizzoAutoNoleggio());
+			ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
+			ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
+			ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
+			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
+			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
+		}
+		
 		
     	if (confirm){
         	ordineMissioneDB.setStato(Costanti.STATO_CONFERMATO);
@@ -439,7 +500,7 @@ public class OrdineMissioneService {
 //		//effettuo controlli di validazione operazione CRUD
 		validaCRUD(principal, ordineMissioneDB);
 
-    	if (confirm){
+    	if (confirm && !ordineMissioneDB.isMissioneDaValidare()){
     		cmisOrdineMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneDB);
     	}
 		ordineMissioneDB = (OrdineMissione)crudServiceBean.modificaConBulk(principal, ordineMissioneDB);
@@ -647,6 +708,8 @@ public class OrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utilizzo auto a noleggio");
 		} else if (StringUtils.isEmpty(ordineMissione.getStato())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Stato");
+		} else if (StringUtils.isEmpty(ordineMissione.getValidato())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Validato");
 		} else if (StringUtils.isEmpty(ordineMissione.getNumero())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Numero");
 		}

@@ -1,5 +1,8 @@
 package it.cnr.si.missioni.service;
 
+import java.util.Iterator;
+import java.util.List;
+
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -35,4 +38,19 @@ public class UoService {
     	return null;
     }
 
+    public Uo recuperoUo(String codiceUo){
+    	DatiUo datiUo = configService.getDatiUo();
+		return recuperoUo(datiUo, codiceUo);
+	}
+
+	public Uo recuperoUo(DatiUo datiUo, String codiceUo) {
+		List<Uo> uos = datiUo.getUo();
+		for (Iterator<Uo> iterator = uos.iterator(); iterator.hasNext();){
+			Uo uo = iterator.next();
+			if (uo != null && uo.getCodiceUo() != null && uo.getCodiceUo().equals(codiceUo)){
+				return uo;
+			}
+		}
+		return null;
+	}
 }

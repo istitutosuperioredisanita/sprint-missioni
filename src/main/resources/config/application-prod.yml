@@ -106,6 +106,10 @@ jhipster:
             host: localhost
             port: 2003
             prefix: sprint
+    security:
+        authentication:
+            oauth:
+                tokenValidityInSeconds: 36000
 
 ajp:
     port: 8009
