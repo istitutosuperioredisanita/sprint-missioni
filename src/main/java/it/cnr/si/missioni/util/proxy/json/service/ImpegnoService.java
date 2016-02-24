@@ -45,7 +45,7 @@ public class ImpegnoService {
 		return null;
 	}
 
-	public List<JSONClause> prepareJSONClause(OrdineMissione ordineMissione) {
+	private List<JSONClause> prepareJSONClause(OrdineMissione ordineMissione) {
 		JSONClause clause = new JSONClause();
 		clause.setFieldName("cdCds");
 		clause.setFieldValue(ordineMissione.getCdsSpesa());

@@ -37,7 +37,8 @@ angular.module('missioniApp')
         startDatetime: '=',
         endDatetime: '=',
         fnChange: '=',
-        idMissione: '='
+        idMissione: '=',
+        disabilitato: '='
       },
       templateUrl: 'views/datetimepicker-range.html',
       link: function(scope, element, attrs) {

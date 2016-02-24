@@ -7,16 +7,15 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneService;
+import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
@@ -43,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -97,6 +95,9 @@ public class CMISOrdineMissioneService {
 	private VoceService voceService;
 
 	@Autowired
+	private UoService uoService;
+
+	@Autowired
 	private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
 	@Autowired
@@ -104,9 +105,6 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private MissioniCMISService missioniCMISService;
-
-	@Autowired
-	private ConfigService configService;
 
 	@Autowired
 	private AccountService accountService;
@@ -138,6 +136,10 @@ public class CMISOrdineMissioneService {
 		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), null);
 		Voce voce = voceService.loadVoce(ordineMissione);
 		Gae gae = gaeService.loadGae(ordineMissione);
+		UnitaOrganizzativa uoCompetenza = null;
+		if (ordineMissione.getUoCompetenza() != null){
+			uoCompetenza = unitaOrganizzativaService.loadUo(ordineMissione.getUoCompetenza(), null, ordineMissione.getAnno());
+		}
 		UnitaOrganizzativa uoSpesa = unitaOrganizzativaService.loadUo(ordineMissione.getUoSpesa(), null, ordineMissione.getAnno());
 		UnitaOrganizzativa uoRich = unitaOrganizzativaService.loadUo(ordineMissione.getUoRich(), null, ordineMissione.getAnno());
 		String descrImpegno = ""; 
@@ -156,18 +158,22 @@ public class CMISOrdineMissioneService {
 
 		//		String userNameFirmatario = ldapService.getUid(attestato.getSede().getMatricolaDirettoreSede());
 
-		DatiUo datiUo = configService.getDatiUo();
+		String uoCompetenzaPerFlusso = Utility.replace(ordineMissione.getUoCompetenza(), ".", "");
 		String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
 		
-		String userNameFirmatario = recuperoUidDirettoreUo(datiUo, uoRichPerFlusso);
+		String userNameFirmatario = recuperoUidDirettoreUo(uoRichPerFlusso);
 
-		Uo uoDatiSpesa = recuperoUo(datiUo, uoSpesaPerFlusso);
+		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 		String userNameFirmatarioSpesa = null;
 		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-			userNameFirmatarioSpesa = userNameFirmatario;
+			if (uoCompetenzaPerFlusso != null){
+				userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoCompetenzaPerFlusso);
+			} else {
+				userNameFirmatarioSpesa = userNameFirmatario;
+			}
 		} else {
-			userNameFirmatarioSpesa = recuperoUidDirettoreUo(datiUo, uoSpesaPerFlusso);
+			userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoSpesaPerFlusso);
 		}
 		
 
@@ -190,6 +196,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setDescrizioneModulo(progetto == null ? "" : progetto.getDs_progetto());
 		cmisOrdineMissione.setDescrizioneUoOrdine(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
+		cmisOrdineMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDisponibilita(dispImpegno);
 		cmisOrdineMissione.setGae(gae == null ? "" : gae.getDs_linea_attivita());
 		cmisOrdineMissione.setImpegnoAnnoCompetenza(ordineMissione.getEsercizioObbligazione() == null ? null : new Long(ordineMissione.getEsercizioObbligazione()));
@@ -204,6 +211,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "true" : "false");
 		cmisOrdineMissione.setUoOrdine(uoRichPerFlusso);
 		cmisOrdineMissione.setUoSpesa(uoSpesaPerFlusso);
+		cmisOrdineMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
 		cmisOrdineMissione.setUserNameFirmatarioSpesa(userNameFirmatarioSpesa);
 		cmisOrdineMissione.setUserNamePrimoFirmatario(userNameFirmatario);
 		cmisOrdineMissione.setUserNameResponsabileModulo("");
@@ -307,8 +315,8 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
-	private String recuperoUidDirettoreUo(DatiUo datiUo, String codiceUo){
-		Uo uo = recuperoUo(datiUo, codiceUo);
+	private String recuperoUidDirettoreUo(String codiceUo){
+		Uo uo = uoService.recuperoUo(codiceUo);
 		return recuperoUidDirettoreUo(codiceUo, uo);
 	}
 
@@ -319,17 +327,6 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private Uo recuperoUo(DatiUo datiUo, String codiceUo){
-		List<Uo> uos = datiUo.getUo();
-		for (Iterator<Uo> iterator = uos.iterator(); iterator.hasNext();){
-			Uo uo = iterator.next();
-			if (uo != null && uo.getCodiceUo() != null && uo.getCodiceUo().equals(codiceUo)){
-				return uo;
-			}
-		}
-		return null;
-	}
-	
 	public Map<String, Object> createMetadataForFileOrdineMissione(String currentLogin, CMISOrdineMissione cmisOrdineMissione){
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
@@ -452,6 +449,8 @@ public class CMISOrdineMissioneService {
 				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisOrdineMissione.getDescrizioneUoOrdine());
 				 jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisOrdineMissione.getUoSpesa());
 				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisOrdineMissione.getDescrizioneUoSpesa());
+				 jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisOrdineMissione.getUoCompetenza());
+				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisOrdineMissione.getDescrizioneUoCompetenza());
 				 jGenerator.writeStringField("prop_cnrmissioni_autoPropriaFlag" , cmisOrdineMissione.getAutoPropriaFlag());
 				 jGenerator.writeStringField("prop_cnrmissioni_noleggioFlag" , cmisOrdineMissione.getNoleggioFlag());
 				 jGenerator.writeStringField("prop_cnrmissioni_taxiFlag" , cmisOrdineMissione.getTaxiFlag());

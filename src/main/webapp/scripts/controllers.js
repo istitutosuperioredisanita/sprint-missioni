@@ -38,6 +38,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoOrdiniApprovati = true;
                     } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'N'){
                         $scope.esistonoOrdiniAnnullati = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoOrdiniDaValidare = true;
                     }
                 }
             }
@@ -47,6 +49,9 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     
     $scope.doSelectOrdineMissione = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id);
+    };
+    $scope.doSelectOrdineMissioneValidazione = function (ordineMissione) {
+        $location.path('/ordine-missione/'+ordineMissione.id+'/'+"S");
     };
 });
 

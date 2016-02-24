@@ -19,6 +19,7 @@ missioniApp.factory('AutoPropriaOrdineMissioneService', function ($http) {
 
 missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, AutoProprieService, DatiPatenteServiceUser, AutoPropriaOrdineMissioneService, ElencoOrdiniMissioneService, ui, COSTANTI) {
     
+    $scope.validazione = $routeParams.validazione;
     $scope.idOrdineMissione = $routeParams.idOrdineMissione;
     $scope.accessToken = AccessToken.get();
     $scope.accountModel = $sessionStorage.accountWork;

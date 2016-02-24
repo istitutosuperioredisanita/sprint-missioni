@@ -28,6 +28,7 @@ public class Costanti {
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
 	public final static String STATO_ANNULLATO = "ANN";
 	public final static String STATO_INSERITO = "INS";
+	public final static String STATO_NON_INVIATO_FLUSSO = "INS";
 	public final static String STATO_INVIATO_FLUSSO = "INV";
 	public final static String STATO_APPROVATO_FLUSSO = "APP";
 	public final static String STATO_CONFERMATO = "CON";
@@ -54,6 +55,7 @@ public class Costanti {
 	public final static String STATO_RESPINTO_PER_HOME = "R";
 	public final static String STATO_ANNULLATO_PER_HOME = "N";
 	public final static String STATO_DA_AUTORIZZARE_PER_HOME = "D";
+	public final static String STATO_DA_VALIDARE_PER_HOME = "V";
 	public final static String STATO_DA_CONFERMARE_PER_HOME = "C";
 	public final static String CDS_SAC = "000";
 	public final static String UO_SAC_PROGETTI = "000.000";

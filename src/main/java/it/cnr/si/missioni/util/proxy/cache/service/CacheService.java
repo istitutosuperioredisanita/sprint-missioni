@@ -18,6 +18,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
+import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,7 +30,10 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -39,7 +43,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class CacheService {
+public class CacheService implements EnvironmentAware{
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
 
@@ -51,6 +55,10 @@ public class CacheService {
     
 	@Autowired
 	private ConfigService configService;
+	
+	private RelaxedPropertyResolver propertyResolver;
+
+	private Environment environment;
 	
 	@PostConstruct
 	public void init(){
@@ -145,14 +153,37 @@ public class CacheService {
 		ResultProxy result = proxyService.process(callCache);
 		/* E' necessario chiamare il service non in cache e poi mettere a mano il risultato in cache perchè quando parte questo service allo startup dell'applicazione
 		 * i servizi di cache non sono stati ancora inizializzati. In questo modo i dati vengono messi in cache. */		
-		cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache, result);
+		cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache.getMd5(), result);
 	}
 
 	private CallCache prepareCallForCache(RestService rest, JSONBody jBody) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
-		CallCache callCache = new CallCache(HttpMethod.POST, jBody, rest.getApp(), rest.getUrl(), "proxyURL="+rest.getUrl(), null, rest.getClasseJson());
+		String app = rest.getApp();
+    	setContext(jBody, app);
+
+		CallCache callCache = new CallCache(HttpMethod.POST, jBody, app, rest.getUrl(), "proxyURL="+rest.getUrl(), null, rest.getClasseJson());
 		return callCache;
+	}
+
+	public void setContext(JSONBody jBody, String app) {
+		String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
+    	if (!StringUtils.isEmpty(uoContext)){
+    		Context context = jBody.getContext();
+    		if (context == null){
+    			context = new Context();
+    		}
+    		if (StringUtils.isEmpty(context.getCd_unita_organizzativa())){
+    			context.setCd_unita_organizzativa(uoContext);
+    		}
+    		if (StringUtils.isEmpty(context.getCd_cds())){
+    			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
+    		}
+    		if (StringUtils.isEmpty(context.getCd_cdr())){
+    			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
+    		}
+    		jBody.setContext(context);
+    	}
 	}
 
 	private JSONBody prepareJSONForRest(RestService rest, List<JSONClause> clauseToAdd) {
@@ -223,7 +254,7 @@ public class CacheService {
 		return clause;
 	}
 
-	public ResultCacheProxy manageCache(String url, JSONBody bodyRequest) throws AwesomeException{
+	public ResultCacheProxy manageCache(String url, JSONBody bodyRequest, String app) throws AwesomeException{
 		List<JSONClause> listClausesDeleted = new ArrayList<JSONClause>();
 		RestService restService = null;
 		boolean isUrlToCache = false;
@@ -252,6 +283,7 @@ public class CacheService {
 							bodyRequest.setClauses(null);
 						}
 					}
+					setContext(bodyRequest, app);
 					//						}
 					ResultCacheProxy resultCacheProxy = new ResultCacheProxy();
 					resultCacheProxy.setListClausesDeleted(listClausesDeleted);
@@ -558,5 +590,10 @@ public class CacheService {
 			}
 		}
 		return clauseTrovata;
+	}
+	@Override
+	public void setEnvironment(Environment environment) {
+        this.environment = environment;
+        this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.proxy.");
 	}
 }

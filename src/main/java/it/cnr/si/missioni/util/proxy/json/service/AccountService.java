@@ -6,11 +6,14 @@ import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -83,6 +86,26 @@ public class AccountService {
 		return risposta;
 	}
 
+	public Boolean isUserSpecialEnableToValidateOrder(String user, String uo){
+		if (uo == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
+		}
+		UsersSpecial userSpecial = getUoForUsersSpecial(user);
+		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+				List<String> listaUoUtente = new ArrayList<String>();
+		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
+		    		if (uo.equals(uoForUsersSpecial.getCodice_uo()) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
+		    			return true;
+		    		}
+		    	}
+			}
+		} else {
+			return true;
+		}
+		return false;
+	}
+	
 	public Account getAccount(String risposta) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();

@@ -133,7 +133,7 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
-                .when('/ordine-missione/:idMissione?', {
+                .when('/ordine-missione/:idMissione?/:validazione?', {
                     templateUrl: 'views/ordine-missione.html',
                     controller: 'OrdineMissioneController',
                     access: {
@@ -147,14 +147,14 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
-                .when('/ordine-missione/auto-propria/:idOrdineMissione', {
+                .when('/ordine-missione/auto-propria/:idOrdineMissione/:validazione?', {
                     templateUrl: 'views/ordine-missione/auto-propria.html',
                     controller: 'AutoPropriaOrdineMissioneController',
                     access: {
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
-                .when('/ordine-missione/richiesta-anticipo/:idOrdineMissione', {
+                .when('/ordine-missione/richiesta-anticipo/:idOrdineMissione/:validazione?', {
                     templateUrl: 'views/ordine-missione/richiesta-anticipo.html',
                     controller: 'AnticipoOrdineMissioneController',
                     access: {

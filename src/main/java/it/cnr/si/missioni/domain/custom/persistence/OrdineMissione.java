@@ -66,6 +66,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_ORDINE	= "cnrmissioni:descrizioneUoOrdine",
 			CMIS_PROPERTY_FLOW_UO_SPESA	= "cnrmissioni:uoSpesa",
 			CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_SPESA	= "cnrmissioni:descrizioneUoSpesa",
+			CMIS_PROPERTY_FLOW_UO_COMPETENZA	= "cnrmissioni:uoCompetenza",
+			CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_COMPETENZA	= "cnrmissioni:descrizioneUoCompetenza",
 			CMIS_PROPERTY_FLOW_DESTINAZIONE	= "cnrmissioni:destinazione",
 			CMIS_PROPERTY_FLOW_ESTERA_FLAG	= "cnrmissioni:missioneEsteraFlag",
 			CMIS_PROPERTY_FLOW_DATA_INIZIO_MISSIONE	= "cnrmissioni:dataInizioMissione",
@@ -165,6 +167,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private Date dataFineMissione;
 
     @Size(min = 0, max = 1)
+    @Column(name = "VALIDATO", length = 1, nullable = false)
+    private String validato;
+
+    @Size(min = 0, max = 1)
     @Column(name = "OBBLIGO_RIENTRO", length = 1, nullable = false)
     private String obbligoRientro;
 
@@ -216,6 +222,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String uoSpesa;
 
     @Size(min = 0, max = 28)
+    @Column(name = "CDS_COMPETENZA", length = 28, nullable = true)
+    private String cdsCompetenza;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "UO_COMPETENZA", length = 28, nullable = false)
+    private String uoCompetenza;
+
+    @Size(min = 0, max = 28)
     @Column(name = "MODULO", length = 28, nullable = true)
     private String modulo;
 
@@ -263,6 +277,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String statoFlusso;
 
 	@Transient
+    private String daValidazione;
+	
+	@Transient
     private String utilizzoAutoPropria;
 	
 	@Transient
@@ -300,7 +317,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 
 	public OrdineMissione(Long id, Integer anno, Long numero, Date dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, Date dataInizioMissione, Date dataFineMissione){
+			String oggetto, Date dataInizioMissione, Date dataFineMissione, String validato){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -314,6 +331,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.setOggetto(oggetto);
 		this.setDataInizioMissione(dataInizioMissione);
 		this.setDataFineMissione(dataFineMissione);
+		this.setValidato(validato);
 	}
 
 	public OrdineMissione(){
@@ -332,7 +350,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			add(Projections.property("destinazione")).
 			add(Projections.property("oggetto")).
 			add(Projections.property("dataInizioMissione")).
-			add(Projections.property("dataFineMissione"));
+			add(Projections.property("dataFineMissione")).
+			add(Projections.property("validato"));
 
 	@Override
 	public Serializable getId() {
@@ -841,9 +860,29 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     }
 
 	@Transient
+    public Boolean isMissioneDefinitiva() {
+		if (!StringUtils.isEmpty(getStato())){
+        	if (getStato().equals(Costanti.STATO_DEFINITIVO)){
+        		return true;
+        	} 
+    	}
+    	return false;
+    }
+
+	@Transient
     public Boolean isMissioneInserita() {
 		if (!StringUtils.isEmpty(getStato())){
         	if (getStato().equals(Costanti.STATO_INSERITO)){
+        		return true;
+        	} 
+    	}
+    	return false;
+    }
+
+	@Transient
+    public Boolean isMissioneDaValidare() {
+		if (!StringUtils.isEmpty(getValidato())){
+        	if (getValidato().equals("N")){
         		return true;
         	} 
     	}
@@ -929,5 +968,37 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			return true;
 		}
 		return false;
+	}
+
+	public String getCdsCompetenza() {
+		return cdsCompetenza;
+	}
+
+	public void setCdsCompetenza(String cdsCompetenza) {
+		this.cdsCompetenza = cdsCompetenza;
+	}
+
+	public String getUoCompetenza() {
+		return uoCompetenza;
+	}
+
+	public void setUoCompetenza(String uoCompetenza) {
+		this.uoCompetenza = uoCompetenza;
+	}
+
+	public String getValidato() {
+		return validato;
+	}
+
+	public void setValidato(String validato) {
+		this.validato = validato;
+	}
+
+	public String getDaValidazione() {
+		return daValidazione;
+	}
+
+	public void setDaValidazione(String daValidazione) {
+		this.daValidazione = daValidazione;
 	}
 }

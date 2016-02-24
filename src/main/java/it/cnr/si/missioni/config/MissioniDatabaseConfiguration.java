@@ -1,7 +1,6 @@
 package it.cnr.si.missioni.config;
 
 import it.cnr.si.config.DatabaseConfiguration;
-import it.cnr.si.missioni.util.Costanti;
 
 import javax.sql.DataSource;
 
@@ -37,7 +36,6 @@ public class MissioniDatabaseConfiguration extends DatabaseConfiguration {
         log.debug("Configuring Liquibase");
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:config/liquibase/master.xml");
         liquibase.setContexts(liquibaseProperties.getContexts());
         liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());

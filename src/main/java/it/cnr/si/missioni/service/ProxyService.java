@@ -8,7 +8,6 @@ import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
-import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -55,7 +54,7 @@ public class ProxyService implements EnvironmentAware{
     @Autowired
     CacheManager cacheManager;
     
-    @Cacheable(value=Costanti.NOME_CACHE_PROXY)
+    @Cacheable(value=Costanti.NOME_CACHE_PROXY, key="#callCache.getMd5()")
     public ResultProxy processInCache(CallCache callCache)  throws AwesomeException{
     	log.debug("Process in Cache 2: "+callCache.toString());
     	ResultProxy resultProxyForCache = process(callCache.getHttpMethod(), callCache.getBody(), callCache.getApp(), callCache.getUrl(), callCache.getQueryString(), callCache.getAuthorization());
@@ -123,24 +122,6 @@ public class ProxyService implements EnvironmentAware{
         		headers.add("Authorization", authorization);
         	}
         	
-        	String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
-        	if (!StringUtils.isEmpty(uoContext)){
-        		Context context = jsonBody.getContext();
-        		if (context == null){
-        			context = new Context();
-        		}
-        		if (StringUtils.isEmpty(context.getCd_unita_organizzativa())){
-        			context.setCd_unita_organizzativa(uoContext);
-        		}
-        		if (StringUtils.isEmpty(context.getCd_cds())){
-        			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
-        		}
-        		if (StringUtils.isEmpty(context.getCd_cdr())){
-        			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
-        		}
-        		jsonBody.setContext(context);
-        	}
-
     		String body = null;
         	try {
         		ObjectMapper mapper = new ObjectMapper();

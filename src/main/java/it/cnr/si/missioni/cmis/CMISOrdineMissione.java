@@ -21,7 +21,9 @@ public class CMISOrdineMissione {
 	private String uoOrdine;
 	private String descrizioneUoOrdine;
 	private String uoSpesa;
+	private String uoCompetenza;
 	private String descrizioneUoSpesa;
+	private String descrizioneUoCompetenza;
 	private String autoPropriaFlag;
 	private String noleggioFlag;
 	private String taxiFlag;
@@ -269,5 +271,17 @@ public class CMISOrdineMissione {
 	}
 	public void setMissioneEsteraFlag(String missioneEsteraFlag) {
 		this.missioneEsteraFlag = missioneEsteraFlag;
+	}
+	public String getUoCompetenza() {
+		return uoCompetenza;
+	}
+	public void setUoCompetenza(String uoCompetenza) {
+		this.uoCompetenza = uoCompetenza;
+	}
+	public String getDescrizioneUoCompetenza() {
+		return descrizioneUoCompetenza;
+	}
+	public void setDescrizioneUoCompetenza(String descrizioneUoCompetenza) {
+		this.descrizioneUoCompetenza = descrizioneUoCompetenza;
 	}
 }

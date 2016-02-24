@@ -106,12 +106,15 @@ public class ProxyResource {
     
     private ResponseEntity<String> process(HttpMethod httpMethod, JSONBody body, String app, String url, HttpServletRequest request, HttpServletResponse response) {
 		ResultProxy result = null;
-		ResultCacheProxy resultCacheProxy = cacheService.manageCache(url, body);
+		ResultCacheProxy resultCacheProxy = cacheService.manageCache(url, body, app);
 		String existsClauseVariable = existsClauseVariable(resultCacheProxy);
 		if (isCacheable(resultCacheProxy)){
 			CallCache callCache = new CallCache(httpMethod, resultCacheProxy.getBody(), app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION), resultCacheProxy.getRestService().getClasseJson());
 			result = proxyService.processInCache(callCache);
     	} else {
+    		if (body != null && body.getContext() == null){
+        		cacheService.setContext(body, app);
+    		}
         	result = proxyService.process(httpMethod, body, app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
     	}
     	response.setContentType(result.getType());

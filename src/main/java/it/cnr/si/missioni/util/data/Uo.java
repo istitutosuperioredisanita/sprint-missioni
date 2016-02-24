@@ -14,7 +14,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
 	"codice_uo",
-	"uid_direttore"
+	"uid_direttore",
+	"firma_spesa",
+	"ordine_da_validare"
 })
 public class Uo {
 
@@ -24,6 +26,8 @@ public class Uo {
 	private String uidDirettore;
 	@JsonProperty("firma_spesa")
 	private String firmaSpesa;
+	@JsonProperty("ordine_da_validare")
+	private String ordineDaValidare;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -95,6 +99,16 @@ public class Uo {
 	@JsonAnySetter
 	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
+	}
+
+	@JsonProperty("ordine_da_validare")
+	public String getOrdineDaValidare() {
+		return ordineDaValidare;
+	}
+
+	@JsonProperty("ordine_da_validare")
+	public void setOrdineDaValidare(String ordineDaValidare) {
+		this.ordineDaValidare = ordineDaValidare;
 	}
 
 }
