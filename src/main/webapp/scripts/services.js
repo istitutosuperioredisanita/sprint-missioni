@@ -191,6 +191,15 @@ missioniApp.factory('Session', function () {
             this.livello = livello;
             this.allUoForUsersSpecial = allUoForUsersSpecial;
             this.uoForUsersSpecial = uoForUsersSpecial;
+            this.abilitatoRendereDefinitivo = null;
+            if (uoForUsersSpecial){
+                for (var i=0; i<uoForUsersSpecial.length; i++) {
+                    if (uoForUsersSpecial[i].rendi_definitivo === "S"){
+                        this.abilitatoRendereDefinitivo = true;
+                    }
+                }
+
+            }
             this.livello = livello;
 
             this.isAccountLDAP = isAccountLDAP;
@@ -218,6 +227,7 @@ missioniApp.factory('Session', function () {
             this.allUoForUsersSpecial = null;
             this.uoForUsersSpecial = null;
             this.isAccountLDAP = null;
+            this.abilitatoRendereDefinitivo = null;
         };
         return this;
     });

@@ -7,6 +7,8 @@
     <include file="classpath:config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
     
     <include file="classpath:config/liquibase/changelog/1431938187821_missioni_schema.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20160219131400_add_column_competenza.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20160219152200_add_column_validato.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

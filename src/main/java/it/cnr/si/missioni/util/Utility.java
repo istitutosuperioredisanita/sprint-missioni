@@ -46,6 +46,12 @@ public class Utility {
 		  return str;
 		return "";  
 	}
+
+	public static String nvl(String str, String anotherValue){
+		if (str != null)
+		  return str;
+		return anotherValue;  
+	}
 	/**
 	 * Restituisce una Stringa ottenuta sostituendo
 	 * nella stringa sorgente alla stringa pattern la stringa replace,
