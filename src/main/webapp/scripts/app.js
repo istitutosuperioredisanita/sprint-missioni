@@ -147,6 +147,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/ordini-missione-da-rendere-definitivi', {
+                    templateUrl: 'views/ordini-missione-da-rendere-definitivi.html',
+                    controller: 'OrdiniMissioneDaRendereDefinitiviController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/ordine-missione/auto-propria/:idOrdineMissione/:validazione?', {
                     templateUrl: 'views/ordine-missione/auto-propria.html',
                     controller: 'AutoPropriaOrdineMissioneController',

@@ -245,7 +245,7 @@
                     "condition": "AND",
                     "fieldName": "livello",
                     "operator": "=",
-                    "fieldValue": 3
+                    "fieldValue": 2
                 }
             ],
             "clauseToIterate": [
@@ -253,7 +253,7 @@
                     "type": "calculateValues",
                     "condition": "AND",
                     "fieldName": "esercizio",
-                    "fromValue": 2012,
+                    "fromValue": 2013,
                     "toSpecialValue": "ANNO_CORRENTE"
                 }
             ],

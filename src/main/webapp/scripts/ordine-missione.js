@@ -14,7 +14,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         } else {
             objectPostUoClauses = [{condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
         }
-        var objectPostUo = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostUoOrderBy, clauses:objectPostUoClauses}
+        var objectPostUo = {maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostUoOrderBy, clauses:objectPostUoClauses}
         return $http.post(urlRestProxy + app+'/', objectPostUo, {params: {proxyURL: url}}).success(function (data) {
             if (data){
                 if (data.elements){
@@ -206,7 +206,8 @@ missioniApp.factory('OrdineMissioneService', function ($resource) {
             'add':  { method: 'POST'},
             'modify':  { method: 'PUT'},
             'delete':  { method: 'DELETE'},
-            'confirm':  { method: 'PUT', params:{confirm:true}}
+            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
+            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}}
         });
     });
 
@@ -427,7 +428,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             if (uo.substring(0,3) == COSTANTI.CDS_SAC){
                 uo = COSTANTI.UO_STANDARD_SAC;
             }
-            var varClauses = [{condition: 'AND', fieldName: 'livello', operator: "=", fieldValue:3},
+            var varClauses = [{condition: 'AND', fieldName: 'livello', operator: "=", fieldValue:2},
                               {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'cd_unita_organizzativa', operator: "=", fieldValue:uo}];
             var postModuli = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
@@ -804,6 +805,31 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             );
     }
 
+    $scope.validateOrdineMissione = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.confirm_validate($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                        if (httpResponse.status === 200) {
+                        } else {
+                            if (httpResponse.data.message){
+                                ui.error(httpResponse.data.message);
+                            } else {
+                                ui.error(httpResponse.data);
+                            }
+                        }
+                    }
+            );
+    }
+
     var deleteOrdineMissione = function () {
             $rootScope.salvataggio = true;
             OrdineMissioneService.delete({ids:$scope.ordineMissioneModel.id},
@@ -832,6 +858,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         $scope.restCds($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
         $scope.reloadCds($scope.ordineMissioneModel.cdsRich);
         $scope.restCapitoli($scope.ordineMissioneModel.anno);
+        $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
     }
 
     $scope.reloadUserWork = function(uid){

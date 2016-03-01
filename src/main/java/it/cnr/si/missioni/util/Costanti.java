@@ -28,6 +28,7 @@ public class Costanti {
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
 	public final static String STATO_ANNULLATO = "ANN";
 	public final static String STATO_INSERITO = "INS";
+	public final static String STATO_DEFINITIVO = "DEF";
 	public final static String STATO_NON_INVIATO_FLUSSO = "INS";
 	public final static String STATO_INVIATO_FLUSSO = "INV";
 	public final static String STATO_APPROVATO_FLUSSO = "APP";
@@ -47,7 +48,7 @@ public class Costanti {
 	public final static String STATO_RESPINTO_SPESA_FROM_CMIS = "RESPINTO SPESA";
 	public final static String STATO_FIRMA_UO_FROM_CMIS = "FIRMA UO";
 	public final static String STATO_FIRMA_SPESA_FROM_CMIS = "FIRMA SPESA";
-	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 100000;
+	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 1000000;
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
     public static final String SYSTEM_ACCOUNT = "system";
@@ -91,6 +92,7 @@ public class Costanti {
         aMap.put(STATO_ANNULLATO, "Annullato");
         aMap.put(STATO_CONFERMATO, "Confermato");
         aMap.put(STATO_INSERITO, "Inserito");
+        aMap.put(STATO_DEFINITIVO, "Definitivo");
         STATO = Collections.unmodifiableMap(aMap);
     }
 

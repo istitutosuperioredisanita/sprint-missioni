@@ -95,7 +95,7 @@ public class AccountService {
 			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
 				List<String> listaUoUtente = new ArrayList<String>();
 		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
-		    		if (uo.equals(uoForUsersSpecial.getCodice_uo()) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
+		    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
 		    			return true;
 		    		}
 		    	}
@@ -106,6 +106,10 @@ public class AccountService {
 		return false;
 	}
 	
+	private String getUoSigla(UoForUsersSpecial uo) {
+		return uo.getCodice_uo().substring(0,3)+"."+uo.getCodice_uo().substring(3,6);
+	}
+
 	public Account getAccount(String risposta) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();

@@ -153,7 +153,7 @@ public class CacheService implements EnvironmentAware{
 		ResultProxy result = proxyService.process(callCache);
 		/* E' necessario chiamare il service non in cache e poi mettere a mano il risultato in cache perchè quando parte questo service allo startup dell'applicazione
 		 * i servizi di cache non sono stati ancora inizializzati. In questo modo i dati vengono messi in cache. */		
-		cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache.getMd5(), result);
+		cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache, result);
 	}
 
 	private CallCache prepareCallForCache(RestService rest, JSONBody jBody) {

@@ -19,9 +19,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -55,9 +52,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 @Component
@@ -192,7 +187,15 @@ public class MissioniCMISService {
 	}
 	
 	public InputStream getResource(CmisObject cmisObject){
-		return ((Document)cmisObject).getContentStream().getStream();
+		ContentStream content = getContent(cmisObject);
+		if (content != null){
+			return content.getStream();
+		}
+		return null;
+	}
+	
+	public ContentStream getContent(CmisObject cmisObject){
+		return ((Document)cmisObject).getContentStream();
 	}
 	
 	public Document storeSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
@@ -238,10 +241,20 @@ public class MissioniCMISService {
 	}
 	
 	
-	public InputStream recuperoFileFromObjectID(String id){
+	public InputStream recuperoStreamFileFromObjectID(String id){
 		if (id != null){
 			try{
 				return getResource(getNodeByNodeRef(id));
+			}catch (CmisObjectNotFoundException _ex){
+			}
+		}
+		return null;
+	}
+	
+	public ContentStream recuperoContentFileFromObjectID(String id){
+		if (id != null){
+			try{
+				return getContent(getNodeByNodeRef(id));
 			}catch (CmisObjectNotFoundException _ex){
 			}
 		}
@@ -469,7 +482,7 @@ public class MissioniCMISService {
 		try {
 			Response responseFirmatario = invokeGET(new UrlBuilder(getRepositoryURL()+"service/cnr/person/person/"+username));
 			if (responseFirmatario.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Utente " + username + " non registrato o servizio non disponibile.");
+				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Richiesta Utente " + username + ". Errore "+responseFirmatario.getResponseMessage());
 			TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
 			HashMap<String,Object> mapFirmatario = mapper.readValue(responseFirmatario.getStream(), typeRef); 
 			

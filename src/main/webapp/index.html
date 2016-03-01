@@ -90,6 +90,8 @@
                                     &nbsp;<span translate="global.menu.account.ordine-missione">Ordine di Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/elenco-ordini-missione"><span class="fa fa-pencil-square-o"></span>
                                     &nbsp;<span translate="global.menu.account.elenco-ordini-missione">Ordine di Missione</span></a></li>
+                                <li ng-switch-when="true" ng-show="account.abilitatoRendereDefinitivo"><a href="#/ordini-missione-da-rendere-definitivi"><span class="glyphicon glyphicon-ok"></span>
+                                    &nbsp;<span translate="global.menu.account.elenco-ordini-missione-per-definitivo">Ordine di Missione</span></a></li>
                             </ul>
                         </li>
                         <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)" class="dropdown pointer" ng-controller="AdminController">
@@ -196,6 +198,7 @@
         <script src="scripts/direttore-uo.js"></script>
         <script src="scripts/ordine-missione.js"></script>
         <script src="scripts/elenco-ordini-missione.js"></script>
+        <script src="scripts/ordini-missione-da-rendere-definitivi.js"></script>
         <script src="scripts/services.js"></script> 
         <script src="scripts/directives/directives.js"></script>
         <script src="scripts/directives/cnr-widget-datetime-range.js"></script>
