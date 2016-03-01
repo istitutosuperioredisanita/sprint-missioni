@@ -10,7 +10,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
 	"codice_uo",
-	"ordine_da_validare"
+	"ordine_da_validare",
+	"rendi_definitivo"
 })
 public class UoForUsersSpecial {
 
@@ -19,6 +20,9 @@ public class UoForUsersSpecial {
 
 	@JsonProperty("ordine_da_validare")
 	private String ordine_da_validare;
+
+	@JsonProperty("rendi_definitivo")
+	private String rendi_definitivo;
 
 	/**
 	 *
@@ -48,6 +52,16 @@ public class UoForUsersSpecial {
 	@JsonProperty("ordine_da_validare")
 	public void setOrdine_da_validare(String ordine_da_validare) {
 		this.ordine_da_validare = ordine_da_validare;
+	}
+
+	@JsonProperty("rendi_definitivo")
+	public String getRendi_definitivo() {
+		return rendi_definitivo;
+	}
+
+	@JsonProperty("rendi_definitivo")
+	public void setRendi_definitivo(String rendi_definitivo) {
+		this.rendi_definitivo = rendi_definitivo;
 	}
 
 }

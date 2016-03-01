@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -72,6 +73,23 @@ public class OrdineMissioneResource {
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissione(HttpServletRequest request,
     		OrdineMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
+        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
+        return new ResponseEntity<>(
+        		ordiniMissione,
+        		HttpStatus.OK);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/ordiniMissione/listToFinal",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneToFinal(HttpServletRequest request,
+    		OrdineMissioneFilter filter) throws Exception {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
+        filter.setToFinal("S");
         List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
         		ordiniMissione,
@@ -168,9 +186,10 @@ public class OrdineMissioneResource {
             params = {"confirm"}, 
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> confirmOrdineMissione(@RequestBody OrdineMissione ordineMissione, @RequestParam(value = "confirm") Boolean confirm, 
+    public ResponseEntity<?> confirmOrdineMissione(@RequestBody OrdineMissione ordineMissione, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,  
     		HttpServletRequest request, HttpServletResponse response) {
     	if (ordineMissione.getId() != null){
+    		ordineMissione.setDaValidazione(daValidazione);
             try {
 				ordineMissione = ordineMissioneService.updateOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ordineMissione, false, confirm);
     		} catch (AwesomeException e) {
@@ -219,29 +238,25 @@ public class OrdineMissioneResource {
             	Long idMissioneLong = new Long (idMissione); 
             	OAuth2Authentication auth = tokenStore.readAuthentication(token);
             	if (auth != null){
-                	byte[] print = ordineMissioneService.printOrdineMissione(auth, idMissioneLong);
-                	
-              		res.setContentType("application/pdf");
-                	try {
-                		String attachFileName = "OrdineMissione"+idMissione+".pdf";
-                		String headerValue = "attachment";
-                		if (attachFileName != null && !attachFileName.isEmpty()) {
-                			headerValue += "; filename=\"" + attachFileName + "\"";
-                		}
-                		res.setHeader("Content-Disposition", headerValue);
-                		OutputStream outputStream = res.getOutputStream();
-                		InputStream inputStream = new ByteArrayInputStream(print);
-
-                		IOUtils.copy(inputStream, outputStream);
-
-                		outputStream.flush();
-
-                		inputStream.close();
-                		outputStream.close();       	
-        			} catch (IOException e) {
-            			throw new RuntimeException(Utility.getMessageException(e));
-            		} 
-                	
+            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(auth, idMissioneLong);
+            		if (map != null){
+                  		res.setContentType("application/pdf");
+                    	try {
+                    		String headerValue = "attachment";
+                    		for (String key : map.keySet()) {
+                       			headerValue += "; filename=\"" + key + "\"";
+                        		res.setHeader("Content-Disposition", headerValue);
+                        		OutputStream outputStream = res.getOutputStream();
+                        		InputStream inputStream = new ByteArrayInputStream(map.get(key));
+                        		IOUtils.copy(inputStream, outputStream);
+                        		outputStream.flush();
+                        		inputStream.close();
+                        		outputStream.close();       	
+                    		}
+            			} catch (IOException e) {
+                			throw new RuntimeException(Utility.getMessageException(e));
+                		} 
+            		}
             	}
     		} catch (ComponentException e) {
     			throw new RuntimeException(Utility.getMessageException(e));

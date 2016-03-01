@@ -4,7 +4,7 @@
 {"codice_uo":"000100"},
 {"codice_uo":"000200", "ordine_da_validare":"S"},
 {"codice_uo":"000201"},
-{"codice_uo":"000411", "ordine_da_validare":"S"},
+{"codice_uo":"000411", "ordine_da_validare":"S", "rendi_definitivo":"S"},
 {"codice_uo":"000412"},
 {"codice_uo":"044000"}]},
 {"uid":"antonella.verdecchia", "uoForUsersSpecial":[

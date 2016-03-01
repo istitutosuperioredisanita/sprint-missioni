@@ -40,14 +40,30 @@ public class UoService {
 
     public Uo recuperoUo(String codiceUo){
     	DatiUo datiUo = configService.getDatiUo();
-		return recuperoUo(datiUo, codiceUo);
+		return recuperoUo(datiUo, codiceUo, false);
 	}
 
-	public Uo recuperoUo(DatiUo datiUo, String codiceUo) {
+    public Uo recuperoUoSigla(String codiceUo){
+    	DatiUo datiUo = configService.getDatiUo();
+		return recuperoUo(datiUo, codiceUo, true);
+	}
+
+    public String getUo(String uo, Boolean uoSigla){
+    	if (uoSigla){
+        	if (uo != null){
+            	return uo.substring(0,3)+"."+uo.substring(3,6);
+        	}
+    	} else {
+    		return uo;
+    	}
+    	return "";
+    }
+    
+	private Uo recuperoUo(DatiUo datiUo, String codiceUo, Boolean uoSigla) {
 		List<Uo> uos = datiUo.getUo();
 		for (Iterator<Uo> iterator = uos.iterator(); iterator.hasNext();){
 			Uo uo = iterator.next();
-			if (uo != null && uo.getCodiceUo() != null && uo.getCodiceUo().equals(codiceUo)){
+			if (uo != null && uo.getCodiceUo() != null && getUo(uo.getCodiceUo(), uoSigla).equals(codiceUo)){
 				return uo;
 			}
 		}
