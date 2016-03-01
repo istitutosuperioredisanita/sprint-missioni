@@ -13,6 +13,7 @@ public class OrdineMissioneFilter {
 	private Date aData;
 	private String cdsRich;
 	private String uoRich;
+	private String toFinal;
 	public Long getDaNumero() {
 		return daNumero;
 	}
@@ -72,5 +73,11 @@ public class OrdineMissioneFilter {
 	}
 	public void setaId(Long aId) {
 		this.aId = aId;
+	}
+	public String getToFinal() {
+		return toFinal;
+	}
+	public void setToFinal(String toFinal) {
+		this.toFinal = toFinal;
 	}
 }

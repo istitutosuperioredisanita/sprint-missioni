@@ -5,7 +5,7 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 
-import java.io.Serializable;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,8 +13,11 @@ import java.security.NoSuchAlgorithmException;
 import org.springframework.http.HttpMethod;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.DataSerializable;
 
-public class CallCache implements Serializable {
+public class CallCache implements DataSerializable {
 	private HttpMethod httpMethod;
 	private JSONBody body;
 	private String app;
@@ -100,5 +103,13 @@ public class CallCache implements Serializable {
 			new AwesomeException("Errore nel recupero dell'algoritmo MD5 "+e.getMessage());
 		}
 		return "";
+	}
+	@Override
+	public void writeData(ObjectDataOutput out) throws IOException {
+		out.writeUTF(toString());
+	}
+	@Override
+	public void readData(ObjectDataInput in) throws IOException {
+		in.readData();
 	}
 }

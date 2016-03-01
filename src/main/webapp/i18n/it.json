@@ -27,7 +27,8 @@
                 "apidocs": "API",
                 "register": "Register",
                 "ordine-missione": "Nuovo Ordine di Missione",
-                "elenco-ordini-missione": "Elenco Ordini di Missione"
+                "elenco-ordini-missione": "Elenco Ordini di Missione",
+                "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi"
             },
             "admin": "Administration",
             "language": "Linguaggio"
@@ -101,7 +102,7 @@
         "subtitle_approvato": "Ultimi Ordini di Missione Approvati",
         "subtitle_annullato": "Ultimi Ordini di Missione Annullati",
         "subtitle_da_approvare": "Ordini di Missione da Approvare",
-        "subtitle_da_validare": "Ordini di Missione da Validare",
+        "subtitle_da_validare": "Ordini di Missione da Inviare alla firma",
         "comment": "Motivazione",
         "userid": "Utente",
         "logged": {
@@ -378,6 +379,9 @@
             "modulo": "Progetto",
             "modulo.placeholder": "Progetto"
         }
+    },
+    "ordini-missione-da-rendere-definitivi": {
+        "title": "ORDINI DI MISSIONE DA RENDERE DEFINITIVI"
     },
     "activate": {
         "title": "Activation",

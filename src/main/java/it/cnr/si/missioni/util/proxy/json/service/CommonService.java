@@ -58,6 +58,7 @@ public class CommonService {
 			JSONBody jBody = null;
 			jBody = proxyService.inizializzaJson();
 			jBody.setClauses(clauses);
+			cacheService.setContext(jBody, app);
 			ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null);
 			risposta = result.getBody();
 		}

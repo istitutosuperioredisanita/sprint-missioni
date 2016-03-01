@@ -53,6 +53,7 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -198,7 +199,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDisponibilita(dispImpegno);
-		cmisOrdineMissione.setGae(gae == null ? "" : gae.getDs_linea_attivita());
+		cmisOrdineMissione.setGae(gae == null ? "" : gae.getCd_linea_attivita());
 		cmisOrdineMissione.setImpegnoAnnoCompetenza(ordineMissione.getEsercizioObbligazione() == null ? null : new Long(ordineMissione.getEsercizioObbligazione()));
 		cmisOrdineMissione.setImpegnoAnnoResiduo(ordineMissione.getEsercizioOriginaleObbligazione() == null ? null : new Long(ordineMissione.getEsercizioOriginaleObbligazione()));
 		cmisOrdineMissione.setImpegnoNumero(ordineMissione.getPgObbligazione());
@@ -519,10 +520,10 @@ public class CMISOrdineMissioneService {
 		 }
 	}
 
-	public InputStream getStreamOrdineMissione(OrdineMissione ordineMissione) throws Exception{
+	public ContentStream getContentStreamOrdineMissione(OrdineMissione ordineMissione) throws Exception{
 		String id = getNodeRefOrdineMissione(ordineMissione);
 		if (id != null){
-			return missioniCMISService.recuperoFileFromObjectID(id);
+			return missioniCMISService.recuperoContentFileFromObjectID(id);
 		}
 		return null;
 	}
