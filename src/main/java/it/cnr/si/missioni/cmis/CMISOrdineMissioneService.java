@@ -163,18 +163,18 @@ public class CMISOrdineMissioneService {
 		String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
 		
-		String userNameFirmatario = recuperoUidDirettoreUo(uoRichPerFlusso);
+		String userNameFirmatario = accountService.getDirector(uoRichPerFlusso);
 
 		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 		String userNameFirmatarioSpesa = null;
 		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 			if (uoCompetenzaPerFlusso != null){
-				userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoCompetenzaPerFlusso);
+				userNameFirmatarioSpesa = accountService.getDirector(uoCompetenzaPerFlusso);
 			} else {
 				userNameFirmatarioSpesa = userNameFirmatario;
 			}
 		} else {
-			userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoSpesaPerFlusso);
+			userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
 		}
 		
 
@@ -383,18 +383,18 @@ public class CMISOrdineMissioneService {
 		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
 		Document documento = salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
 		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
-		if (anticipo != null){
-			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
-			ordineMissione.setRichiestaAnticipo("S");
-		} else {
-			ordineMissione.setRichiestaAnticipo("N");
-		}
+//		if (anticipo != null){
+//			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
+//			ordineMissione.setRichiestaAnticipo("S");
+//		} else {
+//			ordineMissione.setRichiestaAnticipo("N");
+//		}
 		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()));
-		if (autoPropria != null){
-			ordineMissione.setUtilizzoAutoPropria("S");
-		} else {
-			ordineMissione.setUtilizzoAutoPropria("N");
-		}
+//		if (autoPropria != null){
+//			ordineMissione.setUtilizzoAutoPropria("S");
+//		} else {
+//			ordineMissione.setUtilizzoAutoPropria("N");
+//		}
 		Document documentoAnticipo = null;
 		if (anticipo != null){
 			anticipo.setOrdineMissione(ordineMissione);

@@ -9,9 +9,11 @@ import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
@@ -30,7 +32,6 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.OrdineMissioneFilter;
-import it.cnr.si.missioni.util.SecurityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
-import net.bzdyl.ejb3.criteria.Criterion;
 import net.bzdyl.ejb3.criteria.Order;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
@@ -127,8 +127,10 @@ public class OrdineMissioneService {
 			if (retrieveDataFromFlows){
 				if (ordineMissione.isStatoInviatoAlFlusso()){
 	    			ResultFlows result = retrieveDataFromFlows(ordineMissione);
-	    			ordineMissione.setStateFlows(retrieveStateFromFlows(result));
-	    			ordineMissione.setCommentFlows(result.getComment());
+	    			if (result != null){
+		    			ordineMissione.setStateFlows(retrieveStateFromFlows(result));
+		    			ordineMissione.setCommentFlows(result.getComment());
+	    			}
 				}
 			}
 			
@@ -211,7 +213,7 @@ public class OrdineMissioneService {
     	if (lista != null){
         	List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
     		for (OrdineMissione ordineMissione : lista){
-    			if (ordineMissione.isStatoInviatoAlFlusso()){
+    			if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
         			ResultFlows result = retrieveDataFromFlows(ordineMissione);
         			if (result != null){
     			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
@@ -231,6 +233,12 @@ public class OrdineMissioneService {
         					ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
         					ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
         					ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+        					OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
+        					if (anticipo != null){
+        						anticipo.setStato(Costanti.STATO_INSERITO);
+        						ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
+        					}
+
         					updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
         					listaNew.add(ordineMissione);
@@ -245,7 +253,7 @@ public class OrdineMissioneService {
         				}
         			}
     			} else {
-    				if (ordineMissione.isMissioneDaValidare()){
+    				if (ordineMissione.isMissioneDaValidare() && ordineMissione.isMissioneConfermata()){
     					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
     					listaNew.add(ordineMissione);
     				} else if (ordineMissione.isMissioneInserita()){
@@ -300,6 +308,9 @@ public class OrdineMissioneService {
 			if (filter.getDaId() != null){
 				criterionList.add(Restrictions.ge("id", filter.getDaId()));
 			}
+			if (filter.getStato() != null){
+				criterionList.add(Restrictions.le("stato", filter.getStato()));
+			}
 			if (filter.getaId() != null){
 				criterionList.add(Restrictions.le("id", filter.getaId()));
 			}
@@ -326,6 +337,7 @@ public class OrdineMissioneService {
 			if (StringUtils.isEmpty(filter.getUoRich())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
 			}
+//			criterionList.add(Restrictions.isNull("pgObbligazione"));
 			UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
 			boolean uoAbilitata = false;
 			if (userSpecial != null){
@@ -492,7 +504,7 @@ public class OrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
 		}
 		
-		if (ordineMissioneDB.isMissioneConfermata() && !fromFlows){
+		if (ordineMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
 			if (ordineMissioneDB.isStatoFlussoApprovato()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare l'ordine di missione. E' già stato approvato.");
 			}
@@ -513,7 +525,18 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
 			}
 			ordineMissioneDB.setValidato("S");
-		} else if (Utility.nvl(ordineMissione.getDaRendereDefinitivo(), "N").equals("S")){
+		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
+			if (ordineMissione.getEsercizioObbligazione() == null || ordineMissione.getPgObbligazione() == null ){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo l'ordine di missione è necessario valorizzare l'impegno.");
+			}
+			if (!StringUtils.isEmpty(ordineMissione.getGae())){
+				ordineMissioneDB.setGae(ordineMissione.getGae());
+			}
+			if (!StringUtils.isEmpty(ordineMissione.getVoce())){
+				ordineMissioneDB.setGae(ordineMissione.getVoce());
+			}
+			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
+			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
 			ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 		} else {
 			ordineMissioneDB.setStato(ordineMissione.getStato());

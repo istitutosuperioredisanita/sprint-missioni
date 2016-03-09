@@ -14,7 +14,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         } else {
             objectPostUoClauses = [{condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
         }
-        var objectPostUo = {maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostUoOrderBy, clauses:objectPostUoClauses}
+        var objectPostUo = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostUoOrderBy, clauses:objectPostUoClauses}
         return $http.post(urlRestProxy + app+'/', objectPostUo, {params: {proxyURL: url}}).success(function (data) {
             if (data){
                 if (data.elements){
@@ -207,7 +207,8 @@ missioniApp.factory('OrdineMissioneService', function ($resource) {
             'modify':  { method: 'PUT'},
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
-            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}}
+            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
+            'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
         });
     });
 
@@ -392,7 +393,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
     
-    $scope.restCdr = function(uo){
+    $scope.restCdr = function(uo, daQuery){
         if (uo){
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.CDR;
@@ -405,8 +406,10 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $scope.elencoCdr = data.elements;
                         if (data.elements.length === 1){
                             $scope.ordineMissioneModel.cdrSpesa = data.elements[0].cd_centro_responsabilita;
-                            $scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
-                            $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                            if (daQuery != 'S'){
+                                $scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
+                                $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                            }
                         }
                     } else {
                         $scope.elencoCdr = [];
@@ -527,7 +530,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     if (data.elements){
                         $scope.elencoGae = data.elements;
                         if (data.elements.length === 1){
-                            $scope.ordineMissioneModel.gae = data.elements[0];
+                            $scope.ordineMissioneModel.gae = data.elements[0].cd_linea_attivita;
                         }
                     } else {
                         $scope.elencoGae = [];
@@ -639,7 +642,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.reloadUo = function(uo) {
       $scope.annullaCdr();  
-      $scope.restCdr(uo);
+      $scope.restCdr(uo, "N");
     }
 
     $scope.reloadCdr = function(cdr) {
@@ -722,6 +725,14 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
+    $scope.impostaDisabilitaOrdineMissione = function() {
+        if ($scope.esisteOrdineMissione && ($scope.esisteOrdineMissione.stato === 'DEF' || ($scope.esisteOrdineMissione.stato === 'CON' && $scope.esisteOrdineMissione.statoFlusso in ('ANNULLATO', 'FIRMA SPESA', 'FIRMA UO', 'FIRMATO')))) {
+          return true;
+        } else {
+          return false;
+        }
+    }
+
     $scope.inizializzaFormPerModifica = function(){
         $scope.showEsisteOrdineMissione = true;
         if ($scope.ordineMissioneModel.statoFlusso === "INV" && $scope.ordineMissioneModel.stato === "INS" && $scope.ordineMissioneModel.commentFlows){
@@ -738,6 +749,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             $scope.ordineMissioneModel.daValidazione = "S";
         }
 
+        $scope.disabilitaOrdineMissione = $scope.impostaDisabilitaOrdineMissione;
         dateInizioFineDiverse();
     }
 
@@ -762,6 +774,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         $scope.ordineMissioneModel.dataInserimento = today;
         $scope.ordineMissioneModel.anno = today.getFullYear();
         $scope.showObbligoRientro = null;
+        $scope.disabilitaOrdineMissione = false;
     }
 
     $scope.gestioneInCasoDiErrore = function(){
@@ -777,7 +790,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     $scope.confirm = function () {
-        ui.confirmCRUD("Si sta per confermare e rendere definitivo l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
+        ui.confirmCRUD("Si sta per confermare l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
     }
 
     var confirmOrdineMissione = function () {
@@ -811,6 +824,31 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                        if (httpResponse.status === 200) {
+                        } else {
+                            if (httpResponse.data.message){
+                                ui.error(httpResponse.data.message);
+                            } else {
+                                ui.error(httpResponse.data);
+                            }
+                        }
+                    }
+            );
+    }
+
+    $scope.finalizeOrdineMissione = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.finalize($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione Completato.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
@@ -879,7 +917,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.goAutoPropria = function () {
       if ($scope.ordineMissioneModel.id){
-        $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
+        if ($scope.validazione){
+            $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
+        } else {
+            $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+"N");
+        }
       } else {
         ui.error("Per poter inserire i dati dell'auto propria è necessario prima salvare l'ordine di missione");
       }
@@ -887,7 +929,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.goAnticipo = function () {
       if ($scope.ordineMissioneModel.id){
-        $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
+        if ($scope.validazione){
+            $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
+        } else {
+            $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+"N");
+        }
       } else {
         ui.error("Per poter inserire i dati dell'anticipo è necessario prima salvare l'ordine di missione");
       }
@@ -980,7 +1026,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.restCdsCompetenza(model.anno, model.cdsCompetenza);
                 $scope.restUo(model.anno, model.cdsSpesa, model.uoSpesa);
                 $scope.restUoCompetenza(model.anno, model.cdsCompetenza, model.uoCompetenza);
-                $scope.restCdr(model.uoSpesa);
+                $scope.restCdr(model.uoSpesa, "S");
                 $scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
                 $scope.restCapitoli(model.anno);
