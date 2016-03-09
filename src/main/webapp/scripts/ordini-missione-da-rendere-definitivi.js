@@ -10,9 +10,9 @@ missioniApp.controller('OrdiniMissioneDaRendereDefinitiviController', function (
     };
 
     $scope.ricerca = function () {
-        ElencoOrdiniMissioneService.findMissioniDaRendereDefinitive($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData, $scope.uoWorkForSpecialUser).then(function(data){
-            if (data && data.length > 0){
-                $scope.ordiniMissione = data;
+        ElencoOrdiniMissioneService.findMissioniDaRendereDefinitive($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData, $scope.uoWorkForSpecialUser).then(function(response){
+            if (response.data && response.data.length > 0){
+                $scope.ordiniMissione = response.data;
                 $scope.messageOrdiniNonEsistenti = false;
             } else {
                 $scope.messageOrdiniNonEsistenti = true;

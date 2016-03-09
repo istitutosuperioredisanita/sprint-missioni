@@ -53,6 +53,13 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($scope, $loca
             'Media': '5'
     };
 
+    $scope.statoMissione = {
+        'Annullato': 'ANN',
+        'Confermato': 'CON',
+        'Inserito': 'INS',
+        'Definitivo': 'DEF'
+    };
+
     $scope.ricerca = function () {
         ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData).then(function(data){
             if (data && data.length > 0){

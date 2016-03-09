@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class OrdineMissioneFilter {
 	private String user;
+	private String stato;
 	private Integer anno;
 	private Long daId;
 	private Long aId;
@@ -79,5 +80,11 @@ public class OrdineMissioneFilter {
 	}
 	public void setToFinal(String toFinal) {
 		this.toFinal = toFinal;
+	}
+	public String getStato() {
+		return stato;
+	}
+	public void setStato(String stato) {
+		this.stato = stato;
 	}
 }
