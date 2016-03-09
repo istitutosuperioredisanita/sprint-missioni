@@ -9,11 +9,11 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
+import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
+import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -86,6 +86,22 @@ public class AccountService {
 		return risposta;
 	}
 
+	public String getDirector(String uo) {
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, "titCa="+uo+"&userinfo=true&ruolo=dir", null, null);
+		ResultProxy result = proxyService.processInCache(callCache);
+		String risposta = result.getBody();
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			DatiDirettore [] lista = mapper.readValue(risposta, DatiDirettore[].class);
+			if (lista != null && lista.length > 0){
+				return lista[0].getUid();
+			}
+		} catch (Exception ex) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i Direttori ("+Utility.getMessageException(ex)+").");
+		}
+		return risposta;
+	}
+
 	public Boolean isUserSpecialEnableToValidateOrder(String user, String uo){
 		if (uo == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
@@ -93,9 +109,27 @@ public class AccountService {
 		UsersSpecial userSpecial = getUoForUsersSpecial(user);
 		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
 			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
-				List<String> listaUoUtente = new ArrayList<String>();
 		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
 		    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
+		    			return true;
+		    		}
+		    	}
+			}
+		} else {
+			return true;
+		}
+		return false;
+	}
+	
+	public Boolean isUserSpecialEnableToFinalizeOrder(String user, String uo){
+		if (uo == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
+		}
+		UsersSpecial userSpecial = getUoForUsersSpecial(user);
+		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
+		    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getRendi_definitivo()).equals("S")){
 		    			return true;
 		    		}
 		    	}

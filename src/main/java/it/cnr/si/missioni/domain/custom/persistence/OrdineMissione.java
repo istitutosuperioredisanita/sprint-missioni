@@ -280,9 +280,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String daValidazione;
 	
 	@Transient
-    private String daRendereDefinitivo;
-	
-	@Transient
     private String utilizzoAutoPropria;
 	
 	@Transient
@@ -1003,13 +1000,5 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setDaValidazione(String daValidazione) {
 		this.daValidazione = daValidazione;
-	}
-
-	public String getDaRendereDefinitivo() {
-		return daRendereDefinitivo;
-	}
-
-	public void setDaRendereDefinitivo(String daRendereDefinitivo) {
-		this.daRendereDefinitivo = daRendereDefinitivo;
 	}
 }
