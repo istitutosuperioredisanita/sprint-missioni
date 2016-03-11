@@ -725,8 +725,12 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
-    $scope.impostaDisabilitaOrdineMissione = function() {
-        if ($scope.esisteOrdineMissione && ($scope.esisteOrdineMissione.stato === 'DEF' || ($scope.esisteOrdineMissione.stato === 'CON' && $scope.esisteOrdineMissione.statoFlusso in ('ANNULLATO', 'FIRMA SPESA', 'FIRMA UO', 'FIRMATO')))) {
+    var impostaDisabilitaOrdineMissione = function() {
+        if ($scope.esisteOrdineMissione && ($scope.ordineMissioneModel.stato === 'DEF' || ($scope.ordineMissioneModel.stato === 'CON' && 
+            ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
+                $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||
+                $scope.ordineMissioneModel.stateFlows === 'FIRMA UO' ||
+                $scope.ordineMissioneModel.stateFlows === 'FIRMATO')))) {
           return true;
         } else {
           return false;
@@ -749,7 +753,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             $scope.ordineMissioneModel.daValidazione = "S";
         }
 
-        $scope.disabilitaOrdineMissione = $scope.impostaDisabilitaOrdineMissione;
+        $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
         dateInizioFineDiverse();
     }
 
@@ -920,7 +924,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if ($scope.validazione){
             $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
         } else {
-            $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+"N");
+            if ($scope.disabilitaOrdineMissione){
+                $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+"D");
+            } else {
+                $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+"N");
+            }
         }
       } else {
         ui.error("Per poter inserire i dati dell'auto propria è necessario prima salvare l'ordine di missione");
@@ -932,7 +940,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if ($scope.validazione){
             $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
         } else {
-            $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+"N");
+            if ($scope.disabilitaOrdineMissione){
+                $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+"D");
+            } else {
+                $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+"N");
+            }
         }
       } else {
         ui.error("Per poter inserire i dati dell'anticipo è necessario prima salvare l'ordine di missione");

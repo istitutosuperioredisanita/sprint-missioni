@@ -803,7 +803,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	@Transient
 	public String getDecodeStatoFlusso() {
 		if (!StringUtils.isEmpty(getStateFlows())){
-			return getStateFlows();
+			return Costanti.STATO_FLUSSO_FROM_CMIS.get(getStateFlows());
 		} else {
 			if (!StringUtils.isEmpty(getStatoFlusso())){
 				return Costanti.STATO_FLUSSO.get(getStatoFlusso());

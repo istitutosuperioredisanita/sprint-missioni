@@ -163,18 +163,22 @@ public class CMISOrdineMissioneService {
 		String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
 		
-		String userNameFirmatario = accountService.getDirector(uoRichPerFlusso);
+		
+		String userNameFirmatario = recuperoUidDirettoreUo(uoRichPerFlusso);
+//		String userNameFirmatario = accountService.getDirector(uoRichPerFlusso);
 
 		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 		String userNameFirmatarioSpesa = null;
 		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 			if (uoCompetenzaPerFlusso != null){
-				userNameFirmatarioSpesa = accountService.getDirector(uoCompetenzaPerFlusso);
+				userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoCompetenzaPerFlusso);
+//				userNameFirmatarioSpesa = accountService.getDirector(uoCompetenzaPerFlusso);
 			} else {
 				userNameFirmatarioSpesa = userNameFirmatario;
 			}
 		} else {
-			userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
+			userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoSpesaPerFlusso);
+//			userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
 		}
 		
 
@@ -528,6 +532,22 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 	
+	public ContentStream getContentStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws Exception{
+		String id = getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+		if (id != null){
+			return missioniCMISService.recuperoContentFileFromObjectID(id);
+		}
+		return null;
+	}
+	
+	public ContentStream getContentStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws Exception{
+		String id = getNodeRefOrdineMissioneAnticipo(ordineMissioneAnticipo);
+		if (id != null){
+			return missioniCMISService.recuperoContentFileFromObjectID(id);
+		}
+		return null;
+	}
+	
 	public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
 		List<String> ids = new ArrayList<String>();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
@@ -543,6 +563,56 @@ public class CMISOrdineMissioneService {
 			return null;
 		else if (results.getTotalNumItems() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		} else {
+			for (QueryResult nodeFile : results) {
+				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
+				return file;
+			}
+		}
+		return null;
+	}
+	
+	public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException{
+		List<String> ids = new ArrayList<String>();
+		OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
+		Folder node = recuperoFolderOrdineMissione(ordineMissione);
+		if (node == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti di richiesta di auto propria collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		}
+		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
+		StringBuffer query = new StringBuffer("select doc.cmis:objectId from cmis:document doc ");
+		query.append(" join missioni_ordine_attachment:uso_auto_propria auto_propria on doc.cmis:objectId = auto_propria.cmis:objectId ");
+		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
+		ItemIterable<QueryResult> results = missioniCMISService.search(query);
+		if (results.getTotalNumItems() == 0)
+			return null;
+		else if (results.getTotalNumItems() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di auto propria per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		} else {
+			for (QueryResult nodeFile : results) {
+				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
+				return file;
+			}
+		}
+		return null;
+	}
+	
+	public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException{
+		List<String> ids = new ArrayList<String>();
+		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
+		Folder node = recuperoFolderOrdineMissione(ordineMissione);
+		if (node == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti di richiesta anticipo collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		}
+		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
+		StringBuffer query = new StringBuffer("select doc.cmis:objectId from cmis:document doc ");
+		query.append(" join missioni_ordine_attachment:richiesta_anticipo anticipo on doc.cmis:objectId = anticipo.cmis:objectId ");
+		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
+		ItemIterable<QueryResult> results = missioniCMISService.search(query);
+		if (results.getTotalNumItems() == 0)
+			return null;
+		else if (results.getTotalNumItems() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta anticipo per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		} else {
 			for (QueryResult nodeFile : results) {
 				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);

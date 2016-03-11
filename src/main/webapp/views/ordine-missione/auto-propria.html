@@ -29,7 +29,7 @@
           </div>
 
            <div class="col-md-1"> 
-                <button ng-show="validazione != 'S'" class="btn btn-outline" ng-click="edit()" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-outline" ng-click="edit()" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
           </div>
         </div>
 
@@ -39,15 +39,15 @@
             <form class="form-inline" role="form" id ="missioni">
                <p class="input-group">
                   <span class="input-group-addon" translate="ordine-missione-auto-propria.form.auto-propria">auto</span>
-                    <select ng-disabled="validazione == 'S'" class="form-control" ng-model="autoPropriaSelected" ng-change="changeAuto(autoPropriaSelected)" ng-options="autoPropria.targa + ' - ' + autoPropria.marca + ' ' + autoPropria.modello + ' - Numero Carta di Circolazione: ' + autoPropria.cartaCircolazione + ' - Numero Polizza Assicurativa: ' + autoPropria.polizzaAssicurativa for autoPropria in autoProprie"></select>
+                    <select ng-disabled="validazione != 'N'" class="form-control" ng-model="autoPropriaSelected" ng-change="changeAuto(autoPropriaSelected)" ng-options="autoPropria.targa + ' - ' + autoPropria.marca + ' ' + autoPropria.modello + ' - Numero Carta di Circolazione: ' + autoPropria.cartaCircolazione + ' - Numero Polizza Assicurativa: ' + autoPropria.polizzaAssicurativa for autoPropria in autoProprie"></select>
                </p>
             </form>
           </div>
            <div class="col-md-1"> 
-                <button ng-show="validazione != 'S'" class="btn btn-sm" ng-disabled="saveButtonDisable(rigaAutoPropria)" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm" ng-disabled="saveButtonDisable(rigaAutoPropria)" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
           </div>
            <div class="col-md-1"> 
-                <button ng-show="validazione != 'S'" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
           </div>
           </div>
   </div>
@@ -66,7 +66,7 @@
   </div>
      <div class="panel-body my-panel-body">
 
-      <button ng-disabled="addSpostamentoAutoPropria || !autoPropriaOrdineMissioneModel.id || validazione == 'S'" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'ordine-missione-auto-propria.form.addSpostamento' | translate}}" ng-click="aggiungiRigaSpostamento()"><span class="glyphicon glyphicon-plus"></span></button> 
+      <button ng-disabled="addSpostamentoAutoPropria || !autoPropriaOrdineMissioneModel.id || validazione != 'N'" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'ordine-missione-auto-propria.form.addSpostamento' | translate}}" ng-click="aggiungiRigaSpostamento()"><span class="glyphicon glyphicon-plus"></span></button> 
         <table class="table table-condensed table-striped table-bordered table-responsive">
           <tr>
             <th>{{'ordine-missione-auto-propria.form.percorso-da' | translate}}</th>
@@ -76,23 +76,23 @@
             <tr ng-repeat="spostamentoAutoPropria in spostamentiAutoPropria">
               <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left" >{{spostamentoAutoPropria.percorsoDa}}</td>
               <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione == 'S'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256"></input>
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256"></input>
               </td>
               <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left">{{spostamentoAutoPropria.percorsoA}}</td>
               <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'S'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256"></input>
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256"></input>
               </td>
               <td ng-hide="spostamentoAutoPropria.editing">
-                <button ng-show="validazione != 'S'" class="btn btn-sm btn-link" ng-click="editSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
               </td>
               <td ng-hide="spostamentoAutoPropria.editing">
-                <button ng-show="validazione != 'S'" class="btn btn-sm btn-link" ng-click="confirmDeleteSpostamenti($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteSpostamenti($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </td>
               <td ng-show="spostamentoAutoPropria.editing">
-                <button ng-show="validazione != 'S'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(spostamentoAutoPropria)" ng-click="modifySpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(spostamentoAutoPropria)" ng-click="modifySpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
               </td>
               <td ng-show="spostamentoAutoPropria.editing">
-                <button ng-show="validazione != 'S'" class="btn btn-sm btn-link" ng-click="undoSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
               </td>
             </tr>
 
@@ -100,22 +100,22 @@
           <tr ng-show="addSpostamentoAutoPropria" id="spostamentoAddAutoPropria">
 
             <td class="col-xs-6">
-              <input ng-disabled="validazione == 'S'" class="form-control" ng-model="newSpostamentoAutoPropria.percorsoDa" maxlength="256"</input>
+              <input ng-disabled="validazione != 'N'" class="form-control" ng-model="newSpostamentoAutoPropria.percorsoDa" maxlength="256"</input>
             </td>
             <td class="col-xs-6">
-              <input ng-disabled="validazione == 'S'" class="form-control" ng-model="newSpostamentoAutoPropria.percorsoA" maxlength="256"</input>
+              <input ng-disabled="validazione != 'N'" class="form-control" ng-model="newSpostamentoAutoPropria.percorsoA" maxlength="256"</input>
             </td>
             <td style="text-align: left">
               <form class="form-inline" role="form">
                 <div class="form-group btn-group">
-                  <button ng-show="validazione != 'S'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newSpostamentoAutoPropria)" ng-click="insertSpostamentoAutoPropria(newSpostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                  <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newSpostamentoAutoPropria)" ng-click="insertSpostamentoAutoPropria(newSpostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
                 </div>
               </form>
             </td>
             <td style="text-align: left">
               <form class="form-inline" role="form">
                 <div class="form-group btn-group">
-                  <button ng-show="validazione != 'S'" class="btn btn-sm btn-link" ng-click="undoAddSpostamentoAutoPropria()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                  <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoAddSpostamentoAutoPropria()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
                 </div>
               </form>
             </td>
@@ -178,7 +178,7 @@
              </div>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-md-1" ng-show="autoPropriaOrdineMissioneModel.id">
-                            <button ng-show="!validazione" type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
+                            <button ng-show="validazione == 'N'" type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
                     </div>
             </form>
         </div>

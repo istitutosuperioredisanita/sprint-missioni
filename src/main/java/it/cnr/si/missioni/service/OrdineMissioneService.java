@@ -277,7 +277,7 @@ public class OrdineMissioneService {
 	}
 
 	public String retrieveStateFromFlows(ResultFlows result) {
-		return Costanti.STATO_FLUSSO_FROM_CMIS.get(result.getState());
+		return result.getState();
 	}
 
 	public ResultFlows retrieveDataFromFlows(OrdineMissione ordineMissione)

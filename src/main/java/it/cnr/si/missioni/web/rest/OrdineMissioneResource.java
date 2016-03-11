@@ -240,13 +240,15 @@ public class OrdineMissioneResource {
             	if (auth != null){
             		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(auth, idMissioneLong);
             		if (map != null){
-                  		res.setContentType("application/pdf");
+            			res.setContentType("application/pdf");
                     	try {
                     		String headerValue = "attachment";
                     		for (String key : map.keySet()) {
+                    			System.out.println(map.get(key).length);
+                    			log.error("Lunghezza "+map.get(key).length);
                        			headerValue += "; filename=\"" + key + "\"";
-                        		res.setHeader("Content-Disposition", headerValue);
                         		OutputStream outputStream = res.getOutputStream();
+                        		res.setHeader("Content-Disposition", headerValue);
                         		InputStream inputStream = new ByteArrayInputStream(map.get(key));
                         		IOUtils.copy(inputStream, outputStream);
                         		outputStream.flush();
