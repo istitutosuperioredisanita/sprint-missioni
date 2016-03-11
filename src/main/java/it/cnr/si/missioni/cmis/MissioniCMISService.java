@@ -501,8 +501,9 @@ public class MissioniCMISService {
     
 	public Response startFlowOrdineMissione(StringWriter stringWriter) throws Exception{
 		try {
-			logger.debug(stringWriter.getBuffer().toString());
-			Response responsePost = invokePOST(new UrlBuilder(getRepositoryURL()+"service/api/workflow/activiti$flussoMissioni/formprocessor"), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
+			String url = getRepositoryURL()+"service/api/workflow/activiti$flussoMissioni/formprocessor";
+			logger.info("Start Flow. Url: "+url+" - Content: "+stringWriter.getBuffer().toString());
+			Response responsePost = invokePOST(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
 			if (responsePost.getResponseCode()!=200) 
 				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: "+ responsePost.getErrorContent()+".");
 			return responsePost;
