@@ -21,8 +21,10 @@ import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,9 @@ import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -281,15 +285,48 @@ public class OrdineMissioneAutoPropriaService {
     }
 
     @Transactional(readOnly = true)
-   	public byte[] printOrdineMissioneAutoPropria(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
+   	public Map<String, byte[]>  printOrdineMissioneAutoPropria(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
     	String username = SecurityUtils.getCurrentUserLogin();
     	Principal principal = (Principal)auth;
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = getAutoPropria(principal, idMissione, true);
-		byte[] printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
-		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
-			salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
-		}
-		return printOrdineMissione;
+		Map<String, byte[]> map = new HashMap<String, byte[]>();
+    	byte[] printOrdineMissione = null;
+    	String fileName = null;
+    	if (!ordineMissioneAutoPropria.getOrdineMissione().isStatoNonInviatoAlFlusso()){
+    		ContentStream content = null;
+			try {
+				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+			} catch (Exception e1) {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")");
+			}
+    		if (content != null){
+        		fileName = content.getFileName();
+        		InputStream is = null;
+    			try {
+    				is = content.getStream();
+    			} catch (Exception e) {
+    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file Auto Propria sul documentale (" + Utility.getMessageException(e) + ")");
+    			}
+        		if (is != null){
+            		try {
+    					printOrdineMissione = IOUtils.toByteArray(is);
+    				} catch (IOException e) {
+    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")");
+    				}
+        		}
+    		} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Auto Propria sul documentale");
+    		}
+    		map.put(fileName, printOrdineMissione);
+    	} else {
+    		fileName = "OrdineMissioneAutoPropria"+idMissione+".pdf";
+    		printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
+    		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
+    			salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
+    		}
+    		map.put(fileName, printOrdineMissione);
+    	}
+		return map;
     }
 
 	private byte[] printAutoPropria(String username,

@@ -242,7 +242,7 @@
                     <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.anno-impegno">anno</span>
-                            <input ng-disabled="validazione === 'S' || (ordineMissioneModel.statoFlusso = 'APPROVATO' && validazione != 'D')" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
+                            <input ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
                         </span>
                     </p>
             </form>
@@ -251,7 +251,7 @@
                     <p class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.numero-impegno">numero</span>
-                            <input ng-disabled="validazione === 'S' || (ordineMissioneModel.statoFlusso = 'APPROVATO' && validazione != 'D')" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
+                            <input ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
                         </span>
                     </p>
             </form>
