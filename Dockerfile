@@ -2,7 +2,7 @@
 FROM anapsix/alpine-java:jdk8
 MAINTAINER Francesco Uliana <francesco.uliana@cnr.it>
 
-RUN wget "http://maven.si.cnr.it/service/local/artifact/maven/redirect?r=releases&v=LATEST&g=it.cnr.si.sprint&a=sprint-missioni&e=war" -O /opt/missioni.war
+ADD "http://maven.si.cnr.it/service/local/artifact/maven/redirect?r=releases&v=LATEST&g=it.cnr.si.sprint&a=sprint-missioni&e=war" /opt/missioni.war
 
 EXPOSE 8080
 
