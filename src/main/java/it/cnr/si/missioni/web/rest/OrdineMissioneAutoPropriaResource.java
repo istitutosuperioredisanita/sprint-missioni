@@ -8,8 +8,8 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -265,28 +266,28 @@ public class OrdineMissioneAutoPropriaResource {
             	Long idMissioneLong = new Long (idMissione); 
             	OAuth2Authentication auth = tokenStore.readAuthentication(token);
             	if (auth != null){
-                	byte[] print = ordineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(auth, idMissioneLong);
-                	
-              		res.setContentType("application/pdf");
-                	try {
-                		String attachFileName = "OrdineMissioneAutoPropria"+idMissione+".pdf";
-                		String headerValue = "attachment";
-                		if (attachFileName != null && !attachFileName.isEmpty()) {
-                			headerValue += "; filename=\"" + attachFileName + "\"";
-                		}
-                		res.setHeader("Content-Disposition", headerValue);
-                		OutputStream outputStream = res.getOutputStream();
-                		InputStream inputStream = new ByteArrayInputStream(print);
+            		Map<String, byte[]> map = ordineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(auth, idMissioneLong);
+            		if (map != null){
+                  		res.setContentType("application/pdf");
+                    	try {
+                    		String headerValue = "attachment";
+                    		for (String key : map.keySet()) {
+                       			headerValue += "; filename=\"" + key + "\"";
+                        		res.setHeader("Content-Disposition", headerValue);
+                        		OutputStream outputStream = res.getOutputStream();
+                        		InputStream inputStream = new ByteArrayInputStream(map.get(key));
 
-                		IOUtils.copy(inputStream, outputStream);
+                        		IOUtils.copy(inputStream, outputStream);
 
-                		outputStream.flush();
+                        		outputStream.flush();
 
-                		inputStream.close();
-                		outputStream.close();       	
-        			} catch (IOException e) {
-            			throw new RuntimeException(Utility.getMessageException(e));
-            		} 
+                        		inputStream.close();
+                        		outputStream.close();       	
+                    		}
+            			} catch (IOException e) {
+                			throw new RuntimeException(Utility.getMessageException(e));
+                		} 
+            		}
             	}
     		} catch (ComponentException e) {
     			throw new RuntimeException(Utility.getMessageException(e));

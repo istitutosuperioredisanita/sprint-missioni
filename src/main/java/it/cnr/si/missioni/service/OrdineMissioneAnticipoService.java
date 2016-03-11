@@ -11,6 +11,7 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAnticipoRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -20,15 +21,19 @@ import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,17 +174,49 @@ public class OrdineMissioneAnticipoService {
 		crudServiceBean.modificaConBulk(principal, ordineMissioneAnticipo);
 	}
 
-    @Transactional(readOnly = true)
-   	public byte[] printOrdineMissioneAnticipo(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
+   	@Transactional(readOnly = true)
+   	public Map<String, byte[]>  printOrdineMissioneAnticipo(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
     	String username = SecurityUtils.getCurrentUserLogin();
     	Principal principal = (Principal)auth;
     	OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(principal, idMissione, true);
-		byte[] printOrdineMissione = printAnticipo(username, ordineMissioneAnticipo);
-		if (ordineMissioneAnticipo.isAnticipoInserito()){
-			salvaStampaAnticipoSuCMIS(username, printOrdineMissione, ordineMissioneAnticipo);
-		}
-
-		return printOrdineMissione;
+		Map<String, byte[]> map = new HashMap<String, byte[]>();
+    	byte[] printOrdineMissione = null;
+    	String fileName = null;
+    	if (!ordineMissioneAnticipo.getOrdineMissione().isStatoNonInviatoAlFlusso()){
+    		ContentStream content = null;
+			try {
+				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAnticipo(ordineMissioneAnticipo);
+			} catch (Exception e1) {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Anticipo sul documentale (" + Utility.getMessageException(e1) + ")");
+			}
+    		if (content != null){
+        		fileName = content.getFileName();
+        		InputStream is = null;
+    			try {
+    				is = content.getStream();
+    			} catch (Exception e) {
+    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file Anticipo sul documentale (" + Utility.getMessageException(e) + ")");
+    			}
+        		if (is != null){
+            		try {
+    					printOrdineMissione = IOUtils.toByteArray(is);
+    				} catch (IOException e) {
+    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file Anticipo (" + Utility.getMessageException(e) + ")");
+    				}
+        		}
+    		} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Anticipo sul documentale");
+    		}
+    		map.put(fileName, printOrdineMissione);
+    	} else {
+    		fileName = "OrdineMissioneAnticipo"+idMissione+".pdf";
+    		printOrdineMissione = printAnticipo(username, ordineMissioneAnticipo);
+    		if (ordineMissioneAnticipo.isAnticipoInserito()){
+    			salvaStampaAnticipoSuCMIS(username, printOrdineMissione, ordineMissioneAnticipo);
+    		}
+    		map.put(fileName, printOrdineMissione);
+    	}
+		return map;
     }
 
 	private byte[] printAnticipo(String username,

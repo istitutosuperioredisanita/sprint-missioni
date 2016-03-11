@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -159,37 +160,39 @@ public class OrdineMissioneAnticipoResource {
         log.debug("REST request per la stampa dell'Ordine di Missione " );
         
         if (!StringUtils.isEmpty(idMissione)){
-            try {
-            	Long idMissioneLong = new Long (idMissione); 
-            	OAuth2Authentication auth = tokenStore.readAuthentication(token);
-            	if (auth != null){
-                	byte[] print = ordineMissioneAnticipoService.printOrdineMissioneAnticipo(auth, idMissioneLong);
-                	
-              		res.setContentType("application/pdf");
-                	try {
-                		String attachFileName = "OrdineMissioneAnticipo"+idMissione+".pdf";
-                		String headerValue = "attachment";
-                		if (attachFileName != null && !attachFileName.isEmpty()) {
-                			headerValue += "; filename=\"" + attachFileName + "\"";
-                		}
-                		res.setHeader("Content-Disposition", headerValue);
-                		OutputStream outputStream = res.getOutputStream();
-                		InputStream inputStream = new ByteArrayInputStream(print);
+        	try {
+        		Long idMissioneLong = new Long (idMissione); 
+        		OAuth2Authentication auth = tokenStore.readAuthentication(token);
+        		if (auth != null){
+        			Map<String, byte[]> map = ordineMissioneAnticipoService.printOrdineMissioneAnticipo(auth, idMissioneLong);
+        			if (map != null){
+        				res.setContentType("application/pdf");
+        				try {
+        					String headerValue = "attachment";
+        					for (String key : map.keySet()) {
+        						headerValue += "; filename=\"" + key + "\"";
 
-                		IOUtils.copy(inputStream, outputStream);
 
-                		outputStream.flush();
+        						res.setHeader("Content-Disposition", headerValue);
+        						OutputStream outputStream = res.getOutputStream();
+        						InputStream inputStream = new ByteArrayInputStream(map.get(key));
 
-                		inputStream.close();
-                		outputStream.close();       	
-        			} catch (IOException e) {
-            			throw new RuntimeException(Utility.getMessageException(e));
-            		} 
-                	
-            	}
-    		} catch (ComponentException e) {
-    			throw new RuntimeException(Utility.getMessageException(e));
-    		} 
+        						IOUtils.copy(inputStream, outputStream);
+
+        						outputStream.flush();
+
+        						inputStream.close();
+        						outputStream.close();       	
+
+        					}
+        				} catch (IOException e) {
+        					throw new RuntimeException(Utility.getMessageException(e));
+        				} 
+        			}
+    			}
+        	} catch (ComponentException e) {
+        		throw new RuntimeException(Utility.getMessageException(e));
+        	} 
         }
     }
 
