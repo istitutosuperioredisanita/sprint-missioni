@@ -101,7 +101,7 @@ public class ProxyService implements EnvironmentAware{
 	}
     
     public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization) {
-        log.debug("REST request from app ", app);
+        log.info("REST request from app ", app);
         String appUrl = propertyResolver.getProperty(app + ".url");
         if (appUrl == null) {
         	log.error("Cannot find properties for app: " + app + " Current profile are: ", Arrays.toString(environment.getActiveProfiles()));
