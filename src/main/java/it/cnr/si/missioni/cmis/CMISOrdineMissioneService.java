@@ -393,7 +393,7 @@ public class CMISOrdineMissioneService {
 //		} else {
 //			ordineMissione.setRichiestaAnticipo("N");
 //		}
-		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()));
+		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
 //		if (autoPropria != null){
 //			ordineMissione.setUtilizzoAutoPropria("S");
 //		} else {
