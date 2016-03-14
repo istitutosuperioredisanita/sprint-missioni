@@ -726,7 +726,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     var impostaDisabilitaOrdineMissione = function() {
-        if ($scope.esisteOrdineMissione && ($scope.ordineMissioneModel.stato === 'DEF' || ($scope.ordineMissioneModel.stato === 'CON' && 
+        if ($scope.esisteOrdineMissione && ($scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || ($scope.ordineMissioneModel.stato === 'CON' && 
             ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
                 $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||
                 $scope.ordineMissioneModel.stateFlows === 'FIRMA UO' ||
