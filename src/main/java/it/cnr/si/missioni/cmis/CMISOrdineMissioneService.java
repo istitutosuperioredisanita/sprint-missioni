@@ -60,6 +60,7 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +74,9 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private DatiIstitutoService datiIstitutoService;
+
+    @Autowired
+    private Environment env;
 
 	@Autowired
 	private PrintOrdineMissioneService printOrdineMissioneService;
@@ -157,33 +161,36 @@ public class CMISOrdineMissioneService {
 			}
 		}
 
-		//		String userNameFirmatario = ldapService.getUid(attestato.getSede().getMatricolaDirettoreSede());
-
 		String uoCompetenzaPerFlusso = Utility.replace(ordineMissione.getUoCompetenza(), ".", "");
 		String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
-		
-		
-		String userNameFirmatario = recuperoUidDirettoreUo(uoRichPerFlusso);
-//		String userNameFirmatario = accountService.getDirector(uoRichPerFlusso);
-
 		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
+		String userNameFirmatario = null;
 		String userNameFirmatarioSpesa = null;
+		if (isDevProfile()){
+			userNameFirmatario = recuperoUidDirettoreUo(uoRichPerFlusso);
+		} else {
+			userNameFirmatario = accountService.getDirector(uoRichPerFlusso);		
+		}
+		
 		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 			if (uoCompetenzaPerFlusso != null){
-				userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoCompetenzaPerFlusso);
-//				userNameFirmatarioSpesa = accountService.getDirector(uoCompetenzaPerFlusso);
+				if (isDevProfile()){
+					userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoCompetenzaPerFlusso);
+				} else {
+					userNameFirmatarioSpesa = accountService.getDirector(uoCompetenzaPerFlusso);
+				}
 			} else {
 				userNameFirmatarioSpesa = userNameFirmatario;
 			}
 		} else {
-			userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoSpesaPerFlusso);
-//			userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
+			if (isDevProfile()){
+				recuperoUidDirettoreUo(uoSpesaPerFlusso);
+			} else {
+				userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
+			}
 		}
 		
-
-//		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(userNameFirmatario);
-
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
 		dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
 		dataScadenzaFlusso.add(Calendar.DATE, 14);
@@ -234,6 +241,12 @@ public class CMISOrdineMissioneService {
 		return cmisOrdineMissione;
 	}
 	
+	private boolean isDevProfile(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return true;
+   		}
+   		return false;
+	}
 	private String impostaValidazioneSpesa(String userNameFirmatario, String userNameFirmatarioSpesa){
 		if (userNameFirmatario != null && userNameFirmatarioSpesa != null && userNameFirmatario.equals(userNameFirmatarioSpesa)){
 			return "false";
