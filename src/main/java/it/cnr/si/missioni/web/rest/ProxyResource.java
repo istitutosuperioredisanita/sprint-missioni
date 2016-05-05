@@ -149,6 +149,13 @@ public class ProxyResource {
 			} else {
 				return risposta;
 			}
+		} else if (isAccountRestWithAnotherUSer(url)){
+			String resp = accountService.manageResponseForAccountRest(result.getBody());
+			if (resp != null){
+				return resp;
+			} else {
+				return risposta;
+			}
 		}
 		return risposta;
 	}
@@ -165,6 +172,12 @@ public class ProxyResource {
 
 	private Boolean isAccountRest(String url, String uid){
 		if (url.equals(Costanti.REST_ACCOUNT+uid)){
+			return true;
+		}
+		return false;
+	}
+	private Boolean isAccountRestWithAnotherUSer(String url){
+		if (url.startsWith(Costanti.REST_ACCOUNT)){
 			return true;
 		}
 		return false;

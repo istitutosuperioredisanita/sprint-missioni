@@ -19,6 +19,7 @@ public class Costanti {
 	public final static String REST_MODULO =  "ConsProgettiAction.json";
 	public final static String REST_GAE =  "ConsGAEAction.json";
 	public final static String REST_VOCE =  "ConsCapitoloAction.json";
+	public final static String REST_TERZO =  "ConsTerzoAction.json";
 	public final static String REST_IMPEGNO =  "ConsImpegnoAction.json";
 	public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
 	public final static String REST_ACCOUNT = "json/userinfo/";
