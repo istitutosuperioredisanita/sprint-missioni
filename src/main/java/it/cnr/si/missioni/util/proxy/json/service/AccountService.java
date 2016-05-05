@@ -12,6 +12,7 @@ import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
+import it.cnr.si.missioni.util.proxy.json.object.Terzo;
 
 import java.util.Iterator;
 
@@ -29,6 +30,9 @@ public class AccountService {
 	@Autowired
     private ConfigService configService;
 
+	@Autowired
+    private TerzoService terzoService;
+
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
@@ -41,17 +45,37 @@ public class AccountService {
 		return null;
 	}
 	
-	public String manageResponseForAccountRest(String uid, 
-			String body) {
+	public String manageResponseForAccountRest(String body) {
 		Account account = getAccount(body);
 		if (account != null){
-			return getResponseAccount(uid, account);
+			return getResponseAccount(null, account, Boolean.FALSE);
 		}
 		return null;
 	}
 
-	private String getResponseAccount(String uid, Account account) {
-		UsersSpecial user = getUoForUsersSpecial(uid);
+	public String manageResponseForAccountRest(String uid, 
+			String body, Boolean loadSpecialUserData) {
+		Account account = getAccount(body);
+		if (account != null){
+			return getResponseAccount(uid, account, loadSpecialUserData);
+		}
+		return null;
+	}
+
+	public String manageResponseForAccountRest(String uid, 
+			String body) {
+		Account account = getAccount(body);
+		if (account != null){
+			return getResponseAccount(uid, account, true);
+		}
+		return null;
+	}
+
+	private String getResponseAccount(String uid, Account account, Boolean loadSpecialUserData) {
+		UsersSpecial user = null;
+		if (loadSpecialUserData){
+			user = getUoForUsersSpecial(uid);
+		}
 		return createResponseForAccountRest(account, user);
 	}
 
@@ -59,9 +83,14 @@ public class AccountService {
 		if (user != null){
 			account.setAllUoForUsersSpecial(user.getAll());
 			account.setUoForUsersSpecial(user.getUoForUsersSpecials());
-			return getBodyAccount(account);
 		}
-		return null;
+		if (account.getCodiceFiscale() != null){
+			Terzo terzo = terzoService.loadTerzo(account.getCodiceFiscale(), null);
+			if (terzo != null){
+				account.setCdTerzoSigla(terzo.getCd_terzo().toString());
+			}
+		}
+		return getBodyAccount(account);
 	}
 
 	public Account loadAccountFromRest(String currentLogin){
@@ -77,11 +106,9 @@ public class AccountService {
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
 		ResultProxy result = proxyService.process(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_ACCOUNT+currentLogin, "proxyURL="+Costanti.REST_ACCOUNT+currentLogin, null);
 		String risposta = result.getBody();
-		if (loadSpecialUserData){
-			String resp = manageResponseForAccountRest(currentLogin, risposta);
-			if (resp != null){
-				return resp;
-			}
+		String resp = manageResponseForAccountRest(currentLogin, risposta, loadSpecialUserData);
+		if (resp != null){
+			return resp;
 		}
 		return risposta;
 	}

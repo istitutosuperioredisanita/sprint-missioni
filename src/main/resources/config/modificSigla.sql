@@ -542,3 +542,27 @@ AS
             obbligazione.ds_obbligazione,
             obbligazione.fl_pgiro,
             obbligazione_scad_voce.cd_linea_attivita;
+
+
+Insert into ACCESSO
+   (CD_ACCESSO, TI_ACCESSO, DS_ACCESSO, DUVA, UTUV, 
+    DACR, UTCR, PG_VER_REC)
+ Values
+   ('CONSTERZOREST', 'D', 'Servizio REST per i Terzi', TO_DATE('04/13/2016 16:02:32', 'MM/DD/YYYY HH24:MI:SS'), '$$$$$MIGRAZIONE$$$$$', 
+    TO_DATE('04/13/2016 16:02:32', 'MM/DD/YYYY HH24:MI:SS'), '$$$$$MIGRAZIONE$$$$$', 1);
+
+Insert into ASS_BP_ACCESSO
+   (CD_ACCESSO, BUSINESS_PROCESS, TI_FUNZIONE, DACR, UTCR, 
+    DUVA, UTUV, PG_VER_REC, ESERCIZIO_INIZIO_VALIDITA, ESERCIZIO_FINE_VALIDITA)
+ Values
+   ('CONSTERZOREST', 'ConsTerzoRestBP', 'V', TO_DATE('04/13/2016 16:02:41', 'MM/DD/YYYY HH24:MI:SS'), '$$$$$MIGRAZIONE$$$$$', 
+    TO_DATE('04/13/2016 16:02:41', 'MM/DD/YYYY HH24:MI:SS'), '$$$$$MIGRAZIONE$$$$$', 1, NULL, NULL);
+
+Insert into RUOLO_ACCESSO
+   (CD_RUOLO, CD_ACCESSO, UTUV, DACR, UTCR, 
+    DUVA, PG_VER_REC)
+ Values
+   ('MISSIONI', 'CONSTERZOREST', 'CNRTUTTO', TO_DATE('04/13/2016 16:03:38', 'MM/DD/YYYY HH24:MI:SS'), 'CNRTUTTO', 
+    TO_DATE('04/13/2016 16:03:38', 'MM/DD/YYYY HH24:MI:SS'), 1);
+
+COMMIT;

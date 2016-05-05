@@ -48,7 +48,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"profilo",
 	"struttura_appartenenza",
 	"uoForUsersSpecial",
-	"allUoForUsersSpecial"
+	"allUoForUsersSpecial",
+	"cdTerzoSigla"
 })
 public class Account {
 
@@ -114,6 +115,8 @@ public class Account {
 	private List<UoForUsersSpecial> uoForUsersSpecial;
 	@JsonProperty("allUoForUsersSpecial")
 	private String allUoForUsersSpecial;
+	@JsonProperty("cdTerzoSigla")
+	private String cdTerzoSigla;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -735,6 +738,26 @@ public class Account {
 	@JsonProperty("allUoForUsersSpecial")
 	public void setAllUoForUsersSpecial(String allUoForUsersSpecial) {
 		this.allUoForUsersSpecial = allUoForUsersSpecial;
+	}
+
+	/**
+	 *
+	 * @return
+	 * The cdTerzoSigla
+	 */
+	@JsonProperty("cdTerzoSigla")
+	public String getCdTerzoSigla() {
+		return cdTerzoSigla;
+	}
+
+	/**
+	 *
+	 * @param cdTerzoSigla
+	 * The cdTerzoSigla
+	 */
+	@JsonProperty("cdTerzoSigla")
+	public void setCdTerzoSigla(String cdTerzoSigla) {
+		this.cdTerzoSigla = cdTerzoSigla;
 	}
 
 	@JsonAnyGetter
