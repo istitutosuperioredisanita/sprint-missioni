@@ -22,3 +22,5 @@ bower_components/
 /*.bak
 /*.log
 /src/main/resources/config/RestDirettore.txt
+/.idea/
+*.iml
