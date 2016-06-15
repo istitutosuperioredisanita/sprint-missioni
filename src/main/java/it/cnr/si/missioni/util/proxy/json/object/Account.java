@@ -49,7 +49,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"struttura_appartenenza",
 	"uoForUsersSpecial",
 	"allUoForUsersSpecial",
-	"cdTerzoSigla"
+	"cdTerzoSigla",
+	"inquadramenti"
 })
 public class Account {
 
@@ -117,6 +118,8 @@ public class Account {
 	private String allUoForUsersSpecial;
 	@JsonProperty("cdTerzoSigla")
 	private String cdTerzoSigla;
+	@JsonProperty("inquadramenti")
+	private List<Inquadramento> inquadramenti;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -768,6 +771,26 @@ public class Account {
 	@JsonAnySetter
 	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
+	}
+
+	/**
+	 *
+	 * @return
+	 * The inquadramenti
+	 */
+	@JsonProperty("inquadramenti")
+	public List<Inquadramento> getInquadramenti() {
+		return inquadramenti;
+	}
+
+	/**
+	 *
+	 * @param inquadramenti
+	 * The inquadramenti
+	 */
+	@JsonProperty("inquadramenti")
+	public void setInquadramenti(List<Inquadramento> inquadramenti) {
+		this.inquadramenti = inquadramenti;
 	}
 }
 

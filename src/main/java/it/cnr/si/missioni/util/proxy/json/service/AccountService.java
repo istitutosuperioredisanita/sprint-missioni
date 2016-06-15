@@ -33,6 +33,9 @@ public class AccountService {
 	@Autowired
     private TerzoService terzoService;
 
+	@Autowired
+    private InquadramentoService inquadramentoService;
+
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
@@ -84,12 +87,15 @@ public class AccountService {
 			account.setAllUoForUsersSpecial(user.getAll());
 			account.setUoForUsersSpecial(user.getUoForUsersSpecials());
 		}
-		if (account.getCodiceFiscale() != null){
-			Terzo terzo = terzoService.loadTerzo(account.getCodiceFiscale(), null);
-			if (terzo != null){
-				account.setCdTerzoSigla(terzo.getCd_terzo().toString());
-			}
-		}
+// Da richiamare come servizio REST a parte per il rimborso
+//		if (account.getCodiceFiscale() != null){
+//			Terzo terzo = terzoService.loadTerzo(account.getCodiceFiscale(), null);
+//			if (terzo != null){
+//				account.setCdTerzoSigla(terzo.getCd_terzo().toString());
+//				account.setInquadramenti(inquadramentoService.loadInquadramento(terzo.getCd_anag()));
+//				
+//			}
+//		}
 		return getBodyAccount(account);
 	}
 
