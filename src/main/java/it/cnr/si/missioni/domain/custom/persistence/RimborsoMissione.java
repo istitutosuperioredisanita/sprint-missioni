@@ -230,6 +230,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient implements Seriali
     @Column(name = "NOTE", length = 1000, nullable = true)
     private String note;
 
+    @Size(min = 0, max = 1000)
+    @Column(name = "NOTE_DIFFERENZE_ORDINE", length = 1000, nullable = true)
+    private String noteDifferenzeOrdine;
+
     @Size(min = 0, max = 28)
     @Column(name = "VOCE", length = 28, nullable = true)
     private String voce;
@@ -1078,5 +1082,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient implements Seriali
 
 	public void setCdTerzoSigla(String cdTerzoSigla) {
 		this.cdTerzoSigla = cdTerzoSigla;
+	}
+
+	public String getNoteDifferenzeOrdine() {
+		return noteDifferenzeOrdine;
+	}
+
+	public void setNoteDifferenzeOrdine(String noteDifferenzeOrdine) {
+		this.noteDifferenzeOrdine = noteDifferenzeOrdine;
 	}
 }
