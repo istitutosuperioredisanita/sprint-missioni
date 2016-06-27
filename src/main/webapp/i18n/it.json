@@ -28,7 +28,8 @@
                 "register": "Register",
                 "ordine-missione": "Nuovo Ordine di Missione",
                 "elenco-ordini-missione": "Elenco Ordini di Missione",
-                "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi"
+                "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi",
+                "rimborso-missione": "Rimborso Missione"
             },
             "admin": "Administration",
             "language": "Linguaggio"
@@ -311,8 +312,8 @@
             "cds-competenza.placeholder": "CDS di Competenza",
             "uo-competenza": "UO Competenza",
             "uo-competenza.placeholder": "UO di Competenza",
-            "uo-userid-missione": "Uo dell'utente dell'Ordine di Missione",
-            "userid-missione": "Utente Ordine di Missione",
+            "uo-userid-missione": "Uo dell'utente della Missione",
+            "userid-missione": "Utente Missione",
             "uo-spesa.placeholder": "UO sul quale graverà la Spesa",
             "cds-spesa": "CDS Spesa",
             "cds-spesa.placeholder": "CDS sul quale graverà la Spesa",
@@ -383,6 +384,15 @@
     },
     "ordini-missione-da-rendere-definitivi": {
         "title": "ORDINI DI MISSIONE DA RENDERE DEFINITIVI"
+    },
+    "rimborso-missione": {
+        "title": "RIMBORSO MISSIONE ",
+        "form": {
+            "inquadramento": "Inquadramento"
+        },
+        "button": {
+            "print": "Stampa Rimborso"
+        }
     },
     "activate": {
         "title": "Activation",
