@@ -140,6 +140,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/rimborso-missione/:idMissione?/:validazione?', {
+                    templateUrl: 'views/rimborso-missione.html',
+                    controller: 'RimborsoMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/elenco-ordini-missione', {
                     templateUrl: 'views/elenco-ordini-missione.html',
                     controller: 'ElencoOrdiniMissioneController',
