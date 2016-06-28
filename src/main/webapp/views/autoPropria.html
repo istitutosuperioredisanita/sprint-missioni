@@ -3,7 +3,7 @@
         <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                <p class="col-md-12">
                   <span class="input-group">
-                  <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-userid-missione">uo</span>
+                  <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
                     <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
                    </span>
                </p>
@@ -11,7 +11,7 @@
             <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
                 <p class="col-md-12">
                     <span class="input-group">
-                    <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.userid-missione">user</span>
+                    <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
                        <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
                     </span>
                 </p>
