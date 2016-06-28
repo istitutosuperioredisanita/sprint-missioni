@@ -4,7 +4,7 @@
         <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                <p class="col-md-12">
                   <span class="input-group">
-                  <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-userid-missione">uo</span>
+                  <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
                     <select ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
                    </span>
                </p>
@@ -49,14 +49,14 @@
     <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
             <th style="text-align: left">{{'main.userid' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data-fine' | translate}}</th>
         </tr>
       </thead>
 
