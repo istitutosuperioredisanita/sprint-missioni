@@ -1,207 +1,7 @@
 'use strict';
 
-missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, DirettoreUoService) {
-    var recuperoUo = function(anno, cds, uoRich){
-        var urlRestProxy = URL_REST.STANDARD;
-        var uos = [];
-        var app = APP_FOR_REST.SIGLA;
-        var url = SIGLA_REST.UO;
-        var objectPostUoOrderBy = [{name: 'cd_unita_organizzativa', type: 'ASC'}];
-        var objectPostUoClauses = null;
-        if (cds){
-            objectPostUoClauses = [{condition: 'AND', fieldName: 'cd_unita_padre', operator: "=", fieldValue:cds},
-                                    {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
-        } else {
-            objectPostUoClauses = [{condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
-        }
-        var objectPostUo = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostUoOrderBy, clauses:objectPostUoClauses}
-        return $http.post(urlRestProxy + app+'/', objectPostUo, {params: {proxyURL: url}}).success(function (data) {
-            if (data){
-                if (data.elements){
-                    var listaUo = data.elements;
-                    if (uoRich){
-                        uos = [];
-                        var ind = -1;
-                        for (var i=0; i<listaUo.length; i++) {
-                            if (listaUo[i].cd_unita_organizzativa === uoRich){
-                                ind ++;
-                                uos[ind] = listaUo[i];
-                            }
-                        }
-
-                        for (var i=0; i<listaUo.length; i++) {
-                            if (listaUo[i].cd_unita_organizzativa != uoRich){
-                                ind ++;
-                                uos[ind] = listaUo[i];
-                            }
-                        }
-                        return uos;
-                    }
-                } else {
-                    return uos;
-                }
-            } else {
-                return uos;
-            }
-        }).error(function (data) {
-            ui.error(data);
-        });
-    }
-
-    var estraiUo = function(codice){
-        return codice.substring(0,3)+'.'+codice.substring(3,6);
-    }
-
-    var estraiUoRichFromAccount = function(account){
-        if (account.codice_uo){
-            return estraiUo(account.codice_uo);
-        }
-        return "";
-    }
-
-    var isPersonaGiaPresente = function(persons, codice_fiscale){
-        for (var i=0; i<persons.length; i++) {
-            if (persons[i].codice_fiscale == codice_fiscale){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    var recuperoDirettoreUo = function(uo){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
-        var y = x.then(function (result) {
-            if (result.data){
-                return createPerson(result.data);
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
-    var recuperoDatiPerson = function(username){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
-        var y = x.then(function (result) {
-            if (result.data){
-                return createPerson(result.data);
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
-    var recuperoPersonsForUo = function(uo){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.PERSONS_FOR_UO;
-        var persons = [];
-        var uoSiper = uo.replace('.','');
-        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: uoSiper, userinfo:true}});
-        var y = x.then(function (result) {
-            if (result.data){
-                var listaPersons = result.data;
-                var ind = -1;
-
-                var personPromise = DirettoreUoService.getDirettore(uoSiper);
-                return personPromise.then(function(result){
-                    if (result && result.data){
-                        var direttore = result.data;
-                        var trovatoDirettore = false;
-                        for (var z=0; z<persons.length; z++) {
-                            if (persons[z].uid == direttore.uid){
-                                trovatoDirettore = true;
-                            }
-                        }
-                        if (!trovatoDirettore){
-                            listaPersons.push(direttore);
-                        }
-                    }
-                    for (var k=0; k<listaPersons.length; k++) {
-                        var person = null;
-                        var cognome = null;
-                        var cf = null;
-                        var nome = null;
-                        for (var i=0; i<listaPersons.length; i++) {
-                            if ((ind == -1 || !isPersonaGiaPresente(persons, listaPersons[i].codice_fiscale)) && (cognome == null || 
-                                (listaPersons[i].cognome < cognome && 
-                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                (listaPersons[i].cognome == cognome && listaPersons[i].nome < nome && 
-                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                (listaPersons[i].cognome == cognome && listaPersons[i].nome == nome && listaPersons[i].codice_fiscale < cf ) ) ) {
-                                person = listaPersons[i];
-                                cognome = person.cognome;
-                                nome = person.nome;
-                                cf = person.codice_fiscale;
-                            }
-                        }
-                        if (person != null){
-                            ind ++;
-                            persons[ind] = person;
-                        }
-                    }
-                    return persons;
-                });
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
-    var createPerson = function(data){
-        var userWork = {};
-        userWork.login = data.uid;
-        userWork.matricola = data.matricola;
-        userWork.firstName = data.nome;
-        userWork.lastName = data.cognome;
-        userWork.email = data.email_comunicazioni;
-        userWork.userRoles = ['ROLE_USER'];
-        userWork.comune_nascita = data.comune_nascita; 
-        userWork.data_nascita = data.data_nascita;
-        userWork.comune_residenza = data.comune_residenza; 
-        userWork.indirizzo_residenza = data.indirizzo_residenza; 
-        userWork.num_civico_residenza = data.num_civico_residenza;
-        userWork.cap_residenza = data.cap_residenza;
-        userWork.provincia_residenza = data.provincia_residenza;
-        userWork.codice_fiscale = data.codice_fiscale;
-        userWork.profilo = data.profilo;
-        userWork.struttura_appartenenza = data.struttura_appartenenza;
-        userWork.codice_sede = data.codice_sede;
-        userWork.codice_uo = data.codice_uo;
-        userWork.livello = data.livello_profilo;
-        userWork.allUoForUsersSpecial = data.allUoForUsersSpecial;
-        userWork.uoForUsersSpecial = data.uoForUsersSpecial;
-        userWork.isAccountLDAP = true;
-        return userWork;
-    }
-
-    return { getUos: recuperoUo,
-             getPersons: recuperoPersonsForUo,
-             getPerson: recuperoDatiPerson ,
-             buildPerson: createPerson ,
-             buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
-             buildUoSiglaFromUoSiper: estraiUo };
-});
-
 missioniApp.factory('RimborsoMissioneService', function ($resource) {
-        return $resource('app/rest/ordineMissione/:ids', {}, {
+        return $resource('app/rest/rimborsoMissione/:ids', {}, {
             'get': { method: 'GET', isArray: true},
             'add':  { method: 'POST'},
             'modify':  { method: 'PUT'},
@@ -212,7 +12,7 @@ missioniApp.factory('RimborsoMissioneService', function ($resource) {
         });
     });
 
-missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
+missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, RimborsoMissioneService, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
             ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session) {
 
     var urlRestProxy = URL_REST.STANDARD;
@@ -234,8 +34,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var controlliPrimaDelSalvataggio = function(){
         if ($scope.impegnoSelected){
             if ($scope.uoSpesaSelected.cd_unita_organizzativa) {
-                $scope.ordineMissioneModel.uoSpesa = $scope.uoSpesaSelected.cd_unita_organizzativa;
-                $scope.ordineMissioneModel.objUoSpesa = $scope.uoSpesaSelected;
+                $scope.rimborsoMissioneModel.uoSpesa = $scope.uoSpesaSelected.cd_unita_organizzativa;
+                $scope.rimborsoMissioneModel.objUoSpesa = $scope.uoSpesaSelected;
             }
         }
     }
@@ -245,17 +45,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.undoCds = function(){
-        $scope.ordineMissioneModel.cdsSpesa = null;
+        $scope.rimborsoMissioneModel.cdsSpesa = null;
     };
 
     $scope.undoVoce = function(){
-        $scope.ordineMissioneModel.voce = null;
+        $scope.rimborsoMissioneModel.voce = null;
     };
 
     var caricaCds = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
-                $scope.ordineMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
+                $scope.rimborsoMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
             } else {
                 if (cds){
                     $scope.elencoCds = [];
@@ -270,8 +70,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                             $scope.elencoCds[ind] = $scope.formatResultCds(listaCds[i]);
                         }
                     }
-                    if ($scope.ordineMissioneModel){
-                        $scope.ordineMissioneModel.cdsSpesa = cds;
+                    if ($scope.rimborsoMissioneModel){
+                        $scope.rimborsoMissioneModel.cdsSpesa = cds;
                     }
                 }
             }
@@ -284,7 +84,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var caricaCdsCompetenza = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
-                $scope.ordineMissioneModel.cdsCompetenza = $scope.formatResultCds(listaCds[0]);
+                $scope.rimborsoMissioneModel.cdsCompetenza = $scope.formatResultCds(listaCds[0]);
             } else {
                 if (cds){
                     $scope.elencoCdsCompetenza = [];
@@ -299,8 +99,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                             $scope.elencoCdsCompetenza[ind] = $scope.formatResultCds(listaCds[i]);
                         }
                     }
-                    if ($scope.ordineMissioneModel){
-                        $scope.ordineMissioneModel.cdsCompetenza = cds;
+                    if ($scope.rimborsoMissioneModel){
+                        $scope.rimborsoMissioneModel.cdsCompetenza = cds;
                     }
                 } else {
                     $scope.elencoCdsCompetenza = listaCds;
@@ -366,7 +166,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 		        $scope.elencoUo = result.data.elements;
 		        if ($scope.elencoUo){
 		            if ($scope.elencoUo.length === 1){
-		                $scope.ordineMissioneModel.uoSpesa = $scope.elencoUo[0];
+		                $scope.rimborsoMissioneModel.uoSpesa = $scope.elencoUo[0];
 		            }
 		        }
         	} else {
@@ -383,7 +183,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     $scope.elencoUoCompetenza = result.data.elements;
                     if ($scope.elencoUoCompetenza){
                         if ($scope.elencoUoCompetenza.length === 1){
-                            $scope.ordineMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0];
+                            $scope.rimborsoMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0];
                         }
                     }
                 } else {
@@ -405,10 +205,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     if (data.elements){
                         $scope.elencoCdr = data.elements;
                         if (data.elements.length === 1){
-                            $scope.ordineMissioneModel.cdrSpesa = data.elements[0].cd_centro_responsabilita;
+                            $scope.rimborsoMissioneModel.cdrSpesa = data.elements[0].cd_centro_responsabilita;
                             if (daQuery != 'S'){
-                                $scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
-                                $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                                $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+                                $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                             }
                         }
                     } else {
@@ -440,7 +240,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     if (data.elements){
                         $scope.elencoModuli = data.elements;
                         if (data.elements.length === 1){
-                            $scope.ordineMissioneModel.modulo = data.elements[0].pg_progetto;
+                            $scope.rimborsoMissioneModel.modulo = data.elements[0].pg_progetto;
                         }
                     } else {
                         $scope.elencoModuli = [];
@@ -455,23 +255,23 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
     
     $scope.restImpegno = function(){
-        if ($scope.ordineMissioneModel.esercizioOriginaleObbligazione && $scope.ordineMissioneModel.pgObbligazione){
+        if ($scope.rimborsoMissioneModel.esercizioOriginaleObbligazione && $scope.rimborsoMissioneModel.pgObbligazione){
             var app = APP_FOR_REST.SIGLA;
             var url = null;
             var varClauses = [];
             if ($scope.gaeSelected){
                 url = SIGLA_REST.IMPEGNO_GAE;
-                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:$scope.ordineMissioneModel.anno},
-                              {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.ordineMissioneModel.cdsSpesa},
-                              {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.ordineMissioneModel.esercizioOriginaleObbligazione},
-                              {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.ordineMissioneModel.pgObbligazione},
-                              {condition: 'AND', fieldName: 'cdLineaAttivita', operator: "=", fieldValue:$scope.ordineMissioneModel.gaeSelected}];
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:$scope.rimborsoMissioneModel.anno},
+                              {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.rimborsoMissioneModel.cdsSpesa},
+                              {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.rimborsoMissioneModel.esercizioOriginaleObbligazione},
+                              {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.rimborsoMissioneModel.pgObbligazione},
+                              {condition: 'AND', fieldName: 'cdLineaAttivita', operator: "=", fieldValue:$scope.rimborsoMissioneModel.gaeSelected}];
             } else {
                 url = SIGLA_REST.IMPEGNO;
-                varClauses = [{condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.ordineMissioneModel.cdsSpesa},
-                              {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:$scope.ordineMissioneModel.anno},
-                              {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.ordineMissioneModel.esercizioOriginaleObbligazione},
-                              {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.ordineMissioneModel. pgObbligazione}];
+                varClauses = [{condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.rimborsoMissioneModel.cdsSpesa},
+                              {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:$scope.rimborsoMissioneModel.anno},
+                              {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.rimborsoMissioneModel.esercizioOriginaleObbligazione},
+                              {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.rimborsoMissioneModel. pgObbligazione}];
             }
             var varOrderBy = [{name: 'esercizio', type: 'DESC'}];
             var postImpegno = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
@@ -530,7 +330,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     if (data.elements){
                         $scope.elencoGae = data.elements;
                         if (data.elements.length === 1){
-                            $scope.ordineMissioneModel.gae = data.elements[0].cd_linea_attivita;
+                            $scope.rimborsoMissioneModel.gae = data.elements[0].cd_linea_attivita;
                         }
                     } else {
                         $scope.elencoGae = [];
@@ -560,7 +360,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     if (listaVoci){
                         $scope.elencoVoci = [];
                         if (listaVoci.length === 1){
-                            $scope.ordineMissioneModel.voce = listaVoci[0];
+                            $scope.rimborsoMissioneModel.voce = listaVoci[0];
                         }
 	                    var ind = -1;
     	                for (var i=0; i<listaVoci.length; i++) {
@@ -594,33 +394,33 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.annullaGae = function(){
-      $scope.ordineMissioneModel.gae = null;
+      $scope.rimborsoMissioneModel.gae = null;
       $scope.gaeSelected = null;
     }
 
     $scope.annullaModulo = function(){
       $scope.annullaGae();
-      $scope.ordineMissioneModel.pgProgetto = null;
+      $scope.rimborsoMissioneModel.pgProgetto = null;
     }
 
     $scope.annullaCdr = function(){
       $scope.annullaModulo();
-      $scope.ordineMissioneModel.cdrSpesa = null;
+      $scope.rimborsoMissioneModel.cdrSpesa = null;
     }
 
     $scope.annullaUo = function(){
       $scope.annullaCdr();
-      $scope.ordineMissioneModel.uoSpesa = null;
+      $scope.rimborsoMissioneModel.uoSpesa = null;
     }
 
     $scope.reloadCds = function(cds) {
       $scope.annullaUo();  
-      $scope.restUo($scope.ordineMissioneModel.anno, cds, $scope.ordineMissioneModel.uoRich);
+      $scope.restUo($scope.rimborsoMissioneModel.anno, cds, $scope.rimborsoMissioneModel.uoRich);
     }
 
     $scope.reloadCdsCompetenza = function(cds) {
-      $scope.ordineMissioneModel.uoCompetenza = null;
-      $scope.restUoCompetenza($scope.ordineMissioneModel.anno, cds, null);
+      $scope.rimborsoMissioneModel.uoCompetenza = null;
+      $scope.restUoCompetenza($scope.rimborsoMissioneModel.anno, cds, null);
     }
 
     $scope.reloadUoWork = function(uo){
@@ -628,7 +428,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
         $scope.userWork = null;
-        $scope.ordineMissioneModel = {};
+        $scope.rimborsoMissioneModel = {};
         if (uo){
             $scope.disableUo = true;
             var persons = ProxyService.getPersons(uo).then(function(result){
@@ -647,12 +447,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.reloadCdr = function(cdr) {
       $scope.annullaModulo();  
-      $scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
+      $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
     }
 
     $scope.reloadModulo = function(pgProgetto, cdr, uo) {
       $scope.annullaGae();
-      $scope.restGae($scope.ordineMissioneModel.anno, pgProgetto, cdr, uo);
+      $scope.restGae($scope.rimborsoMissioneModel.anno, pgProgetto, cdr, uo);
     }
 
     $scope.tipiMissione = {
@@ -682,28 +482,28 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     };
 
     $scope.onChangeTipoMissione = function() {
-        if ($scope.ordineMissioneModel.tipoMissione === 'E') {
-            $scope.ordineMissioneModel.trattamento = "R";
+        if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
+            $scope.rimborsoMissioneModel.trattamento = "R";
             $scope.missioneEstera = true;
         } else {
-            $scope.ordineMissioneModel.trattamento = null;
+            $scope.rimborsoMissioneModel.trattamento = null;
             $scope.missioneEstera = null;
-            $scope.ordineMissioneModel.nazione = null;
+            $scope.rimborsoMissioneModel.nazione = null;
         }
     };
 
     var dateInizioFineDiverse = function() {
-        if ($scope.ordineMissioneModel.dataInizioMissione === undefined || 
-            $scope.ordineMissioneModel.dataFineMissione === undefined ||
-            $scope.ordineMissioneModel.dataInizioMissione == null || 
-            $scope.ordineMissioneModel.dataFineMissione === null ||
-            $scope.ordineMissioneModel.dataInizioMissione === "" || 
-            $scope.ordineMissioneModel.dataFineMissione === "" ||
-            $scope.ordineMissioneModel.dataFineMissione === $scope.ordineMissioneModel.dataInizioMissione) {
+        if ($scope.rimborsoMissioneModel.dataInizioMissione === undefined || 
+            $scope.rimborsoMissioneModel.dataFineMissione === undefined ||
+            $scope.rimborsoMissioneModel.dataInizioMissione == null || 
+            $scope.rimborsoMissioneModel.dataFineMissione === null ||
+            $scope.rimborsoMissioneModel.dataInizioMissione === "" || 
+            $scope.rimborsoMissioneModel.dataFineMissione === "" ||
+            $scope.rimborsoMissioneModel.dataFineMissione === $scope.rimborsoMissioneModel.dataInizioMissione) {
           $scope.showObbligoRientro = null;
         } else {
-            var dataInizio = moment($scope.ordineMissioneModel.dataInizioMissione).format("DD/MM/YYYY");
-            var dataFine = moment($scope.ordineMissioneModel.dataFineMissione).format("DD/MM/YYYY");
+            var dataInizio = moment($scope.rimborsoMissioneModel.dataInizioMissione).format("DD/MM/YYYY");
+            var dataFine = moment($scope.rimborsoMissioneModel.dataFineMissione).format("DD/MM/YYYY");
             if (dataInizio != dataFine){
                 $scope.showObbligoRientro = true;
             } else {
@@ -717,8 +517,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.esisteOrdineMissione = function() {
-        if ($scope.ordineMissioneModel.id === undefined || 
-            $scope.ordineMissioneModel.id === "") {
+        if ($scope.rimborsoMissioneModel.id === undefined || 
+            $scope.rimborsoMissioneModel.id === "") {
           return null;
         } else {
           return true;
@@ -726,11 +526,11 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     var impostaDisabilitaOrdineMissione = function() {
-        if ($scope.esisteOrdineMissione && ($scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || ($scope.ordineMissioneModel.stato === 'CON' && 
-            ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
-                $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||
-                $scope.ordineMissioneModel.stateFlows === 'FIRMA UO' ||
-                $scope.ordineMissioneModel.stateFlows === 'FIRMATO')))) {
+        if ($scope.esisteOrdineMissione && ($scope.rimborsoMissioneModel.stato === 'DEF' || $scope.rimborsoMissioneModel.statoFlusso === 'APP' || ($scope.rimborsoMissioneModel.stato === 'CON' && 
+            ($scope.rimborsoMissioneModel.stateFlows === 'ANNULLATO' ||
+                $scope.rimborsoMissioneModel.stateFlows === 'FIRMA SPESA' ||
+                $scope.rimborsoMissioneModel.stateFlows === 'FIRMA UO' ||
+                $scope.rimborsoMissioneModel.stateFlows === 'FIRMATO')))) {
           return true;
         } else {
           return false;
@@ -739,18 +539,18 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.inizializzaFormPerModifica = function(){
         $scope.showEsisteOrdineMissione = true;
-        if ($scope.ordineMissioneModel.statoFlusso === "INV" && $scope.ordineMissioneModel.stato === "INS" && $scope.ordineMissioneModel.commentFlows){
+        if ($scope.rimborsoMissioneModel.statoFlusso === "INV" && $scope.rimborsoMissioneModel.stato === "INS" && $scope.rimborsoMissioneModel.commentFlows){
 	        $scope.showCommentFlows = true;
         } else {
 	        $scope.showCommentFlows = false;
         }
-        if ($scope.ordineMissioneModel.tipoMissione === 'E') {
+        if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
             $scope.missioneEstera = true;
         } else {
             $scope.missioneEstera = null;
         }
         if ($scope.validazione === 'S') {
-            $scope.ordineMissioneModel.daValidazione = "S";
+            $scope.rimborsoMissioneModel.daValidazione = "S";
         }
 
         $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
@@ -765,7 +565,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.inizializzaFormPerInserimento = function(account){
-        $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
+        $scope.rimborsoMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
                                         indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
@@ -773,10 +573,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
             uoRich:ProxyService.buildUoRichiedenteSiglaFromUoSiper(account), cdsRich:$scope.estraiCdsRichFromAccount(account)};
         $scope.missioneEstera = null;
-        $scope.ordineMissioneModel.uid = account.login;
+        $scope.rimborsoMissioneModel.uid = account.login;
         var today = $scope.today();
-        $scope.ordineMissioneModel.dataInserimento = today;
-        $scope.ordineMissioneModel.anno = today.getFullYear();
+        $scope.rimborsoMissioneModel.dataInserimento = today;
+        $scope.rimborsoMissioneModel.anno = today.getFullYear();
         $scope.showObbligoRientro = null;
         $scope.disabilitaOrdineMissione = false;
     }
@@ -790,21 +590,21 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.confirmDelete = function () {
-        ui.confirmCRUD("Confermi l'eliminazione dell'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+"?", deleteOrdineMissione);
+        ui.confirmCRUD("Confermi l'eliminazione dell'Ordine di Missione Numero: "+$scope.rimborsoMissioneModel.numero+" del "+$filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+"?", deleteOrdineMissione);
     }
 
     $scope.confirm = function () {
-        ui.confirmCRUD("Si sta per confermare l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
+        ui.confirmCRUD("Si sta per confermare l'Ordine di Missione Numero: "+$scope.rimborsoMissioneModel.numero+" del "+$filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
     }
 
     var confirmOrdineMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.confirm($scope.ordineMissioneModel,
+            OrdineMissioneService.confirm($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
 	                    ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
-                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
-                            $scope.ordineMissioneModel = data;
+                        ElencoOrdiniMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                            $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -824,12 +624,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.validateOrdineMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.confirm_validate($scope.ordineMissioneModel,
+            OrdineMissioneService.confirm_validate($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
-                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
-                            $scope.ordineMissioneModel = data;
+                        ElencoOrdiniMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                            $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -849,12 +649,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.finalizeOrdineMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.finalize($scope.ordineMissioneModel,
+            OrdineMissioneService.finalize($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Ordine di Missione Completato.");
-                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
-                            $scope.ordineMissioneModel = data;
+                        ElencoOrdiniMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                            $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -874,11 +674,11 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     var deleteOrdineMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.delete({ids:$scope.ordineMissioneModel.id},
+            OrdineMissioneService.delete({ids:$scope.rimborsoMissioneModel.id},
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         $scope.idMissione = null;
-                        $scope.ordineMissioneModel = {}
+                        $scope.rimborsoMissioneModel = {}
                         $scope.inizializzaFormPerInserimento($sessionStorage.account);
                     },
                     function (httpResponse) {
@@ -897,10 +697,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     var serviziRestInizialiInserimento = function(){
         $scope.restNazioni();
-        $scope.restCds($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
-        $scope.reloadCds($scope.ordineMissioneModel.cdsRich);
-        $scope.restCapitoli($scope.ordineMissioneModel.anno);
-        $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
+        $scope.restCds($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsRich);
+        $scope.reloadCds($scope.rimborsoMissioneModel.cdsRich);
+        $scope.restCapitoli($scope.rimborsoMissioneModel.anno);
+        $scope.restCdsCompetenza($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsRich);
     }
 
     $scope.reloadUserWork = function(uid){
@@ -920,14 +720,14 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.goAutoPropria = function () {
-      if ($scope.ordineMissioneModel.id){
+      if ($scope.rimborsoMissioneModel.id){
         if ($scope.validazione){
-            $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
+            $location.path('/ordine-missione/auto-propria/'+$scope.rimborsoMissioneModel.id+'/'+$scope.validazione);
         } else {
             if ($scope.disabilitaOrdineMissione){
-                $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+"D");
+                $location.path('/ordine-missione/auto-propria/'+$scope.rimborsoMissioneModel.id+'/'+"D");
             } else {
-                $location.path('/ordine-missione/auto-propria/'+$scope.ordineMissioneModel.id+'/'+"N");
+                $location.path('/ordine-missione/auto-propria/'+$scope.rimborsoMissioneModel.id+'/'+"N");
             }
         }
       } else {
@@ -936,14 +736,14 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.goAnticipo = function () {
-      if ($scope.ordineMissioneModel.id){
+      if ($scope.rimborsoMissioneModel.id){
         if ($scope.validazione){
-            $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+$scope.validazione);
+            $location.path('/ordine-missione/richiesta-anticipo/'+$scope.rimborsoMissioneModel.id+'/'+$scope.validazione);
         } else {
             if ($scope.disabilitaOrdineMissione){
-                $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+"D");
+                $location.path('/ordine-missione/richiesta-anticipo/'+$scope.rimborsoMissioneModel.id+'/'+"D");
             } else {
-                $location.path('/ordine-missione/richiesta-anticipo/'+$scope.ordineMissioneModel.id+'/'+"N");
+                $location.path('/ordine-missione/richiesta-anticipo/'+$scope.rimborsoMissioneModel.id+'/'+"N");
             }
         }
       } else {
@@ -952,15 +752,15 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.doPrintOrdineMissione = function(idOrdineMissione){
-      $scope.ordineMissioneModel.stampaInCorso=true;
+      $scope.rimborsoMissioneModel.stampaInCorso=true;
       $http.get('app/rest/ordineMissione/print/json',{params: {idMissione: idOrdineMissione}})
         .success(function (data) {
-            delete $scope.ordineMissioneModel.stampaInCorso;
+            delete $scope.rimborsoMissioneModel.stampaInCorso;
 //            var file = new Blob([data], {type: 'application/pdf'});
 //            var fileURL = URL.createObjectURL(file);
 //            window.open(fileURL);
         }).error(function (data) {
-            delete $scope.ordineMissioneModel.stampaInCorso;
+            delete $scope.rimborsoMissioneModel.stampaInCorso;
             ui.error(data);
         }); 
     }
@@ -973,7 +773,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         controlliPrimaDelSalvataggio();
         if ($scope.esisteOrdineMissione()){
             $rootScope.salvataggio = true;
-            OrdineMissioneService.modify($scope.ordineMissioneModel,
+            OrdineMissioneService.modify($scope.rimborsoMissioneModel,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
                     },
@@ -988,15 +788,15 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             );
         } else {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.add($scope.ordineMissioneModel,
+            OrdineMissioneService.add($scope.rimborsoMissioneModel,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
-                        $scope.ordineMissioneModel = value;
+                        $scope.rimborsoMissioneModel = value;
                         $scope.elencoPersone = null;
                         $scope.uoForUsersSpecial = null;
                         $scope.inizializzaFormPerModifica();
                         var path = $location.path();
-                        $location.path(path+'/'+$scope.ordineMissioneModel.id);
+                        $location.path(path+'/'+$scope.rimborsoMissioneModel.id);
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
@@ -1018,7 +818,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.accessToken = AccessToken.get();
     $sessionStorage.accountWork = null;
 
-    if (isInQuery() || ($scope.ordineMissioneModel != null && $scope.ordineMissioneModel.idMissione)){
+    if (isInQuery() || ($scope.rimborsoMissioneModel != null && $scope.rimborsoMissioneModel.idMissione)){
         ElencoOrdiniMissioneService.findById($scope.idMissione).then(function(data){
             var model = data;
             if (model){
@@ -1042,7 +842,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
                 $scope.restCapitoli(model.anno);
-                $scope.ordineMissioneModel = model;
+                $scope.rimborsoMissioneModel = model;
                 $scope.inizializzaFormPerModifica();
             }
         });
