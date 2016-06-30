@@ -189,7 +189,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient implements Seriali
     private String utilizzoAutoNoleggio;
 
     @Column(name = "CD_TERZO_SIGLA", length = 8, nullable = false)
-    private String cdTerzoSigla;
+    private Long cdTerzoSigla;
 
     @Size(min = 0, max = 5)
     @Column(name = "MODPAG", length = 5, nullable = false)
@@ -1076,11 +1076,11 @@ public class RimborsoMissione extends OggettoBulkXmlTransient implements Seriali
 		this.decodeStatoFlusso = decodeStatoFlusso;
 	}
 
-	public String getCdTerzoSigla() {
+	public Long getCdTerzoSigla() {
 		return cdTerzoSigla;
 	}
 
-	public void setCdTerzoSigla(String cdTerzoSigla) {
+	public void setCdTerzoSigla(Long cdTerzoSigla) {
 		this.cdTerzoSigla = cdTerzoSigla;
 	}
 
