@@ -2,6 +2,12 @@
 
 missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui) {
         return {
+            findMissioniDaRimborsare: function(user) {
+                var promise = $http.get('app/rest/ordiniMissione/list', {params: {user:user, stato: stato, daRimborsare: "S"}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
             findMissioni: function(user, anno, cdsRich, daNumero, aNumero, daData, aData) {
                 var promise = $http.get('app/rest/ordiniMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData}}).then(function (response) {
                     return response.data;

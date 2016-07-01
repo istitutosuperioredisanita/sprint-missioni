@@ -36,6 +36,17 @@
           </div>
 </div>
 
+<div>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
+                    <select ng-disabled="rimborsoMissioneModel.id" ng-change="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+'/'+ordineMissione.numero' dal '+ordineMissione.dataInizioMissione+' al '+ordineMissione.dataFineMissione+' - '+ordineMissione.destinazione+ for ordineMissione in elencoOrdiniMissione"></select>
+                        </span>
+                    </p>
+            </form>
+</div>
+
 <div class="panel panel-success">
   <div class="panel-heading color-verde-scuro text-center">
     <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
