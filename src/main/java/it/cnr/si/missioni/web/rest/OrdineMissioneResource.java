@@ -7,6 +7,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.OrdineMissioneFilter;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +75,28 @@ public class OrdineMissioneResource {
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissione(HttpServletRequest request,
     		OrdineMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
+        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
+        return new ResponseEntity<>(
+        		ordiniMissione,
+        		HttpStatus.OK);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/ordiniMissione/listDaRimborsare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneDaRimborsare(HttpServletRequest request,
+    		OrdineMissioneFilter filter) throws Exception {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare" );
+        filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+        filter.setValidato("S");
+        List<String> listaStati = new ArrayList<>();
+        listaStati.add(Costanti.STATO_DEFINITIVO);
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        filter.setListaStatiMissione(listaStati);
         List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
         		ordiniMissione,
