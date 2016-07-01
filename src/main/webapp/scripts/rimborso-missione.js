@@ -31,6 +31,29 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         }
     }
     
+    $scope.reloadOrdineMissione = function(idOrdineMissione){
+        $scope.rimborsoMissioneModel = {};
+        $scope.rimborsoMissioneModel.idOrdineMissione = idOrdineMissione;
+    }
+
+    $scope.restOrdiniMissioneDaRimborsare = function(userWork){
+        ElencoOrdiniMissioneService.findMissioniDaRimborsare(userWork).then(function(data){
+        $scope.elencoOrdiniMissione = data;
+        inizializzaFormPerInserimento($scope.account);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     var controlliPrimaDelSalvataggio = function(){
         if ($scope.impegnoSelected){
             if ($scope.uoSpesaSelected.cd_unita_organizzativa) {
@@ -565,7 +588,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.inizializzaFormPerInserimento = function(account){
-        $scope.rimborsoMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
+        $scope.rimborsoMissioneModel = {nominativo:account.lastName+" "+account.firstName, 
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
                                         indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
