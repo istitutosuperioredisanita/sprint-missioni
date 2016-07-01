@@ -37,9 +37,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.restOrdiniMissioneDaRimborsare = function(userWork){
-        ElencoOrdiniMissioneService.findMissioniDaRimborsare(userWork).then(function(data){
-        $scope.elencoOrdiniMissione = data;
-        inizializzaFormPerInserimento($scope.account);
+        ElencoOrdiniMissioneService.findMissioniDaRimborsare(userWork.login).then(function(data){
+            $scope.elencoOrdiniMissione = data;
+        });
     }
 
 
@@ -732,7 +732,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (uid == $scope.elencoPersone[i].uid){
                     var data = $scope.elencoPersone[i];
                     var userWork = ProxyService.buildPerson(data);
-
+                    $scope.restOrdiniMissioneDaRimborsare(userWork);
                     $scope.accountModel = userWork;
                     $sessionStorage.accountWork = userWork;
                     $scope.inizializzaFormPerInserimento($scope.accountModel);
@@ -835,6 +835,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             );
         }
     }
+
 
     $scope.idMissione = $routeParams.idMissione;
     $scope.validazione = $routeParams.validazione;

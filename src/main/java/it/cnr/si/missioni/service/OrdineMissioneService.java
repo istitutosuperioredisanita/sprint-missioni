@@ -311,6 +311,16 @@ public class OrdineMissioneService {
 			if (filter.getStato() != null){
 				criterionList.add(Restrictions.le("stato", filter.getStato()));
 			}
+			if (filter.getStatoFlusso() != null){
+				criterionList.add(Restrictions.le("statoFlusso", filter.getStatoFlusso()));
+			}
+			if (filter.getValidato() != null){
+				criterionList.add(Restrictions.le("validato", filter.getValidato()));
+			}
+			if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()){
+				criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
+			}
+			
 			if (filter.getaId() != null){
 				criterionList.add(Restrictions.le("id", filter.getaId()));
 			}
