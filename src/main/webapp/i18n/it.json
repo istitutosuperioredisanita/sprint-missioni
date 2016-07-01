@@ -394,6 +394,7 @@
     "rimborso-missione": {
         "title": "RIMBORSO MISSIONE ",
         "form": {
+            "ordine-missione.placeholder": "Selezionare l'Ordine di Missione",
             "inquadramento": "Inquadramento"
         },
         "button": {
