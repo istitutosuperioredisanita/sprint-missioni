@@ -65,7 +65,9 @@ public class CacheService implements EnvironmentAware{
 		if (configService.getServices()!= null && configService.getServices().getRestService() != null ){
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();
-				cacheRestService(rest);
+				if (!Utility.nvl(rest.getSkipLoadStartup(),"N").equals("S")){
+					cacheRestService(rest);
+				}
 			}
 		}
 	}

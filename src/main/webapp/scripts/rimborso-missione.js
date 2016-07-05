@@ -33,7 +33,36 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     
     $scope.reloadOrdineMissione = function(idOrdineMissione){
         $scope.rimborsoMissioneModel = {};
-        $scope.rimborsoMissioneModel.idOrdineMissione = idOrdineMissione;
+
+        for (var i=0; i<$scope.elencoOrdiniMissione.length; i++) {
+            if ($scope.elencoOrdiniMissione[i].id === idOrdineMissione){
+                var ordineMissioneSelected = $scope.elencoOrdiniMissione[i];
+                $scope.rimborsoMissioneModel.oggetto = ordineMissioneSelected.oggetto;
+                $scope.rimborsoMissioneModel.destinazione = ordineMissioneSelected.destinazione;
+                $scope.rimborsoMissioneModel.nazione = ordineMissioneSelected.nazione;
+                $scope.rimborsoMissioneModel.tipoMissione = ordineMissioneSelected.tipoMissione;
+                $scope.rimborsoMissioneModel.trattamento = ordineMissioneSelected.trattamento;
+                $scope.rimborsoMissioneModel.dataInizioMissione = ordineMissioneSelected.dataInizioMissione;
+                $scope.rimborsoMissioneModel.dataFineMissione = ordineMissioneSelected.dataFineMissione;
+                $scope.rimborsoMissioneModel.voce = ordineMissioneSelected.voce;
+                $scope.rimborsoMissioneModel.gae = ordineMissioneSelected.gae;
+                $scope.rimborsoMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
+                $scope.rimborsoMissioneModel.uoRich = ordineMissioneSelected.uoRich;
+                $scope.rimborsoMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
+                $scope.rimborsoMissioneModel.uospesa = ordineMissioneSelected.uospesa;
+                $scope.rimborsoMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
+                $scope.rimborsoMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
+                $scope.rimborsoMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
+                $scope.rimborsoMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
+                $scope.rimborsoMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
+                $scope.rimborsoMissioneModel.cdcdsObbligazione = ordineMissioneSelected.cdcdsObbligazione;
+                $scope.rimborsoMissioneModel.esercizioOriginaleObbligazione = ordineMissioneSelected.esercizioOriginaleObbligazione;
+                $scope.rimborsoMissioneModel.esercizioObbligazione = ordineMissioneSelected.esercizioObbligazione;
+                $scope.rimborsoMissioneModel.pgObbligazione = ordineMissioneSelected.pgObbligazione;
+                $scope.rimborsoMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
+                $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+            }
+        }
     }
 
     $scope.restOrdiniMissioneDaRimborsare = function(userWork){
