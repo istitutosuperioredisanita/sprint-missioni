@@ -111,9 +111,6 @@
 			    <column name="NOTE" type="varchar(1000)">
 			        <constraints nullable="true"/>
 			    </column>
-			    <column name="NOTE_DIFFERENZE_ORDINE" type="varchar(1000)">
-			        <constraints nullable="true"/>
-			    </column>
 			    <column name="VOCE" type="varchar(20)">
 			        <constraints nullable="true"/>
 			    </column>

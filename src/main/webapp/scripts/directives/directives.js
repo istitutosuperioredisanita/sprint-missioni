@@ -143,6 +143,13 @@ angular.module('missioniApp')
             }
             return input;
         };
+    }).filter('dateMissioni', function () {
+        return function (input) {
+            if (input) {
+              input = moment(input).format("DD/MM/YYYY");
+            }
+            return input;
+        };
   }).filter('myNumberFilter', function(){
 
     return function(number) {
