@@ -3,26 +3,18 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.Cdr;
-import it.cnr.si.missioni.util.proxy.json.object.Cds;
-import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Inheritance;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlTransient;
-
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
 
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
@@ -30,7 +22,15 @@ import org.springframework.util.StringUtils;
 /**
  * A user.
  */
+//@Entity
+//@Inheritance
 public abstract class Missione extends OggettoBulkXmlTransient implements Serializable {
+
+	@Id
+	@Column(name="ID", unique=true, nullable=false, length = 20)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
+	private Long id;
 
 	@Size(min = 0, max = 256)
     @Column(name = "UID_INSERT", length = 256, nullable = false)
@@ -192,8 +192,21 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
     @Column(name = "NOTE_UTILIZZO_TAXI_NOLEGGIO", length = 1000, nullable = true)
     public String noteUtilizzoTaxiNoleggio;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "PARTENZA_DA", length = 1, nullable = false)
+    private String partenzaDa;
+
 	public Missione(){
 		super();
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public Serializable getId() {
+		return id;
 	}
 
     public String getUid() {
@@ -382,6 +395,10 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
 
 	public String getStato() {
 		return stato;
+	}
+
+	public void setStato(String stato) {
+		this.stato = stato;
 	}
 
 	public String getDestinazione() {
@@ -651,4 +668,20 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
 		this.validato = validato;
 	}
 
+	public String getPartenzaDa() {
+		return partenzaDa;
+	}
+
+	public void setPartenzaDa(String partenzaDa) {
+		this.partenzaDa = partenzaDa;
+	}
+
+	@Transient
+	public String decodePartenzaDa(){
+		if (!StringUtils.isEmpty(getPartenzaDa())){
+			return Costanti.PARTENZA_DA.get(getPartenzaDa());
+		}
+		return "";
+	}
+	
 }

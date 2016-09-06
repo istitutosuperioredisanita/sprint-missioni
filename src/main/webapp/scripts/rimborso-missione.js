@@ -37,6 +37,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         for (var i=0; i<$scope.elencoOrdiniMissione.length; i++) {
             if ($scope.elencoOrdiniMissione[i].id === idOrdineMissione){
                 var ordineMissioneSelected = $scope.elencoOrdiniMissione[i];
+                $scope.rimborsoMissioneModel.idOrdineMissione = idOrdineMissione;
+                var today = $scope.today();
+                $scope.rimborsoMissioneModel.dataInserimento = today;
+                $scope.rimborsoMissioneModel.anno = today.getFullYear();
                 $scope.rimborsoMissioneModel.oggetto = ordineMissioneSelected.oggetto;
                 $scope.rimborsoMissioneModel.destinazione = ordineMissioneSelected.destinazione;
                 $scope.rimborsoMissioneModel.nazione = ordineMissioneSelected.nazione;
@@ -46,14 +50,14 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.dataFineMissione = ordineMissioneSelected.dataFineMissione;
                 $scope.rimborsoMissioneModel.voce = ordineMissioneSelected.voce;
                 $scope.rimborsoMissioneModel.gae = ordineMissioneSelected.gae;
-                $scope.rimborsoMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
-                $scope.rimborsoMissioneModel.uoRich = ordineMissioneSelected.uoRich;
-                $scope.rimborsoMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
-                $scope.rimborsoMissioneModel.uospesa = ordineMissioneSelected.uospesa;
-                $scope.rimborsoMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
-                $scope.rimborsoMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
-                $scope.rimborsoMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
                 $scope.rimborsoMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
+                $scope.rimborsoMissioneModel.uoRich = ordineMissioneSelected.uoRich;
+                $scope.rimborsoMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
+                $scope.rimborsoMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
+                $scope.rimborsoMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
+                $scope.rimborsoMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
+                $scope.rimborsoMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
+                $scope.rimborsoMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
                 $scope.rimborsoMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
                 $scope.rimborsoMissioneModel.cdcdsObbligazione = ordineMissioneSelected.cdcdsObbligazione;
                 $scope.rimborsoMissioneModel.esercizioOriginaleObbligazione = ordineMissioneSelected.esercizioOriginaleObbligazione;
@@ -61,6 +65,25 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.pgObbligazione = ordineMissioneSelected.pgObbligazione;
                 $scope.rimborsoMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
                 $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+                $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
+                if ($scope.rimborsoMissioneModel.uoSpesa){
+                    $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
+                }
+                if ($scope.rimborsoMissioneModel.cdsCompetenza){
+                    $scope.restCdsCompetenza($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsCompetenza);
+                }
+                if ($scope.rimborsoMissioneModel.uoCompetenza){
+                    $scope.restUoCompetenza($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsCompetenza, $scope.rimborsoMissioneModel.uoCompetenza);
+                }
+                if ($scope.rimborsoMissioneModel.cdrSpesa){
+                    $scope.restCdr($scope.rimborsoMissioneModel.uoSpesa, "S");
+                }
+                if ($scope.rimborsoMissioneModel.uoSpesa){
+                    $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+                }
+                if ($scope.rimborsoMissioneModel.gae){
+                    $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
+                }
             }
         }
     }
@@ -71,15 +94,27 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         });
     }
 
+    $scope.recuperoDatiTerzoSigla = function(userWork){
+        ProxyService.getTerzo(userWork.codice_fiscale).then(function(ret){
+            if (ret && ret.data && ret.data.elements){
+                $scope.terzoSigla = ret.data.elements[0];
+                $scope.recuperoDatiInquadramento(userWork, $scope.terzoSigla);
+            }
+        });
+    }
 
+    $scope.recuperoDatiInquadramento = function(userWork, terzoSigla){
+        ProxyService.getInquadramento(terzoSigla.cd_anag).then(function(ret){
+            if (ret && ret.data && ret.data.elements){
+                $scope.inquadramento = ret.data.elements;
+            }
+        });
+    }
 
-
-
-
-
-
-
-
+    $scope.aggiungiDettaglioSpese = function () {
+      $scope.addDettaglioSpese = true;
+      $scope.newDettaglioSpese = {};
+    }
 
 
 
@@ -517,12 +552,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         'Residenza/Domicilio Fiscale': 'R'
     };
 
-    $scope.valoriPriorita = {
-        'Critica': '1',
-        'Importante': '3',
-        'Media': '5'
-    };
-
     $scope.trattamenti = {
         'Rimborso Documentato': 'R',
         'Trattamento Alternativo di Missione': 'T'
@@ -761,6 +790,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (uid == $scope.elencoPersone[i].uid){
                     var data = $scope.elencoPersone[i];
                     var userWork = ProxyService.buildPerson(data);
+                    $scope.recuperoDatiTerzoSigla(userWork);
                     $scope.restOrdiniMissioneDaRimborsare(userWork);
                     $scope.accountModel = userWork;
                     $sessionStorage.accountWork = userWork;

@@ -76,11 +76,11 @@
             <tr ng-repeat="spostamentoAutoPropria in spostamentiAutoPropria">
               <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left" >{{spostamentoAutoPropria.percorsoDa}}</td>
               <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256"></input>
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256">
               </td>
               <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left">{{spostamentoAutoPropria.percorsoA}}</td>
               <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256"></input>
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256">
               </td>
               <td ng-hide="spostamentoAutoPropria.editing">
                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>

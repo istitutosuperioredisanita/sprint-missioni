@@ -395,6 +395,14 @@
         "title": "RIMBORSO MISSIONE ",
         "form": {
             "ordine-missione.placeholder": "Selezionare l'Ordine di Missione",
+            "box-dettaglio-spese": "Dettaglio Spese",
+            "dettaglio-spese": {
+                    "data": "Data",
+                    "tipologiaSpesa" : "Tipologia di Spesa",
+                    "importo": "Importo",
+                    "km": "Km percorsi"
+                }
+            "add-dettaglio-spese": "Aggiungi Dettaglio Spese",
             "inquadramento": "Inquadramento"
         },
         "button": {
