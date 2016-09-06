@@ -97,7 +97,7 @@ public class OrdineMissioneResource {
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_CONFERMATO);
         filter.setListaStatiMissione(listaStati);
-        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
+        List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
         return new ResponseEntity<>(
         		ordiniMissione,
         		HttpStatus.OK);

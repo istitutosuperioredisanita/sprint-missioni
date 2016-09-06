@@ -68,29 +68,11 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return false;
     }
 
-    var recuperoDirettoreUo = function(uo){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
-        var y = x.then(function (result) {
-            if (result.data){
-                return createPerson(result.data);
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
     var recuperoDatiPerson = function(username){
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.SIPER;
         var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
+        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username, {params: {fromRimborso: uoSiper}});
         var y = x.then(function (result) {
             if (result.data){
                 return createPerson(result.data);
@@ -192,9 +174,46 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return userWork;
     }
 
+
+    var recuperoDatiInquadramento = function(cdAnag){
+        var urlRestProxy = URL_REST.STANDARD;
+        var inq = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.INQUADRAMENTO;
+        var objectPostInqClauses = [{condition: 'AND', fieldName: 'cd_anag', operator: "=", fieldValue:cdAnag}];
+        var objectPostInq = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostInqClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostInq, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                inq = data.elements;
+            }
+            return inq;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
+    var recuperoDatiTerzoSigla = function(codiceFiscale){
+        var urlRestProxy = URL_REST.STANDARD;
+        var terzo = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.TERZO;
+        var objectPostTerzoClauses = [{condition: 'AND', fieldName: 'anagrafico.codice_fiscale', operator: "=", fieldValue:codiceFiscale}];
+        var objectPostTerzo = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostTerzoClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostTerzo, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                terzo = data.elements;
+            }
+            return terzo;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
     return { getUos: recuperoUo,
              getPersons: recuperoPersonsForUo,
              getPerson: recuperoDatiPerson ,
+             getTerzo: recuperoDatiTerzoSigla ,
+             getInquadramento: recuperoDatiInquadramento ,
              buildPerson: createPerson ,
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
              buildUoSiglaFromUoSiper: estraiUo };

@@ -88,162 +88,16 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			CMIS_PROPERTY_FLOW_IMPORTO_MISSIONE	= "cnrmissioni:importoMissione",
 			CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO	= "cnrmissioni:disponibilita";
 	
-	@Id
-	@Column(name="ID", unique=true, nullable=false, length = 20)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
-	private Long id;
-
-    @Size(min = 0, max = 256)
-    @Column(name = "UID_INSERT", length = 256, nullable = false)
-    private String uidInsert;
-
-    @Size(min = 0, max = 256)
-    @Column(name = "UID", length = 256, nullable = false)
-    private String uid;
-
-    @Column(name = "ANNO", length = 4, nullable = false)
-    private Integer anno;
-
-    @Column(name = "NUMERO", length = 50, nullable = false)
-    private Long numero;
-
-    @Type(type = "java.util.Date")
-    @Column(name = "DATA_INSERIMENTO", nullable = false)
-    private Date dataInserimento;
-
-    @Size(min = 0, max = 40)
-    @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
-    private String comuneResidenzaRich;
-
-    @Size(min = 0, max = 80)
-    @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = false)
-    private String indirizzoResidenzaRich;
-
-    @Size(min = 0, max = 100)
-    @Column(name = "DOMICILIO_FISCALE_RICH", length = 100, nullable = true)
-    private String domicilioFiscaleRich;
-
-    @Size(min = 0, max = 250)
-    @Column(name = "DATORE_LAVORO_RICH", length = 250, nullable = true)
-    private String datoreLavoroRich;
-
-    @Size(min = 0, max = 50)
-    @Column(name = "CONTRATTO_RICH", length = 50, nullable = true)
-    private String contrattoRich;
-
-    @Size(min = 0, max = 50)
-    @Column(name = "QUALIFICA_RICH", length = 50, nullable = true)
-    private String qualificaRich;
-
-    @Column(name = "LIVELLO_RICH", length = 4, nullable = true)
-    private Integer livelloRich;
-
-    @Size(min = 0, max = 1000)
-    @Column(name = "OGGETTO", length = 1000, nullable = false)
-    private String oggetto;
-
-    @Size(min = 0, max = 200)
-    @Column(name = "DESTINAZIONE", length = 200, nullable = false)
-    private String destinazione;
-
-    @Column(name = "NAZIONE", length = 10, nullable = true)
-    private Long nazione;
-
-    @Size(min = 0, max = 3)
-    @Column(name = "TIPO_MISSIONE", length = 3, nullable = false)
-    private String tipoMissione;
-
-    @Size(min = 0, max = 3)
-    @Column(name = "TRATTAMENTO", length = 3, nullable = false)
-    private String trattamento;
-
-    @Type(type = "java.util.Date")
-    @Column(name = "DATA_INIZIO_MISSIONE", nullable = false)
-    private Date dataInizioMissione;
-
-    @Type(type = "java.util.Date")
-    @Column(name = "DATA_FINE_MISSIONE", nullable = false)
-    private Date dataFineMissione;
-
-    @Size(min = 0, max = 1)
-    @Column(name = "VALIDATO", length = 1, nullable = false)
-    private String validato;
-
     @Size(min = 0, max = 1)
     @Column(name = "OBBLIGO_RIENTRO", length = 1, nullable = false)
     private String obbligoRientro;
 
-    @Size(min = 0, max = 1)
-    @Column(name = "UTILIZZO_TAXI", length = 1, nullable = false)
-    private String utilizzoTaxi;
-
-    @Size(min = 0, max = 1)
-    @Column(name = "UTILIZZO_AUTO_NOLEGGIO", length = 1, nullable = false)
-    private String utilizzoAutoNoleggio;
-
-    @Size(min = 0, max = 1)
-    @Column(name = "PARTENZA_DA", length = 1, nullable = false)
-    private String partenzaDa;
-
     @Column(name = "DISTANZA_DALLA_SEDE", length = 5, nullable = true)
     private Long distanzaDallaSede;
-
-    @Size(min = 0, max = 1000)
-    @Column(name = "NOTE", length = 1000, nullable = true)
-    private String note;
-
-    @Size(min = 0, max = 1000)
-    @Column(name = "NOTE_UTILIZZO_TAXI_NOLEGGIO", length = 1000, nullable = true)
-    private String noteUtilizzoTaxiNoleggio;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "VOCE", length = 28, nullable = true)
-    private String voce;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "GAE", length = 28, nullable = true)
-    private String gae;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "CDR_RICH", length = 28, nullable = true)
-    private String cdrRich;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "UO_RICH", length = 28, nullable = false)
-    private String uoRich;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "CDR_SPESA", length = 28, nullable = true)
-    private String cdrSpesa;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "UO_SPESA", length = 28, nullable = false)
-    private String uoSpesa;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "CDS_COMPETENZA", length = 28, nullable = true)
-    private String cdsCompetenza;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "UO_COMPETENZA", length = 28, nullable = false)
-    private String uoCompetenza;
 
     @Size(min = 0, max = 28)
     @Column(name = "MODULO", length = 28, nullable = true)
     private String modulo;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "CDS_RICH", length = 28, nullable = false)
-    private String cdsRich;
-
-    @Size(min = 0, max = 28)
-    @Column(name = "CDS_SPESA", length = 28, nullable = false)
-    private String cdsSpesa;
-
-    @Size(min = 0, max = 3)
-    @Column(name = "STATO", length = 3, nullable = false)
-    private String stato;
 
     @Size(min = 0, max = 3)
     @Column(name = "PRIORITA", length = 3, nullable = false)
@@ -252,31 +106,177 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "IMPORTO_PRESUNTO", length = 28, nullable = true)
     private BigDecimal importoPresunto;
 
+	@Id
+	@Column(name="ID", unique=true, nullable=false, length = 20)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
+	private Long id;
+
+	@Size(min = 0, max = 256)
+    @Column(name = "UID_INSERT", length = 256, nullable = false)
+    public String uidInsert;
+
+    @Size(min = 0, max = 256)
+    @Column(name = "UID", length = 256, nullable = false)
+    public String uid;
+
+    @Column(name = "ANNO", length = 4, nullable = false)
+    public Integer anno;
+
+    @Column(name = "NUMERO", length = 50, nullable = false)
+    public Long numero;
+
+    @Type(type = "java.util.Date")
+    @Column(name = "DATA_INSERIMENTO", nullable = false)
+    public Date dataInserimento;
+
+    @Size(min = 0, max = 40)
+    @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
+    public String comuneResidenzaRich;
+
+    @Size(min = 0, max = 80)
+    @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = false)
+    public String indirizzoResidenzaRich;
+
+    @Size(min = 0, max = 100)
+    @Column(name = "DOMICILIO_FISCALE_RICH", length = 100, nullable = true)
+    public String domicilioFiscaleRich;
+
+    @Size(min = 0, max = 250)
+    @Column(name = "DATORE_LAVORO_RICH", length = 250, nullable = true)
+    public String datoreLavoroRich;
+
+    @Size(min = 0, max = 50)
+    @Column(name = "CONTRATTO_RICH", length = 50, nullable = true)
+    public String contrattoRich;
+
+    @Size(min = 0, max = 50)
+    @Column(name = "QUALIFICA_RICH", length = 50, nullable = true)
+    public String qualificaRich;
+
+    @Column(name = "LIVELLO_RICH", length = 4, nullable = true)
+    public Integer livelloRich;
+
+    @Size(min = 0, max = 1000)
+    @Column(name = "OGGETTO", length = 1000, nullable = false)
+    public String oggetto;
+
+    @Size(min = 0, max = 200)
+    @Column(name = "DESTINAZIONE", length = 200, nullable = false)
+    public String destinazione;
+
+    @Column(name = "NAZIONE", length = 10, nullable = true)
+    public Long nazione;
+
+    @Size(min = 0, max = 3)
+    @Column(name = "TIPO_MISSIONE", length = 3, nullable = false)
+    public String tipoMissione;
+
+    @Size(min = 0, max = 3)
+    @Column(name = "TRATTAMENTO", length = 3, nullable = false)
+    public String trattamento;
+
+    @Type(type = "java.util.Date")
+    @Column(name = "DATA_INIZIO_MISSIONE", nullable = false)
+    public Date dataInizioMissione;
+
+    @Type(type = "java.util.Date")
+    @Column(name = "DATA_FINE_MISSIONE", nullable = false)
+    public Date dataFineMissione;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "VALIDATO", length = 1, nullable = false)
+    public String validato;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_TAXI", length = 1, nullable = false)
+    public String utilizzoTaxi;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_AUTO_NOLEGGIO", length = 1, nullable = false)
+    public String utilizzoAutoNoleggio;
+
+    @Size(min = 0, max = 1000)
+    @Column(name = "NOTE", length = 1000, nullable = true)
+    public String note;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "VOCE", length = 28, nullable = true)
+    public String voce;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "GAE", length = 28, nullable = true)
+    public String gae;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "CDR_RICH", length = 28, nullable = true)
+    public String cdrRich;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "UO_RICH", length = 28, nullable = false)
+    public String uoRich;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "CDR_SPESA", length = 28, nullable = true)
+    public String cdrSpesa;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "UO_SPESA", length = 28, nullable = false)
+    public String uoSpesa;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "CDS_COMPETENZA", length = 28, nullable = true)
+    public String cdsCompetenza;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "UO_COMPETENZA", length = 28, nullable = false)
+    public String uoCompetenza;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "CDS_RICH", length = 28, nullable = false)
+    public String cdsRich;
+
+    @Size(min = 0, max = 28)
+    @Column(name = "CDS_SPESA", length = 28, nullable = false)
+    public String cdsSpesa;
+
+    @Size(min = 0, max = 3)
+    @Column(name = "STATO", length = 3, nullable = false)
+    public String stato;
+
     @Column(name = "PG_PROGETTO", length = 20, nullable = true)
-    private Long pgProgetto;
+    public Long pgProgetto;
 
     @Size(min = 0, max = 30)
     @Column(name = "CD_CDS_OBBLIGAZIONE", length = 30, nullable = true)
-    private String cdCdsObbligazione;
+    public String cdCdsObbligazione;
 
     @Column(name = "ESERCIZIO_OBBLIGAZIONE", length = 4, nullable = true)
-    private Integer esercizioObbligazione;
+    public Integer esercizioObbligazione;
 
     @Column(name = "PG_OBBLIGAZIONE", length = 50, nullable = true)
-    private Long pgObbligazione;
+    public Long pgObbligazione;
 
     @Column(name = "ESERCIZIO_ORIGINALE_OBBLIGAZIONE", length = 4, nullable = true)
-    private Integer esercizioOriginaleObbligazione;
+    public Integer esercizioOriginaleObbligazione;
 
     @Size(min = 0, max = 100)
     @Column(name = "ID_FLUSSO", length = 100, nullable = true)
-    private String idFlusso;
+    public String idFlusso;
 
     @Size(min = 0, max = 3)
     @Column(name = "STATO_FLUSSO", length = 3, nullable = false)
-    private String statoFlusso;
+    public String statoFlusso;
 
-	@Transient
+    @Size(min = 0, max = 1000)
+    @Column(name = "NOTE_UTILIZZO_TAXI_NOLEGGIO", length = 1000, nullable = true)
+    public String noteUtilizzoTaxiNoleggio;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "PARTENZA_DA", length = 1, nullable = false)
+    private String partenzaDa;
+
+    @Transient
     private String daValidazione;
 	
 	@Transient
@@ -312,10 +312,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	@Transient
     private String statoFlussoRitornoHome;
 	
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public OrdineMissione(Long id, Integer anno, Long numero, Date dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
 			String oggetto, Date dataInizioMissione, Date dataFineMissione, String validato){
 		super();
@@ -352,6 +348,176 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			add(Projections.property("dataInizioMissione")).
 			add(Projections.property("dataFineMissione")).
 			add(Projections.property("validato"));
+
+	public String getObbligoRientro() {
+		return obbligoRientro;
+	}
+
+	public void setObbligoRientro(String obbligoRientro) {
+		this.obbligoRientro = obbligoRientro;
+	}
+
+	public Long getDistanzaDallaSede() {
+		return distanzaDallaSede;
+	}
+
+	public void setDistanzaDallaSede(Long distanzaDallaSede) {
+		this.distanzaDallaSede = distanzaDallaSede;
+	}
+
+	public String getModulo() {
+		return modulo;
+	}
+
+	public void setModulo(String modulo) {
+		this.modulo = modulo;
+	}
+
+	public BigDecimal getImportoPresunto() {
+		return importoPresunto;
+	}
+
+	public void setImportoPresunto(BigDecimal importoPresunto) {
+		this.importoPresunto = importoPresunto;
+	}
+
+	public String getPriorita() {
+		return priorita;
+	}
+
+	public void setPriorita(String priorita) {
+		this.priorita = priorita;
+	}
+
+	@XmlTransient
+	public static Projection getProjectionForElencoMissioni() {
+		return PROJECTIONLIST_ELENCO_MISSIONI;
+	}
+
+	@Transient
+	public Cds getObjCdsSpesa() {
+		return objCdsSpesa;
+	}
+
+	@Transient
+	public void setObjCdsSpesa(Cds objCdsSpesa) {
+		this.objCdsSpesa = objCdsSpesa;
+	}
+
+	public Cdr getObjCdrSpesa() {
+		return objCdrSpesa;
+	}
+
+	public void setObjCdrSpesa(Cdr objCdrSpesa) {
+		this.objCdrSpesa = objCdrSpesa;
+	}
+
+	public UnitaOrganizzativa getObjUoSpesa() {
+		return objUoSpesa;
+	}
+
+	public void setObjUoSpesa(UnitaOrganizzativa objUoSpesa) {
+		this.objUoSpesa = objUoSpesa;
+	}
+
+	@Transient
+	public String constructCMISNomeFile() {
+		StringBuffer nomeFile = new StringBuffer();
+		nomeFile = nomeFile.append(Utility.lpad(this.getNumero().toString(),9,'0'));
+		return nomeFile.toString();
+	}
+
+	@Transient
+	public String decodePriorita(){
+		if (!StringUtils.isEmpty(getPriorita())){
+			return Costanti.PRIORITA.get(getPriorita());
+		}
+		return "";
+	}
+	
+	@Transient
+	public String decodeObbligoRientro(){
+		if (!StringUtils.isEmpty(getObbligoRientro())){
+			return Costanti.SI_NO.get(getObbligoRientro());
+		}
+		return "";
+	}
+	
+	public String getUtilizzoAutoPropria() {
+		return utilizzoAutoPropria;
+	}
+
+	public void setUtilizzoAutoPropria(String utilizzoAutoPropria) {
+		this.utilizzoAutoPropria = utilizzoAutoPropria;
+	}
+
+	public String getRichiestaAnticipo() {
+		return richiestaAnticipo;
+	}
+
+	public void setRichiestaAnticipo(String richiestaAnticipo) {
+		this.richiestaAnticipo = richiestaAnticipo;
+	}
+
+	@Transient
+	public String getDecodeStatoFlusso() {
+		if (!StringUtils.isEmpty(getStateFlows())){
+			return Costanti.STATO_FLUSSO_FROM_CMIS.get(getStateFlows());
+		} else {
+			if (!StringUtils.isEmpty(getStatoFlusso())){
+				return Costanti.STATO_FLUSSO.get(getStatoFlusso());
+			}
+		}
+		return "";
+	}
+	
+    
+	public DatiIstituto getDatiIstituto() {
+		return datiIstituto;
+	}
+
+	public void setDatiIstituto(DatiIstituto datiIstituto) {
+		this.datiIstituto = datiIstituto;
+	}
+
+	@Transient
+    public String getFileName() {
+		return "OrdineMissione"+getId()+".pdf";
+	}
+
+	public String getCommentFlows() {
+		return commentFlows;
+	}
+
+	public void setCommentFlows(String commentFlows) {
+		this.commentFlows = commentFlows;
+	}
+
+	public String getStateFlows() {
+		return stateFlows;
+	}
+
+	public void setStateFlows(String stateFlows) {
+		this.stateFlows = stateFlows;
+	}
+	public String getStatoFlussoRitornoHome() {
+		return statoFlussoRitornoHome;
+	}
+
+	public void setStatoFlussoRitornoHome(
+			String statoFlussoRitornoHome) {
+		this.statoFlussoRitornoHome = statoFlussoRitornoHome;
+	}
+	public String getDaValidazione() {
+		return daValidazione;
+	}
+
+	public void setDaValidazione(String daValidazione) {
+		this.daValidazione = daValidazione;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	@Override
 	public Serializable getId() {
@@ -470,30 +636,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.dataFineMissione = dataFineMissione;
 	}
 
-	public String getObbligoRientro() {
-		return obbligoRientro;
-	}
-
-	public void setObbligoRientro(String obbligoRientro) {
-		this.obbligoRientro = obbligoRientro;
-	}
-
-	public String getPartenzaDa() {
-		return partenzaDa;
-	}
-
-	public void setPartenzaDa(String partenzaDa) {
-		this.partenzaDa = partenzaDa;
-	}
-
-	public Long getDistanzaDallaSede() {
-		return distanzaDallaSede;
-	}
-
-	public void setDistanzaDallaSede(Long distanzaDallaSede) {
-		this.distanzaDallaSede = distanzaDallaSede;
-	}
-
 	public String getNote() {
 		return note;
 	}
@@ -550,14 +692,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.uoSpesa = uoSpesa;
 	}
 
-	public String getModulo() {
-		return modulo;
-	}
-
-	public void setModulo(String modulo) {
-		this.modulo = modulo;
-	}
-
 	public String getCdsRich() {
 		return cdsRich;
 	}
@@ -580,17 +714,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setStato(String stato) {
 		this.stato = stato;
-		if (!StringUtils.isEmpty(stato)){
-			this.decodeStato = Costanti.STATO.get(stato);
-		}
-	}
-
-	public BigDecimal getImportoPresunto() {
-		return importoPresunto;
-	}
-
-	public void setImportoPresunto(BigDecimal importoPresunto) {
-		this.importoPresunto = importoPresunto;
 	}
 
 	public String getDestinazione() {
@@ -609,25 +732,12 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.tipoMissione = tipoMissione;
 	}
 
-	public String getPriorita() {
-		return priorita;
-	}
-
-	public void setPriorita(String priorita) {
-		this.priorita = priorita;
-	}
-
 	public Integer getAnno() {
 		return anno;
 	}
 
 	public void setAnno(Integer anno) {
 		this.anno = anno;
-	}
-
-	@XmlTransient
-	public static Projection getProjectionForElencoMissioni() {
-		return PROJECTIONLIST_ELENCO_MISSIONI;
 	}
 
 	public Long getNazione() {
@@ -680,39 +790,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 
 	@Transient
-	public Cds getObjCdsSpesa() {
-		return objCdsSpesa;
-	}
-
-	@Transient
-	public void setObjCdsSpesa(Cds objCdsSpesa) {
-		this.objCdsSpesa = objCdsSpesa;
-	}
-
-	public Cdr getObjCdrSpesa() {
-		return objCdrSpesa;
-	}
-
-	public void setObjCdrSpesa(Cdr objCdrSpesa) {
-		this.objCdrSpesa = objCdrSpesa;
-	}
-
-	public UnitaOrganizzativa getObjUoSpesa() {
-		return objUoSpesa;
-	}
-
-	public void setObjUoSpesa(UnitaOrganizzativa objUoSpesa) {
-		this.objUoSpesa = objUoSpesa;
-	}
-
-	@Transient
-	public String constructCMISNomeFile() {
-		StringBuffer nomeFile = new StringBuffer();
-		nomeFile = nomeFile.append(Utility.lpad(this.getNumero().toString(),9,'0'));
-		return nomeFile.toString();
-	}
-
-	@Transient
 	public String decodeTipoMissione(){
 		if (!StringUtils.isEmpty(getTipoMissione())){
 			return Costanti.TIPO_MISSIONE.get(getTipoMissione());
@@ -724,30 +801,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public String decodeTrattamento(){
 		if (!StringUtils.isEmpty(getTrattamento())){
 			return Costanti.TRATTAMENTO.get(getTrattamento());
-		}
-		return "";
-	}
-	
-	@Transient
-	public String decodePartenzaDa(){
-		if (!StringUtils.isEmpty(getPartenzaDa())){
-			return Costanti.PARTENZA_DA.get(getPartenzaDa());
-		}
-		return "";
-	}
-	
-	@Transient
-	public String decodePriorita(){
-		if (!StringUtils.isEmpty(getPriorita())){
-			return Costanti.PRIORITA.get(getPriorita());
-		}
-		return "";
-	}
-	
-	@Transient
-	public String decodeObbligoRientro(){
-		if (!StringUtils.isEmpty(getObbligoRientro())){
-			return Costanti.SI_NO.get(getObbligoRientro());
 		}
 		return "";
 	}
@@ -776,38 +829,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.utilizzoAutoNoleggio = utilizzoAutoNoleggio;
 	}
 
-	public String getUtilizzoAutoPropria() {
-		return utilizzoAutoPropria;
-	}
-
-	public void setUtilizzoAutoPropria(String utilizzoAutoPropria) {
-		this.utilizzoAutoPropria = utilizzoAutoPropria;
-	}
-
-	public String getRichiestaAnticipo() {
-		return richiestaAnticipo;
-	}
-
-	public void setRichiestaAnticipo(String richiestaAnticipo) {
-		this.richiestaAnticipo = richiestaAnticipo;
-	}
-
 	@Transient
 	public String getDecodeStato() {
 		if (!StringUtils.isEmpty(getStato())){
 			return Costanti.STATO.get(getStato());
-		}
-		return "";
-	}
-	
-	@Transient
-	public String getDecodeStatoFlusso() {
-		if (!StringUtils.isEmpty(getStateFlows())){
-			return Costanti.STATO_FLUSSO_FROM_CMIS.get(getStateFlows());
-		} else {
-			if (!StringUtils.isEmpty(getStatoFlusso())){
-				return Costanti.STATO_FLUSSO.get(getStatoFlusso());
-			}
 		}
 		return "";
 	}
@@ -889,19 +914,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     	return false;
     }
 
-	public DatiIstituto getDatiIstituto() {
-		return datiIstituto;
-	}
-
-	public void setDatiIstituto(DatiIstituto datiIstituto) {
-		this.datiIstituto = datiIstituto;
-	}
-
-	@Transient
-    public String getFileName() {
-		return "OrdineMissione"+getId()+".pdf";
-	}
-
 	public String getIdFlusso() {
 		return idFlusso;
 	}
@@ -918,14 +930,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.statoFlusso = statoFlusso;
 	}
 
-	public String getCommentFlows() {
-		return commentFlows;
-	}
-
-	public void setCommentFlows(String commentFlows) {
-		this.commentFlows = commentFlows;
-	}
-
 	public String getUidInsert() {
 		return uidInsert;
 	}
@@ -934,13 +938,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.uidInsert = uidInsert;
 	}
 
-	public String getStateFlows() {
-		return stateFlows;
-	}
-
-	public void setStateFlows(String stateFlows) {
-		this.stateFlows = stateFlows;
-	}
 	public Boolean isStatoInviatoAlFlusso(){
 		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO)){
 			return true;
@@ -955,14 +952,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		return false;
 	}
 
-	public String getStatoFlussoRitornoHome() {
-		return statoFlussoRitornoHome;
-	}
-
-	public void setStatoFlussoRitornoHome(
-			String statoFlussoRitornoHome) {
-		this.statoFlussoRitornoHome = statoFlussoRitornoHome;
-	}
 	public Boolean isStatoFlussoApprovato(){
 		if (getStatoFlusso() != null && getStatoFlusso().equals(Costanti.STATO_APPROVATO_FLUSSO)){
 			return true;
@@ -994,11 +983,19 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.validato = validato;
 	}
 
-	public String getDaValidazione() {
-		return daValidazione;
+	public String getPartenzaDa() {
+		return partenzaDa;
 	}
 
-	public void setDaValidazione(String daValidazione) {
-		this.daValidazione = daValidazione;
+	public void setPartenzaDa(String partenzaDa) {
+		this.partenzaDa = partenzaDa;
+	}
+
+	@Transient
+	public String decodePartenzaDa(){
+		if (!StringUtils.isEmpty(getPartenzaDa())){
+			return Costanti.PARTENZA_DA.get(getPartenzaDa());
+		}
+		return "";
 	}
 }

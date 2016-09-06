@@ -31,7 +31,9 @@ missioniApp.constant('SIGLA_REST', {
         'GAE': 'ConsGAEAction.json',
         'VOCE': 'ConsCapitoloAction.json',
         'IMPEGNO': 'ConsImpegnoAction.json',
-        'IMPEGNO_GAE': 'ConsImpegnoGaeAction.json'
+        'IMPEGNO_GAE': 'ConsImpegnoGaeAction.json',
+        'TERZO': 'ConsTerzoAction.json',
+        'INQUADRAMENTO': 'ConsInquadramentoAction.json'
     });
 
 missioniApp.constant('COSTANTI', {
