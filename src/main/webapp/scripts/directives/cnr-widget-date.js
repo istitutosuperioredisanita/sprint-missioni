@@ -6,6 +6,7 @@ angular.module('missioniApp')
               var data = element.find('input');
               data.datepicker({
                 language: "it", 
+                autoclose: true, 
                 todayBtn: "linked",
                 todayHighlight: true,
                 endDate: scope.endDate, 
@@ -33,6 +34,7 @@ angular.module('missioniApp')
         endDate: '=',
         startDate: '='
       },
+      templateUrl: 'views/datepicker.html',
       link: function link(scope, element, attrs) {
           var init = true;
           scope.$watch('ngModelDate', function (startValue) {
@@ -46,11 +48,6 @@ angular.module('missioniApp')
                 setDatetime(scope, element);
             }
           });
-      },
-      template: function(element, args) {
-        return '<div>' +
-                    '<input type="text" class="input-sm form-control" name="dateName" data-date-format="DD/MM/YYYY"/>' +
-                '</div>';
       }
     };
   });
