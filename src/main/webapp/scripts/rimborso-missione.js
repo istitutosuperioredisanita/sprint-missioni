@@ -84,6 +84,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if ($scope.rimborsoMissioneModel.gae){
                     $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                 }
+                break;
             }
         }
     }
@@ -111,10 +112,92 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         });
     }
 
-    $scope.aggiungiDettaglioSpese = function () {
-      $scope.addDettaglioSpese = true;
-      $scope.newDettaglioSpese = {};
+    $scope.aggiungiDettaglioSpesa = function () {
+      $scope.addDettaglioSpesa = true;
+      $scope.newDettaglioSpesa = {};
     }
+
+    $scope.confirmDeleteDettaglioSpesa = function (index) {
+        var dettaglioSpesaDaEliminare = $scope.dettagliSpese[index];
+        ui.confirmCRUD("Confermi l'eliminazione del dettaglio della spesa "+dettaglioSpesaDaEliminare.cdTiSpesa+"?", deleteDettaglioSpesa, index);
+    }
+
+    var deleteDettaglioSpesa = function (index) {
+        var idDettaglioSpesa = $scope.dettagliSpese[index].id;
+            $rootScope.salvataggio = true;
+            $http.delete('app/rest/rimborsoMissione/dettaglio/' + idDettaglioSpesa).success(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                        $scope.dettagliSpese.splice(index,1);
+                    }).error(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                        ui.error(data);
+                    }
+            );
+    }
+
+    $scope.editDettaglioSpesa= function (dettaglioSpesa) {
+      dettaglioSpesa.editing = true;
+    }
+
+    var undoEditingDettaglioSpesa = function (dettaglioSpesa) {
+      delete dettaglioSpesa.editing;
+    }
+
+    $scope.undoDettaglioSpesa = function (dettaglioSpesa) {
+      undoEditingDettaglioSpesa(dettaglioSpesa);
+    }
+
+    var annullaDatiNuovaRiga = function () {
+      delete $scope.addDettaglioSpesa;
+      delete $scope.newDettaglioSpesa;
+    }
+
+    $scope.undoAddDettaglioSpesa = function () {
+        annullaDatiNuovaRiga();
+    }
+
+    $scope.insertDettaglioSpesa = function (newDettaglioSpesa) {
+        newDettaglioSpesa.rimborsoMissione = $scope.rimborsoMissioneModel;
+            $rootScope.salvataggio = true;
+            $http.post('app/rest/rimborsoMissione/dettaglio/create', newDettaglioSpesa).success(function(data){
+                    $rootScope.salvataggio = false;
+                    if (!$scope.dettagliSpesa){
+                        $scope.dettagliSpesa = [];
+                    }
+                    $scope.dettagliSpesa.push(data);
+                    $scope.undoDettaglioSpesa();
+            }).error(function (data) {
+                $rootScope.salvataggio = false;
+                ui.error(data);
+            });
+    }
+
+    $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
+        $rootScope.salvataggio = true;
+        $http.put('app/rest/rimborsoMissione/dettaglio/modify', dettaglioSpesa).success(function(data){
+            $rootScope.salvataggio = false;
+            undoEditingDettaglioSpesa(dettaglioSpesa);
+        }).error(function (data) {
+            $rootScope.salvataggio = false;
+            ui.error(data);
+        });
+    }
+
+    $scope.getTotaleDettagliSpesa = function(){
+        var totale = 0;
+        if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
+            for (var i=0; i<$scope.dettagliSpese.length; i++) {
+                totale = totale + dettagliSpese[i].importoEuro;
+            }
+        }
+        if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.importoEuro){
+            totale = totale + $scope.newDettaglioSpesa.importoEuro;
+        }
+        return totale;
+    }
+
 
 
 

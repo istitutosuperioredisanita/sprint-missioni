@@ -53,6 +53,10 @@
   width: 110px !important;
 }
 
+.align-right {
+  text-align: right !important;
+}
+
 .button-info-missioni {
   background-color: #7BB068;
 }

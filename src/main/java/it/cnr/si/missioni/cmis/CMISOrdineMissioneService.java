@@ -259,7 +259,7 @@ public class CMISOrdineMissioneService {
 		if (ordineMissione != null){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
 			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstituto(principal, ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
 			}
 			ordineMissione.setDatiIstituto(dati);
 			if (ordineMissione.getDatiIstituto() == null){
