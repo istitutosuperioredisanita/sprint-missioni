@@ -170,58 +170,79 @@
   </div>
      <div class="panel-body my-panel-body">
 
-      <button ng-enabled="rimborsoMissioneModel.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.form.addDettaglioSpese' | translate}}" ng-click="aggiungiDettaglioSpese()"><span class="glyphicon glyphicon-plus"></span></button> 
+      <button ng-enabled="rimborsoMissioneModel.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.form.addDettaglioSpesa' | translate}}" ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button> 
         <table class="table table-condensed table-striped table-bordered table-responsive">
-          <tr>
+          <tr id ="missioni">
             <th>{{'rimborso-missione.form.dettaglio-spese.data' | translate}}</th>
-            <th>{{'rimborso-missione.form.dettaglio-spese.tipologiaSpesa' | translate}}</th>
-            <th>{{'rimborso-missione.form.dettaglio-spese.importo' | translate}}</th>
-            <th>{{'rimborso-missione.form.dettaglio-spese.km' | translate}}</th>
+            <th>{{'rimborso-missione.form.dettaglio-spese.tipologia-spesa' | translate}}</th>
+            <th class="align-right">{{'rimborso-missione.form.dettaglio-spese.importo' | translate}}</th>
+            <th class="align-right">{{'rimborso-missione.form.dettaglio-spese.km' | translate}}</th>
           </tr>
+          <tfoot>
+            <tr>
+              <td <span style="font-weight:bold" colspan="2" align="right" translate="rimborso-missione.form.dettaglio-spese.totale-dettagli">Totale</td>
+              <td align="right"> {{getTotaleDettagliSpesa()}}</td>
+              <td></td>
+            </tr>
+          </tfoot>
           <tbody id ="missioni">
-            <tr ng-repeat="spostamentoAutoPropria in spostamentiAutoPropria">
-              <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left" >{{spostamentoAutoPropria.percorsoDa}}</td>
-              <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256">
+            <tr ng-repeat="dettaglioSpesa in dettagliSpesa">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-2" style="text-align: left" >{{dettaglioSpesa.dataSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-2" style="text-align:left">
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dataSpesa" required maxlength="256">
               </td>
-              <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left">{{spostamentoAutoPropria.percorsoA}}</td>
-              <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-5" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-5" style="text-align:left">
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsTiSpesa" required maxlength="256">
               </td>
-              <td ng-hide="spostamentoAutoPropria.editing">
-                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left" >{{dettaglioSpesa.importoEuro}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:right">
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.importoEuro" ng-currency required maxlength="256">
               </td>
-              <td ng-hide="spostamentoAutoPropria.editing">
-                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteSpostamenti($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-2" style="text-align: left">{{dettaglioSpesa.kmPerscorsi}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-2" style="text-align:right">
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.kmPerscorsi" maxlength="256">
               </td>
-              <td ng-show="spostamentoAutoPropria.editing">
-                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(spostamentoAutoPropria)" ng-click="modifySpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+              <td ng-hide="dettaglioSpesa.editing">
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
               </td>
-              <td ng-show="spostamentoAutoPropria.editing">
-                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+              <td ng-hide="dettaglioSpesa.editing">
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteDettaglioSpesa($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              </td>
+              <td ng-show="dettaglioSpesa.editing">
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(dettaglioSpesa)" ng-click="modifyDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+              </td>
+              <td ng-show="dettaglioSpesa.editing">
+                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
               </td>
             </tr>
 
 
-          <tr ng-show="addSpostamentoAutoPropria" id="spostamentoAddAutoPropria">
+          <tr ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
 
-            <td class="col-xs-6">
-              <input ng-disabled="validazione != 'N'" class="form-control" ng-model="newSpostamentoAutoPropria.percorsoDa" maxlength="256"</input>
+            <td class="col-xs-2">
+              <cnr-widget-date date-name="dataSpesa" start-date="rimborsoMissioneModel.dataInizioMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
             </td>
-            <td class="col-xs-6">
-              <input ng-disabled="validazione != 'N'" class="form-control" ng-model="newSpostamentoAutoPropria.percorsoA" maxlength="256"</input>
+            <td class="col-xs-8">
+              <input class="form-control" ng-model="newDettaglioSpesa.dsTiSpesa" maxlength="256"</input>
+            </td>
+            <td class="col-xs-2">
+              <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="256"</input>
+            </td>
+            <td class="col-xs-1">
+              <input class="form-control" ng-model="newDettaglioSpesa.kmPercorsi" maxlength="256"</input>
             </td>
             <td style="text-align: left">
               <form class="form-inline" role="form">
                 <div class="form-group btn-group">
-                  <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newSpostamentoAutoPropria)" ng-click="insertSpostamentoAutoPropria(newSpostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                  <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newDettaglioSpesa)" ng-click="insertDettaglioSpesa(newDettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
                 </div>
               </form>
             </td>
             <td style="text-align: left">
               <form class="form-inline" role="form">
                 <div class="form-group btn-group">
-                  <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoAddSpostamentoAutoPropria()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                  <button class="btn btn-sm btn-link" ng-click="undoAddDettaglioSpesa()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
                 </div>
               </form>
             </td>

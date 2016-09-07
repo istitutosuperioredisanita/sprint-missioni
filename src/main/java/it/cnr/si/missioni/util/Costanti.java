@@ -63,6 +63,8 @@ public class Costanti {
 	public final static String STATO_DA_CONFERMARE_PER_HOME = "C";
 	public final static String CDS_SAC = "000";
 	public final static String UO_SAC_PROGETTI = "000.000";
+    public final static String TIPO_ORDINE_DI_MISSIONE = "O";
+    public final static String TIPO_RIMBORSO_MISSIONE = "R";
 	
 	public final static Map<String, String> PRIORITA;
     static {

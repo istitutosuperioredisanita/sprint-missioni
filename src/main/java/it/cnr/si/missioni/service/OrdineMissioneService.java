@@ -148,7 +148,7 @@ public class OrdineMissioneService {
 		if (ordineMissione != null){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
 			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstituto(principal, ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
 			}
 			ordineMissione.setDatiIstituto(dati);
 			if (ordineMissione.getDatiIstituto() == null){
@@ -461,7 +461,7 @@ public class OrdineMissioneService {
     	ordineMissione.setUser(principal.getName());
     	Integer anno = recuperoAnno(ordineMissione);
     	ordineMissione.setAnno(anno);
-    	ordineMissione.setNumero(datiIstitutoService.getNextPG(principal, ordineMissione.getCdsRich(), anno ));
+    	ordineMissione.setNumero(datiIstitutoService.getNextPG(principal, ordineMissione.getCdsRich(), anno , Costanti.TIPO_ORDINE_DI_MISSIONE));
     	if (StringUtils.isEmpty(ordineMissione.getTrattamento())){
     		ordineMissione.setTrattamento("R");
     	}

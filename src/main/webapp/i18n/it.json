@@ -398,11 +398,12 @@
             "box-dettaglio-spese": "Dettaglio Spese",
             "dettaglio-spese": {
                     "data": "Data",
-                    "tipologiaSpesa" : "Tipologia di Spesa",
+                    "totale-dettagli" : "Totale Dettagli Spesa",
+                    "tipologia-spesa" : "Tipologia di Spesa",
                     "importo": "Importo",
                     "km": "Km percorsi"
-                }
-            "add-dettaglio-spese": "Aggiungi Dettaglio Spese",
+                },
+            "add-dettaglio-spesa": "Aggiungi Dettaglio Spese",
             "inquadramento": "Inquadramento"
         },
         "button": {
