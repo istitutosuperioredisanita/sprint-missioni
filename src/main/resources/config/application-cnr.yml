@@ -1,0 +1,62 @@
+spring:
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:postgresql://localhost:54321/missioni
+        name: missioni
+        username: missioni
+        password: missionipw
+    jpa:
+        database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
+        database: POSTGRESQL
+    print:
+        baseDir: /it/cnr/missioni/print/
+    proxy:
+        SIGLA:
+            url: http://sigla-main.test.si.cnr.it/SIGLA/
+            username: MISSIONI
+            password: M15510N1
+            context:
+                cd_unita_organizzativa: "999.000"
+                cd_cds: "999"
+                cd_cdr: "999.000.000"
+        SIPER:
+    #            url: https://testsiper.si.cnr.it/siper/
+            url: https://siper.cnr.it/siper/
+            username: app.selezioni
+            password: pentagono
+    ldap:
+        userSearchBase: o=cnr, c=it
+        userSearchFilter: uid={0}
+        url: ldap://virtest1.si.cnr.it:389
+        managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+        managerPassword: pippa
+
+ajp:
+    port: 8009
+    timeout: 120000
+
+siper:
+  url: https://siper.cnr.it/siper/json/userinfo/
+  urldett: https://siper.cnr.it/siper/json/userinfodett/
+  username: app.selezioni
+  password: pentagono
+
+cmis:
+    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
+    url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
+    username: app.missioni
+    password: bubbazza
+    maxItemsPerPage: 10
+    folder_path: /Missioni
+    folder_path_config: /Config
+
+cache:
+    init_cache: true
+    hazelcast.packages: it.cnr.si.missioni.domain.*,it.cnr.si.missioni.service.*
+
+jhipster:
+    security:
+        authentication:
+            oauth:
+                clientid: sprintapp
+                secret: mySecretOAuthSecret
