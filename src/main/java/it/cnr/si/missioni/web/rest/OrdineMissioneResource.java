@@ -327,26 +327,4 @@ public class OrdineMissioneResource {
 //  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
 //    	}
     }
-	private void controlloCampiObbligatori(OrdineMissione ordineMissione) {
-		if (!ordineMissione.isToBeCreated()){
-			controlloDatiObbligatoriDaGUI(ordineMissione);
-		}
-		if (StringUtils.isEmpty(ordineMissione.getAnno())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Anno");
-		} else if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Obbligo di Rientro");
-		} else if (StringUtils.isEmpty(ordineMissione.getUid())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utente");
-		} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utilizzo del Taxi");
-		} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utilizzo auto a noleggio");
-		} else if (StringUtils.isEmpty(ordineMissione.getStato())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Stato");
-		} else if (StringUtils.isEmpty(ordineMissione.getValidato())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Validato");
-		} else if (StringUtils.isEmpty(ordineMissione.getNumero())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Numero");
-		}
-	}
 }
