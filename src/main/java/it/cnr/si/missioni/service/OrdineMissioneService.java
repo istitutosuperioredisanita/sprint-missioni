@@ -683,7 +683,7 @@ public class OrdineMissioneService {
 		}
 		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
 			if (ordineMissione.getUtilizzoTaxi().equals("N") && ordineMissione.getUtilizzoAutoNoleggio().equals("N")){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del tazi o dell'auto a noleggio se non si è scelto il loro utilizzo");
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
 			}
 		}
 		if (StringUtils.isEmpty(ordineMissione.getIdFlusso()) &&  ordineMissione.isStatoInviatoAlFlusso()){
