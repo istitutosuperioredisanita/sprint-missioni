@@ -12,5 +12,3 @@ missioni:
     - SERVICE_NAME=##{SERVICE_NAME}##
 postgres:
   image: docker.si.cnr.it/postgres-missioni
-  ports:
-  - "54321:5432"
