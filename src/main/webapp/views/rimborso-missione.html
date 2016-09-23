@@ -1,6 +1,6 @@
 <div class="container-fluid">
 
-  <h4 center translate="rimborso-missione.title">Rimborso missione</b></h4>
+  <h4 center translate="rimborso-missione.title">Rimborso missione</h4>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                     <p class="col-md-12">
                         <span class="input-group">
@@ -45,8 +45,6 @@
                         </span>
                     </p>
             </form>
-            </p>
-            </p>
 </div>
 
 <div class="panel panel-success">
@@ -116,9 +114,9 @@
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.oggetto">oggetto</span>
-                            <textarea ng-disabled="validazione || disabilitaOrdineMissione" 
+                            <textarea ng-disabled="validazione || disabilitaOrdineMissione"
                               class="input-sm form-control" name="oggetto" placeholder="{{'missione.form.oggetto.placeholder' | translate}}" ng-model="rimborsoMissioneModel.oggetto" rows = "2">
-                            </textarea> 
+                            </textarea>
                         </span>
                 </p>
             </form>
@@ -139,9 +137,9 @@
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.note">note</span>
-                            <textarea ng-disabled="validazione || disabilitaOrdineMissione" 
+                            <textarea ng-disabled="validazione || disabilitaOrdineMissione"
                               class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.note" rows = "2">
-                            </textarea> 
+                            </textarea>
                         </span>
                 </p>
             </form>
@@ -170,7 +168,7 @@
   </div>
      <div class="panel-body my-panel-body">
 
-      <button ng-enabled="rimborsoMissioneModel.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.form.addDettaglioSpesa' | translate}}" ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button> 
+      <button ng-enabled="rimborsoMissioneModel.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.form.addDettaglioSpesa' | translate}}" ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button>
         <table class="table table-condensed table-striped table-bordered table-responsive">
           <tr id ="missioni">
             <th>{{'rimborso-missione.form.dettaglio-spese.data' | translate}}</th>
@@ -180,7 +178,7 @@
           </tr>
           <tfoot>
             <tr>
-              <td <span style="font-weight:bold" colspan="2" align="right" translate="rimborso-missione.form.dettaglio-spese.totale-dettagli">Totale</td>
+              <td style="font-weight:bold" colspan="2" align="right" translate="rimborso-missione.form.dettaglio-spese.totale-dettagli">Totale</td>
               <td align="right"> {{getTotaleDettagliSpesa()}}</td>
               <td></td>
             </tr>
@@ -380,9 +378,9 @@
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
-                            <textarea ng-disabled="validazione || disabilitaOrdineMissione" 
+                            <textarea ng-disabled="validazione || disabilitaOrdineMissione"
                               class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.noteUtilizzoTaxiNoleggio" rows = "2">
-                            </textarea> 
+                            </textarea>
                         </span>
                 </p>
             </form>
