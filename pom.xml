@@ -25,10 +25,11 @@
         <commons-lang.version>2.6</commons-lang.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
 
-        <jada.version>2.7</jada.version> <!-- upgrade -->
+        <jada.version>2.7</jada.version>
+        <jasperreports.version>5.5.0</jasperreports.version>
+        <!-- upgrade -->
         <javax.inject.version>1</javax.inject.version>
         <joda-time-hibernate.version>1.3</joda-time-hibernate.version>
-        <jasperreports.version>5.5.0</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
         <liquibase.version>3.4.2</liquibase.version>
@@ -40,9 +41,9 @@
         <profile.swagger />
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
-        <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
+        <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <sprint.version>2.0.1</sprint.version>
-        <start-class>it.cnr.si.Application</start-class>
+        <start-class>it.cnr.si.SprintApp</start-class>
     </properties>
 
     <dependencies>
@@ -163,7 +164,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
         <pluginManagement>
@@ -195,10 +195,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-              </plugin>
             <plugin>
                 <groupId>com.github.ekryd.sortpom</groupId>
                 <artifactId>sortpom-maven-plugin</artifactId>
@@ -409,6 +405,10 @@
                     <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments>
                     -->
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
             </plugin>
             <!-- jhipster-needle-maven-add-plugin -->
         </plugins>
