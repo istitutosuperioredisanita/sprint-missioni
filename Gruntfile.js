@@ -11,7 +11,7 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'src/main/webapp/dist'
+            dist: 'target/www'
         },
         watch: {
             styles: {
@@ -333,7 +333,6 @@ module.exports = function (grunt) {
             ],
             dist: [
                 'copy:styles',
-                'imagemin',
                 'svgmin'
             ]
         },
