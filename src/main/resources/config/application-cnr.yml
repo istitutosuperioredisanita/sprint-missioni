@@ -60,3 +60,5 @@ jhipster:
             oauth:
                 clientid: sprintapp
                 secret: mySecretOAuthSecret
+
+cache.hazelcast.name: sprint-missioni
