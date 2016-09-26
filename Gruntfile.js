@@ -279,6 +279,18 @@ module.exports = function (grunt) {
         },
         // Put files not handled in other tasks here
         copy: {
+i18n: {
+
+
+files: [{                                                                                                                                          
+expand: true,
+cwd: 'src/main/webapp',
+dest: '<%= yeoman.dist %>/',
+src: [
+'i18n/**'
+]
+}]
+},
             dist: {
                 files: [{
                     expand: true,
@@ -425,6 +437,7 @@ module.exports = function (grunt) {
         'concurrent:dist',
         'autoprefixer',
         'concat',
+        'copy:i18n',
         'copy:dist',
         'ngAnnotate',
         'cssmin',
