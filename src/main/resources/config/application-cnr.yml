@@ -61,4 +61,6 @@ jhipster:
                 clientid: sprintapp
                 secret: mySecretOAuthSecret
 
-cache.hazelcast.name: sprint-missioni
+cache.hazelcast:
+    name: sprint-missioni
+    members: 127.0.0.1
