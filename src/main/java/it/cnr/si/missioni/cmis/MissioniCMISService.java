@@ -501,7 +501,7 @@ public class MissioniCMISService {
     
 	public Response startFlowOrdineMissione(StringWriter stringWriter) throws Exception{
 		try {
-			String url = getRepositoryURL()+"service/api/workflow/activiti$flussoMissioni/formprocessor";
+			String url = getRepositoryURL()+"service/api/workflow/activiti$flussoMissioniOrdine/formprocessor";
 			logger.info("Start Flow. Url: "+url+" - Content: "+stringWriter.getBuffer().toString());
 			Response responsePost = invokePOST(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
 			if (responsePost.getResponseCode()!=200) 

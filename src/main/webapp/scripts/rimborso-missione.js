@@ -317,6 +317,29 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         var a = 1;
     }
 
+    $scope.restTipiSpesa = function(data, tipoMissione){
+        var urlRestProxy = URL_REST.STANDARD;
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.TIPI_SPESA;
+        var objectPostTipiSpesaOrderBy = [{name: 'ds_ti_spesa', type: 'ASC'}];
+        var objectPostTipiSpesaClauses = null;
+        if (tipoMissione == "I"){
+            objectPostTipiSpesaClauses = [{condition: 'AND', fieldName: 'ti_area_geografica', operator: "!=", fieldValue:'E'},
+                              {condition: 'AND', fieldName: 'dt_inizio_validita', operator: ">=", fieldValue:data},
+                              {condition: 'AND', fieldName: 'dt_fine_validita', operator: "<=", fieldValue:data}];
+        } else {
+            objectPostTipiSpesaClauses = [{condition: 'AND', fieldName: 'ti_area_geografica', operator: "!=", fieldValue:'I'},
+                              {condition: 'AND', fieldName: 'dt_inizio_validita', operator: ">=", fieldValue:data},
+                              {condition: 'AND', fieldName: 'dt_fine_validita', operator: "<=", fieldValue:data}];
+        }
+        
+        var objectPostTipiSpesa = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostTipiSpesaOrderBy, clauses:objectPostTipiSpesaClauses}
+        $http.post(urlRestProxy + app+'/', objectPostTipiSpesa, {params: {proxyURL: url}}).success(function (data) {
+            if (data)
+                $scope.tipi_spesa = data.elements;
+        });
+    }        
+
     $scope.restNazioni = function(){
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.SIGLA;

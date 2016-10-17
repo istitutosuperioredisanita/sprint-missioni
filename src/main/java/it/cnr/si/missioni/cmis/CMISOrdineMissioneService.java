@@ -185,7 +185,7 @@ public class CMISOrdineMissioneService {
 			}
 		} else {
 			if (isDevProfile()){
-				recuperoUidDirettoreUo(uoSpesaPerFlusso);
+				userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoSpesaPerFlusso);
 			} else {
 				userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
 			}

@@ -1,7 +1,7 @@
 spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:postgresql://localhost:54321/missioni
+        url: jdbc:postgresql://as4dock.si.cnr.it:54321/missioni
         name: missioni
         username: missioni
         password: missionipw
