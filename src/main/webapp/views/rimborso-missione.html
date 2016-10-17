@@ -122,7 +122,7 @@
             </form>
             <form class="form-inline" role="form" id="missioni">
                 <p class="column-in-column col-md-8">
-<cnr-widget-datetime-range id-missione="1" disabilitato="validazione || disabilitaOrdineMissione" start-datetime="rimborsoMissioneModel.dataInizioMissione" end-datetime="rimborsoMissioneModel.dataFineMissione" start-label="{{'missione.form.data-inizio' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'missione.form.data-fine' | translate}}"></cnr-widget-datetime-range>
+<cnr-widget-datetime-range id-missione="1" disabilitato="validazione || disabilitaOrdineMissione" start-datetime="rimborsoMissioneModel.dataInizioMissione" end-datetime="rimborsoMissioneModel.dataFineMissione" start-label="{{'rimborso-missione.form.data-inizio' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'rimborso-missione.form.data-fine' | translate}}"></cnr-widget-datetime-range>
                 </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
@@ -222,7 +222,7 @@
               <cnr-widget-date date-name="dataSpesa" start-date="rimborsoMissioneModel.dataInizioMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
             </td>
             <td class="col-xs-8">
-              <input class="form-control" ng-model="newDettaglioSpesa.dsTiSpesa" maxlength="256"</input>
+              <select class="form-control" ng-model="newDettaglioSpesa.tipo_spesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.cd_ti_spesa for tipo_spesa in tipi_spesa"></select>
             </td>
             <td class="col-xs-2">
               <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="256"</input>
