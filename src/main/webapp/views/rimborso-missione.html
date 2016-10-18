@@ -219,7 +219,7 @@
           <tr ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
 
             <td class="col-xs-2">
-              <cnr-widget-date date-name="dataSpesa" start-date="rimborsoMissioneModel.dataInizioMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
+              <cnr-widget-date date-name="dataSpesa" start-date="rimborsoMissioneModel.dataInizioMissione" fn-change="onChangeDataDettaglio()" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
             </td>
             <td class="col-xs-8">
               <select class="form-control" ng-model="newDettaglioSpesa.tipo_spesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.cd_ti_spesa for tipo_spesa in tipi_spesa"></select>

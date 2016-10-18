@@ -317,10 +317,18 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         var a = 1;
     }
 
+    $scope.onChangeDataDettaglio = function() {
+        if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
+            $scope.restTipiSpesa($scope.newDettaglioSpesa.dataSpesa, $scope.rimborsoMissioneModel.tipoMissione);
+        } else {
+            $scope.tipi_spesa = {};
+        }
+    }
+
     $scope.restTipiSpesa = function(data, tipoMissione){
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.SIGLA;
-        var url = SIGLA_REST.TIPI_SPESA;
+        var url = SIGLA_REST.TIPO_SPESA;
         var objectPostTipiSpesaOrderBy = [{name: 'ds_ti_spesa', type: 'ASC'}];
         var objectPostTipiSpesaClauses = null;
         if (tipoMissione == "I"){
