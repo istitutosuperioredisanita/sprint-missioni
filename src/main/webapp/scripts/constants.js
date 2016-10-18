@@ -33,7 +33,14 @@ missioniApp.constant('SIGLA_REST', {
         'IMPEGNO': 'ConsImpegnoAction.json',
         'IMPEGNO_GAE': 'ConsImpegnoGaeAction.json',
         'TERZO': 'ConsTerzoAction.json',
-        'INQUADRAMENTO': 'ConsInquadramentoAction.json'
+        'INQUADRAMENTO': 'ConsInquadramentoAction.json',
+        'MANDATO': 'ConsMandatoRevRestAction.json',
+        'DIVISA': 'ConsDivisaAction.json',
+        'TIPO_PASTO': 'ConsMissioneTipoPastoAction.json',
+        'TIPO_SPESA': 'ConsMissioneTipoSpesaAction.json',
+        'TIPI_SPESA': 'ConsTipiSpesaAction.json',
+        'TIPI_SPESA': 'ConsTipiSpesaAction.json',
+        'TIPI_SPESA': 'ConsTipiSpesaAction.json'
     });
 
 missioniApp.constant('COSTANTI', {
