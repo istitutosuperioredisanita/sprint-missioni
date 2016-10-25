@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Definition of new Model -->
-<model name="missioni_ordine:missioni_ordineModel" 
+<model name="missioni:missioni_model" 
 	xmlns="http://www.alfresco.org/model/dictionary/1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd">
@@ -23,57 +23,57 @@
 
 	<!-- Introduction of new namespaces defined by this model -->
 	<namespaces>
-		<namespace uri="http://www.cnr.it/model/missioni/ordine/cmis" prefix="missioni_ordine" />
+		<namespace uri="http://www.cnr.it/model/missioni/cmis" prefix="missioni" />
 	</namespaces>
 
 	<types>
-		<type name="missioni_ordine:main">
-			<title>Dati Generali Ordine Missione</title>
-			<description>Dati Generali Ordine Missione</description>
+		<type name="missioni:main">
+			<title>Dati Generali Documento Missione</title>
+			<description>Dati Generali Documento Missione</description>
 			<parent>cm:folder</parent>
 			<properties>
-				<property name="missioni_ordine:anno">
+				<property name="missioni:anno">
 					<title>Anno</title>
 					<type>d:int</type>
 				</property>
-				<property name="missioni_ordine:numero">
-					<title>Numero Ordine di Missione</title>
+				<property name="missioni:numero">
+					<title>Numero Missione</title>
 					<type>d:long</type>
 				</property>
-				<property name="missioni_ordine:id">
-					<title>ID Ordine di Missione</title>
+				<property name="missioni:id">
+					<title>ID Missione</title>
 					<type>d:long</type>
 				</property>
-				<property name="missioni_ordine:uid">
-					<title>Utente Ordine di Missione</title>
+				<property name="missioni:uid">
+					<title>Utente Missione</title>
 					<type>d:text</type>
 				</property>
-				<property name="missioni_ordine:modulo">
-					<title>Modulo Ordine di Missione</title>
+				<property name="missioni:modulo">
+					<title>Modulo Missione</title>
 					<type>d:text</type>
 				</property>
-				<property name="missioni_ordine:oggetto">
-					<title>Oggetto Ordine di Missione</title>
+				<property name="missioni:oggetto">
+					<title>Oggetto Missione</title>
 					<type>d:text</type>
 				</property>
-				<property name="missioni_ordine:destinazione">
-					<title>Destinazione Ordine di Missione</title>
+				<property name="missioni:destinazione">
+					<title>Destinazione Missione</title>
 					<type>d:text</type>
 				</property>
-				<property name="missioni_ordine:note">
-					<title>Note Ordine di Missione</title>
+				<property name="missioni:note">
+					<title>Note Missione</title>
 					<type>d:text</type>
 				</property>
-				<property name="missioni_ordine:dataInizio">
-					<title>Data Inizio Ordine di Missione</title>
+				<property name="missioni:dataInizio">
+					<title>Data Inizio Missione</title>
 					<type>d:datetime</type>
 				</property>
-				<property name="missioni_ordine:dataFine">
-					<title>Data Fine Ordine di Missione</title>
+				<property name="missioni:dataFine">
+					<title>Data Fine Missione</title>
 					<type>d:datetime</type>
 				</property>
-				<property name="missioni_ordine:dataInserimento">
-					<title>Data Inserimento Ordine di Missione</title>
+				<property name="missioni:dataInserimento">
+					<title>Data Inserimento Missione</title>
 					<type>d:datetime</type>
 				</property>
 			</properties>

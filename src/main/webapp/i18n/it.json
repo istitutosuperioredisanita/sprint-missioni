@@ -29,7 +29,8 @@
                 "ordine-missione": "Nuovo Ordine di Missione",
                 "elenco-ordini-missione": "Elenco Ordini di Missione",
                 "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi",
-                "rimborso-missione": "Rimborso Missione"
+                "rimborso-missione": "Rimborso Missione",
+                "elenco-rimborsi-missione": "Elenco Rimborsi Missione"
             },
             "admin": "Administration",
             "language": "Linguaggio"
@@ -104,6 +105,7 @@
         "subtitle_annullato": "Ultimi Ordini di Missione Annullati",
         "subtitle_da_approvare": "Ordini di Missione da Approvare",
         "subtitle_da_validare": "Ordini di Missione da Inviare alla firma",
+        "subtitle_da_rendere_definitivi": "Ordini di Missione da Rendere Definitivi",
         "comment": "Motivazione",
         "userid": "Utente",
         "logged": {
@@ -399,6 +401,16 @@
             "data-inizio.placeholder": "Data di Inizio della Missione",
             "data-fine": "Data Fine",
             "data-fine.placeholder": "Data presunta di Fine della Missione",
+            "inquadramento": "Inquadramento"
+        },
+        "button": {
+            "print": "Stampa Rimborso",
+            "dettagli": "Dettagli Spesa"
+        }
+    },
+    "rimborso-missione-dettagli": {
+        "title": "RIMBORSO MISSIONE  {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} - DETTAGLI SPESE",
+        "form": {
             "box-dettaglio-spese": "Dettaglio Spese",
             "dettaglio-spese": {
                     "data": "Data",
@@ -407,11 +419,22 @@
                     "importo": "Importo",
                     "km": "Km percorsi"
                 },
-            "add-dettaglio-spesa": "Aggiungi Dettaglio Spese",
-            "inquadramento": "Inquadramento"
-        },
-        "button": {
-            "print": "Stampa Rimborso"
+            "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"
+        }
+    },
+    "elenco-rimborsi-missione": {
+        "title": "ELENCO RIMBORSI MISSIONE",
+        "no-result": "Non esistono Rimborsi di Missione per i criteri di selezione indicati",
+        "filter": {
+            "title": "Criteri di Ricerca",
+            "da-numero": "Da Numero",
+            "a-numero": "A Numero",
+            "da-data": "Da Data Inserimento",
+            "a-data": "A Data Inserimento",
+            "anno": "Anno",
+            "da-numero-ordine": "Da Numero Ordine",
+            "a-numero-ordine": "A Numero Ordine",
+            "anno-ordine": "Anno Ordine"
         }
     },
     "activate": {

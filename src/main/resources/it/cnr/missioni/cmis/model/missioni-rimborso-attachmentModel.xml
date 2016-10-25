@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="missioni_rimborso_attachment:missioni_rimborso_attachmentModel" 
+	xmlns="http://www.alfresco.org/model/dictionary/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd">
+	<description>Sigla Dynamic Model</description>
+	<author>gianfranco.gasparro</author>
+	<version>1.0</version>
+	<imports>
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+	</imports>
+	<namespaces>
+		<namespace uri="http://www.cnr.it/model/missioni/rimborso/attachment/cmis" prefix="missioni_rimborso_attachment" />
+	</namespaces>
+	<types>
+		<type name="missioni_rimborso_attachment:document">
+			<title>Allegati al Rimborso della Missione</title>
+			<description>Allegati al Rimborso della Missione</description>
+			<parent>cm:content</parent>
+			<properties>
+				<property name="missioni_rimborso_attachment:original_name">
+					<title>Nome Originale del File</title>
+					<description>Nome Originale del File</description>
+					<type>d:text</type>
+				</property>
+			</properties>
+		</type>
+	</types>
+	<aspects>
+		<aspect name="missioni_rimborso_attachment:allegati">
+			<title>Allegati al Rimborso della Missione</title>
+			<description>Allegati al Rimborso della Missione</description>
+		</aspect>
+		<aspect name="missioni_rimborso_attachment:scontrini">
+			<title>Scontrini collegati al Rimborso della Missione</title>
+			<description>Scontrini collegati al Rimborso della Missione</description>
+		</aspect>
+		<aspect name="missioni_rimborso_attachment:rimborso">
+			<title>Rimborso della Missione</title>
+			<description>Rimborso della Missione</description>
+		</aspect>
+	</aspects>
+</model>

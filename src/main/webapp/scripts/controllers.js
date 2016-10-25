@@ -21,6 +21,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
 
         ElencoOrdiniMissioneService.findListToValidate().then(function(response){
             $scope.listOrdiniMissioniToValidate = response.data;
+            $scope.esistonoOrdiniDaRendereDefinitivi = false;
             $scope.esistonoOrdiniDaApprovare = false;
             $scope.esistonoOrdiniAnnullati = false;
             $scope.esistonoOrdiniApprovati = false;
@@ -40,6 +41,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoOrdiniAnnullati = true;
                     } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
                         $scope.esistonoOrdiniDaValidare = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'F'){
+                        $scope.esistonoOrdiniDaRendereDefinitivi = true;
                     }
                 }
             }
@@ -52,6 +55,9 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     };
     $scope.doSelectOrdineMissioneValidazione = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id+'/'+"S");
+    };
+    $scope.doSelectOrdineMissioneToFinalize = function (ordineMissione) {
+        $location.path('/ordine-missione/'+ordineMissione.id+'/'+"D");
     };
 });
 

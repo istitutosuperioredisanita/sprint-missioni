@@ -3,7 +3,7 @@ package it.cnr.si.missioni.web.filter;
 import java.util.Date;
 import java.util.List;
 
-public class OrdineMissioneFilter {
+public class MissioneFilter {
 	private List<String> listaStatiMissione;
 	private String user;
 	private String stato;

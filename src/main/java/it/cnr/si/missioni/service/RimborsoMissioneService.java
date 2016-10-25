@@ -1,33 +1,11 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
-import it.cnr.si.missioni.util.proxy.json.object.Cdr;
-import it.cnr.si.missioni.util.proxy.json.object.Gae;
-import it.cnr.si.missioni.util.proxy.json.object.Impegno;
-import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
-import it.cnr.si.missioni.util.proxy.json.object.Progetto;
-import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
-import it.cnr.si.missioni.util.proxy.json.service.CdrService;
-import it.cnr.si.missioni.util.proxy.json.service.GaeService;
-import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
-import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
-import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
-import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
-
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.slf4j.Logger;
@@ -37,6 +15,41 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import it.cnr.jada.criterion.CriterionList;
+import it.cnr.jada.ejb.session.BusyResourceException;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
+import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.Uo;
+import it.cnr.si.missioni.util.data.UoForUsersSpecial;
+import it.cnr.si.missioni.util.data.UsersSpecial;
+import it.cnr.si.missioni.util.proxy.json.object.Cdr;
+import it.cnr.si.missioni.util.proxy.json.object.Gae;
+import it.cnr.si.missioni.util.proxy.json.object.Impegno;
+import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
+import it.cnr.si.missioni.util.proxy.json.object.Progetto;
+import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import it.cnr.si.missioni.util.proxy.json.service.CdrService;
+import it.cnr.si.missioni.util.proxy.json.service.GaeService;
+import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
+import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
+import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
+import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
+import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import net.bzdyl.ejb3.criteria.Order;
+import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
+import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
 
 
 /**
@@ -54,6 +67,12 @@ public class RimborsoMissioneService {
 	private UoService uoService;
 
 	@Autowired
+	private AccountService accountService;
+
+	@Autowired
+	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
+
+	@Autowired
 	UnitaOrganizzativaService unitaOrganizzativaService;
 	
 	@Autowired
@@ -69,19 +88,409 @@ public class RimborsoMissioneService {
 	GaeService gaeService;
 	
 	@Autowired
+	CMISRimborsoMissioneService cmisRimborsoMissioneService; 
+	
+	@Autowired
 	ProgettoService progettoService;
 	
-    @Inject
+    @Autowired
     private DatiIstitutoService datiIstitutoService;
 
+    @Transactional(readOnly = true)
+    public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
+    	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
+    	filter.setDaId(idMissione);
+    	filter.setaId(idMissione);
+    	RimborsoMissione rimborsoMissione = null;
+		List<RimborsoMissione> listaRimborsiMissione = getRimborsiMissione(principal, filter, false, true);
+		if (listaRimborsiMissione != null && !listaRimborsiMissione.isEmpty()){
+			rimborsoMissione = listaRimborsiMissione.get(0);
+			if (retrieveDataFromFlows){
+				if (rimborsoMissione.isStatoInviatoAlFlusso()){
+	    			ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
+	    			if (result != null){
+	    				rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
+	    				rimborsoMissione.setCommentFlows(result.getComment());
+	    			}
+				}
+			}
+			
+		}
+		return rimborsoMissione;
+    }
+
+    public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
+    	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
+    	if (lista != null){
+        	List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
+    		for (RimborsoMissione rimborsoMissione : lista){
+    			if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
+        			ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
+        			if (result != null){
+        				RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
+        				if (result.isApprovato()){
+        					rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+        					if (rimborsoMissioneDaAggiornare.getPgObbligazione() != null){
+        						rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+        					}
+        					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+        					listaNew.add(rimborsoMissione);
+        				} else if (result.isStateReject()){
+        					rimborsoMissione.setCommentFlows(result.getComment());
+        					rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
+
+        			    	aggiornaValidazione(rimborsoMissioneDaAggiornare);
+        			    	rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
+        			    	rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+        			    	rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+        					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
+        					listaNew.add(rimborsoMissione);
+        				} else if (result.isAnnullato()){
+        					rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+        					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
+        					listaNew.add(rimborsoMissione);
+        				} else {
+        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
+        					listaNew.add(rimborsoMissione);
+        				}
+        			}
+    			} else {
+    				if (rimborsoMissione.isMissioneDaValidare() && rimborsoMissione.isMissioneConfermata()){
+    					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
+    					listaNew.add(rimborsoMissione);
+    				} else if (rimborsoMissione.isMissioneInserita()){
+    					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_CONFERMARE_PER_HOME);
+    					listaNew.add(rimborsoMissione);
+    				}
+    			}
+    		}
+    		return listaNew;
+    	}
+    	return lista;
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione createOrdineMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws AwesomeException, 
+    public RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws AwesomeException, 
+    ComponentException, Exception{
+    	return updateRimborsoMissione(principal, rimborsoMissione, false);
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRED)
+    private RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows)  throws AwesomeException, 
+    ComponentException, Exception{
+    	return updateRimborsoMissione(principal, rimborsoMissione, fromFlows, false);
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRED)
+    public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm)  throws AwesomeException, 
+    ComponentException, Exception {
+
+    	RimborsoMissione rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
+
+		if (rimborsoMissioneDB==null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
+		}
+		
+		if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
+			if (rimborsoMissioneDB.isStatoFlussoApprovato()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare il rimborso della missione. E' già stato approvato.");
+			}
+			if (!rimborsoMissioneDB.isMissioneDaValidare()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare il rimborso della missione. E' già stato avviato il flusso di approvazione.");
+			}
+		}
+		
+		if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("S")){
+			if (!rimborsoMissioneDB.isMissioneDaValidare()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione già validato.");
+			}
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissioneDB.getUoRich())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi di missione.");
+			}
+			
+			if (!confirm){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un rimborso di missione durante la fase di validazione. Rieseguire la ricerca.");
+			}
+			rimborsoMissioneDB.setValidato("S");
+		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
+			if (rimborsoMissione.getEsercizioOriginaleObbligazione() == null || rimborsoMissione.getPgObbligazione() == null ){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo il rimborso della missione è necessario valorizzare l'impegno.");
+			}
+			if (!StringUtils.isEmpty(rimborsoMissione.getGae())){
+				rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
+			}
+			if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
+				rimborsoMissioneDB.setVoce(rimborsoMissione.getVoce());
+			}
+			rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
+			rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
+			rimborsoMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
+		} else {
+			rimborsoMissioneDB.setStato(rimborsoMissione.getStato());
+			rimborsoMissioneDB.setStatoFlusso(rimborsoMissione.getStatoFlusso());
+			rimborsoMissioneDB.setCdrSpesa(rimborsoMissione.getCdrSpesa());
+			rimborsoMissioneDB.setCdsSpesa(rimborsoMissione.getCdsSpesa());
+			rimborsoMissioneDB.setUoSpesa(rimborsoMissione.getUoSpesa());
+			rimborsoMissioneDB.setCdsCompetenza(rimborsoMissione.getCdsCompetenza());
+			rimborsoMissioneDB.setUoCompetenza(rimborsoMissione.getUoCompetenza());
+			rimborsoMissioneDB.setDomicilioFiscaleRich(rimborsoMissione.getDomicilioFiscaleRich());
+			rimborsoMissioneDB.setDataInizioMissione(rimborsoMissione.getDataInizioMissione());
+			rimborsoMissioneDB.setDataFineMissione(rimborsoMissione.getDataFineMissione());
+			rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
+			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
+			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
+			rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
+			rimborsoMissioneDB.setOggetto(rimborsoMissione.getOggetto());
+			rimborsoMissioneDB.setTipoMissione(rimborsoMissione.getTipoMissione());
+			rimborsoMissioneDB.setVoce(rimborsoMissione.getVoce());
+			rimborsoMissioneDB.setTrattamento(rimborsoMissione.getTrattamento());
+			rimborsoMissioneDB.setNazione(rimborsoMissione.getNazione());
+
+			rimborsoMissioneDB.setNoteUtilizzoTaxiNoleggio(rimborsoMissione.getNoteUtilizzoTaxiNoleggio());
+			rimborsoMissioneDB.setUtilizzoAutoNoleggio(rimborsoMissione.getUtilizzoAutoNoleggio());
+			rimborsoMissioneDB.setUtilizzoTaxi(rimborsoMissione.getUtilizzoTaxi());
+			rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+			rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+			rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
+			rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
+
+			rimborsoMissioneDB.setDataInizioEstero(rimborsoMissione.getDataInizioEstero());
+			rimborsoMissioneDB.setDataFineEstero(rimborsoMissione.getDataFineEstero());
+			rimborsoMissioneDB.setCdTerzoSigla(rimborsoMissione.getCdTerzoSigla());
+			rimborsoMissioneDB.setModpag(rimborsoMissione.getModpag());
+			rimborsoMissioneDB.setIban(rimborsoMissione.getIban());
+			rimborsoMissioneDB.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto());
+			rimborsoMissioneDB.setAnticipoAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato());
+			rimborsoMissioneDB.setAnticipoNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato());
+			rimborsoMissioneDB.setAnticipoImporto(rimborsoMissione.getAnticipoImporto());
+			rimborsoMissioneDB.setAltreSpeseAntDescrizione(rimborsoMissione.getAltreSpeseAntDescrizione());
+			rimborsoMissioneDB.setAltreSpeseAntImporto(rimborsoMissione.getAltreSpeseAntImporto());
+			rimborsoMissioneDB.setSpeseTerziImporto(rimborsoMissione.getSpeseTerziImporto());
+			rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
+			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
+//			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
+		}
+		
+		
+    	if (confirm){
+    		rimborsoMissioneDB.setStato(Costanti.STATO_CONFERMATO);
+    	} 
+
+    	rimborsoMissioneDB.setToBeUpdated();
+
+//		//effettuo controlli di validazione operazione CRUD
+		validaCRUD(principal, rimborsoMissioneDB);
+
+    	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare()){
+    		cmisRimborsoMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), rimborsoMissioneDB);
+    	}
+    	rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDB);
+    	
+//    	autoPropriaRepository.save(autoPropria);
+    	log.debug("Updated Information for Rimborso Missione: {}", rimborsoMissioneDB);
+
+    	return rimborsoMissione;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+	public void deleteRimborsoMissione(Principal principal, Long idRimborsoMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    	RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
+		if (rimborsoMissione != null){
+			if (!rimborsoMissione.isMissioneInserita()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile cancellare un rimborso di missione che non si trova in uno stato "+Costanti.STATO.get(Costanti.STATO_INSERITO));
+			}
+			rimborsoMissioneDettagliService.cancellaRimborsoMissioneDettagli(principal, rimborsoMissione);
+			//effettuo controlli di validazione operazione CRUD
+			rimborsoMissione.setStato(Costanti.STATO_ANNULLATO);
+			rimborsoMissione.setToBeUpdated();
+			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+				cmisRimborsoMissioneService.annullaFlusso(rimborsoMissione);
+			}
+			crudServiceBean.modificaConBulk(principal, rimborsoMissione);
+		}
+	}
+	
+	public String retrieveStateFromFlows(ResultFlows result) {
+		return result.getState();
+	}
+
+	public ResultFlows retrieveDataFromFlows(RimborsoMissione rimborsoMissione)
+			throws ComponentException {
+		ResultFlows result = cmisRimborsoMissioneService.getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
+		return result;
+	}
+
+    @Transactional(readOnly = true)
+    public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione) throws ComponentException {
+		return getRimborsoMissione(principal, idMissione, false);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RimborsoMissione> getRimborsoMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
+		return getRimborsiMissione(principal, filter, isServiceRest, false);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RimborsoMissione> getRimborsiMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
+		return getRimborsiMissione(principal, filter, isServiceRest, false);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<RimborsoMissione> getRimborsiMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
+		CriterionList criterionList = new CriterionList();
+		List<RimborsoMissione> rimborsoMissioneList=null;
+		String aliasOrdineMissione = "Ordine";
+		if (filter != null){
+			if (filter.getAnno() != null){
+				criterionList.add(Restrictions.eq("anno", filter.getAnno()));
+			}
+			if (filter.getDaId() != null){
+				criterionList.add(Restrictions.ge("id", filter.getDaId()));
+			}
+			if (filter.getStato() != null){
+				criterionList.add(Restrictions.le("stato", filter.getStato()));
+			}
+			if (filter.getStatoFlusso() != null){
+				criterionList.add(Restrictions.le("statoFlusso", filter.getStatoFlusso()));
+			}
+			if (filter.getValidato() != null){
+				criterionList.add(Restrictions.le("validato", filter.getValidato()));
+			}
+			if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()){
+				criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
+			}
+			
+			if (filter.getaId() != null){
+				criterionList.add(Restrictions.le("id", filter.getaId()));
+			}
+			if (filter.getDaNumero() != null){
+				criterionList.add(Restrictions.ge("numero", filter.getDaNumero()));
+			}
+			if (filter.getaNumero() != null){
+				criterionList.add(Restrictions.le("numero", filter.getaNumero()));
+			}
+			if (filter.getDaData() != null){
+				criterionList.add(Restrictions.ge("dataInserimento", filter.getDaData()));
+			}
+			if (filter.getaData() != null){
+				criterionList.add(Restrictions.le("dataInserimento", filter.getaData()));
+			}
+			if (filter.getCdsRich() != null){
+				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
+			}
+			if (filter.getUoRich() != null){
+				criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+			}
+			if (filter.getAnnoOrdine() != null){
+				criterionList.add(Restrictions.eq(aliasOrdineMissione+".anno", filter.getAnnoOrdine()));
+			}
+			if (filter.getDaNumeroOrdine() != null){
+				criterionList.add(Restrictions.ge(aliasOrdineMissione+".numero", filter.getDaNumeroOrdine()));
+			}
+			if (filter.getaNumeroOrdine() != null){
+				criterionList.add(Restrictions.le(aliasOrdineMissione+".numero", filter.getaNumeroOrdine()));
+			}
+		}
+		if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
+			if (StringUtils.isEmpty(filter.getUoRich())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stata selezionata la uo per rendere definitivi il rimborso della missione.");
+			}
+			UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
+			boolean uoAbilitata = false;
+			if (userSpecial != null){
+				if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+					if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+				    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
+				    		if (uoService.getUoSigla(uoUser).equals(filter.getUoRich())){
+				    			uoAbilitata = true;
+				    			if (!Utility.nvl(uoUser.getRendi_definitivo(),"N").equals("S")){
+									throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente non è abilitato a rendere definitivi rimborsi di missione.");
+					    		}
+				    		}
+				    	} 
+					}
+				}
+			}
+			if (!uoAbilitata){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente non è abilitato a rendere definitivi rimborsi di missione.");
+			}
+			criterionList.add(Restrictions.eq("statoFlusso", Costanti.STATO_APPROVATO_FLUSSO));
+			criterionList.add(Restrictions.eq("stato", Costanti.STATO_CONFERMATO));
+			criterionList.add(Restrictions.eq("validato", "S"));
+			rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"));
+			return rimborsoMissioneList;
+			
+		} else {
+			if (!isForValidateFlows){
+				if (!StringUtils.isEmpty(filter.getUser())){
+					criterionList.add(Restrictions.eq("uid", filter.getUser()));
+				} else {
+					criterionList.add(Restrictions.eq("uid", principal.getName()));
+				}
+			} else {
+				UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
+				if (userSpecial != null){
+					if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+						if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+							boolean esisteUoConValidazioneConUserNonAbilitato = false;
+							Disjunction condizioneOr = Restrictions.disjunction();
+							List<String> listaUoUtente = new ArrayList<String>();
+					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
+					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
+					    		if (uo != null){
+						    		listaUoUtente.add(uoService.getUoSigla(uoUser));
+						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
+						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
+							    			condizioneOr.add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser)));
+							    		} else {
+							    			esisteUoConValidazioneConUserNonAbilitato = true;
+							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "S")));
+						    			}
+						    		}
+					    		}
+					    	}
+					    	if (esisteUoConValidazioneConUserNonAbilitato){
+						    	criterionList.add(condizioneOr);
+					    	} else {
+						    	criterionList.add(Restrictions.in("uoRich", listaUoUtente));
+					    	}
+						} else {
+							criterionList.add(Restrictions.eq("uid", principal.getName()));
+						}
+					}
+				} else {
+					criterionList.add(Restrictions.eq("uid", principal.getName()));
+				}
+			}
+			criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
+
+			if (isServiceRest) {
+				if (isForValidateFlows){
+					List<String> listaStatiFlusso = new ArrayList<String>();
+					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
+					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.eq("stato", Costanti.STATO_INSERITO))));
+				}
+				rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"));
+			} else
+				rimborsoMissioneList = crudServiceBean.findByCriterion(principal, RimborsoMissione.class, criterionList, Order.asc("dataInserimento"));
+			return rimborsoMissioneList;
+		}
+    }
+
+    
+    @Transactional(propagation = Propagation.REQUIRED)
+    public RimborsoMissione createRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws AwesomeException, 
     ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
     	controlloDatiObbligatoriDaGUI(rimborsoMissione);
     	inizializzaCampiPerInserimento(principal, rimborsoMissione);
 		validaCRUD(principal, rimborsoMissione);
 		rimborsoMissione = (RimborsoMissione)crudServiceBean.creaConBulk(principal, rimborsoMissione);
-    	log.debug("Created Information for User: {}", rimborsoMissione);
+    	log.info("Creato Rimborso Missione", rimborsoMissione.getId());
     	return rimborsoMissione;
     }
 
@@ -270,7 +679,7 @@ public class RimborsoMissioneService {
     }
 	
     private void controlloCongruenzaDatiInseriti(Principal principal, RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getDataFineMissione().before(rimborsoMissione.getDataFineMissione())){
+		if (rimborsoMissione.getDataFineMissione().before(rimborsoMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
 		if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
