@@ -38,9 +38,8 @@ missioniApp.constant('SIGLA_REST', {
         'DIVISA': 'ConsDivisaAction.json',
         'TIPO_PASTO': 'ConsMissioneTipoPastoAction.json',
         'TIPO_SPESA': 'ConsMissioneTipoSpesaAction.json',
-        'TIPI_SPESA': 'ConsTipiSpesaAction.json',
-        'TIPI_SPESA': 'ConsTipiSpesaAction.json',
-        'TIPI_SPESA': 'ConsTipiSpesaAction.json'
+        'BANCA': 'ConsBancaAction.json',
+        'MOD_PAGAMENTO': 'ConsModalitaPagamentoAction.json'
     });
 
 missioniApp.constant('COSTANTI', {

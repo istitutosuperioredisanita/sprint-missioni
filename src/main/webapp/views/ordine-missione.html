@@ -218,7 +218,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="validazione === 'S' || disabilitaOrdineMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
                         </span>
                     </p>
             </form>
@@ -228,12 +228,12 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
-                    <selectize ng-disabled="validazione === 'S' || disabilitaOrdineMissione" options='elencoVoci' config="{maxItems: 1}" ng-model="ordineMissioneModel.voce"></selectize>
+                    <selectize ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" options='elencoVoci' config="{maxItems: 1}" ng-model="ordineMissioneModel.voce"></selectize>
                         </span>
                     </p>
             </form>
                     <p class="col-md-1">
-            <button ng-disabled="validazione === 'S' || disabilitaOrdineMissione" type="button" class="btn" ng-click="undoVoce()">{{'global.button.simpleUndo' | translate}}</button>
+            <button ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="button" class="btn" ng-click="undoVoce()">{{'global.button.simpleUndo' | translate}}</button>
                     </p>
 
 

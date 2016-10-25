@@ -7,6 +7,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
@@ -67,7 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
-public class CMISOrdineMissioneService {
+public class CMISRimborsoMissioneService {
 	public static final String 
 			PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC",
 			PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
@@ -395,138 +396,127 @@ public class CMISOrdineMissioneService {
 		return metadataProperties;
 	}
 	
-	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) throws ComponentException {
-		String username = principal.getName();
-		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
-		Document documento = salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
-		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
+	public void avviaFlusso(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
+//		String username = principal.getName();
+//		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
+//		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
+//		Document documento = salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
+//		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
+//		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
+//		Document documentoAnticipo = null;
 //		if (anticipo != null){
-//			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
-//			ordineMissione.setRichiestaAnticipo("S");
-//		} else {
-//			ordineMissione.setRichiestaAnticipo("N");
+//			anticipo.setOrdineMissione(ordineMissione);
+//			documentoAnticipo = ordineMissioneAnticipoService.creaDocumentoAnticipo(username, anticipo);
 //		}
-		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
+//		
+//		Document documentoAutoPropria = null;
 //		if (autoPropria != null){
-//			ordineMissione.setUtilizzoAutoPropria("S");
-//		} else {
-//			ordineMissione.setUtilizzoAutoPropria("N");
+//			autoPropria.setOrdineMissione(ordineMissione);
+//			documentoAutoPropria = ordineMissioneAutoPropriaService.creaDocumentoRichiestaAutoPropria(username, autoPropria);
 //		}
-		Document documentoAnticipo = null;
-		if (anticipo != null){
-			anticipo.setOrdineMissione(ordineMissione);
-			documentoAnticipo = ordineMissioneAnticipoService.creaDocumentoAnticipo(username, anticipo);
-		}
-		
-		Document documentoAutoPropria = null;
-		if (autoPropria != null){
-			autoPropria.setOrdineMissione(ordineMissione);
-			documentoAutoPropria = ordineMissioneAutoPropriaService.creaDocumentoRichiestaAutoPropria(username, autoPropria);
-		}
-
-		if (ordineMissione.isStatoNonInviatoAlFlusso()){
-			String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
-
-			StringWriter stringWriter = new StringWriter();
-			JsonFactory jsonFactory = new JsonFactory();
-			ObjectMapper mapper = new ObjectMapper(jsonFactory); 
-			try {
-				 JsonGenerator jGenerator = jsonFactory.createJsonGenerator(stringWriter);
-				 jGenerator.writeStartObject();
-				 jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
-				 jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
-				 StringBuffer nodeRefs = new StringBuffer();
-				 aggiungiDocumento(documento, nodeRefs);
-				 aggiungiDocumento(documentoAnticipo, nodeRefs);
-				 aggiungiDocumento(documentoAutoPropria, nodeRefs);
-				 
-				 jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
-				 jGenerator.writeStringField("assoc_packageItems_removed" , "");
-				 jGenerator.writeStringField("prop_bpm_comment" , "");
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
-				 jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
-				 jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
-				 jGenerator.writeStringField("prop_bpm_sendEMailNotifications" , "false");
-				 jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
-				 jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
-				 jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
-				 jGenerator.writeStringField("prop_bpm_workflowPriority" , cmisOrdineMissione.getPriorita());
-				 jGenerator.writeStringField("prop_wfcnr_groupName" , "GENERICO");
-				 jGenerator.writeStringField("prop_wfcnr_wfCounterIndex" , "");
-				 jGenerator.writeStringField("prop_wfcnr_wfCounterId" , "");
-				 jGenerator.writeStringField("prop_wfcnr_wfCounterAnno" , "");
-				 jGenerator.writeStringField("prop_cnrmissioni_validazioneSpesaFlag" , cmisOrdineMissione.getValidazioneSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_missioneConAnticipoFlag" , cmisOrdineMissione.getAnticipo());
-				 jGenerator.writeStringField("prop_cnrmissioni_validazioneModuloFlag" , "false");
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameUtenteOrdineMissione" , cmisOrdineMissione.getUsernameUtenteOrdine());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisOrdineMissione.getUsernameRichiedente());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameResponsabileModulo" , cmisOrdineMissione.getUserNameResponsabileModulo());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisOrdineMissione.getUserNamePrimoFirmatario());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisOrdineMissione.getUserNameFirmatarioSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisOrdineMissione.getUoOrdine());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisOrdineMissione.getDescrizioneUoOrdine());
-				 jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisOrdineMissione.getUoSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisOrdineMissione.getDescrizioneUoSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisOrdineMissione.getUoCompetenza());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisOrdineMissione.getDescrizioneUoCompetenza());
-				 jGenerator.writeStringField("prop_cnrmissioni_autoPropriaFlag" , cmisOrdineMissione.getAutoPropriaFlag());
-				 jGenerator.writeStringField("prop_cnrmissioni_noleggioFlag" , cmisOrdineMissione.getNoleggioFlag());
-				 jGenerator.writeStringField("prop_cnrmissioni_taxiFlag" , cmisOrdineMissione.getTaxiFlag());
-				 jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisOrdineMissione.getCapitolo());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisOrdineMissione.getDescrizioneCapitolo());
-				 jGenerator.writeStringField("prop_cnrmissioni_modulo" , cmisOrdineMissione.getModulo());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneModulo" , cmisOrdineMissione.getDescrizioneModulo());
-				 jGenerator.writeStringField("prop_cnrmissioni_gae" , cmisOrdineMissione.getGae());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneGae" , cmisOrdineMissione.getDescrizioneGae());
-				 jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoResiduo" , cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoCompetenza" , cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_impegnoNumero" , cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneImpegno" , cmisOrdineMissione.getDescrizioneImpegno());
-				 jGenerator.writeStringField("prop_cnrmissioni_importoMissione" , cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_disponibilita" , cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_missioneEsteraFlag" , cmisOrdineMissione.getMissioneEsteraFlag());
-				 jGenerator.writeStringField("prop_cnrmissioni_destinazione" , cmisOrdineMissione.getDestinazione());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisOrdineMissione.getDataInizioMissione());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisOrdineMissione.getDataFineMissione());
-				jGenerator.writeEndObject();
-				jGenerator.close();
-			} catch (IOException e) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: "+e);
-			}
-			
-			try {
-				Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
-				TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-				HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
-				String idFlusso = null;
-				
-				String text = mapRichiedente.get("persistedObject").toString();
-				String patternString1 = "id=(activiti\\$[0-9]+)";
-
-				Pattern pattern = Pattern.compile(patternString1);
-				Matcher matcher = pattern.matcher(text);
-				if (matcher.find())
-					idFlusso = matcher.group(1);
-				ordineMissione.setIdFlusso(idFlusso);
-	        	ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-				if (anticipo != null){
-					anticipo.setIdFlusso(idFlusso);
-				}
-			} catch (AwesomeException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-			}
-		} else {
-			if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
-				StringBuffer nodeRefs = new StringBuffer();
-				aggiungiDocumento(documentoAutoPropria, nodeRefs);
-				avanzaFlusso(ordineMissione, nodeRefs);
-			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
-			}
-		}
+//
+//		if (ordineMissione.isStatoNonInviatoAlFlusso()){
+//			String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
+//
+//			StringWriter stringWriter = new StringWriter();
+//			JsonFactory jsonFactory = new JsonFactory();
+//			ObjectMapper mapper = new ObjectMapper(jsonFactory); 
+//			try {
+//				 JsonGenerator jGenerator = jsonFactory.createJsonGenerator(stringWriter);
+//				 jGenerator.writeStartObject();
+//				 jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
+//				 jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
+//				 StringBuffer nodeRefs = new StringBuffer();
+//				 aggiungiDocumento(documento, nodeRefs);
+//				 aggiungiDocumento(documentoAnticipo, nodeRefs);
+//				 aggiungiDocumento(documentoAutoPropria, nodeRefs);
+//				 
+//				 jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
+//				 jGenerator.writeStringField("assoc_packageItems_removed" , "");
+//				 jGenerator.writeStringField("prop_bpm_comment" , "");
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
+//				 jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
+//				 jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
+//				 jGenerator.writeStringField("prop_bpm_sendEMailNotifications" , "false");
+//				 jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
+//				 jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
+//				 jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
+//				 jGenerator.writeStringField("prop_bpm_workflowPriority" , cmisOrdineMissione.getPriorita());
+//				 jGenerator.writeStringField("prop_wfcnr_groupName" , "GENERICO");
+//				 jGenerator.writeStringField("prop_wfcnr_wfCounterIndex" , "");
+//				 jGenerator.writeStringField("prop_wfcnr_wfCounterId" , "");
+//				 jGenerator.writeStringField("prop_wfcnr_wfCounterAnno" , "");
+//				 jGenerator.writeStringField("prop_cnrmissioni_validazioneSpesaFlag" , cmisOrdineMissione.getValidazioneSpesa());
+//				 jGenerator.writeStringField("prop_cnrmissioni_missioneConAnticipoFlag" , cmisOrdineMissione.getAnticipo());
+//				 jGenerator.writeStringField("prop_cnrmissioni_validazioneModuloFlag" , "false");
+//				 jGenerator.writeStringField("prop_cnrmissioni_userNameUtenteOrdineMissione" , cmisOrdineMissione.getUsernameUtenteOrdine());
+//				 jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisOrdineMissione.getUsernameRichiedente());
+//				 jGenerator.writeStringField("prop_cnrmissioni_userNameResponsabileModulo" , cmisOrdineMissione.getUserNameResponsabileModulo());
+//				 jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisOrdineMissione.getUserNamePrimoFirmatario());
+//				 jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisOrdineMissione.getUserNameFirmatarioSpesa());
+//				 jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisOrdineMissione.getUoOrdine());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisOrdineMissione.getDescrizioneUoOrdine());
+//				 jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisOrdineMissione.getUoSpesa());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisOrdineMissione.getDescrizioneUoSpesa());
+//				 jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisOrdineMissione.getUoCompetenza());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisOrdineMissione.getDescrizioneUoCompetenza());
+//				 jGenerator.writeStringField("prop_cnrmissioni_autoPropriaFlag" , cmisOrdineMissione.getAutoPropriaFlag());
+//				 jGenerator.writeStringField("prop_cnrmissioni_noleggioFlag" , cmisOrdineMissione.getNoleggioFlag());
+//				 jGenerator.writeStringField("prop_cnrmissioni_taxiFlag" , cmisOrdineMissione.getTaxiFlag());
+//				 jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisOrdineMissione.getCapitolo());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisOrdineMissione.getDescrizioneCapitolo());
+//				 jGenerator.writeStringField("prop_cnrmissioni_modulo" , cmisOrdineMissione.getModulo());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneModulo" , cmisOrdineMissione.getDescrizioneModulo());
+//				 jGenerator.writeStringField("prop_cnrmissioni_gae" , cmisOrdineMissione.getGae());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneGae" , cmisOrdineMissione.getDescrizioneGae());
+//				 jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoResiduo" , cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
+//				 jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoCompetenza" , cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
+//				 jGenerator.writeStringField("prop_cnrmissioni_impegnoNumero" , cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
+//				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneImpegno" , cmisOrdineMissione.getDescrizioneImpegno());
+//				 jGenerator.writeStringField("prop_cnrmissioni_importoMissione" , cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
+//				 jGenerator.writeStringField("prop_cnrmissioni_disponibilita" , cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
+//				 jGenerator.writeStringField("prop_cnrmissioni_missioneEsteraFlag" , cmisOrdineMissione.getMissioneEsteraFlag());
+//				 jGenerator.writeStringField("prop_cnrmissioni_destinazione" , cmisOrdineMissione.getDestinazione());
+//				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisOrdineMissione.getDataInizioMissione());
+//				 jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisOrdineMissione.getDataFineMissione());
+//				jGenerator.writeEndObject();
+//				jGenerator.close();
+//			} catch (IOException e) {
+//				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: "+e);
+//			}
+//			
+//			try {
+//				Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
+//				TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+//				HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
+//				String idFlusso = null;
+//				
+//				String text = mapRichiedente.get("persistedObject").toString();
+//				String patternString1 = "id=(activiti\\$[0-9]+)";
+//
+//				Pattern pattern = Pattern.compile(patternString1);
+//				Matcher matcher = pattern.matcher(text);
+//				if (matcher.find())
+//					idFlusso = matcher.group(1);
+//				ordineMissione.setIdFlusso(idFlusso);
+//	        	ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+//				if (anticipo != null){
+//					anticipo.setIdFlusso(idFlusso);
+//				}
+//			} catch (AwesomeException e) {
+//				throw e;
+//			} catch (Exception e) {
+//				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+//			}
+//		} else {
+//			if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
+//				StringBuffer nodeRefs = new StringBuffer();
+//				aggiungiDocumento(documentoAutoPropria, nodeRefs);
+//				avanzaFlusso(ordineMissione, nodeRefs);
+//			} else {
+//				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
+//			}
+//		}
 	}
 	private void aggiungiDocumento(Document documentoAnticipo,
 			StringBuffer nodeRefs) {
@@ -674,23 +664,23 @@ public class CMISOrdineMissioneService {
     	}
     }
 
-	private void avanzaFlusso(OrdineMissione ordineMissione, StringBuffer nodeRefs) throws AwesomeException {
-    	avanzaFlusso(ordineMissione, nodeRefs, FlowResubmitType.RESTART_FLOW);
+	private void avanzaFlusso(RimborsoMissione rimborsoMissione, StringBuffer nodeRefs) throws AwesomeException {
+    	avanzaFlusso(rimborsoMissione, nodeRefs, FlowResubmitType.RESTART_FLOW);
     }
 
-    public void annullaFlusso(OrdineMissione ordineMissione) throws AwesomeException {
-    	avanzaFlusso(ordineMissione, null, FlowResubmitType.ABORT_FLOW);
-		ordineMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
+    public void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException {
+    	avanzaFlusso(rimborsoMissione, null, FlowResubmitType.ABORT_FLOW);
+    	rimborsoMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }
 
-    private void avanzaFlusso(OrdineMissione ordineMissione, StringBuffer nodeRefs, FlowResubmitType step) throws AwesomeException {
+    private void avanzaFlusso(RimborsoMissione rimborsoMissione, StringBuffer nodeRefs, FlowResubmitType step) throws AwesomeException {
     	try {
-    		restartFlowOrdineMissione(ordineMissione, nodeRefs, step);
+    		restartFlowRimborsoMissione(rimborsoMissione, nodeRefs, step);
     	} catch (AwesomeException e) {
     		throw e;
     	}
     }
-	public ResultFlows getFlowsOrdineMissione(String idFlusso)throws AwesomeException{
+	public ResultFlows getFlowsRimborsoMissione(String idFlusso)throws AwesomeException{
 		String fieldStato = "wfcnr:statoFlusso"; 
 		String fieldTaskId = "wfcnr:taskId"; 
 		String fieldComment = "cnrmissioni:commento"; 
@@ -705,15 +695,15 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	public void restartFlowOrdineMissione(OrdineMissione ordineMissione, StringBuffer nodeRefs, FlowResubmitType step) throws AwesomeException {
-    	ResultFlows result = getFlowsOrdineMissione(ordineMissione.getIdFlusso());
+	public void restartFlowRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuffer nodeRefs, FlowResubmitType step) throws AwesomeException {
+    	ResultFlows result = getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
     	if (!StringUtils.isEmpty(result.getTaskId())){
     		if (step.equals(FlowResubmitType.ABORT_FLOW.operation())){
         		StringWriter stringWriter = createJsonForAbortFlowOrdineMissione();
-        		missioniCMISService.abortFlowOrdineMissione(stringWriter, result);
+//        		missioniCMISService.abortFlowOrdineMissione(stringWriter, result);
     		} else {
     			StringWriter stringWriter = createJsonForRestartFlowOrdineMissione(nodeRefs);
-        		missioniCMISService.restartFlowOrdineMissione(stringWriter, result);
+//        		missioniCMISService.restartFlowOrdineMissione(stringWriter, result);
     		}
     	} else {
     		throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");

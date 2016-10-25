@@ -31,7 +31,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
 import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
-import it.cnr.si.missioni.web.filter.OrdineMissioneFilter;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,7 +117,7 @@ public class OrdineMissioneService {
 	
     @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
-    	OrdineMissioneFilter filter = new OrdineMissioneFilter();
+    	MissioneFilter filter = new MissioneFilter();
     	filter.setDaId(idMissione);
     	filter.setaId(idMissione);
     	OrdineMissione ordineMissione = null;
@@ -208,7 +208,7 @@ public class OrdineMissioneService {
     	return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, principal.getName());
     }
 
-    public List<OrdineMissione> getOrdiniMissioneForValidateFlows(Principal principal, OrdineMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
+    public List<OrdineMissione> getOrdiniMissioneForValidateFlows(Principal principal, MissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
     	List<OrdineMissione> lista = getOrdiniMissione(principal, filter, isServiceRest, true);
     	if (lista != null){
         	List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
@@ -293,12 +293,12 @@ public class OrdineMissioneService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrdineMissione> getOrdiniMissione(Principal principal, OrdineMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
+    public List<OrdineMissione> getOrdiniMissione(Principal principal, MissioneFilter filter, Boolean isServiceRest) throws ComponentException {
 		return getOrdiniMissione(principal, filter, isServiceRest, false);
     }
 
     @Transactional(readOnly = true)
-    public List<OrdineMissione> getOrdiniMissione(Principal principal, OrdineMissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
+    public List<OrdineMissione> getOrdiniMissione(Principal principal, MissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
 		CriterionList criterionList = new CriterionList();
 		List<OrdineMissione> ordineMissioneList=null;
 		if (filter != null){
@@ -354,7 +354,7 @@ public class OrdineMissioneService {
 				if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
 					if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
 				    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
-				    		if (getUoSigla(uoUser).equals(filter.getUoRich())){
+				    		if (uoService.getUoSigla(uoUser).equals(filter.getUoRich())){
 				    			uoAbilitata = true;
 				    			if (!Utility.nvl(uoUser.getRendi_definitivo(),"N").equals("S")){
 									throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente non è abilitato a rendere definitivi ordini di missione.");
@@ -391,13 +391,13 @@ public class OrdineMissioneService {
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
 					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
 					    		if (uo != null){
-						    		listaUoUtente.add(getUoSigla(uoUser));
+						    		listaUoUtente.add(uoService.getUoSigla(uoUser));
 						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-							    			condizioneOr.add(Restrictions.eq("uoRich", getUoSigla(uoUser)));
+							    			condizioneOr.add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser)));
 							    		} else {
 							    			esisteUoConValidazioneConUserNonAbilitato = true;
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", getUoSigla(uoUser))).add(Restrictions.eq("validato", "S")));
+							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "S")));
 						    			}
 						    		}
 					    		}
@@ -430,10 +430,6 @@ public class OrdineMissioneService {
 			return ordineMissioneList;
 		}
     }
-
-	private String getUoSigla(UoForUsersSpecial uo) {
-		return uoService.getUo(uo.getCodice_uo(), true);
-	}
 
 //    @Transactional(readOnly = true)
 //    public AutoPropria getAutoPropria(String targa) {
@@ -536,14 +532,14 @@ public class OrdineMissioneService {
 			}
 			ordineMissioneDB.setValidato("S");
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
-			if (ordineMissione.getEsercizioObbligazione() == null || ordineMissione.getPgObbligazione() == null ){
+			if (ordineMissione.getEsercizioOriginaleObbligazione() == null || ordineMissione.getPgObbligazione() == null ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo l'ordine di missione è necessario valorizzare l'impegno.");
 			}
 			if (!StringUtils.isEmpty(ordineMissione.getGae())){
 				ordineMissioneDB.setGae(ordineMissione.getGae());
 			}
 			if (!StringUtils.isEmpty(ordineMissione.getVoce())){
-				ordineMissioneDB.setGae(ordineMissione.getVoce());
+				ordineMissioneDB.setVoce(ordineMissione.getVoce());
 			}
 			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());

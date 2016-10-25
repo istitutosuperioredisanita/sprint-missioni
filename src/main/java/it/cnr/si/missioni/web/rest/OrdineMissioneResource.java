@@ -10,7 +10,7 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.web.filter.OrdineMissioneFilter;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class OrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissione(HttpServletRequest request,
-    		OrdineMissioneFilter filter) throws Exception {
+    		MissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
@@ -89,7 +89,7 @@ public class OrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneDaRimborsare(HttpServletRequest request,
-    		OrdineMissioneFilter filter) throws Exception {
+    		MissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare" );
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         filter.setValidato("S");
@@ -111,7 +111,7 @@ public class OrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneToFinal(HttpServletRequest request,
-    		OrdineMissioneFilter filter) throws Exception {
+    		MissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         filter.setToFinal("S");
         List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
@@ -128,7 +128,7 @@ public class OrdineMissioneResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneDaValidare(HttpServletRequest request, OrdineMissioneFilter filter) throws Exception {
+    public ResponseEntity<List<OrdineMissione>> getOrdiniMissioneDaValidare(HttpServletRequest request, MissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<OrdineMissione> ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(

@@ -161,6 +161,20 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/elenco-rimborsi-missione', {
+                    templateUrl: 'views/elenco-rimborsi-missione.html',
+                    controller: 'ElencoRimborsiMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
+                .when('/rimborso-missione/rimborso-missione-dettagli/:idOrdineMissione/:validazione?', {
+                    templateUrl: 'views/rimborso-missione/rimborso-missione-dettagli.html',
+                    controller: 'RimborsoMissioneDettagliController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/ordine-missione/auto-propria/:idOrdineMissione/:validazione?', {
                     templateUrl: 'views/ordine-missione/auto-propria.html',
                     controller: 'AutoPropriaOrdineMissioneController',
