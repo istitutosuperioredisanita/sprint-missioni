@@ -12,6 +12,7 @@
     <include file="classpath:config/liquibase/changelog/20160412145700_add_table_rimborso.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160627152200_add_column_note.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160906152200_add_column_partenza" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20160913152200_add_column_progr_rimborso.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 
