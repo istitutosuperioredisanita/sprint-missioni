@@ -3,7 +3,7 @@
     <changeSet author="missioni" id="20160627152200">
     	<addColumn 
             tableName="DATI_ISTITUTO">
-            <column name="PROGRESSIVO_ORDINE" type="bigint">
+            <column name="PROGRESSIVO_RIMBORSO" type="bigint">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>
