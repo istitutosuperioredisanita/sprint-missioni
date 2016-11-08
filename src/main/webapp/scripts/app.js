@@ -168,7 +168,7 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
-                .when('/rimborso-missione/rimborso-missione-dettagli/:idOrdineMissione/:validazione?', {
+                .when('/rimborso-missione/rimborso-missione-dettagli/:idRimborsoMissione/:validazione?/:inizioMissione/:fineMissione', {
                     templateUrl: 'views/rimborso-missione/rimborso-missione-dettagli.html',
                     controller: 'RimborsoMissioneDettagliController',
                     access: {

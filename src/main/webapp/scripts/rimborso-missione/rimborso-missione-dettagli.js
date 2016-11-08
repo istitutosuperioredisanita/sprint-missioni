@@ -11,9 +11,11 @@ missioniApp.factory('RimborsoMissioneDettagliService', function ($http) {
         }
     });
 
-missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ui, COSTANTI) {
+missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ElencoRimborsiMissioneService, ui, COSTANTI) {
     
     $scope.validazione = $routeParams.validazione;
+    $scope.inizioMissione = $routeParams.inizioMissione;
+    $scope.fineMissione = $routeParams.fineMissione;
     $scope.idRimborsoMissione = $routeParams.idRimborsoMissione;
     $scope.accessToken = AccessToken.get();
     $scope.accountModel = $sessionStorage.accountWork;
@@ -106,16 +108,18 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
 
    var inizializzaDati = function(){
-        ElencoRimborsoMissioneService.findById($scope.idRimborsoMissione).then(function(data){
+        ElencoRimborsiMissioneService.findById($scope.idRimborsoMissione).then(function(data){
             $scope.rimborsoMissione = data;
+            if ($scope.rimborsoMissione){
+                $scope.dettagliSpese = RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione);
+                if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
+                    $scope.getTotaleDettagliSpesa;
+                }
+            }
         });
     }
 
     inizializzaDati();
-    $scope.dettagliSpese = RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione);
-    if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
-        $scope.getTotaleDettagliSpesa;
-    }
 
 
     $scope.today = function() {

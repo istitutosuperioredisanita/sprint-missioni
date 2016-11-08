@@ -4,13 +4,21 @@ angular.module('missioniApp')
   .directive('cnrWidgetDate', function () {
     function setDatetime (scope, element){
               var data = element.find('input');
+              var dataInizio = null;
+              var dataFine = null;
+              if (scope.startDate){
+                dataInizio = new Date(scope.startDate);
+              }
+              if (scope.endDate){
+                dataFine = new Date(scope.endDate);
+              }
               data.datepicker({
                 language: "it", 
                 autoclose: true, 
                 todayBtn: "linked",
                 todayHighlight: true,
-                endDate: scope.endDate, 
-                startDate: scope.startDate, 
+                endDate: dataFine, 
+                startDate: dataInizio, 
                 format: "dd/mm/yyyy",
                 weekStart: 1
               }).on('changeDate', function (event) {

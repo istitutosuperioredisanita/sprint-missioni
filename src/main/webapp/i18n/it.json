@@ -400,8 +400,24 @@
             "data-inizio": "Data Inizio",
             "data-inizio.placeholder": "Data di Inizio della Missione",
             "data-fine": "Data Fine",
-            "data-fine.placeholder": "Data presunta di Fine della Missione",
-            "inquadramento": "Inquadramento"
+            "data-fine.placeholder": "Data di Fine della Missione",
+            "data-inizio-frontiera": "Inizio Attr. Frontiera",
+            "data-inizio-frontiera.placeholder": "Data di Inizio di attraversamento della Frontiera",
+            "data-fine-frontiera": "Fine Attr. Frontiera",
+            "data-fine-frontiera.placeholder": "Data di Fine di attraversamento della Frontiera",
+            "inquadramento": "Inquadramento",
+            "modalita-pagamento": "Modalità di Pagamento",
+            "dati-modalita-pagamento": "Dati Modalità di Pagamento",
+            "anticipo-ricevuto": "Anticipo Ricevuto",
+            "anno-mandato": "Anno Mandato",
+            "numero-mandato": "Numero Mandato",
+            "valida-mandato": "Verifica Mandato",
+            "importo-mandato": "Importo Mandato €",
+            "altre-spese": "Altre spese anticipate dall'agenzia di Viaggi",
+            "altre-spese.placeholder": "Indicare ad esempio Albergo, Biglietti Aerei / Ferroviari, ecc.",
+            "altre-spese-importo": "Importo €",
+            "rimborso-spese-terzi": "Rimborso o concorso spese da terzi",
+            "rimborso-spese-terzi-importo": "Importo €"
         },
         "button": {
             "print": "Stampa Rimborso",
@@ -409,7 +425,7 @@
         }
     },
     "rimborso-missione-dettagli": {
-        "title": "RIMBORSO MISSIONE  {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} - DETTAGLI SPESE",
+        "title": "RIMBORSO MISSIONE  {{numeroRimborsoMissione}} DEL {{dataRimborsoMissione}}  ({{destinazioneRimborsoMissione}})  - DETTAGLI SPESE",
         "form": {
             "box-dettaglio-spese": "Dettaglio Spese",
             "dettaglio-spese": {

@@ -192,6 +192,63 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
+    var recuperoModalitaPagamento = function(cdTerzo){
+        var urlRestProxy = URL_REST.STANDARD;
+        var inq = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.MOD_PAGAMENTO;
+        var objectPostInqClauses = [{condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:cdTerzo}];
+        var objectPostInq = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostInqClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostInq, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                inq = data.elements;
+            }
+            return inq;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
+    var recuperoMandato = function(cdTerzo, annoMandato, numeroMandato){
+        var urlRestProxy = URL_REST.STANDARD;
+        var man = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.MANDATO;
+        var objectPostManClauses = [{condition: 'AND', fieldName: 'cd_tipo_documento_cont', operator: "=", fieldValue:"MAN"},
+                                    {condition: 'AND', fieldName: 'soloAnticipi', operator: "=", fieldValue:"S"},
+                                    {condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:cdTerzo},
+                                    {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:annoMandato},
+                                    {condition: 'AND', fieldName: 'pg_documento_cont', operator: "=", fieldValue:numeroMandato}];
+        var objectPostMan = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostManClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostMan, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                man = data.elements;
+            }
+            return man;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
+    var recuperoTerzoModalitaPagamento = function(cdTerzo, cdModPag){
+        var urlRestProxy = URL_REST.STANDARD;
+        var ele = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.BANCA;
+        var objectPostClauses = [{condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:cdTerzo},
+                                    {condition: 'AND', fieldName: 'cd_modalita_pag', operator: "=", fieldValue:cdModPag},
+                                    {condition: 'AND', fieldName: 'fl_cancellato', operator: "=", fieldValue:false}];
+        var objectPost = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostClauses}
+        return $http.post(urlRestProxy + app+'/', objectPost, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                ele = data.elements;
+            }
+            return ele;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
     var recuperoDatiTerzoSigla = function(codiceFiscale){
         var urlRestProxy = URL_REST.STANDARD;
         var terzo = [];
@@ -214,6 +271,9 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getPerson: recuperoDatiPerson ,
              getTerzo: recuperoDatiTerzoSigla ,
              getInquadramento: recuperoDatiInquadramento ,
+             getModalitaPagamento: recuperoModalitaPagamento,
+             getMandato: recuperoMandato,
+             getTerzoModalitaPagamento: recuperoTerzoModalitaPagamento,
              buildPerson: createPerson ,
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
              buildUoSiglaFromUoSiper: estraiUo };
