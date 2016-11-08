@@ -65,10 +65,9 @@ public class RimborsoMissioneResource {
     public ResponseEntity<List<RimborsoMissione>> getRimborsoMissione(HttpServletRequest request,
     		RimborsoMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
-        List<RimborsoMissione> ordiniMissione = null; 
-        		rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
+        List<RimborsoMissione> rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
-        		ordiniMissione,
+        		rimborsiMissione,
         		HttpStatus.OK);
     }
 
@@ -100,10 +99,9 @@ public class RimborsoMissioneResource {
     @Timed
     public ResponseEntity<List<RimborsoMissione>> getRimborsoMissioneDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
-        List<RimborsoMissione> ordiniMissione  = null;
-        rimborsoMissioneService.getRimborsiMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+        List<RimborsoMissione> rimborsiMissione  = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
         return new ResponseEntity<>(
-        		ordiniMissione,
+        		rimborsiMissione,
         		HttpStatus.OK);
     }
 

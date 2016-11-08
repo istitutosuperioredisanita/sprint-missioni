@@ -89,6 +89,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@JoinColumn(name="ID_ORDINE_MISSIONE", nullable=true)
 	private OrdineMissione ordineMissione;
 
+    @Column(name = "INQUADRAMENTO", length = 10, nullable = true)
+    private Long inquadramento;
+
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -1034,6 +1037,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setValidato(String validato) {
 		this.validato = validato;
+	}
+
+	public Long getInquadramento() {
+		return inquadramento;
+	}
+
+	public void setInquadramento(Long inquadramento) {
+		this.inquadramento = inquadramento;
 	}
 
 }

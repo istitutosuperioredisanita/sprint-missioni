@@ -8,6 +8,15 @@ missioniApp.constant('USER_ROLES', {
         'user': 'ROLE_USER'
     });
 
+missioniApp.constant('TIPO_PAGAMENTO', {
+        'ALTRO': 'A',
+        'BANCA_ITALIA': 'I',
+        'POSTA': 'P',
+        'BANCA': 'B',
+        'BANCA_ESTERA': 'N',
+        'QUIETANZA': 'Q'
+    });
+
 missioniApp.constant('APP_FOR_REST', {
         'SIGLA': 'SIGLA',
         'SIPER': 'SIPER'

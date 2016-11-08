@@ -271,6 +271,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setSpeseTerziImporto(rimborsoMissione.getSpeseTerziImporto());
 			rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
 			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
+			rimborsoMissioneDB.setInquadramento(rimborsoMissione.getInquadramento());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 		}
 		
@@ -511,6 +512,13 @@ public class RimborsoMissioneService {
     	}
     	if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoTaxi())){
     		rimborsoMissione.setUtilizzoTaxi("N");
+    	}
+    	if (StringUtils.isEmpty(rimborsoMissione.getAnticipoRicevuto())){
+    		rimborsoMissione.setAnticipoRicevuto("N");
+    	}
+    	
+    	if (StringUtils.isEmpty(rimborsoMissione.getSpeseTerziRicevute())){
+    		rimborsoMissione.setSpeseTerziRicevute("N");
     	}
     	
     	aggiornaValidazione(rimborsoMissione);
