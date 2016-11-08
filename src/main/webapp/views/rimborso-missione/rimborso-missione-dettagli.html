@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <h4 center translate="rimborso-missione-dettagli.title" translate-values="{numeroOrdineMissione: '{{rimborsoMissioniModel.numero}}', dataOrdineMissione: '{{autoPropriaOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Rimborso Missione</b></h4>
+  <h4 center translate="rimborso-missione-dettagli.title" translate-values="{numeroRimborsoMissione: '{{rimborsoMissione.numero}}', destinazioneRimborsoMissione: '{{rimborsoMissione.destinazione}}', dataRimborsoMissione: '{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Rimborso Missione</b></h4>
     <div class="row">
         <div class="col-md-12">
 
@@ -18,7 +18,7 @@
   </div>
      <div class="panel-body my-panel-body">
 
-      <button ng-enabled="rimborsoMissioneModel.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.addDettaglioSpesa' | translate}}" ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button>
+      <button ng-enabled="rimborsoMissione.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.add-dettaglio-spesa' | translate}}" ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button>
         <table class="table table-condensed table-striped table-bordered table-responsive">
           <tr id ="missioni">
             <th>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</th>
@@ -69,7 +69,7 @@
           <tr ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
 
             <td class="col-xs-2">
-              <cnr-widget-date date-name="dataSpesa" start-date="rimborsoMissioneModel.dataInizioMissione" fn-change="onChangeDataDettaglio" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
+              <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" fn-change="onChangeDataDettaglio" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
             </td>
             <td class="col-xs-8">
               <select class="form-control" ng-model="newDettaglioSpesa.tipo_spesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.cd_ti_spesa for tipo_spesa in tipi_spesa"></select>
