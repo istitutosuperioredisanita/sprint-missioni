@@ -23,6 +23,7 @@
           <tr id ="missioni">
             <th>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</th>
             <th>{{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa' | translate}}</th>
+            <th>{{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}</th>
             <th class="align-right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}</th>
             <th class="align-right">{{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}</th>
           </tr>
@@ -35,13 +36,17 @@
           </tfoot>
           <tbody id ="missioni">
             <tr ng-repeat="dettaglioSpesa in dettagliSpesa">
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-2" style="text-align: left" >{{dettaglioSpesa.dataSpesa}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-2" style="text-align:left">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left" >{{dettaglioSpesa.dataSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dataSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-5" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-5" style="text-align:left">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsTiSpesa" required maxlength="256">
+              </td>
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left">{{dettaglioSpesa.dsSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:left">
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsSpesa" required maxlength="256">
               </td>
               <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left" >{{dettaglioSpesa.importoEuro}}</td>
               <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:right">
@@ -68,17 +73,20 @@
 
           <tr ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
 
-            <td class="col-xs-2">
+            <td class="col-xs-1 without-padding">
               <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" fn-change="onChangeDataDettaglio" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
             </td>
-            <td class="col-xs-8">
-              <select class="form-control" ng-model="newDettaglioSpesa.tipo_spesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.cd_ti_spesa for tipo_spesa in tipi_spesa"></select>
+            <td class="col-xs-3">
+              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.cd_ti_spesa for tipo_spesa in tipi_spesa"></select>
+            </td>
+            <td class="col-xs-3">
+              <input class="form-control" ng-model="newDettaglioSpesa.cdSpesa" maxlength="250"></select>
             </td>
             <td class="col-xs-2">
-              <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="256"</input>
+              <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="25"</input>
             </td>
             <td class="col-xs-1">
-              <input class="form-control" ng-model="newDettaglioSpesa.kmPercorsi" maxlength="256"</input>
+              <input class="form-control" ng-model="newDettaglioSpesa.kmPercorsi" maxlength="20"</input>
             </td>
             <td style="text-align: left">
               <form class="form-inline" role="form">

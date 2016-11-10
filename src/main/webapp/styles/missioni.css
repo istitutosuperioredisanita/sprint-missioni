@@ -4,7 +4,13 @@
 
 #missioni td{
   font-size: 12px;
-  vertical-align: middle;  
+  vertical-align: middle;
+}
+
+#missioni td{
+  font-size: 12px;
+  vertical-align: middle;
+  padding: 0px;  
 }
 
 .banner-missioni {
@@ -53,6 +59,11 @@
   width: 110px !important;
 }
 
+.row {
+  margin-right: 0px !important;
+  margin-left: 0px !important;
+}
+
 .align-right {
   text-align: right !important;
 }
@@ -68,6 +79,15 @@
 .column-in-column {
   padding-left: 0px !important;
   padding-right: 0px !important;
+}
+
+.input-sm {
+  padding: 5px 5px !important;
+}
+
+.container-fluid {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
 }
 
 input:-webkit-autofill {
@@ -93,7 +113,7 @@ input:-webkit-autofill {
   height: 30px;
   vertical-align: middle;  
 }
-1px 0
+
 #missioni selectize-input{
   padding: 0px 8px !important;
 }
@@ -119,6 +139,7 @@ input:-webkit-autofill {
 
 .my-panel-body {
   background: #F5F5F5;
+  padding: 8px;
 }
 
 .select2-drop-mask {
