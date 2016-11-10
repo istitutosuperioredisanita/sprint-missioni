@@ -168,6 +168,7 @@
                         </span>
                     </p>
             </form>
+            <div class="row" id="missioni">
             <form class="form-inline" role="form" id="missioni" ng-show="rimborsoMissioneModel.modpag">
                     <p class="col-md-12">
                         <span class="input-group">
@@ -176,6 +177,8 @@
                         </span>
                     </p>
             </form>
+            </div>
+            <div class="row" id="missioni">
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-2">
                          <span class="input-group">
@@ -217,22 +220,22 @@
                         </span>
                     </p>
             </form>
-            <form class="form-inline" role="form" id="missioni">
+            </div>
+            <div class="row" id="missioni">
                 <p class="col-md-9">
                         <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.altre-spese">altre spese</span>
                             <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="domicilioFiscale" placeholder="{{'rimborso-missione.form.altre-spese.placeholder' | translate}}" ng-model="rimborsoMissioneModel.altreSpeseAntDescrizione"/>
                         </span>
                 </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="rimborso-missione.form.altre-spese-importo">altri anticipi importo</span>
                           <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-altri-anticipi" ng-model="rimborsoMissioneModel.altreSpeseAntImporto" currency-symbol="">
                         </span>
-                    </p>
-            </form>
+                </p>
+            </div>
+            <div class="row" id="missioni">
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-9">
                          <span class="input-group">
@@ -243,14 +246,13 @@
                         </span>
                 </p>
             </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="rimborso-missione.form.rimborso-spese-terzi-importo">Rimborso da terzi importo</span>
                           <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-rimborso-terzi" ng-model="rimborsoMissioneModel.speseTerziImporto" currency-symbol="">
                         </span>
-                    </p>
-            </form>
+                </p>
+            </div>
   </div>
 </div>
 
