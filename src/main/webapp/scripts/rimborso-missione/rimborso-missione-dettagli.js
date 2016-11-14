@@ -11,7 +11,7 @@ missioniApp.factory('RimborsoMissioneDettagliService', function ($http) {
         }
     });
 
-missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ElencoRimborsiMissioneService, ui, COSTANTI) {
+missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.inizioMissione = $routeParams.inizioMissione;
@@ -45,6 +45,19 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             );
     }
 
+    $scope.onChangeDataDettaglio= function () {
+        if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
+            var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+            var tipi = ProxyService.getTipiSpesa($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione, $scope.rimborsoMissione.trattamento).then(function(result){
+                if (result && result.data){
+                    $scope.tipi_spesa = result.data.elements;
+                } else {
+                    $scope.tipi_spesa = [];
+                }
+            });
+        }
+    }
+
     $scope.editDettaglioSpesa= function (dettaglioSpesa) {
       dettaglioSpesa.editing = true;
     }
@@ -67,7 +80,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     $scope.insertDettaglioSpesa = function (newDettaglioSpesa) {
-        newDettaglioSpesa.rimborsoMissione = $scope.rimborsoMissioneModel;
+        newDettaglioSpesa.rimborsoMissione = $scope.rimborsoMissione;
             $rootScope.salvataggio = true;
             $http.post('app/rest/rimborsoMissione/dettaglio/create', newDettaglioSpesa).success(function(data){
                     $rootScope.salvataggio = false;
@@ -113,7 +126,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             if ($scope.rimborsoMissione){
                 $scope.dettagliSpese = RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione);
                 if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
-                    $scope.getTotaleDettagliSpesa;
+                    $scope.getTotaleDettagliSpesa();
                 }
             }
         });
