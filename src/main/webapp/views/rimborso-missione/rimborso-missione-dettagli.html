@@ -29,7 +29,7 @@
           </tr>
           <tfoot>
             <tr>
-              <td style="font-weight:bold" colspan="2" align="right" translate="rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli">Totale</td>
+              <td style="font-weight:bold" colspan="3" align="right" translate="rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli">Totale</td>
               <td align="right"> {{getTotaleDettagliSpesa()}}</td>
               <td></td>
             </tr>
@@ -40,20 +40,20 @@
               <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dataSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:left">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-4" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-4" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsTiSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left">{{dettaglioSpesa.dsSpesa}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:left">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left">{{dettaglioSpesa.dsSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left" >{{dettaglioSpesa.importoEuro}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:right">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left" >{{dettaglioSpesa.importoEuro}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:right">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.importoEuro" ng-currency required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-2" style="text-align: left">{{dettaglioSpesa.kmPerscorsi}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-2" style="text-align:right">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left">{{dettaglioSpesa.kmPerscorsi}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:right">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.kmPerscorsi" maxlength="256">
               </td>
               <td ng-hide="dettaglioSpesa.editing">
@@ -74,15 +74,16 @@
           <tr ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
 
             <td class="col-xs-1 without-padding">
-              <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" fn-change="onChangeDataDettaglio" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
+              <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
+                <button class="btn btn-sm btn-link" ng-click="onChangeDataDettaglio()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
             </td>
-            <td class="col-xs-3">
-              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.cd_ti_spesa for tipo_spesa in tipi_spesa"></select>
-            </td>
-            <td class="col-xs-3">
-              <input class="form-control" ng-model="newDettaglioSpesa.cdSpesa" maxlength="250"></select>
+            <td class="col-xs-5">
+              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
             </td>
             <td class="col-xs-2">
+              <textarea class="input-sm form-control" ng-model="newDettaglioSpesa.dsSpesa" rows = "4"></textarea>
+            </td>
+            <td class="col-xs-1">
               <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="25"</input>
             </td>
             <td class="col-xs-1">
