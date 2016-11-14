@@ -230,6 +230,31 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
+    var recuperoTipoSpesa = function(inquadramento, data, nazione, trattamento){
+        var urlRestProxy = URL_REST.STANDARD;
+        var tipiSpesa = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.TIPO_SPESA;
+        var ammissibileRimborso = false;
+        if (trattamento === 'T'){
+            ammissibileRimborso = true;
+        }
+        var objectPostTipoSpesaClauses = [{condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue:nazione},
+                                    {condition: 'AND', fieldName: 'condizioneTipiSpesaMissione', operator: "=", fieldValue:"S"},
+                                    {condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:inquadramento},
+                                    {condition: 'AND', fieldName: 'data', operator: "=", fieldValue:data},
+                                    {condition: 'AND', fieldName: 'ammissibileRimborso', operator: "=", fieldValue:ammissibileRimborso}];
+        var objectPostTipoSpesa = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostTipoSpesaClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostTipoSpesa, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                tipiSpesa = data.elements;
+            }
+            return tipiSpesa;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
     var recuperoTerzoModalitaPagamento = function(cdTerzo, cdModPag){
         var urlRestProxy = URL_REST.STANDARD;
         var ele = [];
@@ -272,6 +297,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getTerzo: recuperoDatiTerzoSigla ,
              getInquadramento: recuperoDatiInquadramento ,
              getModalitaPagamento: recuperoModalitaPagamento,
+             getTipiSpesa: recuperoTipoSpesa,
              getMandato: recuperoMandato,
              getTerzoModalitaPagamento: recuperoTerzoModalitaPagamento,
              buildPerson: createPerson ,
