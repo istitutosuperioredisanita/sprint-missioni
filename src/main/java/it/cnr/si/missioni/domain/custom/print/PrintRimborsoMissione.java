@@ -20,7 +20,7 @@ public class PrintRimborsoMissione extends PrintMissione{
 
     private String numeroMandato;
 
-    private Integer annoMandato;
+    private String annoMandato;
 
     private String altreSpese;
 
@@ -32,7 +32,7 @@ public class PrintRimborsoMissione extends PrintMissione{
 
     private String cdTerzo;
 
-	private List<PrintDettaglioSpeseRimborsoMissione> printDettaglioSpeseRimborsoMissione = new ArrayList<PrintDettaglioSpeseRimborsoMissione>();
+	private List<PrintRimborsoMissioneDettagli> printDettaglioSpeseRimborsoMissione = new ArrayList<PrintRimborsoMissioneDettagli>();
 
 	public String getDataInizioEstero() {
 		return dataInizioEstero;
@@ -98,11 +98,11 @@ public class PrintRimborsoMissione extends PrintMissione{
 		this.numeroMandato = numeroMandato;
 	}
 
-	public Integer getAnnoMandato() {
+	public String getAnnoMandato() {
 		return annoMandato;
 	}
 
-	public void setAnnoMandato(Integer annoMandato) {
+	public void setAnnoMandato(String annoMandato) {
 		this.annoMandato = annoMandato;
 	}
 
@@ -146,12 +146,12 @@ public class PrintRimborsoMissione extends PrintMissione{
 		this.cdTerzo = cdTerzo;
 	}
 
-	public List<PrintDettaglioSpeseRimborsoMissione> getPrintDettaglioSpeseRimborsoMissione() {
+	public List<PrintRimborsoMissioneDettagli> getPrintDettaglioSpeseRimborsoMissione() {
 		return printDettaglioSpeseRimborsoMissione;
 	}
 
 	public void setPrintDettaglioSpeseRimborsoMissione(
-			List<PrintDettaglioSpeseRimborsoMissione> printDettaglioSpeseRimborsoMissione) {
+			List<PrintRimborsoMissioneDettagli> printDettaglioSpeseRimborsoMissione) {
 		this.printDettaglioSpeseRimborsoMissione = printDettaglioSpeseRimborsoMissione;
 	}
 }

@@ -1,11 +1,9 @@
 package it.cnr.si.missioni.domain.custom.print;
 
-
-public class PrintDettaglioSpeseRimborsoMissione {
-
+public class PrintRimborsoMissioneDettagli {
 	private String data;
-	private String tipologiaSpesa;
-	private String divisa;
+	private String dsSpesa;
+	private String dsTipoSpesa;
 	private String importo;
 	private String kmPercorsi;
 	public String getData() {
@@ -14,17 +12,17 @@ public class PrintDettaglioSpeseRimborsoMissione {
 	public void setData(String data) {
 		this.data = data;
 	}
-	public String getTipologiaSpesa() {
-		return tipologiaSpesa;
+	public String getDsSpesa() {
+		return dsSpesa;
 	}
-	public void setTipologiaSpesa(String tipologiaSpesa) {
-		this.tipologiaSpesa = tipologiaSpesa;
+	public void setDsSpesa(String dsSpesa) {
+		this.dsSpesa = dsSpesa;
 	}
-	public String getDivisa() {
-		return divisa;
+	public String getDsTipoSpesa() {
+		return dsTipoSpesa;
 	}
-	public void setDivisa(String divisa) {
-		this.divisa = divisa;
+	public void setDsTipoSpesa(String dsTipoSpesa) {
+		this.dsTipoSpesa = dsTipoSpesa;
 	}
 	public String getImporto() {
 		return importo;
@@ -38,6 +36,4 @@ public class PrintDettaglioSpeseRimborsoMissione {
 	public void setKmPercorsi(String kmPercorsi) {
 		this.kmPercorsi = kmPercorsi;
 	}
-
-
 }

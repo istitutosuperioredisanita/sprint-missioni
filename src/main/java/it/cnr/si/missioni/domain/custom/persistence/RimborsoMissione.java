@@ -10,6 +10,7 @@ import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -294,6 +295,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
     private String statoFlussoRitornoHome;
 	
+	@Transient
+    List<RimborsoMissioneDettagli> rimborsoMissioneDettagli;
+
 	public RimborsoMissione(Long id, Integer anno, Long numero, Date dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
 			String oggetto, Date dataInizioMissione, Date dataFineMissione, String validato){
 		super();
@@ -1045,6 +1049,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setInquadramento(Long inquadramento) {
 		this.inquadramento = inquadramento;
+	}
+
+	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli() {
+		return rimborsoMissioneDettagli;
+	}
+
+	public void setRimborsoMissioneDettagli(List<RimborsoMissioneDettagli> rimborsoMissioneDettagli) {
+		this.rimborsoMissioneDettagli = rimborsoMissioneDettagli;
 	}
 
 }

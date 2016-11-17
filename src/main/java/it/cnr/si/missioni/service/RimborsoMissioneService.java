@@ -45,7 +45,6 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
 import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
-import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import net.bzdyl.ejb3.criteria.Order;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
@@ -578,6 +577,19 @@ public class RimborsoMissioneService {
 				if (StringUtils.isEmpty(rimborsoMissione.getTrattamento())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Trattamento");
 				} 
+				if (rimborsoMissione.getDataInizioEstero() == null){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Inizio Attraversamento Frontiera");
+				}
+				if (rimborsoMissione.getDataFineEstero() == null){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Fine Attraversamento Frontiera");
+				}
+			} else {
+				if (rimborsoMissione.getDataInizioEstero() != null){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Inizio Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
+				}
+				if (rimborsoMissione.getDataFineEstero() == null){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Fine Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
+				}
 			}
 		}
     }
@@ -693,6 +705,17 @@ public class RimborsoMissioneService {
 		if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
 			if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N")){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
+			}
+		}
+		if (rimborsoMissione.isMissioneEstera()) {
+			if (rimborsoMissione.getDataInizioEstero().before(rimborsoMissione.getDataInizioMissione())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di inizio attraversamento frontiera non può essere precedente alla data di inizio missione");
+			}
+			if (rimborsoMissione.getDataFineMissione().before(rimborsoMissione.getDataFineEstero())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine attraversamento frontiera non può essere successiva alla data di fine missione");
+			}
+			if (rimborsoMissione.getDataFineEstero().before(rimborsoMissione.getDataInizioEstero())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine attraversamento frontiera non può essere precedente alla data di inizio attraversamento frontiera");
 			}
 		}
 		if (StringUtils.isEmpty(rimborsoMissione.getIdFlusso()) &&  rimborsoMissione.isStatoInviatoAlFlusso()){
