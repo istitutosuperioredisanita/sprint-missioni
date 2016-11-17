@@ -60,6 +60,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.trattamento = ordineMissioneSelected.trattamento;
                 $scope.rimborsoMissioneModel.dataInizioMissione = ordineMissioneSelected.dataInizioMissione;
                 $scope.rimborsoMissioneModel.dataFineMissione = ordineMissioneSelected.dataFineMissione;
+
                 $scope.rimborsoMissioneModel.voce = ordineMissioneSelected.voce;
                 $scope.rimborsoMissioneModel.gae = ordineMissioneSelected.gae;
                 $scope.rimborsoMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
@@ -99,6 +100,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.anticipoRicevuto = "N";
                 $scope.rimborsoMissioneModel.speseTerziRicevute = "N";
                 inizializzaForm();
+                $scope.impostaInquadramento();
+                $scope.recuperoDatiDivisa();
                 break;
             }
         }
@@ -116,6 +119,15 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.terzoSigla = ret.data.elements[0];
                 $scope.recuperoDatiInquadramento(userWork, $scope.terzoSigla);
                 $scope.recuperoDatiModalitaPagamento(userWork, $scope.terzoSigla);
+            }
+        });
+    }
+
+    $scope.recuperoDatiDivisa = function(){
+        var dataInizio = moment($scope.rimborsoMissioneModel.dataInizioMissione).format("DD/MM/YYYY");
+        ProxyService.getDivisa($scope.rimborsoMissioneModel.inquadramento, dataInizio, $scope.rimborsoMissioneModel.nazione).then(function(ret){
+            if (ret && ret.data && ret.data.elements){
+                $scope.divisa = ret.data.elements[0];
             }
         });
     }
@@ -172,6 +184,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.objUoSpesa = $scope.uoSpesaSelected;
             }
         }
+        $scope.impostaInquadramento();
+    }
+
+    $scope.impostaInquadramento = function(){
         if ($scope.terzoSigla && $scope.inquadramento){
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];

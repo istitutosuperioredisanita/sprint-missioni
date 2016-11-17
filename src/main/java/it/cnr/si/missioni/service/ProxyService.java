@@ -8,6 +8,7 @@ import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.web.rest.ProxyResource;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
@@ -121,6 +123,7 @@ public class ProxyService implements EnvironmentAware{
         	} else {
         		headers.add("Authorization", authorization);
         	}
+        	headers.setContentType(MediaType.APPLICATION_JSON);
         	
     		String body = null;
         	try {
@@ -130,8 +133,15 @@ public class ProxyService implements EnvironmentAware{
         		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
         	}
         	String proxyURL = appUrl.concat(url);
-    		if (queryString != null)
-    			proxyURL = proxyURL.concat("?").concat(queryString);        	
+    		if (queryString != null){
+    			String valueToDelete = ProxyResource.PROXY_URL+"="+url;
+    			int numberCharacter = valueToDelete.length(); 
+    			String newValue = queryString;
+    			if (queryString.startsWith(valueToDelete)){
+    				newValue = queryString.substring(numberCharacter);
+    			}
+    			proxyURL = proxyURL.concat("?").concat(newValue);        	
+    		}
         	HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);  
             ResponseEntity<String> result = getRestTemplate(app).
             		exchange(proxyURL, httpMethod, requestEntity, String.class);

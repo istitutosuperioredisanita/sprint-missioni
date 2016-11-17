@@ -48,6 +48,8 @@ public class ProxyResource {
 
     private final Logger log = LoggerFactory.getLogger(ProxyResource.class);
 
+    public final static String PROXY_URL = "proxyURL";
+    
     @Autowired
     private AccountService accountService;
     
@@ -60,7 +62,7 @@ public class ProxyResource {
     @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed(AuthoritiesConstants.USER)
-    public ResponseEntity<String> get(@PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> get(@PathVariable String app, @RequestParam(value=PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
     		log.debug("GET from app: " + app + " with proxyURL: " + url);
     	return process(HttpMethod.GET, null, app, url, request, response);
@@ -70,7 +72,7 @@ public class ProxyResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @RolesAllowed(AuthoritiesConstants.USER)
-    public ResponseEntity<String> post(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> post(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value=PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
     		log.debug("POST from app: " + app + " with proxyURL: " + url);
     	try {
@@ -83,7 +85,7 @@ public class ProxyResource {
     @RequestMapping(method = RequestMethod.PUT,
             produces = MediaType.ALL_VALUE)
     @RolesAllowed(AuthoritiesConstants.USER)    
-    public ResponseEntity<String> put(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> put(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value=PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
     		log.debug("PUT from app: " + app + " with proxyURL: " + url);
     	try {
@@ -98,7 +100,7 @@ public class ProxyResource {
     @RequestMapping(method = RequestMethod.DELETE,
             produces = MediaType.ALL_VALUE) 
     @RolesAllowed(AuthoritiesConstants.USER)
-    public ResponseEntity<String> delete(@PathVariable String app, @RequestParam(value="proxyURL") String url, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> delete(@PathVariable String app, @RequestParam(value=PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
     	if (log.isDebugEnabled())
     		log.debug("DELETE from app: " + app + " with proxyURL: " + url);    	
     	return process(HttpMethod.DELETE, null, app, url, request, response);
@@ -113,6 +115,9 @@ public class ProxyResource {
 			result = proxyService.processInCache(callCache);
     	} else {
     		if (body != null && body.getContext() == null){
+        		cacheService.setContext(body, app);
+    		} else if (body == null && app != null && app.equals(Costanti.APP_SIGLA)){
+    			body = new JSONBody();
         		cacheService.setContext(body, app);
     		}
         	result = proxyService.process(httpMethod, body, app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
