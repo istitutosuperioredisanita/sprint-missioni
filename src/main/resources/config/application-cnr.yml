@@ -54,6 +54,8 @@ cache:
     init_cache: true
     hazelcast.packages: it.cnr.si.missioni.domain.*,it.cnr.si.missioni.service.*
 
+logging.config: classpath:logback-local.xml
+
 jhipster:
     security:
         authentication:
