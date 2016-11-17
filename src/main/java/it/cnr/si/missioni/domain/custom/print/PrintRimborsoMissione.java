@@ -32,7 +32,7 @@ public class PrintRimborsoMissione extends PrintMissione{
 
     private String cdTerzo;
 
-	private List<PrintRimborsoMissioneDettagli> printDettaglioSpeseRimborsoMissione = new ArrayList<PrintRimborsoMissioneDettagli>();
+	private List<PrintRimborsoMissioneDettagli> printDettagliSpeseRimborsoMissione = new ArrayList<PrintRimborsoMissioneDettagli>();
 
 	public String getDataInizioEstero() {
 		return dataInizioEstero;
@@ -146,12 +146,12 @@ public class PrintRimborsoMissione extends PrintMissione{
 		this.cdTerzo = cdTerzo;
 	}
 
-	public List<PrintRimborsoMissioneDettagli> getPrintDettaglioSpeseRimborsoMissione() {
-		return printDettaglioSpeseRimborsoMissione;
+	public List<PrintRimborsoMissioneDettagli> getPrintDettagliSpeseRimborsoMissione() {
+		return printDettagliSpeseRimborsoMissione;
 	}
 
-	public void setPrintDettaglioSpeseRimborsoMissione(
-			List<PrintRimborsoMissioneDettagli> printDettaglioSpeseRimborsoMissione) {
-		this.printDettaglioSpeseRimborsoMissione = printDettaglioSpeseRimborsoMissione;
+	public void setPrintDettagliSpeseRimborsoMissione(
+			List<PrintRimborsoMissioneDettagli> printDettagliSpeseRimborsoMissione) {
+		this.printDettagliSpeseRimborsoMissione = printDettagliSpeseRimborsoMissione;
 	}
 }

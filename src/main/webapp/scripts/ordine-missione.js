@@ -255,6 +255,22 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
+    var recuperoDivisa = function(inquadramento, data, nazione){
+        var urlRestProxy = URL_REST.STANDARD;
+        var divisa = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.DIVISA;
+        var objectContext = {context:{"esercizio":2016,"cd_unita_organizzativa":"999.000","cd_cds":"999","cd_cdr":"999.000.000"}};
+        return $http.post(urlRestProxy + app+'/?proxyURL='+url+'&data='+ data+'&nazione='+ nazione+'&inquadramento='+inquadramento, objectContext).success(function (data) {
+            if (data){
+                divisa = data.elements;
+            }
+            return divisa;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
     var recuperoTerzoModalitaPagamento = function(cdTerzo, cdModPag){
         var urlRestProxy = URL_REST.STANDARD;
         var ele = [];
@@ -299,6 +315,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getModalitaPagamento: recuperoModalitaPagamento,
              getTipiSpesa: recuperoTipoSpesa,
              getMandato: recuperoMandato,
+             getDivisa: recuperoDivisa,
              getTerzoModalitaPagamento: recuperoTerzoModalitaPagamento,
              buildPerson: createPerson ,
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,

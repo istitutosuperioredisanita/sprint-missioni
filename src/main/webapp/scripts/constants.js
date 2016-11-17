@@ -44,7 +44,7 @@ missioniApp.constant('SIGLA_REST', {
         'TERZO': 'ConsTerzoAction.json',
         'INQUADRAMENTO': 'ConsInquadramentoAction.json',
         'MANDATO': 'ConsMandatoRevRestAction.json',
-        'DIVISA': 'ConsDivisaAction.json',
+        'DIVISA': 'restservice/servizirest/getDivisa',
         'TIPO_PASTO': 'ConsMissioneTipoPastoAction.json',
         'TIPO_SPESA': 'ConsMissioneTipoSpesaAction.json',
         'BANCA': 'ConsBancaAction.json',

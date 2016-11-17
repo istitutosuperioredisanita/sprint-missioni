@@ -138,7 +138,7 @@ public class PrintRimborsoMissioneService {
 	    			dettagliPrint.setKmPercorsi("");
 	    		}
 	    	}
-	    	printRimborsoMissione.setPrintDettaglioSpeseRimborsoMissione(listDettagliPrint);
+	    	printRimborsoMissione.setPrintDettagliSpeseRimborsoMissione(listDettagliPrint);
 		}
     	return printRimborsoMissione; 
     }
