@@ -36,7 +36,15 @@ import org.springframework.util.StringUtils;
 @Entity
 @Table(name = "RIMBORSO_MISSIONE")
 public class RimborsoMissione extends OggettoBulkXmlTransient {
-    @Type(type = "java.util.Date")
+	public final static String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale",
+			CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegato",
+			CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione",
+			CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id",
+			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "cnrmissioni:dataInizioMissioneEstero",
+			CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "missioni_rimborso_attachment:document",
+			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "cnrmissioni:dataFineMissioneEstero";
+
+	@Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_ESTERO", nullable = true)
     private Date dataInizioEstero;
 
