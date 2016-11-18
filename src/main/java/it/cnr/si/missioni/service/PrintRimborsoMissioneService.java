@@ -124,8 +124,13 @@ public class PrintRimborsoMissioneService {
 	    	for (Iterator<RimborsoMissioneDettagli> iterator = rimborsoMissione.getRimborsoMissioneDettagli().iterator(); iterator.hasNext();){
 	    		RimborsoMissioneDettagli dettagli = iterator.next();
 	    		PrintRimborsoMissioneDettagli dettagliPrint = new PrintRimborsoMissioneDettagli();
-	    		dettagliPrint.setDsSpesa(dettagli.getDsSpesa());
-	    		dettagliPrint.setDsTipoSpesa(dettagli.getDsTiSpesa());
+	    		String dsSpesa = "";
+	    		if (dettagli.getDsSpesa() != null){
+	    			dsSpesa = dettagli.getDsTiSpesa() + " - "+dettagli.getDsSpesa();
+	    		} else {
+	    			dsSpesa = dettagli.getDsTiSpesa();
+	    		}
+	    		dettagliPrint.setDsSpesa(dsSpesa);
 	    		dettagliPrint.setData(DateUtils.getDateAsString(dettagli.getDataSpesa(),DateUtils.PATTERN_DATE));
 	    		if (dettagli.getImporto() != null){
 		    		dettagliPrint.setImporto(Utility.numberFormat(dettagli.getImporto()));
