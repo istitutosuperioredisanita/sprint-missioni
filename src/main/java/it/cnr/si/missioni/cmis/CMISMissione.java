@@ -27,6 +27,7 @@ public class CMISMissione {
 	private String taxiFlag;
 	private String capitolo;
 	private String descrizioneCapitolo;
+	private String trattamento;
 	private String gae;
 	private String descrizioneGae;
 	private String destinazione;
@@ -255,5 +256,11 @@ public class CMISMissione {
 	}
 	public void setDescrizioneUoCompetenza(String descrizioneUoCompetenza) {
 		this.descrizioneUoCompetenza = descrizioneUoCompetenza;
+	}
+	public String getTrattamento() {
+		return trattamento;
+	}
+	public void setTrattamento(String trattamento) {
+		this.trattamento = trattamento;
 	}
 }

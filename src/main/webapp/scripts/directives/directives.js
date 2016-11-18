@@ -233,7 +233,11 @@ angular.module('missioniApp')
               scope.accountBanner.nominativo = account.lastName+" "+account.firstName;
             }
             scope.accountBanner.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza; 
-            scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_residenza+" "+account.num_civico_residenza; 
+            if (account.num_civico_residenza){
+              scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_residenza + " " + account.num_civico_residenza; 
+            } else {
+              scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_residenza; 
+            }
             scope.accountBanner.qualificaRich = account.profilo; 
             scope.accountBanner.livelloRich = account.livello; 
             scope.accountBanner.codiceFiscale = account.codice_fiscale; 

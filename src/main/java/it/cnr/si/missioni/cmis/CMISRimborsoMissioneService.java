@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -32,11 +34,11 @@ import org.springframework.util.StringUtils;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
+import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -63,6 +65,7 @@ import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 public class CMISRimborsoMissioneService {
 	public static final String 
 			PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC",
+			PROPERTY_TIPOLOGIA_DOC_SPECIFICA = "wfcnr:tipologiaDocSpecifica",
 			PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
 
 	@Autowired
@@ -98,9 +101,20 @@ public class CMISRimborsoMissioneService {
 	@Autowired
 	private AccountService accountService;
 
+	@Autowired
+	private CRUDComponentSession<OrdineMissione> crudServiceBean;
+
 	public CMISRimborsoMissione create(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException{
 		CMISRimborsoMissione cmisRimborsoMissione = new CMISRimborsoMissione();
 		caricaDatiDerivati(principal, rimborsoMissione);
+
+		if (rimborsoMissione != null && rimborsoMissione.getOrdineMissione() != null){
+			OrdineMissione ordineMissione = rimborsoMissione.getOrdineMissione();
+	    	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
+	    	if (ordineMissioneDB != null){
+	    		ordineMissione = ordineMissioneDB;
+	    	}
+		}
 
 		String username = principal.getName();
 		
@@ -194,6 +208,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setWfDescription("Ordine di Missione n. "+rimborsoMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
 		cmisRimborsoMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDestinazione(rimborsoMissione.getDestinazione());
+		cmisRimborsoMissione.setTrattamento(rimborsoMissione.decodeTrattamento());
 		cmisRimborsoMissione.setMissioneEsteraFlag(rimborsoMissione.getTipoMissione().equals("E") ? "true" : "false");
 		cmisRimborsoMissione.setDataInizioMissione(DateUtils.getDateAsString(rimborsoMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDataFineMissione(DateUtils.getDateAsString(rimborsoMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
@@ -204,6 +219,7 @@ public class CMISRimborsoMissioneService {
 			cmisRimborsoMissione.setDataFineEstero(DateUtils.getDateAsString(rimborsoMissione.getDataFineEstero(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 		}
 		cmisRimborsoMissione.setIdOrdineMissione(rimborsoMissione.getOrdineMissione().getId().toString());
+		cmisRimborsoMissione.setWfOrdineMissione(rimborsoMissione.getOrdineMissione().getIdFlusso() == null ? "" : rimborsoMissione.getOrdineMissione().getIdFlusso());
 		return cmisRimborsoMissione;
 	}
 	
@@ -320,6 +336,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Rimborso di Missione"));
 		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ORDINE);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, RimborsoMissione.CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, RimborsoMissione.CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO);
 
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANNO_IMPEGNO_COMP, cmisRimborsoMissione.getImpegnoAnnoCompetenza());
@@ -347,7 +364,13 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO, cmisRimborsoMissione.getDataInizioEstero());
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO, cmisRimborsoMissione.getDataFineEstero());
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE, cmisRimborsoMissione.getIdOrdineMissione());
-		
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE, cmisRimborsoMissione.getWfOrdineMissione());
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO, cmisRimborsoMissione.getAnticipoRicevuto());
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_ANNO_MANDATO, cmisRimborsoMissione.getAnnoMandato());
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_NUMERO_MANDATO, cmisRimborsoMissione.getNumeroMandato());
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_IMPORTO_MANDATO, cmisRimborsoMissione.getImportoMandato());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TRATTAMENTO, cmisRimborsoMissione.getTrattamento());
+
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_ORDINE, cmisRimborsoMissione.getUoOrdine());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_SPESA, cmisRimborsoMissione.getUoSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA, cmisRimborsoMissione.getUserNameFirmatarioSpesa());

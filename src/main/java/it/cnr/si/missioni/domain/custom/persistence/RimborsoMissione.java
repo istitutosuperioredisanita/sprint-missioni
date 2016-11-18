@@ -37,12 +37,18 @@ import org.springframework.util.StringUtils;
 @Table(name = "RIMBORSO_MISSIONE")
 public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public final static String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale",
-			CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegato",
+			CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati",
 			CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione",
+			CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Scontrini",
 			CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id",
-			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "cnrmissioni:dataInizioMissioneEstero",
+			CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso",
+			CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto",
+			CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato",
+			CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandato",
+			CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato",
 			CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "missioni_rimborso_attachment:document",
-			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "cnrmissioni:dataFineMissioneEstero";
+			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "cnrmissioni:dataInizioEstero",
+			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "cnrmissioni:dataFineEstero";
 
 	@Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_ESTERO", nullable = true)
