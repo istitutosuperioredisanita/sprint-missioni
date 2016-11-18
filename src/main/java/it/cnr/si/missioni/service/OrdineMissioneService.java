@@ -287,9 +287,9 @@ public class OrdineMissioneService {
 	}
 
     @Transactional(readOnly = true)
-    public void uploadAllegatoOrdineMissione(Principal principal, Long idMissione, InputStream uploadedAllegatoInputStream) throws AwesomeException, ComponentException {
+    public void uploadAllegatoOrdineMissione(Principal principal, Long idMissione, InputStream uploadedAllegatoInputStream, String fileName, String contentType) throws AwesomeException, ComponentException {
     	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
-    	cmisOrdineMissioneService.uploadAllegatoOrdineMissione(principal, ordineMissione, uploadedAllegatoInputStream);
+    	cmisOrdineMissioneService.uploadAllegatoOrdineMissione(principal, ordineMissione, uploadedAllegatoInputStream, fileName, contentType);
     }
 
     @Transactional(readOnly = true)

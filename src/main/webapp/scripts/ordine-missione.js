@@ -1135,6 +1135,59 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
+    $('#fileupload')
+      .fileupload(
+        { url: 'app/rest/ordineMissione/uploadAllegati/'+$routeParams.idMissione,
+          dataType: 'json',
+          progressInterval: 1000,
+          add: function (e, data) {
+            if($(".attachment_box").length > 0) { 
+                alert("E' permesso il caricamento di un solo file alla volta")
+                return;
+            }
+            $scope.messageTitle = 'CARICAMENTO IN CORSO ('+data.files[0].name+')';
+            $scope.messages = null;
+            $scope.loading = true;
+            $scope.$apply();
+            data.submit();
+          },
+          progressall: function (e, data) {
+            $('#progress .progress-bar > p').remove();
+            $('<p/>').text('Uploading...').appendTo($('#progress .progress-bar'));
+            $('#progress .progress-bar').css(
+                'width',
+                75 + '%'
+            );
+          },
+          fail: function(e, data) {
+            $scope.loading = false;
+            if (data.jqXHR.status===200) {
+              $.each(data.files, function (index, file) {
+                $scope.messageTitle = 'CARICAMENTO EFFETTUATO ('+data.files[0].name+')';
+                $scope.messages =['Il file ('+file.name+') è stato caricato correttamente.'];
+                $('<p style="color:green"/>').text(file.name).appendTo('#files');
+              });
+            } else {
+              $scope.messages = data.jqXHR.responseText;
+              $.each(data.files, function (index, file) {
+                $scope.messageTitle = 'ERRORI ('+file.name+')';
+                $('<p style="color:red"/>').text(file.name).appendTo('#files');
+              });
+            }
+            $('#progress .progress-bar > p').remove();
+            $('<p/>').text('Loaded').appendTo($('#progress .progress-bar'));
+            $('#progress .progress-bar').css(
+              'width', 100 + '%'
+            );
+            $scope.$apply();
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer "+$scope.accessToken);
+          }   
+        })
+      .prop('disabled', !$.support.fileInput)
+      .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
     $scope.idMissione = $routeParams.idMissione;
     $scope.validazione = $routeParams.validazione;
     $scope.accessToken = AccessToken.get();
