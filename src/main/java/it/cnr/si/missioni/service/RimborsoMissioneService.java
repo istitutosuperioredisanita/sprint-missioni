@@ -1,16 +1,23 @@
 package it.cnr.si.missioni.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +31,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -72,6 +80,9 @@ public class RimborsoMissioneService {
 	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
 
 	@Autowired
+	private PrintRimborsoMissioneService printRimborsoMissioneService;
+
+	@Autowired
 	UnitaOrganizzativaService unitaOrganizzativaService;
 	
 	@Autowired
@@ -96,7 +107,7 @@ public class RimborsoMissioneService {
     private DatiIstitutoService datiIstitutoService;
 
     @Transactional(readOnly = true)
-    public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
+    public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
     	filter.setDaId(idMissione);
     	filter.setaId(idMissione);
@@ -113,7 +124,10 @@ public class RimborsoMissioneService {
 	    			}
 				}
 			}
-			
+			if (retrieveDetail){
+				List<RimborsoMissioneDettagli> list = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli(principal, new Long(rimborsoMissione.getId().toString()));
+				rimborsoMissione.setRimborsoMissioneDettagli(list);
+			}
 		}
 		return rimborsoMissione;
     }
@@ -324,8 +338,8 @@ public class RimborsoMissioneService {
 	}
 
     @Transactional(readOnly = true)
-    public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione) throws ComponentException {
-		return getRimborsoMissione(principal, idMissione, false);
+    public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail) throws ComponentException {
+		return getRimborsoMissione(principal, idMissione, retrieveDetail, false);
     }
 
     @Transactional(readOnly = true)
@@ -343,7 +357,7 @@ public class RimborsoMissioneService {
     public List<RimborsoMissione> getRimborsiMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
 		CriterionList criterionList = new CriterionList();
 		List<RimborsoMissione> rimborsoMissioneList=null;
-		String aliasOrdineMissione = "Ordine";
+		String aliasRimborsoMissione = "Rimborso";
 		if (filter != null){
 			if (filter.getAnno() != null){
 				criterionList.add(Restrictions.eq("anno", filter.getAnno()));
@@ -386,13 +400,13 @@ public class RimborsoMissioneService {
 				criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
 			}
 			if (filter.getAnnoOrdine() != null){
-				criterionList.add(Restrictions.eq(aliasOrdineMissione+".anno", filter.getAnnoOrdine()));
+				criterionList.add(Restrictions.eq(aliasRimborsoMissione+".anno", filter.getAnnoOrdine()));
 			}
 			if (filter.getDaNumeroOrdine() != null){
-				criterionList.add(Restrictions.ge(aliasOrdineMissione+".numero", filter.getDaNumeroOrdine()));
+				criterionList.add(Restrictions.ge(aliasRimborsoMissione+".numero", filter.getDaNumeroOrdine()));
 			}
 			if (filter.getaNumeroOrdine() != null){
-				criterionList.add(Restrictions.le(aliasOrdineMissione+".numero", filter.getaNumeroOrdine()));
+				criterionList.add(Restrictions.le(aliasRimborsoMissione+".numero", filter.getaNumeroOrdine()));
 			}
 		}
 		if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
@@ -743,5 +757,49 @@ public class RimborsoMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Numero");
 		}
 	}
-    
+
+	@Transactional(readOnly = true)
+   	public Map<String, byte[]> printRimborsoMissione(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
+    	String username = SecurityUtils.getCurrentUserLogin();
+    	Principal principal = (Principal)auth;
+    	RimborsoMissione rimborsoMissione = getRimborsoMissione(principal, idMissione, true);
+		Map<String, byte[]> map = new HashMap<String, byte[]>();
+    	byte[] printRimborsoMissione = null;
+    	String fileName = null;
+    	if (!rimborsoMissione.isStatoNonInviatoAlFlusso()){
+    		ContentStream content = null;
+			try {
+				content = cmisRimborsoMissioneService.getContentStreamRimborsoMissione(rimborsoMissione);
+			} catch (Exception e1) {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")");
+			}
+    		if (content != null){
+        		fileName = content.getFileName();
+        		InputStream is = null;
+    			try {
+    				is = content.getStream();
+    			} catch (Exception e) {
+    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")");
+    			}
+        		if (is != null){
+            		try {
+    					printRimborsoMissione = IOUtils.toByteArray(is);
+    				} catch (IOException e) {
+    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")");
+    				}
+        		}
+    		} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale");
+    		}
+    		map.put(fileName, printRimborsoMissione);
+    	} else {
+    		fileName = "RimborsoMissione"+idMissione+".pdf";
+    		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
+    		if (rimborsoMissione.isMissioneInserita()){
+    			cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(principal, printRimborsoMissione, rimborsoMissione);
+    		}
+    		map.put(fileName, printRimborsoMissione);
+    	}
+		return map;
+    }
 }
