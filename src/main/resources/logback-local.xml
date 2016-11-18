@@ -11,7 +11,7 @@
     <include resource="logging/appender/syslog.xml" />
 
     <!-- logger CNR -->
-    <logger name="it.cnr" level="TRACE"/>
+    <logger name="it.cnr" level="DEBUG"/>
     <logger name="com.sun" level="WARN"/>
     <logger name="com.hazelcast" level="INFO"/>
 
