@@ -637,8 +637,9 @@ public class CMISOrdineMissioneService {
 	}
 	
 	public Folder recuperoFolderOrdineMissione(OrdineMissione ordineMissione)throws ComponentException{
-		StringBuffer query = new StringBuffer("select ord.cmis:objectId from missioni:main as ord ");
-		query.append(" where ord.missioni:id = ").append(ordineMissione.getId());
+		StringBuffer query = new StringBuffer("select miss.cmis:objectId from missioni:main as miss "
+				+ " join missioni_commons_aspect:ordine_missione ordine on miss.cmis:objectId = ordine.cmis:objectId");
+		query.append(" where miss.missioni:id = ").append(ordineMissione.getId());
 
 		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
 		if (resultsFolder.getTotalNumItems() == 0)

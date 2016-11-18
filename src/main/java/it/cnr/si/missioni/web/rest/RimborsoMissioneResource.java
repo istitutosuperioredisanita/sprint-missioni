@@ -1,13 +1,19 @@
 package it.cnr.si.missioni.web.rest;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -226,37 +234,37 @@ public class RimborsoMissioneResource {
     		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'rimborso di Missione " );
         
-//        if (!StringUtils.isEmpty(idMissione)){
-//            try {
-//            	Long idMissioneLong = new Long (idMissione); 
-//            	OAuth2Authentication auth = tokenStore.readAuthentication(token);
-//            	if (auth != null){
-//            		Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(auth, idMissioneLong);
-//            		if (map != null){
-//            			res.setContentType("application/pdf");
-//                    	try {
-//                    		String headerValue = "attachment";
-//                    		for (String key : map.keySet()) {
-//                    			System.out.println(map.get(key).length);
-//                    			log.error("Lunghezza "+map.get(key).length);
-//                       			headerValue += "; filename=\"" + key + "\"";
-//                        		OutputStream outputStream = res.getOutputStream();
-//                        		res.setHeader("Content-Disposition", headerValue);
-//                        		InputStream inputStream = new ByteArrayInputStream(map.get(key));
-//                        		IOUtils.copy(inputStream, outputStream);
-//                        		outputStream.flush();
-//                        		inputStream.close();
-//                        		outputStream.close();       	
-//                    		}
-//            			} catch (IOException e) {
-//                			throw new RuntimeException(Utility.getMessageException(e));
-//                		} 
-//            		}
-//            	}
-//    		} catch (ComponentException e) {
-//    			throw new RuntimeException(Utility.getMessageException(e));
-//    		} 
-//        }
+        if (!StringUtils.isEmpty(idMissione)){
+            try {
+            	Long idMissioneLong = new Long (idMissione); 
+            	OAuth2Authentication auth = tokenStore.readAuthentication(token);
+            	if (auth != null){
+            		Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(auth, idMissioneLong);
+            		if (map != null){
+            			res.setContentType("application/pdf");
+                    	try {
+                    		String headerValue = "attachment";
+                    		for (String key : map.keySet()) {
+                    			System.out.println(map.get(key).length);
+                    			log.error("Lunghezza "+map.get(key).length);
+                       			headerValue += "; filename=\"" + key + "\"";
+                        		OutputStream outputStream = res.getOutputStream();
+                        		res.setHeader("Content-Disposition", headerValue);
+                        		InputStream inputStream = new ByteArrayInputStream(map.get(key));
+                        		IOUtils.copy(inputStream, outputStream);
+                        		outputStream.flush();
+                        		inputStream.close();
+                        		outputStream.close();       	
+                    		}
+            			} catch (IOException e) {
+                			throw new RuntimeException(Utility.getMessageException(e));
+                		} 
+            		}
+            	}
+    		} catch (ComponentException e) {
+    			throw new RuntimeException(Utility.getMessageException(e));
+    		} 
+        }
     }
 
     @RequestMapping(value = "/rest/rimborsoMissione/print/json",
@@ -282,10 +290,9 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegatiRimborsoMissione(HttpServletRequest req, @RequestParam("file") MultipartFile file) {
-        log.debug("REST request per l'upload di allegati all'rimborso di Missione " );
-//        if (rimborsoMissione.getId() != null){
-//            	rimborsoMissioneService.uploadAllegatorimborsoMissione((Principal) SecurityUtils.getCurrentUser(), (Long)rimborsoMissione.getId(), file.getInputStream());
+    public ResponseEntity<?> uploadAllegatiRimborsoMissione(HttpServletRequest req, @RequestParam("idRimborso") Long idMissione, @RequestParam("file") MultipartFile file) {
+        log.debug("REST request per l'upload di allegati al rimborso di Missione " );
+//         rimborsoMissioneService.uploadAllegatoRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), (Long)rimborsoMissione.getId(), file.getInputStream());
 //            try {
                 return new ResponseEntity<>(
                 		null,

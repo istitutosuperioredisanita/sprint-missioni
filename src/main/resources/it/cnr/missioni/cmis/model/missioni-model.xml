@@ -8,7 +8,7 @@
 	<!-- Optional meta-data about the model -->
 	<description>Missioni extension Content Model - Missioni</description>
 	<author>Gianfranco Gasparro</author>
-	<version>1.0</version>
+	<version>2.0</version>
 
 	<!--
 		Imports are required to allow references to definitions in other
@@ -72,9 +72,21 @@
 					<title>Data Fine Missione</title>
 					<type>d:datetime</type>
 				</property>
+				<property name="missioni:dataInizioMissioneEstero">
+					<title>Data Inizio Missione Estero</title>
+					<type>d:datetime</type>
+				</property>
+				<property name="missioni:dataFineMissioneEstero">
+					<title>Data Fine Missione Estero</title>
+					<type>d:datetime</type>
+				</property>
 				<property name="missioni:dataInserimento">
 					<title>Data Inserimento Missione</title>
 					<type>d:datetime</type>
+				</property>
+				<property name="missioni:ordine_id">
+					<title>ID Ordine Missione, valorizzato solo per il rimborso missione</title>
+					<type>d:long</type>
 				</property>
 			</properties>
 		</type>
