@@ -44,6 +44,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -659,15 +660,27 @@ public class CMISOrdineMissioneService {
 	}
 	
     @Transactional(readOnly = true)
-    public void uploadAllegatoOrdineMissione(Principal principal, OrdineMissione ordineMissione, InputStream uploadedAllegatoInputStream) throws AwesomeException, ComponentException {
-    	String fileName = "Allegato1.pdf";
+    public void uploadAllegatoOrdineMissione(Principal principal, OrdineMissione ordineMissione, InputStream uploadedAllegatoInputStream, String fileName, String contentType) throws AwesomeException, ComponentException {
+    	if (fileName == null){
+    		fileName = "Allegato"+UUID.randomUUID();
+    	}
     	CmisPath cmisPath = createFolderOrdineMissione(ordineMissione);
-    	Map<String, Object> metadataProperties = new HashMap<String, Object>();
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione);
+		MimeTypes mime = null;
+		try {
+			mime = MimeTypes.valueOf(contentType);
+		} catch (Exception e) {
+			if (e instanceof IllegalArgumentException)
+	    		throw new AwesomeException("Tipo File "+contentType+" non supportato.");
+    	}
+		if (mime == null){
+    		throw new AwesomeException("Tipo File "+contentType+" non supportato.");
+		}
     	try{
     		Document node = missioniCMISService.restoreSimpleDocument(
     				metadataProperties,
     				uploadedAllegatoInputStream,
-    				MimeTypes.PDF.mimetype(),
+    				mime.mimetype(),
     				fileName, 
     				cmisPath);
     		missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value());
@@ -801,15 +814,15 @@ public class CMISOrdineMissioneService {
 		return metadataProperties;
 	}
 	
-	public Map<String, Object> createMetadataForFileOrdineMissioneAllegati(String currentLogin, OrdineMissioneAutoPropria autoPropria){
+	public Map<String, Object> createMetadataForFileOrdineMissioneAllegati(String currentLogin, OrdineMissione ordineMissione){
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
-		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Allegato all'Ordine Missione - anno "+autoPropria.getOrdineMissione().getAnno()+" numero "+autoPropria.getOrdineMissione().getNumero()));
+		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Allegato all'Ordine Missione - anno "+ordineMissione.getAnno()+" numero "+ordineMissione.getNumero()));
 		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Allegato Ordine di Missione"));
 		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ALLEGATO);
-		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ALLEGATO);
-		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ALLEGATO);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
 		return metadataProperties;
 	}
 }

@@ -318,6 +318,11 @@
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
+        <!--    <form name="form-inline" role="form" ng-submit="addAttach()">
+              <div class="col-md-3" ng-show="showEsisteOrdineMissione">
+                  <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+              </div>
+            </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-4" ng-show="showEsisteOrdineMissione && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
@@ -350,6 +355,28 @@
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
                     </div>
             </form>
+  <div class="col-md-12">
+    <span class="btn btn-success fileinput-button" ng-hide="loading">
+      <i class="glyphicon glyphicon-plus"></i>
+      <span>Upload files...</span>
+      <input id="fileupload" type="file" name="file" multiple>
+    </span>
+    <br>
+    <br>
+    <div id="progress" class="progress">
+      <div class="progress-bar progress-bar-success"></div>
+    </div>
+    <div id="files" class="files"></div>
+  </div>
+
+  <div class="col-md-8 well highlight" id="message">
+    <h4><div id="messageTitle">{{messageTitle}}</div></h4>
+    <ul style="text-align:left">
+      <li ng-repeat="message in messages">
+        {{message}}
+      </li>
+    </ul>
+  </div>
         </div>
     </div>
 </div>
