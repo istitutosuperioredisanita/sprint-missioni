@@ -307,24 +307,28 @@ public class OrdineMissioneResource {
 		} 
     }
 
-    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati",
+    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegatiOrdineMissione(HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadAllegatiOrdineMissione(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
         log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
-//        if (ordineMissione.getId() != null){
-//            	ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), (Long)ordineMissione.getId(), file.getInputStream());
-//            try {
+        if (idOrdineMissione != null){
+            	try {
+					ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getName(), file.getContentType());
+				} catch (ComponentException | AwesomeException | IOException e1) {
+	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
+				}
+            try {
                 return new ResponseEntity<>(
                 		null,
                         HttpStatus.OK);
-//    		} catch (ComponentException e) {
-//    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//    		} 
-//    	} else {
-//  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
-//    	}
+    		} catch (ComponentException e) {
+    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    		} 
+    	} else {
+  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    	}
     }
 }
