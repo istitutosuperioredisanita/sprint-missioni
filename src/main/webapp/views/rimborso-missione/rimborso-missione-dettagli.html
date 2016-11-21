@@ -19,6 +19,118 @@
      <div class="panel-body my-panel-body">
 
       <button ng-enabled="rimborsoMissione.id" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.add-dettaglio-spesa' | translate}}" ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button>
+<!--      <div class="row">
+        <div class="col-md-12 text-center">
+          <div>
+              <div class="text-left">
+                  <ul class="list-unstyled subscriptions">
+                    <li ng-repeat="dettaglioSpesa in dettagliSpese">
+                      <div class="row">
+                        <div class="col-md-10">
+
+                          <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</b> {{dettaglioSpesa.dataSpesa | date:'dd/MM/yyyy'}}
+                          <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa' | translate}}:</b>
+                          {{dettaglioSpesa.dsTiSpesa}}
+                          <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
+                          <br>
+                          <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
+
+
+                          <div ng-show="active === edition.id">
+
+                            <ul class="list-unstyled materials" ng-show="materialsExists">
+                              <li ng-repeat="(name, id) in materials">
+                                <span class="glyphicon glyphicon-download-alt"></span>
+                                <a href="/api/download/repository/{{id}}">
+                                  {{name}}
+                                </a>
+                              </li>
+                            </ul>
+
+                            <h4 ng-hide="materialsExists">
+                              <span class="label label-warning">nessun allegato disponibile</span>
+                            </h4>
+
+                          </div>
+
+                        </div>
+                        <div class="col-md-1-button-large col-md-1 text-right">
+                          <button ng-hide="active === edition.id" class="btn btn-sm btn-default" ng-click="attachments(edition.id)">vedi allegati</button>
+                          <button ng-show="active === edition.id" class="btn btn-sm btn-warning" ng-click="deselect()">nascondi allegati</button>
+                        </div>
+        <div class="col-md-1-button col-md-1 text-right" >
+           <button ng-show="validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+            <button ng-show="validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="confirmDeleteDettaglioSpesa($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+            <button ng-show="validazione == 'N' && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(dettaglioSpesa)" ng-click="modifyDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+            <button ng-show="validazione == 'N' && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-click="undoDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+        </div>
+                      </div>
+                    </li>
+                  </ul>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 text-center" ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
+          <div class="row">
+          <div class="col-md-11">
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-2">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.data">tipo spesa</span>
+              <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-10">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa">tipo spesa</span>
+              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa">tipo spesa</span>
+                        <textarea class="input-sm form-control" ng-model="newDettaglioSpesa.dsSpesa" rows = "1"></textarea>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-6">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">tipo spesa</span>
+                            <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="25"</input>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-6">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.km">tipo spesa</span>
+                            <input class="form-control" ng-model="newDettaglioSpesa.kmPercorsi" maxlength="20"</input>
+                        </span>
+                    </p>
+            </form>
+        </div>
+
+            <div class="col-md-1 text-right">
+                  <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newDettaglioSpesa)" ng-click="insertDettaglioSpesa(newDettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                  <button class="btn btn-sm btn-link" ng-click="undoAddDettaglioSpesa()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+            </div>
+        </div>
+        </div>
+      </div>
+
+-->
+
+
+
+
+
         <table class="table table-condensed table-striped table-bordered table-responsive">
           <tr id ="missioni">
             <th>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</th>
@@ -30,25 +142,25 @@
           <tfoot>
             <tr>
               <td style="font-weight:bold" colspan="3" align="right" translate="rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli">Totale</td>
-              <td align="right"> {{getTotaleDettagliSpesa()}}</td>
+              <td align="right"> {{getTotaleDettagliSpesa()|currency : ""}}</td>
               <td></td>
             </tr>
           </tfoot>
           <tbody id ="missioni">
-            <tr ng-repeat="dettaglioSpesa in dettagliSpesa">
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left" >{{dettaglioSpesa.dataSpesa}}</td>
+            <tr ng-repeat="dettaglioSpesa in dettagliSpese">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left" >{{dettaglioSpesa.dataSpesa | date:'dd/MM/yyyy'}}</td>
               <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dataSpesa" required maxlength="256">
+                <input ng-disabled="validazione != 'N'" class="form-control" fn-change="onChangeDataDettaglio" ng-model="dettaglioSpesa.dataSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-4" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-4" style="text-align:left">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left">{{dettaglioSpesa.dsTiSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsTiSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left">{{dettaglioSpesa.dsSpesa}}</td>
-              <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:left">
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-3" style="text-align: left">{{dettaglioSpesa.dsSpesa}}</td>
+              <td ng-show="dettaglioSpesa.editing" class="col-xs-3" style="text-align:left">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.dsSpesa" required maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: left" >{{dettaglioSpesa.importoEuro}}</td>
+              <td ng-hide="dettaglioSpesa.editing" class="col-md-1" style="text-align: right" >{{dettaglioSpesa.importoEuro|currency : ""}}</td>
               <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:right">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.importoEuro" ng-currency required maxlength="256">
               </td>
@@ -56,16 +168,16 @@
               <td ng-show="dettaglioSpesa.editing" class="col-xs-1" style="text-align:right">
                 <input ng-disabled="validazione != 'N'" class="form-control" ng-model="dettaglioSpesa.kmPerscorsi" maxlength="256">
               </td>
-              <td ng-hide="dettaglioSpesa.editing">
+              <td class="td-small" ng-hide="dettaglioSpesa.editing">
                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
               </td>
-              <td ng-hide="dettaglioSpesa.editing">
+              <td class="td-small" ng-hide="dettaglioSpesa.editing">
                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteDettaglioSpesa($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </td>
-              <td ng-show="dettaglioSpesa.editing">
+              <td class="td-small" ng-show="dettaglioSpesa.editing">
                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(dettaglioSpesa)" ng-click="modifyDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
               </td>
-              <td ng-show="dettaglioSpesa.editing">
+              <td class="td-small" ng-show="dettaglioSpesa.editing">
                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
               </td>
             </tr>
@@ -75,7 +187,6 @@
 
             <td class="col-xs-1 without-padding">
               <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
-                <button class="btn btn-sm btn-link" ng-click="onChangeDataDettaglio()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
             </td>
             <td class="col-xs-5">
               <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
@@ -89,14 +200,22 @@
             <td class="col-xs-1">
               <input class="form-control" ng-model="newDettaglioSpesa.kmPercorsi" maxlength="20"</input>
             </td>
-            <td style="text-align: left">
+            <td class="col-xs-1">
+              <table class="table table-condensed table-striped table-bordered table-responsive">
+                <th>Allegati</th>
+                  <tr>
+                    <td>This is row one, column 1</td>
+                  </tr>
+              </table>
+            </td>
+            <td class="td-small" style="text-align: left">
               <form class="form-inline" role="form">
                 <div class="form-group btn-group">
                   <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newDettaglioSpesa)" ng-click="insertDettaglioSpesa(newDettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
                 </div>
               </form>
             </td>
-            <td style="text-align: left">
+            <td class="td-small" style="text-align: left">
               <form class="form-inline" role="form">
                 <div class="form-group btn-group">
                   <button class="btn btn-sm btn-link" ng-click="undoAddDettaglioSpesa()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
@@ -106,8 +225,12 @@
           </tr>
           </tbody>
         </table>
+
+
+
       </div>
     </div>
+     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{getTotaleDettagliSpesa() | currency : "€"}}
 
   <div class="col-md-11">
     <ul class="pager">
