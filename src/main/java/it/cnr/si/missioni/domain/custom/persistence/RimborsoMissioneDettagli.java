@@ -37,9 +37,6 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "UID", length = 256, nullable = false)
     private String uid;
 
-    @Column(name = "IMPORTO", length = 28, nullable = true)
-    private BigDecimal importo;
-
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE", length = 3, nullable = true)
     private String note;
@@ -143,14 +140,6 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 
 	public void setStato(String stato) {
 		this.stato = stato;
-	}
-
-	public BigDecimal getImporto() {
-		return importo;
-	}
-
-	public void setImporto(BigDecimal importo) {
-		this.importo = importo;
 	}
 
 	public String getNote() {

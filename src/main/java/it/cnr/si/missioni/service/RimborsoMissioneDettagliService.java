@@ -148,7 +148,6 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setDsTiSpesa(rimborsoMissioneDettagli.getDsTiSpesa());
 		rimborsoMissioneDettagliDB.setCambio(rimborsoMissioneDettagli.getCambio());
 		rimborsoMissioneDettagliDB.setCdDivisa(rimborsoMissioneDettagli.getCdDivisa());
-		rimborsoMissioneDettagliDB.setImporto(rimborsoMissioneDettagli.getImporto());
 		rimborsoMissioneDettagliDB.setImportoEuro(rimborsoMissioneDettagli.getImportoEuro());
 		rimborsoMissioneDettagliDB.setImportoDivisa(rimborsoMissioneDettagli.getImportoDivisa());
 		

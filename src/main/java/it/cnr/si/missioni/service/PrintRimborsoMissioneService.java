@@ -132,8 +132,8 @@ public class PrintRimborsoMissioneService {
 	    		}
 	    		dettagliPrint.setDsSpesa(dsSpesa);
 	    		dettagliPrint.setData(DateUtils.getDateAsString(dettagli.getDataSpesa(),DateUtils.PATTERN_DATE));
-	    		if (dettagli.getImporto() != null){
-		    		dettagliPrint.setImporto(Utility.numberFormat(dettagli.getImporto()));
+	    		if (dettagli.getImportoEuro() != null){
+		    		dettagliPrint.setImporto(Utility.numberFormat(dettagli.getImportoEuro()));
 	    		} else {
 	    			dettagliPrint.setImporto("");
 	    		}
