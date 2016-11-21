@@ -45,7 +45,11 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             );
     }
 
-    $scope.onChangeDataDettaglio= function () {
+    $scope.$on('cambioData', function(event, data) {
+        onChangeDataDettaglio();
+    });
+
+    var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
             var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
             var tipi = ProxyService.getTipiSpesa($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione, $scope.rimborsoMissione.trattamento).then(function(result){
@@ -110,7 +114,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         var totale = 0;
         if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
             for (var i=0; i<$scope.dettagliSpese.length; i++) {
-                totale = totale + dettagliSpese[i].importoEuro;
+                totale = totale + $scope.dettagliSpese[i].importoEuro;
             }
         }
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.importoEuro){
@@ -124,10 +128,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         ElencoRimborsiMissioneService.findById($scope.idRimborsoMissione).then(function(data){
             $scope.rimborsoMissione = data;
             if ($scope.rimborsoMissione){
-                $scope.dettagliSpese = RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione);
-                if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
-                    $scope.getTotaleDettagliSpesa();
-                }
+                RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione).then(function(data){
+                    $scope.dettagliSpese = data;    
+                    if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
+                        $scope.getTotaleDettagliSpesa();
+                    }
+                });
             }
         });
     }
