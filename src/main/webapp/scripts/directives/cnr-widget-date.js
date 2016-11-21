@@ -25,6 +25,7 @@ angular.module('missioniApp')
                 var newDate = event.date;
                 scope.ngModelDate = newDate;
                 scope.$apply();
+                scope.$emit('cambioData', newDate);
               }).on('show', function (event) {
                 var newDate = event.date;
                 scope.ngModelDate = newDate;
@@ -44,6 +45,7 @@ angular.module('missioniApp')
       },
       templateUrl: 'views/datepicker.html',
       link: function link(scope, element, attrs) {
+          scope.label = attrs.label;
           var init = true;
           scope.$watch('ngModelDate', function (startValue) {
             if (startValue){
