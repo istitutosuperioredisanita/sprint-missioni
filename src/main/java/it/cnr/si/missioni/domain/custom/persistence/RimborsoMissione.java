@@ -46,9 +46,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato",
 			CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandato",
 			CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato",
-			CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "missioni_rimborso_attachment:document",
-			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "cnrmissioni:dataInizioEstero",
-			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "cnrmissioni:dataFineEstero";
+			CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "D:missioni_rimborso_attachment:document",
+			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero",
+			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero";
 
 	@Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_ESTERO", nullable = true)

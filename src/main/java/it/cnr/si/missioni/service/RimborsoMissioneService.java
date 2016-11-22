@@ -125,12 +125,16 @@ public class RimborsoMissioneService {
 				}
 			}
 			if (retrieveDetail){
-				List<RimborsoMissioneDettagli> list = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli(principal, new Long(rimborsoMissione.getId().toString()));
-				rimborsoMissione.setRimborsoMissioneDettagli(list);
+				retrieveDetails(principal, rimborsoMissione);
 			}
 		}
 		return rimborsoMissione;
     }
+
+	private void retrieveDetails(Principal principal, RimborsoMissione rimborsoMissione) {
+		List<RimborsoMissioneDettagli> list = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli(principal, new Long(rimborsoMissione.getId().toString()));
+		rimborsoMissione.setRimborsoMissioneDettagli(list);
+	}
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
@@ -283,7 +287,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setAltreSpeseAntImporto(rimborsoMissione.getAltreSpeseAntImporto());
 			rimborsoMissioneDB.setSpeseTerziImporto(rimborsoMissione.getSpeseTerziImporto());
 			rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
-			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
+//			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
 			rimborsoMissioneDB.setInquadramento(rimborsoMissione.getInquadramento());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 		}
@@ -294,7 +298,7 @@ public class RimborsoMissioneService {
     	} 
 
     	rimborsoMissioneDB.setToBeUpdated();
-
+    	retrieveDetails(principal, rimborsoMissioneDB);
 //		//effettuo controlli di validazione operazione CRUD
 		validaCRUD(principal, rimborsoMissioneDB);
 

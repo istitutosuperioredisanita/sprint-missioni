@@ -409,12 +409,12 @@
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
-            <form name="form-inline" role="form" ng-submit="validateOrdineMissione()">
+            <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
                     <div class="col-md-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
-            <form name="form-inline" role="form" ng-submit="finalizeOrdineMissione()">
+            <form name="form-inline" role="form" ng-submit="finalizeRimborsoMissione()">
                     <div class="col-md-4" ng-show="showEsisteRimborsoMissione && validazione === 'D'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
@@ -423,7 +423,7 @@
                     <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
 
                     <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
-                      <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                      <a target="_blank" href="app/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
 <!--
