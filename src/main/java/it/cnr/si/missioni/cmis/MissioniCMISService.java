@@ -500,8 +500,26 @@ public class MissioniCMISService {
     }
     
 	public Response startFlowOrdineMissione(StringWriter stringWriter) throws Exception{
+		String simpleUrl = getUrlOrdineMissione();
+		return startFlow(stringWriter, simpleUrl);
+	}
+
+	private String getUrlOrdineMissione() {
+		return "service/api/workflow/activiti$flussoMissioniOrdine/formprocessor";
+	}
+	
+	private String getUrlRimborsoMissione() {
+		return "service/api/workflow/activiti$flussoMissioniRimborso/formprocessor";
+	}
+	
+	public Response startFlowRimborsoMissione(StringWriter stringWriter) throws Exception{
+		String simpleUrl = getUrlRimborsoMissione();
+		return startFlow(stringWriter, simpleUrl);
+	}
+
+	private Response startFlow(StringWriter stringWriter, String simpleUrl) {
 		try {
-			String url = getRepositoryURL()+"service/api/workflow/activiti$flussoMissioniOrdine/formprocessor";
+			String url = getRepositoryURL()+simpleUrl;
 			logger.info("Start Flow. Url: "+url+" - Content: "+stringWriter.getBuffer().toString());
 			Response responsePost = invokePOST(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
 			if (responsePost.getResponseCode()!=200) 

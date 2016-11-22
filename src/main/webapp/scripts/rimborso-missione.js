@@ -41,6 +41,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 serviziRestInizialiInserimento();
 
                 $scope.rimborsoMissioneModel.idOrdineMissione = idOrdineMissione;
+                $scope.rimborsoMissioneModel.ordineMissione = ordineMissioneSelected;
                 var today = $scope.today();
                 $scope.rimborsoMissioneModel.dataInserimento = today;
                 $scope.rimborsoMissioneModel.anno = today.getFullYear();
@@ -796,20 +797,20 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.confirmDelete = function () {
-        ui.confirmCRUD("Confermi l'eliminazione dell'Ordine di Missione Numero: "+$scope.rimborsoMissioneModel.numero+" del "+$filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+"?", deleteOrdineMissione);
+        ui.confirmCRUD("Confermi l'eliminazione del Rimborso Missione Numero: "+$scope.rimborsoMissioneModel.numero+" del "+$filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+"?", deleteRimborsoMissione);
     }
 
     $scope.confirm = function () {
-        ui.confirmCRUD("Si sta per confermare l'Ordine di Missione Numero: "+$scope.rimborsoMissioneModel.numero+" del "+$filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
+        ui.confirmCRUD("Si sta per confermare il Rimborso Missione Numero: "+$scope.rimborsoMissioneModel.numero+" del "+$filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e il rimborso non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
     }
 
     var confirmOrdineMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.confirm($scope.rimborsoMissioneModel,
+            RimborsoMissioneService.confirm($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
-	                    ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
-                        ElencoOrdiniMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+	                    ui.ok_message("Rimborso Missione confermato e inviato all'approvazione.");
+                        ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
                         });
@@ -828,13 +829,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             );
     }
 
-    $scope.validateOrdineMissione = function () {
+    $scope.validateRimborsoMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.confirm_validate($scope.rimborsoMissioneModel,
+            RimborsoMissioneService.confirm_validate($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
-                        ElencoOrdiniMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                        ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
                         });
@@ -853,13 +854,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             );
     }
 
-    $scope.finalizeOrdineMissione = function () {
+    $scope.finalizeRimborsoMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.finalize($scope.rimborsoMissioneModel,
+            RimborsoMissioneService.finalize($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Ordine di Missione Completato.");
-                        ElencoOrdiniMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                        ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
                         });
@@ -878,9 +879,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             );
     }
 
-    var deleteOrdineMissione = function () {
+    var deleteRimborsoMissione = function () {
             $rootScope.salvataggio = true;
-            OrdineMissioneService.delete({ids:$scope.rimborsoMissioneModel.id},
+            RimborsoMissioneService.delete({ids:$scope.rimborsoMissioneModel.id},
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         $scope.idMissione = null;

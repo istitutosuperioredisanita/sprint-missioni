@@ -43,6 +43,7 @@ public class PrintRimborsoMissioneService {
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
     	PrintRimborsoMissione printRimborsoMissione = new PrintRimborsoMissione();
     	printRimborsoMissione.setAnno(rimborsoMissione.getAnno());
+    	printRimborsoMissione.setNumero(rimborsoMissione.getNumero());
     	printRimborsoMissione.setCodiceFiscaleRich(account.getCodiceFiscale());
     	printRimborsoMissione.setComuneResidenzaRich(rimborsoMissione.getComuneResidenzaRich());
     	if (account.getDataNascita() != null){
@@ -100,6 +101,7 @@ public class PrintRimborsoMissioneService {
     		printRimborsoMissione.setImportoMandato("");
     	}
     	printRimborsoMissione.setItaliaEstero(rimborsoMissione.decodeTipoMissione());
+    	printRimborsoMissione.setTipoMissione(rimborsoMissione.decodeTipoMissione());
     	printRimborsoMissione.setModpag(rimborsoMissione.getModpag());
     	if (rimborsoMissione.isMissioneEstera()){
         	printRimborsoMissione.setNazione(nazione.getDs_nazione());
@@ -142,6 +144,7 @@ public class PrintRimborsoMissioneService {
 	    		} else {
 	    			dettagliPrint.setKmPercorsi("");
 	    		}
+	    		listDettagliPrint.add(dettagliPrint);
 	    	}
 	    	printRimborsoMissione.setPrintDettagliSpeseRimborsoMissione(listDettagliPrint);
 		}
