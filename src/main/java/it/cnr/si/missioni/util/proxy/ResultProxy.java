@@ -5,9 +5,11 @@ import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 
 import java.io.Serializable;
 
+import org.springframework.http.HttpStatus;
+
 public class ResultProxy implements Serializable {
     private String type;
-    private int status;
+    private HttpStatus status;
     private String body;
 	CommonJsonRest<RestServiceBean> commonJsonResponse;
     
@@ -17,10 +19,10 @@ public class ResultProxy implements Serializable {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public int getStatus() {
+	public HttpStatus getStatus() {
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(HttpStatus status) {
 		this.status = status;
 	}
 	public String getBody() {

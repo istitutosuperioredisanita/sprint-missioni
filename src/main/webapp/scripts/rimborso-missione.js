@@ -126,9 +126,15 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.recuperoDatiDivisa = function(){
         var dataInizio = moment($scope.rimborsoMissioneModel.dataInizioMissione).format("DD/MM/YYYY");
-        ProxyService.getDivisa($scope.rimborsoMissioneModel.inquadramento, dataInizio, $scope.rimborsoMissioneModel.nazione).then(function(ret){
-            if (ret && ret.data && ret.data.elements){
-                $scope.divisa = ret.data.elements[0];
+
+        ProxyService.getDatiDivisa("EURO").then(function(ret){
+            if (ret && ret.data){
+                $scope.divisa = ret.data.elements;
+//                ProxyService.validaRiga($scope.rimborsoMissioneModel.inquadramento, dataInizio, $scope.rimborsoMissioneModel.nazione, $scope.divisa.cd_divisa, "AEREO", null, 9999999999, null ).then(function(ret){
+//                    if (ret && ret.data ){
+//                        var rit = ret.data;
+//                    }
+//                });
             }
         });
     }
