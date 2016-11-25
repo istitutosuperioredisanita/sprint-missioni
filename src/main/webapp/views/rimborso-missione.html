@@ -46,7 +46,7 @@
                       <p class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
-                      <select ng-disabled="rimborsoMissioneModel.id" ng-change="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
+                      <select ng-disabled="rimborsoMissioneModel.id || !modalitaPagamentos || !inquadramento|| !elencoOrdiniMissione" ng-change="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
                           </span>
                       </p>
               </form>

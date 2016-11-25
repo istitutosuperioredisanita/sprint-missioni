@@ -87,7 +87,15 @@
                     <p class="col-md-10">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa">tipo spesa</span>
-              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-change="onChangeTipoSpesa(newDettaglioSpesa.cdTiSpesa)" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="pasto">
+                    <p class="col-md-10">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
+              <select class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  ' + tipo_pasto.limite_max_spesa for tipo_pasto in tipi_pasto"></select>
                         </span>
                     </p>
             </form>
@@ -99,7 +107,7 @@
                         </span>
                     </p>
             </form>
-            <form class="form-inline" role="form" id="missioni">
+            <form class="form-inline" role="form" id="missioni" ng-hide="rimborso">
                     <p class="col-md-6">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">tipo spesa</span>
@@ -107,7 +115,7 @@
                         </span>
                     </p>
             </form>
-            <form class="form-inline" role="form" id="missioni">
+            <form class="form-inline" role="form" id="missioni" ng-show="rimborso">
                     <p class="col-md-6">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.km">tipo spesa</span>
