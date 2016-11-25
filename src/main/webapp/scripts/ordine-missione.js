@@ -241,7 +241,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         }
         var objectPostTipoSpesaClauses = [{condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue:nazione},
                                     {condition: 'AND', fieldName: 'condizioneTipiSpesaMissione', operator: "=", fieldValue:"S"},
-                                    {condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:inquadramento},
+                                    {condition: 'AND', fieldName: 'inquadramento', operator: "=", fieldValue:inquadramento},
                                     {condition: 'AND', fieldName: 'data', operator: "=", fieldValue:data},
                                     {condition: 'AND', fieldName: 'ammissibileRimborso', operator: "=", fieldValue:ammissibileRimborso}];
         var objectPostTipoSpesa = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostTipoSpesaClauses}
@@ -250,6 +250,26 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 tipiSpesa = data.elements;
             }
             return tipiSpesa;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
+    var recuperoTipoPasto = function(inquadramento, data, nazione){
+        var urlRestProxy = URL_REST.STANDARD;
+        var tipiPasto = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.TIPO_PASTO;
+        var objectPostTipoPastoClauses = [{condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue:nazione},
+                                    {condition: 'AND', fieldName: 'condizioneTipiPastoMissione', operator: "=", fieldValue:"S"},
+                                    {condition: 'AND', fieldName: 'inquadramento', operator: "=", fieldValue:inquadramento},
+                                    {condition: 'AND', fieldName: 'data', operator: "=", fieldValue:data}];
+        var objectPostTipoPasto = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostTipoPastoClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostTipoPasto, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                tipiPasto = data.elements;
+            }
+            return tipiPasto;
         }).error(function (data) {
             ui.error(data);
         });
@@ -266,6 +286,39 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 divisa = data.elements;
             }
             return divisa;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
+    var recuperoDatiDivisa = function(divisa){
+        var urlRestProxy = URL_REST.STANDARD;
+        var datiDivisa = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.DATI_DIVISA;
+        var objectPostDatiDivisaClauses = [{condition: 'AND', fieldName: 'cd_divisa', operator: "=", fieldValue:divisa}];
+        var objectPostDatiDivisa = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostDatiDivisaClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostDatiDivisa, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                datiDivisa = data.elements;
+            }
+            return datiDivisa;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
+    var validaMassimaleSpesa = function(inquadramento, data, nazione, divisa, cdTipoSpesa, cdTipoPasto, importoSpesa, km){
+        var urlRestProxy = URL_REST.STANDARD;
+        var valida = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.VALIDA_RIGA_RIMBORSO;
+        var objectPost = {"data":data,"nazione":nazione, "inquadramento":inquadramento,"importoSpesa":importoSpesa,"divisa":divisa,"cdTipoSpesa":cdTipoSpesa, "cdTipoPasto":cdTipoPasto, "km":km};
+        return $http.post(urlRestProxy + app+'/?proxyURL='+url, objectPost).success(function (data) {
+            if (data){
+                valida = data;
+            }
+            return valida;
         }).error(function (data) {
             ui.error(data);
         });
@@ -314,8 +367,11 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getInquadramento: recuperoDatiInquadramento ,
              getModalitaPagamento: recuperoModalitaPagamento,
              getTipiSpesa: recuperoTipoSpesa,
+             getTipiPasto: recuperoTipoPasto,
              getMandato: recuperoMandato,
              getDivisa: recuperoDivisa,
+             getDatiDivisa: recuperoDatiDivisa,
+             validaRiga: validaMassimaleSpesa,
              getTerzoModalitaPagamento: recuperoTerzoModalitaPagamento,
              buildPerson: createPerson ,
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,

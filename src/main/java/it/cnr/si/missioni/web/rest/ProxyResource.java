@@ -122,8 +122,12 @@ public class ProxyResource {
     		}
         	result = proxyService.process(httpMethod, body, app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
     	}
+		if (result.getStatus().compareTo(HttpStatus.OK) != 0){
+			
+	    	return new ResponseEntity<String>("", result.getStatus());
+		}
     	response.setContentType(result.getType());
-    	response.setStatus(result.getStatus());
+    	response.setStatus(result.getStatus().value());
 		String risposta = result.getBody();
 		CommonJsonRest<RestServiceBean> commonJsonRest = result.getCommonJsonResponse();
 

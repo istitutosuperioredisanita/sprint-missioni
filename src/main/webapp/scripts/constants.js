@@ -45,9 +45,11 @@ missioniApp.constant('SIGLA_REST', {
         'INQUADRAMENTO': 'ConsInquadramentoAction.json',
         'MANDATO': 'ConsMandatoRevRestAction.json',
         'DIVISA': 'restservice/servizirest/getDivisa',
+        'DATI_DIVISA': 'ConsDivisaAction.json',
         'TIPO_PASTO': 'ConsMissioneTipoPastoAction.json',
         'TIPO_SPESA': 'ConsMissioneTipoSpesaAction.json',
         'BANCA': 'ConsBancaAction.json',
+        'VALIDA_RIGA_RIMBORSO': 'restservice/servizirest/validaMassimaleSpesa',
         'MOD_PAGAMENTO': 'ConsModalitaPagamentoAction.json'
     });
 

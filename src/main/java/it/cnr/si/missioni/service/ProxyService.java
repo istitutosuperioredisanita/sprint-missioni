@@ -148,12 +148,13 @@ public class ProxyService implements EnvironmentAware{
             ResultProxy resultProxy = new ResultProxy();
             resultProxy.setBody(result.getBody());
             resultProxy.setType(result.getHeaders().getContentType().getType());
-            resultProxy.setStatus(result.getStatusCode().value());
+            resultProxy.setStatus(result.getStatusCode());
             log.debug("Response for url : " + proxyURL, resultProxy);
             return resultProxy;
         } catch (HttpClientErrorException _ex) {
-        	log.error(_ex.getMessage(), _ex);
-        	throw new ApplicationContextException(_ex.getMessage(), _ex);
+        	String errResponse = _ex.getResponseBodyAsString();
+        	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
+        	throw new ApplicationContextException(errResponse);
         }    	
     }
 

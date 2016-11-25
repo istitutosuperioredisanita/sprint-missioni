@@ -62,6 +62,34 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         }
     }
 
+    $scope.onChangeTipoSpesa = function (cdTipoSpesa) {
+        if (cdTipoSpesa){
+            if ($scope.tipi_spesa && $scope.tipi_spesa.length > 0){
+                for (var i=0; i<$scope.tipi_spesa.length; i++) {
+                    var tipo_spesa = $scope.tipi_spesa[i];
+                    if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
+                        $scope.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
+                        $scope.pasto = tipo_spesa.fl_pasto;
+                        $scope.rimborso = tipo_spesa.fl_rimborso_km;
+                        $scope.trasporto = tipo_spesa.fl_trasporto;
+                        $scope.alloggio = tipo_spesa.fl_alloggio;
+                        $scope.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;
+                        if ($scope.pasto){
+                            var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                            var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
+                                if (result && result.data){
+                                    $scope.tipi_pasto = result.data.elements;
+                                } else {
+                                    $scope.tipi_pasto = [];
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     $scope.editDettaglioSpesa= function (dettaglioSpesa) {
       dettaglioSpesa.editing = true;
     }
