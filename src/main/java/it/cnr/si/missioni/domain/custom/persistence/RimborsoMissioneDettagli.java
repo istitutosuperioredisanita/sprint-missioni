@@ -79,6 +79,9 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "KM_PERCORSI", length = 10, nullable = true)
     private Long kmPercorsi;
 
+    @Column(name = "FL_SPESA_ANTICIPATA", length = 1, nullable = true)
+    private String flSpesaAnticipata;
+
     @Size(min = 0, max = 10)
     @Column(name = "CD_DIVISA", length = 10, nullable = true)
     private String cdDivisa;
@@ -253,6 +256,14 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 
 	public void setKmPercorsi(Long kmPercorsi) {
 		this.kmPercorsi = kmPercorsi;
+	}
+
+	public String getFlSpesaAnticipata() {
+		return flSpesaAnticipata;
+	}
+
+	public void setFlSpesaAnticipata(String flSpesaAnticipata) {
+		this.flSpesaAnticipata = flSpesaAnticipata;
 	}
 
 	public String getCdDivisa() {

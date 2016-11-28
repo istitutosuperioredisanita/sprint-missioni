@@ -219,9 +219,9 @@ public class OrdineMissioneService {
     			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
         				if (result.isApprovato()){
         					ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
-        					if (ordineMissioneDaAggiornare.getPgObbligazione() != null){
+//        					if (ordineMissioneDaAggiornare.getPgObbligazione() != null){
         						ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-        					}
+//        					}
         					updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
         					listaNew.add(ordineMissione);

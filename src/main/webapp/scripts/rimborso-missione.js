@@ -156,7 +156,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.recuperoDatiTerzoModalitaPagamento = function(terzoSigla, modPag){
-        ProxyService.getTerzoModalitaPagamento(terzoSigla.cd_terzo, modPag.cd_modalita_pag).then(function(ret){
+        ProxyService.getTerzoModalitaPagamento(terzoSigla, modPag).then(function(ret){
             if (ret && ret.data && ret.data.elements){
                 $scope.terzoModalitaPagamentos = ret.data.elements;
             }
@@ -328,7 +328,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 var modalitaPagamento = $scope.modalitaPagamentos[i];
                 if (modalitaPagamento.cd_modalita_pag === modpag){
                     $scope.rimborsoMissioneModel.tipoPagamento = modalitaPagamento.ti_pagamento;
-                    $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla, modalitaPagamento);
+                    $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, modalitaPagamento.cd_modalita_pag);
                 }
             }
         }
@@ -755,6 +755,11 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             $scope.rimborsoMissioneModel.daValidazione = "S";
         }
         $scope.disabilitaRimborsoMissione = impostadisabilitaRimborsoMissione();
+        
+        if ($scope.rimborsoMissioneModel && $scope.rimborsoMissioneModel.ordineMissione){
+            $scope.elencoOrdiniMissione = [];
+            $scope.elencoOrdiniMissione.push($scope.rimborsoMissioneModel.ordineMissione);
+        }
 
         inizializzaForm();
     }
@@ -1028,6 +1033,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                             $scope.accountModel = result;
                             $sessionStorage.accountWork = $scope.accountModel;
                             $scope.recuperoDatiTerzoSigla($scope.accountModel);
+                            if (model.modpag){
+                                $scope.recuperoDatiTerzoModalitaPagamento(model.cdTerzoSigla, model.modpag);
+                            }
                         }
                     });
                 }
