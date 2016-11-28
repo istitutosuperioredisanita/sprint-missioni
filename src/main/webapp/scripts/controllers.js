@@ -5,7 +5,7 @@
 missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
 });
 
-missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService) {
+missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService) {
     $scope.endSearchCmis = false;
     if (!$sessionStorage.account || !$sessionStorage.account.login) {
       $location.path('/login');
@@ -46,10 +46,42 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                     }
                 }
             }
+        });        
+
+        ElencoRimborsiMissioneService.findListToValidate().then(function(response){
+            $scope.listRimborsiMissioniToValidate = response.data;
+            $scope.esistonoRimborsiDaRendereDefinitivi = false;
+            $scope.esistonoRimborsiDaApprovare = false;
+            $scope.esistonoRimborsiAnnullati = false;
+            $scope.esistonoRimborsiApprovati = false;
+            $scope.esistonoRimborsiRespinti = false;
+            $scope.esistonoRimborsiDaConfermare = false;
+            if ($scope.listRimborsiMissioniToValidate){
+                for (var i=0; i< $scope.listRimborsiMissioniToValidate.length; i++) {
+                    if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
+                        $scope.esistonoRimborsiDaApprovare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'R'){
+                        $scope.esistonoRimborsiRespinti = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'C'){
+                        $scope.esistonoRimborsiDaConfermare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'A'){
+                        $scope.esistonoRimborsiApprovati = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'N'){
+                        $scope.esistonoRimborsiAnnullati = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoRimborsiDaValidare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'F'){
+                        $scope.esistonoRimborsiDaRendereDefinitivi = true;
+                    }
+                }
+            }
             $scope.endSearchCmis = true;
         });        
     }
     
+    $scope.doSelectRimborsoMissione = function (rimborsoMissione) {
+        $location.path('/rimborso-missione/'+rimborsoMissione.id);
+    };
     $scope.doSelectOrdineMissione = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id);
     };

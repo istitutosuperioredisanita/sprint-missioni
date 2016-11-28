@@ -27,7 +27,8 @@ public class ResultFlows {
 		this.taskId = taskId;
 	}
 	public Boolean isStateReject(){
-		if (!StringUtils.isEmpty(getState()) && (getState().equals(Costanti.STATO_RESPINTO_SPESA_FROM_CMIS)|| getState().equals(Costanti.STATO_RESPINTO_UO_FROM_CMIS))){
+		if (!StringUtils.isEmpty(getState()) && (getState().equals(Costanti.STATO_RESPINTO_SPESA_FROM_CMIS) || getState().equals(Costanti.STATO_RESPINTO_UO_FROM_CMIS)|| 
+				getState().equals(Costanti.STATO_RESPINTO_UO_RIMBORSO_FROM_CMIS)|| getState().equals(Costanti.STATO_RESPINTO_SPESA_RIMBORSO_FROM_CMIS))){
 			return true;
 		}
 		return false;
@@ -41,7 +42,7 @@ public class ResultFlows {
 	}
 
 	public Boolean isFirmaSpesa(){
-		if (!StringUtils.isEmpty(getState()) && getState().equals(Costanti.STATO_FIRMA_SPESA_FROM_CMIS)){
+		if (!StringUtils.isEmpty(getState()) && (getState().equals(Costanti.STATO_FIRMA_SPESA_FROM_CMIS) || getState().equals(Costanti.STATO_FIRMA_SPESA_RIMBORSO_FROM_CMIS))){
 			return true;
 		}
 		return false;

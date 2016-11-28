@@ -157,7 +157,7 @@ public class RimborsoMissioneService {
         					rimborsoMissione.setCommentFlows(result.getComment());
         					rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
 
-        			    	aggiornaValidazione(rimborsoMissioneDaAggiornare);
+//        			    	aggiornaValidazione(rimborsoMissioneDaAggiornare);
         			    	rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
         			    	rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
         			    	rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);

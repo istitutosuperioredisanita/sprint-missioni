@@ -229,7 +229,7 @@ public class OrdineMissioneService {
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
 
-        			    	aggiornaValidazione(ordineMissioneDaAggiornare);
+//        			    	aggiornaValidazione(ordineMissioneDaAggiornare);
         					ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
         					ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
         					ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);

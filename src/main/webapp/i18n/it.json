@@ -99,7 +99,8 @@
     "main": {
         "wait": "Controllo Flussi Missioni in corso",
         "subtitle_da_confermare": "Ordini di Missione da Confermare",
-        "subtitle_ko": "Flussi Respinti su Missioni",
+        "subtitle_ko": "Flussi Respinti su Ordini di Missione",
+        "subtitle_ko_rimborso": "Flussi Respinti Rimborso Missione",
         "subtitle_ok": "Flussi su Missioni Regolari",
         "subtitle_approvato": "Ultimi Ordini di Missione Approvati",
         "subtitle_annullato": "Ultimi Ordini di Missione Annullati",
