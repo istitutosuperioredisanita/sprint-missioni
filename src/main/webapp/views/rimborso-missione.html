@@ -1,6 +1,15 @@
 <div class="container-fluid">
 
   <h4 center translate="rimborso-missione.title">Rimborso missione</h4>
+  <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.id" align="center">
+                <b>{{'missione.form.numero' | translate}}:</b> {{rimborsoMissioneModel.numero}}  -  
+                <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  -  
+                <b>  {{'missione.form.stato' | translate}}: </b>{{rimborsoMissioneModel.decodeStato}}  -  
+                <b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}
+  </div>
+  <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
+                <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{rimborsoMissioneModel.commentFlows}}  -  
+  </div>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                     <p class="col-md-12">
                         <span class="input-group">
@@ -41,12 +50,12 @@
 
 
 <div class="row">
-  <div class="panel panel-success">
+  <div class="panel panel-success" ng-hide="rimborsoMissioneModel.id">
               <form class="form-inline" role="form" id="missioni">
                       <p class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
-                      <select ng-disabled="rimborsoMissioneModel.id || !modalitaPagamentos || !inquadramento|| !elencoOrdiniMissione" ng-change="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
+                      <select ng-disabled="!modalitaPagamentos || !inquadramento|| !elencoOrdiniMissione" ng-change="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
                           </span>
                       </p>
               </form>
@@ -58,36 +67,13 @@
     <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
   </div>
      <div class="panel-body my-panel-body">
-            <div class="col-md-2">
-              <dl class="align-left dl-horizontal" ng-show="showEsisteRimborsoMissione">
-                <dt translate="missione.form.numero"> Numero</dt>
-                <dd>{{rimborsoMissioneModel.numero}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-3">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showEsisteRimborsoMissione">
-                <dt translate="missione.form.data-inserimento"> Data</dt>
-                <dd>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-3">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showEsisteRimborsoMissione">
-                <dt translate="missione.form.stato"> Stato</dt>
-                <dd>{{rimborsoMissioneModel.decodeStato}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-4">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showEsisteRimborsoMissione">
-                <dt translate="missione.form.stato-flusso"> Stato</dt>
-                <dd>{{rimborsoMissioneModel.decodeStatoFlusso}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-12">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showCommentFlows">
-                <dt translate="missione.form.motivazione-flusso"> Motivazione</dt>
-                <dd>{{rimborsoMissioneModel.commentFlows}}</dd>
-              </dl>
-            </div>
+  <div class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.id" align="center">
+                          <b>{{'ordine-missione.title' | translate}} - {{'missione.form.numero' | translate}}:</b>
+                          {{rimborsoMissioneModel.ordineMissione.anno}}/{{rimborsoMissioneModel.ordineMissione.numero}}
+                          <b> - Dal </b> {{rimborsoMissioneModel.ordineMissione.dataInizioMissione | date:'dd/MM/yyyy'}}
+                          <b> - Al </b>
+                          {{rimborsoMissioneModel.ordineMissione.dataFineMissione | date:'dd/MM/yyyy'}} - {{rimborsoMissioneModel.ordineMissione.destinazione}}
+  </div>
             <form class="form-inline" role="form" id ="missioni">
                 <p class="col-md-6">
                         <span class="input-group">
@@ -173,7 +159,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
-                    <select class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban + ' '  +  terzoModalitaPagamento.quietanza for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
+                    <select class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban  for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
                         </span>
                     </p>
             </form>

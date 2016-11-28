@@ -123,6 +123,7 @@ input:-webkit-autofill {
 
 .subscriptions > li:not(:first-child) {
     border-top: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
 }
 
 
@@ -166,7 +167,7 @@ input:-webkit-autofill {
 }
 
 .my-panel-body {
-  background: #F5F5F5;
+  background: #F5F5F5 !important;
   padding: 8px;
 }
 

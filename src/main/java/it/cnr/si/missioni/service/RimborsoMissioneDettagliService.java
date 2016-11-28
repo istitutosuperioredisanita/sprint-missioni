@@ -3,6 +3,7 @@ package it.cnr.si.missioni.service;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
+import java.math.BigDecimal;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -84,6 +85,9 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagli.setUid(principal.getName());
 		rimborsoMissioneDettagli.setUser(principal.getName());
 		rimborsoMissioneDettagli.setStato(Costanti.STATO_INSERITO);
+		if (rimborsoMissioneDettagli.getTiSpesaDiaria() == null){
+			rimborsoMissioneDettagli.setTiSpesaDiaria("S");
+		}
 		RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissioneDettagli.getRimborsoMissione().getId());
 		rimborsoMissioneDettagli.setRimborsoMissione(rimborsoMissione);
     	Long maxRiga = rimborsoMissioneDettagliRepository.getMaxRigaDettaglio(rimborsoMissione);
@@ -93,6 +97,7 @@ public class RimborsoMissioneDettagliService {
     	maxRiga = maxRiga + 1;
     	rimborsoMissioneDettagli.setRiga(maxRiga);
     	rimborsoMissioneDettagli.setToBeCreated();
+		impostaImportoDivisa(rimborsoMissioneDettagli);
 		validaCRUD(principal, rimborsoMissioneDettagli);
 		rimborsoMissioneDettagli = (RimborsoMissioneDettagli)crudServiceBean.creaConBulk(principal, rimborsoMissioneDettagli);
 //    	autoPropriaRepository.save(autoPropria);
@@ -131,6 +136,12 @@ public class RimborsoMissioneDettagliService {
 		crudServiceBean.modificaConBulk(principal, rimborsoMissioneDettagli);
 	}
 
+	private void impostaImportoDivisa(RimborsoMissioneDettagli rimborsoMissioneDettagli){
+		if (rimborsoMissioneDettagli.getCambio().compareTo(BigDecimal.ONE) == 0){
+			rimborsoMissioneDettagli.setImportoDivisa(rimborsoMissioneDettagli.getImportoEuro());
+		}
+	}
+
     @Transactional(propagation = Propagation.REQUIRED)
     public RimborsoMissioneDettagli updateRimborsoMissioneDettagli(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws AwesomeException, 
     ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
@@ -149,9 +160,10 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setCambio(rimborsoMissioneDettagli.getCambio());
 		rimborsoMissioneDettagliDB.setCdDivisa(rimborsoMissioneDettagli.getCdDivisa());
 		rimborsoMissioneDettagliDB.setImportoEuro(rimborsoMissioneDettagli.getImportoEuro());
-		rimborsoMissioneDettagliDB.setImportoDivisa(rimborsoMissioneDettagli.getImportoDivisa());
+		impostaImportoDivisa(rimborsoMissioneDettagliDB);
 		
 		rimborsoMissioneDettagliDB.setToBeUpdated();
+
 
 
 		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDettagliDB);
