@@ -435,6 +435,7 @@
                     "ds-spesa" : "Descrizione Spesa",
                     "tipologia-pasto" : "Tipo Pasto",
                     "importo": "Importo",
+                    "spesa-anticipata": "Spesa Anticipata",
                     "km": "Km percorsi"
                 },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"

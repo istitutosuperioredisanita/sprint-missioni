@@ -27,36 +27,30 @@
                     <li ng-repeat="dettaglioSpesa in dettagliSpese">
                       <div class="row">
                         <div class="col-md-10">
-
                           <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</b> {{dettaglioSpesa.dataSpesa | date:'dd/MM/yyyy'}}
                           <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa' | translate}}:</b>
                           {{dettaglioSpesa.dsTiSpesa}}
                           <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
+                          <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.flSpesaAnticipata}}
                           <br>
                           <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
-
-
-                          <div ng-show="active === edition.id">
-
-                            <ul class="list-unstyled materials" ng-show="materialsExists">
-                              <li ng-repeat="(name, id) in materials">
+                          <div ng-show="dettaglioSpesa.viewAttachment">
+                            <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists">
+                              <li ng-repeat="(name, id) in dettaglioSpesa.attachments">
                                 <span class="glyphicon glyphicon-download-alt"></span>
                                 <a href="/api/download/repository/{{id}}">
                                   {{name}}
                                 </a>
                               </li>
                             </ul>
-
-                            <h4 ng-hide="materialsExists">
+                            <h4 ng-hide="dettaglioSpesa.attachmentsExists">
                               <span class="label label-warning">nessun allegato disponibile</span>
                             </h4>
-
                           </div>
-
                         </div>
                         <div class="col-md-1-button-large col-md-1 text-right">
-                          <button ng-hide="active === edition.id" class="btn btn-sm btn-default" ng-click="attachments(edition.id)">vedi allegati</button>
-                          <button ng-show="active === edition.id" class="btn btn-sm btn-warning" ng-click="deselect()">nascondi allegati</button>
+                          <button ng-hide="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-default" ng-click="viewAttachments(dettaglioSpesa.id)">Vedi allegati</button>
+                          <button ng-show="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect(dettaglioSpesa.id)">Nascondi allegati</button>
                         </div>
         <div class="col-md-1-button col-md-1 text-right" >
            <button ng-show="validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
@@ -72,13 +66,13 @@
         </div>
       </div>
 
-      <div class="col-md-12 text-center" ng-show="addDettaglioSpesa" id="spostamentoAddAutoPropria">
+      <div class="col-md-12 text-center" ng-show="addDettaglioSpesa" id="addDettaglio">
           <div class="row">
           <div class="col-md-11">
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-2">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.data">tipo spesa</span>
+                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.data">data spesa</span>
               <cnr-widget-date date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" ng-model-date="newDettaglioSpesa.dataSpesa"></cnr-widget-date>
                         </span>
                     </p>
@@ -87,15 +81,15 @@
                     <p class="col-md-10">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa">tipo spesa</span>
-              <select class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-change="onChangeTipoSpesa(newDettaglioSpesa.cdTiSpesa)" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+              <select ng-disabled="!tipi_spesa || tipi_spesa.size() == 0" class="form-control" ng-model="newDettaglioSpesa.cdTiSpesa" ng-change="onChangeTipoSpesa(newDettaglioSpesa.cdTiSpesa)" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
                         </span>
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni" ng-show="pasto">
-                    <p class="col-md-10">
+                    <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
-              <select class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  ' + tipo_pasto.limite_max_spesa for tipo_pasto in tipi_pasto"></select>
+              <select ng-disabled="!tipi_pasto || tipi_pasto.size() == 0" class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
                         </span>
                     </p>
             </form>
@@ -108,10 +102,18 @@
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni" ng-hide="rimborso">
-                    <p class="col-md-6">
+                    <p class="col-md-2">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
+                            <label class="checkbox">
+                                    <input type="checkbox" ng-model="newDettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                    </p>
+                    <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">tipo spesa</span>
-                            <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="" maxlength="25"</input>
+                            <input class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
                         </span>
                     </p>
             </form>
