@@ -30,10 +30,12 @@
                           <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</b> {{dettaglioSpesa.dataSpesa | date:'dd/MM/yyyy'}}
                           <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa' | translate}}:</b>
                           {{dettaglioSpesa.dsTiSpesa}}
+                          <span ng-show="dettaglioSpesa.cdTipoPasto"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto' | translate}}:</b>{{dettaglioSpesa.cdTiPasto}}</span>
                           <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
                           <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.flSpesaAnticipata}}
                           <br>
                           <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
+                          <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
                           <div ng-show="dettaglioSpesa.viewAttachment">
                             <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists">
                               <li ng-repeat="(name, id) in dettaglioSpesa.attachments">

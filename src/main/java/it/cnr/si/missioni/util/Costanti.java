@@ -52,6 +52,10 @@ public class Costanti {
 	public final static String STATO_RESPINTO_SPESA_FROM_CMIS = "RESPINTO SPESA";
 	public final static String STATO_FIRMA_UO_FROM_CMIS = "FIRMA UO";
 	public final static String STATO_FIRMA_SPESA_FROM_CMIS = "FIRMA SPESA";
+	public final static String STATO_RESPINTO_UO_RIMBORSO_FROM_CMIS = "RESPINTO UO RIMBORSO";
+	public final static String STATO_RESPINTO_SPESA_RIMBORSO_FROM_CMIS = "RESPINTO SPESA RIMBORSO";
+	public final static String STATO_FIRMA_UO_RIMBORSO_FROM_CMIS = "FIRMA UO RIMBORSO";
+	public final static String STATO_FIRMA_SPESA_RIMBORSO_FROM_CMIS = "FIRMA SPESA RIMBORSO";
 	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 1000000;
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
@@ -138,6 +142,18 @@ public class Costanti {
         aMap.put(STATO_RESPINTO_SPESA_FROM_CMIS, "Respinto da Uo Spesa");
         aMap.put(STATO_RESPINTO_UO_FROM_CMIS, "Respinto da Uo");
         STATO_FLUSSO_FROM_CMIS = Collections.unmodifiableMap(aMap);
+    }
+
+    public final static Map<String, String> STATO_FLUSSO_RIMBORSO_FROM_CMIS;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(STATO_ANNULLATO_FROM_CMIS, "Annullato");
+        aMap.put(STATO_FIRMA_SPESA_RIMBORSO_FROM_CMIS, "Alla Firma Uo Spesa");
+        aMap.put(STATO_FIRMA_UO_RIMBORSO_FROM_CMIS, "Alla Firma Uo");
+        aMap.put(STATO_FIRMATO_FROM_CMIS, "Approvato");
+        aMap.put(STATO_RESPINTO_SPESA_RIMBORSO_FROM_CMIS, "Respinto da Uo Spesa");
+        aMap.put(STATO_RESPINTO_UO_RIMBORSO_FROM_CMIS, "Respinto da Uo");
+        STATO_FLUSSO_RIMBORSO_FROM_CMIS = Collections.unmodifiableMap(aMap);
     }
 
 }

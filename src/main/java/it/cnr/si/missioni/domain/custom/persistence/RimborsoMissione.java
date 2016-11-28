@@ -100,6 +100,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "NOTE_DIFFERENZE_ORDINE", length = 1000, nullable = true)
     private String noteDifferenzeOrdine;
 
+    @Column(name = "PG_BANCA", length = 4, nullable = true)
+    public Integer pgBanca;
+
 	@ManyToOne
 	@JoinColumn(name="ID_ORDINE_MISSIONE", nullable=true)
 	private OrdineMissione ordineMissione;
@@ -413,7 +416,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
 	public String getDecodeStatoFlusso() {
 		if (!StringUtils.isEmpty(getStateFlows())){
-			return Costanti.STATO_FLUSSO_FROM_CMIS.get(getStateFlows());
+			return Costanti.STATO_FLUSSO_RIMBORSO_FROM_CMIS.get(getStateFlows());
 		} else {
 			if (!StringUtils.isEmpty(getStatoFlusso())){
 				return Costanti.STATO_FLUSSO.get(getStatoFlusso());
@@ -1071,6 +1074,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setRimborsoMissioneDettagli(List<RimborsoMissioneDettagli> rimborsoMissioneDettagli) {
 		this.rimborsoMissioneDettagli = rimborsoMissioneDettagli;
+	}
+
+	public Integer getPgBanca() {
+		return pgBanca;
+	}
+
+	public void setPgBanca(Integer pgBanca) {
+		this.pgBanca = pgBanca;
 	}
 
 }
