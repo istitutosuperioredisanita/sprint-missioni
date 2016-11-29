@@ -19,6 +19,7 @@ import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -51,6 +52,17 @@ public class RimborsoMissioneDettagliService {
 	@Inject
 	private CRUDComponentSession crudServiceBean;
 
+
+    @Transactional(readOnly = true)
+    public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissioneDettagli) throws ComponentException {
+    	RimborsoMissioneDettagli dettaglio = (RimborsoMissioneDettagli)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissioneDettagli);
+		
+		if (dettaglio!= null){
+			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(principal, dettaglio);
+			return lista;
+		}
+		return null;
+    }
 
     @Transactional(readOnly = true)
     public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Principal principal, Long idRimborsoMissione) throws ComponentException {

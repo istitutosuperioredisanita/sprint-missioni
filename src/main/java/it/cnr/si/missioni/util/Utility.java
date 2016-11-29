@@ -1,7 +1,5 @@
 package it.cnr.si.missioni.util;
 
-import it.cnr.jada.bulk.OggettoBulk;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -9,6 +7,9 @@ import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import it.cnr.jada.bulk.OggettoBulk;
+import it.cnr.si.missioni.cmis.MimeTypes;
 
 public class Utility {
 	public static final java.math.BigDecimal ZERO = new java.math.BigDecimal(0);
@@ -124,4 +125,14 @@ public class Utility {
 	public static String getMessageException(Exception e){
 		return e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();		
 	}
+	public static Boolean isTypeOk(String contentType){
+		Boolean typeOk = false; 
+		for(MimeTypes m : MimeTypes.values()) {
+			if (m.mimetype().equals(contentType)){
+				typeOk = true;
+			}
+		}
+		return typeOk;
+	}
+	
 }

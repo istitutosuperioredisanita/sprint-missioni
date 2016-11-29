@@ -42,6 +42,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
@@ -112,6 +113,10 @@ public class CMISRimborsoMissioneService {
 	@Autowired
 	private PrintRimborsoMissioneService printRimborsoMissioneService;
 
+	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, RimborsoMissioneDettagli dettaglio) throws ComponentException{
+		return null;
+	}
+		
 	public CMISRimborsoMissione create(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException{
 		CMISRimborsoMissione cmisRimborsoMissione = new CMISRimborsoMissione();
 		caricaDatiDerivati(principal, rimborsoMissione);
@@ -307,6 +312,21 @@ public class CMISRimborsoMissioneService {
 		return cmisPath;
 	}
 	
+	private CmisPath createLastFolderDettaglioIfNotPresent(CmisPath cmisPath, RimborsoMissioneDettagli dettaglio){
+		Map<String, Object> metadataProperties = new HashMap<String, Object>();
+		String name = dettaglio.constructCMISNomeFile();
+		String folderName = name;
+		folderName = missioniCMISService.sanitizeFolderName(folderName);
+		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_MAIN);
+		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(name));
+		metadataProperties.put(PropertyIds.NAME, missioniCMISService.sanitizeFilename(name));
+// TODO GGGG da aggiungere i metadati 
+		List<String> aspectsToAdd = new ArrayList<String>();
+		aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);
+		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName);
+		return cmisPath;
+	}
+	
 	private Document salvaStampaRimborsoMissioneSuCMIS(Principal principal,
 			byte[] stampa, RimborsoMissione rimborsoMissione,
 			CMISRimborsoMissione cmisRimborsoMissione) {
@@ -330,6 +350,48 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
+	private Folder getFolderRimborso(RimborsoMissione rimborso){
+		StringBuffer query = new StringBuffer("select rim.cmis:objectId from missioni:main missioni join missioni_commons_aspect:rimborso_missione rim on missioni.cmis:objectId = rim.cmis:objectId ");
+		query.append(" where missioni.missioni:id = ").append(rimborso.getId());
+		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
+		if (resultsFolder.getTotalNumItems() == 0)
+			return null;
+		else if (resultsFolder.getTotalNumItems() > 1){
+			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' rimborsi di missione.  Anno:"+ rimborso.getAnno()+ " cds:" +rimborso.getCdsRich() +" numero:"+rimborso.getNumero());
+		} else {
+			for (QueryResult queryResult : resultsFolder) {
+				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
+			}
+		}
+		return null;
+	}
+	
+	private Document salvaAllegatoRimborsoMissioneDettaglioCMIS(Principal principal,
+			RimborsoMissioneDettagli dettaglio, InputStream stream, String fileName,MimeTypes mimeTypes) {
+		
+		Folder folder = (Folder) getFolderRimborso(dettaglio.getRimborsoMissione());
+		CmisPath cmisPath = CmisPath.construct(folder.getPath());
+
+		cmisPath = createLastFolderDettaglioIfNotPresent(cmisPath, dettaglio);
+
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneDettaglio(principal.getName(), dettaglio, fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
+		try{
+			Document node = missioniCMISService.restoreSimpleDocument(
+					metadataProperties,
+					stream,
+					mimeTypes.mimetype(),
+					dettaglio.getFileName(), 
+					cmisPath);
+			missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
+			missioniCMISService.makeVersionable(node);
+			return node;
+		} catch (Exception e) {
+			if (e.getCause() instanceof CmisConstraintException)
+				throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - File ["+dettaglio.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+			throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
+		}
+	}
+
 	private String recuperoUidDirettoreUo(String codiceUo){
 		Uo uo = uoService.recuperoUo(codiceUo);
 		return recuperoUidDirettoreUo(codiceUo, uo);
@@ -342,6 +404,19 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 
+
+	public Map<String, Object> createMetadataForFileRimborsoMissioneDettaglio(String currentLogin, RimborsoMissioneDettagli dettaglio, String fileName, String tipoDocumento){
+		Map<String, Object> metadataProperties = new HashMap<String, Object>();
+		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, RimborsoMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
+		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(fileName));
+		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename(fileName));
+		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ALLEGATO);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, tipoDocumento);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, tipoDocumento);
+
+		return metadataProperties;
+	}
 	public Map<String, Object> createMetadataForFileRimborsoMissione(String currentLogin, CMISRimborsoMissione cmisRimborsoMissione){
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, RimborsoMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
@@ -545,27 +620,26 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 	
-    @Transactional(readOnly = true)
-    public void uploadAllegatoRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, InputStream uploadedAllegatoInputStream) throws AwesomeException, ComponentException {
-    	String fileName = "Allegato1.pdf";
-    	CmisPath cmisPath = createFolderRimborsoMissione(rimborsoMissione);
-    	Map<String, Object> metadataProperties = new HashMap<String, Object>();
-    	try{
-    		Document node = missioniCMISService.restoreSimpleDocument(
-    				metadataProperties,
-    				uploadedAllegatoInputStream,
-    				MimeTypes.PDF.mimetype(),
-    				fileName, 
-    				cmisPath);
-    		missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI.value());
-    		missioniCMISService.makeVersionable(node);
-    	} catch (Exception e) {
-    		if (e.getCause() instanceof CmisConstraintException)
-    			throw new AwesomeException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
-    		throw new AwesomeException("CMIS - Errore nella registrazione del file sul Documentale (" + Utility.getMessageException(e) + ")");
-    	}
-    }
-
+//    @Transactional(readOnly = true)
+//    public void uploadAllegatoRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, InputStream uploadedAllegatoInputStream) throws AwesomeException, ComponentException {
+//    	CmisPath cmisPath = createFolderRimborsoMissione(rimborsoMissione);
+//    	Map<String, Object> metadataProperties = new HashMap<String, Object>();
+//    	try{
+//    		Document node = missioniCMISService.restoreSimpleDocument(
+//    				metadataProperties,
+//    				uploadedAllegatoInputStream,
+//    				MimeTypes.PDF.mimetype(),
+//    				fileName, 
+//    				cmisPath);
+//    		missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI.value());
+//    		missioniCMISService.makeVersionable(node);
+//    	} catch (Exception e) {
+//    		if (e.getCause() instanceof CmisConstraintException)
+//    			throw new AwesomeException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+//    		throw new AwesomeException("CMIS - Errore nella registrazione del file sul Documentale (" + Utility.getMessageException(e) + ")");
+//    	}
+//    }
+//
 	private void avanzaFlusso(RimborsoMissione rimborsoMissione, StringBuffer nodeRefs) throws AwesomeException {
     	avanzaFlusso(rimborsoMissione, nodeRefs, FlowResubmitType.RESTART_FLOW);
     }

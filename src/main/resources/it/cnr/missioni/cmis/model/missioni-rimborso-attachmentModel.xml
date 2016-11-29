@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd">
 	<description>Sigla Dynamic Model</description>
 	<author>gianfranco.gasparro</author>
-	<version>1.0</version>
+	<version>2.0</version>
 	<imports>
 		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
 		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
@@ -22,6 +22,11 @@
 				<property name="missioni_rimborso_attachment:original_name">
 					<title>Nome Originale del File</title>
 					<description>Nome Originale del File</description>
+					<type>d:text</type>
+				</property>
+				<property name="missioni_rimborso_attachment:id_dettaglio_rimborso">
+					<title>Id Collegato</title>
+					<description>Id Collegato</description>
 					<type>d:text</type>
 				</property>
 			</properties>

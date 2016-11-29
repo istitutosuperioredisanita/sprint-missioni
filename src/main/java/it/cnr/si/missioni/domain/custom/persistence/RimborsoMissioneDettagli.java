@@ -2,6 +2,7 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -28,6 +29,8 @@ import org.springframework.util.StringUtils;
 @Table(name = "RIMBORSO_MISSIONE_DETTAGLI")
 public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements Serializable {
 
+	public final static String CMIS_PROPERTY_ATTACHMENT_ID_DETTAGLIO_RIMBORSO = "missioni_rimborso_attachment:id_dettaglio_rimborso";
+	
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -298,5 +301,10 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.cambio = cambio;
 	}
 	
-
+	@Transient
+	public String constructCMISNomeFile() {
+		StringBuffer nomeFile = new StringBuffer();
+		nomeFile = nomeFile.append(Utility.lpad(this.getRiga().toString(),4,'0'));
+		return nomeFile.toString();
+	}
 }
