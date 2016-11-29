@@ -49,6 +49,7 @@ missioniApp.constant('SIGLA_REST', {
         'TIPO_PASTO': 'ConsMissioneTipoPastoAction.json',
         'TIPO_SPESA': 'ConsMissioneTipoSpesaAction.json',
         'BANCA': 'ConsBancaAction.json',
+        'RIMBORSO_KM': 'ConsMissioneRimborsoKmAction',
         'VALIDA_RIGA_RIMBORSO': 'restservice/servizirest/validaMassimaleSpesa',
         'MOD_PAGAMENTO': 'ConsModalitaPagamentoAction.json'
     });

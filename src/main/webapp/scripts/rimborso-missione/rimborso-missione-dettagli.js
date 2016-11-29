@@ -30,6 +30,8 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         $scope.newDettaglioSpesa.flSpesaAnticipata = "N";
         $scope.newDettaglioSpesa.cdDivisa = "EURO";
         $scope.newDettaglioSpesa.cambio = 1;
+        $scope.tipi_pasto = [];
+        $scope.rimborsoKm = null;
     }
 
     $scope.confirmDeleteDettaglioSpesa = function (index) {
@@ -55,6 +57,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     $scope.$on('cambioData', function(event, data) {
         onChangeDataDettaglio();
     });
+
+    $scope.onChangeKm= function (kmPercorsi) {
+        if (kmPercorsi && $scope.rimborsoKm && $scope.rimborsoKm.indennita_chilometrica){
+            $scope.newDettaglioSpesa.importoEuro = kmPercorsi * $scope.rimborsoKm.indennita_chilometrica;
+        }
+    }
 
     var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
@@ -138,6 +146,16 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                     $scope.tipi_pasto = result.data.elements;
                                 } else {
                                     $scope.tipi_pasto = [];
+                                }
+                            });
+                        }
+                        if ($scope.rimborso){
+                            var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                            var tipi = ProxyService.getRimborsoKm("A", dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
+                                if (result && result.data && result.data.elements && result.data.elements.length() > 0){
+                                    $scope.rimborsoKm = result.data.elements[0];
+                                } else {
+                                    $scope.rimborsoKm = [];
                                 }
                             });
                         }
