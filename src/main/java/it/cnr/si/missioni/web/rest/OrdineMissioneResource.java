@@ -4,6 +4,7 @@ import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -316,8 +317,18 @@ public class OrdineMissioneResource {
         log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
         if (idOrdineMissione != null){
             	try {
+            		Boolean typeOk = false; 
+            		for(MimeTypes m : MimeTypes.values()) {
+            			if (m.mimetype().equals(file.getContentType())){
+            				typeOk = true;
+            			}
+            		}
+            		if (!typeOk){
+    	    			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
+            		}
 					ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getName(), file.getContentType());
-				} catch (ComponentException | AwesomeException | IOException e1) {
+					MimeTypes.valueOf(file.getContentType());
+            	} catch (ComponentException | AwesomeException | IOException e1) {
 	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
 				}
             try {
