@@ -151,8 +151,8 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         }
                         if ($scope.rimborso){
                             var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
-                            var tipi = ProxyService.getRimborsoKm("A", dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
-                                if (result && result.data && result.data.elements && result.data.elements.length() > 0){
+                            var tipi = ProxyService.getRimborsoKm("P", dataFormatted, 1).then(function(result){
+                                if (result && result.data && result.data.elements && result.data.elements.length > 0){
                                     $scope.rimborsoKm = result.data.elements[0];
                                 } else {
                                     $scope.rimborsoKm = [];

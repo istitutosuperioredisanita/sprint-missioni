@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.web.rest;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -27,6 +29,8 @@ import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.service.RimborsoMissioneDettagliService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -130,4 +134,52 @@ public class RimborsoMissioneDettagliResource {
 		}
 	}
 
+    @RequestMapping(value = "/rest/rimborsoMissione/dettagli/viewAttachments/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<CMISFileAttachment>> getAttachments(HttpServletRequest request,
+    		@PathVariable Long idRimborsoMissione) {
+        log.debug("REST request per visualizzare gli allegati dei dettagli del Rimborso della Missione" );
+        try {
+            List<CMISFileAttachment> lista = rimborsoMissioneDettagliService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idRimborsoMissione);
+            return new ResponseEntity<>(
+            		lista,
+                    HttpStatus.OK);
+		} catch (ComponentException e) {
+			List<CMISFileAttachment> listaVuota = new ArrayList<CMISFileAttachment>();
+			return new ResponseEntity<>(
+                    listaVuota,
+                    HttpStatus.BAD_REQUEST);
+		} 
+    }
+
+//    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @Timed
+//    public ResponseEntity<?> uploadAllegatiOrdineMissione(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+//        log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
+//        if (idOrdineMissione != null){
+//            	try {
+//            		if (!Utility.isTypeOk(file.getContentType())){
+//    	    			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
+//            		}
+//					ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getName(), file.getContentType());
+//					MimeTypes.valueOf(file.getContentType());
+//            	} catch (ComponentException | AwesomeException | IOException e1) {
+//	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
+//				}
+//            try {
+//                return new ResponseEntity<>(
+//                		null,
+//                        HttpStatus.OK);
+//    		} catch (ComponentException e) {
+//    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//    		} 
+//    	} else {
+//  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+//    	}
+//    }
 }
