@@ -275,6 +275,26 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
+    var recuperoRimborsoKm = function(tipoAuto, data, nazione){
+        var urlRestProxy = URL_REST.STANDARD;
+        var rimborso = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.RIMBORSO_KM;
+        var objectPostRimborsoClauses = [{condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue:nazione},
+                                    {condition: 'AND', fieldName: 'condizioneRimborsoKmMissione', operator: "=", fieldValue:"S"},
+                                    {condition: 'AND', fieldName: 'tipoAuto', operator: "=", fieldValue:tipoAuto},
+                                    {condition: 'AND', fieldName: 'data', operator: "=", fieldValue:data}];
+        var objectPostRimborso = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostRimborsoClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostRimborso, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                rimborso = data.elements;
+            }
+            return rimborso;
+        }).error(function (data) {
+            ui.error(data);
+        });
+    }
+
     var recuperoDivisa = function(inquadramento, data, nazione){
         var urlRestProxy = URL_REST.STANDARD;
         var divisa = [];
@@ -367,6 +387,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getInquadramento: recuperoDatiInquadramento ,
              getModalitaPagamento: recuperoModalitaPagamento,
              getTipiSpesa: recuperoTipoSpesa,
+             getRimborsoKm: recuperoRimborsoKm,
              getTipiPasto: recuperoTipoPasto,
              getMandato: recuperoMandato,
              getDivisa: recuperoDivisa,

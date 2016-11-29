@@ -147,9 +147,9 @@ public class RimborsoMissioneService {
         				RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
         				if (result.isApprovato()){
         					rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
-        					if (rimborsoMissioneDaAggiornare.getPgObbligazione() != null){
+//        					if (rimborsoMissioneDaAggiornare.getPgObbligazione() != null){
         						rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-        					}
+//        					}
         					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
         					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
         					listaNew.add(rimborsoMissione);

@@ -50,7 +50,6 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
 
         ElencoRimborsiMissioneService.findListToValidate().then(function(response){
             $scope.listRimborsiMissioniToValidate = response.data;
-            $scope.esistonoRimborsiDaRendereDefinitivi = false;
             $scope.esistonoRimborsiDaApprovare = false;
             $scope.esistonoRimborsiAnnullati = false;
             $scope.esistonoRimborsiApprovati = false;
@@ -70,8 +69,6 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoRimborsiAnnullati = true;
                     } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
                         $scope.esistonoRimborsiDaValidare = true;
-                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'F'){
-                        $scope.esistonoRimborsiDaRendereDefinitivi = true;
                     }
                 }
             }
