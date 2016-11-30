@@ -38,15 +38,15 @@
                           <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
                           <div ng-show="dettaglioSpesa.viewAttachment">
                             <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists">
-                              <li ng-repeat="(name, id) in dettaglioSpesa.attachments">
+                              <li ng-repeat="(nomeFile, id) in dettaglioSpesa.attachments">
                                 <span class="glyphicon glyphicon-download-alt"></span>
-                                <a href="/api/download/repository/{{id}}">
-                                  {{name}}
+                                <a target="_blank" href="app/rest/public/getAttachment?id={{id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}"><
+                                {{nomeFile}}
                                 </a>
                               </li>
                             </ul>
                             <h4 ng-hide="dettaglioSpesa.attachmentsExists">
-                              <span class="label label-warning">nessun allegato disponibile</span>
+                              <span class="label label-warning">Nessun Allegato Disponibile</span>
                             </h4>
                           </div>
                         </div>

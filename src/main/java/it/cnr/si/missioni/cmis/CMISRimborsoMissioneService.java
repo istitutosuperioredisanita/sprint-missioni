@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -113,7 +114,20 @@ public class CMISRimborsoMissioneService {
 	@Autowired
 	private PrintRimborsoMissioneService printRimborsoMissioneService;
 
-	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, RimborsoMissioneDettagli dettaglio) throws ComponentException{
+	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
+		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
+		if (folder != null){
+	        ItemIterable<CmisObject> children = ((Folder) folder).getChildren();
+	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
+	        for (CmisObject object : children){
+	        	Document doc = (Document)object;
+	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+	        	cmisFileAttachment.setNomeFile(doc.getPropertyValue(PropertyIds.NAME));
+	        	cmisFileAttachment.setId(doc.getId());
+	        	lista.add(cmisFileAttachment);
+	        }
+	        return lista;
+		}
 		return null;
 	}
 		
@@ -317,10 +331,14 @@ public class CMISRimborsoMissioneService {
 		String name = dettaglio.constructCMISNomeFile();
 		String folderName = name;
 		folderName = missioniCMISService.sanitizeFolderName(folderName);
-		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_MAIN);
+		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, RimborsoMissioneDettagli.CMIS_PROPERTY_MAIN);
 		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(name));
 		metadataProperties.put(PropertyIds.NAME, missioniCMISService.sanitizeFilename(name));
-// TODO GGGG da aggiungere i metadati 
+		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_ID_DETTAGLIO_RIMBORSO, dettaglio.getId());
+		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_CD_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getCdTiSpesa());
+		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_DS_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getDsTiSpesa());
+		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_DATA_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getDataSpesa());
+		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getRiga());
 		List<String> aspectsToAdd = new ArrayList<String>();
 		aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName);
@@ -357,11 +375,39 @@ public class CMISRimborsoMissioneService {
 		if (resultsFolder.getTotalNumItems() == 0)
 			return null;
 		else if (resultsFolder.getTotalNumItems() > 1){
-			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' rimborsi di missione.  Anno:"+ rimborso.getAnno()+ " cds:" +rimborso.getCdsRich() +" numero:"+rimborso.getNumero());
+			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' cartelle per lo stesso rimborso missione.  Anno:"+ rimborso.getAnno()+ " cds:" +rimborso.getCdsRich() +" numero:"+rimborso.getNumero());
 		} else {
 			for (QueryResult queryResult : resultsFolder) {
 				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
 			}
+		}
+		return null;
+	}
+	
+	private Folder getFolderDettaglioRimborso(Long idDettagliorimborso){
+		StringBuffer query = new StringBuffer("select rim.cmis:objectId from missioni_rimborso_dettaglio:main missioni ");
+		query.append(" where missioni_rimborso_dettaglio:id = ").append(idDettagliorimborso);
+		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
+		if (resultsFolder.getTotalNumItems() == 0)
+			return null;
+		else if (resultsFolder.getTotalNumItems() > 1){
+			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' cartelle per lo stesso dettaglio di rimborso missione.  Id:"+ idDettagliorimborso);
+		} else {
+			for (QueryResult queryResult : resultsFolder) {
+				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
+			}
+		}
+		return null;
+	}
+	
+	public CMISFileAttachment uploadAttachmentDetail(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes){
+		Document doc = salvaAllegatoRimborsoMissioneDettaglioCMIS(principal, rimborsoMissioneDettagli, inputStream, name, mimeTypes);
+		if (doc != null){
+			String nodeRef = doc.getProperty(MissioniCMISService.ALFCMIS_NODEREF).getValueAsString();
+			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+			cmisFileAttachment.setId(nodeRef);
+			cmisFileAttachment.setNomeFile(name);
+			return cmisFileAttachment;
 		}
 		return null;
 	}
@@ -382,7 +428,7 @@ public class CMISRimborsoMissioneService {
 					mimeTypes.mimetype(),
 					dettaglio.getFileName(), 
 					cmisPath);
-			missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
+			missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_SCONTRINI.value());
 			missioniCMISService.makeVersionable(node);
 			return node;
 		} catch (Exception e) {

@@ -29,7 +29,13 @@ import org.springframework.util.StringUtils;
 @Table(name = "RIMBORSO_MISSIONE_DETTAGLI")
 public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements Serializable {
 
-	public final static String CMIS_PROPERTY_ATTACHMENT_ID_DETTAGLIO_RIMBORSO = "missioni_rimborso_attachment:id_dettaglio_rimborso";
+	public final static String CMIS_PROPERTY_ID_DETTAGLIO_RIMBORSO = "missioni_rimborso_dettaglio:id",			
+			CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:riga",
+			CMIS_PROPERTY_CD_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:cdTiSpesa",
+			CMIS_PROPERTY_DS_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:dsTiSpesa",
+			CMIS_PROPERTY_DATA_SPESA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:dataSpesa",
+			CMIS_PROPERTY_MAIN = "F:missioni_rimborso_dettaglio:main";
+
 	
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
