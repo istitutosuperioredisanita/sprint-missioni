@@ -39,6 +39,7 @@ angular.module('missioniApp')
       scope: {
         ngModelDate: '=',
         dateName: '=',
+        disabilitato: '=',
         labelDate: '=',
         endDate: '=',
         startDate: '='
