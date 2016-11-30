@@ -125,14 +125,13 @@ public class Utility {
 	public static String getMessageException(Exception e){
 		return e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();		
 	}
-	public static Boolean isTypeOk(String contentType){
-		Boolean typeOk = false; 
+	public static MimeTypes getMimeType(String contentType){
 		for(MimeTypes m : MimeTypes.values()) {
 			if (m.mimetype().equals(contentType)){
-				typeOk = true;
+				return m;
 			}
 		}
-		return typeOk;
+		return null;
 	}
 	
 }

@@ -442,6 +442,7 @@
                     "tipologia-pasto" : "Tipo Pasto",
                     "importo": "Importo",
                     "spesa-anticipata": "Spesa Anticipata",
+                    "download-file": "Download File",
                     "km": "Km percorsi"
                 },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"
