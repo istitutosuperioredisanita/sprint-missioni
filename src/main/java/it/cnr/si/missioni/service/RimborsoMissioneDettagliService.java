@@ -3,6 +3,7 @@ package it.cnr.si.missioni.service;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
+import java.io.InputStream;
 import java.math.BigDecimal;
 
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
@@ -28,6 +30,7 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.SecurityUtils;
 
 /**
  * Service class for managing users.
@@ -53,12 +56,20 @@ public class RimborsoMissioneDettagliService {
 	private CRUDComponentSession crudServiceBean;
 
 
-    @Transactional(readOnly = true)
-    public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissioneDettagli) throws ComponentException {
+	@Transactional(readOnly = true)
+    public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
     	RimborsoMissioneDettagli dettaglio = (RimborsoMissioneDettagli)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissioneDettagli);
-		
 		if (dettaglio!= null){
-			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(principal, dettaglio);
+			CMISFileAttachment attachment = cmisRimborsoMissioneService.uploadAttachmentDetail(principal, dettaglio, inputStream, name, mimeTypes);
+			return attachment;
+		}
+		return null;
+	}
+	
+	@Transactional(readOnly = true)
+    public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissioneDettagli) throws ComponentException {
+		if (idRimborsoMissioneDettagli!= null){
+			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(principal, idRimborsoMissioneDettagli);
 			return lista;
 		}
 		return null;

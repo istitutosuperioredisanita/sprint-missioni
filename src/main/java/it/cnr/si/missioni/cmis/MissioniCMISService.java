@@ -575,5 +575,16 @@ public class MissioniCMISService {
 			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
+	public CMISFileContent getAttachment(String nodeRef){
+		CMISFileContent cmisFileContent = new CMISFileContent();
+        CmisObject obj = getNodeByNodeRef(nodeRef);
+        if (obj != null){
+        	cmisFileContent.setStream(getResource(obj));
+        	cmisFileContent.setFileName(obj.getName());
+        	cmisFileContent.setMimeType(obj.getPropertyValue(PropertyIds.CONTENT_STREAM_MIME_TYPE));
+        	return cmisFileContent;
+        }
 
+		return null;
+	}
 }
