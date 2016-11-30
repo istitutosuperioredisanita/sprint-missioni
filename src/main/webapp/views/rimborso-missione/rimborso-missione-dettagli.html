@@ -36,7 +36,7 @@
                           <br>
                           <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
                           <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
-                          <div ng-show="dettaglioSpesa.viewAttachment">
+<!--Commento                          <div ng-show="dettaglioSpesa.viewAttachment">
                             <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists">
                               <li ng-repeat="(nomeFile, id) in dettaglioSpesa.attachments">
                                 <span class="glyphicon glyphicon-download-alt"></span>
@@ -48,7 +48,7 @@
                             <h4 ng-hide="dettaglioSpesa.attachmentsExists">
                               <span class="label label-warning">Nessun Allegato Disponibile</span>
                             </h4>
-                          </div>
+                          </div> -->
                         </div>
                         <div class="col-md-1-button-large col-md-1 text-right">
                           <button ng-hide="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-default" ng-click="viewAttachments(dettaglioSpesa.id)">Vedi allegati</button>
