@@ -58,7 +58,7 @@ public class RimborsoMissioneDettagliService {
 
 	@Transactional(readOnly = true)
     public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
-    	RimborsoMissioneDettagli dettaglio = (RimborsoMissioneDettagli)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissioneDettagli);
+    	RimborsoMissioneDettagli dettaglio = (RimborsoMissioneDettagli)crudServiceBean.findById(principal, RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
 		if (dettaglio!= null){
 			CMISFileAttachment attachment = cmisRimborsoMissioneService.uploadAttachmentDetail(principal, dettaglio, inputStream, name, mimeTypes);
 			return attachment;

@@ -66,14 +66,31 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
-            $scope.tipi_spesa = [];
-            var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
-            var tipi = ProxyService.getTipiSpesa($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione, $scope.rimborsoMissione.trattamento).then(function(result){
-                if (result && result.data){
-                    $scope.tipi_spesa = result.data.elements;
-                }
-            });
+            recuperoTipiSpesa($scope.newDettaglioSpesa.dataSpesa);
         }
+    }
+
+    var prepareModifyDetail = function (dettaglioSpesa) {
+        if (dettaglioSpesa && dettaglioSpesa.dataSpesa){
+            recuperoTipiSpesa(dettaglioSpesa.dataSpesa);
+        }
+    }
+
+    var recuperoTipiSpesa = function(dataSpesa){
+        recuperoTipiSpesa(dataSpesa, null);
+    }
+
+    var recuperoTipiSpesa = function(dataSpesa, cdTipoSpesa){
+        $scope.tipi_spesa = [];
+        var dataFormatted = $filter('date')(dataSpesa, "dd/MM/yyyy");
+        var tipi = ProxyService.getTipiSpesa($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione, $scope.rimborsoMissione.trattamento).then(function(result){
+            if (result && result.data){
+                $scope.tipi_spesa = result.data.elements;
+                if (cdTipoSpesa){
+                    $scope.onChangeTipoSpesa(cdTipoSpesa);
+                }
+            }
+        });
     }
 
     $scope.deselect = function (idDettaglioSpesa) {
@@ -90,23 +107,25 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     $scope.viewAttachments = function (idDettaglioSpesa) {
+        $scope.setUrl(idDettaglioSpesa);
         if (idDettaglioSpesa){
             if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                 for (var i=0; i<$scope.dettagliSpese.length; i++) {
                     var dettaglio = $scope.dettagliSpese[i];
                     if (dettaglio.id === idDettaglioSpesa){
                         if (!dettaglio.isFireSearchAttachments){
-                            $http.get('app/rest/rimborsoMissione/dettagli/viewAttachments/' + id).then(function (data) {
-                                  dettaglio.isFireSearchAttachments = true;
+                            $http.get('app/rest/rimborsoMissione/dettagli/viewAttachments/' + idDettaglioSpesa).then(function (data) {
+                                  $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
-                                  dettaglio.attachmentsExists = attachments && Object.keys(attachments).length > 0;
-                                  dettaglio.attachments = attachments;
+                                  $scope.dettagliSpese[i].attachmentsExists = attachments && Object.keys(attachments).length > 0;
+                                  $scope.dettagliSpese[i].attachments = attachments;
                             }, function () {
-                                  dettaglio.attachmentsExists = false;
-                                  dettaglio.attachments = {};
+                                  $scope.dettagliSpese[i].attachmentsExists = false;
+                                  $scope.dettagliSpese[i].attachments = {};
                             });
                         }
-                        dettaglio.viewAttachment = true;
+                        $scope.dettagliSpese[i].viewAttachment = true;
+                        break;
                     }
                 }
             }
@@ -133,6 +152,44 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     var tipo_spesa = $scope.tipi_spesa[i];
                     if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
                         $scope.newDettaglioSpesa.dsTiSpesa = tipo_spesa.ds_ti_spesa;
+                        $scope.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
+                        $scope.pasto = tipo_spesa.fl_pasto;
+                        $scope.rimborso = tipo_spesa.fl_rimborso_km;
+                        $scope.trasporto = tipo_spesa.fl_trasporto;
+                        $scope.alloggio = tipo_spesa.fl_alloggio;
+                        $scope.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;
+                        if ($scope.pasto){
+                            var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                            var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
+                                if (result && result.data){
+                                    $scope.tipi_pasto = result.data.elements;
+                                } else {
+                                    $scope.tipi_pasto = [];
+                                }
+                            });
+                        }
+                        if ($scope.rimborso){
+                            var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                            var tipi = ProxyService.getRimborsoKm("P", dataFormatted, 1).then(function(result){
+                                if (result && result.data && result.data.elements && result.data.elements.length > 0){
+                                    $scope.rimborsoKm = result.data.elements[0];
+                                } else {
+                                    $scope.rimborsoKm = [];
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $scope.reloadFromTipoSpesa = function (cdTipoSpesa) {
+        if (cdTipoSpesa){
+            if ($scope.tipi_spesa && $scope.tipi_spesa.length > 0){
+                for (var i=0; i<$scope.tipi_spesa.length; i++) {
+                    var tipo_spesa = $scope.tipi_spesa[i];
+                    if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
                         $scope.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
                         $scope.pasto = tipo_spesa.fl_pasto;
                         $scope.rimborso = tipo_spesa.fl_rimborso_km;
@@ -242,6 +299,41 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     inizializzaDati();
+
+    $scope.fileDetailUpload = {
+        autoUpload: true,
+        maxNumberOfFiles: 1,
+        dataType: 'json',
+        done: function (e, data) {
+            if ($scope.idDettaglioSpesaForAttach){
+                if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
+                    for (var i=0; i<$scope.dettagliSpese.length; i++) {
+                        var dettaglio = $scope.dettagliSpese[i];
+                        if (dettaglio.id === $scope.idDettaglioSpesaForAttach){
+                            var attachments = dettaglio.attachments;
+                            if (!attachments){
+                                attachments = [];
+                            }
+                            attachments.push(data.result);
+                            $scope.dettagliSpese[i].attachments = attachments;
+                        }
+                    }
+                }
+                delete $scope.idDettaglioSpesaForAttach;
+            }
+        },
+        fail: function (e, data) {
+            $scope.myError = e;
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer "+$scope.accessToken);
+        }   
+    };
+
+    $scope.setUrl = function (idDettaglioSpesa) {
+        $scope.fileDetailUpload.url = 'app/rest/rimborsoMissione/dettaglio/uploadAllegati/'+idDettaglioSpesa;
+        $scope.idDettaglioSpesaForAttach = idDettaglioSpesa;
+    };
 
 
     $scope.today = function() {

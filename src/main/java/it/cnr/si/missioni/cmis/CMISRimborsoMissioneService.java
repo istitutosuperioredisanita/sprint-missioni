@@ -385,7 +385,7 @@ public class CMISRimborsoMissioneService {
 	}
 	
 	private Folder getFolderDettaglioRimborso(Long idDettagliorimborso){
-		StringBuffer query = new StringBuffer("select rim.cmis:objectId from missioni_rimborso_dettaglio:main missioni ");
+		StringBuffer query = new StringBuffer("select cmis:objectId from missioni_rimborso_dettaglio:main ");
 		query.append(" where missioni_rimborso_dettaglio:id = ").append(idDettagliorimborso);
 		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
 		if (resultsFolder.getTotalNumItems() == 0)
@@ -403,9 +403,8 @@ public class CMISRimborsoMissioneService {
 	public CMISFileAttachment uploadAttachmentDetail(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes){
 		Document doc = salvaAllegatoRimborsoMissioneDettaglioCMIS(principal, rimborsoMissioneDettagli, inputStream, name, mimeTypes);
 		if (doc != null){
-			String nodeRef = doc.getProperty(MissioniCMISService.ALFCMIS_NODEREF).getValueAsString();
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
-			cmisFileAttachment.setId(nodeRef);
+			cmisFileAttachment.setId(doc.getId());
 			cmisFileAttachment.setNomeFile(name);
 			return cmisFileAttachment;
 		}
@@ -426,14 +425,14 @@ public class CMISRimborsoMissioneService {
 					metadataProperties,
 					stream,
 					mimeTypes.mimetype(),
-					dettaglio.getFileName(), 
+					fileName, 
 					cmisPath);
 			missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_SCONTRINI.value());
 			missioniCMISService.makeVersionable(node);
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof CmisConstraintException)
-				throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - File ["+dettaglio.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+				throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
 			throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
 		}
 	}

@@ -104,6 +104,9 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "CAMBIO", length = 19, nullable = true)
     private BigDecimal cambio;
 
+	@Transient
+    private String decodeSpesaAnticipata;
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -189,11 +192,6 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     	}
     	return false;
     }
-
-	@Transient
-    public String getFileName() {
-		return "AnticipoOrdineMissione"+getId()+".pdf";
-	}
 
 	public Long getRiga() {
 		return riga;
@@ -312,5 +310,14 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		StringBuffer nomeFile = new StringBuffer();
 		nomeFile = nomeFile.append(Utility.lpad(this.getRiga().toString(),4,'0'));
 		return nomeFile.toString();
+	}
+
+	@Transient
+	public String getDecodeSpesaAnticipata() {
+		if (!StringUtils.isEmpty(getFlSpesaAnticipata())){
+			return Costanti.SI_NO.get(getFlSpesaAnticipata());
+		} else {
+			return Costanti.SI_NO.get("N");
+		}
 	}
 }

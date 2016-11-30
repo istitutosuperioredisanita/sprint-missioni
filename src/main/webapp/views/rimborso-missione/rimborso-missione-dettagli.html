@@ -26,33 +26,103 @@
                   <ul class="list-unstyled subscriptions">
                     <li ng-repeat="dettaglioSpesa in dettagliSpese">
                       <div class="row">
-                        <div class="col-md-10">
-                          <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</b> {{dettaglioSpesa.dataSpesa | date:'dd/MM/yyyy'}}
-                          <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa' | translate}}:</b>
-                          {{dettaglioSpesa.dsTiSpesa}}
-                          <span ng-show="dettaglioSpesa.cdTipoPasto"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto' | translate}}:</b>{{dettaglioSpesa.cdTiPasto}}</span>
-                          <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
-                          <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.flSpesaAnticipata}}
-                          <br>
-                          <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
-                          <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
-<!--Commento                          <div ng-show="dettaglioSpesa.viewAttachment">
-                            <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists">
-                              <li ng-repeat="(nomeFile, id) in dettaglioSpesa.attachments">
-                                <span class="glyphicon glyphicon-download-alt"></span>
-                                <a target="_blank" href="app/rest/public/getAttachment?id={{id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}"><
-                                {{nomeFile}}
-                                </a>
-                              </li>
-                            </ul>
-                            <h4 ng-hide="dettaglioSpesa.attachmentsExists">
-                              <span class="label label-warning">Nessun Allegato Disponibile</span>
-                            </h4>
-                          </div> -->
+                        <div ng-hide="dettaglioSpesa.editing">
+                          <div class="col-md-10">
+                            <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.data' | translate}}</b> {{dettaglioSpesa.dataSpesa | date:'dd/MM/yyyy'}}
+                            <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa' | translate}}:</b>
+                            {{dettaglioSpesa.dsTiSpesa}}
+                            <span ng-show="dettaglioSpesa.cdTipoPasto"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto' | translate}}:</b>{{dettaglioSpesa.cdTiPasto}}</span>
+                            <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
+                            <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.decodeSpesaAnticipata}}
+                            <br>
+                            <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
+                            <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
+                            <div ng-show="dettaglioSpesa.viewAttachment">
+                              <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists">
+                                <li ng-repeat="attachment in dettaglioSpesa.attachments">
+                                  <span class="glyphicon glyphicon-download-alt"></span>
+                                  <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">
+                                  {{attachment.nomeFile}}
+                                  </a>
+                                </li>
+                              </ul>
+                              <h4 >
+                                  <div class="row fileupload-buttonbar">
+                                    <span ng-hide="dettaglioSpesa.attachmentsExists" class="label label-warning">Nessun Allegato Disponibile</span>
+                                    <form ng-if="fileDetailUpload.url" id="fileupload" method="POST" enctype="multipart/form-data" file-upload="fileDetailUpload">
+                                    <span class="btn-sm btn-success fileinput-button" ng-class="{disabled: disabled}">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                        <span>Aggiungi Allegato</span>
+                                        <input type="file" name="file" multiple ng-disabled="disabled">
+                                    </span>
+                                </div>
+                              </h4>
+                            </div>
+                          </div>
+                          <div class="col-md-1-button-large col-md-1 text-right">
+                            <button ng-hide="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-default" ng-click="viewAttachments(dettaglioSpesa.id)">Allegati</button>
+                            <button ng-show="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect(dettaglioSpesa.id)">Nascondi allegati</button>
+                          </div>
                         </div>
-                        <div class="col-md-1-button-large col-md-1 text-right">
-                          <button ng-hide="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-default" ng-click="viewAttachments(dettaglioSpesa.id)">Vedi allegati</button>
-                          <button ng-show="dettaglioSpesa.viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect(dettaglioSpesa.id)">Nascondi allegati</button>
+                        <div ng-show="dettaglioSpesa.editing">
+                          <div class="col-md-11">
+                            <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-2">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.data">data spesa</span>
+                              <cnr-widget-date disabilitato="dettaglioSpesa.id" date-name="dataSpesa" start-date="inizioMissione" end-date="fineMissione" ng-model-date="dettaglioSpesa.dataSpesa"></cnr-widget-date>
+                                        </span>
+                                    </p>
+                            </form>
+                            <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-10">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-spesa">tipo spesa</span>
+                              <select  ng-disabled="dettaglioSpesa.id" class="form-control" ng-model="dettaglioSpesa.cdTiSpesa" ng-change="onChangeTipoSpesa(dettaglioSpesa.cdTiSpesa)" ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+                                        </span>
+                                    </p>
+                            </form>
+                            <form class="form-inline" role="form" id="missioni" ng-show="pasto">
+                                    <p class="col-md-12">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
+                              <select ng-disabled="!tipi_pasto || tipi_pasto.length() == 0" class="form-control" ng-model="dettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
+                                        </span>
+                                    </p>
+                            </form>
+                            <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-12">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa">ds spesa</span>
+                                        <textarea class="input-sm form-control" ng-model="dettaglioSpesa.dsSpesa" rows = "1"></textarea>
+                                        </span>
+                                    </p>
+                            </form>
+                            <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-2" ng-hide="rimborso">
+                                         <span class="input-group">
+                                            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
+                                            <label class="checkbox">
+                                                    <input type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
+                                            </label>
+                                        </span>
+                                    </p>
+                                    <p class="col-md-3">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
+                                            <input ng-disabled="rimborso" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
+                                        </span>
+                                    </p>
+                            </form>
+                            <form class="form-inline" role="form" id="missioni" ng-show="rimborso">
+                                    <p class="col-md-3">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.km">km</span>
+                                            <input class="form-control align-right" ng-model="dettaglioSpesa.kmPercorsi" ng-change="onChangeKm(dettaglioSpesa.kmPercorsi)" maxlength="20"</input>
+                                        </span>
+                                    </p>
+                            </form>
+                          </div>
                         </div>
         <div class="col-md-1-button col-md-1 text-right" >
            <button ng-show="validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
