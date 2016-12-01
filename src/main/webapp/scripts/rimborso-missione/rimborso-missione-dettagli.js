@@ -39,22 +39,22 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         ui.confirmCRUD("Confermi l'eliminazione del dettaglio della spesa "+dettaglioSpesaDaEliminare.cdTiSpesa+"?", deleteDettaglioSpesa, index);
     }
 
-    $scope.confirmDeleteAttachment = function (id, nomeFile, idDettaglioRimborsoMissione) {
-        ui.confirmCRUD("Confermi l'eliminazione del file "+nomeFile+"?", deleteAttachment, id, idDettaglioRimborsoMissione);
+    $scope.confirmDeleteAttachment = function (attachment) {
+        ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
 
-    var deleteAttachment = function (id, idDettaglioRimborsoMissione) {
+    var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('app/rest/deleteAttachment/' + id);
+        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
         var y = x.then(function (result) {
             if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                 for (var i=0; i<$scope.dettagliSpese.length; i++) {
                     var dettaglio = $scope.dettagliSpese[i];
-                    if (dettaglio.id === idDettaglioRimborsoMissione){
+                    if (dettaglio.id === attachment.idMissione){
                         var attachments = dettaglio.attachments;
                         if (attachments && Object.keys(attachments).length > 0){
-                            newAttachments = attachments.filter(function(el){
-                                return el.id === id;
+                            var newAttachments = attachments.filter(function(el){
+                                return el.id !== attachment.id;
                             });
                             $scope.dettagliSpese[i].attachments = newAttachments;
                             if (Object.keys(newAttachments).length = 0){
@@ -65,7 +65,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                 }
             }
             $rootScope.salvataggio = false;
-            ui.error(data);
+            ui.ok();
         });
         x.error(function (data) {
             $rootScope.salvataggio = false;
@@ -335,6 +335,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         maxNumberOfFiles: 1,
         dataType: 'json',
         done: function (e, data) {
+            $rootScope.salvataggio = false;
             if (data && data.result && data.result.idMissione){
                 if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                     for (var i=0; i<$scope.dettagliSpese.length; i++) {
@@ -353,9 +354,11 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             }
         },
         fail: function (e, data) {
-            ui.error("Errore nel caricamento del file. "+ data.result);
+            $rootScope.salvataggio = false;
+            ui.error("Errore nel caricamento del file. "+ data.jqXHR.responseText);
         },
         beforeSend: function(xhr) {
+            $rootScope.salvataggio = true;
             xhr.setRequestHeader("Authorization", "Bearer "+$scope.accessToken);
         }   
     };
