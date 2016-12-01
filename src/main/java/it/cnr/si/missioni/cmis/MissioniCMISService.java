@@ -185,7 +185,12 @@ public class MissioniCMISService {
 		else	
 			session.delete(cmisObject);
 	}
-	
+
+	public void deleteNode(String nodeRef){
+        CmisObject obj = getNodeByNodeRef(nodeRef);
+        deleteNode(obj);
+	}
+
 	public InputStream getResource(CmisObject cmisObject){
 		ContentStream content = getContent(cmisObject);
 		if (content != null){

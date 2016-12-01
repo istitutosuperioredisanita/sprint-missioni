@@ -42,8 +42,9 @@
                                 <li ng-repeat="attachment in dettaglioSpesa.attachments">
                                   <span class="glyphicon glyphicon-download-alt"></span>
                                   <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">
-                                  {{attachment.nomeFile}}
+                                    {{attachment.nomeFile}}
                                   </a>
+                                  <button class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment.id, attachment.nomeFile, dettaglioSpesa.id)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
                                 </li>
                               </ul>
                               <h4 >
@@ -82,7 +83,7 @@
                                         </span>
                                     </p>
                             </form>
-                            <form class="form-inline" role="form" id="missioni" ng-show="pasto">
+                            <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.pasto">
                                     <p class="col-md-12">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
@@ -99,7 +100,7 @@
                                     </p>
                             </form>
                             <form class="form-inline" role="form" id="missioni">
-                                    <p class="col-md-2" ng-hide="rimborso">
+                                    <p class="col-md-2" ng-hide="dettaglioSpesa.rimborso">
                                          <span class="input-group">
                                             <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
                                             <label class="checkbox">
@@ -110,11 +111,11 @@
                                     <p class="col-md-3">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
-                                            <input ng-disabled="rimborso" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
+                                            <input ng-disabled="dettaglioSpesa.rimborso" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
                                         </span>
                                     </p>
                             </form>
-                            <form class="form-inline" role="form" id="missioni" ng-show="rimborso">
+                            <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.rimborso">
                                     <p class="col-md-3">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.km">km</span>

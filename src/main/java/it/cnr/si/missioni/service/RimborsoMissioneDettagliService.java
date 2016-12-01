@@ -180,14 +180,15 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setDsSpesa(rimborsoMissioneDettagli.getDsSpesa());
 		rimborsoMissioneDettagliDB.setTiSpesaDiaria(rimborsoMissioneDettagli.getTiSpesaDiaria());
 		rimborsoMissioneDettagliDB.setDsTiSpesa(rimborsoMissioneDettagli.getDsTiSpesa());
+		rimborsoMissioneDettagliDB.setNote(rimborsoMissioneDettagli.getNote());
+		rimborsoMissioneDettagliDB.setFlSpesaAnticipata(rimborsoMissioneDettagli.getFlSpesaAnticipata());
+		rimborsoMissioneDettagliDB.setKmPercorsi(rimborsoMissioneDettagli.getKmPercorsi());
 		rimborsoMissioneDettagliDB.setCambio(rimborsoMissioneDettagli.getCambio());
 		rimborsoMissioneDettagliDB.setCdDivisa(rimborsoMissioneDettagli.getCdDivisa());
 		rimborsoMissioneDettagliDB.setImportoEuro(rimborsoMissioneDettagli.getImportoEuro());
 		impostaImportoDivisa(rimborsoMissioneDettagliDB);
 		
 		rimborsoMissioneDettagliDB.setToBeUpdated();
-
-
 
 		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDettagliDB);
     	
