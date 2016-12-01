@@ -133,7 +133,7 @@ public class RimborsoMissioneDettagliResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> deleteSpostamento(@PathVariable Long ids, HttpServletRequest request) {
+    public ResponseEntity<?> deleteDettaglio(@PathVariable Long ids, HttpServletRequest request) {
 		try {
 			rimborsoMissioneDettagliService.deleteRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), ids);
             return new ResponseEntity<>(HttpStatus.OK);
