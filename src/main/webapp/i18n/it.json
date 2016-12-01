@@ -443,6 +443,7 @@
                     "importo": "Importo",
                     "spesa-anticipata": "Spesa Anticipata",
                     "download-file": "Download File",
+                    "remove-file": "Elimina File",
                     "km": "Km percorsi"
                 },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"

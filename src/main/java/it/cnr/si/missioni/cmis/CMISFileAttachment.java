@@ -1,9 +1,16 @@
 package it.cnr.si.missioni.cmis;
 
 public class CMISFileAttachment {
+	private Long idMissione;
 	private String id;
 	private String nomeFile;
 	private String tipo;
+	public Long getIdMissione() {
+		return idMissione;
+	}
+	public void setIdMissione(Long idMissione) {
+		this.idMissione = idMissione;
+	}
 	public String getId() {
 		return id;
 	}
