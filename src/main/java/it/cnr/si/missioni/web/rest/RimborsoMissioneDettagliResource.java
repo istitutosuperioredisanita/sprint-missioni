@@ -245,4 +245,28 @@ public class RimborsoMissioneDettagliResource {
     		} 
         }
     }
+
+    @RequestMapping(value = "/rest/deleteAttachment",
+            method = RequestMethod.GET)
+    @Timed
+    public ResponseEntity<?> deleteAttachment(HttpServletRequest request,
+            @RequestParam(value = "id") String id, @RequestParam(value = "token") String token, HttpServletResponse res) {
+        log.debug("REST request per il downlaod degli allegati " );
+        
+        if (!StringUtils.isEmpty(id)){
+            try {
+                OAuth2Authentication auth = tokenStore.readAuthentication(token);
+                if (auth != null){
+                    missioniCMISService.deleteNode(id);
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                }
+            } catch (AwesomeException e) {
+                throw new RuntimeException(Utility.getMessageException(e));
+            } 
+        } else {
+            return new ResponseEntity<>("Id Allegato non valorizzato", HttpStatus.BAD_REQUEST);
+        }
+    }
 }

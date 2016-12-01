@@ -124,6 +124,7 @@ public class CMISRimborsoMissioneService {
 	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 	        	cmisFileAttachment.setNomeFile(doc.getPropertyValue(PropertyIds.NAME));
 	        	cmisFileAttachment.setId(doc.getId());
+	        	cmisFileAttachment.setIdMissione(idDettagliorimborso);
 	        	lista.add(cmisFileAttachment);
 	        }
 	        return lista;
@@ -406,6 +407,7 @@ public class CMISRimborsoMissioneService {
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 			cmisFileAttachment.setId(doc.getId());
 			cmisFileAttachment.setNomeFile(name);
+	        cmisFileAttachment.setIdMissione(new Long(rimborsoMissioneDettagli.getId().toString()));
 			return cmisFileAttachment;
 		}
 		return null;
