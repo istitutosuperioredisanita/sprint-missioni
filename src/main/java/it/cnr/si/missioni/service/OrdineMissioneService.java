@@ -611,9 +611,7 @@ public class OrdineMissioneService {
 	public void deleteOrdineMissione(Principal principal, Long idOrdineMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
 		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
 		if (ordineMissione != null){
-			if (!ordineMissione.isMissioneInserita()){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile cancellare un ordine di missione che non si trova in uno stato "+Costanti.STATO.get(Costanti.STATO_INSERITO));
-			}
+			controlloOperazioniCRUDDaGui(ordineMissione);
 			ordineMissioneAnticipoService.deleteAnticipo(principal, ordineMissione);
 			ordineMissioneAutoPropriaService.deleteAutoPropria(principal, ordineMissione);
 			//effettuo controlli di validazione operazione CRUD
@@ -623,6 +621,12 @@ public class OrdineMissioneService {
 				cmisOrdineMissioneService.annullaFlusso(ordineMissione);
 			}
 			crudServiceBean.modificaConBulk(principal, ordineMissione);
+		}
+	}
+
+	public void controlloOperazioniCRUDDaGui(OrdineMissione ordineMissione) {
+		if (!ordineMissione.isMissioneInserita()){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile effettuare l'operazione su un ordine di missione che non si trova in uno stato "+Costanti.STATO.get(Costanti.STATO_INSERITO));
 		}
 	}
 	

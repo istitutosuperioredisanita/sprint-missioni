@@ -537,7 +537,7 @@ public class MissioniCMISService {
 		}
 	}
 	
-	public void restartFlowOrdineMissione(StringWriter stringWriter, ResultFlows result) {
+	public void restartFlow(StringWriter stringWriter, ResultFlows result) {
 
 		try {
 			String url = getRepositoryURL()+"service/api/task/"+result.getTaskId()+"/formprocessor";
@@ -552,7 +552,7 @@ public class MissioniCMISService {
 		}
 	}
 
-	private void nextStepForRestartFlowOrdineMissione(ResultFlows result) {
+	private void nextStepForRestartFlow(ResultFlows result) {
 		try {
 			String next = "next";
 			Response responseNext = invokePOST(new UrlBuilder(getRepositoryURL()+"service/api/workflow/task/end/"+result.getTaskId()+"/Next" ), MimeTypes.JSON, next.getBytes());
@@ -565,7 +565,7 @@ public class MissioniCMISService {
 		}
 	}
 
-	public void abortFlowOrdineMissione(StringWriter stringWriter, ResultFlows result) {
+	public void abortFlow(StringWriter stringWriter, ResultFlows result) {
 
 		try {
 			String url = getRepositoryURL()+"service/api/task-instances/"+result.getTaskId();
@@ -573,7 +573,7 @@ public class MissioniCMISService {
 			Response responsePut = invokePUT(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes(), null);
 			if (responsePut.getResponseCode()!=200) 
 				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: "+ responsePut.getErrorContent()+".");
-			nextStepForRestartFlowOrdineMissione(result);
+			nextStepForRestartFlow(result);
 		} catch (CMISException e) {
 			throw e;
 		} catch (Exception e) {

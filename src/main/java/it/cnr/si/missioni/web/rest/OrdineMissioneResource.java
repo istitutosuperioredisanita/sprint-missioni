@@ -308,38 +308,38 @@ public class OrdineMissioneResource {
 		} 
     }
 
-    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Timed
-    public ResponseEntity<?> uploadAllegatiOrdineMissione(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
-        log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
-        if (idOrdineMissione != null){
-            	try {
-            		Boolean typeOk = false; 
-            		for(MimeTypes m : MimeTypes.values()) {
-            			if (m.mimetype().equals(file.getContentType())){
-            				typeOk = true;
-            			}
-            		}
-            		if (!typeOk){
-    	    			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
-            		}
-					ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getName(), file.getContentType());
-					MimeTypes.valueOf(file.getContentType());
-            	} catch (ComponentException | AwesomeException | IOException e1) {
-	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
-				}
-            try {
-                return new ResponseEntity<>(
-                		null,
-                        HttpStatus.OK);
-    		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    		} 
-    	} else {
-  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
-    	}
-    }
+//    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
+//            method = RequestMethod.POST,
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @Timed
+//    public ResponseEntity<?> uploadAllegatiOrdineMissione(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+//        log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
+//        if (idOrdineMissione != null){
+//            	try {
+//            		Boolean typeOk = false; 
+//            		for(MimeTypes m : MimeTypes.values()) {
+//            			if (m.mimetype().equals(file.getContentType())){
+//            				typeOk = true;
+//            			}
+//            		}
+//            		if (!typeOk){
+//    	    			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
+//            		}
+//					ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getName(), file.getContentType());
+//					MimeTypes.valueOf(file.getContentType());
+//            	} catch (ComponentException | AwesomeException | IOException e1) {
+//	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
+//				}
+//            try {
+//                return new ResponseEntity<>(
+//                		null,
+//                        HttpStatus.OK);
+//    		} catch (ComponentException e) {
+//    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//    		} 
+//    	} else {
+//  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+//    	}
+//    }
 }

@@ -129,13 +129,13 @@ public class RimborsoMissioneDettagliResource {
     	}
     }
 
-    @RequestMapping(value = "/rest/rimborsoMissione/dettagli/{ids}",
+    @RequestMapping(value = "/rest/rimborsoMissione/dettagli/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> deleteDettaglio(@PathVariable Long ids, HttpServletRequest request) {
+    public ResponseEntity<?> deleteDettaglio(@PathVariable Long id, HttpServletRequest request) {
 		try {
-			rimborsoMissioneDettagliService.deleteRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), ids);
+			rimborsoMissioneDettagliService.deleteRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), id);
             return new ResponseEntity<>(HttpStatus.OK);
 		} catch (AwesomeException e) {
 			return e.getResponse();

@@ -36,7 +36,22 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.confirmDeleteDettaglioSpesa = function (index) {
         var dettaglioSpesaDaEliminare = $scope.dettagliSpese[index];
-        ui.confirmCRUD("Confermi l'eliminazione del dettaglio della spesa "+dettaglioSpesaDaEliminare.cdTiSpesa+"?", deleteDettaglioSpesa, index);
+        ui.confirmCRUD("Confermi l'eliminazione del dettaglio spesa: "+dettaglioSpesaDaEliminare.dsTiSpesa+" del "+$filter('date')(dettaglioSpesaDaEliminare.dataSpesa, COSTANTI.FORMATO_DATA)+"?", deleteDettaglioSpesa, index);
+    }
+
+    var deleteDettaglioSpesa = function (index) {
+        var dettaglioSpesaDaEliminare = $scope.dettagliSpese[index];
+        $rootScope.salvataggio = true;
+        $http.delete('app/rest/rimborsoMissione/dettagli/' + dettaglioSpesaDaEliminare.id).success(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                        $scope.dettaglioSpesaDaEliminare.splice(index,1);
+                    }).error(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                        ui.error(data);
+                    }
+            );
     }
 
     $scope.confirmDeleteAttachment = function (attachment) {
@@ -126,7 +141,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     $scope.viewAttachments = function (idDettaglioSpesa) {
-        $scope.setUrl(idDettaglioSpesa);
         if (idDettaglioSpesa){
             if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                 for (var i=0; i<$scope.dettagliSpese.length; i++) {
@@ -134,11 +148,13 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     if (dettaglio.id === idDettaglioSpesa){
                         if (!dettaglio.isFireSearchAttachments){
                             $http.get('app/rest/rimborsoMissione/dettagli/viewAttachments/' + idDettaglioSpesa).then(function (data) {
+                                  $scope.setUrl(idDettaglioSpesa);
                                   $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
                                   $scope.dettagliSpese[i].attachmentsExists = attachments && Object.keys(attachments).length > 0;
                                   $scope.dettagliSpese[i].attachments = attachments;
                             }, function () {
+                                  $scope.setUrl(idDettaglioSpesa);
                                   $scope.dettagliSpese[i].attachmentsExists = false;
                                   $scope.dettagliSpese[i].attachments = {};
                             });
