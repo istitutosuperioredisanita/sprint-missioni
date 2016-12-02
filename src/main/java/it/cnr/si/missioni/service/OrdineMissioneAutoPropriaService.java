@@ -63,6 +63,10 @@ public class OrdineMissioneAutoPropriaService {
     private PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
 
     @Autowired
+    private OrdineMissioneService ordineMissioneService;
+
+    
+    @Autowired
     private MissioniCMISService missioniCMISService;
 
     @Autowired
@@ -111,6 +115,9 @@ public class OrdineMissioneAutoPropriaService {
     	ordineMissioneAutoPropria.setUid(principal.getName());
     	ordineMissioneAutoPropria.setUser(principal.getName());
     	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissioneAutoPropria.getOrdineMissione().getId());
+    	if (ordineMissione != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
+    	}
     	ordineMissioneAutoPropria.setOrdineMissione(ordineMissione);
     	ordineMissioneAutoPropria.setStato(Costanti.STATO_INSERITO);
     	ordineMissioneAutoPropria.setToBeCreated();
@@ -151,6 +158,10 @@ public class OrdineMissioneAutoPropriaService {
     	spostamentoAutoPropria.setUser(principal.getName());
     	spostamentoAutoPropria.setStato(Costanti.STATO_INSERITO);
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.findById(principal, OrdineMissioneAutoPropria.class, spostamentoAutoPropria.getOrdineMissioneAutoPropria().getId());
+    	if (ordineMissioneAutoPropria != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropria.getOrdineMissione());
+    	}
+
     	spostamentoAutoPropria.setOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
     	Long maxRiga = spostamentiAutoPropriaRepository.getMaxRigaSpostamenti(ordineMissioneAutoPropria);
     	if (maxRiga == null ){
@@ -175,6 +186,9 @@ public class OrdineMissioneAutoPropriaService {
 		if (ordineMissioneAutoPropriaDB==null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Auto Propria Ordine di Missione da aggiornare inesistente.");
 		
+    	if (ordineMissioneAutoPropriaDB.getOrdineMissione() != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropriaDB.getOrdineMissione());
+    	}
 		ordineMissioneAutoPropriaDB.setTarga(ordineMissioneAutoPropria.getTarga());
 		ordineMissioneAutoPropriaDB.setMarca(ordineMissioneAutoPropria.getMarca());
 		ordineMissioneAutoPropriaDB.setModello(ordineMissioneAutoPropria.getModello());
@@ -271,6 +285,9 @@ public class OrdineMissioneAutoPropriaService {
 		if (spostamentiAutoPropriaDB==null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Spostamenti Auto Propria Ordine di Missione da aggiornare inesistente.");
 		
+    	if (spostamentiAutoPropriaDB.getOrdineMissioneAutoPropria().getOrdineMissione() != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(spostamentiAutoPropriaDB.getOrdineMissioneAutoPropria().getOrdineMissione());
+    	}
 		spostamentiAutoPropriaDB.setPercorsoDa(spostamentiAutoPropria.getPercorsoDa());
 		spostamentiAutoPropriaDB.setPercorsoA(spostamentiAutoPropria.getPercorsoA());
 		

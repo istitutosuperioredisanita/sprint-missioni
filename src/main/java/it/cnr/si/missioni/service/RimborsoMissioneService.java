@@ -131,7 +131,7 @@ public class RimborsoMissioneService {
 		return rimborsoMissione;
     }
 
-	private void retrieveDetails(Principal principal, RimborsoMissione rimborsoMissione) {
+	private void retrieveDetails(Principal principal, RimborsoMissione rimborsoMissione) throws NumberFormatException, ComponentException {
 		List<RimborsoMissioneDettagli> list = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli(principal, new Long(rimborsoMissione.getId().toString()));
 		rimborsoMissione.setRimborsoMissioneDettagli(list);
 	}
@@ -317,17 +317,20 @@ public class RimborsoMissioneService {
 	public void deleteRimborsoMissione(Principal principal, Long idRimborsoMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
     	RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
 		if (rimborsoMissione != null){
-			if (!rimborsoMissione.isMissioneInserita()){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile cancellare un rimborso di missione che non si trova in uno stato "+Costanti.STATO.get(Costanti.STATO_INSERITO));
-			}
-			rimborsoMissioneDettagliService.cancellaRimborsoMissioneDettagli(principal, rimborsoMissione);
-			//effettuo controlli di validazione operazione CRUD
+			controlloOperazioniCRUDDaGui(rimborsoMissione);
+			rimborsoMissioneDettagliService.cancellaRimborsoMissioneDettagli(principal, rimborsoMissione, false);
 			rimborsoMissione.setStato(Costanti.STATO_ANNULLATO);
 			rimborsoMissione.setToBeUpdated();
 			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
 				cmisRimborsoMissioneService.annullaFlusso(rimborsoMissione);
 			}
 			crudServiceBean.modificaConBulk(principal, rimborsoMissione);
+		}
+	}
+
+	public void controlloOperazioniCRUDDaGui(RimborsoMissione rimborsoMissione) {
+		if (!rimborsoMissione.isMissioneInserita()){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile effettuare l'operazione su un Rimborso che non si trova in uno stato "+Costanti.STATO.get(Costanti.STATO_INSERITO));
 		}
 	}
 	
