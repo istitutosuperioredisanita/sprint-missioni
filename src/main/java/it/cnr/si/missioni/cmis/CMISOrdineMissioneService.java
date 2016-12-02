@@ -728,10 +728,10 @@ public class CMISOrdineMissioneService {
     	if (!StringUtils.isEmpty(result.getTaskId())){
     		if (step.equals(FlowResubmitType.ABORT_FLOW.operation())){
         		StringWriter stringWriter = createJsonForAbortFlowOrdineMissione();
-        		missioniCMISService.abortFlowOrdineMissione(stringWriter, result);
+        		missioniCMISService.abortFlow(stringWriter, result);
     		} else {
     			StringWriter stringWriter = createJsonForRestartFlowOrdineMissione(nodeRefs);
-        		missioniCMISService.restartFlowOrdineMissione(stringWriter, result);
+        		missioniCMISService.restartFlow(stringWriter, result);
     		}
     	} else {
     		throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");

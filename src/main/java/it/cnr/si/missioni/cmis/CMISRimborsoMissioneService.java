@@ -132,6 +132,20 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 		
+	public void deleteFolderRimborsoMissioneDettaglio(RimborsoMissioneDettagli dettaglio) throws ComponentException{
+		Folder folder = getFolderDettaglioRimborso(new Long (dettaglio.getId().toString()));
+		if (folder != null){
+        	missioniCMISService.deleteNode(folder);
+		}
+	}
+	
+	public void deleteFolderRimborsoMissione(RimborsoMissione rimborso) throws ComponentException{
+		Folder folder = getFolderRimborso(rimborso);
+		if (folder != null){
+        	missioniCMISService.deleteNode(folder);
+		}
+	}
+	
 	public CMISRimborsoMissione create(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException{
 		CMISRimborsoMissione cmisRimborsoMissione = new CMISRimborsoMissione();
 		caricaDatiDerivati(principal, rimborsoMissione);
@@ -723,10 +737,10 @@ public class CMISRimborsoMissioneService {
     	if (!StringUtils.isEmpty(result.getTaskId())){
     		if (step.equals(FlowResubmitType.ABORT_FLOW.operation())){
         		StringWriter stringWriter = createJsonForAbortFlowOrdineMissione();
-//        		missioniCMISService.abortFlowOrdineMissione(stringWriter, result);
+        		missioniCMISService.abortFlow(stringWriter, result);
     		} else {
     			StringWriter stringWriter = createJsonForRestartFlowOrdineMissione(nodeRefs);
-//        		missioniCMISService.restartFlowOrdineMissione(stringWriter, result);
+        		missioniCMISService.restartFlow(stringWriter, result);
     		}
     	} else {
     		throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
