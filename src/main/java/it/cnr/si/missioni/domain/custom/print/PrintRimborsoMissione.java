@@ -32,6 +32,8 @@ public class PrintRimborsoMissione extends PrintMissione{
 
     private String cdTerzo;
 
+    private String totMissione;
+
 	private List<PrintRimborsoMissioneDettagli> printDettagliSpeseRimborsoMissione = new ArrayList<PrintRimborsoMissioneDettagli>();
 
 	public String getDataInizioEstero() {
@@ -153,5 +155,13 @@ public class PrintRimborsoMissione extends PrintMissione{
 	public void setPrintDettagliSpeseRimborsoMissione(
 			List<PrintRimborsoMissioneDettagli> printDettagliSpeseRimborsoMissione) {
 		this.printDettagliSpeseRimborsoMissione = printDettagliSpeseRimborsoMissione;
+	}
+
+	public String getTotMissione() {
+		return totMissione;
+	}
+
+	public void setTotMissione(String totMissione) {
+		this.totMissione = totMissione;
 	}
 }
