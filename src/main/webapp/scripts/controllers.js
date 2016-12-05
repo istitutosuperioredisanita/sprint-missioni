@@ -76,6 +76,9 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         });        
     }
     
+    $scope.doSelectRimborsoMissioneValidazione = function (rimborsoMissione) {
+        $location.path('/rimborso-missione/'+rimborsoMissione.id+'/'+"S");
+    };
     $scope.doSelectRimborsoMissione = function (rimborsoMissione) {
         $location.path('/rimborso-missione/'+rimborsoMissione.id);
     };
