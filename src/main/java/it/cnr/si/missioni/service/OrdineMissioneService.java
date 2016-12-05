@@ -194,9 +194,9 @@ public class OrdineMissioneService {
     	} else {
     		fileName = "OrdineMissione"+idMissione+".pdf";
     		printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-//    		if (ordineMissione.isMissioneInserita()){
-//    			cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, printOrdineMissione, ordineMissione);
-//    		}
+    		if (ordineMissione.isMissioneInserita()){
+    			cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, printOrdineMissione, ordineMissione);
+    		}
     		map.put(fileName, printOrdineMissione);
     	}
 		return map;
@@ -475,6 +475,7 @@ public class OrdineMissioneService {
     	
     	ordineMissione.setStato(Costanti.STATO_INSERITO);
     	ordineMissione.setStatoFlusso(Costanti.STATO_INSERITO);
+
     	ordineMissione.setToBeCreated();
     }
 
@@ -692,6 +693,9 @@ public class OrdineMissioneService {
 		}
 		if (StringUtils.isEmpty(ordineMissione.getIdFlusso()) &&  ordineMissione.isStatoInviatoAlFlusso()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
+		} 
+		if (!ordineMissione.isMissioneEstera()){
+			ordineMissione.setNazione(new Long("1"));
 		} 
 	}
 	

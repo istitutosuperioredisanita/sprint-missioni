@@ -359,11 +359,11 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         if (dettaglio.id === data.result.idMissione){
                             var attachments = dettaglio.attachments;
                             if (!attachments){
-                                attachments = {};
+                                attachments = [];
                             }
-                            attachments.push(data.result);
                             $scope.dettagliSpese[i].attachmentsExists = true;
                             $scope.dettagliSpese[i].attachments = attachments;
+                            $scope.dettagliSpese[i].attachments.push(data.result);
                         }
                     }
                 }

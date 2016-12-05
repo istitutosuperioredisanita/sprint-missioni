@@ -305,12 +305,12 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
-//	@Transactional(readOnly = true)
-//	private Document salvaStampaRimborsoMissioneSuCMIS(Principal principal, byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
-//		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
-//		return salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
-//	}
-//	
+	@Transactional(readOnly = true)
+	public Document salvaStampaRimborsoMissioneSuCMIS(Principal principal, byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
+		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
+		return salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
+	}
+	
 	public CmisPath createFolderRimborsoMissione(RimborsoMissione rimborsoMissione){
 		CmisPath cmisPath = missioniCMISService.getBasePath();
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoRich());
@@ -439,7 +439,12 @@ public class CMISRimborsoMissioneService {
 			RimborsoMissioneDettagli dettaglio, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
 		Folder folder = (Folder) getFolderRimborso(dettaglio.getRimborsoMissione());
-		CmisPath cmisPath = CmisPath.construct(folder.getPath());
+		CmisPath cmisPath = null;
+		if (folder == null){
+			cmisPath = createFolderRimborsoMissione(dettaglio.getRimborsoMissione());
+		} else {
+			cmisPath = CmisPath.construct(folder.getPath());
+		}
 
 		cmisPath = createLastFolderDettaglioIfNotPresent(cmisPath, dettaglio);
 
