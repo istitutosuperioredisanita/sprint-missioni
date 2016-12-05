@@ -150,7 +150,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.modalita-pagamento">Modalita di Pagamento</span>
-                    <select class="form-control" id="missioni" ng-model="rimborsoMissioneModel.modpag" ng-change="onChangeModpag()" ng-options="modalitaPagamento.cd_modalita_pag as modalitaPagamento.ds_modalita_pag for modalitaPagamento in modalitaPagamentos"></select>
+                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-model="rimborsoMissioneModel.modpag" ng-change="onChangeModpag()" ng-options="modalitaPagamento.cd_modalita_pag as modalitaPagamento.ds_modalita_pag for modalitaPagamento in modalitaPagamentos"></select>
                         </span>
                     </p>
             </form>
@@ -159,7 +159,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
-                    <select class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
+                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
                         </span>
                     </p>
             </form>
@@ -202,7 +202,7 @@
                     <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
-                          <input ng-disabled="rimborsoMissioneModel.idOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
+                          <input ng-disabled="rimborsoMissioneModel.idOrdineMissione || validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
                         </span>
                     </p>
             </form>
