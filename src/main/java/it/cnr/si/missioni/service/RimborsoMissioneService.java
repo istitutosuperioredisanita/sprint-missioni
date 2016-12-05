@@ -157,7 +157,7 @@ public class RimborsoMissioneService {
         					rimborsoMissione.setCommentFlows(result.getComment());
         					rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
 
-//        			    	aggiornaValidazione(rimborsoMissioneDaAggiornare);
+        			    	aggiornaValidazione(rimborsoMissioneDaAggiornare);
         			    	rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
         			    	rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
         			    	rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
@@ -259,7 +259,11 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
 			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
 			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
-			rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
+			if (confirm){
+				aggiornaValidazione(rimborsoMissioneDB);
+			} else {
+				rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
+			}
 			rimborsoMissioneDB.setOggetto(rimborsoMissione.getOggetto());
 			rimborsoMissioneDB.setTipoMissione(rimborsoMissione.getTipoMissione());
 			rimborsoMissioneDB.setVoce(rimborsoMissione.getVoce());
@@ -299,6 +303,11 @@ public class RimborsoMissioneService {
 
     	rimborsoMissioneDB.setToBeUpdated();
     	retrieveDetails(principal, rimborsoMissioneDB);
+		if (confirm){
+			if (assenzaDettagli(rimborsoMissioneDB)){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile confermare un rimborso missione senza aver indicato nessun dettaglio di spesa.");
+			}
+		}
 //		//effettuo controlli di validazione operazione CRUD
 		validaCRUD(principal, rimborsoMissioneDB);
 
@@ -312,6 +321,13 @@ public class RimborsoMissioneService {
 
     	return rimborsoMissione;
     }
+
+	public Boolean assenzaDettagli(RimborsoMissione rimborsoMissioneDB) {
+		if (rimborsoMissioneDB.getRimborsoMissioneDettagli() == null || rimborsoMissioneDB.getRimborsoMissioneDettagli().isEmpty() ){
+			return true;
+		}
+		return false;
+	}
 
     @Transactional(propagation = Propagation.REQUIRED)
 	public void deleteRimborsoMissione(Principal principal, Long idRimborsoMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
@@ -767,10 +783,8 @@ public class RimborsoMissioneService {
 
 	@Transactional(readOnly = true)
    	public Map<String, byte[]> printRimborsoMissione(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
-    	String username = SecurityUtils.getCurrentUserLogin();
     	Principal principal = (Principal)auth;
     	RimborsoMissione rimborsoMissione = getRimborsoMissione(principal, idMissione, true);
-		Map<String, byte[]> map = new HashMap<String, byte[]>();
     	byte[] printRimborsoMissione = null;
     	String fileName = null;
     	if (!rimborsoMissione.isStatoNonInviatoAlFlusso()){
@@ -798,15 +812,29 @@ public class RimborsoMissioneService {
     		} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale");
     		}
+    		Map<String, byte[]> map = new HashMap<String, byte[]>();
     		map.put(fileName, printRimborsoMissione);
+    		return map;
     	} else {
-    		fileName = "RimborsoMissione"+idMissione+".pdf";
-    		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
-    		if (rimborsoMissione.isMissioneInserita()){
-    			cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(principal, printRimborsoMissione, rimborsoMissione);
-    		}
-    		map.put(fileName, printRimborsoMissione);
+    		return stampaRimborso(principal, rimborsoMissione);
     	}
-		return map;
     }
+
+	public Map<String, byte[]> stampaRimborso(Principal principal, RimborsoMissione rimborsoMissione)
+			throws ComponentException {
+		byte[] printRimborsoMissione;
+		String fileName;
+		retrieveDetails(principal, rimborsoMissione);
+		if (assenzaDettagli(rimborsoMissione)){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile stampare un rimborso missione senza aver indicato nessun dettaglio di spesa.");
+		}
+		fileName = "RimborsoMissione"+rimborsoMissione.getId()+".pdf";
+		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, principal.getName());
+//		if (rimborsoMissione.isMissioneInserita()){
+//			cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(principal, printRimborsoMissione, rimborsoMissione);
+//		}
+		Map<String, byte[]> map = new HashMap<String, byte[]>();
+		map.put(fileName, printRimborsoMissione);
+		return map;
+	}
 }

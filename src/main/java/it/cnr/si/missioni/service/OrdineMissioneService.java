@@ -194,9 +194,9 @@ public class OrdineMissioneService {
     	} else {
     		fileName = "OrdineMissione"+idMissione+".pdf";
     		printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-    		if (ordineMissione.isMissioneInserita()){
-    			cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, printOrdineMissione, ordineMissione);
-    		}
+//    		if (ordineMissione.isMissioneInserita()){
+//    			cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, printOrdineMissione, ordineMissione);
+//    		}
     		map.put(fileName, printOrdineMissione);
     	}
 		return map;
@@ -229,7 +229,7 @@ public class OrdineMissioneService {
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
 
-//        			    	aggiornaValidazione(ordineMissioneDaAggiornare);
+        			    	aggiornaValidazione(ordineMissioneDaAggiornare);
         					ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
         					ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
         					ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
@@ -562,7 +562,11 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setModulo(ordineMissione.getModulo());
 			ordineMissioneDB.setNote(ordineMissione.getNote());
 			ordineMissioneDB.setObbligoRientro(ordineMissione.getObbligoRientro());
-			ordineMissioneDB.setValidato(ordineMissione.getValidato());
+			if (confirm){
+				aggiornaValidazione(ordineMissioneDB);
+			} else {
+				ordineMissioneDB.setValidato(ordineMissione.getValidato());
+			}
 			ordineMissioneDB.setOggetto(ordineMissione.getOggetto());
 			ordineMissioneDB.setPartenzaDa(ordineMissione.getPartenzaDa());
 			ordineMissioneDB.setPriorita(ordineMissione.getPriorita());
@@ -601,12 +605,12 @@ public class OrdineMissioneService {
     	return ordineMissione;
     }
 
-    @Transactional(readOnly = true)
-	public void salvaStampaOrdineMissioneSuCMIS(Principal principal, Long idMissione, byte[] stampa) throws AwesomeException, ComponentException {
-    	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
-		cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione);
-    }
-
+//    @Transactional(readOnly = true)
+//	public void salvaStampaOrdineMissioneSuCMIS(Principal principal, Long idMissione, byte[] stampa) throws AwesomeException, ComponentException {
+//    	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
+//		cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione);
+//    }
+//
     @Transactional(propagation = Propagation.REQUIRED)
 	public void deleteOrdineMissione(Principal principal, Long idOrdineMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
 		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);

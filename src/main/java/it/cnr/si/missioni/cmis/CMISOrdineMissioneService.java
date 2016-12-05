@@ -10,6 +10,8 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
+import it.cnr.si.missioni.service.PrintOrdineMissioneAnticipoService;
+import it.cnr.si.missioni.service.PrintOrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneService;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -104,6 +106,12 @@ public class CMISOrdineMissioneService {
 	@Autowired
 	private UoService uoService;
 
+	@Autowired
+	private PrintOrdineMissioneAnticipoService printOrdineMissioneAnticipoService;
+	
+	@Autowired
+	private PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
+	
 	@Autowired
 	private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
@@ -420,13 +428,13 @@ public class CMISOrdineMissioneService {
 		Document documentoAnticipo = null;
 		if (anticipo != null){
 			anticipo.setOrdineMissione(ordineMissione);
-			documentoAnticipo = ordineMissioneAnticipoService.creaDocumentoAnticipo(username, anticipo);
+			documentoAnticipo = creaDocumentoAnticipo(username, anticipo);
 		}
 		
 		Document documentoAutoPropria = null;
 		if (autoPropria != null){
 			autoPropria.setOrdineMissione(ordineMissione);
-			documentoAutoPropria = ordineMissioneAutoPropriaService.creaDocumentoRichiestaAutoPropria(username, autoPropria);
+			documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
 		}
 
 		if (ordineMissione.isStatoNonInviatoAlFlusso()){
@@ -539,7 +547,7 @@ public class CMISOrdineMissioneService {
 			if (nodeRefs.length() > 0){
 				 nodeRefs.append(",");
 			}
-			 nodeRefs.append((String)documentoAnticipo.getPropertyValue("alfcmis:nodeRef"));
+			nodeRefs.append((String)documentoAnticipo.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
 		 }
 	}
 
@@ -824,5 +832,63 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
 		return metadataProperties;
+	}
+
+	@Transactional(readOnly = true)
+    public Document salvaStampaAutoPropriaSuCMIS(String currentLogin, byte[] stampa,
+			OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
+		InputStream streamStampa = new ByteArrayInputStream(stampa);
+		Folder folder = recuperoFolderOrdineMissione(ordineMissioneAutoPropria.getOrdineMissione());
+		if (folder != null){
+			CmisPath cmisPath = CmisPath.construct(folder.getPath()); 
+			Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAutoPropria(currentLogin, ordineMissioneAutoPropria);
+			try{
+				Document node = missioniCMISService.restoreSimpleDocument(
+						metadataProperties,
+						streamStampa,
+						MimeTypes.PDF.mimetype(),
+						ordineMissioneAutoPropria.getFileName(), 
+						cmisPath);
+				missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
+				missioniCMISService.makeVersionable(node);
+				return node;
+			} catch (Exception e) {
+				if (e.getCause() instanceof CmisConstraintException)
+					throw new ComponentException("CMIS - File ["+ordineMissioneAutoPropria.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+				throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
+			}
+		} else {
+			throw new ComponentException("CMIS - Errore nel recupero della folder dell'ordine di missione con id: " + ordineMissioneAutoPropria.getOrdineMissione().getId());
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public Document salvaStampaAnticipoSuCMIS(String currentLogin, byte[] stampa,
+			OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException {
+		InputStream streamStampa = new ByteArrayInputStream(stampa);
+		CmisPath cmisPath = createFolderOrdineMissione(ordineMissioneAnticipo.getOrdineMissione());
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAnticipo(currentLogin, ordineMissioneAnticipo);
+		try {
+			Document node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
+					MimeTypes.PDF.mimetype(), ordineMissioneAnticipo.getFileName(), cmisPath);
+			missioniCMISService.addAspect(node,
+					CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
+			missioniCMISService.makeVersionable(node);
+			return node;
+		} catch (Exception e) {
+			if (e.getCause() instanceof CmisConstraintException)
+				throw new ComponentException("CMIS - File [" + ordineMissioneAnticipo.getFileName()
+						+ "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale ("
+					+ Utility.getMessageException(e) + ")");
+		}
+	}
+	private Document creaDocumentoAnticipo(String username, OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException, ComponentException{
+		byte[] print = printOrdineMissioneAnticipoService.printOrdineMissioneAnticipo(ordineMissioneAnticipo, username);
+		return salvaStampaAnticipoSuCMIS(username, print, ordineMissioneAnticipo);
+	}
+	private Document creaDocumentoAutoPropria(String username, OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException, ComponentException{
+		byte[] print = printOrdineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(ordineMissioneAutoPropria, username);
+		return salvaStampaAutoPropriaSuCMIS(username, print, ordineMissioneAutoPropria);
 	}
 }

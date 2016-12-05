@@ -211,10 +211,9 @@ public class OrdineMissioneAutoPropriaService {
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.findById(principal, OrdineMissioneAutoPropria.class, idAutoPropriaOrdineMissione);
 
 		if (ordineMissioneAutoPropria != null){
-			Document documentoAutoPropria = null;
-			documentoAutoPropria = creaDocumentoRichiestaAutoPropria(principal.getName(), ordineMissioneAutoPropria);
-			if (documentoAutoPropria != null){
-				missioniCMISService.deleteNode(documentoAutoPropria);
+			String nodeRef = cmisOrdineMissioneService.getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+			if (nodeRef != null){
+				missioniCMISService.deleteNode(nodeRef);
 			}
 			cancellaOrdineMissioneAutoPropria(principal, ordineMissioneAutoPropria);
 		}
@@ -338,9 +337,9 @@ public class OrdineMissioneAutoPropriaService {
     	} else {
     		fileName = "OrdineMissioneAutoPropria"+idMissione+".pdf";
     		printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
-    		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
-    			salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
-    		}
+//    		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
+//    			salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
+//    		}
     		map.put(fileName, printOrdineMissione);
     	}
 		return map;
@@ -353,33 +352,12 @@ public class OrdineMissioneAutoPropriaService {
 		return print;
 	}
     
-	public Document creaDocumentoRichiestaAutoPropria(String username,
-			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-			throws ComponentException {
-		byte[] printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
-		return salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
-	}
-    
-    @Transactional(readOnly = true)
-    private Document salvaStampaAutoPropriaSuCMIS(String currentLogin, byte[] stampa,
-			OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
-		InputStream streamStampa = new ByteArrayInputStream(stampa);
-		CmisPath cmisPath = cmisOrdineMissioneService.createFolderOrdineMissione(ordineMissioneAutoPropria.getOrdineMissione());
-		Map<String, Object> metadataProperties = cmisOrdineMissioneService.createMetadataForFileOrdineMissioneAutoPropria(currentLogin, ordineMissioneAutoPropria);
-		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
-					metadataProperties,
-					streamStampa,
-					MimeTypes.PDF.mimetype(),
-					ordineMissioneAutoPropria.getFileName(), 
-					cmisPath);
-			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
-			missioniCMISService.makeVersionable(node);
-			return node;
-		} catch (Exception e) {
-			if (e.getCause() instanceof CmisConstraintException)
-				throw new ComponentException("CMIS - File ["+ordineMissioneAutoPropria.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
-		}
-	}
+//    @Transactional(readOnly = true)
+//	public Document creaDocumentoRichiestaAutoPropria(String username,
+//			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
+//			throws ComponentException {
+//		byte[] printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
+//		return cmisOrdineMissioneService.salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
+//	}
+//    
 }
