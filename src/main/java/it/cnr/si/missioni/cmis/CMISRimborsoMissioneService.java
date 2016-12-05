@@ -115,9 +115,8 @@ public class CMISRimborsoMissioneService {
 	private PrintRimborsoMissioneService printRimborsoMissioneService;
 
 	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
-		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
-		if (folder != null){
-	        ItemIterable<CmisObject> children = ((Folder) folder).getChildren();
+		ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(principal, idDettagliorimborso);
+		if (children != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
 	        for (CmisObject object : children){
 	        	Document doc = (Document)object;
@@ -128,6 +127,15 @@ public class CMISRimborsoMissioneService {
 	        	lista.add(cmisFileAttachment);
 	        }
 	        return lista;
+		}
+		return null;
+	}
+		
+	public ItemIterable<CmisObject> getAttachmentsDetailRimborso(Principal principal, Long idDettagliorimborso) throws ComponentException{
+		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
+		if (folder != null){
+	        ItemIterable<CmisObject> children = ((Folder) folder).getChildren();
+	        return children;
 		}
 		return null;
 	}
@@ -297,12 +305,12 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
-	@Transactional(readOnly = true)
-	public Document salvaStampaRimborsoMissioneSuCMIS(Principal principal, byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
-		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
-		return salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
-	}
-	
+//	@Transactional(readOnly = true)
+//	private Document salvaStampaRimborsoMissioneSuCMIS(Principal principal, byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
+//		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
+//		return salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
+//	}
+//	
 	public CmisPath createFolderRimborsoMissione(RimborsoMissione rimborsoMissione){
 		CmisPath cmisPath = missioniCMISService.getBasePath();
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoRich());
@@ -527,11 +535,14 @@ public class CMISRimborsoMissioneService {
 		return metadataProperties;
 	}
 	
+	
+	@Transactional(readOnly = true)
 	public void avviaFlusso(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
 		String username = principal.getName();
 		byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
 		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
 		Document documento = salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
+		StringBuffer nodeRefs = new StringBuffer();
 		if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
 			String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisRimborsoMissione.getUserNamePrimoFirmatario());
 
@@ -543,7 +554,6 @@ public class CMISRimborsoMissioneService {
 				 jGenerator.writeStartObject();
 				 jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
 				 jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
-				 StringBuffer nodeRefs = new StringBuffer();
 				 aggiungiDocumento(documento, nodeRefs);
 				 
 				 jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
@@ -622,12 +632,22 @@ public class CMISRimborsoMissioneService {
 			}
 		} else {
 			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
-				StringBuffer nodeRefs = new StringBuffer();
-//				aggiungiDocumento(documentoAutoPropria, nodeRefs);
-//				avanzaFlusso(ordineMissione, nodeRefs);
+		        aggiungiAllegatiDettagli(principal, rimborsoMissione, nodeRefs);
+				avanzaFlusso(rimborsoMissione, nodeRefs);
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
 			}
+		}
+	}
+
+	public void aggiungiAllegatiDettagli(Principal principal, RimborsoMissione rimborsoMissione, StringBuffer nodeRefs)
+			throws ComponentException {
+		for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
+			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(principal, new Long (dettaglio.getId().toString()));				
+		    for (CmisObject object : children){
+		    	Document doc = (Document)object;
+				aggiungiDocumento(doc, nodeRefs);
+		    }
 		}
 	}
 	private void aggiungiDocumento(Document documentoAnticipo,
@@ -636,7 +656,7 @@ public class CMISRimborsoMissioneService {
 			if (nodeRefs.length() > 0){
 				 nodeRefs.append(",");
 			}
-			 nodeRefs.append((String)documentoAnticipo.getPropertyValue("alfcmis:nodeRef"));
+			 nodeRefs.append((String)documentoAnticipo.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
 		 }
 	}
 
