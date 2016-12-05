@@ -233,7 +233,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     public String cdsCompetenza;
 
     @Size(min = 0, max = 28)
-    @Column(name = "UO_COMPETENZA", length = 28, nullable = false)
+    @Column(name = "UO_COMPETENZA", length = 28, nullable = true)
     public String uoCompetenza;
 
     @Size(min = 0, max = 28)

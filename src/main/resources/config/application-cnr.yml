@@ -47,7 +47,7 @@ cmis:
     username: app.missioni
     password: bubbazza
     maxItemsPerPage: 10
-    folder_path: /Missioni
+    folder_path: /Comunicazioni al CNR/Missioni
     folder_path_config: /Config
 
 cache:
