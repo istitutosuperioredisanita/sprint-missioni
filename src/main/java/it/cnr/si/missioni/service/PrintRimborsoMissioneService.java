@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -120,12 +121,13 @@ public class PrintRimborsoMissioneService {
     		printRimborsoMissione.setSpeseTerziImporto("");
     	}
 		printRimborsoMissione.setTrattamento(rimborsoMissione.decodeTrattamento());
-
+		BigDecimal totMissione = BigDecimal.ZERO;
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null){
 			List<PrintRimborsoMissioneDettagli> listDettagliPrint = new ArrayList<PrintRimborsoMissioneDettagli>();
 	    	for (Iterator<RimborsoMissioneDettagli> iterator = rimborsoMissione.getRimborsoMissioneDettagli().iterator(); iterator.hasNext();){
 	    		RimborsoMissioneDettagli dettagli = iterator.next();
 	    		PrintRimborsoMissioneDettagli dettagliPrint = new PrintRimborsoMissioneDettagli();
+	    		totMissione = totMissione.add(dettagli.getImportoEuro());
 	    		String dsSpesa = "";
 	    		if (dettagli.getDsSpesa() != null){
 	    			dsSpesa = dettagli.getDsTiSpesa() + " - "+dettagli.getDsSpesa();
@@ -148,7 +150,8 @@ public class PrintRimborsoMissioneService {
 	    	}
 	    	printRimborsoMissione.setPrintDettagliSpeseRimborsoMissione(listDettagliPrint);
 		}
-    	return printRimborsoMissione; 
+		printRimborsoMissione.setTotMissione(Utility.numberFormat(totMissione));
+		return printRimborsoMissione; 
     }
 
 	public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
