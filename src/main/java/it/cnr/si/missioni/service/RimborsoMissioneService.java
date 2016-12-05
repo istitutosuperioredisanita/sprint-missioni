@@ -30,6 +30,7 @@ import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -561,6 +562,14 @@ public class RimborsoMissioneService {
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
     	rimborsoMissione.setStatoFlusso(Costanti.STATO_INSERITO);
+    	if (rimborsoMissione.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+        	if (ordineMissione != null){
+        		rimborsoMissione.setOrdineMissione(ordineMissione);
+        	} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione con ID: "+rimborsoMissione.getOrdineMissione().getId()+" non esiste");
+        	}
+    	}
     	rimborsoMissione.setToBeCreated();
     }
 
@@ -624,7 +633,7 @@ public class RimborsoMissioneService {
 				if (rimborsoMissione.getDataInizioEstero() != null){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Inizio Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
 				}
-				if (rimborsoMissione.getDataFineEstero() == null){
+				if (rimborsoMissione.getDataFineEstero() != null){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Fine Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
 				}
 			}
@@ -830,9 +839,9 @@ public class RimborsoMissioneService {
 		}
 		fileName = "RimborsoMissione"+rimborsoMissione.getId()+".pdf";
 		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, principal.getName());
-//		if (rimborsoMissione.isMissioneInserita()){
-//			cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(principal, printRimborsoMissione, rimborsoMissione);
-//		}
+		if (rimborsoMissione.isMissioneInserita()){
+			cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(principal, printRimborsoMissione, rimborsoMissione);
+		}
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
 		map.put(fileName, printRimborsoMissione);
 		return map;

@@ -231,9 +231,9 @@ public class OrdineMissioneAnticipoService {
 		} else {
 			fileName = "OrdineMissioneAnticipo" + idMissione + ".pdf";
 			printOrdineMissione = printAnticipo(username, ordineMissioneAnticipo);
-//			if (ordineMissioneAnticipo.isAnticipoInserito()) {
-//				salvaStampaAnticipoSuCMIS(username, printOrdineMissione, ordineMissioneAnticipo);
-//			}
+			if (ordineMissioneAnticipo.isAnticipoInserito()) {
+				cmisOrdineMissioneService.salvaStampaAnticipoSuCMIS(username, printOrdineMissione, ordineMissioneAnticipo);
+			}
 			map.put(fileName, printOrdineMissione);
 		}
 		return map;

@@ -136,10 +136,10 @@
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="UO_COMPETENZA" type="varchar(30)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="CDS_COMPETENZA" type="varchar(30)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="CDS_RICH" type="varchar(30)">
 			        <constraints nullable="false"/>

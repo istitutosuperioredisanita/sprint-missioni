@@ -62,7 +62,6 @@ public class DatiIstitutoService {
     		datiIstituto = (DatiIstituto)crudServiceBean.modificaConBulk(principal, datiIstituto);
     		//			    	autoPropriaRepository.save(autoPropria);
     		log.debug("Updated Information for Dati Istituto: {}", datiIstituto);
-    		return datiIstituto.getProgressivoRimborso();
     	} else {
     		DatiIstituto datiIstitutoInsert = null;
     		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
@@ -71,8 +70,12 @@ public class DatiIstitutoService {
         		datiIstitutoInsert = creaDatiIstitutoOrdine(principal, istituto, anno);
     		}
     		log.debug("Created Information for Dati Istituto: {}", datiIstitutoInsert);
-    		return datiIstitutoInsert.getProgressivoOrdine();
     	}
+		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
+			return datiIstituto.getProgressivoRimborso();
+		} else {
+			return datiIstituto.getProgressivoOrdine();
+		}
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)

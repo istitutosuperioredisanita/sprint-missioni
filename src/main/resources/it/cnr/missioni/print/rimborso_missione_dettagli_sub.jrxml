@@ -26,75 +26,72 @@
 	</field>
 	<group name="Dettaglio">
 		<groupExpression><![CDATA[$F{data}]]></groupExpression>
-		<groupHeader>
-			<band height="23">
-				<textField>
-					<reportElement mode="Transparent" x="0" y="0" width="77" height="22" backcolor="#FFFFFF" uuid="45508ba6-abfa-4c41-8f4d-d03c0c1a44b1"/>
-					<box>
-						<pen lineWidth="0.5"/>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
-						<font fontName="Times New Roman" size="9" isBold="false"/>
-						<paragraph lineSpacing="Single" leftIndent="5" spacingBefore="2" spacingAfter="2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{data}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="77" y="0" width="318" height="22" backcolor="#FFFFFF" uuid="1092c234-69f7-4b43-9837-f9926fd6defa"/>
-					<box>
-						<pen lineWidth="0.5"/>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
-						<font fontName="Times New Roman" size="9"/>
-						<paragraph leftIndent="5"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{dsSpesa}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="395" y="0" width="66" height="22" backcolor="#FFFFFF" uuid="a07362ba-ef03-469b-a1b1-7853e8310265"/>
-					<box>
-						<pen lineWidth="0.5"/>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
-						<font fontName="Times New Roman" size="9"/>
-						<paragraph leftIndent="5" rightIndent="5"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{importo}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="461" y="0" width="64" height="22" backcolor="#FFFFFF" uuid="0e010af6-cb50-48fe-b4ed-cdad5918ea23"/>
-					<box>
-						<pen lineWidth="0.5"/>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
-						<font fontName="Times New Roman" size="9"/>
-						<paragraph leftIndent="5" rightIndent="5" spacingBefore="2" spacingAfter="2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{kmPercorsi}]]></textFieldExpression>
-				</textField>
-			</band>
-		</groupHeader>
-		<groupFooter>
-			<band/>
-		</groupFooter>
 	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
+	<detail>
+		<band height="22">
+			<textField>
+				<reportElement mode="Transparent" x="0" y="0" width="77" height="22" backcolor="#FFFFFF" uuid="45508ba6-abfa-4c41-8f4d-d03c0c1a44b1"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" size="9" isBold="false"/>
+					<paragraph lineSpacing="Single" leftIndent="5" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{data}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="77" y="0" width="318" height="22" backcolor="#FFFFFF" uuid="1092c234-69f7-4b43-9837-f9926fd6defa"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dsSpesa}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="395" y="0" width="66" height="22" backcolor="#FFFFFF" uuid="a07362ba-ef03-469b-a1b1-7853e8310265"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph leftIndent="5" rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{importo}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="461" y="0" width="64" height="22" backcolor="#FFFFFF" uuid="0e010af6-cb50-48fe-b4ed-cdad5918ea23"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph leftIndent="5" rightIndent="5" spacingBefore="2" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kmPercorsi}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
 </jasperReport>

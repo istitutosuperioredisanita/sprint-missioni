@@ -337,9 +337,9 @@ public class OrdineMissioneAutoPropriaService {
     	} else {
     		fileName = "OrdineMissioneAutoPropria"+idMissione+".pdf";
     		printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
-//    		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
-//    			salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
-//    		}
+    		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
+    			cmisOrdineMissioneService.salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
+    		}
     		map.put(fileName, printOrdineMissione);
     	}
 		return map;
