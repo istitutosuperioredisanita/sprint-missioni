@@ -690,7 +690,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             $scope.rimborsoMissioneModel.trattamento = "R";
             $scope.missioneEstera = true;
         } else {
-            $scope.rimborsoMissioneModel.trattamento = null;
+            $scope.rimborsoMissioneModel.trattamento = "R";
             $scope.missioneEstera = null;
             $scope.rimborsoMissioneModel.nazione = null;
         }
@@ -845,7 +845,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             RimborsoMissioneService.confirm_validate($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
-                        ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
+                        ui.ok_message("Rimborso Missione confermato e inviato all'approvazione.");
                         ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
@@ -870,7 +870,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             RimborsoMissioneService.finalize($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
-                        ui.ok_message("Ordine di Missione Completato.");
+                        ui.ok_message("Rimborso Missione Completato.");
                         ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();

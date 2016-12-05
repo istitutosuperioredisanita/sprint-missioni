@@ -560,7 +560,8 @@ public class CMISRimborsoMissioneService {
 				 jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
 				 jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
 				 aggiungiDocumento(documento, nodeRefs);
-				 
+			     aggiungiAllegatiDettagli(principal, rimborsoMissione, nodeRefs);
+
 				 jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
 				 jGenerator.writeStringField("assoc_packageItems_removed" , "");
 				 jGenerator.writeStringField("prop_bpm_comment" , "");
@@ -602,8 +603,8 @@ public class CMISRimborsoMissioneService {
 				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisRimborsoMissione.getDataInizioMissione());
 				 jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisRimborsoMissione.getDataFineMissione());
 				 jGenerator.writeStringField("prop_cnrmissioni_trattamento" , cmisRimborsoMissione.getTrattamento());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioEstero" , cmisRimborsoMissione.getDataInizioEstero());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataFineEstero" , cmisRimborsoMissione.getDataFineEstero());
+				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioEstero" , cmisRimborsoMissione.getDataInizioEstero() == null ? "" : cmisRimborsoMissione.getDataInizioEstero());
+				 jGenerator.writeStringField("prop_cnrmissioni_dataFineEstero" , cmisRimborsoMissione.getDataFineEstero() == null ? "" : cmisRimborsoMissione.getDataFineEstero());
 				 jGenerator.writeStringField("prop_cnrmissioni_anticipoRicevuto" , cmisRimborsoMissione.getAnticipoRicevuto());
 				 jGenerator.writeStringField("prop_cnrmissioni_annoMandato" , cmisRimborsoMissione.getAnnoMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());

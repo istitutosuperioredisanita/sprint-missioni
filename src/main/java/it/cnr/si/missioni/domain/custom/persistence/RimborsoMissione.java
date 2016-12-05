@@ -435,7 +435,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	@Transient
     public String getFileName() {
-		return "OrdineMissione"+getId()+".pdf";
+		return "RimborsoMissione"+getId()+".pdf";
 	}
 
 	public String getCommentFlows() {
