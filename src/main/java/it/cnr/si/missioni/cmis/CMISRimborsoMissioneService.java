@@ -230,7 +230,7 @@ public class CMISRimborsoMissioneService {
 
 		cmisRimborsoMissione.setAnno(rimborsoMissione.getAnno().toString());
 		cmisRimborsoMissione.setNumero(rimborsoMissione.getNumero().toString());
-		cmisRimborsoMissione.setCapitolo(rimborsoMissione.getVoce());
+		cmisRimborsoMissione.setCapitolo(voce == null ? "" : rimborsoMissione.getVoce());
 		cmisRimborsoMissione.setDescrizioneCapitolo(voce == null ? "" : voce.getDs_elemento_voce());
 		cmisRimborsoMissione.setDescrizioneGae(gae == null ? "" : gae.getDs_linea_attivita());
 		cmisRimborsoMissione.setDescrizioneImpegno(descrImpegno);
