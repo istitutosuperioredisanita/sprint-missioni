@@ -330,12 +330,25 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
 
+    var impostadisabilitaRimborsoMissione = function() {
+        if ($scope.rimborsoMissione && ($scope.rimborsoMissione.stato === 'DEF' || $scope.rimborsoMissione.statoFlusso === 'APP' || ($scope.rimborsoMissione.stato === 'CON' && 
+            ($scope.rimborsoMissione.stateFlows === 'ANNULLATO' ||
+                $scope.rimborsoMissione.stateFlows === 'FIRMA SPESA RIMBORSO' ||
+                $scope.rimborsoMissione.stateFlows === 'FIRMA UO RIMBORSO' ||
+                $scope.rimborsoMissione.stateFlows === 'FIRMATO')))) {
+          return true;
+        } else {
+          return false;
+        }
+    }
+
    var inizializzaDati = function(){
         ElencoRimborsiMissioneService.findById($scope.idRimborsoMissione).then(function(data){
             $scope.rimborsoMissione = data;
             if ($scope.rimborsoMissione){
+                $scope.disabilita = impostadisabilitaRimborsoMissione();
                 RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione).then(function(data){
-                    $scope.dettagliSpese = data;    
+                    $scope.dettagliSpese = data;
                     if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
                         $scope.getTotaleDettagliSpesa();
                     }
