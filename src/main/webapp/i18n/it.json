@@ -440,7 +440,7 @@
                     "tipologia-spesa" : "Tipologia di Spesa",
                     "ds-spesa" : "Descrizione Spesa",
                     "tipologia-pasto" : "Tipo Pasto",
-                    "importo": "Importo",
+                    "importo": "Importo €",
                     "spesa-anticipata": "Spesa Anticipata",
                     "download-file": "Download File",
                     "remove-file": "Elimina File",
