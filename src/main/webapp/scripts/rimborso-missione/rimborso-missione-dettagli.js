@@ -148,13 +148,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     if (dettaglio.id === idDettaglioSpesa){
                         if (!dettaglio.isFireSearchAttachments){
                             $http.get('app/rest/rimborsoMissione/dettagli/viewAttachments/' + idDettaglioSpesa).then(function (data) {
-                                  $scope.setUrl(idDettaglioSpesa);
                                   $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
                                   $scope.dettagliSpese[i].attachmentsExists = attachments && Object.keys(attachments).length > 0;
                                   $scope.dettagliSpese[i].attachments = attachments;
                             }, function () {
-                                  $scope.setUrl(idDettaglioSpesa);
+                                  $scope.dettagliSpese[i].isFireSearchAttachments = false;
                                   $scope.dettagliSpese[i].attachmentsExists = false;
                                   $scope.dettagliSpese[i].attachments = {};
                             });
@@ -358,44 +357,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     inizializzaDati();
-
-    $scope.fileDetailUpload = {
-        autoUpload: true,
-        maxNumberOfFiles: 1,
-        dataType: 'json',
-        done: function (e, data) {
-            $rootScope.salvataggio = false;
-            if (data && data.result && data.result.idMissione){
-                if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
-                    for (var i=0; i<$scope.dettagliSpese.length; i++) {
-                        var dettaglio = $scope.dettagliSpese[i];
-                        if (dettaglio.id === data.result.idMissione){
-                            var attachments = dettaglio.attachments;
-                            if (!attachments){
-                                attachments = [];
-                            }
-                            $scope.dettagliSpese[i].attachmentsExists = true;
-                            $scope.dettagliSpese[i].attachments = attachments;
-                            $scope.dettagliSpese[i].attachments.push(data.result);
-                        }
-                    }
-                }
-            }
-        },
-        fail: function (e, data) {
-            $rootScope.salvataggio = false;
-            ui.error("Errore nel caricamento del file. "+ data.jqXHR.responseText);
-        },
-        beforeSend: function(xhr) {
-            $rootScope.salvataggio = true;
-            xhr.setRequestHeader("Authorization", "Bearer "+$scope.accessToken);
-        }   
-    };
-
-    $scope.setUrl = function (idDettaglioSpesa) {
-        $scope.fileDetailUpload.url = 'app/rest/rimborsoMissione/dettaglio/uploadAllegati/'+idDettaglioSpesa;
-    };
-
 
     $scope.today = function() {
             // Today + 1 day - needed if the current day must be included
