@@ -45,7 +45,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         $http.delete('app/rest/rimborsoMissione/dettagli/' + dettaglioSpesaDaEliminare.id).success(
                     function (data) {
                         $rootScope.salvataggio = false;
-                        $scope.dettaglioSpesaDaEliminare.splice(index,1);
+                        $scope.dettagliSpese.splice(index,1);
                     }).error(
                     function (data) {
                         $rootScope.salvataggio = false;
@@ -307,7 +307,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
         $rootScope.salvataggio = true;
-        $http.put('app/rest/rimborsoMissione/dettaglio/modify', dettaglioSpesa).success(function(data){
+        $http.put('app/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
             $rootScope.salvataggio = false;
             undoEditingDettaglioSpesa(dettaglioSpesa);
         }).error(function (data) {

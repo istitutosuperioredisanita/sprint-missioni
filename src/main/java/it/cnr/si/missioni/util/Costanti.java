@@ -24,6 +24,7 @@ public class Costanti {
 	public final static String REST_IMPEGNO =  "ConsImpegnoAction.json";
 	public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
     public final static String REST_TIPI_SPESA =  "ConsTipiSpesaAction.json";
+	public final static String REST_VALIDA_MASSIMALE_SPESA =  "restservice/servizirest/validaMassimaleSpesa";
 	public final static String REST_ACCOUNT = "json/userinfo/";
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
