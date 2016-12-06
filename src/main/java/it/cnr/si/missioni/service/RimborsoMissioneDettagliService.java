@@ -31,6 +31,7 @@ import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
 /**
  * Service class for managing users.
@@ -48,6 +49,9 @@ public class RimborsoMissioneDettagliService {
 
     @Autowired
     private MissioniCMISService missioniCMISService;
+
+    @Autowired
+    private ValidaDettaglioRimborsoService validaDettaglioRimborsoService;
 
     @Autowired
     private CMISRimborsoMissioneService cmisRimborsoMissioneService;
@@ -88,20 +92,8 @@ public class RimborsoMissioneDettagliService {
     }
 
     private void validaCRUD(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli) {
-//    	if (StringUtils.isEmpty(ordineMissioneAutoPropria.getCartaCircolazione()) ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getTarga())  ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getPolizzaAssicurativa())  ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getMarca())  ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getModello()) ){
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati dell'auto propria non esistenti o incompleti.");
-//    	}
-//    	if (StringUtils.isEmpty(ordineMissioneAutoPropria.getDataRilascioPatente()) ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getDataScadenzaPatente())  ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getEntePatente())  ||
-//    			StringUtils.isEmpty(ordineMissioneAutoPropria.getNumeroPatente())){
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
-//    	}
-	}
+    	validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
+    }
 
 	@Transactional(propagation = Propagation.REQUIRED)
     public RimborsoMissioneDettagli createRimborsoMissioneDettagli(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws AwesomeException, 
@@ -199,6 +191,8 @@ public class RimborsoMissioneDettagliService {
 		
 		rimborsoMissioneDettagliDB.setToBeUpdated();
 
+		validaCRUD(principal, rimborsoMissioneDettagliDB);
+			
 		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDettagliDB);
     	
     	log.debug("Updated Information for Dettaglio Rimborso Missione: {}", rimborsoMissioneDettagliDB);
