@@ -50,12 +50,14 @@
                               <h4 >
                                   <div class="row fileupload-buttonbar">
                                     <span ng-hide="dettaglioSpesa.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                                    <form ng-if="fileDetailUpload.url" id="fileupload" method="POST" enctype="multipart/form-data" file-upload="fileDetailUpload">
-                                    <span ng-show="!disabilita  && validazione == 'N'" class="btn-sm btn-success fileinput-button" ng-class="{disabled: disabled}">
+                                    <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="dettaglioSpesa.isFireSearchAttachments" url="app/rest/rimborsoMissione/dettaglio/uploadAllegati/{{dettaglioSpesa.id}}" name="file" auto-upload="true" dettagli-spese="dettagliSpese" size-limit="500000"></ng-upload-form>
+<!--                                    <form ng-if="fileDetailUpload.url" id="fileupload" method="POST" enctype="multipart/form-data" file-upload="fileDetailUpload">
+                                      <span ng-show="!disabilita  && validazione == 'N'" class="btn-sm btn-success fileinput-button" ng-class="{disabled: disabled}">
                                         <i class="glyphicon glyphicon-plus"></i>
                                         <span>Aggiungi Allegato</span>
                                         <input type="file" name="file" multiple ng-disabled="disabled">
-                                    </span>
+                                      </span>
+                                    </form> -->
                                 </div>
                               </h4>
                             </div>
