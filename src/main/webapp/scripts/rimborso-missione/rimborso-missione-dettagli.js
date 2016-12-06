@@ -219,56 +219,54 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     $scope.reloadFromTipoSpesa = function (dettaglioSpesa) {
-        if (dettaglioSpesa.cdTipoSpesa){
-            if ($scope.tipi_spesa && $scope.tipi_spesa.length > 0){
-                for (var i=0; i<$scope.tipi_spesa.length; i++) {
-                    var tipo_spesa = $scope.tipi_spesa[i];
-                    if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
-                        dettaglioSpesa.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
-                        dettaglioSpesa.pasto = tipo_spesa.fl_pasto;
-                        dettaglioSpesa.rimborso = tipo_spesa.fl_rimborso_km;
-                        dettaglioSpesa.trasporto = tipo_spesa.fl_trasporto;
-                        dettaglioSpesa.alloggio = tipo_spesa.fl_alloggio;
-                        dettaglioSpesa.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;
-                        if (dettaglioSpesa.pasto){
-                            var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
-                            var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
-                                if (result && result.data){
-                                    dettaglioSpesa.tipi_pasto = result.data.elements;
-                                } else {
-                                    dettaglioSpesa.tipi_pasto = [];
+        if (dettaglioSpesa.cdTiSpesa){
+            $scope.tipi_spesa = [];
+            var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+            var tipi = ProxyService.getTipiSpesa($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione, $scope.rimborsoMissione.trattamento).then(function(result){
+                if (result && result.data){
+                    $scope.tipi_spesa = result.data.elements;
+                    if ($scope.tipi_spesa && $scope.tipi_spesa.length > 0){
+                        for (var i=0; i<$scope.tipi_spesa.length; i++) {
+                            var tipo_spesa = $scope.tipi_spesa[i];
+                            if (tipo_spesa.cd_ti_spesa === dettaglioSpesa.cdTiSpesa){
+                                dettaglioSpesa.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
+                                dettaglioSpesa.pasto = tipo_spesa.fl_pasto;
+                                dettaglioSpesa.rimborso = tipo_spesa.fl_rimborso_km;
+                                dettaglioSpesa.trasporto = tipo_spesa.fl_trasporto;
+                                dettaglioSpesa.alloggio = tipo_spesa.fl_alloggio;
+                                dettaglioSpesa.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;
+                                if (dettaglioSpesa.pasto){
+                                    var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                                    var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
+                                        if (result && result.data){
+                                            $scope.tipi_pasto = result.data.elements;
+                                        } else {
+                                            $scope.tipi_pasto = [];
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                        if (dettaglioSpesa.rimborso){
-                            var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
-                            var tipi = ProxyService.getRimborsoKm("P", dataFormatted, 1).then(function(result){
-                                if (result && result.data && result.data.elements && result.data.elements.length > 0){
-                                    dettaglioSpesa.rimborsoKm = result.data.elements[0];
-                                } else {
-                                    dettaglioSpesa.rimborsoKm = [];
+                                if (dettaglioSpesa.rimborso){
+                                    var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                                    var tipi = ProxyService.getRimborsoKm("P", dataFormatted, 1).then(function(result){
+                                        if (result && result.data && result.data.elements && result.data.elements.length > 0){
+                                            dettaglioSpesa.rimborsoKm = result.data.elements[0];
+                                        } else {
+                                            dettaglioSpesa.rimborsoKm = [];
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                        if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
-                            for (var i=0; i<$scope.dettagliSpese.length; i++) {
-                                var dettaglio = $scope.dettagliSpese[i];
-                                if (dettaglio.id = dettaglioSpesa.id){
-                                    $scope.dettagliSpese[i] = dettaglioSpesa;
-                                    break;
-                                }
+                                break;        
                             }
                         }
-                        break;        
                     }
                 }
-            }
+            });
         }
     }
 
     $scope.editDettaglioSpesa= function (dettaglioSpesa) {
       dettaglioSpesa.editing = true;
-      reloadFromTipoSpesa(dettaglioSpesa);
+      $scope.reloadFromTipoSpesa(dettaglioSpesa);
     }
 
     var undoEditingDettaglioSpesa = function (dettaglioSpesa) {
