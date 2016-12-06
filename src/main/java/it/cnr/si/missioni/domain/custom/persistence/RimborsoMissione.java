@@ -39,7 +39,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public final static String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale",
 			CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati",
 			CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione",
-			CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Scontrini",
+			CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo",
 			CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id",
 			CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso",
 			CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto",

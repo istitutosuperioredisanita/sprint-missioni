@@ -1,5 +1,12 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+
 import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
@@ -9,13 +16,6 @@ import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CommonService {
@@ -62,6 +62,13 @@ public class CommonService {
 			ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null);
 			risposta = result.getBody();
 		}
+		return risposta;
+	}
+	public String process(JSONBody jBody, String app, String url) {
+		String risposta = null;
+		cacheService.setContext(jBody, app);
+		ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null);
+		risposta = result.getBody();
 		return risposta;
 	}
 }

@@ -767,6 +767,9 @@ public class RimborsoMissioneService {
 		if (StringUtils.isEmpty(rimborsoMissione.getIdFlusso()) &&  rimborsoMissione.isStatoInviatoAlFlusso()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
 		} 
+		if (!rimborsoMissione.isMissioneEstera()){
+			rimborsoMissione.setNazione(new Long("1"));
+		} 
 	}
 	
 	private void controlloCampiObbligatori(RimborsoMissione rimborsoMissione) {

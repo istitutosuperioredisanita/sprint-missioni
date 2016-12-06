@@ -96,6 +96,8 @@ public class RimborsoMissioneDettagliResource {
             	dettaglio = rimborsoMissioneDettagliService.updateRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), dettaglio);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
     			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+    		} catch (Exception e) {
+    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
     		}
             return new ResponseEntity<>(dettaglio, HttpStatus.OK);
     	} else {
@@ -121,6 +123,8 @@ public class RimborsoMissioneDettagliResource {
     		} catch (PersistencyException e) {
     			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
     		} catch (BusyResourceException e) {
+    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+    		} catch (Exception e) {
     			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
     		}
             return new ResponseEntity<>(dettaglio, HttpStatus.CREATED);
