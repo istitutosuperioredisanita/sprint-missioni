@@ -427,6 +427,8 @@
         },
         "button": {
             "print": "Stampa Rimborso",
+            "sendToFinal": "Rendi Definitivo il Rimborso Missione",
+            "confirm": "Conferma il Rimborso Missione",
             "dettagli": "Dettagli Spesa"
         }
     },
