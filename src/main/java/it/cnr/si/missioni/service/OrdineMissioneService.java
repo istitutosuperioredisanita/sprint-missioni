@@ -757,6 +757,8 @@ public class OrdineMissioneService {
 						if (!impegnoGae.getCdElementoVoce().equals(ordineMissione.getVoce())){
 							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+ordineMissione.getVoce());
 						}
+					} else {
+						ordineMissione.setVoce(impegnoGae.getCdElementoVoce());
 					}
 					ordineMissione.setCdCdsObbligazione(impegnoGae.getCdCds());
 					ordineMissione.setEsercizioObbligazione(impegnoGae.getEsercizio());
@@ -770,6 +772,8 @@ public class OrdineMissioneService {
 						if (!impegno.getCdElementoVoce().equals(ordineMissione.getVoce())){
 							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+ordineMissione.getVoce());
 						}
+					} else {
+						ordineMissione.setVoce(impegno.getCdElementoVoce());
 					}
 					ordineMissione.setCdCdsObbligazione(impegno.getCdCds());
 					ordineMissione.setEsercizioObbligazione(impegno.getEsercizio());

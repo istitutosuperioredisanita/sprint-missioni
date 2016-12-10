@@ -160,6 +160,11 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         userWork.comune_residenza = data.comune_residenza; 
         userWork.indirizzo_residenza = data.indirizzo_residenza; 
         userWork.num_civico_residenza = data.num_civico_residenza;
+        if (userWork.num_civico_residenza){
+            userWork.indirizzo_completo_residenza = data.indirizzo_residenza+" "+data.num_civico_residenza;
+        } else {
+            userWork.indirizzo_completo_residenza = data.indirizzo_residenza;
+        }
         userWork.cap_residenza = data.cap_residenza;
         userWork.provincia_residenza = data.provincia_residenza;
         userWork.codice_fiscale = data.codice_fiscale;
@@ -966,7 +971,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.inizializzaFormPerInserimento = function(account){
         $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
-                                        indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
+                                        indirizzoResidenzaRich:account.indirizzo_completo_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,

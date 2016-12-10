@@ -237,7 +237,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setDescrizioneUoOrdine(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
 		cmisRimborsoMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
 		cmisRimborsoMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
-		cmisRimborsoMissione.setDisponibilita(dispImpegno);
+		cmisRimborsoMissione.setDisponibilita(Utility.nvl(dispImpegno));
 		cmisRimborsoMissione.setGae(gae == null ? "" : gae.getCd_linea_attivita());
 		cmisRimborsoMissione.setImpegnoAnnoCompetenza(rimborsoMissione.getEsercizioObbligazione() == null ? null : new Long(rimborsoMissione.getEsercizioObbligazione()));
 		cmisRimborsoMissione.setImpegnoAnnoResiduo(rimborsoMissione.getEsercizioOriginaleObbligazione() == null ? null : new Long(rimborsoMissione.getEsercizioOriginaleObbligazione()));
@@ -275,6 +275,7 @@ public class CMISRimborsoMissioneService {
 		}
 		cmisRimborsoMissione.setIdOrdineMissione(rimborsoMissione.getOrdineMissione() == null ? "" :rimborsoMissione.getOrdineMissione().getId().toString());
 		cmisRimborsoMissione.setWfOrdineMissione(rimborsoMissione.getOrdineMissione() == null || rimborsoMissione.getOrdineMissione().getIdFlusso() == null ? "" : rimborsoMissione.getOrdineMissione().getIdFlusso());
+		cmisRimborsoMissione.setTotaleRimborsoMissione(Utility.numberFormat(rimborsoMissione.getTotaleRimborso()));
 		return cmisRimborsoMissione;
 	}
 	
@@ -342,6 +343,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO, rimborsoMissione.getDataInizioEstero());
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO, rimborsoMissione.getDataFineEstero());
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE, rimborsoMissione.getOrdineMissione().getId());
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE, rimborsoMissione.getTotaleRimborso());
 		List<String> aspectsToAdd = new ArrayList<String>();
 		aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);
 		aspectsToAdd.add(CMISMissioniAspect.RIMBORSO_MISSIONE_ASPECT.value());
@@ -610,6 +612,7 @@ public class CMISRimborsoMissioneService {
 				 jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_importoMandato" , cmisRimborsoMissione.getImportoMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRimborso" , cmisRimborsoMissione.getWfOrdineMissione());
+				 jGenerator.writeStringField("prop_cnrmissioni_totRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione());
 				jGenerator.writeEndObject();
 				jGenerator.close();
 			} catch (IOException e) {
@@ -648,21 +651,39 @@ public class CMISRimborsoMissioneService {
 
 	public void aggiungiAllegatiDettagli(Principal principal, RimborsoMissione rimborsoMissione, StringBuffer nodeRefs)
 			throws ComponentException {
+		List<String> list = new ArrayList<>();
 		for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(principal, new Long (dettaglio.getId().toString()));				
-		    for (CmisObject object : children){
-		    	Document doc = (Document)object;
-				aggiungiDocumento(doc, nodeRefs);
-		    }
+			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(principal, new Long (dettaglio.getId().toString()));
+			if (children != null){
+				for (CmisObject object : children){
+			    	Document doc = (Document)object;
+			    	String nodeRef = (String)doc.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF);
+			    	if (!list.contains(nodeRef)){
+						aggiungiDocumento(nodeRef, nodeRefs);
+						list.add(nodeRef);
+			    	}
+			    }
+			} else {
+				if (dettaglio.isGiustificativoObbligatorio()){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
+				}
+			}
 		}
 	}
-	private void aggiungiDocumento(Document documentoAnticipo,
+	private void aggiungiDocumento(Document documento,
 			StringBuffer nodeRefs) {
-		if (documentoAnticipo != null){
+		if (documento != null){
+			 aggiungiDocumento((String)documento.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF), nodeRefs);
+		 }
+	}
+
+	private void aggiungiDocumento(String nodeRef,
+			StringBuffer nodeRefs) {
+		if (nodeRef != null){
 			if (nodeRefs.length() > 0){
 				 nodeRefs.append(",");
 			}
-			 nodeRefs.append((String)documentoAnticipo.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
+			 nodeRefs.append(nodeRef);
 		 }
 	}
 

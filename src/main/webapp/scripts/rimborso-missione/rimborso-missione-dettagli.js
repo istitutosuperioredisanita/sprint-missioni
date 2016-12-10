@@ -186,6 +186,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     var tipo_spesa = $scope.tipi_spesa[i];
                     if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
                         $scope.newDettaglioSpesa.dsTiSpesa = tipo_spesa.ds_ti_spesa;
+                        if (tipo_spesa.fl_giustificativo_richiesto == true){
+                            $scope.newDettaglioSpesa.giustificativo = 'S';    
+                        } else {
+                            $scope.newDettaglioSpesa.giustificativo = 'N';
+                        }
+                        $scope.newDettaglioSpesa.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
                         $scope.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
                         $scope.pasto = tipo_spesa.fl_pasto;
                         $scope.rimborso = tipo_spesa.fl_rimborso_km;
