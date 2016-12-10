@@ -38,7 +38,7 @@ public class Utility {
 	
 	public static BigDecimal nvl(BigDecimal imp){
 		if (imp != null)
-		  return imp;
+		  return imp.setScale(2);
 		return ZERO;  
 	}
 

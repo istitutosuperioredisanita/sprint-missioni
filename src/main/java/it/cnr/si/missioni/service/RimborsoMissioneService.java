@@ -36,6 +36,7 @@ import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
@@ -312,6 +313,7 @@ public class RimborsoMissioneService {
 //		//effettuo controlli di validazione operazione CRUD
 		validaCRUD(principal, rimborsoMissioneDB);
 
+		controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
     	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare()){
     		cmisRimborsoMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), rimborsoMissioneDB);
     	}
@@ -323,6 +325,18 @@ public class RimborsoMissioneService {
     	return rimborsoMissione;
     }
 
+	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
+		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
+			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
+				if (dettaglio.getDataSpesa().after(DateUtils.truncate(rimborsoMissione.getDataFineMissione()))){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
+				}
+				if (dettaglio.getDataSpesa().before(DateUtils.truncate(rimborsoMissione.getDataInizioMissione()))){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
+				}
+			}
+		}
+	}
 	public Boolean assenzaDettagli(RimborsoMissione rimborsoMissioneDB) {
 		if (rimborsoMissioneDB.getRimborsoMissioneDettagli() == null || rimborsoMissioneDB.getRimborsoMissioneDettagli().isEmpty() ){
 			return true;
@@ -716,6 +730,8 @@ public class RimborsoMissioneService {
 						if (!impegnoGae.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
 							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
 						}
+					} else {
+						rimborsoMissione.setVoce(impegnoGae.getCdElementoVoce());
 					}
 					rimborsoMissione.setCdCdsObbligazione(impegnoGae.getCdCds());
 					rimborsoMissione.setEsercizioObbligazione(impegnoGae.getEsercizio());
@@ -729,6 +745,8 @@ public class RimborsoMissioneService {
 						if (!impegno.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
 							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
 						}
+					} else {
+						rimborsoMissione.setVoce(impegno.getCdElementoVoce());
 					}
 					rimborsoMissione.setCdCdsObbligazione(impegno.getCdCds());
 					rimborsoMissione.setEsercizioObbligazione(impegno.getEsercizio());

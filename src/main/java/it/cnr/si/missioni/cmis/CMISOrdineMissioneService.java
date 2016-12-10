@@ -219,7 +219,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setDescrizioneUoOrdine(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
-		cmisOrdineMissione.setDisponibilita(dispImpegno);
+		cmisOrdineMissione.setDisponibilita(Utility.nvl(dispImpegno));
 		cmisOrdineMissione.setGae(gae == null ? "" : gae.getCd_linea_attivita());
 		cmisOrdineMissione.setImpegnoAnnoCompetenza(ordineMissione.getEsercizioObbligazione() == null ? null : new Long(ordineMissione.getEsercizioObbligazione()));
 		cmisOrdineMissione.setImpegnoAnnoResiduo(ordineMissione.getEsercizioOriginaleObbligazione() == null ? null : new Long(ordineMissione.getEsercizioOriginaleObbligazione()));

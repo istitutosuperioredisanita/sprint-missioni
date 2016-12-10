@@ -40,7 +40,7 @@
               <div class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.domicilio-fiscale">Domicilio</span>
-                              <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="domicilioFiscale" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="rimborsoMissioneModel.domicilioFiscale"/>
+                              <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="rimborsoMissioneModel.domicilioFiscaleRich"/>
                           </span>
               </div>
             </div>
@@ -392,7 +392,7 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-4" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
@@ -402,14 +402,14 @@
             </form>
             <form name="form-inline" role="form" ng-submit="finalizeRimborsoMissione()">
                     <div class="col-md-4" ng-show="showEsisteRimborsoMissione && validazione === 'D'">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
 
                     <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
-                      <a target="_blank" href="app/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                      <a target="_blank" href="app/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
 <!--

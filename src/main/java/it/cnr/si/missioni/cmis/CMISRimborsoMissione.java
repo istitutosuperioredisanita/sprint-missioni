@@ -9,6 +9,7 @@ public class CMISRimborsoMissione extends CMISMissione {
 	private String annoMandato;
 	private String numeroMandato;
 	private String importoMandato;
+	private String totaleRimborsoMissione;
 	public String getWfOrdineMissione() {
 		return wfOrdineMissione;
 	}
@@ -56,6 +57,12 @@ public class CMISRimborsoMissione extends CMISMissione {
 	}
 	public void setIdOrdineMissione(String idOrdineMissione) {
 		this.idOrdineMissione = idOrdineMissione;
+	}
+	public String getTotaleRimborsoMissione() {
+		return totaleRimborsoMissione;
+	}
+	public void setTotaleRimborsoMissione(String totaleRimborsoMissione) {
+		this.totaleRimborsoMissione = totaleRimborsoMissione;
 	}
 
 }

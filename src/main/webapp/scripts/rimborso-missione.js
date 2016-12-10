@@ -79,6 +79,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.pgObbligazione = ordineMissioneSelected.pgObbligazione;
                 $scope.rimborsoMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
                 $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+                $scope.rimborsoMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
@@ -784,7 +785,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.inizializzaFormPerInserimento = function(account){
         $scope.rimborsoMissioneModel = {nominativo:account.lastName+" "+account.firstName, 
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
-                                        indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
+                                        indirizzoResidenzaRich:account.indirizzo_completo_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,

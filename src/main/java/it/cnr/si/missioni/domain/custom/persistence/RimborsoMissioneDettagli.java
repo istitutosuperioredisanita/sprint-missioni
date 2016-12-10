@@ -104,6 +104,9 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "CAMBIO", length = 19, nullable = true)
     private BigDecimal cambio;
 
+    @Column(name = "GIUSTIFICATIVO", length = 1, nullable = true)
+    private String giustificativo;
+
 	@Transient
     private String decodeSpesaAnticipata;
 	
@@ -320,4 +323,22 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 			return Costanti.SI_NO.get("N");
 		}
 	}
+
+	public String getGiustificativo() {
+		return giustificativo;
+	}
+
+	public void setGiustificativo(String giustificativo) {
+		this.giustificativo = giustificativo;
+	}
+
+	@Transient
+	public Boolean isGiustificativoObbligatorio() {
+		if (!StringUtils.isEmpty(getGiustificativo()) && getGiustificativo().equals("N")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 }
