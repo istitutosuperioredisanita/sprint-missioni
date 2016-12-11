@@ -377,7 +377,8 @@
             "info-disponibilita": "Informazioni sulla Disponibilità"
         },
         "button": {
-            "sendToSign": "Invia alla Firma"
+            "sendToSign": "Invia alla Firma",
+            "returnToSender": "Sblocca"
         }
     },
     "elenco-ordini-missione": {

@@ -223,6 +223,9 @@ public class RimborsoMissioneService {
 		}
 		
 		if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("S")){
+			if (!rimborsoMissioneDB.getStato().equals(Costanti.STATO_CONFERMATO)){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione non confermato.");
+			}
 			if (!rimborsoMissioneDB.isMissioneDaValidare()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione già validato.");
 			}
@@ -247,6 +250,12 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
 			rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
 			rimborsoMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
+		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
+			if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isMissioneDaValidare()) {
+				rimborsoMissioneDB.setStato(Costanti.STATO_INSERITO);
+			} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un rimborso missione se è stato già inviato al flusso.");
+			}
 		} else {
 			rimborsoMissioneDB.setStato(rimborsoMissione.getStato());
 			rimborsoMissioneDB.setStatoFlusso(rimborsoMissione.getStatoFlusso());
@@ -311,18 +320,21 @@ public class RimborsoMissioneService {
 			}
 		}
 //		//effettuo controlli di validazione operazione CRUD
-		validaCRUD(principal, rimborsoMissioneDB);
+    	if (!Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
+    		validaCRUD(principal, rimborsoMissioneDB);
+    	}
 
 		controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
     	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare()){
     		cmisRimborsoMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), rimborsoMissioneDB);
     	}
+    	rimborsoMissioneDB.setRimborsoMissioneDettagli(null);
     	rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDB);
     	
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Rimborso Missione: {}", rimborsoMissioneDB);
 
-    	return rimborsoMissione;
+    	return rimborsoMissioneDB;
     }
 
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
@@ -337,9 +349,11 @@ public class RimborsoMissioneService {
 			}
 		}
 	}
-	public Boolean assenzaDettagli(RimborsoMissione rimborsoMissioneDB) {
-		if (rimborsoMissioneDB.getRimborsoMissioneDettagli() == null || rimborsoMissioneDB.getRimborsoMissioneDettagli().isEmpty() ){
+	public Boolean assenzaDettagli(RimborsoMissione rimborsoMissione) {
+		if (rimborsoMissione.getRimborsoMissioneDettagli() == null || rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
 			return true;
+		} else {
+			cmisRimborsoMissioneService.controlloEsitenzaGiustificativoDettaglio(rimborsoMissione);
 		}
 		return false;
 	}

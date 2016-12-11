@@ -132,7 +132,7 @@ public class CMISOrdineMissioneService {
 		if (ordineMissione != null){
 			anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
 			if (anticipo != null){
-				ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
+//				ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
 				ordineMissione.setRichiestaAnticipo("S");
 			} else {
 				ordineMissione.setRichiestaAnticipo("N");
