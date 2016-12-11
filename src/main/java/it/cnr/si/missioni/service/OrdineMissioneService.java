@@ -549,7 +549,7 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
 			ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
-			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() ||  ordineMissioneDB.isMissioneDaValidare())) {
+			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
 				ordineMissioneDB.setStato(Costanti.STATO_INSERITO);
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
