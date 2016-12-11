@@ -8,6 +8,7 @@ missioniApp.factory('RimborsoMissioneService', function ($resource) {
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
             'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}},
             'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
         });
     });
@@ -866,6 +867,31 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             );
     }
 
+    $scope.ritornaMittenteRimborsoMissione = function () {
+            $rootScope.salvataggio = true;
+            RimborsoMissioneService.return_sender($scope.rimborsoMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Rimborso Missione sbloccato.");
+                        ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                            $scope.rimborsoMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                        if (httpResponse.status === 200) {
+                        } else {
+                            if (httpResponse.data.message){
+                                ui.error(httpResponse.data.message);
+                            } else {
+                                ui.error(httpResponse.data);
+                            }
+                        }
+                    }
+            );
+    }
+
     $scope.finalizeRimborsoMissione = function () {
             $rootScope.salvataggio = true;
             RimborsoMissioneService.finalize($scope.rimborsoMissioneModel,
@@ -977,6 +1003,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             $rootScope.salvataggio = true;
             RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
                     function (value, responseHeaders) {
+                        $scope.rimborsoMissioneModel = value;
                         $rootScope.salvataggio = false;
                     },
                     function (httpResponse) {
