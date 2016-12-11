@@ -412,6 +412,7 @@ missioniApp.factory('OrdineMissioneService', function ($resource) {
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
             'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}},
             'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
         });
     });
@@ -1026,6 +1027,31 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             );
     }
 
+    $scope.ritornaMittenteOrdineMissione = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.return_sender($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione sbloccato.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                        if (httpResponse.status === 200) {
+                        } else {
+                            if (httpResponse.data.message){
+                                ui.error(httpResponse.data.message);
+                            } else {
+                                ui.error(httpResponse.data);
+                            }
+                        }
+                    }
+            );
+    }
+
     $scope.validateOrdineMissione = function () {
             $rootScope.salvataggio = true;
             OrdineMissioneService.confirm_validate($scope.ordineMissioneModel,
@@ -1180,6 +1206,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             OrdineMissioneService.modify($scope.ordineMissioneModel,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
+                        $scope.ordineMissioneModel = value;
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;

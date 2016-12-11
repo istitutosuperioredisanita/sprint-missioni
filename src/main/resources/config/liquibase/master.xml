@@ -15,6 +15,7 @@
     <include file="classpath:config/liquibase/changelog/20161128152200_add_column_pg_banca.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20161107152200_add_column_inquadramento.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160913152200_add_column_progr_rimborso.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161210152200_add_column_giustificativo.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

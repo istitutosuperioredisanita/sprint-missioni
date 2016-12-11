@@ -150,7 +150,11 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                             $http.get('app/rest/rimborsoMissione/dettagli/viewAttachments/' + idDettaglioSpesa).then(function (data) {
                                   $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
-                                  $scope.dettagliSpese[i].attachmentsExists = attachments && Object.keys(attachments).length > 0;
+                                  if (attachments && Object.keys(attachments).length > 0){
+                                    $scope.dettagliSpese[i].attachmentsExists = true;  
+                                  } else {
+                                    $scope.dettagliSpese[i].attachmentsExists = false;
+                                  }
                                   $scope.dettagliSpese[i].attachments = attachments;
                             }, function () {
                                   $scope.dettagliSpese[i].isFireSearchAttachments = false;
@@ -191,7 +195,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         } else {
                             $scope.newDettaglioSpesa.giustificativo = 'N';
                         }
-                        $scope.newDettaglioSpesa.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
                         $scope.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
                         $scope.pasto = tipo_spesa.fl_pasto;
                         $scope.rimborso = tipo_spesa.fl_rimborso_km;

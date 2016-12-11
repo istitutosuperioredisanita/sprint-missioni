@@ -29,7 +29,7 @@
                     <p class="col-md-5">
                         <span class="input-group">
                           <span class="input-group-addon" translate="ordine-missione-anticipo.form.importo">importo</span>
-                          <input ng-disabled="validazione != 'N' || isOrdineMissioneConfermato" type="text" class="input-sm form-control" required style="text-align:right" ng-currency name="importo" ng-model="anticipoOrdineMissioneModel.importo">
+                          <input ng-disabled="validazione != 'N' || isOrdineMissioneConfermato" type="text" class="input-sm form-control" required style="text-align:right" ng-currency name="importo" currency-symbol="€" ng-model="anticipoOrdineMissioneModel.importo">
                         </span>
                     </p>
             </form>
@@ -54,7 +54,7 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-md-4" ng-show="anticipoOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
+                    <div class="col-md-4" ng-hide="anticipoOrdineMissioneModel.id" >
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>

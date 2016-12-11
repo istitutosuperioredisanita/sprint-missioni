@@ -312,6 +312,11 @@
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
+            <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && validazione === 'S'">
+                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span></button>
+                    </div>
+            </form>
             <form name="form-inline" role="form" ng-submit="finalizeOrdineMissione()">
                     <div class="col-md-4" ng-show="showEsisteOrdineMissione && validazione === 'D'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>

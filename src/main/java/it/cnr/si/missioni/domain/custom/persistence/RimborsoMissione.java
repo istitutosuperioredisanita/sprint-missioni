@@ -1070,11 +1070,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public void setInquadramento(Long inquadramento) {
 		this.inquadramento = inquadramento;
 	}
-
+	
+	@Transient
 	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli() {
 		return rimborsoMissioneDettagli;
 	}
 
+	@Transient
 	public void setRimborsoMissioneDettagli(List<RimborsoMissioneDettagli> rimborsoMissioneDettagli) {
 		this.rimborsoMissioneDettagli = rimborsoMissioneDettagli;
 	}

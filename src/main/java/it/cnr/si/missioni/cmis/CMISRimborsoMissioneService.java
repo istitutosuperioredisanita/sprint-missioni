@@ -115,7 +115,7 @@ public class CMISRimborsoMissioneService {
 	private PrintRimborsoMissioneService printRimborsoMissioneService;
 
 	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
-		ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(principal, idDettagliorimborso);
+		ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(idDettagliorimborso);
 		if (children != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
 	        for (CmisObject object : children){
@@ -131,7 +131,7 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 		
-	public ItemIterable<CmisObject> getAttachmentsDetailRimborso(Principal principal, Long idDettagliorimborso) throws ComponentException{
+	public ItemIterable<CmisObject> getAttachmentsDetailRimborso(Long idDettagliorimborso) throws ComponentException{
 		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
 		if (folder != null){
 	        ItemIterable<CmisObject> children = ((Folder) folder).getChildren();
@@ -612,7 +612,7 @@ public class CMISRimborsoMissioneService {
 				 jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_importoMandato" , cmisRimborsoMissione.getImportoMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRimborso" , cmisRimborsoMissione.getWfOrdineMissione());
-				 jGenerator.writeStringField("prop_cnrmissioni_totRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione());
+//				 jGenerator.writeStringField("prop_cnrmissioni_totRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione());
 				jGenerator.writeEndObject();
 				jGenerator.close();
 			} catch (IOException e) {
@@ -653,7 +653,7 @@ public class CMISRimborsoMissioneService {
 			throws ComponentException {
 		List<String> list = new ArrayList<>();
 		for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(principal, new Long (dettaglio.getId().toString()));
+			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
 			if (children != null){
 				for (CmisObject object : children){
 			    	Document doc = (Document)object;
@@ -663,6 +663,18 @@ public class CMISRimborsoMissioneService {
 						list.add(nodeRef);
 			    	}
 			    }
+			} else {
+				if (dettaglio.isGiustificativoObbligatorio()){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
+				}
+			}
+		}
+	}
+	public void controlloEsitenzaGiustificativoDettaglio(RimborsoMissione rimborsoMissione)
+			throws ComponentException {
+		for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
+			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
+			if (children != null){
 			} else {
 				if (dettaglio.isGiustificativoObbligatorio()){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
