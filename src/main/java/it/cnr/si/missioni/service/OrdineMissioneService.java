@@ -218,11 +218,7 @@ public class OrdineMissioneService {
         			if (result != null){
     			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
         				if (result.isApprovato()){
-        					ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
-//        					if (ordineMissioneDaAggiornare.getPgObbligazione() != null){
-        						ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-//        					}
-        					updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
         					listaNew.add(ordineMissione);
         				} else if (result.isStateReject()){
@@ -267,6 +263,13 @@ public class OrdineMissioneService {
     	return lista;
     }
 
+	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
+			throws Exception {
+		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+	}
+
 	private void aggiornaValidazione(OrdineMissione ordineMissione) {
 		Uo uo = uoService.recuperoUoSigla(ordineMissione.getUoRich());
 		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("N")){
@@ -309,16 +312,19 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.ge("id", filter.getDaId()));
 			}
 			if (filter.getStato() != null){
-				criterionList.add(Restrictions.le("stato", filter.getStato()));
+				criterionList.add(Restrictions.ge("stato", filter.getStato()));
 			}
 			if (filter.getStatoFlusso() != null){
-				criterionList.add(Restrictions.le("statoFlusso", filter.getStatoFlusso()));
+				criterionList.add(Restrictions.ge("statoFlusso", filter.getStatoFlusso()));
 			}
 			if (filter.getValidato() != null){
-				criterionList.add(Restrictions.le("validato", filter.getValidato()));
+				criterionList.add(Restrictions.ge("validato", filter.getValidato()));
 			}
 			if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()){
 				criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
+			}
+			if (filter.getListaStatiFlussoMissione() != null && !filter.getListaStatiFlussoMissione().isEmpty()){
+				criterionList.add(Restrictions.in("statoFlusso", filter.getListaStatiFlussoMissione()));
 			}
 			
 			if (filter.getaId() != null){
