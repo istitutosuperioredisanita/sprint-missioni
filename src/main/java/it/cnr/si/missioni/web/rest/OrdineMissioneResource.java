@@ -1,18 +1,5 @@
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.MimeTypes;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.service.OrdineMissioneService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.web.filter.MissioneFilter;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,9 +31,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.jada.ejb.session.BusyResourceException;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.service.OrdineMissioneService;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 
 /**
  * REST controller for managing the current user's account.
@@ -58,12 +55,10 @@ public class OrdineMissioneResource {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneResource.class);
 
-
     @Autowired
     private TokenStore tokenStore;
-
-    
-    @Inject
+ 
+    @Autowired
     private OrdineMissioneService ordineMissioneService;
 
     /**

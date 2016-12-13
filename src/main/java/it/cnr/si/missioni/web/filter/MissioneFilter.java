@@ -5,6 +5,7 @@ import java.util.List;
 
 public class MissioneFilter {
 	private List<String> listaStatiMissione;
+	private List<String> listaStatiFlussoMissione;
 	private String user;
 	private String stato;
 	private String statoFlusso;
@@ -108,5 +109,11 @@ public class MissioneFilter {
 	}
 	public void setListaStatiMissione(List<String> listaStatiMissione) {
 		this.listaStatiMissione = listaStatiMissione;
+	}
+	public List<String> getListaStatiFlussoMissione() {
+		return listaStatiFlussoMissione;
+	}
+	public void setListaStatiFlussoMissione(List<String> listaStatiFlussoMissione) {
+		this.listaStatiFlussoMissione = listaStatiFlussoMissione;
 	}
 }
