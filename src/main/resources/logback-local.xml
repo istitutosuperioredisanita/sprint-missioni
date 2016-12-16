@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <property name="syslog.url" value="${syslog.url:-gestione.missioni.cnr.it}" />
-    <property name="syslog.port" value="1514" />
-    <property name="LOG_FILE" value="${LOG_FILE:-logs/missioni.log}" />
-    <include resource="logging/properties/prod.xml" />
 
-    <!-- spring boot logback configuration files -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <property name="LOG_FILE" value="${LOG_FILE:-logs/missioni.log}" />
     <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
-    <include resource="logging/appender/syslog.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-    <!-- logger CNR -->
     <logger name="it.cnr" level="DEBUG"/>
-    <logger name="com.sun" level="WARN"/>
-    <logger name="com.hazelcast" level="INFO"/>
 
-    <root level="WARN">
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
+
 </configuration>
