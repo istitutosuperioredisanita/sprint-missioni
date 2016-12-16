@@ -2,13 +2,13 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
     <changeSet author="missioni" id="20161214152300">
     	<addColumn 
-            tableName="RIMBORSO_MISSIONE_DETTAGLIO">
+            tableName="RIMBORSO_MISSIONE_DETTAGLI">
             <column name="DS_NO_GIUSTIFICATIVO" type="VARCHAR(100)">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>
     	<addColumn 
-            tableName="RIMBORSO_MISSIONE_DETTAGLIO">
+            tableName="RIMBORSO_MISSIONE_DETTAGLI">
             <column name="LOCALITA_SPOSTAMENTO" type="VARCHAR(200)">
                 <constraints nullable="true"/>
             </column>
