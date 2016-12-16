@@ -616,6 +616,12 @@ public class RimborsoMissioneService {
 
     private void controlloDatiObbligatoriDaGUI(RimborsoMissione rimborsoMissione){
 		if (rimborsoMissione != null){
+			if (!StringUtils.isEmpty(rimborsoMissione.getMatricola())){
+				if (StringUtils.isEmpty(rimborsoMissione.getInquadramento()))
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato possibile recuperare il valore dell'Inquadramento SIGLA. Verificare i dati");
+			} else {
+				
+			}
 			if (StringUtils.isEmpty(rimborsoMissione.getCdsRich())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Cds Richiedente");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getCdsSpesa())){

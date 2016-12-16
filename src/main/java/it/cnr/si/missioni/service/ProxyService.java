@@ -3,15 +3,18 @@ package it.cnr.si.missioni.service;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 import it.cnr.si.missioni.web.rest.ProxyResource;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,6 +106,9 @@ public class ProxyService implements EnvironmentAware{
 	}
     
     public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization) {
+    	return process(httpMethod, jsonBody, app, url, queryString, authorization, false);
+    }
+    public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
         log.info("REST request from app ", app);
         String appUrl = propertyResolver.getProperty(app + ".url");
         if (appUrl == null) {
@@ -124,6 +130,10 @@ public class ProxyService implements EnvironmentAware{
         		headers.add("Authorization", authorization);
         	}
         	headers.setContentType(MediaType.APPLICATION_JSON);
+        	
+        	if (restContextHeader){
+        		addContextToHeaders(app, headers);
+        	}
         	
     		String body = null;
         	try {
@@ -158,6 +168,17 @@ public class ProxyService implements EnvironmentAware{
         }    	
     }
 
+	private void addContextToHeaders(String app, HttpHeaders headers) {
+		Context context = getDefaultContext(app);
+		if (context != null){
+			headers.add("X-sigla-cd-cds", context.getCd_cds());
+			headers.add("X-sigla-cd-unita-organizzativa", context.getCd_unita_organizzativa());
+			headers.add("X-sigla-cd-cdr", context.getCd_cdr());
+			int anno = DateUtils.getCurrentYear();
+			headers.add("X-sigla-esercizio", new Integer(anno).toString());
+		}
+	}
+
 	private RestTemplate getRestTemplate(String app) {
     	if (!restTemplateMap.containsKey(app))
     		restTemplateMap.put(app, new RestTemplate());    		
@@ -171,6 +192,20 @@ public class ProxyService implements EnvironmentAware{
         this.restTemplateMap = new HashMap<String, RestTemplate>();
 	}
 
+	public Context getDefaultContext(String app){
+		String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
+		Context context = new Context();
+    	if (!StringUtils.isEmpty(uoContext)){
+    		context.setCd_unita_organizzativa(uoContext);
+    		if (StringUtils.isEmpty(context.getCd_cds())){
+    			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
+    		}
+    		if (StringUtils.isEmpty(context.getCd_cdr())){
+    			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
+    		}
+    	}
+    	return context;
+	}
 	public JSONBody inizializzaJson() {
 		JSONBody jBody = new JSONBody();
 		jBody.setActivePage(0);
