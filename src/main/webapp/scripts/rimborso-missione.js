@@ -8,6 +8,7 @@ missioniApp.factory('RimborsoMissioneService', function ($resource) {
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
             'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}},
             'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
         });
     });
@@ -79,6 +80,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.pgObbligazione = ordineMissioneSelected.pgObbligazione;
                 $scope.rimborsoMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
                 $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+                $scope.rimborsoMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
@@ -784,7 +786,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.inizializzaFormPerInserimento = function(account){
         $scope.rimborsoMissioneModel = {nominativo:account.lastName+" "+account.firstName, 
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
-                                        indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
+                                        indirizzoResidenzaRich:account.indirizzo_completo_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
@@ -846,6 +848,31 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Rimborso Missione confermato e inviato all'approvazione.");
+                        ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
+                            $scope.rimborsoMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                        if (httpResponse.status === 200) {
+                        } else {
+                            if (httpResponse.data.message){
+                                ui.error(httpResponse.data.message);
+                            } else {
+                                ui.error(httpResponse.data);
+                            }
+                        }
+                    }
+            );
+    }
+
+    $scope.ritornaMittenteRimborsoMissione = function () {
+            $rootScope.salvataggio = true;
+            RimborsoMissioneService.return_sender($scope.rimborsoMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Rimborso Missione sbloccato.");
                         ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
@@ -976,6 +1003,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             $rootScope.salvataggio = true;
             RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
                     function (value, responseHeaders) {
+                        $scope.rimborsoMissioneModel = value;
                         $rootScope.salvataggio = false;
                     },
                     function (httpResponse) {

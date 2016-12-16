@@ -287,6 +287,10 @@ public class OrdineMissioneResource {
             	}
     		} catch (ComponentException e) {
     			throw new RuntimeException(Utility.getMessageException(e));
+    		} catch (AwesomeException e) {
+    			throw new RuntimeException(e.getLocalizedMessage());
+    		} catch (Exception e) {
+    			throw new RuntimeException(Utility.getMessageException(e));
     		} 
         }
     }
