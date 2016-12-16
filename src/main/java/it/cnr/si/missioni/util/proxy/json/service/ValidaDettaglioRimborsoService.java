@@ -21,7 +21,7 @@ public class ValidaDettaglioRimborsoService {
 
 			String app = Costanti.APP_SIGLA;
 			String url = Costanti.REST_VALIDA_MASSIMALE_SPESA;
-			String risposta = commonService.process(body, app, url);
+			String risposta = commonService.processWithContextHeader(body, app, url);
 
 		}
 		return null;
@@ -32,7 +32,7 @@ public class ValidaDettaglioRimborsoService {
 		if (dettaglio.getKmPercorsi() != null){
 			clause.setKm(dettaglio.getKmPercorsi().toString());
 		}
-		clause.setData(DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa()));
+		clause.setData(DateUtils.getDateAsString(dettaglio.getDataSpesa(),"yyyy-MM-dd"));
 		clause.setNazione(dettaglio.getRimborsoMissione().getNazione());
 		clause.setInquadramento(dettaglio.getRimborsoMissione().getInquadramento());
 		clause.setDivisa(dettaglio.getCdDivisa());
