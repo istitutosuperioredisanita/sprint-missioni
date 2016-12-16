@@ -47,8 +47,16 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     private String uid;
 
     @Size(min = 0, max = 1000)
-    @Column(name = "NOTE", length = 3, nullable = true)
+    @Column(name = "NOTE", length = 1000, nullable = true)
     private String note;
+
+    @Size(min = 0, max = 100)
+    @Column(name = "DS_NO_GIUSTIFICATIVO", length = 100, nullable = true)
+    private String dsNoGiustificativo;
+
+    @Size(min = 0, max = 200)
+    @Column(name = "LOCALITA_SPOSTAMENTO", length = 200, nullable = true)
+    private String localitaSpostamento;
 
     @Column(name = "RIGA", length = 50, nullable = false)
     private Long riga;
@@ -339,6 +347,39 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		} else {
 			return true;
 		}
+	}
+
+	@Transient
+	public Boolean isDettaglioPasto() {
+		if (!StringUtils.isEmpty(getCdTiPasto())){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	@Transient
+	public Boolean isDettaglioIndennitaKm() {
+		if (!StringUtils.isEmpty(getKmPercorsi())){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public String getDsNoGiustificativo() {
+		return dsNoGiustificativo;
+	}
+
+	public void setDsNoGiustificativo(String dsNoGiustificativo) {
+		this.dsNoGiustificativo = dsNoGiustificativo;
+	}
+
+	public String getLocalitaSpostamento() {
+		return localitaSpostamento;
+	}
+
+	public void setLocalitaSpostamento(String localitaSpostamento) {
+		this.localitaSpostamento = localitaSpostamento;
 	}
 
 }
