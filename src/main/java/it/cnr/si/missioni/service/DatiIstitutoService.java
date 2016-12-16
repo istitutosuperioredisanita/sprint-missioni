@@ -69,6 +69,7 @@ public class DatiIstitutoService {
     		} else {
         		datiIstitutoInsert = creaDatiIstitutoOrdine(principal, istituto, anno);
     		}
+    		datiIstituto = datiIstitutoInsert;
     		log.debug("Created Information for Dati Istituto: {}", datiIstitutoInsert);
     	}
 		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
