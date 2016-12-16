@@ -65,9 +65,16 @@ public class CommonService {
 		return risposta;
 	}
 	public String process(JSONBody jBody, String app, String url) {
-		String risposta = null;
 		cacheService.setContext(jBody, app);
-		ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null);
+		return process(jBody, app, url, false);
+	}
+	public String processWithContextHeader(JSONBody jBody, String app, String url) {
+		return process(jBody, app, url, true);
+	}
+
+	private String process(JSONBody jBody, String app, String url, Boolean value) {
+		String risposta = null;
+		ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null, value);
 		risposta = result.getBody();
 		return risposta;
 	}

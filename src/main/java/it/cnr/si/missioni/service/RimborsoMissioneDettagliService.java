@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
@@ -116,6 +117,7 @@ public class RimborsoMissioneDettagliService {
     	maxRiga = maxRiga + 1;
     	rimborsoMissioneDettagli.setRiga(maxRiga);
     	rimborsoMissioneDettagli.setToBeCreated();
+    	controlloDatiObbligatoriDaGui(rimborsoMissioneDettagli);
 		impostaImportoDivisa(rimborsoMissioneDettagli);
 		validaCRUD(principal, rimborsoMissioneDettagli);
 		rimborsoMissioneDettagli = (RimborsoMissioneDettagli)crudServiceBean.creaConBulk(principal, rimborsoMissioneDettagli);
@@ -123,6 +125,16 @@ public class RimborsoMissioneDettagliService {
     	log.debug("Created Information for RimborsoMissioneDettagli: {}", rimborsoMissioneDettagli);
     	return rimborsoMissioneDettagli;
     }
+
+	private void controlloDatiObbligatoriDaGui(RimborsoMissioneDettagli dettaglio){
+		if (dettaglio != null){
+			if (StringUtils.isEmpty(dettaglio.getDataSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Spesa");
+			} else if (StringUtils.isEmpty(dettaglio.getImportoEuro())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Importo Euro");
+			} 
+		}
+	}
 
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -187,6 +199,8 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setCambio(rimborsoMissioneDettagli.getCambio());
 		rimborsoMissioneDettagliDB.setCdDivisa(rimborsoMissioneDettagli.getCdDivisa());
 		rimborsoMissioneDettagliDB.setImportoEuro(rimborsoMissioneDettagli.getImportoEuro());
+		rimborsoMissioneDettagliDB.setDsNoGiustificativo(rimborsoMissioneDettagli.getDsNoGiustificativo());
+		rimborsoMissioneDettagliDB.setLocalitaSpostamento(rimborsoMissioneDettagli.getLocalitaSpostamento());
 		impostaImportoDivisa(rimborsoMissioneDettagliDB);
 		
 		rimborsoMissioneDettagliDB.setToBeUpdated();

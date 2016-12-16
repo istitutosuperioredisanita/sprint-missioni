@@ -35,7 +35,7 @@
                             <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
                             <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.decodeSpesaAnticipata}}
                             <br>
-                            <span ng-show="dettaglioSpesa.dsNoGiustificativo"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.mancanca-giustificativo' | translate}}:</b>{{dettaglioSpesa.dsNoGiustificativo}}</span>
+                            <span ng-show="dettaglioSpesa.dsNoGiustificativo"><b>{{'rimborso-missione-dettagli.form.dettaglio-spese.mancanza-giustificativo' | translate}}:</b>  {{dettaglioSpesa.dsNoGiustificativo}}</span>
                             <br>
                             <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro}}
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
@@ -104,7 +104,7 @@
                                         </span>
                                     </p>
                             </form>
-                            <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.giustificativo == 'S'">
+                            <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.giustificativo = 'S'">
                                     <p class="col-md-12">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.mancanza-giustificativo">mancanza giustificativo</span>
@@ -181,7 +181,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
-              <select ng-disabled="!tipi_pasto || tipi_pasto.length() == 0" class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
+              <select ng-disabled="!tipi_pasto || tipi_pasto.length() = 0" class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
                         </span>
                     </p>
             </form>
