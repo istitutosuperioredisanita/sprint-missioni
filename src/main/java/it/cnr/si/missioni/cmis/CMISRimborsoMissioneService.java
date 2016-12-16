@@ -425,6 +425,13 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 	
+	public String getNodeRefFolderDettaglioRimborso(Long idDettagliorimborso){
+		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
+		if (folder != null){
+			return 	folder.getId();
+		}
+		return null;
+	}
 	public CMISFileAttachment uploadAttachmentDetail(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes){
 		Document doc = salvaAllegatoRimborsoMissioneDettaglioCMIS(principal, rimborsoMissioneDettagli, inputStream, name, mimeTypes);
 		if (doc != null){
@@ -665,7 +672,9 @@ public class CMISRimborsoMissioneService {
 			    }
 			} else {
 				if (dettaglio.isGiustificativoObbligatorio()){
-					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
+					if (!StringUtils.hasLength(dettaglio.getDsNoGiustificativo())){
+						throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo oppure il motivo della mancanza.");
+					}
 				}
 			}
 		}
@@ -715,8 +724,8 @@ public class CMISRimborsoMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files di rimborso di missione aventi l'ID :"+ rimborsoMissione.getId()+", Anno:"+rimborsoMissione.getAnno()+", Numero:"+rimborsoMissione.getNumero());
 		} else {
 			for (QueryResult nodeFile : results) {
-				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
-				return file;
+				String nodeRef = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
+				return nodeRef;
 			}
 		}
 		return null;

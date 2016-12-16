@@ -133,7 +133,7 @@ public class RimborsoMissioneService {
 		return rimborsoMissione;
     }
 
-	private void retrieveDetails(Principal principal, RimborsoMissione rimborsoMissione) throws NumberFormatException, ComponentException {
+	public void retrieveDetails(Principal principal, RimborsoMissione rimborsoMissione) throws NumberFormatException, ComponentException {
 		List<RimborsoMissioneDettagli> list = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli(principal, new Long(rimborsoMissione.getId().toString()));
 		rimborsoMissione.setRimborsoMissioneDettagli(list);
 	}
@@ -148,11 +148,7 @@ public class RimborsoMissioneService {
         			if (result != null){
         				RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
         				if (result.isApprovato()){
-        					rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
-//        					if (rimborsoMissioneDaAggiornare.getPgObbligazione() != null){
-        						rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-//        					}
-        					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
         					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
         					listaNew.add(rimborsoMissione);
         				} else if (result.isStateReject()){
@@ -190,6 +186,13 @@ public class RimborsoMissioneService {
     	}
     	return lista;
     }
+
+	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
+			throws Exception {
+		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+	}
 
     @Transactional(propagation = Propagation.REQUIRED)
     public RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws AwesomeException, 
