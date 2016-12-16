@@ -521,6 +521,9 @@ public class OrdineMissioneService {
 		}
 		
 		if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("S")){
+			if (!ordineMissioneDB.getStato().equals(Costanti.STATO_CONFERMATO)){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione non confermato.");
+			}
 			if (!ordineMissioneDB.isMissioneDaValidare()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
 			}
@@ -545,6 +548,12 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
 			ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
+		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
+			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
+				ordineMissioneDB.setStato(Costanti.STATO_INSERITO);
+			} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
+			}
 		} else {
 			ordineMissioneDB.setStato(ordineMissione.getStato());
 			ordineMissioneDB.setStatoFlusso(ordineMissione.getStatoFlusso());
@@ -593,7 +602,9 @@ public class OrdineMissioneService {
     	ordineMissioneDB.setToBeUpdated();
 
 //		//effettuo controlli di validazione operazione CRUD
-		validaCRUD(principal, ordineMissioneDB);
+    	if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
+        	validaCRUD(principal, ordineMissioneDB);
+    	}
 
     	if (confirm && !ordineMissioneDB.isMissioneDaValidare()){
     		cmisOrdineMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneDB);
@@ -603,7 +614,7 @@ public class OrdineMissioneService {
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
 
-    	return ordineMissione;
+    	return ordineMissioneDB;
     }
 
 //    @Transactional(readOnly = true)
@@ -757,6 +768,8 @@ public class OrdineMissioneService {
 						if (!impegnoGae.getCdElementoVoce().equals(ordineMissione.getVoce())){
 							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+ordineMissione.getVoce());
 						}
+					} else {
+						ordineMissione.setVoce(impegnoGae.getCdElementoVoce());
 					}
 					ordineMissione.setCdCdsObbligazione(impegnoGae.getCdCds());
 					ordineMissione.setEsercizioObbligazione(impegnoGae.getEsercizio());
@@ -770,6 +783,8 @@ public class OrdineMissioneService {
 						if (!impegno.getCdElementoVoce().equals(ordineMissione.getVoce())){
 							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+ordineMissione.getVoce());
 						}
+					} else {
+						ordineMissione.setVoce(impegno.getCdElementoVoce());
 					}
 					ordineMissione.setCdCdsObbligazione(impegno.getCdCds());
 					ordineMissione.setEsercizioObbligazione(impegno.getEsercizio());

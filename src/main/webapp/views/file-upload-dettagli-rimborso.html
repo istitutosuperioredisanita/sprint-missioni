@@ -1,0 +1,11 @@
+<form class="fileupload" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+  <div ng-show="(isFinishRestAttachments == true || isFinishRestAttachments == false) && !disabilita  && validazione == 'N'" class="row fileupload-buttonbar">
+    <div class="col-lg-4">
+      <span class="btn btn-sm btn-success fileinput-button" ng-class="{disabled: disabled}">
+      <i class="glyphicon glyphicon-plus"></i>
+      <span>Aggiungi Allegato</span>
+      <input type="file" name="file" multiple ng-disabled="disabled">
+      </span>
+    </div>
+  </div>
+</form>

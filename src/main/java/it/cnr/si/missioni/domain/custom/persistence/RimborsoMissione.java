@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissioneDettagli;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
@@ -10,6 +11,7 @@ import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -41,6 +43,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione",
 			CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo",
 			CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id",
+			CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione",
 			CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso",
 			CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto",
 			CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato",
@@ -1067,11 +1070,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public void setInquadramento(Long inquadramento) {
 		this.inquadramento = inquadramento;
 	}
-
+	
+	@Transient
 	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli() {
 		return rimborsoMissioneDettagli;
 	}
 
+	@Transient
 	public void setRimborsoMissioneDettagli(List<RimborsoMissioneDettagli> rimborsoMissioneDettagli) {
 		this.rimborsoMissioneDettagli = rimborsoMissioneDettagli;
 	}
@@ -1084,4 +1089,15 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.pgBanca = pgBanca;
 	}
 
+	@Transient
+	public BigDecimal getTotaleRimborso(){
+		BigDecimal totRimborso = BigDecimal.ZERO;
+		if (getRimborsoMissioneDettagli() != null){
+			for (Iterator<RimborsoMissioneDettagli> iterator = getRimborsoMissioneDettagli().iterator(); iterator.hasNext();){
+	    		RimborsoMissioneDettagli dettagli = iterator.next();
+	    		totRimborso = totRimborso.add(dettagli.getImportoEuro());
+			}
+		}
+		return totRimborso;
+	}
 }

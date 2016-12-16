@@ -160,6 +160,11 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         userWork.comune_residenza = data.comune_residenza; 
         userWork.indirizzo_residenza = data.indirizzo_residenza; 
         userWork.num_civico_residenza = data.num_civico_residenza;
+        if (userWork.num_civico_residenza){
+            userWork.indirizzo_completo_residenza = data.indirizzo_residenza+" "+data.num_civico_residenza;
+        } else {
+            userWork.indirizzo_completo_residenza = data.indirizzo_residenza;
+        }
         userWork.cap_residenza = data.cap_residenza;
         userWork.provincia_residenza = data.provincia_residenza;
         userWork.codice_fiscale = data.codice_fiscale;
@@ -407,6 +412,7 @@ missioniApp.factory('OrdineMissioneService', function ($resource) {
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
             'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}},
             'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
         });
     });
@@ -966,7 +972,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.inizializzaFormPerInserimento = function(account){
         $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
                                         comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
-                                        indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
+                                        indirizzoResidenzaRich:account.indirizzo_completo_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
@@ -1002,6 +1008,31 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
 	                    ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                        if (httpResponse.status === 200) {
+                        } else {
+                            if (httpResponse.data.message){
+                                ui.error(httpResponse.data.message);
+                            } else {
+                                ui.error(httpResponse.data);
+                            }
+                        }
+                    }
+            );
+    }
+
+    $scope.ritornaMittenteOrdineMissione = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.return_sender($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione sbloccato.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
@@ -1175,6 +1206,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             OrdineMissioneService.modify($scope.ordineMissioneModel,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
+                        $scope.ordineMissioneModel = value;
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;
