@@ -140,6 +140,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = false)
     public String indirizzoResidenzaRich;
 
+    @Size(min = 0, max = 6)
+    @Column(name = "MATRICOLA", length = 6, nullable = true)
+    private String matricola;
+
     @Size(min = 0, max = 100)
     @Column(name = "DOMICILIO_FISCALE_RICH", length = 100, nullable = true)
     public String domicilioFiscaleRich;
@@ -999,5 +1003,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			return Costanti.PARTENZA_DA.get(getPartenzaDa());
 		}
 		return "";
+	}
+
+	public String getMatricola() {
+		return matricola;
+	}
+
+	public void setMatricola(String matricola) {
+		this.matricola = matricola;
 	}
 }

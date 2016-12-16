@@ -48,8 +48,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "rif_inquadramento",
     "modalita_pagamento",
     "tappeMissioneColl",
-    "speseMissioneColl"
-})
+    "speseMissioneColl",
+    
+    "annoMandatoAnticipo",
+    "numeroMandatoAnticipo",
+    "importoMandatoAnticipo",
+    "idRimborsoMissione",
+    "idFlusso",
+    "TAM?",
+    "cdCdsObbligazione",
+    "esercizioObbligazione",
+    "esercizioOriObbligazione",
+    "pgObbligazione",
+    "gae"})
 public class OggettoBulk {
 
     @JsonProperty("esercizio")
@@ -110,6 +121,30 @@ public class OggettoBulk {
     private String dtFineMissione;
     @JsonProperty("ti_anagrafico")
     private String tiAnagrafico;
+
+    @JsonProperty("annoMandatoAnticipo")
+    private Integer annoMandatoAnticipo;
+    @JsonProperty("numeroMandatoAnticipo")
+    private Long numeroMandatoAnticipo;
+    @JsonProperty("importoMandatoAnticipo")
+    private BigDecimal importoMandatoAnticipo;
+    @JsonProperty("idRimborsoMissione")
+    private Long idRimborsoMissione;
+    @JsonProperty("idFlusso")
+    private String idFlusso;
+    @JsonProperty("tam")
+    private String tam;
+    @JsonProperty("cdCdsObbligazione")
+    private String cdCdsObbligazione;
+    @JsonProperty("esercizioObbligazione")
+    private Integer esercizioObbligazione;
+    @JsonProperty("esercizioOriObbligazione")
+    private Integer esercizioOriObbligazione;
+    @JsonProperty("pgObbligazione")
+    private Long pgObbligazione;
+    @JsonProperty("gae")
+    private String gae;
+    
     @JsonProperty("tipo_rapporto")
     private TipoRapporto tipoRapporto;
     @JsonProperty("banca")
@@ -834,5 +869,93 @@ public class OggettoBulk {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+
+	public Integer getAnnoMandatoAnticipo() {
+		return annoMandatoAnticipo;
+	}
+
+	public void setAnnoMandatoAnticipo(Integer annoMandatoAnticipo) {
+		this.annoMandatoAnticipo = annoMandatoAnticipo;
+	}
+
+	public Long getNumeroMandatoAnticipo() {
+		return numeroMandatoAnticipo;
+	}
+
+	public void setNumeroMandatoAnticipo(Long numeroMandatoAnticipo) {
+		this.numeroMandatoAnticipo = numeroMandatoAnticipo;
+	}
+
+	public BigDecimal getImportoMandatoAnticipo() {
+		return importoMandatoAnticipo;
+	}
+
+	public void setImportoMandatoAnticipo(BigDecimal importoMandatoAnticipo) {
+		this.importoMandatoAnticipo = importoMandatoAnticipo;
+	}
+
+	public Long getIdRimborsoMissione() {
+		return idRimborsoMissione;
+	}
+
+	public void setIdRimborsoMissione(Long idRimborsoMissione) {
+		this.idRimborsoMissione = idRimborsoMissione;
+	}
+
+	public String getIdFlusso() {
+		return idFlusso;
+	}
+
+	public void setIdFlusso(String idFlusso) {
+		this.idFlusso = idFlusso;
+	}
+
+	public String getTam() {
+		return tam;
+	}
+
+	public void setTam(String tam) {
+		this.tam = tam;
+	}
+
+	public String getCdCdsObbligazione() {
+		return cdCdsObbligazione;
+	}
+
+	public void setCdCdsObbligazione(String cdCdsObbligazione) {
+		this.cdCdsObbligazione = cdCdsObbligazione;
+	}
+
+	public Integer getEsercizioObbligazione() {
+		return esercizioObbligazione;
+	}
+
+	public void setEsercizioObbligazione(Integer esercizioObbligazione) {
+		this.esercizioObbligazione = esercizioObbligazione;
+	}
+
+	public Integer getEsercizioOriObbligazione() {
+		return esercizioOriObbligazione;
+	}
+
+	public void setEsercizioOriObbligazione(Integer esercizioOriObbligazione) {
+		this.esercizioOriObbligazione = esercizioOriObbligazione;
+	}
+
+	public Long getPgObbligazione() {
+		return pgObbligazione;
+	}
+
+	public void setPgObbligazione(Long pgObbligazione) {
+		this.pgObbligazione = pgObbligazione;
+	}
+
+	public String getGae() {
+		return gae;
+	}
+
+	public void setGae(String gae) {
+		this.gae = gae;
+	}
 
 }
