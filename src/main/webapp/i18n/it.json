@@ -447,7 +447,10 @@
                     "spesa-anticipata": "Spesa Anticipata",
                     "download-file": "Download File",
                     "remove-file": "Elimina File",
-                    "km": "Km percorsi"
+                    "remove-file": "Elimina File",
+                    "km": "Km percorsi",
+                    "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
+                    "localita-spostamento": "Località Spostamento"
                 },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"
         }

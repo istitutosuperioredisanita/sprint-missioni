@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "dt_fine_tappa",
     "nazione"
 })
-public class TappeMissioneColl {
+public class TappeMissioneColl implements Cloneable{
 
     @JsonProperty("cambio_tappa")
     private Integer cambioTappa;
@@ -349,5 +349,10 @@ public class TappeMissioneColl {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 
 }
