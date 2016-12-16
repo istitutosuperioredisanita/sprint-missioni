@@ -56,6 +56,12 @@ cache:
 
 logging.config: classpath:logback-local.xml
 
+cron:
+    comunicaDati:
+        name: comunicaDati
+        active: false
+        cronExpression: "0 0 22 ? * MON-SAT"
+
 jhipster:
     security:
         authentication:
