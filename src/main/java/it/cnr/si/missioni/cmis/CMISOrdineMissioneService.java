@@ -132,7 +132,7 @@ public class CMISOrdineMissioneService {
 		if (ordineMissione != null){
 			anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
 			if (anticipo != null){
-				ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
+//				ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, true);
 				ordineMissione.setRichiestaAnticipo("S");
 			} else {
 				ordineMissione.setRichiestaAnticipo("N");
@@ -211,7 +211,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setNumero(ordineMissione.getNumero().toString());
 		cmisOrdineMissione.setAnticipo(ordineMissione.getRichiestaAnticipo().equals("S") ? "true" : "false");
 		cmisOrdineMissione.setAutoPropriaFlag(ordineMissione.getUtilizzoAutoPropria().equals("S") ? "true" : "false");
-		cmisOrdineMissione.setCapitolo(ordineMissione.getVoce());
+		cmisOrdineMissione.setCapitolo(voce == null ? "" : ordineMissione.getVoce());
 		cmisOrdineMissione.setDescrizioneCapitolo(voce == null ? "" : voce.getDs_elemento_voce());
 		cmisOrdineMissione.setDescrizioneGae(gae == null ? "" : gae.getDs_linea_attivita());
 		cmisOrdineMissione.setDescrizioneImpegno(descrImpegno);
@@ -219,7 +219,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setDescrizioneUoOrdine(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
 		cmisOrdineMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
-		cmisOrdineMissione.setDisponibilita(dispImpegno);
+		cmisOrdineMissione.setDisponibilita(Utility.nvl(dispImpegno));
 		cmisOrdineMissione.setGae(gae == null ? "" : gae.getCd_linea_attivita());
 		cmisOrdineMissione.setImpegnoAnnoCompetenza(ordineMissione.getEsercizioObbligazione() == null ? null : new Long(ordineMissione.getEsercizioObbligazione()));
 		cmisOrdineMissione.setImpegnoAnnoResiduo(ordineMissione.getEsercizioOriginaleObbligazione() == null ? null : new Long(ordineMissione.getEsercizioOriginaleObbligazione()));
