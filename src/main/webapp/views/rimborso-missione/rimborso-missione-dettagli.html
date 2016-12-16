@@ -92,7 +92,7 @@
                                     <p class="col-md-12">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
-                              <select ng-disabled="!tipi_pasto || tipi_pasto.length() = 0" class="form-control" ng-model="dettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
+                              <select ng-disabled="!tipi_pasto || tipi_pasto.length() == 0" class="form-control" ng-model="dettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
                                         </span>
                                     </p>
                             </form>
@@ -181,7 +181,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto">tipo pasto</span>
-              <select ng-disabled="!tipi_pasto || tipi_pasto.length() = 0" class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
+              <select ng-disabled="!tipi_pasto || tipi_pasto.length() == 0" class="form-control" ng-model="newDettaglioSpesa.cdTiPasto" ng-options="tipo_pasto.cd_ti_pasto as tipo_pasto.cd_ti_pasto + '  -  Limite di Spesa: €   ' + tipo_pasto.limite_max_pasto for tipo_pasto in tipi_pasto"></select>
                         </span>
                     </p>
             </form>
