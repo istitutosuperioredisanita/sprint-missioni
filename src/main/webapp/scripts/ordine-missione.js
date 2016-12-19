@@ -704,28 +704,24 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             var varClauses = [];
             if (modulo){
                 if (cdr){
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
                 } else if (uo) {
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:uo.substring(0,3)+"%"}];
                 }
             } else if (cdr){
-                varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }  else if (uo) {
-                varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }
