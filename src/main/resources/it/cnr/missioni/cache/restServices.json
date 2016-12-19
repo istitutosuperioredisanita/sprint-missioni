@@ -173,14 +173,8 @@
                 },
                 {
                     "condition": "AND",
-                    "fieldName": "esercizio_inizio",
-                    "operator": "<=",
-                    "fieldValue": ""
-                },
-                {
-                    "condition": "AND",
-                    "fieldName": "esercizio_fine",
-                    "operator": ">=",
+                    "fieldName": "esercizio",
+                    "operator": "=",
                     "fieldValue": ""
                 },
                 {

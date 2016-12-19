@@ -71,16 +71,10 @@ public class GaeService {
 		List<JSONClause> clauses = new ArrayList<JSONClause>();
 		clauses.add(clause);
 		clause = new JSONClause();
-		clause.setFieldName("esercizio_inizio");
+		clause.setFieldName("esercizio");
 		clause.setFieldValue(anno);
 		clause.setCondition("AND");
-		clause.setOperator("<=");
-		clauses.add(clause);
-		clause = new JSONClause();
-		clause.setFieldName("esercizio_fine");
-		clause.setFieldValue(anno);
-		clause.setCondition("AND");
-		clause.setOperator(">=");
+		clause.setOperator("=");
 		clauses.add(clause);
 		clause = new JSONClause();
 		clause.setFieldName("ti_gestione");
