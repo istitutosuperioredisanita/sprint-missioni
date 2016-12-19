@@ -685,7 +685,7 @@ public class CMISRimborsoMissioneService {
 			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
 			if (children != null){
 			} else {
-				if (dettaglio.isGiustificativoObbligatorio()){
+				if (dettaglio.isGiustificativoObbligatorio() && StringUtils.isEmpty(dettaglio.getDsNoGiustificativo())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
 				}
 			}
