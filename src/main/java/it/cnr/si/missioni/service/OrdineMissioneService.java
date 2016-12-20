@@ -700,7 +700,7 @@ public class OrdineMissioneService {
 		}
     }
 	private void controlloCongruenzaDatiInseriti(Principal principal, OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getDataFineMissione().before(ordineMissione.getDataFineMissione())){
+		if (ordineMissione.getDataFineMissione().before(ordineMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
 		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){

@@ -343,12 +343,12 @@ public class RimborsoMissioneService {
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				if (dettaglio.getDataSpesa().after(DateUtils.truncate(rimborsoMissione.getDataFineMissione()))){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
-				}
-				if (dettaglio.getDataSpesa().before(DateUtils.truncate(rimborsoMissione.getDataInizioMissione()))){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
-				}
+//				if (dettaglio.getDataSpesa().after(DateUtils.truncate(rimborsoMissione.getDataFineMissione()))){
+//					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
+//				}
+//				if (dettaglio.getDataSpesa().before(DateUtils.truncate(rimborsoMissione.getDataInizioMissione()))){
+//					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Inizio Missione non può essere successiva alla data di una spesa indicata nei dettagli.");
+//				}
 			}
 		}
 	}
