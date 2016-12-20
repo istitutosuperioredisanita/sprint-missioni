@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -7,9 +8,15 @@ import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.bulk.OggettoBulk;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.util.proxy.json.object.sigla.ErrorRestSigla;
 
 public class Utility {
 	public static final java.math.BigDecimal ZERO = new java.math.BigDecimal(0);
@@ -123,7 +130,16 @@ public class Utility {
 	}
 	
 	public static String getMessageException(Exception e){
-		return e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();		
+		String obj = e.getMessage();
+
+		ErrorRestSigla errorRest = null;
+		try {
+			Class<?> classJson= ErrorRestSigla.class;
+			errorRest = (ErrorRestSigla)new ObjectMapper().readValue(obj,classJson);
+			return errorRest.getError();
+		} catch (IOException ex) {
+			return e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();		
+		}
 	}
 	public static MimeTypes getMimeType(String contentType){
 		for(MimeTypes m : MimeTypes.values()) {
