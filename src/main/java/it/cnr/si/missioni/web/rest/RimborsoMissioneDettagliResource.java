@@ -180,7 +180,7 @@ public class RimborsoMissioneDettagliResource {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
     public ResponseEntity<?> uploadAllegatiDettaglioRimborsoMissione(@PathVariable Long idDettaglioRimborsoMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
-        log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
+        log.debug("REST request per l'upload di allegati al dettaglio del Rimborso Missione" );
         if (idDettaglioRimborsoMissione != null){
             	try {
             		if (file != null && file.getContentType() != null){

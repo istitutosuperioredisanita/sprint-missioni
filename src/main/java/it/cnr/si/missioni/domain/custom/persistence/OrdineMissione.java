@@ -1,17 +1,13 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.Cdr;
-import it.cnr.si.missioni.util.proxy.json.object.Cds;
-import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,11 +17,18 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
-
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.Cdr;
+import it.cnr.si.missioni.util.proxy.json.object.Cds;
+import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import net.bzdyl.ejb3.criteria.Projection;
+import net.bzdyl.ejb3.criteria.projections.Projections;
 
 /**
  * A user.
@@ -128,9 +131,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "NUMERO", length = 50, nullable = false)
     public Long numero;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_INSERIMENTO", nullable = false)
-    public Date dataInserimento;
+    public LocalDate dataInserimento;
 
     @Size(min = 0, max = 40)
     @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
@@ -182,13 +184,11 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "TRATTAMENTO", length = 3, nullable = false)
     public String trattamento;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_MISSIONE", nullable = false)
-    public Date dataInizioMissione;
+    public ZonedDateTime dataInizioMissione;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_FINE_MISSIONE", nullable = false)
-    public Date dataFineMissione;
+    public ZonedDateTime dataFineMissione;
 
     @Size(min = 0, max = 1)
     @Column(name = "VALIDATO", length = 1, nullable = false)
@@ -318,8 +318,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	@Transient
     private String statoFlussoRitornoHome;
 	
-	public OrdineMissione(Long id, Integer anno, Long numero, Date dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, Date dataInizioMissione, Date dataFineMissione, String validato){
+	public OrdineMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
+			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -546,11 +546,11 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.numero = numero;
 	}
 
-	public Date getDataInserimento() {
+	public LocalDate getDataInserimento() {
 		return dataInserimento;
 	}
 
-	public void setDataInserimento(Date dataInserimento) {
+	public void setDataInserimento(LocalDate dataInserimento) {
 		this.dataInserimento = dataInserimento;
 	}
 
@@ -626,19 +626,19 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.trattamento = trattamento;
 	}
 
-	public Date getDataInizioMissione() {
+	public ZonedDateTime getDataInizioMissione() {
 		return dataInizioMissione;
 	}
 
-	public void setDataInizioMissione(Date dataInizioMissione) {
+	public void setDataInizioMissione(ZonedDateTime dataInizioMissione) {
 		this.dataInizioMissione = dataInizioMissione;
 	}
 
-	public Date getDataFineMissione() {
+	public ZonedDateTime getDataFineMissione() {
 		return dataFineMissione;
 	}
 
-	public void setDataFineMissione(Date dataFineMissione) {
+	public void setDataFineMissione(ZonedDateTime dataFineMissione) {
 		this.dataFineMissione = dataFineMissione;
 	}
 
@@ -863,9 +863,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Transient
     public Boolean isMissioneConGiorniDivervi() {
     	if (getDataFineMissione() != null && getDataInizioMissione() != null){
-            Date dataInizioSenzaOre = Utility.getDateWithoutHours(getDataInizioMissione());
-            Date dataFineSenzaOre = Utility.getDateWithoutHours(getDataFineMissione());
-        	if (dataFineSenzaOre.after(dataInizioSenzaOre)){
+    		ZonedDateTime dataInizioSenzaOre = Utility.getDateWithoutHours(getDataInizioMissione());
+    		ZonedDateTime dataFineSenzaOre = Utility.getDateWithoutHours(getDataFineMissione());
+        	if (dataFineSenzaOre.isAfter(dataInizioSenzaOre)){
         		return true;
         	} 
     	}

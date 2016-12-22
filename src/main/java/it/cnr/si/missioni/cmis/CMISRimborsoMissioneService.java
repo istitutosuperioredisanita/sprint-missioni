@@ -337,11 +337,13 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_OGGETTO, rimborsoMissione.getOggetto());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DESTINAZIONE, rimborsoMissione.getDestinazione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE, rimborsoMissione.getNote());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, rimborsoMissione.getDataInizioMissione());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, rimborsoMissione.getDataFineMissione());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, rimborsoMissione.getDataInserimento());
-		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO, rimborsoMissione.getDataInizioEstero());
-		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO, rimborsoMissione.getDataFineEstero());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, DateUtils.getDate(rimborsoMissione.getDataInizioMissione()));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, DateUtils.getDate(rimborsoMissione.getDataFineMissione()));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, DateUtils.getDate(rimborsoMissione.getDataInserimento()));
+		if (rimborsoMissione.getDataInizioEstero() != null){
+			metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO, DateUtils.getDate(rimborsoMissione.getDataInizioEstero()));
+			metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO, DateUtils.getDate(rimborsoMissione.getDataFineEstero()));
+		}
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE, rimborsoMissione.getOrdineMissione().getId());
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE, rimborsoMissione.getTotaleRimborso());
 		List<String> aspectsToAdd = new ArrayList<String>();
@@ -362,7 +364,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_ID_DETTAGLIO_RIMBORSO, dettaglio.getId());
 		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_CD_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getCdTiSpesa());
 		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_DS_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getDsTiSpesa());
-		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_DATA_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getDataSpesa());
+		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_DATA_SPESA_DETTAGLIO_RIMBORSO_MISSIONE, DateUtils.getDate(dettaglio.getDataSpesa()));
 		metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE, dettaglio.getRiga());
 		List<String> aspectsToAdd = new ArrayList<String>();
 		aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);

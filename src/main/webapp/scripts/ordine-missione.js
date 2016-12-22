@@ -404,16 +404,52 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              buildUoSiglaFromUoSiper: estraiUo };
 });
 
-missioniApp.factory('OrdineMissioneService', function ($resource) {
+missioniApp.factory('OrdineMissioneService', function ($resource, DateUtils) {
         return $resource('app/rest/ordineMissione/:ids', {}, {
             'get': { method: 'GET', isArray: true},
-            'add':  { method: 'POST'},
-            'modify':  { method: 'PUT'},
+            'add':  { method: 'POST',
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'modify':  { method: 'PUT', 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
             'delete':  { method: 'DELETE'},
-            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
-            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
-            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}},
-            'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
+            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            }
         });
     });
 
