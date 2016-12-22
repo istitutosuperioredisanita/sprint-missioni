@@ -6,6 +6,7 @@ import it.cnr.si.missioni.util.Utility;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -61,9 +62,8 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "RIGA", length = 50, nullable = false)
     private Long riga;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_SPESA", nullable = false)
-    private Date dataSpesa;
+    private LocalDate dataSpesa;
 
     @ManyToOne
 	@JoinColumn(name="ID_RIMBORSO_MISSIONE", nullable=false)
@@ -212,11 +212,11 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.riga = riga;
 	}
 
-	public Date getDataSpesa() {
+	public LocalDate getDataSpesa() {
 		return dataSpesa;
 	}
 
-	public void setDataSpesa(Date dataSpesa) {
+	public void setDataSpesa(LocalDate dataSpesa) {
 		this.dataSpesa = dataSpesa;
 	}
 

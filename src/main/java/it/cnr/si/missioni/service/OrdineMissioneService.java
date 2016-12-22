@@ -36,6 +36,7 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -487,11 +488,9 @@ public class OrdineMissioneService {
 
 	private Integer recuperoAnno(OrdineMissione ordineMissione) {
 		if (ordineMissione.getDataInserimento() == null){
-			ordineMissione.setDataInserimento(new Date());
+			ordineMissione.setDataInserimento(LocalDate.now());
 		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(ordineMissione.getDataInserimento());
-		Integer anno = 	calendar.get(Calendar.YEAR);
+		Integer anno = 	ordineMissione.getDataInserimento().getYear();
 		return anno;
 	}
 
@@ -700,7 +699,7 @@ public class OrdineMissioneService {
 		}
     }
 	private void controlloCongruenzaDatiInseriti(Principal principal, OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getDataFineMissione().before(ordineMissione.getDataInizioMissione())){
+		if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
 		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){

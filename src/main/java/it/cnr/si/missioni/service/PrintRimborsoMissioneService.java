@@ -66,7 +66,7 @@ public class PrintRimborsoMissioneService {
     	printRimborsoMissione.setDataInserimento(DateUtils.getDateAsString(rimborsoMissione.getDataInserimento(), DateUtils.PATTERN_DATE));
     	printRimborsoMissione.setOggetto(rimborsoMissione.getOggetto());
     	printRimborsoMissione.setDestinazione(rimborsoMissione.getDestinazione());
-    	printRimborsoMissione.setAltreSpese(rimborsoMissione.getAltreSpeseAntDescrizione());
+    	printRimborsoMissione.setAltreSpese(rimborsoMissione.getAltreSpeseAntDescrizione() == null ? "" : rimborsoMissione.getAltreSpeseAntDescrizione());
     	printRimborsoMissione.setAltreSpeseImporto(Utility.numberFormat(rimborsoMissione.getAltreSpeseAntImporto()));
     	if (rimborsoMissione.getAnticipoAnnoMandato() != null){
         	printRimborsoMissione.setAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato().toString());

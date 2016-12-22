@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -113,6 +115,11 @@ public class Utility {
 	    cal.set( Calendar.MILLISECOND, 0 );		
 	    Date dataSenzaOre = cal.getTime();
 	    return dataSenzaOre;
+	}
+
+	public static ZonedDateTime getDateWithoutHours(ZonedDateTime data){
+		ZonedDateTime zdt = data.truncatedTo(ChronoUnit.DAYS);		
+		return zdt;
 	}
 
 	public static String numberFormat(BigDecimal importo) {

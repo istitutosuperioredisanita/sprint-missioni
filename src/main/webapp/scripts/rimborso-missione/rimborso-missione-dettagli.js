@@ -1,9 +1,17 @@
 'use strict';
 
-missioniApp.factory('RimborsoMissioneDettagliService', function ($http) {
+missioniApp.factory('RimborsoMissioneDettagliService', function (DateUtils, $http) {
         return {
             findDettagli: function(idRimborsoMissione) {
                 var promise = $http.get('app/rest/rimborsoMissione/dettagli/get', {params: {idRimborsoMissione: idRimborsoMissione}}).then(function (response) {
+                    if (response.data){
+                        var dati = angular.copy(response.data);
+                        for (var i=0; i<dati.length; i++) {
+                            var dettaglio = dati[i];
+                            dettaglio.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglio.dataSpesa);
+                        }
+                        return dati;
+                    }
                     return response.data;
                 });
                 return promise;
@@ -11,7 +19,7 @@ missioniApp.factory('RimborsoMissioneDettagliService', function ($http) {
         }
     });
 
-missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI) {
+missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.inizioMissione = $routeParams.inizioMissione;
@@ -298,6 +306,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     $scope.insertDettaglioSpesa = function (newDettaglioSpesa) {
         newDettaglioSpesa.rimborsoMissione = $scope.rimborsoMissione;
             $rootScope.salvataggio = true;
+            newDettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(newDettaglioSpesa.dataSpesa);
             $http.post('app/rest/rimborsoMissione/dettagli/create', newDettaglioSpesa).success(function(data){
                     $rootScope.salvataggio = false;
                     if (!$scope.dettagliSpese){
@@ -313,6 +322,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
         $rootScope.salvataggio = true;
+        dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(dettaglioSpesa.dataSpesa);
         $http.put('app/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
             $rootScope.salvataggio = false;
             undoEditingDettaglioSpesa(dettaglioSpesa);

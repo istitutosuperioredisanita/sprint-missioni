@@ -18,7 +18,7 @@
 			    <column name="NUMERO" type="bigint">
 			        <constraints nullable="true"/>
 			    </column>
-			    <column name="DATA_INSERIMENTO" type="timestamp">
+			    <column name="DATA_INSERIMENTO" type="date">
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="COMUNE_RESIDENZA_RICH" type="varchar(40)">
@@ -209,7 +209,7 @@
 			    <column name="UID" type="varchar(256)">
 			        <constraints nullable="false"/>
 			    </column>
-			    <column name="DATA_SPESA" type="timestamp">
+			    <column name="DATA_SPESA" type="date">
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="STATO" type="varchar(3)">
