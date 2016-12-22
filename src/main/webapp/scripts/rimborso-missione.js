@@ -1,9 +1,15 @@
 'use strict';
 
-missioniApp.factory('RimborsoMissioneService', function ($resource) {
+missioniApp.factory('RimborsoMissioneService', function ($resource, DateUtils) {
         return $resource('app/rest/rimborsoMissione/:ids', {}, {
             'get': { method: 'GET', isArray: true},
-            'add':  { method: 'POST'},
+            'add':  { method: 'POST',
+                 transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
             'modify':  { method: 'PUT'},
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
@@ -161,6 +167,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         ProxyService.getTerzoModalitaPagamento(terzoSigla, modPag).then(function(ret){
             if (ret && ret.data && ret.data.elements){
                 $scope.terzoModalitaPagamentos = ret.data.elements;
+                if ($scope.rimborsoMissioneModel && $scope.terzoModalitaPagamentos && $scope.terzoModalitaPagamentos.length == 1) {
+                    if (!$scope.rimborsoMissioneModel.pgBanca){
+                        $scope.rimborsoMissioneModel.pgBanca = $scope.terzoModalitaPagamentos[0].pg_banca;
+                        $scope.rimborsoMissioneModel.iban = $scope.terzoModalitaPagamentos[0].codice_iban;
+                    }
+                }
             }
         });
     }

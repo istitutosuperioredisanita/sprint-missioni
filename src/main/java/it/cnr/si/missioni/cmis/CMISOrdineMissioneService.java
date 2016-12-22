@@ -311,9 +311,9 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_OGGETTO, ordineMissione.getOggetto());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DESTINAZIONE, ordineMissione.getDestinazione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE, ordineMissione.getNote());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, ordineMissione.getDataInizioMissione());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, ordineMissione.getDataFineMissione());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, ordineMissione.getDataInserimento());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, DateUtils.getDate(ordineMissione.getDataInizioMissione()));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, DateUtils.getDate(ordineMissione.getDataFineMissione()));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, DateUtils.getDate(ordineMissione.getDataInserimento()));
 		List<String> aspectsToAdd = new ArrayList<String>();
 		aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);
 		aspectsToAdd.add(CMISMissioniAspect.ORDINE_MISSIONE_ASPECT.value());

@@ -1,6 +1,6 @@
 'use strict';
 
-missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui) {
+missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtils) {
         return {
             findMissioniDaRimborsare: function(user) {
                 var promise = $http.get('app/rest/ordiniMissione/listDaRimborsare', {params: {user:user}}).then(function (response) {

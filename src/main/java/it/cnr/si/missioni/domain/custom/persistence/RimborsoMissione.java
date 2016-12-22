@@ -10,11 +10,14 @@ import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,6 +34,8 @@ import net.bzdyl.ejb3.criteria.projections.Projections;
 
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * A user.
@@ -53,13 +58,11 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero",
 			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero";
 
-	@Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_ESTERO", nullable = true)
-    private Date dataInizioEstero;
+    private ZonedDateTime dataInizioEstero;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_FINE_ESTERO", nullable = true)
-    private Date dataFineEstero;
+    private ZonedDateTime dataFineEstero;
 
     @Column(name = "CD_TERZO_SIGLA", length = 8, nullable = false)
     private Long cdTerzoSigla;
@@ -133,9 +136,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "NUMERO", length = 50, nullable = false)
     public Long numero;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_INSERIMENTO", nullable = false)
-    public Date dataInserimento;
+    public LocalDate dataInserimento;
 
     @Size(min = 0, max = 40)
     @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
@@ -187,13 +189,11 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "TRATTAMENTO", length = 3, nullable = false)
     public String trattamento;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_MISSIONE", nullable = false)
-    public Date dataInizioMissione;
+    public ZonedDateTime dataInizioMissione;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_FINE_MISSIONE", nullable = false)
-    public Date dataFineMissione;
+    public ZonedDateTime dataFineMissione;
 
     @Size(min = 0, max = 1)
     @Column(name = "VALIDATO", length = 1, nullable = false)
@@ -322,8 +322,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
     List<RimborsoMissioneDettagli> rimborsoMissioneDettagli;
 
-	public RimborsoMissione(Long id, Integer anno, Long numero, Date dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, Date dataInizioMissione, Date dataFineMissione, String validato){
+	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
+			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -476,19 +476,19 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.daValidazione = daValidazione;
 	}
 
-	public Date getDataInizioEstero() {
+	public ZonedDateTime getDataInizioEstero() {
 		return dataInizioEstero;
 	}
 
-	public void setDataInizioEstero(Date dataInizioEstero) {
+	public void setDataInizioEstero(ZonedDateTime dataInizioEstero) {
 		this.dataInizioEstero = dataInizioEstero;
 	}
 
-	public Date getDataFineEstero() {
+	public ZonedDateTime getDataFineEstero() {
 		return dataFineEstero;
 	}
 
-	public void setDataFineEstero(Date dataFineEstero) {
+	public void setDataFineEstero(ZonedDateTime dataFineEstero) {
 		this.dataFineEstero = dataFineEstero;
 	}
 
@@ -628,11 +628,11 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.numero = numero;
 	}
 
-	public Date getDataInserimento() {
+	public LocalDate getDataInserimento() {
 		return dataInserimento;
 	}
 
-	public void setDataInserimento(Date dataInserimento) {
+	public void setDataInserimento(LocalDate dataInserimento) {
 		this.dataInserimento = dataInserimento;
 	}
 
@@ -708,19 +708,19 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.trattamento = trattamento;
 	}
 
-	public Date getDataInizioMissione() {
+	public ZonedDateTime getDataInizioMissione() {
 		return dataInizioMissione;
 	}
 
-	public void setDataInizioMissione(Date dataInizioMissione) {
+	public void setDataInizioMissione(ZonedDateTime dataInizioMissione) {
 		this.dataInizioMissione = dataInizioMissione;
 	}
 
-	public Date getDataFineMissione() {
+	public ZonedDateTime getDataFineMissione() {
 		return dataFineMissione;
 	}
 
-	public void setDataFineMissione(Date dataFineMissione) {
+	public void setDataFineMissione(ZonedDateTime dataFineMissione) {
 		this.dataFineMissione = dataFineMissione;
 	}
 
@@ -941,9 +941,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Transient
     public Boolean isMissioneConGiorniDivervi() {
     	if (getDataFineMissione() != null && getDataInizioMissione() != null){
-            Date dataInizioSenzaOre = Utility.getDateWithoutHours(getDataInizioMissione());
-            Date dataFineSenzaOre = Utility.getDateWithoutHours(getDataFineMissione());
-        	if (dataFineSenzaOre.after(dataInizioSenzaOre)){
+    		ZonedDateTime dataInizioSenzaOre = Utility.getDateWithoutHours(getDataInizioMissione());
+    		ZonedDateTime dataFineSenzaOre = Utility.getDateWithoutHours(getDataFineMissione());
+        	if (dataFineSenzaOre.isAfter(dataInizioSenzaOre)){
         		return true;
         	} 
     	}

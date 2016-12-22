@@ -2,6 +2,7 @@ package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -357,7 +358,7 @@ public class CronService {
 		impostaDateTappa(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa);
 	}
 
-	private void impostaDateTappa(Date dataInizio, Date dataFine, TappeMissioneColl tappa) {
+	private void impostaDateTappa(ZonedDateTime dataInizio, ZonedDateTime dataFine, TappeMissioneColl tappa) {
 		tappa.setDtInizioTappa(DateUtils.getDefaultDateAsString(dataInizio));
 		tappa.setDtFineTappa(DateUtils.getDefaultDateAsString(dataFine));
 	}

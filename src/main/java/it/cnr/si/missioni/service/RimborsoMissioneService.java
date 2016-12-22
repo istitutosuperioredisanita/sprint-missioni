@@ -3,6 +3,7 @@ package it.cnr.si.missioni.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -297,6 +298,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setCdTerzoSigla(rimborsoMissione.getCdTerzoSigla());
 			rimborsoMissioneDB.setModpag(rimborsoMissione.getModpag());
 			rimborsoMissioneDB.setIban(rimborsoMissione.getIban());
+			rimborsoMissioneDB.setPgBanca(rimborsoMissione.getPgBanca());
 			rimborsoMissioneDB.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto());
 			rimborsoMissioneDB.setAnticipoAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato());
 			rimborsoMissioneDB.setAnticipoNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato());
@@ -343,12 +345,12 @@ public class RimborsoMissioneService {
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-//				if (dettaglio.getDataSpesa().after(DateUtils.truncate(rimborsoMissione.getDataFineMissione()))){
-//					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
-//				}
-//				if (dettaglio.getDataSpesa().before(DateUtils.truncate(rimborsoMissione.getDataInizioMissione()))){
-//					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Inizio Missione non può essere successiva alla data di una spesa indicata nei dettagli.");
-//				}
+				if (dettaglio.getDataSpesa().isAfter(DateUtils.truncate(rimborsoMissione.getDataFineMissione()))){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
+				}
+				if (dettaglio.getDataSpesa().isBefore(DateUtils.truncate(rimborsoMissione.getDataInizioMissione()))){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Inizio Missione non può essere successiva alla data di una spesa indicata nei dettagli.");
+				}
 			}
 		}
 	}
@@ -606,11 +608,9 @@ public class RimborsoMissioneService {
 
 	private Integer recuperoAnno(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getDataInserimento() == null){
-			rimborsoMissione.setDataInserimento(new Date());
+			rimborsoMissione.setDataInserimento(LocalDate.now());
 		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(rimborsoMissione.getDataInserimento());
-		Integer anno = 	calendar.get(Calendar.YEAR);
+		Integer anno = 	rimborsoMissione.getDataInserimento().getYear();
 		return anno;
 	}
 
@@ -786,7 +786,7 @@ public class RimborsoMissioneService {
     }
 	
     private void controlloCongruenzaDatiInseriti(Principal principal, RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getDataFineMissione().before(rimborsoMissione.getDataInizioMissione())){
+		if (rimborsoMissione.getDataFineMissione().isBefore(rimborsoMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
 		if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
@@ -795,13 +795,13 @@ public class RimborsoMissioneService {
 			}
 		}
 		if (rimborsoMissione.isMissioneEstera()) {
-			if (rimborsoMissione.getDataInizioEstero().before(rimborsoMissione.getDataInizioMissione())){
+			if (rimborsoMissione.getDataInizioEstero().isBefore(rimborsoMissione.getDataInizioMissione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di inizio attraversamento frontiera non può essere precedente alla data di inizio missione");
 			}
-			if (rimborsoMissione.getDataFineMissione().before(rimborsoMissione.getDataFineEstero())){
+			if (rimborsoMissione.getDataFineMissione().isBefore(rimborsoMissione.getDataFineEstero())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine attraversamento frontiera non può essere successiva alla data di fine missione");
 			}
-			if (rimborsoMissione.getDataFineEstero().before(rimborsoMissione.getDataInizioEstero())){
+			if (rimborsoMissione.getDataFineEstero().isBefore(rimborsoMissione.getDataInizioEstero())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine attraversamento frontiera non può essere precedente alla data di inizio attraversamento frontiera");
 			}
 		}

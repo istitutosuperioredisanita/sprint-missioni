@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RimborsoMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="285"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -454,9 +454,9 @@
 		<band height="9" splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="93" splitType="Stretch">
+		<band height="81" splitType="Stretch">
 			<frame>
-				<reportElement stretchType="RelativeToBandHeight" x="14" y="0" width="525" height="93" uuid="72a1d452-0a74-4a47-9aeb-7d8c207e229e"/>
+				<reportElement stretchType="RelativeToBandHeight" x="14" y="0" width="525" height="80" uuid="72a1d452-0a74-4a47-9aeb-7d8c207e229e"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -510,7 +510,7 @@
 				<text><![CDATA[Importo Euro]]></text>
 			</staticText>
 			<subreport runToBottom="false">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="14" y="25" width="524" height="49" uuid="fec37bc5-13be-478f-b309-bee6a232b109"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="14" y="25" width="524" height="36" uuid="fec37bc5-13be-478f-b309-bee6a232b109"/>
 				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("printDettagliSpeseRimborsoMissione")]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DETTAGLI}]]></subreportExpression>
 			</subreport>
@@ -529,7 +529,7 @@
 				<text><![CDATA[Km. Percorsi]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="bold" positionType="Float" mode="Transparent" x="91" y="74" width="318" height="19" uuid="d1630ffb-e811-4a53-9688-f185a55d02cc"/>
+				<reportElement style="bold" positionType="Float" mode="Transparent" x="91" y="61" width="318" height="19" uuid="d1630ffb-e811-4a53-9688-f185a55d02cc"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -543,7 +543,7 @@
 				<text><![CDATA[Totale Missione]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="409" y="74" width="66" height="19" uuid="ace2e811-e5af-4de0-a1d1-ee9dc0398572"/>
+				<reportElement positionType="Float" x="409" y="61" width="66" height="19" uuid="ace2e811-e5af-4de0-a1d1-ee9dc0398572"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
