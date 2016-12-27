@@ -42,7 +42,7 @@ siper:
   password: pentagono
 
 cmis:
-    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
+    alfresco: http://as3dock.si.cnr.it:8080/alfresco/
     url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
     username: app.missioni
     password: bubbazza
