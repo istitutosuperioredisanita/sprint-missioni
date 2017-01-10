@@ -68,7 +68,7 @@ public class CronService {
 	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
 
     @Transactional
-	public void comunicaDati(Principal principal) throws Exception {
+	public void comunicaDatiRimborsoSigla(Principal principal) throws Exception {
         ILock lock = hazelcastInstance.getLock(lockKey);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 

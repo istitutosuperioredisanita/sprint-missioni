@@ -21,6 +21,6 @@ public class CronConfigurationMissioni {
 	@Scheduled(cron = "${cron.comunicaDati.cronExpression}")
     public void cronComunicaDati() throws Exception {
     	if (cronComunicaDatiActive)
-    		cronService.comunicaDati(new GenericPrincipal("cronMissioni"));
+    		cronService.comunicaDatiRimborsoSigla(new GenericPrincipal("cronMissioni"));
     }
 }
