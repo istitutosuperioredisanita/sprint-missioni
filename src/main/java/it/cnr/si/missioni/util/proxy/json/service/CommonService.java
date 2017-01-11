@@ -72,10 +72,13 @@ public class CommonService {
 		return process(jBody, app, url, true);
 	}
 
-	private String process(JSONBody jBody, String app, String url, Boolean value) {
+	public String process(JSONBody jBody, String app, String url, Boolean value, HttpMethod httpMethod) {
 		String risposta = null;
-		ResultProxy result = proxyService.process(HttpMethod.POST, jBody, app, url, "proxyURL="+url, null, value);
+		ResultProxy result = proxyService.process(httpMethod, jBody, app, url, "proxyURL="+url, null, value);
 		risposta = result.getBody();
 		return risposta;
+	}
+	private String process(JSONBody jBody, String app, String url, Boolean value) {
+		return process(jBody, app, url, value, HttpMethod.POST);
 	}
 }
