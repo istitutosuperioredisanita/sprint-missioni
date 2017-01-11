@@ -20,7 +20,7 @@ public class MissioneSigla {
     @JsonProperty("userContext")
     private UserContext userContext;
     @JsonProperty("oggettoBulk")
-    private OggettoBulk oggettoBulk;
+    private MissioneBulk oggettoBulk;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -50,7 +50,7 @@ public class MissioneSigla {
      *     The oggettoBulk
      */
     @JsonProperty("oggettoBulk")
-    public OggettoBulk getOggettoBulk() {
+    public MissioneBulk getOggettoBulk() {
         return oggettoBulk;
     }
 
@@ -60,7 +60,7 @@ public class MissioneSigla {
      *     The oggettoBulk
      */
     @JsonProperty("oggettoBulk")
-    public void setOggettoBulk(OggettoBulk oggettoBulk) {
+    public void setOggettoBulk(MissioneBulk oggettoBulk) {
         this.oggettoBulk = oggettoBulk;
     }
 

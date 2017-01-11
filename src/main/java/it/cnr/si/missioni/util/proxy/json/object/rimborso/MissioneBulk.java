@@ -1,6 +1,7 @@
 
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "esercizioOriObbligazione",
     "pgObbligazione",
     "gae"})
-public class OggettoBulk {
+public class MissioneBulk implements Cloneable, Serializable{
 
     @JsonProperty("esercizio")
     private Integer esercizio;

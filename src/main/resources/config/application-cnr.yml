@@ -59,8 +59,8 @@ logging.config: classpath:logback-local.xml
 cron:
     comunicaDati:
         name: comunicaDati
-        active: false
-        cronExpression: "0 0 22 ? * MON-SAT"
+        active: true
+        cronExpression: "0 49 12 ? * MON-SAT"
 
 jhipster:
     security:

@@ -92,6 +92,9 @@ public class RimborsoMissioneService {
 	CdrService cdrService;
 	
 	@Autowired
+	CronService cronService;
+	
+	@Autowired
 	ImpegnoGaeService impegnoGaeService;
 	
 	@Autowired
@@ -141,7 +144,8 @@ public class RimborsoMissioneService {
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
-    	if (lista != null){
+    	cronService.comunicaRimborsoSigla(principal);
+/*    	if (lista != null){
         	List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
     		for (RimborsoMissione rimborsoMissione : lista){
     			if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
@@ -149,9 +153,9 @@ public class RimborsoMissioneService {
         			if (result != null){
         				RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
         				if (result.isApprovato()){
-        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
-        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-        					listaNew.add(rimborsoMissione);
+//        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
+//        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+//        					listaNew.add(rimborsoMissione);
         				} else if (result.isStateReject()){
         					rimborsoMissione.setCommentFlows(result.getComment());
         					rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
@@ -184,7 +188,7 @@ public class RimborsoMissioneService {
     			}
     		}
     		return listaNew;
-    	}
+    	}*/
     	return lista;
     }
 
@@ -325,7 +329,7 @@ public class RimborsoMissioneService {
 			}
 		}
 //		//effettuo controlli di validazione operazione CRUD
-    	if (!Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
+    	if (!Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R") && !fromFlows){
     		validaCRUD(principal, rimborsoMissioneDB);
     	}
 
@@ -423,13 +427,13 @@ public class RimborsoMissioneService {
 				criterionList.add(Restrictions.ge("id", filter.getDaId()));
 			}
 			if (filter.getStato() != null){
-				criterionList.add(Restrictions.le("stato", filter.getStato()));
+				criterionList.add(Restrictions.eq("stato", filter.getStato()));
 			}
 			if (filter.getStatoFlusso() != null){
-				criterionList.add(Restrictions.le("statoFlusso", filter.getStatoFlusso()));
+				criterionList.add(Restrictions.eq("statoFlusso", filter.getStatoFlusso()));
 			}
 			if (filter.getValidato() != null){
-				criterionList.add(Restrictions.le("validato", filter.getValidato()));
+				criterionList.add(Restrictions.eq("validato", filter.getValidato()));
 			}
 			if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()){
 				criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
