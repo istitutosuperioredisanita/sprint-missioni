@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json;
 
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.OggettoBulk;
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
 import java.io.Serializable;
@@ -23,7 +23,7 @@ public class JSONBody implements Cloneable, Serializable{
 	String divisa;
 	String km;
 	String importoSpesa;
-	OggettoBulk oggettoBulk;
+	MissioneBulk missioneBulk;
 	
 	public JSONBody() {
 		super();
@@ -33,7 +33,7 @@ public class JSONBody implements Cloneable, Serializable{
 			List<JSONOrderBy> orderBy, List<JSONClause> clauses,String data, Long nazione,
 			Long inquadramento, String cdTipoSpesa,
 			String cdTipoPasto, String divisa,
-			String km, String importoSpesa, OggettoBulk oggettoBulk) {
+			String km, String importoSpesa, MissioneBulk missioneBulk) {
 		super();
 		this.activePage = activePage;
 		this.maxItemsPerPage = maxItemsPerPage;
@@ -47,7 +47,7 @@ public class JSONBody implements Cloneable, Serializable{
 		this.divisa = divisa;
 		this.km = km;
 		this.importoSpesa = importoSpesa;
-		this.oggettoBulk = oggettoBulk;
+		this.missioneBulk = missioneBulk;
 	}
 
 	public Integer getActivePage() {
@@ -147,11 +147,11 @@ public class JSONBody implements Cloneable, Serializable{
 		this.importoSpesa = importoSpesa;
 	}
 
-	public OggettoBulk getOggettoBulk() {
-		return oggettoBulk;
+	public MissioneBulk getMissioneBulk() {
+		return missioneBulk;
 	}
 
-	public void setOggettoBulk(OggettoBulk oggettoBulk) {
-		this.oggettoBulk = oggettoBulk;
+	public void setMissioneBulk(MissioneBulk missioneBulk) {
+		this.missioneBulk = missioneBulk;
 	}
 }

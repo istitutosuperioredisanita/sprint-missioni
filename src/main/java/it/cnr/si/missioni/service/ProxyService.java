@@ -110,7 +110,18 @@ public class ProxyService implements EnvironmentAware{
     }
     public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
         log.info("REST request from app ", app);
-        String appUrl = propertyResolver.getProperty(app + ".url");
+		String body = null;
+    	try {
+    		ObjectMapper mapper = new ObjectMapper();
+    		body = mapper.writeValueAsString(jsonBody);
+    	} catch (Exception ex) {
+    		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+    	}
+        return process(httpMethod, body, app, url, queryString, authorization, restContextHeader);    	
+    }
+
+	public ResultProxy process(HttpMethod httpMethod, String body, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
+		String appUrl = propertyResolver.getProperty(app + ".url");
         if (appUrl == null) {
         	log.error("Cannot find properties for app: " + app + " Current profile are: ", Arrays.toString(environment.getActiveProfiles()));
         	throw new ApplicationContextException("Cannot find properties for app: " + app);
@@ -135,13 +146,6 @@ public class ProxyService implements EnvironmentAware{
         		addContextToHeader(app, headers);
         	}
         	
-    		String body = null;
-        	try {
-        		ObjectMapper mapper = new ObjectMapper();
-        		body = mapper.writeValueAsString(jsonBody);
-        	} catch (Exception ex) {
-        		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
-        	}
         	String proxyURL = appUrl.concat(url);
     		if (queryString != null){
     			String valueToDelete = ProxyResource.PROXY_URL+"="+url;
@@ -165,8 +169,8 @@ public class ProxyService implements EnvironmentAware{
         	String errResponse = _ex.getResponseBodyAsString();
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
         	throw new ApplicationContextException(errResponse);
-        }    	
-    }
+        }
+	}
 
 	private void addContextToHeader(String app, HttpHeaders headers) {
 		Context context = getDefaultContext(app);

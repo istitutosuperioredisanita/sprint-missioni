@@ -313,13 +313,13 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.ge("id", filter.getDaId()));
 			}
 			if (filter.getStato() != null){
-				criterionList.add(Restrictions.ge("stato", filter.getStato()));
+				criterionList.add(Restrictions.eq("stato", filter.getStato()));
 			}
 			if (filter.getStatoFlusso() != null){
-				criterionList.add(Restrictions.ge("statoFlusso", filter.getStatoFlusso()));
+				criterionList.add(Restrictions.eq("statoFlusso", filter.getStatoFlusso()));
 			}
 			if (filter.getValidato() != null){
-				criterionList.add(Restrictions.ge("validato", filter.getValidato()));
+				criterionList.add(Restrictions.eq("validato", filter.getValidato()));
 			}
 			if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()){
 				criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
