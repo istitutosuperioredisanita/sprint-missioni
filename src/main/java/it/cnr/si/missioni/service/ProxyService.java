@@ -132,7 +132,7 @@ public class ProxyService implements EnvironmentAware{
         	headers.setContentType(MediaType.APPLICATION_JSON);
         	
         	if (restContextHeader){
-        		addContextToHeaders(app, headers);
+        		addContextToHeader(app, headers);
         	}
         	
     		String body = null;
@@ -168,7 +168,7 @@ public class ProxyService implements EnvironmentAware{
         }    	
     }
 
-	private void addContextToHeaders(String app, HttpHeaders headers) {
+	private void addContextToHeader(String app, HttpHeaders headers) {
 		Context context = getDefaultContext(app);
 		if (context != null){
 			headers.add("X-sigla-cd-cds", context.getCd_cds());
