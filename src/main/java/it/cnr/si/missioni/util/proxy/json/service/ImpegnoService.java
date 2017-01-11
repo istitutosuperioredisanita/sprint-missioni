@@ -67,12 +67,12 @@ public class ImpegnoService {
 		clause.setOperator("=");
 		List<JSONClause> clauses = new ArrayList<JSONClause>();
 		clauses.add(clause);
-		clause = new JSONClause();
-		clause.setFieldName("esercizio");
-		clause.setFieldValue(anno);
-		clause.setCondition("AND");
-		clause.setOperator("=");
-		clauses.add(clause);
+//		clause = new JSONClause();
+//		clause.setFieldName("esercizio");
+//		clause.setFieldValue(anno);
+//		clause.setCondition("AND");
+//		clause.setOperator("=");
+//		clauses.add(clause);
 		clause = new JSONClause();
 		clause.setFieldName("esercizioOriginale");
 		clause.setFieldValue(esercizioOriginaleObbligazione);
