@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json;
 
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.OggettoBulk;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class JSONBody implements Cloneable, Serializable{
 	String divisa;
 	String km;
 	String importoSpesa;
+	OggettoBulk oggettoBulk;
 	
 	public JSONBody() {
 		super();
@@ -31,7 +33,7 @@ public class JSONBody implements Cloneable, Serializable{
 			List<JSONOrderBy> orderBy, List<JSONClause> clauses,String data, Long nazione,
 			Long inquadramento, String cdTipoSpesa,
 			String cdTipoPasto, String divisa,
-			String km, String importoSpesa) {
+			String km, String importoSpesa, OggettoBulk oggettoBulk) {
 		super();
 		this.activePage = activePage;
 		this.maxItemsPerPage = maxItemsPerPage;
@@ -45,6 +47,7 @@ public class JSONBody implements Cloneable, Serializable{
 		this.divisa = divisa;
 		this.km = km;
 		this.importoSpesa = importoSpesa;
+		this.oggettoBulk = oggettoBulk;
 	}
 
 	public Integer getActivePage() {
@@ -142,5 +145,13 @@ public class JSONBody implements Cloneable, Serializable{
 
 	public void setImportoSpesa(String importoSpesa) {
 		this.importoSpesa = importoSpesa;
+	}
+
+	public OggettoBulk getOggettoBulk() {
+		return oggettoBulk;
+	}
+
+	public void setOggettoBulk(OggettoBulk oggettoBulk) {
+		this.oggettoBulk = oggettoBulk;
 	}
 }
