@@ -159,7 +159,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
+                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-change="onChangeTerzoModpag()" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
                         </span>
                     </p>
             </form>

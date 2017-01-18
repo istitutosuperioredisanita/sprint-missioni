@@ -71,6 +71,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "MODPAG", length = 5, nullable = false)
     private String modpag;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "TIPO_PAGAMENTO", length = 1, nullable = true)
+    private String tipoPagamento;
+
     @Size(min = 0, max = 34)
     @Column(name = "IBAN", length = 34, nullable = true)
     private String iban;
@@ -897,6 +901,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		return false;
 	}
 
+	@Transient
+	public Boolean isTrattamentoAlternativoMissione() {
+		if (getTrattamento() != null && getTrattamento().equals(Costanti.TAM)){
+			return true;
+		}
+		return false;
+	}
+
 	public String getUtilizzoTaxi() {
 		return utilizzoTaxi;
 	}
@@ -1111,5 +1123,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setMatricola(String matricola) {
 		this.matricola = matricola;
+	}
+
+	public String getTipoPagamento() {
+		return tipoPagamento;
+	}
+
+	public void setTipoPagamento(String tipoPagamento) {
+		this.tipoPagamento = tipoPagamento;
 	}
 }

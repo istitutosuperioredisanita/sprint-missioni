@@ -3,13 +3,7 @@
     <changeSet author="missioni" id="20161214152200">
     	<addColumn 
             tableName="RIMBORSO_MISSIONE">
-            <column name="MATRICOLA" type="VARCHAR(6)">
-                <constraints nullable="true"/>
-            </column>
-    	</addColumn>
-    	<addColumn 
-            tableName="ORDINE_MISSIONE">
-            <column name="MATRICOLA" type="VARCHAR(6)">
+            <column name="MATRICOLA" type="character varying(6)">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>
