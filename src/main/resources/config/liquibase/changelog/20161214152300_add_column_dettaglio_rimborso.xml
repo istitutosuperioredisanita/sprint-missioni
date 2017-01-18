@@ -3,13 +3,13 @@
     <changeSet author="missioni" id="20161214152300">
     	<addColumn 
             tableName="RIMBORSO_MISSIONE_DETTAGLI">
-            <column name="DS_NO_GIUSTIFICATIVO" type="VARCHAR(100)">
+            <column name="DS_NO_GIUSTIFICATIVO" type="character varying(100)">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>
     	<addColumn 
             tableName="RIMBORSO_MISSIONE_DETTAGLI">
-            <column name="LOCALITA_SPOSTAMENTO" type="VARCHAR(200)">
+            <column name="LOCALITA_SPOSTAMENTO" type="character varying(200)">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>

@@ -349,13 +349,13 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
-    var recuperoTerzoModalitaPagamento = function(cdTerzo, cdModPag){
+    var recuperoTerzoModalitaPagamento = function(cdTerzo, tipoPagamento){
         var urlRestProxy = URL_REST.STANDARD;
         var ele = [];
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.BANCA;
         var objectPostClauses = [{condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:cdTerzo},
-                                    {condition: 'AND', fieldName: 'cd_modalita_pag', operator: "=", fieldValue:cdModPag},
+                                    {condition: 'AND', fieldName: 'ti_pagamento', operator: "=", fieldValue:tipoPagamento},
                                     {condition: 'AND', fieldName: 'fl_cancellato', operator: "=", fieldValue:false}];
         var objectPost = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostClauses}
         return $http.post(urlRestProxy + app+'/', objectPost, {params: {proxyURL: url}}).success(function (data) {

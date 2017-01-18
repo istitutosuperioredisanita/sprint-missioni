@@ -3,7 +3,7 @@
     <changeSet author="missioni" id="20160627152200">
     	<addColumn 
             tableName="RIMBORSO_MISSIONE">
-        <column name="NOTE_DIFFERENZE_ORDINE" type="varchar(1000)">
+        <column name="NOTE_DIFFERENZE_ORDINE" type="character varying(1000)">
             <constraints nullable="true"/>
 				</column>
     	</addColumn>

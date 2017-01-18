@@ -41,6 +41,12 @@ public class DateUtils {
 	public static final String PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE = "yyyy-MM-dd HH:mm";
 
 	/**
+	 * PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE
+	 */
+	public static final String PATTERN_DATETIME_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	
+	
+	/**
 	 * PATTERN_DATETIME
 	 */
 	public static final String PATTERN_DATETIME = "dd/MM/yyyy HH:mm:ss";
@@ -273,6 +279,41 @@ public class DateUtils {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "La data " + aDate + " non è nel formato "
 				+ aPattern);
 		}
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @throws {@link AwesomeException}
+	 */
+	public static LocalDate parseLocalDate(String aDate) throws AwesomeException {
+		return parseLocalDate(aDate,PATTERN_DATE);
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @throws {@link AwesomeException}
+	 */
+	public static LocalDate parseLocalDate(String aDate, String aPattern)
+					throws AwesomeException {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(aPattern);
+
+		return LocalDate.parse(aDate, formatter);
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @throws {@link AwesomeException}
+	 */
+	public static ZonedDateTime parseZonedDateTime(String aDate, String aPattern)
+					throws AwesomeException {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(aPattern);
+
+		return ZonedDateTime.parse(aDate, formatter);
 	}
 
 	/**

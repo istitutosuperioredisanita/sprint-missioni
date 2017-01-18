@@ -145,7 +145,7 @@ public class RimborsoMissioneService {
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
     	cronService.comunicaRimborsoSigla(principal);
-/*    	if (lista != null){
+   	if (lista != null){
         	List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
     		for (RimborsoMissione rimborsoMissione : lista){
     			if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
@@ -188,7 +188,7 @@ public class RimborsoMissioneService {
     			}
     		}
     		return listaNew;
-    	}*/
+    	}
     	return lista;
     }
 
@@ -303,6 +303,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setModpag(rimborsoMissione.getModpag());
 			rimborsoMissioneDB.setIban(rimborsoMissione.getIban());
 			rimborsoMissioneDB.setPgBanca(rimborsoMissione.getPgBanca());
+			rimborsoMissioneDB.setTipoPagamento(rimborsoMissione.getTipoPagamento());
 			rimborsoMissioneDB.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto());
 			rimborsoMissioneDB.setAnticipoAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato());
 			rimborsoMissioneDB.setAnticipoNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato());

@@ -122,6 +122,7 @@ public class ProxyService implements EnvironmentAware{
 
 	public ResultProxy process(HttpMethod httpMethod, String body, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
 		String appUrl = propertyResolver.getProperty(app + ".url");
+		String proxyURL = null;
         if (appUrl == null) {
         	log.error("Cannot find properties for app: " + app + " Current profile are: ", Arrays.toString(environment.getActiveProfiles()));
         	throw new ApplicationContextException("Cannot find properties for app: " + app);
@@ -146,7 +147,7 @@ public class ProxyService implements EnvironmentAware{
         		addContextToHeader(app, headers);
         	}
         	
-        	String proxyURL = appUrl.concat(url);
+        	proxyURL = appUrl.concat(url);
     		if (queryString != null){
     			String valueToDelete = ProxyResource.PROXY_URL+"="+url;
     			int numberCharacter = valueToDelete.length(); 
@@ -157,6 +158,9 @@ public class ProxyService implements EnvironmentAware{
     			proxyURL = proxyURL.concat("?").concat(newValue);        	
     		}
         	HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);  
+        	log.info("Url: "+proxyURL);
+        	log.info("Header: "+headers);
+        	log.info("Body: "+body);
             ResponseEntity<String> result = getRestTemplate(app).
             		exchange(proxyURL, httpMethod, requestEntity, String.class);
             ResultProxy resultProxy = new ResultProxy();
@@ -169,6 +173,8 @@ public class ProxyService implements EnvironmentAware{
         	String errResponse = _ex.getResponseBodyAsString();
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
         	throw new ApplicationContextException(errResponse);
+        } catch (Exception _ex) {
+        	throw new ApplicationContextException("Servizio REST "+ proxyURL+" Eccezione: "+ _ex.getLocalizedMessage());
         }
 	}
 

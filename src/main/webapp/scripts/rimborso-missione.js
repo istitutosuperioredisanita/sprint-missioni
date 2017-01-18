@@ -163,8 +163,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         });
     }
 
-    $scope.recuperoDatiTerzoModalitaPagamento = function(terzoSigla, modPag){
-        ProxyService.getTerzoModalitaPagamento(terzoSigla, modPag).then(function(ret){
+    $scope.recuperoDatiTerzoModalitaPagamento = function(terzoSigla, tipoPagamento){
+        ProxyService.getTerzoModalitaPagamento(terzoSigla, tipoPagamento).then(function(ret){
             if (ret && ret.data && ret.data.elements){
                 $scope.terzoModalitaPagamentos = ret.data.elements;
                 if ($scope.rimborsoMissioneModel && $scope.terzoModalitaPagamentos && $scope.terzoModalitaPagamentos.length == 1) {
@@ -335,6 +335,18 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         }
     }
 
+    $scope.onChangeTerzoModpag = function() {
+        var pgBanca = $scope.rimborsoMissioneModel.pgBanca;
+        if (pgBanca){
+            for (var i=0; i<$scope.terzoModalitaPagamentos.length; i++) {
+                var terzoModalitaPagamento = $scope.terzoModalitaPagamentos[i];
+                if (terzoModalitaPagamento.pg_banca === pgBanca){
+                    $scope.rimborsoMissioneModel.iban = terzoModalitaPagamento.codice_iban;
+                }
+            }
+        }
+    }
+
     $scope.onChangeModpag = function() {
         var modpag = $scope.rimborsoMissioneModel.modpag;
         if (modpag){
@@ -342,7 +354,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 var modalitaPagamento = $scope.modalitaPagamentos[i];
                 if (modalitaPagamento.cd_modalita_pag === modpag){
                     $scope.rimborsoMissioneModel.tipoPagamento = modalitaPagamento.ti_pagamento;
-                    $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, modalitaPagamento.cd_modalita_pag);
+                    $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, modalitaPagamento.ti_pagamento);
                 }
             }
         }
@@ -1069,8 +1081,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                             $scope.accountModel = result;
                             $sessionStorage.accountWork = $scope.accountModel;
                             $scope.recuperoDatiTerzoSigla($scope.accountModel);
-                            if (model.modpag){
-                                $scope.recuperoDatiTerzoModalitaPagamento(model.cdTerzoSigla, model.modpag);
+                            if (model.tipoPagamento){
+                                $scope.recuperoDatiTerzoModalitaPagamento(model.cdTerzoSigla, model.tipoPagamento);
                             }
                         }
                     });

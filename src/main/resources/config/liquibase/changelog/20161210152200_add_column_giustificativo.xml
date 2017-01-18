@@ -3,7 +3,7 @@
     <changeSet author="missioni" id="20161210152200">
     	<addColumn 
             tableName="RIMBORSO_MISSIONE_DETTAGLI">
-            <column name="GIUSTIFICATIVO" type="VARCHAR(1)">
+            <column name="GIUSTIFICATIVO" type="character varying(1)">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>

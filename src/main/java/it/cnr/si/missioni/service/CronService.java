@@ -2,6 +2,7 @@ package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,8 +150,8 @@ public class CronService {
 		                }
 		                oggettoBulk.setCdUnitaOrganizzativa(rimborsoApprovato.getUoSpesa());
 		                oggettoBulk.setDsMissione(rimborsoApprovato.getOggetto());
-		                oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
-		                oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+		                oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
+		                oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME));
 /*GGGG TODO...VERIFICARE QUALE ESERCIZIO PASSARE*/                                oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
 						oggettoBulk.setFlAssociatoCompenso(false);
 						if (rimborsoApprovato.isMissioneEstera()){
@@ -179,9 +180,9 @@ public class CronService {
 						if (rimborsoApprovato.getAnticipoImporto() != null){
 							oggettoBulk.setImportoMandatoAnticipo(rimborsoApprovato.getAnticipoImporto());
 						}
-						oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
-						oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
-						if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
+//						oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
+//						oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
+/*						if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
 							oggettoBulk.setCdCds(rimborsoApprovato.getCdCdsObbligazione());
 						}
 						if (rimborsoApprovato.getEsercizioObbligazione() != null){
@@ -195,7 +196,7 @@ public class CronService {
 						}
 						if (rimborsoApprovato.getGae() != null){
 							oggettoBulk.setGae(rimborsoApprovato.getGae());
-						}
+						}*/
 						impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
 						
 						impostaInquadramento(rimborsoApprovato, oggettoBulk);
@@ -217,7 +218,13 @@ public class CronService {
 			    			SpeseMissioneColl spesaMissione = new SpeseMissioneColl();
 			    			spesaMissione.setCdTiSpesa(dettaglio.getCdTiSpesa());
 			    			spesaMissione.setDsTiSpesa(dettaglio.getDsTiSpesa());
-			    			spesaMissione.setDtInizioTappa(DateUtils.getDateAsString(dettaglio.getDataSpesa(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+			    			String dataTappa = recuperoDataTappa(oggettoBulk.getTappeMissioneColl(), dettaglio);
+			    			if (dataTappa != null){
+			    				spesaMissione.setDtInizioTappa(dataTappa);
+				    		} else {
+			    				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+"  non esiste una tappa utile. Possibile incongruenza con le date di inizio e di fine missione.");
+				    		}
+			    			
 			    			spesaMissione.setFlDiariaManuale(false);
 			    			spesaMissione.setFlSpesaAnticipata(dettaglio.getFlSpesaAnticipata().equals("S") ? true : false);
 			    			spesaMissione.setImBaseMaggiorazione(BigDecimal.ZERO);
@@ -244,7 +251,7 @@ public class CronService {
 				    				if (dettaglio.getDsNoGiustificativo() != null){
 						    			spesaMissione.setDsNoGiustificativo(dettaglio.getDsNoGiustificativo());
 				    				} else {
-					    				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+"  è obbligatorio allegare almeno un giustificativo oppure indicare il motivo della mancanza.");
+					    				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+" è obbligatorio allegare almeno un giustificativo oppure indicare il motivo della mancanza.");
 				    				}
 				    			}
 			    			}
@@ -283,7 +290,15 @@ public class CronService {
 			}
 		}
 	}
-
+	
+	private String recuperoDataTappa(List<TappeMissioneColl> tappe, RimborsoMissioneDettagli dettaglio){
+		for (TappeMissioneColl tappa : tappe){
+			if (dettaglio.getDataSpesa().isEqual(DateUtils.parseLocalDate(tappa.getDtInizioTappa().substring(0, 10), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE))){
+    			return tappa.getDtInizioTappa();
+			}
+		}
+		return null;
+	}
 	private void aggiornaOrdiniMissioneFlows(Principal principal) throws Exception {
 		MissioneFilter filtro = new MissioneFilter();
 		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -303,10 +318,17 @@ public class CronService {
 	}
 
 	private void impostaTappe(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk)
-			throws CloneNotSupportedException {
+			throws Exception {
 		List<TappeMissioneColl> tappeMissioneColl = new ArrayList<TappeMissioneColl>();
 		TappeMissioneColl tappa = new TappeMissioneColl();
 		impostaDivisaTappa(tappa);
+		if (rimborsoApprovato.isTrattamentoAlternativoMissione()){
+			tappa.setFlRimborso(false);
+			tappa.setFlNoDiaria(false);
+		} else {
+			tappa.setFlRimborso(true);
+			tappa.setFlNoDiaria(true);
+		}
 		tappa.setFlComuneAltro(oggettoBulk.getFlComuneAltro());
 		tappa.setFlComuneEstero(oggettoBulk.getFlComuneEstero());
 		tappa.setFlComuneProprio(oggettoBulk.getFlComuneProprio());
@@ -317,63 +339,96 @@ public class CronService {
 		tappa.setFlVittoGratuito(false);
 //TODO: GGGG Fine da verificare sul db Gestione vitto e alloggio gratuito con gli abbattimenti 								
 		if (!rimborsoApprovato.isMissioneEstera()){
-			impostaDateStandard(rimborsoApprovato, tappa);
 			impostaNazioneRimborso(rimborsoApprovato, tappa);
-			tappeMissioneColl.add(tappa);
+			tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
 		} else {
-			if (rimborsoApprovato.getDataInizioMissione().compareTo(rimborsoApprovato.getDataInizioEstero()) == 0 && 
-					rimborsoApprovato.getDataFineMissione().compareTo(rimborsoApprovato.getDataFineEstero()) == 0){
-				impostaDateStandard(rimborsoApprovato, tappa);
+			if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0 && 
+					DateUtils.truncate(rimborsoApprovato.getDataFineMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataFineEstero())) == 0){
 				impostaNazioneRimborso(rimborsoApprovato, tappa);
-				tappeMissioneColl.add(tappa);
+				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
 			} else {
-				if (rimborsoApprovato.getDataInizioMissione().compareTo(rimborsoApprovato.getDataInizioEstero()) == 0){
-					TappeMissioneColl tappaEsteroInizio = (TappeMissioneColl)tappa.clone();
-					impostaNazioneRimborso(rimborsoApprovato, tappaEsteroInizio);
-					impostaDateTappa(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineEstero(), tappaEsteroInizio);
-					tappeMissioneColl.add(tappaEsteroInizio);
-					
-					impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
-					impostaDateTappa(rimborsoApprovato.getDataFineEstero(), rimborsoApprovato.getDataFineMissione(), tappa);
-					tappeMissioneColl.add(tappa);
-				} else if (rimborsoApprovato.getDataFineMissione().compareTo(rimborsoApprovato.getDataFineEstero()) == 0){
-					TappeMissioneColl tappaEsteroFine = (TappeMissioneColl)tappa.clone();
-					impostaNazioneRimborso(rimborsoApprovato, tappaEsteroFine);
-					impostaDateTappa(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappaEsteroFine);
-
-					impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
-					impostaDateTappa(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataInizioEstero(), tappa);
-					tappeMissioneColl.add(tappa);
-					tappeMissioneColl.add(tappaEsteroFine);
-				} else {
-					TappeMissioneColl tappaItaliaInizio = (TappeMissioneColl)tappa.clone();
-					TappeMissioneColl tappaEstero = (TappeMissioneColl)tappa.clone();
-					TappeMissioneColl tappaItaliaFine = (TappeMissioneColl)tappa.clone();
-
-					impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappaItaliaInizio);
-					impostaDateTappa(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataInizioEstero(), tappaItaliaInizio);
-					tappeMissioneColl.add(tappaItaliaInizio);
-					
-					impostaNazioneRimborso(rimborsoApprovato, tappaEstero);
-					impostaDateTappa(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappaEstero);
-					tappeMissioneColl.add(tappaEstero);
-					
-					impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappaItaliaFine);
-					impostaDateTappa(rimborsoApprovato.getDataFineEstero(), rimborsoApprovato.getDataFineMissione(), tappaItaliaFine);
-					tappeMissioneColl.add(tappaItaliaFine);
-				}
+//				if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0){
+//					TappeMissioneColl tappaEsteroInizio = (TappeMissioneColl)tappa.clone();
+//					impostaNazioneRimborso(rimborsoApprovato, tappaEsteroInizio);
+//					tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineEstero(), tappaEsteroInizio, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
+//				} else if (DateUtils.truncate(rimborsoApprovato.getDataFineMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataFineEstero())) == 0){
+//					TappeMissioneColl tappaEsteroFine = (TappeMissioneColl)tappa.clone();
+//					impostaNazioneRimborso(rimborsoApprovato, tappaEsteroFine);
+//					tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineMissione(), tappaEsteroFine, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
+//				} else {
+					impostaNazioneRimborso(rimborsoApprovato, tappa);
+					tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
+//				}
 			}
 		}
 		oggettoBulk.setTappeMissioneColl(tappeMissioneColl);
 	}
 
-	private void impostaDateStandard(RimborsoMissione rimborsoApprovato, TappeMissioneColl tappa) {
-		impostaDateTappa(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa);
+	private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws Exception {
+		return impostaTappeDaDate(daData, aData, tappa, tappeMissioneColl, null, null);
+	}
+	private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws Exception {
+		ZonedDateTime ultimaDataInizioUsata = null;
+		if (dataInizioMissione != null && !DateUtils.truncate(daData).equals(DateUtils.truncate(dataInizioMissione))){
+			for (ZonedDateTime data = dataInizioMissione; DateUtils.truncate(data).isBefore(DateUtils.truncate(daData)); data = data.plusDays(1))
+			{
+				ultimaDataInizioUsata = data;
+				TappeMissioneColl newDayTappa = (TappeMissioneColl)tappa.clone();
+				impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, newDayTappa);
+				ZonedDateTime dataFine = data.plusDays(1);
+				if (dataFine.isAfter(dataFineMissione)){
+					dataFine = dataFineMissione;
+				}
+				impostaDateTappa(data, dataFine, newDayTappa);
+				tappeMissioneColl.add(newDayTappa);
+			}
+		}
+		if (ultimaDataInizioUsata != null){
+			daData = ultimaDataInizioUsata.plusDays(1);
+		}
+		for (ZonedDateTime data = daData; DateUtils.truncate(data).isBefore(DateUtils.truncate(aData)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(aData)); data = data.plusDays(1))
+		{
+			ultimaDataInizioUsata = data;
+			TappeMissioneColl newDayTappa = (TappeMissioneColl)tappa.clone();
+			ZonedDateTime dataFine = data.plusDays(1);
+			if (dataFine.isAfter(aData)){
+				if (dataFineMissione == null){
+					dataFine = aData;
+				} else {
+					if (dataFine.isAfter(dataFineMissione)){
+						dataFine = dataFineMissione;
+					}
+				}
+			}
+			impostaDateTappa(data, dataFine, newDayTappa);
+			tappeMissioneColl.add(newDayTappa);
+		}
+		if (dataFineMissione != null && !DateUtils.truncate(aData).equals(DateUtils.truncate(dataFineMissione))){
+			ultimaDataInizioUsata = ultimaDataInizioUsata.plusDays(1);
+			impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
+			for (ZonedDateTime data = ultimaDataInizioUsata; DateUtils.truncate(data).isBefore(DateUtils.truncate(dataFineMissione)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(dataFineMissione)); data = data.plusDays(1))
+			{
+				ZonedDateTime dataInizio = data;
+				if (dataInizio.isAfter(dataFineMissione)){
+					dataInizio = dataFineMissione;
+				}
+				TappeMissioneColl newDayTappa = (TappeMissioneColl)tappa.clone();
+				ZonedDateTime dataFine = dataInizio.plusDays(1);
+				if (dataFine.isAfter(dataFineMissione)){
+					dataFine = dataFineMissione;
+				}
+				impostaDateTappa(dataInizio, dataFine, newDayTappa);
+				tappeMissioneColl.add(newDayTappa);
+			}
+		}
+
+		
+		return tappeMissioneColl;
 	}
 
 	private void impostaDateTappa(ZonedDateTime dataInizio, ZonedDateTime dataFine, TappeMissioneColl tappa) {
-		tappa.setDtInizioTappa(DateUtils.getDateAsString(dataInizio, DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
-		tappa.setDtFineTappa(DateUtils.getDateAsString(dataFine, DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+		tappa.setDtInizioTappa(DateUtils.getDateAsString(dataInizio, DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
+		tappa.setDtFineTappa(DateUtils.getDateAsString(dataFine, DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 	}
 
 	private void impostaNazioneRimborso(RimborsoMissione rimborsoApprovato, TappeMissioneColl tappa) {
