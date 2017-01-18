@@ -44,6 +44,7 @@ import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
 /**
@@ -105,12 +106,10 @@ public class RimborsoMissioneResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<RimborsoMissione>> getRimborsoMissioneDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) throws Exception {
+    public ResponseEntity getRimborsoMissioneDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<RimborsoMissione> rimborsiMissione  = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
-        return new ResponseEntity<>(
-        		rimborsiMissione,
-        		HttpStatus.OK);
+        return JSONResponseEntity.ok(rimborsiMissione);
     }
 
     /**
@@ -128,9 +127,15 @@ public class RimborsoMissioneResource {
             return new ResponseEntity<>(
                     rimborsoMissione,
                     HttpStatus.OK);
+		} catch (AwesomeException e) {
+			return e.getResponse();
 		} catch (ComponentException e) {
-  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
-		} 
+			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+		} catch (OptimisticLockException e) {
+			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+		}
     }
 
     @RequestMapping(value = "/rest/rimborsoMissione",

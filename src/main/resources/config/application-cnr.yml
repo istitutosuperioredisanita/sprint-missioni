@@ -13,6 +13,7 @@ spring:
     proxy:
         SIGLA:
             url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
+         #  url: http://localhost:8080/SIGLA/
             username: MISSIONI
             password: M15510N1
             context:
@@ -72,3 +73,4 @@ jhipster:
 cache.hazelcast:
     name: sprint-missioni
     members: 127.0.0.1
+
