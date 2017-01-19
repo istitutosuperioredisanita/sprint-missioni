@@ -71,13 +71,11 @@ public class RimborsoMissioneResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<RimborsoMissione>> getRimborsoMissione(HttpServletRequest request,
+    public ResponseEntity getRimborsoMissione(HttpServletRequest request,
     		RimborsoMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
         List<RimborsoMissione> rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
-        return new ResponseEntity<>(
-        		rimborsiMissione,
-        		HttpStatus.OK);
+        return JSONResponseEntity.ok(rimborsiMissione);
     }
 
     /**
@@ -87,15 +85,13 @@ public class RimborsoMissioneResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<RimborsoMissione>> getRimborsoMissioneToFinal(HttpServletRequest request,
+    public ResponseEntity getRimborsoMissioneToFinal(HttpServletRequest request,
     		RimborsoMissioneFilter filter) throws Exception {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         filter.setToFinal("S");
-        List<RimborsoMissione> ordiniMissione  = null;
+        List<RimborsoMissione> rimborsiMissione = null;
         		rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
-        return new ResponseEntity<>(
-        		ordiniMissione,
-        		HttpStatus.OK);
+        return JSONResponseEntity.ok(rimborsiMissione);
     }
 
     /**
@@ -119,16 +115,14 @@ public class RimborsoMissioneResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> getRimborsoMissione(HttpServletRequest request,
+    public ResponseEntity getRimborsoMissione(HttpServletRequest request,
     		@RequestParam(value = "id") Long idMissione) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
         	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, false, true);
-            return new ResponseEntity<>(
-                    rimborsoMissione,
-                    HttpStatus.OK);
-		} catch (AwesomeException e) {
-			return e.getResponse();
+            return JSONResponseEntity.ok(rimborsoMissione);
+        } catch (AwesomeException e) {
+			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
 		} catch (ComponentException e) {
 			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
 		} catch (OptimisticLockException e) {
@@ -142,13 +136,13 @@ public class RimborsoMissioneResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> createRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, HttpServletRequest request,
+    public ResponseEntity createRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (rimborsoMissione.getId() == null){
             try {
                 rimborsoMissione =  rimborsoMissioneService.createRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione);
     		} catch (AwesomeException e) {
-    			return e.getResponse();
+    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
     		} catch (ComponentException e) {
     			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
     		} catch (OptimisticLockException e) {
@@ -158,9 +152,9 @@ public class RimborsoMissioneResource {
     		} catch (BusyResourceException e) {
     			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
     		}
-            return new ResponseEntity<>(rimborsoMissione, HttpStatus.CREATED);
+            return JSONResponseEntity.ok(rimborsoMissione);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    	    return JSONResponseEntity.badRequest("Id Rimborso Missione non valorizzato");
     	}
     }
 
@@ -168,22 +162,22 @@ public class RimborsoMissioneResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> modifyRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, HttpServletRequest request,
+    public ResponseEntity modifyRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (rimborsoMissione.getId() != null){
     		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
 				rimborsoMissione =  rimborsoMissioneService.updateRimborsoMissione(principal, rimborsoMissione);
     		} catch (AwesomeException e) {
-    			return e.getResponse();
+    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
     		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		} catch (Exception e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(rimborsoMissione, HttpStatus.OK);
+            return JSONResponseEntity.ok(rimborsoMissione);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    	    return JSONResponseEntity.badRequest("Id Rimborso Missione non valorizzato");
     	}
     }
 
@@ -192,22 +186,22 @@ public class RimborsoMissioneResource {
             params = {"confirm"}, 
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> confirmRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,  
+    public ResponseEntity confirmRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,  
     		HttpServletRequest request, HttpServletResponse response) {
     	if (rimborsoMissione.getId() != null){
     		rimborsoMissione.setDaValidazione(daValidazione);
             try {
 				rimborsoMissione = rimborsoMissioneService.updateRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione, false, confirm);
     		} catch (AwesomeException e) {
-    			return e.getResponse();
+    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
     		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		} catch (Exception e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(rimborsoMissione, HttpStatus.OK);
+            return JSONResponseEntity.ok(rimborsoMissione);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    	    return JSONResponseEntity.badRequest("Id Rimborso Missione non valorizzato");
     	}
     }
 
@@ -215,20 +209,20 @@ public class RimborsoMissioneResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> deleteRimborsoMissione(@PathVariable Long ids, HttpServletRequest request) {
+    public ResponseEntity deleteRimborsoMissione(@PathVariable Long ids, HttpServletRequest request) {
 		try {
 			rimborsoMissioneService.deleteRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), ids);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
-			return e.getResponse();
+			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
 		} catch (ComponentException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} catch (OptimisticLockException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} catch (PersistencyException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} catch (BusyResourceException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
 
@@ -270,71 +264,5 @@ public class RimborsoMissioneResource {
     			throw new RuntimeException(Utility.getMessageException(e));
     		} 
         }
-    }
-
-    @RequestMapping(value = "/rest/rimborsoMissione/print/json",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<?> jsonForPrintRimborsoMissione(HttpServletRequest request,
-    		@RequestParam(value = "idMissione") Long idMissione) {
-        log.debug("REST request per il json della stampa dell'rimborso di Missione " );
-//        try {
-        	String json = null; 
-//        			rimborsoMissioneService.jsonForPrintRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione);
-            return new ResponseEntity<>(
-            		json,
-                    HttpStatus.OK);
-//		} catch (ComponentException e) {
-//			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-//		} 
-    }
-
-//    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
-//            method = RequestMethod.POST,
-//            produces = MediaType.APPLICATION_JSON_VALUE,
-//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @Timed
-//    public ResponseEntity<?> uploadAllegatiOrdineMissione(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
-//        log.debug("REST request per l'upload di allegati all'Ordine di Missione " );
-//        if (idOrdineMissione != null){
-//            	try {
-//            		if (!Utility.isTypeOk(file.getContentType())){
-//    	    			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
-//            		}
-//					ordineMissioneService.uploadAllegatoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getName(), file.getContentType());
-//					MimeTypes.valueOf(file.getContentType());
-//            	} catch (ComponentException | AwesomeException | IOException e1) {
-//	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
-//				}
-//            try {
-//                return new ResponseEntity<>(
-//                		null,
-//                        HttpStatus.OK);
-//    		} catch (ComponentException e) {
-//    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//    		} 
-//    	} else {
-//  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
-//    	}
-//    }
-    @RequestMapping(value = "/rest/rimborsoMissione/uploadAllegati",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Timed
-    public ResponseEntity<?> uploadAllegatiRimborsoMissione(HttpServletRequest req, @RequestParam("idRimborso") Long idMissione, @RequestParam("file") MultipartFile file) {
-        log.debug("REST request per l'upload di allegati al rimborso di Missione " );
-//         rimborsoMissioneService.uploadAllegatoRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), (Long)rimborsoMissione.getId(), file.getInputStream());
-//            try {
-                return new ResponseEntity<>(
-                		null,
-                        HttpStatus.OK);
-//    		} catch (ComponentException e) {
-//    			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//    		} 
-//    	} else {
-//  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
-//    	}
     }
 }
