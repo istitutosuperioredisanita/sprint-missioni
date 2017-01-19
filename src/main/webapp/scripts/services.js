@@ -146,6 +146,11 @@ missioniApp.factory('Session', function () {
             this.comune_residenza = comune_residenza;
             this.indirizzo_residenza = indirizzo_residenza;
             this.num_civico_residenza = num_civico_residenza;
+            if (this.num_civico_residenza){
+                this.indirizzo_completo_residenza = this.indirizzo_residenza+" "+this.num_civico_residenza;
+            } else {
+                this.indirizzo_completo_residenza = this.indirizzo_residenza;
+            }
             this.cap_residenza = cap_residenza;
             this.provincia_residenza = provincia_residenza;
             this.codice_fiscale = codice_fiscale;
@@ -181,6 +186,7 @@ missioniApp.factory('Session', function () {
             this.comune_residenza = null;
             this.indirizzo_residenza = null;
             this.num_civico_residenza = null;
+            this.indirizzo_completo_residenza = null;
             this.cap_residenza = null;
             this.provincia_residenza = null;
             this.codice_fiscale = null;
