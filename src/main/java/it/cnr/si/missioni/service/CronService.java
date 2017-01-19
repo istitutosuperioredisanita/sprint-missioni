@@ -151,7 +151,7 @@ public class CronService {
 		                oggettoBulk.setCdUnitaOrganizzativa(rimborsoApprovato.getUoSpesa());
 		                oggettoBulk.setDsMissione(rimborsoApprovato.getOggetto());
 		                oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
-		                oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME));
+		                oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 /*GGGG TODO...VERIFICARE QUALE ESERCIZIO PASSARE*/                                oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
 						oggettoBulk.setFlAssociatoCompenso(false);
 						if (rimborsoApprovato.isMissioneEstera()){

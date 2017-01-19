@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -41,10 +40,9 @@ import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
-import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
 /**
@@ -72,7 +70,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity getRimborsoMissione(HttpServletRequest request,
-    		RimborsoMissioneFilter filter) throws Exception {
+    		RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
         List<RimborsoMissione> rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
         return JSONResponseEntity.ok(rimborsiMissione);
@@ -86,7 +84,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity getRimborsoMissioneToFinal(HttpServletRequest request,
-    		RimborsoMissioneFilter filter) throws Exception {
+    		RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         filter.setToFinal("S");
         List<RimborsoMissione> rimborsiMissione = null;
@@ -102,9 +100,15 @@ public class RimborsoMissioneResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity getRimborsoMissioneDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) throws Exception {
+    public ResponseEntity getRimborsoMissioneDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
-        List<RimborsoMissione> rimborsiMissione  = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+        List<RimborsoMissione> rimborsiMissione;
+		try {
+			rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+		} catch (Exception e) {
+			log.error("ERRORE getRimborsoMissioneDaValidare",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		}
         return JSONResponseEntity.ok(rimborsiMissione);
     }
 
@@ -122,12 +126,10 @@ public class RimborsoMissioneResource {
         	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, false, true);
             return JSONResponseEntity.ok(rimborsoMissione);
         } catch (AwesomeException e) {
+			log.error("ERRORE getRimborsoMissione",e);
 			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-		} catch (ComponentException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (OptimisticLockException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
+			log.error("ERRORE getRimborsoMissione",e);
 			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
 		}
     }
@@ -142,14 +144,10 @@ public class RimborsoMissioneResource {
             try {
                 rimborsoMissione =  rimborsoMissioneService.createRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione);
     		} catch (AwesomeException e) {
+    			log.error("ERRORE createRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (OptimisticLockException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (PersistencyException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (BusyResourceException e) {
+    		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    			log.error("ERRORE createRimborsoMissione",e);
     			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
     		}
             return JSONResponseEntity.ok(rimborsoMissione);
@@ -169,10 +167,10 @@ public class RimborsoMissioneResource {
             try {
 				rimborsoMissione =  rimborsoMissioneService.updateRimborsoMissione(principal, rimborsoMissione);
     		} catch (AwesomeException e) {
+    			log.error("ERRORE modifyRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (ComponentException e) {
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		} catch (Exception e) {
+    			log.error("ERRORE modifyRimborsoMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
             return JSONResponseEntity.ok(rimborsoMissione);
@@ -193,10 +191,10 @@ public class RimborsoMissioneResource {
             try {
 				rimborsoMissione = rimborsoMissioneService.updateRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione, false, confirm);
     		} catch (AwesomeException e) {
+    			log.error("ERRORE confirmRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (ComponentException e) {
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		} catch (Exception e) {
+    			log.error("ERRORE confirmRimborsoMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
             return JSONResponseEntity.ok(rimborsoMissione);
@@ -214,14 +212,10 @@ public class RimborsoMissioneResource {
 			rimborsoMissioneService.deleteRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
+			log.error("ERRORE deleteRimborsoMissione",e);
 			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-		} catch (ComponentException e) {
-            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		} catch (OptimisticLockException e) {
-            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		} catch (PersistencyException e) {
-            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		} catch (BusyResourceException e) {
+		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+			log.error("ERRORE deleteRimborsoMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
@@ -256,11 +250,13 @@ public class RimborsoMissioneResource {
                         		outputStream.close();       	
                     		}
             			} catch (IOException e) {
+            				log.error("ERRORE deleteRimborsoMissione",e);
                 			throw new RuntimeException(Utility.getMessageException(e));
                 		} 
             		}
             	}
     		} catch (ComponentException e) {
+    			log.error("ERRORE deleteRimborsoMissione",e);
     			throw new RuntimeException(Utility.getMessageException(e));
     		} 
         }
