@@ -8,3 +8,5 @@ missioni:
   environment:
     - SERVICE_TAGS=webapp
     - SERVICE_NAME=##{SERVICE_NAME}##
+  labels:
+    - SERVICE_NAME=##{SERVICE_NAME}##
