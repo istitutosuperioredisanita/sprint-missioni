@@ -287,6 +287,20 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "NOTE_UTILIZZO_TAXI_NOLEGGIO", length = 1000, nullable = true)
     public String noteUtilizzoTaxiNoleggio;
 
+    @Column(name = "PG_MISSIONE_SIGLA", length = 10, nullable = true)
+    public Long pgMissioneSigla;
+
+    @Column(name = "ESERCIZIO_SIGLA", length = 4, nullable = true)
+    public Integer esercizioSigla;
+
+    @Size(min = 0, max = 30)
+    @Column(name = "CD_CDS_SIGLA", length = 30, nullable = true)
+    public String cdCdsSigla;
+
+    @Size(min = 0, max = 30)
+    @Column(name = "CD_UO_SIGLA", length = 30, nullable = true)
+    public String cdUoSigla;
+
 	@Transient
     private String daValidazione;
 	
@@ -1131,5 +1145,37 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setTipoPagamento(String tipoPagamento) {
 		this.tipoPagamento = tipoPagamento;
+	}
+
+	public Long getPgMissioneSigla() {
+		return pgMissioneSigla;
+	}
+
+	public void setPgMissioneSigla(Long pgMissioneSigla) {
+		this.pgMissioneSigla = pgMissioneSigla;
+	}
+
+	public Integer getEsercizioSigla() {
+		return esercizioSigla;
+	}
+
+	public void setEsercizioSigla(Integer esercizioSigla) {
+		this.esercizioSigla = esercizioSigla;
+	}
+
+	public String getCdCdsSigla() {
+		return cdCdsSigla;
+	}
+
+	public void setCdCdsSigla(String cdCdsSigla) {
+		this.cdCdsSigla = cdCdsSigla;
+	}
+
+	public String getCdUoSigla() {
+		return cdUoSigla;
+	}
+
+	public void setCdUoSigla(String cdUoSigla) {
+		this.cdUoSigla = cdUoSigla;
 	}
 }
