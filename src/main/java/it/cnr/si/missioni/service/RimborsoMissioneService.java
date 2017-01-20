@@ -314,6 +314,10 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
 //			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
 			rimborsoMissioneDB.setInquadramento(rimborsoMissione.getInquadramento());
+			rimborsoMissioneDB.setCdCdsSigla(rimborsoMissione.getCdCdsSigla());
+			rimborsoMissioneDB.setCdUoSigla(rimborsoMissione.getCdUoSigla());
+			rimborsoMissioneDB.setEsercizioSigla(rimborsoMissione.getEsercizioSigla());
+			rimborsoMissioneDB.setPgMissioneSigla(rimborsoMissione.getPgMissioneSigla());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 		}
 		

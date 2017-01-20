@@ -14,10 +14,6 @@ public class JSONResponseEntity {
 	private JSONResponseEntity(){
 	}
 
-	public static ResponseEntity<String> ok(String message) {
-		return getResponse(HttpStatus.OK, message);
-	}
-	
 	public static ResponseEntity<String> badRequest(String message) {
 		return getResponse(HttpStatus.BAD_REQUEST, message);
 	}
