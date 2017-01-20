@@ -1,16 +1,5 @@
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.SecurityUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +32,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.jada.ejb.session.BusyResourceException;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -66,13 +65,14 @@ public class OrdineMissioneAnticipoResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity getAnticipo(HttpServletRequest request,
+    public ResponseEntity<?> getAnticipo(HttpServletRequest request,
     		@RequestParam(value = "idMissione") Long idMissione) {
         log.debug("REST request per visualizzare i dati dell'auto propria dell'Ordine di Missione" );
         try {
             OrdineMissioneAnticipo ordineMissioneAnticipo = ordineMissioneAnticipoService.getAnticipo((Principal) SecurityUtils.getCurrentUser(), idMissione, true);
             return JSONResponseEntity.ok(ordineMissioneAnticipo);
         } catch (ComponentException e) {
+			log.error("ERRORE getAnticipo",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} 
     }
@@ -86,20 +86,15 @@ public class OrdineMissioneAnticipoResource {
     	if (ordineMissioneAnticipo.getId() == null){
             try {
                 ordineMissioneAnticipo = ordineMissioneAnticipoService.createAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo);
-    		} catch (AwesomeException e) {
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		} catch (ComponentException e) {
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		} catch (OptimisticLockException e) {
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		} catch (PersistencyException e) {
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		} catch (BusyResourceException e) {
+    		} catch (Exception e) {
+    			log.error("ERRORE createAnticipoOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
             return JSONResponseEntity.ok(ordineMissioneAnticipo);
     	} else {
-            return JSONResponseEntity.badRequest("Id anticipo non valorizzato");
+    		String error = "Id anticipo già valorizzato";
+			log.error("ERRORE createAnticipoOrdineMissione",error);
+    	    return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -113,11 +108,14 @@ public class OrdineMissioneAnticipoResource {
             try {
             	ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    			log.error("ERRORE modifyAnticipoOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
             return JSONResponseEntity.ok(ordineMissioneAnticipo);
     	} else {
-            return JSONResponseEntity.badRequest("ID Anticipo dell'Ordine di missione non trovato");
+    		String error = "ID Anticipo dell'Ordine di missione non trovato";
+			log.error("ERRORE modifyAnticipoOrdineMissione",error);
+    	    return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -131,8 +129,10 @@ public class OrdineMissioneAnticipoResource {
 			ordineMissioneAnticipoService.deleteAnticipo((Principal) SecurityUtils.getCurrentUser(), ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
+			log.error("ERRORE deleteAnticipo",e);
 			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
 		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+			log.error("ERRORE deleteAnticipo",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
@@ -171,11 +171,13 @@ public class OrdineMissioneAnticipoResource {
 
         					}
         				} catch (IOException e) {
+        					log.error("ERRORE printOrdineMissioneAnticipo",e);
         					throw new RuntimeException(Utility.getMessageException(e));
         				} 
         			}
     			}
         	} catch (ComponentException e) {
+    			log.error("ERRORE printOrdineMissioneAnticipo",e);
         		throw new RuntimeException(Utility.getMessageException(e));
         	} 
         }
@@ -192,6 +194,7 @@ public class OrdineMissioneAnticipoResource {
         	String json = ordineMissioneAnticipoService.jsonForPrintOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idMissione);
         	return JSONResponseEntity.ok(json);
         } catch (ComponentException e) {
+			log.error("ERRORE jsonForPrintOrdineMissioneAnticipo",e);
         	return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} 
     }
@@ -207,14 +210,17 @@ public class OrdineMissioneAnticipoResource {
             try {
 				ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo, confirm);
     		} catch (AwesomeException e) {
+    			log.error("ERRORE confirmOrdineMissioneAnticipo",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
     		} catch (ComponentException|OptimisticLockException e) {
+    			log.error("ERRORE confirmOrdineMissioneAnticipo",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
         	return JSONResponseEntity.ok(ordineMissioneAnticipo);
     	} else {
-            return JSONResponseEntity.badRequest("ID Anticipo non trovato");
+    		String error = "ID Anticipo non trovato";
+			log.error("ERRORE confirmOrdineMissioneAnticipo",error);
+            return JSONResponseEntity.badRequest(error);
     	}
     }
-
 }

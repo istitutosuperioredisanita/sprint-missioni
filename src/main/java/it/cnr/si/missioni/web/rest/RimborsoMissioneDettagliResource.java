@@ -2,7 +2,6 @@ package it.cnr.si.missioni.web.rest;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
@@ -43,7 +42,7 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.service.RimborsoMissioneDettagliService;
-import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 
@@ -69,19 +68,15 @@ public class RimborsoMissioneDettagliResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<RimborsoMissioneDettagli>> getDettagli(HttpServletRequest request,
+    public ResponseEntity<?> getDettagli(HttpServletRequest request,
     		@RequestParam(value = "idRimborsoMissione") Long idRimborsoMissione) {
         log.debug("REST request per visualizzare i dettagli del Rimborso della Missione" );
         try {
             List<RimborsoMissioneDettagli> dettagli = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), idRimborsoMissione);
-            return new ResponseEntity<>(
-            		dettagli,
-                    HttpStatus.OK);
+            return JSONResponseEntity.ok(dettagli);
 		} catch (ComponentException e) {
-			List<RimborsoMissioneDettagli> listaVuota = new ArrayList<RimborsoMissioneDettagli>();
-			return new ResponseEntity<>(
-                    listaVuota,
-                    HttpStatus.BAD_REQUEST);
+			log.error("ERRORE getDettagli",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} 
     }
 
@@ -95,13 +90,16 @@ public class RimborsoMissioneDettagliResource {
             try {
             	dettaglio = rimborsoMissioneDettagliService.updateRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), dettaglio);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+    			log.error("ERRORE getDettagli",e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		} catch (Exception e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+    			log.error("ERRORE getDettagli",e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(dettaglio, HttpStatus.OK);
+            return JSONResponseEntity.ok(dettaglio);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+			log.error("modifyDettaglio Id non valorizzato");
+            return JSONResponseEntity.badRequest("modifyDettaglio Id non valorizzato");
     	}
     }
 
@@ -115,21 +113,16 @@ public class RimborsoMissioneDettagliResource {
             try {
             	dettaglio = rimborsoMissioneDettagliService.createRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), dettaglio);
     		} catch (AwesomeException e) {
-    			return e.getResponse();
-    		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (OptimisticLockException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (PersistencyException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+    			log.error("createDettaglio", e);
+                return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
     		} catch (Exception e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+    			log.error("createDettaglio", e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(dettaglio, HttpStatus.CREATED);
+            return JSONResponseEntity.ok(dettaglio);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+			log.error("createDettaglio Id non valorizzato");
+            return JSONResponseEntity.badRequest("createDettaglio Id non valorizzato");
     	}
     }
 
@@ -140,17 +133,13 @@ public class RimborsoMissioneDettagliResource {
     public ResponseEntity<?> deleteDettaglio(@PathVariable Long id, HttpServletRequest request) {
 		try {
 			rimborsoMissioneDettagliService.deleteRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
-			return e.getResponse();
-		} catch (ComponentException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (OptimisticLockException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (PersistencyException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (BusyResourceException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+			log.error("deleteDettaglio", e);
+            return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+			log.error("createDettaglio", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
 
@@ -158,19 +147,15 @@ public class RimborsoMissioneDettagliResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<CMISFileAttachment>> getAttachments(HttpServletRequest request,
+    public ResponseEntity<?> getAttachments(HttpServletRequest request,
     		@PathVariable Long idDettaglioRimborsoMissione) {
         log.debug("REST request per visualizzare gli allegati dei dettagli del Rimborso della Missione" );
         try {
             List<CMISFileAttachment> lista = rimborsoMissioneDettagliService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idDettaglioRimborsoMissione);
-            return new ResponseEntity<>(
-            		lista,
-                    HttpStatus.OK);
+            return JSONResponseEntity.ok(lista);
 		} catch (ComponentException e) {
-			List<CMISFileAttachment> listaVuota = new ArrayList<CMISFileAttachment>();
-			return new ResponseEntity<>(
-                    listaVuota,
-                    HttpStatus.BAD_REQUEST);
+			log.error("getAttachments", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} 
     }
 
@@ -190,23 +175,26 @@ public class RimborsoMissioneDettagliResource {
             			} else {
         					CMISFileAttachment cmisFileAttachment = rimborsoMissioneDettagliService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idDettaglioRimborsoMissione, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
         	                if (cmisFileAttachment != null){
-            					return new ResponseEntity<>(
-            	                		cmisFileAttachment,
-            	                        HttpStatus.OK);
+        	                    return JSONResponseEntity.ok(cmisFileAttachment);
         	                } else {
-            					return new ResponseEntity<>(
-            	                		"Non è stato possibile salvare il file.",
-            	                        HttpStatus.BAD_REQUEST);
+        	                	String error = "Non è stato possibile salvare il file.";
+        	        			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+        	                    return JSONResponseEntity.badRequest(error);
         	                }
             			}
             		}else {
-    	    			return new ResponseEntity<String>("File vuoto o con tipo non specificato", HttpStatus.BAD_REQUEST);
+	                	String error = "File vuoto o con tipo non specificato.";
+	        			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+	                    return JSONResponseEntity.badRequest(error);
             		}
             	} catch (ComponentException | AwesomeException | IOException e1) {
-	    			return new ResponseEntity<String>(e1.getMessage(), HttpStatus.BAD_REQUEST);
+        			log.error("uploadAllegatiDettaglioRimborsoMissione", e1);
+                    return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
 				}
     	} else {
-  	      return new ResponseEntity<String>("Id Dettaglio non valorizzato", HttpStatus.BAD_REQUEST);
+        	String error = "Id Dettaglio non valorizzato.";
+			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+            return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -245,6 +233,7 @@ public class RimborsoMissioneDettagliResource {
                     }
             	}
     		} catch (AwesomeException e) {
+                log.error("getAttachment", e);
     			throw new RuntimeException(Utility.getMessageException(e));
     		} 
         }
@@ -260,12 +249,15 @@ public class RimborsoMissioneDettagliResource {
         if (!StringUtils.isEmpty(id)){
             try {
                     missioniCMISService.deleteNode(id);
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    return JSONResponseEntity.ok();
             } catch (AwesomeException e) {
-                throw new RuntimeException(Utility.getMessageException(e));
+            	log.error("deleteAttachment", e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
             } 
         } else {
-            return new ResponseEntity<>("Id Allegato non valorizzato", HttpStatus.BAD_REQUEST);
+        	String error = "Id Allegato non valorizzato";
+        	log.error("deleteAttachment", error);
+            return JSONResponseEntity.badRequest(error);
         }
     }
 }

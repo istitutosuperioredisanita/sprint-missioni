@@ -1,12 +1,8 @@
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.si.missioni.service.UoService;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.missioni.service.UoService;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 
 /**
  * REST controller for managing the current user's account.
@@ -36,13 +36,11 @@ public class UoResource {
             params = {"uo"}, 
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Account> getDirettore(@RequestParam(value = "uo") String uo) {
+    public ResponseEntity getDirettore(@RequestParam(value = "uo") String uo) {
         log.debug("REST request per recuperare i dati del direttore");
         
         Account direttore = uoService.getDirettore(uo);
-        return new ResponseEntity<>(
-            direttore,
-            HttpStatus.OK);
+        return JSONResponseEntity.ok(direttore);
     }
 
 }

@@ -7,6 +7,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.service.AutoPropriaService;
 import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.SecurityUtils;
 
@@ -56,20 +57,10 @@ public class AutoPropriaResource {
             params = {"user"}, 
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<AutoPropria>> getAutoProprie(@RequestParam(value = "user") String user) {
+    public ResponseEntity<?> getAutoProprie(@RequestParam(value = "user") String user) {
         log.debug("REST request per visualizzare i dati di Auto Propria");
         List<AutoPropria> autoProprie = autoPropriaService.getAutoProprie(user);
-//        if (autoPropria == null) {
-//            return new ResponseEntity<>(HttpStatus.);
-//        }
-
-//        List<String> roles = new ArrayList<>();
-//        for (Authority authority : user.getAuthorities()) {
-//            roles.add(authority.getName());
-//        }
-        return new ResponseEntity<>(
-            autoProprie,
-            HttpStatus.OK);
+        return JSONResponseEntity.ok(autoProprie);
     }
 
     @RequestMapping(value = "/rest/autoPropria",
@@ -81,16 +72,20 @@ public class AutoPropriaResource {
     	if (autoPropria.getId() == null){
         	AutoPropria auto = autoPropriaService.getAutoPropria(autoPropria.getUid(), autoPropria.getTarga());
         	if (auto != null){
-                return new ResponseEntity<String>(CodiciErrore.TARGA_GIA_INSERITA, HttpStatus.BAD_REQUEST);
+    			log.error("ERRORE createAutoPropria ",CodiciErrore.TARGA_GIA_INSERITA);
+                return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         	}
             try {
                 autoPropria = autoPropriaService.createAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria.getUid(), autoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+    			log.error("ERRORE createAutoPropria ",e);
+    			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(autoPropria, HttpStatus.CREATED);
+            return JSONResponseEntity.ok(autoPropria);
     	} else {
-	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    		String error = "Id Auto Propria già valorizzato";
+			log.error("ERRORE createAutoPropria",error);
+    	    return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -104,17 +99,21 @@ public class AutoPropriaResource {
         	AutoPropria auto = autoPropriaService.getAutoPropria(autoPropria.getUid(), autoPropria.getTarga());
         	if (auto != null){
         		if (!auto.getId().equals(autoPropria.getId())){
-                    return new ResponseEntity<String>(CodiciErrore.TARGA_GIA_INSERITA, HttpStatus.BAD_REQUEST);
+        			log.error("ERRORE modifyAutoPropria ",CodiciErrore.TARGA_GIA_INSERITA);
+                    return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         		}
         	}
             try {
 				autoPropria = autoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+    			log.error("ERRORE modifyAutoPropria",e);
+    			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(autoPropria, HttpStatus.OK);
+            return JSONResponseEntity.ok(autoPropria);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    		String error = "Id Auto Propria non valorizzato";
+			log.error("ERRORE modifyAutoPropria",error);
+    	    return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -125,9 +124,10 @@ public class AutoPropriaResource {
     public ResponseEntity<?> deleteAutoPropria(@PathVariable Long ids, HttpServletRequest request) {
 		try {
 			autoPropriaService.deleteAutoPropria((Principal) SecurityUtils.getCurrentUser(), ids);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return JSONResponseEntity.ok();
 		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("ERRORE deleteAutoPropria",e);
+			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
 
