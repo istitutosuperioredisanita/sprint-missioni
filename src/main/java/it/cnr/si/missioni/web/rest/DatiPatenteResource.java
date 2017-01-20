@@ -50,7 +50,7 @@ public class DatiPatenteResource {
             params = {"user"}, 
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity getDatiPatente(@RequestParam(value = "user") String user) {
+    public ResponseEntity<?> getDatiPatente(@RequestParam(value = "user") String user) {
         log.debug("REST request per visualizzare i dati della Patente");
         DatiPatente datiPatente = datiPatenteService.getDatiPatente(user);
         return JSONResponseEntity.ok(datiPatente);
@@ -60,15 +60,16 @@ public class DatiPatenteResource {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity registerDatiPatente(@RequestBody DatiPatente datiPatente, HttpServletRequest request,
+    public ResponseEntity<?> registerDatiPatente(@RequestBody DatiPatente datiPatente, HttpServletRequest request,
                                              HttpServletResponse response) {
     	log.debug("Entro nel metodo POST");
     	if (datiPatente.getId() == null){
         	log.debug("id vuoto");
         	DatiPatente patente = datiPatenteService.getDatiPatente(datiPatente.getUid());
         	if (patente != null){
-            	log.debug("patente trovata");
-                return JSONResponseEntity.badRequest("I dati della patente sono già inseriti");
+        		String error = "I dati della patente sono già inseriti";
+            	log.error("registerDatiPatente ", error);
+                return JSONResponseEntity.badRequest(error);
         	}
             datiPatente = datiPatenteService.createDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
             return JSONResponseEntity.ok();
@@ -80,6 +81,7 @@ public class DatiPatenteResource {
         		log.debug("modificata patente");
                 return JSONResponseEntity.ok();
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+            	log.error("registerDatiPatente", e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}    		
     	}

@@ -1,16 +1,5 @@
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
-import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +33,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.jada.ejb.session.BusyResourceException;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
+import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -55,13 +55,10 @@ public class OrdineMissioneAutoPropriaResource {
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneAutoPropriaResource.class);
 
 
-//    @Inject
-//    private AutoPropriaRepository autoPropriaRepository;
-
     @Autowired
     private TokenStore tokenStore;
     
-    @Inject
+    @Autowired
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
 
     /**
@@ -76,20 +73,11 @@ public class OrdineMissioneAutoPropriaResource {
         log.debug("REST request per visualizzare i dati dell'auto propria dell'Ordine di Missione" );
         try {
             OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.getAutoPropria((Principal) SecurityUtils.getCurrentUser(), idMissione);
-            return new ResponseEntity<>(
-                    ordineMissioneAutoPropria,
-                    HttpStatus.OK);
+            return JSONResponseEntity.ok(ordineMissioneAutoPropria);
 		} catch (ComponentException e) {
-  	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+			log.error("ERRORE getAutoPropria",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} 
-//        if (autoPropria == null) {
-//            return new ResponseEntity<>(HttpStatus.);
-//        }
-
-//        List<String> roles = new ArrayList<>();
-//        for (Authority authority : user.getAuthorities()) {
-//            roles.add(authority.getName());
-//        }
     }
 
     /**
@@ -99,28 +87,16 @@ public class OrdineMissioneAutoPropriaResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<SpostamentiAutoPropria>> getSpostamenti(HttpServletRequest request,
+    public ResponseEntity<?> getSpostamenti(HttpServletRequest request,
     		@RequestParam(value = "idAutoPropriaOrdineMissione") Long idAutoPropriaOrdineMissione) {
         log.debug("REST request per visualizzare i dati degli spostamenti con l'auto propria dell'Ordine di Missione" );
         try {
             List<SpostamentiAutoPropria> spostamentiAutoPropria = ordineMissioneAutoPropriaService.getSpostamentiAutoPropria((Principal) SecurityUtils.getCurrentUser(), idAutoPropriaOrdineMissione);
-            return new ResponseEntity<>(
-                    spostamentiAutoPropria,
-                    HttpStatus.OK);
+            return JSONResponseEntity.ok(spostamentiAutoPropria);
 		} catch (ComponentException e) {
-			List<SpostamentiAutoPropria> listaVuota = new ArrayList<SpostamentiAutoPropria>();
-			return new ResponseEntity<>(
-                    listaVuota,
-                    HttpStatus.BAD_REQUEST);
+			log.error("ERRORE getSpostamenti",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		} 
-//        if (autoPropria == null) {
-//            return new ResponseEntity<>(HttpStatus.);
-//        }
-
-//        List<String> roles = new ArrayList<>();
-//        for (Authority authority : user.getAuthorities()) {
-//            roles.add(authority.getName());
-//        }
     }
 
     @RequestMapping(value = "/rest/ordineMissione/autoPropria/create",
@@ -133,19 +109,17 @@ public class OrdineMissioneAutoPropriaResource {
             try {
                 ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.createAutoPropria((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAutoPropria);
     		} catch (AwesomeException e) {
-    			return e.getResponse();
-    		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (OptimisticLockException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (PersistencyException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+    			log.error("ERRORE createAutoPropriaOrdineMissione",e);
+    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+    		} catch (Exception e) {
+    			log.error("ERRORE createAutoPropriaOrdineMissione",e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(ordineMissioneAutoPropria, HttpStatus.CREATED);
+            return JSONResponseEntity.ok(ordineMissioneAutoPropria);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    		String error = "Id Ordine Missione Auto Propria non valorizzato";
+    		log.error("ERRORE createAutoPropriaOrdineMissione",error);
+            return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -159,11 +133,14 @@ public class OrdineMissioneAutoPropriaResource {
             try {
             	ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAutoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+        		log.error("ERRORE modifyAutoPropriaOrdineMissione",e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(ordineMissioneAutoPropria, HttpStatus.OK);
+            return JSONResponseEntity.ok(ordineMissioneAutoPropria);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+    		String error = "Id Ordine Missione Auto Propria non valorizzato";
+    		log.error("ERRORE modifyAutoPropriaOrdineMissione",error);
+            return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -177,11 +154,14 @@ public class OrdineMissioneAutoPropriaResource {
             try {
             	spostamentiAutoPropria = ordineMissioneAutoPropriaService.updateSpostamenti((Principal) SecurityUtils.getCurrentUser(), spostamentiAutoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+        		log.error("ERRORE modifySpostamento",e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(spostamentiAutoPropria, HttpStatus.OK);
+            return JSONResponseEntity.ok(spostamentiAutoPropria);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+       		String error = "Id Spostamento Auto Propria non valorizzato";
+    		log.error("ERRORE modifySpostamento",error);
+            return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -195,19 +175,17 @@ public class OrdineMissioneAutoPropriaResource {
             try {
             	spostamentoAutoPropria = ordineMissioneAutoPropriaService.createSpostamentoAutoPropria((Principal) SecurityUtils.getCurrentUser(), spostamentoAutoPropria);
     		} catch (AwesomeException e) {
-    			return e.getResponse();
-    		} catch (ComponentException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (OptimisticLockException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (PersistencyException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-    		} catch (BusyResourceException e) {
-    			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+        		log.error("ERRORE createSpostamentoAutoPropria",e);
+    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+    		} catch (Exception e) {
+        		log.error("ERRORE createSpostamentoAutoPropria",e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
-            return new ResponseEntity<>(spostamentoAutoPropria, HttpStatus.CREATED);
+            return JSONResponseEntity.ok(spostamentoAutoPropria);
     	} else {
-    	      return new ResponseEntity<String>(CodiciErrore.INVALID_REQUEST, HttpStatus.BAD_REQUEST);
+       		String error = "Id Spostamento Auto Propria valorizzato";
+    		log.error("ERRORE createSpostamentoAutoPropria",error);
+            return JSONResponseEntity.badRequest(error);
     	}
     }
 
@@ -219,17 +197,13 @@ public class OrdineMissioneAutoPropriaResource {
     public ResponseEntity<?> deleteAutoPropria(@PathVariable Long ids, HttpServletRequest request) {
 		try {
 			ordineMissioneAutoPropriaService.deleteAutoPropria((Principal) SecurityUtils.getCurrentUser(), ids);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
-			return e.getResponse();
-		} catch (ComponentException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (OptimisticLockException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (PersistencyException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (BusyResourceException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+    		log.error("ERRORE deleteAutoPropria",e);
+			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+		} catch (Exception e) {
+    		log.error("ERRORE deleteAutoPropria",e);
+			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
 
@@ -240,17 +214,13 @@ public class OrdineMissioneAutoPropriaResource {
     public ResponseEntity<?> deleteSpostamento(@PathVariable Long ids, HttpServletRequest request) {
 		try {
 			ordineMissioneAutoPropriaService.deleteSpostamenti((Principal) SecurityUtils.getCurrentUser(), ids);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
-			return e.getResponse();
-		} catch (ComponentException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (OptimisticLockException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (PersistencyException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
-		} catch (BusyResourceException e) {
-			return new ResponseEntity<String>(Utility.getMessageException(e), HttpStatus.BAD_REQUEST);
+    		log.error("ERRORE deleteSpostamento",e);
+			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+		} catch (Exception e) {
+    		log.error("ERRORE deleteSpostamento",e);
+			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
 
@@ -285,11 +255,13 @@ public class OrdineMissioneAutoPropriaResource {
                         		outputStream.close();       	
                     		}
             			} catch (IOException e) {
+                    		log.error("ERRORE printOrdineMissioneAutoPropria",e);
                 			throw new RuntimeException(Utility.getMessageException(e));
                 		} 
             		}
             	}
     		} catch (ComponentException e) {
+        		log.error("ERRORE printOrdineMissioneAutoPropria",e);
     			throw new RuntimeException(Utility.getMessageException(e));
     		} 
         }
