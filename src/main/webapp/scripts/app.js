@@ -69,6 +69,20 @@ missioniApp
       }
     };
   })
+    .factory('missioniHttpInterceptor', function ($q, ui) {
+        return {
+            responseError: function (rejection) {
+                if (rejection.status === 400 || rejection.status === 401 ||
+                    rejection.status === 403 || rejection.status === 406 ||
+                    rejection.status === 412 || rejection.status === 500) {
+                    if (rejection.data.isFromApplication)
+                        ui.error(rejection.data.message);
+                }
+                return $q.reject(rejection);
+            }
+        };
+    })
+
     .config(function ($routeProvider, $httpProvider, $translateProvider, tmhDynamicLocaleProvider, USER_ROLES) {
             $routeProvider
                 .when('/', {
@@ -279,6 +293,8 @@ missioniApp
                 prefix: 'i18n/',
                 suffix: '.json'
             });
+
+            $httpProvider.interceptors.push('missioniHttpInterceptor');
 
             $translateProvider.preferredLanguage('it');
 
