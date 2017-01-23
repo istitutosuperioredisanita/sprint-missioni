@@ -70,6 +70,8 @@ public class MissioneBulk implements Cloneable, Serializable{
     private String cdCds;
     @JsonProperty("cd_unita_organizzativa")
     private String cdUnitaOrganizzativa;
+    @JsonProperty("pg_missione")
+    private Long pgMissione;
     @JsonProperty("cd_terzo")
     private Integer cdTerzo;
     @JsonProperty("ds_missione")
@@ -957,6 +959,14 @@ public class MissioneBulk implements Cloneable, Serializable{
 
 	public void setGae(String gae) {
 		this.gae = gae;
+	}
+
+	public Long getPgMissione() {
+		return pgMissione;
+	}
+
+	public void setPgMissione(Long pgMissione) {
+		this.pgMissione = pgMissione;
 	}
 
 }
