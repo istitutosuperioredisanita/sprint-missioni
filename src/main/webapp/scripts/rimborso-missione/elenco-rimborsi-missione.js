@@ -11,8 +11,6 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
             findRimborsiMissioneDaRendereDefinitive: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, uoRich, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
                 var promise = $http.get('app/rest/rimborsoMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).success(function (response) {
                     return response.data;
-                }).error(function(response){
-                    ui.error(response.message)
                 });
                 return promise;
             },
@@ -25,8 +23,6 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
             findListToValidate: function() {
                 var promise = $http.get('app/rest/rimborsoMissione/listToValidate').success(function (response) {
                     return response.data;
-                }).error(function(response){
-                    ui.error(response.message)
                 });
                 return promise;
             }

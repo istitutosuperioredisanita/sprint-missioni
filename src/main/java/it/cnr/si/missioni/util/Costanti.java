@@ -25,7 +25,7 @@ public class Costanti {
 	public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
     public final static String REST_TIPI_SPESA =  "ConsTipiSpesaAction.json";
 	public final static String REST_VALIDA_MASSIMALE_SPESA =  "restapi/missioni/validaMassimaleSpesa";
-	public final static String REST_COMUNICA_RIMBORSO_SIGLA =  "restapi/missioni";
+	public final static String REST_COMUNICA_RIMBORSO_SIGLA =  "restapi/mission";
 	public final static String REST_ACCOUNT = "json/userinfo/";
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
@@ -58,6 +58,8 @@ public class Costanti {
 	public final static String STATO_RESPINTO_SPESA_RIMBORSO_FROM_CMIS = "RESPINTO SPESA RIMBORSO";
 	public final static String STATO_FIRMA_UO_RIMBORSO_FROM_CMIS = "FIRMA UO RIMBORSO";
 	public final static String STATO_FIRMA_SPESA_RIMBORSO_FROM_CMIS = "FIRMA SPESA RIMBORSO";
+	public final static String STATO_INVIO_SIGLA_DA_COMUNICARE = "DAC";
+	public final static String STATO_INVIO_SIGLA_COMUNICATA = "COM";
 	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 1000000;
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
@@ -158,6 +160,16 @@ public class Costanti {
         aMap.put(STATO_RESPINTO_SPESA_RIMBORSO_FROM_CMIS, "Respinto da Uo Spesa");
         aMap.put(STATO_RESPINTO_UO_RIMBORSO_FROM_CMIS, "Respinto da Uo");
         STATO_FLUSSO_RIMBORSO_FROM_CMIS = Collections.unmodifiableMap(aMap);
+    }
+
+    public final static Map<String, String> STATO_INVIO_SIGLA;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(null, "Non Completa");
+        aMap.put("", "Non Completa");
+        aMap.put(STATO_INVIO_SIGLA_DA_COMUNICARE, "Da Comunicare");
+        aMap.put(STATO_INVIO_SIGLA_COMUNICATA, "Comunicata");
+        STATO_INVIO_SIGLA = Collections.unmodifiableMap(aMap);
     }
 
 }

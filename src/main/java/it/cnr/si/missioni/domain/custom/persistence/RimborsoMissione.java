@@ -283,6 +283,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "STATO_FLUSSO", length = 3, nullable = false)
     public String statoFlusso;
 
+    @Size(min = 0, max = 3)
+    @Column(name = "STATO_INVIO_SIGLA", length = 3, nullable = true)
+    public String statoInvioSigla;
+
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE_UTILIZZO_TAXI_NOLEGGIO", length = 1000, nullable = true)
     public String noteUtilizzoTaxiNoleggio;
@@ -327,6 +331,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	
 	@Transient
     private String decodeStatoFlusso;
+	
+	@Transient
+    private String decodeStatoInvioSigla;
 	
 	@Transient
 	private String stateFlows;
@@ -448,6 +455,15 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			}
 		}
 		return "";
+	}
+	
+	@Transient
+	public String getDecodeStatoInvioSigla() {
+		if (!StringUtils.isEmpty(getStatoInvioSigla())){
+			return Costanti.STATO_INVIO_SIGLA.get(getStatoInvioSigla());
+		} else {
+			return Costanti.STATO_INVIO_SIGLA.get("");
+		}
 	}
 	
 	public DatiIstituto getDatiIstituto() {
@@ -1177,5 +1193,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setCdUoSigla(String cdUoSigla) {
 		this.cdUoSigla = cdUoSigla;
+	}
+
+	public String getStatoInvioSigla() {
+		return statoInvioSigla;
+	}
+
+	public void setStatoInvioSigla(String statoInvioSigla) {
+		this.statoInvioSigla = statoInvioSigla;
 	}
 }

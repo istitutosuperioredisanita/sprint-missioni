@@ -17,8 +17,6 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
             findMissioniDaRendereDefinitive: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, uoRich) {
                 var promise = $http.get('app/rest/ordiniMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich}}).success(function (response) {
                     return response.data;
-                }).error(function(response){
-                    ui.error(response.message)
                 });
                 return promise;
             },
@@ -31,8 +29,6 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
             findListToValidate: function() {
                 var promise = $http.get('app/rest/ordiniMissione/listToValidate').success(function (response) {
                     return response.data;
-                }).error(function(response){
-                    ui.error(response.message)
                 });
                 return promise;
             }
