@@ -143,7 +143,7 @@ public class RimborsoMissioneService {
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
-//    	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
+    	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
     	if (lista != null){
     		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
     		for (RimborsoMissione rimborsoMissione : lista){

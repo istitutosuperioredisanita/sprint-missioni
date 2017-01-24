@@ -137,7 +137,7 @@ public class Utility {
 	}
 	
 	public static String getMessageException(Exception e){
-		String obj = e.getMessage();
+		String obj = e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();
 
 		ErrorRestSigla errorRest = null;
 		try {
@@ -145,7 +145,7 @@ public class Utility {
 			errorRest = (ErrorRestSigla)new ObjectMapper().readValue(obj,classJson);
 			return errorRest.getError();
 		} catch (IOException ex) {
-			return e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();		
+			return obj;		
 		}
 	}
 	public static MimeTypes getMimeType(String contentType){

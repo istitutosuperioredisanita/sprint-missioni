@@ -12,8 +12,8 @@ spring:
         baseDir: /it/cnr/missioni/print/
     proxy:
         SIGLA:
-            url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
-         #  url: http://localhost:8080/SIGLA/
+         #   url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
+            url: http://localhost:8080/SIGLA/
             username: MISSIONI
             password: M15510N1
             context:
@@ -74,3 +74,5 @@ cache.hazelcast:
     name: sprint-missioni
     members: 127.0.0.1
 
+server:
+    port: 8081
