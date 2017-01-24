@@ -424,7 +424,9 @@
             "altre-spese.placeholder": "Indicare ad esempio Albergo, Biglietti Aerei / Ferroviari, ecc.",
             "altre-spese-importo": "Importo €",
             "rimborso-spese-terzi": "Rimborso o concorso spese da terzi",
-            "rimborso-spese-terzi-importo": "Importo €"
+            "rimborso-spese-terzi-importo": "Importo €",
+            "stato-invio-sigla": "Stato Sigla",
+            "id-sigla": "Id. SIGLA"
         },
         "button": {
             "print": "Stampa Rimborso",
