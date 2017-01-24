@@ -50,7 +50,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "modalita_pagamento",
     "tappeMissioneColl",
     "speseMissioneColl",
-    
+
     "annoMandatoAnticipo",
     "numeroMandatoAnticipo",
     "importoMandatoAnticipo",
@@ -137,16 +137,16 @@ public class MissioneBulk implements Cloneable, Serializable{
     private String idFlusso;
     @JsonProperty("tam")
     private String tam;
-    @JsonProperty("cdCdsObbligazione")
-    private String cdCdsObbligazione;
-    @JsonProperty("esercizioObbligazione")
-    private Integer esercizioObbligazione;
-    @JsonProperty("esercizioOriObbligazione")
-    private Integer esercizioOriObbligazione;
-    @JsonProperty("pgObbligazione")
-    private Long pgObbligazione;
-    @JsonProperty("gae")
-    private String gae;
+    @JsonProperty("cdsObblGeMis")
+    private String cdsObblGeMis;
+    @JsonProperty("esercizioObblGeMis")
+    private Integer esercizioObblGeMis;
+    @JsonProperty("esercizioOriObblGeMis")
+    private Integer esercizioOriObblGeMis;
+    @JsonProperty("pgObblGeMis")
+    private Long pgObblGeMis;
+    @JsonProperty("gaeGeMis")
+    private String gaeGeMis;
     
     @JsonProperty("tipo_rapporto")
     private TipoRapporto tipoRapporto;
@@ -921,52 +921,52 @@ public class MissioneBulk implements Cloneable, Serializable{
 		this.tam = tam;
 	}
 
-	public String getCdCdsObbligazione() {
-		return cdCdsObbligazione;
-	}
-
-	public void setCdCdsObbligazione(String cdCdsObbligazione) {
-		this.cdCdsObbligazione = cdCdsObbligazione;
-	}
-
-	public Integer getEsercizioObbligazione() {
-		return esercizioObbligazione;
-	}
-
-	public void setEsercizioObbligazione(Integer esercizioObbligazione) {
-		this.esercizioObbligazione = esercizioObbligazione;
-	}
-
-	public Integer getEsercizioOriObbligazione() {
-		return esercizioOriObbligazione;
-	}
-
-	public void setEsercizioOriObbligazione(Integer esercizioOriObbligazione) {
-		this.esercizioOriObbligazione = esercizioOriObbligazione;
-	}
-
-	public Long getPgObbligazione() {
-		return pgObbligazione;
-	}
-
-	public void setPgObbligazione(Long pgObbligazione) {
-		this.pgObbligazione = pgObbligazione;
-	}
-
-	public String getGae() {
-		return gae;
-	}
-
-	public void setGae(String gae) {
-		this.gae = gae;
-	}
-
 	public Long getPgMissione() {
 		return pgMissione;
 	}
 
 	public void setPgMissione(Long pgMissione) {
 		this.pgMissione = pgMissione;
+	}
+
+	public String getCdsObblGeMis() {
+		return cdsObblGeMis;
+	}
+
+	public void setCdsObblGeMis(String cdsObblGeMis) {
+		this.cdsObblGeMis = cdsObblGeMis;
+	}
+
+	public Integer getEsercizioObblGeMis() {
+		return esercizioObblGeMis;
+	}
+
+	public void setEsercizioObblGeMis(Integer esercizioObblGeMis) {
+		this.esercizioObblGeMis = esercizioObblGeMis;
+	}
+
+	public Integer getEsercizioOriObblGeMis() {
+		return esercizioOriObblGeMis;
+	}
+
+	public void setEsercizioOriObblGeMis(Integer esercizioOriObblGeMis) {
+		this.esercizioOriObblGeMis = esercizioOriObblGeMis;
+	}
+
+	public Long getPgObblGeMis() {
+		return pgObblGeMis;
+	}
+
+	public void setPgObblGeMis(Long pgObblGeMis) {
+		this.pgObblGeMis = pgObblGeMis;
+	}
+
+	public String getGaeGeMis() {
+		return gaeGeMis;
+	}
+
+	public void setGaeGeMis(String gaeGeMis) {
+		this.gaeGeMis = gaeGeMis;
 	}
 
 }
