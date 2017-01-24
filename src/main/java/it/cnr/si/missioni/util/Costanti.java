@@ -25,7 +25,7 @@ public class Costanti {
 	public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
     public final static String REST_TIPI_SPESA =  "ConsTipiSpesaAction.json";
 	public final static String REST_VALIDA_MASSIMALE_SPESA =  "restapi/missioni/validaMassimaleSpesa";
-	public final static String REST_COMUNICA_RIMBORSO_SIGLA =  "restapi/mission";
+	public final static String REST_COMUNICA_RIMBORSO_SIGLA =  "restapi/missioni";
 	public final static String REST_ACCOUNT = "json/userinfo/";
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
@@ -168,7 +168,7 @@ public class Costanti {
         aMap.put(null, "Non Completa");
         aMap.put("", "Non Completa");
         aMap.put(STATO_INVIO_SIGLA_DA_COMUNICARE, "Da Comunicare");
-        aMap.put(STATO_INVIO_SIGLA_COMUNICATA, "Comunicata");
+        aMap.put(STATO_INVIO_SIGLA_COMUNICATA, "Comunicato");
         STATO_INVIO_SIGLA = Collections.unmodifiableMap(aMap);
     }
 

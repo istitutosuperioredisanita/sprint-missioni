@@ -3,10 +3,11 @@ package it.cnr.si.missioni.util.proxy.json.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import it.cnr.jada.bulk.OggettoBulk;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -19,7 +20,7 @@ public class ComunicaRimborsoSiglaService {
 	@Autowired
     private CommonService commonService;
 	
-	public OggettoBulk comunica(MissioneBulk missione) throws AwesomeException {
+	public MissioneBulk comunica(MissioneBulk missione) throws AwesomeException {
 		String risp = null;
 		String body = null;
 		if (missione != null){
@@ -33,7 +34,13 @@ public class ComunicaRimborsoSiglaService {
 	    	}
 
 			String risposta = commonService.process(body, app, url, true, HttpMethod.PUT);
-			risp = risposta;
+	    	try {
+	    		ObjectMapper mapper = new ObjectMapper();
+	    		MissioneBulk missioneBulk = mapper.readValue(risposta, MissioneBulk.class);
+	    		return missioneBulk;
+	    	} catch (Exception ex) {
+	    		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file di risposta.");
+	    	}
 		}
 		return null;
 	}

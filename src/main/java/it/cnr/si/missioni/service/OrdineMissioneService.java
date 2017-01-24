@@ -1,5 +1,28 @@
 package it.cnr.si.missioni.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.persistence.OptimisticLockException;
+
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
@@ -32,35 +55,9 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.persistence.OptimisticLockException;
-
 import net.bzdyl.ejb3.criteria.Order;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
-
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 
 /**
@@ -127,7 +124,7 @@ public class OrdineMissioneService {
 			ordineMissione = listaOrdiniMissione.get(0);
 			if (retrieveDataFromFlows){
 				if (ordineMissione.isStatoInviatoAlFlusso()){
-	    			ResultFlows result = retrieveDataFromFlows(ordineMissione);
+	    			ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
 	    			if (result != null){
 		    			ordineMissione.setStateFlows(retrieveStateFromFlows(result));
 		    			ordineMissione.setCommentFlows(result.getComment());
@@ -215,7 +212,7 @@ public class OrdineMissioneService {
         	List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
     		for (OrdineMissione ordineMissione : lista){
     			if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
-        			ResultFlows result = retrieveDataFromFlows(ordineMissione);
+        			ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
         			if (result != null){
     			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
         				if (result.isApprovato()){
@@ -225,7 +222,6 @@ public class OrdineMissioneService {
         				} else if (result.isStateReject()){
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
-
         			    	aggiornaValidazione(ordineMissioneDaAggiornare);
         					ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
         					ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
@@ -235,7 +231,6 @@ public class OrdineMissioneService {
         						anticipo.setStato(Costanti.STATO_INSERITO);
         						ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
         					}
-
         					updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
         					listaNew.add(ordineMissione);
@@ -282,12 +277,6 @@ public class OrdineMissioneService {
 
 	public String retrieveStateFromFlows(ResultFlows result) {
 		return result.getState();
-	}
-
-	public ResultFlows retrieveDataFromFlows(OrdineMissione ordineMissione)
-			throws ComponentException {
-		ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
-		return result;
 	}
 
     @Transactional(readOnly = true)

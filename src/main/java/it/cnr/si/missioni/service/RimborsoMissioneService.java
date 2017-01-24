@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +47,7 @@ import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.CdrService;
 import it.cnr.si.missioni.util.proxy.json.service.GaeService;
@@ -144,39 +143,39 @@ public class RimborsoMissioneService {
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
-//    	cronService.comunicaRimborsoSigla(principal);
-   	if (lista != null){
-        	List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
+//    	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
+    	if (lista != null){
+    		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
     		for (RimborsoMissione rimborsoMissione : lista){
     			if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
-        			ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
-        			if (result != null){
-        				RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
-        				if (result.isApprovato()){
-        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
-        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-        					listaNew.add(rimborsoMissione);
-        				} else if (result.isStateReject()){
-        					rimborsoMissione.setCommentFlows(result.getComment());
-        					rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
+    				ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
+    				if (result != null){
+    					RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
+    					if (result.isApprovato()){
+    						aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
+    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+    						listaNew.add(rimborsoMissione);
+    					} else if (result.isStateReject()){
+    						rimborsoMissione.setCommentFlows(result.getComment());
+    						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
 
-        			    	aggiornaValidazione(rimborsoMissioneDaAggiornare);
-        			    	rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
-        			    	rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
-        			    	rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
-        					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
-        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
-        					listaNew.add(rimborsoMissione);
-        				} else if (result.isAnnullato()){
-        					rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
-        					updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
-        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
-        					listaNew.add(rimborsoMissione);
-        				} else {
-        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
-        					listaNew.add(rimborsoMissione);
-        				}
-        			}
+    						aggiornaValidazione(rimborsoMissioneDaAggiornare);
+    						rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
+    						rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+    						rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+    						updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
+    						listaNew.add(rimborsoMissione);
+    					} else if (result.isAnnullato()){
+    						rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+    						updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
+    						listaNew.add(rimborsoMissione);
+    					} else {
+    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
+    						listaNew.add(rimborsoMissione);
+    					}
+    				}
     			} else {
     				if (rimborsoMissione.isMissioneDaValidare() && rimborsoMissione.isMissioneConfermata()){
     					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
@@ -194,8 +193,19 @@ public class RimborsoMissioneService {
 
 	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws Exception {
+		rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+	}
+
+	public RimborsoMissione aggiornaRimborsoMissioneComunicata(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, MissioneBulk missioneBulk)
+			throws Exception {
+		rimborsoMissioneDaAggiornare.setEsercizioSigla(missioneBulk.getEsercizio());
+		rimborsoMissioneDaAggiornare.setPgMissioneSigla(missioneBulk.getPgMissione());
+		rimborsoMissioneDaAggiornare.setCdCdsSigla(missioneBulk.getCdCds());
+		rimborsoMissioneDaAggiornare.setCdUoSigla(missioneBulk.getCdUnitaOrganizzativa());
+		rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_COMUNICATA);
 		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
 	}
 
@@ -318,6 +328,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setCdUoSigla(rimborsoMissione.getCdUoSigla());
 			rimborsoMissioneDB.setEsercizioSigla(rimborsoMissione.getEsercizioSigla());
 			rimborsoMissioneDB.setPgMissioneSigla(rimborsoMissione.getPgMissioneSigla());
+			rimborsoMissioneDB.setStatoInvioSigla(rimborsoMissione.getStatoInvioSigla());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 		}
 		
@@ -345,7 +356,6 @@ public class RimborsoMissioneService {
     	rimborsoMissioneDB.setRimborsoMissioneDettagli(null);
     	rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDB);
     	
-//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Rimborso Missione: {}", rimborsoMissioneDB);
 
     	return rimborsoMissioneDB;
@@ -473,6 +483,9 @@ public class RimborsoMissioneService {
 			}
 			if (filter.getaNumeroOrdine() != null){
 				criterionList.add(Restrictions.le(aliasRimborsoMissione+".numero", filter.getaNumeroOrdine()));
+			}
+			if (filter.getStatoInvioSigla() != null){
+				criterionList.add(Restrictions.eq("statoInvioSigla", filter.getStatoInvioSigla()));
 			}
 		}
 		if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){

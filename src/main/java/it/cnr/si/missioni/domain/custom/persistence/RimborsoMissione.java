@@ -466,6 +466,15 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		}
 	}
 	
+	@Transient
+	public String getIdSigla() {
+		if (!StringUtils.isEmpty(getPgMissioneSigla())){
+			return getCdUoSigla()+"-"+getEsercizioSigla()+"-"+getPgMissioneSigla();
+		} else {
+			return null;
+		}
+	}
+	
 	public DatiIstituto getDatiIstituto() {
 		return datiIstituto;
 	}

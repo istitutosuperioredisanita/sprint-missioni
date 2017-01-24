@@ -25,5 +25,11 @@
                 <constraints nullable="true"/>
             </column>
     	</addColumn>
+    	<addColumn 
+            tableName="RIMBORSO_MISSIONE">
+            <column name="STATO_INVIO_SIGLA" type="character varying(3)">
+                <constraints nullable="true"/>
+            </column>
+    	</addColumn>
     </changeSet>
 </databaseChangeLog>
