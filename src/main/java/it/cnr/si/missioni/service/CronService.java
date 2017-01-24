@@ -191,21 +191,21 @@ public class CronService {
 		}
 //						oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
 //						oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
-/*						if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
-			oggettoBulk.setCdCds(rimborsoApprovato.getCdCdsObbligazione());
+		if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
+			oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
 		}
 		if (rimborsoApprovato.getEsercizioObbligazione() != null){
-			oggettoBulk.setEsercizioObbligazione(rimborsoApprovato.getEsercizioObbligazione());
+			oggettoBulk.setEsercizioObblGeMis(rimborsoApprovato.getEsercizioObbligazione());
 		}
 		if (rimborsoApprovato.getEsercizioOriginaleObbligazione() != null){
-			oggettoBulk.setEsercizioOriObbligazione(rimborsoApprovato.getEsercizioOriginaleObbligazione());
+			oggettoBulk.setEsercizioOriObblGeMis(rimborsoApprovato.getEsercizioOriginaleObbligazione());
 		}
 		if (rimborsoApprovato.getPgObbligazione() != null){
-			oggettoBulk.setPgObbligazione(rimborsoApprovato.getPgObbligazione());
+			oggettoBulk.setPgObblGeMis(rimborsoApprovato.getPgObbligazione());
 		}
 		if (rimborsoApprovato.getGae() != null){
-			oggettoBulk.setGae(rimborsoApprovato.getGae());
-		}*/
+			oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
+		}
 		impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
 		
 		impostaInquadramento(rimborsoApprovato, oggettoBulk);
@@ -342,18 +342,8 @@ public class CronService {
 				impostaNazioneRimborso(rimborsoApprovato, tappa);
 				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
 			} else {
-//				if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0){
-//					TappeMissioneColl tappaEsteroInizio = (TappeMissioneColl)tappa.clone();
-//					impostaNazioneRimborso(rimborsoApprovato, tappaEsteroInizio);
-//					tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineEstero(), tappaEsteroInizio, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
-//				} else if (DateUtils.truncate(rimborsoApprovato.getDataFineMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataFineEstero())) == 0){
-//					TappeMissioneColl tappaEsteroFine = (TappeMissioneColl)tappa.clone();
-//					impostaNazioneRimborso(rimborsoApprovato, tappaEsteroFine);
-//					tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineMissione(), tappaEsteroFine, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
-//				} else {
-					impostaNazioneRimborso(rimborsoApprovato, tappa);
-					tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
-//				}
+				impostaNazioneRimborso(rimborsoApprovato, tappa);
+				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
 			}
 		}
 		oggettoBulk.setTappeMissioneColl(tappeMissioneColl);
