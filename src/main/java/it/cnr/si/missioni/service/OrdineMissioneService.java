@@ -586,6 +586,7 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
 			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
+			ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
 		}
 		
 		
@@ -660,10 +661,6 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Datore di Lavoro Richiedente");
 			} else if (StringUtils.isEmpty(ordineMissione.getDestinazione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Destinazione");
-			} else if (StringUtils.isEmpty(ordineMissione.getComuneResidenzaRich())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Comune di Residenza del Richiedente");
-			} else if (StringUtils.isEmpty(ordineMissione.getIndirizzoResidenzaRich())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Indirizzo di Residenza del Richiedente");
 			} else if (StringUtils.isEmpty(ordineMissione.getOggetto())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Oggetto");
 			} else if (StringUtils.isEmpty(ordineMissione.getPriorita())){
@@ -685,6 +682,13 @@ public class OrdineMissioneService {
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Obbligo di Rientro");
 				}
 			} 
+			if (ordineMissione.isMissioneDipendente()){
+				if (StringUtils.isEmpty(ordineMissione.getComuneResidenzaRich())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Comune di Residenza del Richiedente");
+				} else if (StringUtils.isEmpty(ordineMissione.getIndirizzoResidenzaRich())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Indirizzo di Residenza del Richiedente");
+				}
+			}
 		}
     }
 	private void controlloCongruenzaDatiInseriti(Principal principal, OrdineMissione ordineMissione) throws AwesomeException {

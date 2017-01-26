@@ -282,7 +282,8 @@
             "importo-presunto": "Importo Presunto €",
             "uso-auto-propria": "Utilizzo Auto Propria",
             "utilizzo-auto-noleggio": "Utilizzo Auto Noleggio",
-            "utilizzo-taxi": "Utilizzo Taxi"
+            "utilizzo-taxi": "Utilizzo Taxi",
+            "responsabile-gruppo": "Responsabile del Gruppo"
         },
         "button": {
             "sendToFinal": "Rendi Definitivo l'Ordine di Missione",

@@ -22,10 +22,10 @@
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="COMUNE_RESIDENZA_RICH" type="varchar(40)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="INDIRIZZO_RESIDENZA_RICH" type="varchar(80)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="DOMICILIO_FISCALE_RICH" type="varchar(80)">
 			        <constraints nullable="true"/>

@@ -660,10 +660,6 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Datore di Lavoro Richiedente");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getDestinazione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Destinazione");
-			} else if (StringUtils.isEmpty(rimborsoMissione.getComuneResidenzaRich())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Comune di Residenza del Richiedente");
-			} else if (StringUtils.isEmpty(rimborsoMissione.getIndirizzoResidenzaRich())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Indirizzo di Residenza del Richiedente");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getOggetto())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Oggetto");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getTipoMissione())){
@@ -694,6 +690,13 @@ public class RimborsoMissioneService {
 				}
 				if (rimborsoMissione.getDataFineEstero() != null){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Fine Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
+				}
+			}
+			if (rimborsoMissione.isMissioneDipendente()){
+				if (StringUtils.isEmpty(rimborsoMissione.getComuneResidenzaRich())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Comune di Residenza del Richiedente");
+				} else if (StringUtils.isEmpty(rimborsoMissione.getIndirizzoResidenzaRich())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Indirizzo di Residenza del Richiedente");
 				}
 			}
 		}

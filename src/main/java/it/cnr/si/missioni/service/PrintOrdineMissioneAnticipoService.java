@@ -35,7 +35,7 @@ public class PrintOrdineMissioneAnticipoService {
     	printOrdineMissioneAnticipo.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAnticipo.setNumero(new Integer(ordineMissione.getNumero().toString()));
     	printOrdineMissioneAnticipo.setCodiceFiscaleRich(account.getCodiceFiscale());
-    	printOrdineMissioneAnticipo.setComuneResidenzaRich(ordineMissione.getComuneResidenzaRich());
+    	printOrdineMissioneAnticipo.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
     		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissioneAnticipo.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
@@ -47,7 +47,7 @@ public class PrintOrdineMissioneAnticipoService {
 
     	printOrdineMissioneAnticipo.setDomicilioFiscaleRich(Utility.nvl(ordineMissione.getDomicilioFiscaleRich()));
     	printOrdineMissioneAnticipo.setImportoPresunto(Utility.numberFormat(ordineMissione.getImportoPresunto()));
-    	printOrdineMissioneAnticipo.setIndirizzoResidenzaRich(ordineMissione.getIndirizzoResidenzaRich());
+    	printOrdineMissioneAnticipo.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissioneAnticipo.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
     	printOrdineMissioneAnticipo.setLuogoDiNascitaRich(account.getComuneNascita());
     	printOrdineMissioneAnticipo.setMatricolaRich(account.getMatricola());

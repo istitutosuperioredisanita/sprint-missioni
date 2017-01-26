@@ -41,14 +41,14 @@ public class PrintOrdineMissioneAutoPropriaService {
     	PrintOrdineMissioneAutoPropria printOrdineMissioneAutoPropria = new PrintOrdineMissioneAutoPropria();
     	printOrdineMissioneAutoPropria.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAutoPropria.setCodiceFiscaleRich(account.getCodiceFiscale());
-    	printOrdineMissioneAutoPropria.setComuneResidenzaRich(ordineMissione.getComuneResidenzaRich());
+    	printOrdineMissioneAutoPropria.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
     		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissioneAutoPropria.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
     	}
     	printOrdineMissioneAutoPropria.setDatoreLavoroRich(ordineMissione.getDatoreLavoroRich());
     	printOrdineMissioneAutoPropria.setDomicilioFiscaleRich(Utility.nvl(ordineMissione.getDomicilioFiscaleRich()));
-    	printOrdineMissioneAutoPropria.setIndirizzoResidenzaRich(ordineMissione.getIndirizzoResidenzaRich());
+    	printOrdineMissioneAutoPropria.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissioneAutoPropria.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
     	printOrdineMissioneAutoPropria.setLuogoDiNascitaRich(account.getComuneNascita());
     	printOrdineMissioneAutoPropria.setMatricolaRich(account.getMatricola());
