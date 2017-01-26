@@ -135,11 +135,11 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public LocalDate dataInserimento;
 
     @Size(min = 0, max = 40)
-    @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
+    @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = true)
     public String comuneResidenzaRich;
 
     @Size(min = 0, max = 80)
-    @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = false)
+    @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = true)
     public String indirizzoResidenzaRich;
 
     @Size(min = 0, max = 6)
@@ -281,6 +281,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Size(min = 0, max = 1)
     @Column(name = "PARTENZA_DA", length = 1, nullable = false)
     private String partenzaDa;
+
+    @Size(min = 0, max = 250)
+    @Column(name = "RESPONSABILE_GRUPPO", length = 250, nullable = true)
+    private String responsabileGruppo;
 
     @Transient
     private String daValidazione;
@@ -965,6 +969,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		return false;
 	}
 
+	public Boolean isMissioneDipendente(){
+		if (StringUtils.isEmpty(getMatricola())){
+			return false;
+		}
+		return true;
+	}
+
 	public String getCdsCompetenza() {
 		return cdsCompetenza;
 	}
@@ -1011,5 +1022,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setMatricola(String matricola) {
 		this.matricola = matricola;
+	}
+
+	public String getResponsabileGruppo() {
+		return responsabileGruppo;
+	}
+
+	public void setResponsabileGruppo(String responsabileGruppo) {
+		this.responsabileGruppo = responsabileGruppo;
 	}
 }

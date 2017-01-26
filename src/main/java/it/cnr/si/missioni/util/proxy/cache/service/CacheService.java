@@ -266,26 +266,28 @@ public class CacheService implements EnvironmentAware{
 				if (rest.getUrl() != null && url != null && url.equals(rest.getUrl())){
 					isUrlToCache = true;
 					restService = rest;
-					bodyRequest.setMaxItemsPerPage(Costanti.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE);
-					if (bodyRequest.getClauses() != null && !bodyRequest.getClauses().isEmpty() &&
-							rest.getClauseVariable() != null && !rest.getClauseVariable().isEmpty()){
-						List<JSONClause> listNewClauses = new ArrayList<JSONClause>();
-						for (Iterator<JSONClause> iterator = bodyRequest.getClauses().iterator(); iterator.hasNext();){
-							JSONClause clause = iterator.next();
-							boolean clauseTrovata = existsClause(rest.getClauseVariable(), clause);
-							if (!clauseTrovata){
-								listNewClauses.add(clause);
+					if (bodyRequest != null){
+						bodyRequest.setMaxItemsPerPage(Costanti.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE);
+						if (bodyRequest.getClauses() != null && !bodyRequest.getClauses().isEmpty() &&
+								rest.getClauseVariable() != null && !rest.getClauseVariable().isEmpty()){
+							List<JSONClause> listNewClauses = new ArrayList<JSONClause>();
+							for (Iterator<JSONClause> iterator = bodyRequest.getClauses().iterator(); iterator.hasNext();){
+								JSONClause clause = iterator.next();
+								boolean clauseTrovata = existsClause(rest.getClauseVariable(), clause);
+								if (!clauseTrovata){
+									listNewClauses.add(clause);
+								} else {
+									listClausesDeleted.add(clause);
+								}
+							}
+							if (listNewClauses != null && !listNewClauses.isEmpty()){
+								bodyRequest.setClauses(listNewClauses);
 							} else {
-								listClausesDeleted.add(clause);
+								bodyRequest.setClauses(null);
 							}
 						}
-						if (listNewClauses != null && !listNewClauses.isEmpty()){
-							bodyRequest.setClauses(listNewClauses);
-						} else {
-							bodyRequest.setClauses(null);
-						}
+						setContext(bodyRequest, app);
 					}
-					setContext(bodyRequest, app);
 					//						}
 					ResultCacheProxy resultCacheProxy = new ResultCacheProxy();
 					resultCacheProxy.setListClausesDeleted(listClausesDeleted);

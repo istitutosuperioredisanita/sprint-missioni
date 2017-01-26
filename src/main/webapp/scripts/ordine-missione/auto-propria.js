@@ -120,7 +120,6 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
                     $rootScope.salvataggio = false;
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
-                    ui.error(data);
                 });
             } else {
                 $http.post('app/rest/ordineMissione/autoPropria/create', $scope.autoPropriaOrdineMissioneModel).success(function(data){
@@ -128,7 +127,6 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
                     $scope.autoPropriaOrdineMissioneModel = data;
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
-                    ui.error(data);
                 });
             }
             undoEditing();
@@ -144,7 +142,6 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
                     }).error(
                     function (data) {
                         $rootScope.salvataggio = false;
-                        ui.error(data);
                     }
             );
     }
@@ -161,7 +158,6 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
                     }).error(
                     function (data) {
                         $rootScope.salvataggio = false;
-                        ui.error(data);
                     }
             );
     }
@@ -188,7 +184,6 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
                     $scope.undoAddSpostamentoAutoPropria();
             }).error(function (data) {
                 $rootScope.salvataggio = false;
-                ui.error(data);
             });
     }
 
@@ -199,7 +194,6 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
             undoEditingSpostamento(spostamentoAutoPropria);
         }).error(function (data) {
             $rootScope.salvataggio = false;
-            ui.error(data);
         });
     }
 

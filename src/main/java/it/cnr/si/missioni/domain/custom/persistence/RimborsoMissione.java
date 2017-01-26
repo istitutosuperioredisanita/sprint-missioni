@@ -144,7 +144,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     public LocalDate dataInserimento;
 
     @Size(min = 0, max = 40)
-    @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
+    @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = true)
     public String comuneResidenzaRich;
 
     @Size(min = 0, max = 6)
@@ -152,7 +152,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     private String matricola;
 
     @Size(min = 0, max = 80)
-    @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = false)
+    @Column(name = "INDIRIZZO_RESIDENZA_RICH", length = 80, nullable = true)
     public String indirizzoResidenzaRich;
 
     @Size(min = 0, max = 100)
@@ -1210,5 +1210,11 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setStatoInvioSigla(String statoInvioSigla) {
 		this.statoInvioSigla = statoInvioSigla;
+	}
+	public Boolean isMissioneDipendente(){
+		if (StringUtils.isEmpty(getMatricola())){
+			return false;
+		}
+		return true;
 	}
 }

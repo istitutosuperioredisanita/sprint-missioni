@@ -4,9 +4,11 @@ import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.DatiIstitutoRepository;
+import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 
 import java.security.Principal;
@@ -87,6 +89,7 @@ public class DatiIstitutoService {
     public DatiIstituto creaDatiIstitutoRimborso(Principal principal, String istituto, Integer anno ) throws ComponentException {
 		return creaDatiIstituto(principal, istituto, anno, Costanti.TIPO_RIMBORSO_MISSIONE);
 	}
+    
     @Transactional(propagation = Propagation.REQUIRED)
 	private DatiIstituto creaDatiIstituto(Principal principal, String istituto, Integer anno, String tipo) throws ComponentException {
 		DatiIstituto datiIstitutoInsert = new DatiIstituto();
@@ -100,5 +103,51 @@ public class DatiIstitutoService {
 		datiIstitutoInsert.setToBeCreated();
 		datiIstitutoInsert = (DatiIstituto)crudServiceBean.creaConBulk(principal, datiIstitutoInsert);
 		return datiIstitutoInsert;
+	}
+
+    @Transactional(propagation = Propagation.REQUIRED)
+	public DatiIstituto creaDatiIstituto(Principal principal, DatiIstituto datiIstituto) throws ComponentException {
+		datiIstituto.setProgressivoOrdine(new Long(0));
+		datiIstituto.setProgressivoRimborso(new Long(0));
+		datiIstituto.setUser(principal.getName());
+		datiIstituto.setToBeCreated();
+		datiIstituto= (DatiIstituto)crudServiceBean.creaConBulk(principal, datiIstituto);
+		return datiIstituto;
+	}
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public DatiIstituto updateDatiIstituto(Principal principal, DatiIstituto datiIstituto) throws ComponentException {
+
+    	DatiIstituto datiIstitutoDB = (DatiIstituto)crudServiceBean.findById(principal, DatiIstituto.class, datiIstituto.getId());
+
+    	if (datiIstitutoDB==null)
+    		throw new AwesomeException(CodiciErrore.ERRGEN, "Dati istituto da aggiornare inesistenti.");
+
+    	datiIstitutoDB.setDescrIstituto(datiIstituto.getDescrIstituto());
+    	datiIstitutoDB.setGestioneRespModulo(datiIstituto.getGestioneRespModulo());
+    	datiIstitutoDB.setProgressivoOrdine(datiIstituto.getProgressivoOrdine());
+    	datiIstitutoDB.setProgressivoRimborso(datiIstituto.getProgressivoRimborso());
+    	datiIstitutoDB.setToBeUpdated();
+
+    	datiIstituto = (DatiIstituto)crudServiceBean.modificaConBulk(principal, datiIstitutoDB);
+
+    	//	autoPropriaRepository.save(autoPropria);
+    	log.debug("Updated Information for DatiIstituto: {}", datiIstituto);
+    	return datiIstituto;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+	public void deleteDatiIstituto(Principal principal, Long idDatiIstituto) throws Exception {
+    	DatiIstituto datiIstituto = (DatiIstituto)crudServiceBean.findById(principal, DatiIstituto.class, idDatiIstituto);
+
+		//effettuo controlli di validazione operazione CRUD
+		if (datiIstituto != null){
+			if (datiIstituto.getProgressivoOrdine().compareTo(new Long(0)) > 0 ||
+					datiIstituto.getProgressivoRimborso().compareTo(new Long(0)) > 0 ){
+	    		throw new AwesomeException(CodiciErrore.ERRGEN, "Dati istituto già utilizzati, impossibile effettuare la cancellazione.");
+			}
+			datiIstituto.setToBeDeleted();
+			crudServiceBean.eliminaConBulk(principal, datiIstituto);
+		}
 	}
 }
