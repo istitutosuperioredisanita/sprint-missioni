@@ -131,7 +131,7 @@ public class ProxyResource {
 		String risposta = result.getBody();
 		CommonJsonRest<RestServiceBean> commonJsonRest = result.getCommonJsonResponse();
 
-		if (isCacheable(resultCacheProxy)){
+		if (isCacheable(resultCacheProxy) && !app.equals(Costanti.APP_SIPER)){
 			if (existsClauseVariable.equals("S")){
 		    	risposta = cacheService.manageResponse(resultCacheProxy.getRestService(), resultCacheProxy.getListClausesDeleted(), commonJsonRest);
 			} else {

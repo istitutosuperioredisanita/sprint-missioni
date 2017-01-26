@@ -72,7 +72,7 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setCdsRich(ordineMissione.getCdsRich());
     	printOrdineMissione.setCdsSpesa(ordineMissione.getCdsSpesa());
     	printOrdineMissione.setCodiceFiscaleRich(account.getCodiceFiscale());
-    	printOrdineMissione.setComuneResidenzaRich(ordineMissione.getComuneResidenzaRich());
+    	printOrdineMissione.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
     		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissione.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
@@ -91,7 +91,7 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setDomicilioFiscaleRich(Utility.nvl(ordineMissione.getDomicilioFiscaleRich()));
        	printOrdineMissione.setImportoPresunto(Utility.numberFormat(ordineMissione.getImportoPresunto()));
 
-       	printOrdineMissione.setIndirizzoResidenzaRich(ordineMissione.getIndirizzoResidenzaRich());
+       	printOrdineMissione.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissione.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
     	printOrdineMissione.setLuogoDiNascitaRich(account.getComuneNascita());
     	printOrdineMissione.setMatricolaRich(account.getMatricola());

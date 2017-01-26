@@ -57,7 +57,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     }).error(
                     function (data) {
                         $rootScope.salvataggio = false;
-                        ui.error(data);
                     }
             );
     }
@@ -92,7 +91,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         });
         x.error(function (data) {
             $rootScope.salvataggio = false;
-            ui.error(data);
         });
     }
 
@@ -316,7 +314,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     $scope.undoAddDettaglioSpesa();
             }).error(function (data) {
                 $rootScope.salvataggio = false;
-                ui.error(data);
             });
     }
 
@@ -328,7 +325,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             undoEditingDettaglioSpesa(dettaglioSpesa);
         }).error(function (data) {
             $rootScope.salvataggio = false;
-            ui.error(data);
         });
     }
 

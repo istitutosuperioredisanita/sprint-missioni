@@ -149,7 +149,11 @@ missioniApp.factory('Session', function () {
             if (this.num_civico_residenza){
                 this.indirizzo_completo_residenza = this.indirizzo_residenza+" "+this.num_civico_residenza;
             } else {
-                this.indirizzo_completo_residenza = this.indirizzo_residenza;
+                if (this.indirizzo_residenza){
+                    this.indirizzo_completo_residenza = this.indirizzo_residenza;
+                } else {
+                    this.indirizzo_completo_residenza = null;
+                }
             }
             this.cap_residenza = cap_residenza;
             this.provincia_residenza = provincia_residenza;

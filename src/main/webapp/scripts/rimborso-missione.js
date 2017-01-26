@@ -301,7 +301,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         $http.post(urlRestProxy + app+'/', objectPostCds, {params: {proxyURL: url}}).success(function (data) {
             caricaCds(cdsRich, data.elements);
         }).error(function (data) {
-                ui.error(data);
         });
         var a = 1;
     }
@@ -322,7 +321,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 }
 //            caricaCdsCompetenza(cds, data.elements);
         }).error(function (data) {
-                ui.error(data);
         });
         var a = 1;
     }
@@ -452,7 +450,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.elencoCdr = [];
@@ -483,7 +480,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.elencoModuli = [];
@@ -520,7 +516,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.impegnoSelected = [];
@@ -569,7 +564,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.elencoGae = [];
@@ -606,7 +600,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 		            $scope.elencoVoci = [];
 		        }
             }).error(function (data) {
-                ui.error(data);
             });
     }
     
@@ -805,12 +798,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.inizializzaFormPerInserimento = function(account){
         $scope.rimborsoMissioneModel = {nominativo:account.lastName+" "+account.firstName, 
-                                        comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
-                                        indirizzoResidenzaRich:account.indirizzo_completo_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
             uoRich:ProxyService.buildUoRichiedenteSiglaFromUoSiper(account), cdsRich:$scope.estraiCdsRichFromAccount(account)};
+        if (account.comune_residenza && account.cap_residenza){
+            $scope.rimborsoMissioneModel.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza;
+        }
+        if (account.indirizzo_completo_residenza){
+            $scope.rimborsoMissioneModel.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
+        }
+
         $scope.missioneEstera = null;
         $scope.rimborsoMissioneModel.uid = account.login;
         var today = $scope.today();
@@ -850,14 +848,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -875,14 +865,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -900,14 +882,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -925,14 +899,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -948,14 +914,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -1009,7 +967,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 //            window.open(fileURL);
         }).error(function (data) {
             delete $scope.rimborsoMissioneModel.stampaInCorso;
-            ui.error(data);
         }); 
     }
 
@@ -1028,11 +985,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
                     }
             );
         } else {
@@ -1049,14 +1001,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
         }

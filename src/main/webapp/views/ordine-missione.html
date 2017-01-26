@@ -147,6 +147,14 @@
                         </span>
                     </p>
             </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.responsabile-gruppo">resp</span>
+                    <select ng-disabled="disableResponsabileGruppo" class="form-control" id="missioni" ng-model="ordineMissioneModel.responsabileGruppo" ng-options="responsabile.uid as responsabile.cognome+' - '+responsabile.nome for responsabile in elencoResponsabiliGruppo"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
   </div>
 </div>
 

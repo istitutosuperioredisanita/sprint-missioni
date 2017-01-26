@@ -53,7 +53,6 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
                     $rootScope.salvataggio = false;
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
-                    ui.error(data);
                 });
             } else {
                 $http.post('app/rest/ordineMissione/anticipo/create', $scope.anticipoOrdineMissioneModel).success(function(data){
@@ -61,7 +60,6 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
                     $scope.anticipoOrdineMissioneModel = data;
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
-                    ui.error(data);
                 });
             }
     }
@@ -92,7 +90,6 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
                     }).error(
                     function (data) {
                         $rootScope.salvataggio = false;
-                        ui.error(data);
                     }
             );
     }
