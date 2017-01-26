@@ -12,8 +12,7 @@ spring:
         baseDir: /it/cnr/missioni/print/
     proxy:
         SIGLA:
-         #   url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
-            url: http://localhost:8080/SIGLA/
+            url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
             username: MISSIONI
             password: M15510N1
             context:
