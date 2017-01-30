@@ -294,7 +294,7 @@
             <div class="col-md-12">
               <ul class="pager" ng-show="showEsisteOrdineMissione">
                 <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
-                <li><a ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria"></a></li>
+                <li ng-hide="ordineMissioneModel.utilizzoAutoNoleggio == 'S'"><a ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria"></a></li>
                 <li><a ng-click="goAnticipo()" translate="ordine-missione.button.anticipo">Anticipo</a></li>
               </ul>
             </div>
@@ -313,6 +313,11 @@
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-4" ng-show="showEsisteOrdineMissione && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && showResponsabile && ordineMissioneModel.stato === 'INS'">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateOrdineMissione()">
