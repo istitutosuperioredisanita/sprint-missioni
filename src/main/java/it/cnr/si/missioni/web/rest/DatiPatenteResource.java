@@ -71,7 +71,12 @@ public class DatiPatenteResource {
             	log.error("registerDatiPatente ", error);
                 return JSONResponseEntity.badRequest(error);
         	}
-            datiPatente = datiPatenteService.createDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
+            try {
+				datiPatente = datiPatenteService.createDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
+			} catch (Exception e) {
+            	log.error("registerDatiPatente", e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+			}
             return JSONResponseEntity.ok();
     	} else {
     		log.debug("id pieno");
