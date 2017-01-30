@@ -39,6 +39,7 @@ public class Costanti {
 	public final static String STATO_INVIATO_FLUSSO = "INV";
 	public final static String STATO_APPROVATO_FLUSSO = "APP";
 	public final static String STATO_CONFERMATO = "CON";
+    public final static String STATO_INVIATO_RESPONSABILE = "INv";
 	public final static String MISSIONE_ITALIANA = "I";
 	public final static String MISSIONE_ESTERA = "E";
 	public final static String PRIORITA_CRITICA = "1";
@@ -107,6 +108,7 @@ public class Costanti {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(STATO_ANNULLATO, "Annullato");
         aMap.put(STATO_CONFERMATO, "Confermato");
+        aMap.put(STATO_INVIATO_RESPONSABILE, "Inviato");
         aMap.put(STATO_INSERITO, "Inserito");
         aMap.put(STATO_DEFINITIVO, "Definitivo");
         STATO = Collections.unmodifiableMap(aMap);

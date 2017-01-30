@@ -10,6 +10,7 @@ import it.cnr.si.missioni.repository.DatiPatenteRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 
 import java.security.Principal;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -76,6 +77,8 @@ public class DatiPatenteService {
     public DatiPatente createDatiPatente(Principal principal, DatiPatente datiPatente) {
     	datiPatente.setUser(principal.getName());
     	datiPatente.setToBeCreated();
+        //effettuo controlli di validazione operazione CRUD
+        validaCRUD(principal, datiPatente);
     	try {
     		datiPatente = (DatiPatente)crudServiceBean.creaConBulk(principal, datiPatente);
 		} catch (ComponentException e) {
@@ -94,7 +97,7 @@ public class DatiPatenteService {
     	DatiPatente datiPatenteDB = (DatiPatente)crudServiceBean.findById(principal, DatiPatente.class, datiPatente.getId());
 
 		if (datiPatenteDB==null)
-			throw new AwesomeException(CodiciErrore.ERRGEN, "RigaAttestatoAssenze da aggiornare inesistente.");
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati patente da aggiornare inesistente.");
 		
 		datiPatenteDB.setNumero(datiPatente.getNumero());
 		datiPatenteDB.setDataRilascio(datiPatente.getDataRilascio());
@@ -116,24 +119,14 @@ public class DatiPatenteService {
     private void validaCRUD(Principal principal, DatiPatente datiPatente) throws AwesomeException, 
     ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
 		crudServiceBean.lockBulk(principal, datiPatente);
-		if (principal==null)
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile! Utente non loggato correttamente!");
-//		else if (userLogged.getSediAbilitate()== null || userLogged.getSediAbilitate().isEmpty() || 
-//				 !userLogged.getSediAbilitate().contains(sede))
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile! Utente non abilitato ad operare sulla sede "+sede.getCodiceSede()+"!");
-
-//		DatiPatente attestato = sedeService.getAttestato(principal, sede.getCodiceSede(), anno, mese);
-//		attestato = sedeService.inizializzaBulkPerModifica(principal, attestato);
-//		if (attestato==null)
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile! Attestato non ancora attivo per la sede "+ sede.getCodiceSede() + " e per il periodo "+DipendentePeriodo.convertToPeriodo(anno, mese));
-//		else if (attestato.isValidato())
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile! Attestato già validato per la sede "+ sede.getCodiceSede() + " e per il periodo "+DipendentePeriodo.convertToPeriodo(anno, mese));
-//		else if (attestato.isComunicato())
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile! Attestato già comunicato a NSIP per la sede "+ sede.getCodiceSede() + " e per il periodo "+DipendentePeriodo.convertToPeriodo(anno, mese));
-//		else if (attestato.getStralcio()==null)
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile! Stralcio dati non ancora effettuato per la sede "+ sede.getCodiceSede() + " e per il periodo "+DipendentePeriodo.convertToPeriodo(anno, mese));
-
+        Date oggi = new Date(System.currentTimeMillis());
+        if (datiPatente.getDataRilascio() != null){
+            if (oggi.before(DateUtils.datiPatente.getDataRilascio()){
+                throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data odierna.");
+            }
+            if (datiPatente.getDataScadenza() != null){
+                throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data di scadenza.");
+            }
+        }
     }
-
-
 }
