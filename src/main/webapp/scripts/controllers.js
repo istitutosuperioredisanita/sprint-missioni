@@ -43,6 +43,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoOrdiniDaValidare = true;
                     } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'F'){
                         $scope.esistonoOrdiniDaRendereDefinitivi = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'M'){
+                        $scope.esistonoOrdiniResponsabileGruppo = true;
                     }
                 }
             }
