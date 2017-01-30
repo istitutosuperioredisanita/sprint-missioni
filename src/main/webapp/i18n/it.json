@@ -290,6 +290,7 @@
             "confirm": "Conferma l'Ordine di Missione",
             "print": "Stampa Ordine di Missione",
             "auto-propria": "Richiesta Utilizzo Auto Propria",
+            "sendToManager": "Invia al Responsabile del gruppo",
             "anticipo": "Richiesta Anticipo"
         },
         "messages": {

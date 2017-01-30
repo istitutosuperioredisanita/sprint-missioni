@@ -33,7 +33,9 @@ import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.SecurityUtils;
@@ -79,6 +81,9 @@ public class OrdineMissioneService {
 
     @Autowired
     private UoService uoService;
+
+    @Autowired
+    OrdineMissioneAutoPropriaRepository OrdineMissioneAutoPropriaRepository;
 
     @Inject
     private UnitaOrganizzativaService unitaOrganizzativaService;
@@ -428,7 +433,7 @@ public class OrdineMissioneService {
     }
 
     @Transactional(readOnly = true)
-    public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione) {
+    public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione ordineMissione) {
         return OrdineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
     }
 

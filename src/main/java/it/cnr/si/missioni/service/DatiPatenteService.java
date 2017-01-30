@@ -8,6 +8,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiPatente;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.DatiPatenteRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.DateUtils;
 
 import java.security.Principal;
 import java.util.Date;
@@ -74,18 +75,13 @@ public class DatiPatenteService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public DatiPatente createDatiPatente(Principal principal, DatiPatente datiPatente) {
+    public DatiPatente createDatiPatente(Principal principal, DatiPatente datiPatente) throws Exception{
     	datiPatente.setUser(principal.getName());
     	datiPatente.setToBeCreated();
-        //effettuo controlli di validazione operazione CRUD
-        validaCRUD(principal, datiPatente);
-    	try {
-    		datiPatente = (DatiPatente)crudServiceBean.creaConBulk(principal, datiPatente);
-		} catch (ComponentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//    	autoPropriaRepository.save(autoPropria);
+    	//effettuo controlli di validazione operazione CRUD
+    	validaCRUD(principal, datiPatente);
+    	datiPatente = (DatiPatente)crudServiceBean.creaConBulk(principal, datiPatente);
+    	//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Created Information for Dati Patente: {}", datiPatente);
     	return datiPatente;
     }
@@ -121,7 +117,7 @@ public class DatiPatenteService {
 		crudServiceBean.lockBulk(principal, datiPatente);
         Date oggi = new Date(System.currentTimeMillis());
         if (datiPatente.getDataRilascio() != null){
-            if (oggi.before(DateUtils.datiPatente.getDataRilascio()){
+            if (oggi.before(datiPatente.getDataRilascio())){
                 throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data odierna.");
             }
             if (datiPatente.getDataScadenza() != null){
