@@ -427,11 +427,11 @@ public class OrdineMissioneService {
 		}
     }
 
-//    @Transactional(readOnly = true)
-//    public AutoPropria getAutoPropria(String targa) {
-//        return autoPropriaRepository.getAutoPropria(SecurityUtils.getCurrentLogin(), targa);
-//    }
-//
+    @Transactional(readOnly = true)
+    public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione) {
+        return OrdineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione createOrdineMissione(Principal principal, OrdineMissione ordineMissione)  throws AwesomeException, 
     ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
@@ -706,6 +706,10 @@ public class OrdineMissioneService {
 		if (!ordineMissione.isMissioneEstera()){
 			ordineMissione.setNazione(new Long("1"));
 		} 
+        if (ordineMissione.getUtilizzoAutoNoleggio() != null && ordineMissione.getUtilizzoAutoNoleggio().equals("S") && 
+            getAutoPropria(ordineMissione) != null ){
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto a noleggio e dell'auto propria.");
+        } 
 	}
 	
     @Transactional(propagation = Propagation.REQUIRED)

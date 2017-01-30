@@ -53,10 +53,11 @@ public class DatiIstitutoService {
    		datiIstituto = getDatiIstitutoAndLock(istituto, anno);
     	Long pgCorrente = null;
     	if (datiIstituto != null){
-    		pgCorrente = new Long(datiIstituto.getProgressivoOrdine()+1);
-    		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
+            if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
+        		pgCorrente = new Long(datiIstituto.getProgressivoRimborso()+1);
         		datiIstituto.setProgressivoRimborso(pgCorrente);
     		} else{
+                pgCorrente = new Long(datiIstituto.getProgressivoOrdine()+1);
         		datiIstituto.setProgressivoOrdine(pgCorrente);
     		}
     		datiIstituto.setUser(principal.getName());

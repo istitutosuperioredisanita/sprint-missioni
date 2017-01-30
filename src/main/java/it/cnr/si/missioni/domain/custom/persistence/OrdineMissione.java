@@ -895,6 +895,16 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     }
 
 	@Transient
+    public Boolean isMissioneInviataResponsabile() {
+		if (!StringUtils.isEmpty(getStato())){
+        	if (getStato().equals(Costanti.STATO_INVIATA_RESPONSABILE)){
+        		return true;
+        	} 
+    	}
+    	return false;
+    }
+
+	@Transient
     public Boolean isMissioneDefinitiva() {
 		if (!StringUtils.isEmpty(getStato())){
         	if (getStato().equals(Costanti.STATO_DEFINITIVO)){
