@@ -2,15 +2,16 @@
 
 /* Controller */
 
-missioniApp.factory('DatiIstitutoService', function ($resource) {
+missioniApp.factory('DatiIstitutoService', function ($http) {
     return {
-      get: function(cds, anno){
-        return $resource('app/rest/datiIstituto/:ids', {}, {
-            'get': { method: 'GET', params: {istituto:cds, anno:anno}, isArray: false}
-        }).get();
-      }
+      get: function(cds, anno) {
+        var promise = $http.get('app/rest/datiIstituto', {params: {istituto: cds, anno:anno}}).then(function (response) {
+          return response.data;
+        });
+        return promise;
+      },
     }
-  });
+});
 
 missioniApp.factory('DatiIstitutoServiceCud', function ($resource) {
     

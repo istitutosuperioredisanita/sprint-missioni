@@ -78,6 +78,39 @@
     </table>
 
     <div class="row">
+        <h2 ng-show="esistonoOrdiniResponsabileGruppo" class="text-center color-rosso-mattone" translate="main.subtitle_resp_gruppo"></h2>
+    </div>
+    <table ng-show="esistonoOrdiniResponsabileGruppo" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'ordine-missione.form.responsabile-gruppo' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="ordineMissione in listOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'M'}" ng-click="doSelectOrdineMissione(ordineMissione)" data-method="get">
+              <td style="text-align: center" >{{ordineMissione.anno}}</td>
+              <td style="text-align: right">{{ordineMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{ordineMissione.uid}}</td>
+              <td class="col-md-2" style="text-align: left">{{ordineMissione.responsabileGruppo}}</td>
+              <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{ordineMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
         <h2 ng-show="esistonoOrdiniApprovati" class="text-center" translate="main.subtitle_approvato"></h2>
     </div>
     <table ng-show="esistonoOrdiniApprovati" class="table table-condensed table-striped table-bordered table-responsive table-selected">

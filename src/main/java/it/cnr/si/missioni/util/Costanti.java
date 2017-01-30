@@ -39,7 +39,7 @@ public class Costanti {
 	public final static String STATO_INVIATO_FLUSSO = "INV";
 	public final static String STATO_APPROVATO_FLUSSO = "APP";
 	public final static String STATO_CONFERMATO = "CON";
-    public final static String STATO_INVIATO_RESPONSABILE = "INv";
+    public final static String STATO_INVIATO_RESPONSABILE = "INR";
 	public final static String MISSIONE_ITALIANA = "I";
 	public final static String MISSIONE_ESTERA = "E";
 	public final static String PRIORITA_CRITICA = "1";
@@ -71,6 +71,7 @@ public class Costanti {
 	public final static String STATO_DA_AUTORIZZARE_PER_HOME = "D";
 	public final static String STATO_DA_VALIDARE_PER_HOME = "V";
 	public final static String STATO_DA_CONFERMARE_PER_HOME = "C";
+	public final static String STATO_PER_RESPONSABILE_GRUPPO_PER_HOME = "M";
 	public final static String CDS_SAC = "000";
 	public final static String UO_SAC_PROGETTI = "000.000";
     public final static String TIPO_ORDINE_DI_MISSIONE = "O";

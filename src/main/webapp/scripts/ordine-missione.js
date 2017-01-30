@@ -32,6 +32,13 @@ missioniApp.factory('OrdineMissioneService', function ($resource, DateUtils) {
                     return angular.toJson(copy);
                 }
             },
+            'send_to_manager':  { method: 'PUT', params:{confirm:false, daValidazione:"M"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
             'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}, 
                 transformRequest: function (data) {
                     var copy = angular.copy(data);
@@ -83,6 +90,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.undoCds = function(){
         $scope.ordineMissioneModel.cdsSpesa = null;
+        $scope.showResponsabile = false;
     };
 
     $scope.undoVoce = function(){
@@ -93,6 +101,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if (listaCds){
             if (listaCds.length === 1){
                 $scope.ordineMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
+                $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.cdsSpesa);
             } else {
                 if (cds){
                     $scope.elencoCds = [];
@@ -109,6 +118,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                     if ($scope.ordineMissioneModel){
                         $scope.ordineMissioneModel.cdsSpesa = cds;
+                        $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.cdsSpesa);
                     }
                 }
             }
@@ -442,12 +452,17 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.reloadCds = function(cds) {
       $scope.annullaUo();  
       $scope.restUo($scope.ordineMissioneModel.anno, cds, $scope.ordineMissioneModel.uoRich);
+      $scope.impostaGestioneResponsabileGruppo(cds);      
+    }
+
+    $scope.impostaGestioneResponsabileGruppo = function(cds){
       DatiIstitutoService.get(cds, $scope.ordineMissioneModel.anno).then(function(data){
         if (data.gestioneRespModulo != null && data.gestioneRespModulo == 'S'){
             $scope.showResponsabile = true;
             $scope.disableResponsabileGruppo = true;
         } else {
             $scope.showResponsabile = false;
+            $scope.ordineMissioneModel.responsabileGruppo = null;
         }
       });
     }
@@ -573,7 +588,9 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     var impostaDisabilitaOrdineMissione = function() {
-        if ($scope.esisteOrdineMissione && ($scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || ($scope.ordineMissioneModel.stato === 'CON' && 
+        if ($scope.esisteOrdineMissione && 
+            (($scope.ordineMissioneModel.stato === 'INR' && $scope.ordineMissioneModel.responsabileGruppo != $sessionStorage.account.login) || 
+              $scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || ($scope.ordineMissioneModel.stato === 'CON' && 
             ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
                 $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||
                 $scope.ordineMissioneModel.stateFlows === 'FIRMA UO' ||
@@ -650,6 +667,10 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         ui.confirmCRUD("Si sta per confermare l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
     }
 
+    $scope.sendToManagerOrdineMissione = function () {
+        ui.confirmCRUD("Si sta per inviare al responsabile del gruppo l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'ordine non sarà più modificabile. Si desidera Continuare?", inviaResponsabileGruppo);
+    }
+
     var confirmOrdineMissione = function () {
             $rootScope.salvataggio = true;
             OrdineMissioneService.confirm($scope.ordineMissioneModel,
@@ -673,6 +694,23 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
                         ui.ok_message("Ordine di Missione sbloccato.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                    }
+            );
+    }
+
+    var inviaResponsabileGruppo = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.send_to_manager($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione inviato al responsabile del gruppo.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
                             $scope.inizializzaFormPerModifica();
@@ -739,7 +777,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         $scope.reloadCds($scope.ordineMissioneModel.cdsRich);
         $scope.restCapitoli($scope.ordineMissioneModel.anno);
         $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
-        $scope.getRestForResponsabileGruppo($scope.ordineMissioneModel.uoRich);
     }
 
     $scope.reloadUserWork = function(uid){
@@ -867,7 +904,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.restCdr(model.uoSpesa, "S");
                 $scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
-                $scope.getRestForResponsabileGruppo($scope.ordineMissioneModel.uoRich);
+                $scope.getRestForResponsabileGruppo(model.uoSpesa);
                 $scope.restCapitoli(model.anno);
                 $scope.ordineMissioneModel = model;
                 $scope.inizializzaFormPerModifica();

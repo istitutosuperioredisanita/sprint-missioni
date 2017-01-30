@@ -323,7 +323,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String statoFlussoRitornoHome;
 	
 	public OrdineMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato){
+			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String responsabileGruppo){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -338,6 +338,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.setDataInizioMissione(dataInizioMissione);
 		this.setDataFineMissione(dataFineMissione);
 		this.setValidato(validato);
+		this.setResponsabileGruppo(responsabileGruppo);
 	}
 
 	public OrdineMissione(){
@@ -357,7 +358,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			add(Projections.property("oggetto")).
 			add(Projections.property("dataInizioMissione")).
 			add(Projections.property("dataFineMissione")).
-			add(Projections.property("validato"));
+			add(Projections.property("validato")).
+			add(Projections.property("responsabileGruppo"));
 
 	public String getObbligoRientro() {
 		return obbligoRientro;
