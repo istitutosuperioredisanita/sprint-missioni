@@ -112,6 +112,7 @@
         "subtitle_da_validare": "Ordini di Missione da Inviare alla firma",
         "subtitle_da_validare_rimborso": "Rimborsi Missione da Inviare alla firma",
         "subtitle_da_rendere_definitivi": "Ordini di Missione da Rendere Definitivi",
+        "subtitle_resp_gruppo": "Ordini di Missione da Approvare dal Responsabile del gruppo",
         "comment": "Motivazione",
         "userid": "Utente",
         "logged": {

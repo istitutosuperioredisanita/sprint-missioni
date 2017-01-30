@@ -147,14 +147,6 @@
                         </span>
                     </p>
             </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile">
-                    <p class="col-md-12">
-                        <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.responsabile-gruppo">resp</span>
-                    <select ng-disabled="disableResponsabileGruppo" class="form-control" id="missioni" ng-model="ordineMissioneModel.responsabileGruppo" ng-options="responsabile.uid as responsabile.cognome+' - '+responsabile.nome for responsabile in elencoResponsabiliGruppo"><option value=""></option></select>
-                        </span>
-                    </p>
-            </form>
   </div>
 </div>
 
@@ -259,9 +251,17 @@
 
 <div class="panel panel-info">
   <div class="panel-heading color-verde-giada text-center">
-    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
   </div>
      <div class="panel-body my-panel-body">
+            <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.responsabile-gruppo">resp</span>
+                    <select ng-disabled="disableResponsabileGruppo || disabilitaOrdineMissione||validazione" class="form-control" id="missioni" ng-model="ordineMissioneModel.responsabileGruppo" ng-options="responsabile.uid as responsabile.cognome+' - '+responsabile.nome for responsabile in elencoResponsabiliGruppo"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-6">
                          <span class="input-group">
@@ -311,12 +311,12 @@
               </div>
             </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && !showResponsabile && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && (!showResponsabile||ordineMissioneModel.stato === 'INR')  && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
-                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && showResponsabile && ordineMissioneModel.stato === 'INS'">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.stato === 'INS'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToManager' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
@@ -337,19 +337,21 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-3" ng-show="showEsisteOrdineMissione">
-
-                    <div class="col-md-3" ng-show="showEsisteOrdineMissione">
                       <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
 <!--
                       <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(ordineMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
 -->
-                    </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-md-1" ng-show="showEsisteOrdineMissione && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-md-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato != 'INR' && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
+                    <div class="col-md-1" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && ordineMissioneModel.stato === 'INR'">
+                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span></button>
                     </div>
             </form>
 <!--  <div class="col-md-12">

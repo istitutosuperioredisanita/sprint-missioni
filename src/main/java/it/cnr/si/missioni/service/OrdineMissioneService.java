@@ -256,6 +256,9 @@ public class OrdineMissioneService {
     				} else if (ordineMissione.isMissioneInserita()){
     					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_CONFERMARE_PER_HOME);
     					listaNew.add(ordineMissione);
+    				} else if (ordineMissione.isMissioneInviataResponsabile()){
+    					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_PER_RESPONSABILE_GRUPPO_PER_HOME);
+    					listaNew.add(ordineMissione);
     				}
     			}
     		}
@@ -403,17 +406,20 @@ public class OrdineMissioneService {
 						    		}
 					    		}
 					    	}
+					    	condizioneResponsabileGruppo(principal, condizioneOr);
 					    	if (esisteUoConValidazioneConUserNonAbilitato){
-						    	criterionList.add(condizioneOr);
+					    		criterionList.add(condizioneOr);
 					    	} else {
-						    	criterionList.add(Restrictions.in("uoRich", listaUoUtente));
+								Disjunction condizioneNuovaOr = Restrictions.disjunction();
+					    		condizioneNuovaOr.add(Restrictions.in("uoRich", listaUoUtente));
+					    		criterionList.add(condizioneNuovaOr);
 					    	}
 						} else {
-							criterionList.add(Restrictions.eq("uid", principal.getName()));
+							condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
 						}
 					}
 				} else {
-					criterionList.add(Restrictions.eq("uid", principal.getName()));
+					condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
 				}
 			}
 			criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
@@ -431,6 +437,17 @@ public class OrdineMissioneService {
 			return ordineMissioneList;
 		}
     }
+
+	private void condizioneOrdineDellUtenteConResponsabileGruppo(Principal principal, CriterionList criterionList) {
+		Disjunction condizioneOr = Restrictions.disjunction();
+		condizioneResponsabileGruppo(principal, condizioneOr);
+		condizioneOr.add(Restrictions.eq("uid", principal.getName()));
+		criterionList.add(condizioneOr);
+	}
+
+	private void condizioneResponsabileGruppo(Principal principal, Disjunction condizioneOr) {
+		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.eq("stato", "INR")));
+	}
 
     @Transactional(readOnly = true)
     public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione ordineMissione) {
@@ -552,6 +569,17 @@ public class OrdineMissioneService {
 				ordineMissioneDB.setStato(Costanti.STATO_INSERITO);
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
+			}
+		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("M")){
+			if (ordineMissione.getResponsabileGruppo() != null){
+				if (ordineMissioneDB.isMissioneInserita()) {
+					ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
+					ordineMissioneDB.setStato(Costanti.STATO_INVIATO_RESPONSABILE);
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inviare al responsabile una missione in stato diverso da 'Inserito'.");
+				}
+			} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "E' obbligatorio indicare il responsabile del gruppo.");
 			}
 		} else {
 			ordineMissioneDB.setStato(ordineMissione.getStato());
