@@ -36,6 +36,7 @@ import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -173,7 +174,12 @@ public class ProxyService implements EnvironmentAware{
         	String errResponse = _ex.getResponseBodyAsString();
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
         	throw new ApplicationContextException(errResponse);
+        } catch (HttpServerErrorException _ex) {
+        	String errResponse = _ex.getResponseBodyAsString();
+        	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
+        	throw new ApplicationContextException(errResponse);
         } catch (Exception _ex) {
+        	log.error(_ex.getMessage(), _ex.getLocalizedMessage());
         	throw new ApplicationContextException("Servizio REST "+ proxyURL+" Eccezione: "+ _ex.getLocalizedMessage());
         }
 	}

@@ -157,7 +157,7 @@ public class RimborsoMissioneResource {
     		} catch (AwesomeException e) {
     			log.error("ERRORE createRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    		} catch (Exception e) {
     			log.error("ERRORE createRimborsoMissione",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}

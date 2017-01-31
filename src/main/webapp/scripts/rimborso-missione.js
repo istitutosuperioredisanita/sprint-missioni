@@ -109,7 +109,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.anticipoRicevuto = "N";
                 $scope.rimborsoMissioneModel.speseTerziRicevute = "N";
                 inizializzaForm();
-                $scope.impostaInquadramento();
                 $scope.recuperoDatiDivisa();
                 break;
             }
@@ -149,8 +148,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.recuperoDatiInquadramento = function(userWork, terzoSigla){
         ProxyService.getInquadramento(terzoSigla.cd_anag).then(function(ret){
-            if (ret && ret.data && ret.data.elements){
+            if (ret && ret.data && ret.data.elements && ret.data.elements.length > 0){
                 $scope.inquadramento = ret.data.elements;
+            } else {
+                ui.error("Inquadramento non trovato");
             }
         });
     }
@@ -205,19 +206,26 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.objUoSpesa = $scope.uoSpesaSelected;
             }
         }
-        $scope.impostaInquadramento();
+        return $scope.impostaInquadramento();
     }
 
     $scope.impostaInquadramento = function(){
         if ($scope.terzoSigla && $scope.inquadramento){
+            var trovatoInquadramento = false;
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
-                if (inquadramento.dt_ini_validita <= $scope.rimborsoMissioneModel.dataInserimento && 
-                    inquadramento.dt_fin_validita >= $scope.rimborsoMissioneModel.dataInserimento){
+                if (inquadramento.dt_ini_validita <= $scope.rimborsoMissioneModel.dataInizioMissione && 
+                    inquadramento.dt_fin_validita >= $scope.rimborsoMissioneModel.dataFineMissione){
                     $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
+                    trovatoInquadramento = true;
                 }
             }
+            if (!trovatoInquadramento){
+                ui.error("Per la data della missione non esiste un inquadramento valido.");
+                return false;
+            }
         }
+        return true;
     }
 
     $scope.formatResultCdr = function(item) {
@@ -975,34 +983,36 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.save = function () {
-        controlliPrimaDelSalvataggio();
-        if ($scope.esisteRimborsoMissione()){
-            $rootScope.salvataggio = true;
-            RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
-                    function (value, responseHeaders) {
-                        $scope.rimborsoMissioneModel = value;
-                        $rootScope.salvataggio = false;
-                    },
-                    function (httpResponse) {
+        var ret = controlliPrimaDelSalvataggio();
+        if (ret){
+            if ($scope.esisteRimborsoMissione()){
+                $rootScope.salvataggio = true;
+                RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
+                        function (value, responseHeaders) {
+                            $scope.rimborsoMissioneModel = value;
                             $rootScope.salvataggio = false;
-                    }
-            );
-        } else {
-            $rootScope.salvataggio = true;
-            RimborsoMissioneService.add($scope.rimborsoMissioneModel,
-                    function (value, responseHeaders) {
-                        $rootScope.salvataggio = false;
-                        $scope.rimborsoMissioneModel = value;
-                        $scope.elencoPersone = null;
-                        $scope.uoForUsersSpecial = null;
-                        $scope.inizializzaFormPerModifica();
-                        var path = $location.path();
-                        $location.path(path+'/'+$scope.rimborsoMissioneModel.id);
-                    },
-                    function (httpResponse) {
-                        $rootScope.salvataggio = false;
-                    }
-            );
+                        },
+                        function (httpResponse) {
+                                $rootScope.salvataggio = false;
+                        }
+                );
+            } else {
+                $rootScope.salvataggio = true;
+                RimborsoMissioneService.add($scope.rimborsoMissioneModel,
+                        function (value, responseHeaders) {
+                            $rootScope.salvataggio = false;
+                            $scope.rimborsoMissioneModel = value;
+                            $scope.elencoPersone = null;
+                            $scope.uoForUsersSpecial = null;
+                            $scope.inizializzaFormPerModifica();
+                            var path = $location.path();
+                            $location.path(path+'/'+$scope.rimborsoMissioneModel.id);
+                        },
+                        function (httpResponse) {
+                            $rootScope.salvataggio = false;
+                        }
+                );
+            }
         }
     }
 

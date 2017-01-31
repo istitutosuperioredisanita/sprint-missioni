@@ -54,6 +54,7 @@ import it.cnr.si.missioni.util.proxy.json.service.GaeService;
 import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
 import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
+import it.cnr.si.missioni.util.proxy.json.service.TerzoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import net.bzdyl.ejb3.criteria.Order;
@@ -89,6 +90,9 @@ public class RimborsoMissioneService {
 	
 	@Autowired
 	CdrService cdrService;
+	
+	@Autowired
+	TerzoService terzoService;
 	
 	@Autowired
 	CronService cronService;
@@ -577,8 +581,7 @@ public class RimborsoMissioneService {
 
     
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione createRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws AwesomeException, 
-    ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public RimborsoMissione createRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws Exception {
     	controlloDatiObbligatoriDaGUI(rimborsoMissione);
     	inizializzaCampiPerInserimento(principal, rimborsoMissione);
 		validaCRUD(principal, rimborsoMissione);
@@ -670,6 +673,9 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Anticipo Ricevuto");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getSpeseTerziRicevute())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Altri anticipi ricevuti");
+			} 
+			if (StringUtils.isEmpty(rimborsoMissione.getInquadramento())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Per la data della missione indicata non è stato possibile recuperare l'inquadramento.");
 			} 
 			if (rimborsoMissione.isMissioneEstera()){
 				if (StringUtils.isEmpty(rimborsoMissione.getNazione())){
@@ -835,12 +841,15 @@ public class RimborsoMissioneService {
 		} 
 		if (!rimborsoMissione.isMissioneEstera()){
 			rimborsoMissione.setNazione(new Long("1"));
-		} 
+		}
 	}
 	
 	private void controlloCampiObbligatori(RimborsoMissione rimborsoMissione) {
 		if (!rimborsoMissione.isToBeCreated()){
 			controlloDatiObbligatoriDaGUI(rimborsoMissione);
+		}
+		if (rimborsoMissione.getCdTerzoSigla() == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato recuperato il codice terzo SIGLA, verificare il rimborso.");
 		}
 		if (StringUtils.isEmpty(rimborsoMissione.getAnno())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Anno");
