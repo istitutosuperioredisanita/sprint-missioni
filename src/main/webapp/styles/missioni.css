@@ -24,6 +24,10 @@
 
 .progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}
 
+.form-group.required .control-label:after {
+  content:"*";color:red;
+}
+
 .color-rosso-bruno {
   background-color: #b27b60 !important;
   border-color: #b27b60 !important;

@@ -108,45 +108,50 @@ public class ProxyResource {
     }
     
     private ResponseEntity<String> process(HttpMethod httpMethod, JSONBody body, String app, String url, HttpServletRequest request, HttpServletResponse response) {
-		ResultProxy result = null;
-		ResultCacheProxy resultCacheProxy = cacheService.manageCache(url, body, app);
-		String existsClauseVariable = existsClauseVariable(resultCacheProxy);
-		if (isCacheable(resultCacheProxy)){
-			CallCache callCache = new CallCache(httpMethod, resultCacheProxy.getBody(), app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION), resultCacheProxy.getRestService().getClasseJson());
-			result = proxyService.processInCache(callCache);
-    	} else {
-    		if (body != null && body.getContext() == null){
-        		cacheService.setContext(body, app);
-    		} else if (body == null && app != null && app.equals(Costanti.APP_SIGLA)){
-    			body = new JSONBody();
-        		cacheService.setContext(body, app);
+    	try{
+        	ResultProxy result = null;
+    		ResultCacheProxy resultCacheProxy = cacheService.manageCache(url, body, app);
+    		String existsClauseVariable = existsClauseVariable(resultCacheProxy);
+    		if (isCacheable(resultCacheProxy)){
+    			CallCache callCache = new CallCache(httpMethod, resultCacheProxy.getBody(), app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION), resultCacheProxy.getRestService().getClasseJson());
+    			result = proxyService.processInCache(callCache);
+        	} else {
+        		if (body != null && body.getContext() == null){
+            		cacheService.setContext(body, app);
+        		} else if (body == null && app != null && app.equals(Costanti.APP_SIGLA)){
+        			body = new JSONBody();
+            		cacheService.setContext(body, app);
+        		}
+            	result = proxyService.process(httpMethod, body, app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
+        	}
+    		if (result.getStatus().compareTo(HttpStatus.OK) != 0){
+                return JSONResponseEntity.getResponse(result.getStatus(), "");
     		}
-        	result = proxyService.process(httpMethod, body, app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
-    	}
-		if (result.getStatus().compareTo(HttpStatus.OK) != 0){
-            return JSONResponseEntity.getResponse(result.getStatus(), "");
-		}
-    	response.setContentType(result.getType());
-    	response.setStatus(result.getStatus().value());
-		String risposta = result.getBody();
-		CommonJsonRest<RestServiceBean> commonJsonRest = result.getCommonJsonResponse();
+        	response.setContentType(result.getType());
+        	response.setStatus(result.getStatus().value());
+    		String risposta = result.getBody();
+    		CommonJsonRest<RestServiceBean> commonJsonRest = result.getCommonJsonResponse();
 
-		if (isCacheable(resultCacheProxy) && !app.equals(Costanti.APP_SIPER)){
-			if (existsClauseVariable.equals("S")){
-		    	risposta = cacheService.manageResponse(resultCacheProxy.getRestService(), resultCacheProxy.getListClausesDeleted(), commonJsonRest);
-			} else {
-				
-		    	try {
-					risposta = cacheService.createResponse(commonJsonRest);
-				} catch (JsonProcessingException e) {
-					log.error("ERRORE process",e);
-		            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-				}
+    		if (isCacheable(resultCacheProxy) && !app.equals(Costanti.APP_SIPER)){
+    			if (existsClauseVariable.equals("S")){
+    		    	risposta = cacheService.manageResponse(resultCacheProxy.getRestService(), resultCacheProxy.getListClausesDeleted(), commonJsonRest);
+    			} else {
+    				
+    		    	try {
+    					risposta = cacheService.createResponse(commonJsonRest);
+    				} catch (JsonProcessingException e) {
+    					log.error("ERRORE process",e);
+    		            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+    				}
 
-			}
+    			}
+    		}
+    		risposta = manageResponseForAccountRest(url, result, risposta);
+        	return JSONResponseEntity.ok(risposta);
+		} catch (Exception e) {
+			log.error("ERRORE ProxyResource",e);
+			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
-		risposta = manageResponseForAccountRest(url, result, risposta);
-    	return JSONResponseEntity.ok(risposta);
     }
 
 	private String manageResponseForAccountRest(String url, ResultProxy result,

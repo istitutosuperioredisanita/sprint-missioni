@@ -310,7 +310,11 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     if (!$scope.dettagliSpese){
                         $scope.dettagliSpese = [];
                     }
-                    $scope.dettagliSpese.push(data);
+                    if (data){
+                        var dettaglio = angular.copy(data);
+                        dettaglio.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglio.dataSpesa);
+                        $scope.dettagliSpese.push(dettaglio);
+                    }
                     $scope.undoAddDettaglioSpesa();
             }).error(function (data) {
                 $rootScope.salvataggio = false;
@@ -322,6 +326,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(dettaglioSpesa.dataSpesa);
         $http.put('app/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
             $rootScope.salvataggio = false;
+            dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglioSpesa.dataSpesa);
             undoEditingDettaglioSpesa(dettaglioSpesa);
         }).error(function (data) {
             $rootScope.salvataggio = false;

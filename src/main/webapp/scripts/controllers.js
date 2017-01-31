@@ -48,6 +48,9 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                     }
                 }
             }
+        },
+        function(error){
+            $scope.endSearchCmis = true;
         });        
 
         ElencoRimborsiMissioneService.findListToValidate().then(function(response){
@@ -74,6 +77,9 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                     }
                 }
             }
+            $scope.endSearchCmis = true;
+        },
+        function(error){
             $scope.endSearchCmis = true;
         });        
     }
