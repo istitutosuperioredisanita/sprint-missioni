@@ -12,6 +12,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.bulk.OggettoBulk;
@@ -145,7 +149,16 @@ public class Utility {
 			errorRest = (ErrorRestSigla)new ObjectMapper().readValue(obj,classJson);
 			return errorRest.getError();
 		} catch (IOException ex) {
-			return obj;		
+				try {
+					JSONObject json = new JSONObject(obj);
+					String message = json.getString("userMessage");
+					if (message != null){
+						return message;
+					}
+				} catch (JSONException e1) {
+					return obj;		
+				}
+				return obj;		
 		}
 	}
 	public static MimeTypes getMimeType(String contentType){

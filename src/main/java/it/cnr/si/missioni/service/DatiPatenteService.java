@@ -114,14 +114,16 @@ public class DatiPatenteService {
     @Transactional(propagation = Propagation.REQUIRED)
     private void validaCRUD(Principal principal, DatiPatente datiPatente) throws AwesomeException, 
     ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
-		crudServiceBean.lockBulk(principal, datiPatente);
+//		crudServiceBean.lockBulk(principal, datiPatente);
         Date oggi = new Date(System.currentTimeMillis());
         if (datiPatente.getDataRilascio() != null){
             if (oggi.before(datiPatente.getDataRilascio())){
                 throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data odierna.");
             }
             if (datiPatente.getDataScadenza() != null){
-                throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data di scadenza.");
+                if (datiPatente.getDataScadenza().before(datiPatente.getDataRilascio())){
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data di scadenza.");
+                }
             }
         }
     }
