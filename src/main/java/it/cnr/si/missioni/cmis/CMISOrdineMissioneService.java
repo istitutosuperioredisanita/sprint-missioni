@@ -240,7 +240,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setUserNameResponsabileModulo("");
 		cmisOrdineMissione.setUsernameRichiedente(username);
 		cmisOrdineMissione.setUsernameUtenteOrdine(ordineMissione.getUid());
-		cmisOrdineMissione.setValidazioneModulo("false");
+		cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "false" : "true");
 		cmisOrdineMissione.setValidazioneSpesa(impostaValidazioneSpesa(userNameFirmatario, userNameFirmatarioSpesa));
 		cmisOrdineMissione.setWfDescription("Ordine di Missione n. "+ordineMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
 		cmisOrdineMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
@@ -248,6 +248,9 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setMissioneEsteraFlag(ordineMissione.getTipoMissione().equals("E") ? "true" : "false");
 		cmisOrdineMissione.setDataInizioMissione(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 		cmisOrdineMissione.setDataFineMissione(DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
+		cmisOrdineMissione.setFondi(ordineMissione.getDecodeFondi());
+		cmisOrdineMissione.setUsernameResponsabileGruppo(ordineMissione.getResponsabileGruppo());
+		cmisOrdineMissione.setUserNameResponsabileModulo(ordineMissione.getResponsabileGruppo());
 
 		return cmisOrdineMissione;
 	}
@@ -400,9 +403,11 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA, cmisOrdineMissione.getUserNameFirmatarioSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO, cmisOrdineMissione.getUserNamePrimoFirmatario());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_ORDINE, cmisOrdineMissione.getUsernameUtenteOrdine());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RESPONSABILE_MODULO, "");
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RESPONSABILE_MODULO, cmisOrdineMissione.getUsernameResponsabileGruppo());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_FONDI, cmisOrdineMissione.getFondi());
+		
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE, cmisOrdineMissione.getUsernameRichiedente());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, false);
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, StringUtils.isEmpty(cmisOrdineMissione.getUsernameResponsabileGruppo()) ? false : true);
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA, cmisOrdineMissione.getValidazioneSpesa().equals("true"));
 		return metadataProperties;
 	}
@@ -470,7 +475,7 @@ public class CMISOrdineMissioneService {
 				 jGenerator.writeStringField("prop_wfcnr_wfCounterAnno" , "");
 				 jGenerator.writeStringField("prop_cnrmissioni_validazioneSpesaFlag" , cmisOrdineMissione.getValidazioneSpesa());
 				 jGenerator.writeStringField("prop_cnrmissioni_missioneConAnticipoFlag" , cmisOrdineMissione.getAnticipo());
-				 jGenerator.writeStringField("prop_cnrmissioni_validazioneModuloFlag" , "false");
+				 jGenerator.writeStringField("prop_cnrmissioni_validazioneModuloFlag" , StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "false": "true");
 				 jGenerator.writeStringField("prop_cnrmissioni_userNameUtenteOrdineMissione" , cmisOrdineMissione.getUsernameUtenteOrdine());
 				 jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisOrdineMissione.getUsernameRichiedente());
 				 jGenerator.writeStringField("prop_cnrmissioni_userNameResponsabileModulo" , cmisOrdineMissione.getUserNameResponsabileModulo());
@@ -502,6 +507,7 @@ public class CMISOrdineMissioneService {
 				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisOrdineMissione.getDataInizioMissione());
 				 jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisOrdineMissione.getDataFineMissione());
 				 jGenerator.writeStringField("prop_cnrmissioni_trattamento" , cmisOrdineMissione.getTrattamento());
+				 jGenerator.writeStringField("prop_cnrmissioni_competenzaResiduo" , cmisOrdineMissione.getFondi());
 				jGenerator.writeEndObject();
 				jGenerator.close();
 			} catch (IOException e) {

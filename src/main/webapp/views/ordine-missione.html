@@ -218,6 +218,14 @@
 
 
             <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-2">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="ordine-missione.form.fondi">Fondi</span>
+                          <select ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" ng-model="ordineMissioneModel.fondi" ng-options="value as compRes for (compRes,value) in fondi"></select>
+                        </span>
+              </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
@@ -227,7 +235,7 @@
             </form>
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                    <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
                             <input ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
@@ -236,10 +244,10 @@
             </form>
 
                     <p class="col-md-1">
-            <cnr-modal-info-impegno anno="ordineMissioneModel.anno" cds="ordineMissioneModel.cdsSpesa" gae="ordineMissioneModel.gae" anno-impegno="ordineMissioneModel.esercizioOriginaleObbligazione" numero="ordineMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
+            <cnr-modal-info-impegno fondi="ordineMissioneModel.fondi" anno="ordineMissioneModel.anno" cds="ordineMissioneModel.cdsSpesa" gae="ordineMissioneModel.gae" anno-impegno="ordineMissioneModel.esercizioOriginaleObbligazione" numero="ordineMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
                     </p>
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                    <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="ordine-missione.form.importo-presunto">obbligo</span>
                           <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-presunto" ng-model="ordineMissioneModel.importoPresunto" currency-symbol="">

@@ -64,6 +64,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			CMIS_PROPERTY_FLOW_USERNAME_ORDINE = "cnrmissioni:userNameUtenteOrdineMissione",
 			CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE	= "cnrmissioni:userNameRichiedente",
 			CMIS_PROPERTY_FLOW_USERNAME_RESPONSABILE_MODULO	= "cnrmissioni:userNameResponsabileModulo",
+			CMIS_PROPERTY_FLOW_FONDI = "cnrmissioni:competenzaResiduo",
 			CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO	= "cnrmissioni:userNamePrimoFirmatario",
 			CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA	= "cnrmissioni:userNameFirmatarioSpesa",
 			CMIS_PROPERTY_FLOW_UO_ORDINE	= "cnrmissioni:uoOrdine",
@@ -282,6 +283,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "PARTENZA_DA", length = 1, nullable = false)
     private String partenzaDa;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "FONDI", length = 1, nullable = true)
+    private String fondi;
+
     @Size(min = 0, max = 250)
     @Column(name = "RESPONSABILE_GRUPPO", length = 250, nullable = true)
     private String responsabileGruppo;
@@ -483,7 +488,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		return "";
 	}
 	
-    
+	@Transient
+	public String getDecodeFondi() {
+		if (!StringUtils.isEmpty(getFondi())){
+			return Costanti.FONDI.get(getFondi());
+		}
+		return "";
+	}
+	
 	public DatiIstituto getDatiIstituto() {
 		return datiIstituto;
 	}
@@ -981,6 +993,20 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		return false;
 	}
 
+	public Boolean isFondiCompetenza(){
+		if (getFondi() != null && getFondi().equals(Costanti.FONDI_DI_COMPETENZA)){
+			return true;
+		}
+		return false;
+	}
+
+	public Boolean isFondiResiduo(){
+		if (getFondi() != null && getFondi().equals(Costanti.FONDI_DI_RESIDUO)){
+			return true;
+		}
+		return false;
+	}
+
 	public Boolean isMissioneDipendente(){
 		if (StringUtils.isEmpty(getMatricola())){
 			return false;
@@ -1042,5 +1068,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setResponsabileGruppo(String responsabileGruppo) {
 		this.responsabileGruppo = responsabileGruppo;
+	}
+
+	public String getFondi() {
+		return fondi;
+	}
+
+	public void setFondi(String fondi) {
+		this.fondi = fondi;
 	}
 }

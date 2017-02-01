@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.cmis;
 
 public class CMISOrdineMissione extends CMISMissione {
+	private String usernameResponsabileGruppo;
+	private String fondi;
 	private String anticipo;
 	private String validazioneModulo;
 	private String modulo;
@@ -28,6 +30,18 @@ public class CMISOrdineMissione extends CMISMissione {
 	}
 	public void setDescrizioneModulo(String descrizioneModulo) {
 		this.descrizioneModulo = descrizioneModulo;
+	}
+	public String getUsernameResponsabileGruppo() {
+		return usernameResponsabileGruppo;
+	}
+	public void setUsernameResponsabileGruppo(String usernameResponsabileGruppo) {
+		this.usernameResponsabileGruppo = usernameResponsabileGruppo;
+	}
+	public String getFondi() {
+		return fondi;
+	}
+	public void setFondi(String fondi) {
+		this.fondi = fondi;
 	}
 
 }

@@ -138,6 +138,7 @@ input:-webkit-autofill {
 #missioni select{
   font-size: 12px;
   height: 30px;
+  padding: 3px 6px;
   vertical-align: middle;  
 }
 

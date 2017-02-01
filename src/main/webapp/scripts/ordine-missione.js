@@ -538,6 +538,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         'Trattamento Alternativo di Missione': 'T'
     };
 
+    $scope.fondi = {
+        'Competenza': 'C',
+        'Residuo': 'R'
+    };
+
     $scope.obblighiRientro = {
         'Sì': 'S',
         'No': 'N'
