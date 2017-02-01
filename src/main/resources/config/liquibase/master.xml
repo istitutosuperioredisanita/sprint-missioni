@@ -20,6 +20,8 @@
     <include file="classpath:config/liquibase/changelog/20161214152300_add_column_dettaglio_rimborso.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170117103500_add_column_tipo_pagamento.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170120104200_add_column_missione_sigla.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170126145400_add_column_responsabile" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170131182000_add_column_tipo_rapporto.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 
