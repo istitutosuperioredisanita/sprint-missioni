@@ -275,7 +275,7 @@ public class CMISRimborsoMissioneService {
 		}
 		cmisRimborsoMissione.setIdOrdineMissione(rimborsoMissione.getOrdineMissione() == null ? "" :rimborsoMissione.getOrdineMissione().getId().toString());
 		cmisRimborsoMissione.setWfOrdineMissione(rimborsoMissione.getOrdineMissione() == null || rimborsoMissione.getOrdineMissione().getIdFlusso() == null ? "" : rimborsoMissione.getOrdineMissione().getIdFlusso());
-		cmisRimborsoMissione.setTotaleRimborsoMissione(Utility.numberFormat(rimborsoMissione.getTotaleRimborso()));
+		cmisRimborsoMissione.setTotaleRimborsoMissione(rimborsoMissione.getTotaleRimborso());
 		return cmisRimborsoMissione;
 	}
 	
@@ -540,6 +540,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_NUMERO_MANDATO, cmisRimborsoMissione.getNumeroMandato().equals("") ? null : new Integer(cmisRimborsoMissione.getNumeroMandato()));
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_IMPORTO_MANDATO, cmisRimborsoMissione.getImportoMandato().equals("") ? null : new Float(cmisRimborsoMissione.getImportoMandato()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TRATTAMENTO, cmisRimborsoMissione.getTrattamento());
+		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_TOTALE_RIMBORSO_MISSIONE, cmisRimborsoMissione.getTotaleRimborsoMissione());
 
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_ORDINE, cmisRimborsoMissione.getUoOrdine());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_SPESA, cmisRimborsoMissione.getUoSpesa());
@@ -621,7 +622,7 @@ public class CMISRimborsoMissioneService {
 				 jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_importoMandato" , cmisRimborsoMissione.getImportoMandato());
 				 jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRimborso" , cmisRimborsoMissione.getWfOrdineMissione());
-//				 jGenerator.writeStringField("prop_cnrmissioni_totRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione());
+				 jGenerator.writeStringField("prop_cnrmissioni_totaleRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione() == null ? "": cmisRimborsoMissione.getTotaleRimborsoMissione().toString());
 				jGenerator.writeEndObject();
 				jGenerator.close();
 			} catch (IOException e) {

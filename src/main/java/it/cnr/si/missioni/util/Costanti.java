@@ -7,7 +7,6 @@ import java.util.Map;
 
 /**
  * 
- * @author ISED Interfaccia che dichiara gli errori e i rispettivi codici
  * 
  * 
  */
@@ -49,6 +48,8 @@ public class Costanti {
 	public final static String RIMBORSO_DOCUMENTATO = "R";
 	public final static String RESIDENZA_DOMICILIO = "R";
 	public final static String SEDE_LAVORO = "S";
+	public final static String FONDI_DI_COMPETENZA = "C";
+	public final static String FONDI_DI_RESIDUO = "R";
 	public final static String STATO_FIRMATO_FROM_CMIS = "FIRMATO";
 	public final static String STATO_ANNULLATO_FROM_CMIS = "ANNULLATO";
 	public final static String STATO_RESPINTO_UO_FROM_CMIS = "RESPINTO UO";
@@ -175,4 +176,11 @@ public class Costanti {
         STATO_INVIO_SIGLA = Collections.unmodifiableMap(aMap);
     }
 
+    public final static Map<String, String> FONDI;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(FONDI_DI_COMPETENZA, "Competenza");
+        aMap.put(FONDI_DI_RESIDUO, "Residuo");
+        FONDI = Collections.unmodifiableMap(aMap);
+    }
 }

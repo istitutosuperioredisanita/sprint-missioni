@@ -15,6 +15,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -156,7 +157,15 @@ public class Utility {
 						return message;
 					}
 				} catch (JSONException e1) {
-					return obj;		
+					try {
+						JSONObject json = new JSONObject(obj);
+						String message = json.getString("originalMessage");
+						if (message != null){
+							return message;
+						}
+					} catch (JSONException e2) {
+						return obj;		
+					}
 				}
 				return obj;		
 		}

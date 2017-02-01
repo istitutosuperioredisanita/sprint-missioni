@@ -751,6 +751,14 @@ public class OrdineMissioneService {
             getAutoPropria(ordineMissione) != null ){
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto a noleggio e dell'auto propria.");
         } 
+        if (ordineMissione.isFondiCompetenza() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione()) && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) 
+        		&&  ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) != 0){
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Incongruenza tra fondi e esercizio obbligazione.");
+        } 
+        if (ordineMissione.isFondiResiduo() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione()) && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) 
+        		&&  ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) <= 0){
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Incongruenza tra fondi e esercizio obbligazione.");
+        } 
 	}
 	
     @Transactional(propagation = Propagation.REQUIRED)

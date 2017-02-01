@@ -42,6 +42,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo",
 			CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id",
 			CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione",
+			CMIS_PROPERTY_FLOW_TOTALE_RIMBORSO_MISSIONE = "cnrmissioni:totaleRimborsoMissione",
 			CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso",
 			CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto",
 			CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato",
