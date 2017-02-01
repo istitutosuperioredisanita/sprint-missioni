@@ -333,6 +333,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setEsercizioSigla(rimborsoMissione.getEsercizioSigla());
 			rimborsoMissioneDB.setPgMissioneSigla(rimborsoMissione.getPgMissioneSigla());
 			rimborsoMissioneDB.setStatoInvioSigla(rimborsoMissione.getStatoInvioSigla());
+			rimborsoMissioneDB.setCdTipoRapporto(rimborsoMissione.getCdTipoRapporto());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 		}
 		
@@ -377,7 +378,8 @@ public class RimborsoMissioneService {
 			}
 		}
 	}
-	public Boolean assenzaDettagli(RimborsoMissione rimborsoMissione) {
+
+	private Boolean assenzaDettagli(RimborsoMissione rimborsoMissione) throws ComponentException {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() == null || rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
 			return true;
 		} else {
