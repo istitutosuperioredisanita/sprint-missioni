@@ -1,23 +1,14 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissioneDettagli;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.Cdr;
-import it.cnr.si.missioni.util.proxy.json.object.Cds;
-import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,13 +20,15 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
-
-import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.Cdr;
+import it.cnr.si.missioni.util.proxy.json.object.Cds;
+import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import net.bzdyl.ejb3.criteria.Projection;
+import net.bzdyl.ejb3.criteria.projections.Projections;
 
 /**
  * A user.
@@ -304,6 +297,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Size(min = 0, max = 30)
     @Column(name = "CD_UO_SIGLA", length = 30, nullable = true)
     public String cdUoSigla;
+
+    @Size(min = 0, max = 10)
+    @Column(name = "CD_TIPO_RAPPORTO", length = 10, nullable = true)
+    public String cdTipoRapporto;
 
 	@Transient
     private String daValidazione;
@@ -1216,5 +1213,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			return false;
 		}
 		return true;
+	}
+
+	public String getCdTipoRapporto() {
+		return cdTipoRapporto;
+	}
+
+	public void setCdTipoRapporto(String cdTipoRapporto) {
+		this.cdTipoRapporto = cdTipoRapporto;
 	}
 }

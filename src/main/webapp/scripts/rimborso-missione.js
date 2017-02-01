@@ -217,6 +217,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (inquadramento.dt_ini_validita <= $scope.rimborsoMissioneModel.dataInizioMissione && 
                     inquadramento.dt_fin_validita >= $scope.rimborsoMissioneModel.dataFineMissione){
                     $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
+                    $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                     trovatoInquadramento = true;
                 }
             }

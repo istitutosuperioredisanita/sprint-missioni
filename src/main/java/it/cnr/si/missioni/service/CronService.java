@@ -216,7 +216,7 @@ public class CronService {
 			tipoRapporto.setCdTipoRapporto("DIP");
 			oggettoBulk.setTiAnagrafico("D");
 		} else {
-//									tipoRapporto.setCdTipoRapporto(cdTipoRapporto);
+			tipoRapporto.setCdTipoRapporto(rimborsoApprovato.getCdTipoRapporto());
 			oggettoBulk.setTiAnagrafico("A");
 		}
 

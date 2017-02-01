@@ -668,7 +668,15 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     $scope.sendToManagerOrdineMissione = function () {
-        ui.confirmCRUD("Si sta per inviare al responsabile del gruppo l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'ordine non sarà più modificabile. Si desidera Continuare?", inviaResponsabileGruppo);
+        if ($scope.ordineMissioneModel && $scope.ordineMissioneModel.responsabileGruppo){
+          if ($scope.ordineMissioneModel.responsabileGruppo == $scope.ordineMissioneModel.uid){
+            $scope.confirm();
+          } else {
+            ui.confirmCRUD("Si sta per inviare al responsabile del gruppo l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'ordine non sarà più modificabile. Si desidera Continuare?", inviaResponsabileGruppo);
+          }
+        } else {
+            ui.error("Valorizzare il responsabile del gruppo");
+        }
     }
 
     var confirmOrdineMissione = function () {

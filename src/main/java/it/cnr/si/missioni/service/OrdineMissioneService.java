@@ -622,8 +622,16 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
 		}
 		
-		
     	if (confirm){
+    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+    		if (istituto.isAttivaGestioneResponsabileModulo()){
+    			if (StringUtils.isEmpty(ordineMissioneDB.getResponsabileGruppo())){
+    				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
+    			}
+    			if (ordineMissioneDB.isMissioneInserita() && !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())){
+    				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma l'ordine di missione non è stato inviato alla sua approvazione.");
+    			}
+    		}
         	ordineMissioneDB.setStato(Costanti.STATO_CONFERMATO);
     	} 
 
@@ -635,10 +643,6 @@ public class OrdineMissioneService {
     	}
 
     	if (confirm && !ordineMissioneDB.isMissioneDaValidare()){
-    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
-    		if (istituto.isAttivaGestioneResponsabileModulo() && StringUtils.isEmpty(ordineMissione.getResponsabileGruppo())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
-    		}
     		cmisOrdineMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneDB);
     	}
 		ordineMissioneDB = (OrdineMissione)crudServiceBean.modificaConBulk(principal, ordineMissioneDB);
