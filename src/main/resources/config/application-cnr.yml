@@ -32,6 +32,15 @@ spring:
         managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
         managerPassword: pippa
 
+    mail:
+        host: smtp.cnr.it
+        protocol: smtp
+        port: 25
+        from: missioni@cnr.it
+        tls: false
+        auth: false
+        send.error.to: gianfranco.gasparro@cnr.it
+
 ajp:
     port: 8009
     timeout: 120000
