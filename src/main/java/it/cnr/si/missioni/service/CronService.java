@@ -19,9 +19,11 @@ import org.springframework.util.StringUtils;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -41,6 +43,7 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
 @Service
@@ -309,7 +312,20 @@ public class CronService {
 	}
 
 	private void aggiornaOrdiniMissioneFlows(Principal principal) throws Exception {
-		flowsService.aggiornaOrdiniMissioneFlows(principal);
+		MissioneFilter filtro = new MissioneFilter();
+		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+		filtro.setValidato("S");
+		List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+		if (listaOrdiniMissione != null){
+			for (OrdineMissione ordineMissione : listaOrdiniMissione){
+				try {
+					flowsService.aggiornaOrdiniMissioneFlowsNewTransaction(principal,ordineMissione);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private void impostaTappe(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk)

@@ -39,27 +39,20 @@ public class FlowsService {
 	CMISRimborsoMissioneService cmisRimborsoMissioneService;
 	
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void aggiornaOrdiniMissioneFlows(Principal principal)  {
-    	try {
-    		MissioneFilter filtro = new MissioneFilter();
-    		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-    		filtro.setValidato("S");
-    		List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
-    		if (listaOrdiniMissione != null){
-    			for (OrdineMissione ordineMissione : listaOrdiniMissione){
-    				if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
-    					ResultFlows result = retrieveDataFromFlows(ordineMissione);
-    					if (result.isApprovato()){
-    						log.info("Trovato Ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-    						ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
-    					}
-    				}
-    			}
-    		}
-    	} catch (Exception e) {
-			log.error("Errore nell'aggiornamento dell'ordine di missione con i dati del flusso "+Utility.getMessageException(e) );
-    	}
+    public void aggiornaOrdiniMissioneFlowsNewTransaction(Principal principal, OrdineMissione ordineMissione) throws Exception {
+    	aggiornaOrdineMissioneFlows(principal, ordineMissione);
     }
+
+	public void aggiornaOrdineMissioneFlows(Principal principal, OrdineMissione ordineMissione)
+			throws ComponentException, Exception {
+		if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
+			ResultFlows result = retrieveDataFromFlows(ordineMissione);
+			if (result.isApprovato()){
+				log.info("Trovato Ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+				ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
+			}
+		}
+	}
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void aggiornaRimborsiMissioneFlows(Principal principal) {
