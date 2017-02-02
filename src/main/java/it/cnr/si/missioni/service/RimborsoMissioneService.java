@@ -162,17 +162,11 @@ public class RimborsoMissioneService {
     					} else if (result.isStateReject()){
     						rimborsoMissione.setCommentFlows(result.getComment());
     						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
-
-    						aggiornaValidazione(rimborsoMissioneDaAggiornare);
-    						rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
-    						rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
-    						rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
-    						updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+    						aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
     						listaNew.add(rimborsoMissione);
     					} else if (result.isAnnullato()){
-    						rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
-    						updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+    						aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
     						listaNew.add(rimborsoMissione);
     					} else {
@@ -194,6 +188,21 @@ public class RimborsoMissioneService {
     	}
     	return lista;
     }
+
+	public void aggiornaRimborsoMissioneRespinto(Principal principal, ResultFlows result,
+			RimborsoMissione rimborsoMissioneDaAggiornare) throws Exception {
+		aggiornaValidazione(rimborsoMissioneDaAggiornare);
+		rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
+		rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+	}
+
+	public void aggiornaRimborsoMissioneAnnullato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
+			throws Exception {
+		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+	}
 
 	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws Exception {

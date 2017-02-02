@@ -49,7 +49,7 @@ public class MailService {
        	this.mailToError = Arrays.asList(s);
     }
     
-    private void sendEmail(String to, String subject, String content, MultipartFile multipartFile, boolean isMultipart, boolean isHtml) {
+    private void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isMultipart, boolean isHtml, String... to) {
         log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}', content={}",
                 isMultipart, isHtml, to, subject, content);
 
@@ -66,21 +66,21 @@ public class MailService {
             javaMailSender.send(mimeMessage);
             log.debug("Sent e-mail to User '{}'", to);
         } catch (Exception e) {
-            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+            log.error("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
             Utility.getMessageException(e);            
         }
     }
 
-    public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
-    	sendEmail(to, subject, content, null, isMultipart, isHtml);
+    public void sendEmail(String subject, String content, boolean isMultipart, boolean isHtml, String... to) {
+    	sendEmail(subject, content, null, isMultipart, isHtml, to);
     }
 
-    public void sendEmail(String to, String subject, String content, MultipartFile multipartFile, boolean isHtml) {
-    	sendEmail(to, subject, content, multipartFile, true, isHtml);
+    public void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isHtml, String... to) {
+    	sendEmail(subject, content, multipartFile, true, isHtml, to);
     }
 
     public void sendEmailError(String subject, String content, boolean isMultipart, boolean isHtml) {
        	for (String emailTo : mailToError)
-           	sendEmail(emailTo, subject, content, isMultipart, isHtml);
+           	sendEmail(subject, content, isMultipart, isHtml, emailTo);
     }
 }

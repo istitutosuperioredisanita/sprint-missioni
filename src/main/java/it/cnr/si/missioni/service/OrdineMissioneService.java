@@ -227,21 +227,11 @@ public class OrdineMissioneService {
         				} else if (result.isStateReject()){
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
-        			    	aggiornaValidazione(ordineMissioneDaAggiornare);
-        					ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
-        					ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
-        					ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
-        					OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
-        					if (anticipo != null){
-        						anticipo.setStato(Costanti.STATO_INSERITO);
-        						ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
-        					}
-        					updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+        			    	aggiornaOrdineMissioneRespinto(principal, result, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
         					listaNew.add(ordineMissione);
         				} else if (result.isAnnullato()){
-        					ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
-        					updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+        					aggiornaOrdineMissioneAnnullato(principal, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
         					listaNew.add(ordineMissione);
         				} else {
@@ -266,6 +256,26 @@ public class OrdineMissioneService {
     	}
     	return lista;
     }
+
+	public void aggiornaOrdineMissioneRespinto(Principal principal, ResultFlows result,
+			OrdineMissione ordineMissioneDaAggiornare) throws Exception {
+		aggiornaValidazione(ordineMissioneDaAggiornare);
+		ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
+		ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+		ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissioneDaAggiornare.getId().toString()));
+		if (anticipo != null){
+			anticipo.setStato(Costanti.STATO_INSERITO);
+			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
+		}
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+	}
+
+	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
+			throws Exception {
+		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+	}
 
 	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
 			throws Exception {

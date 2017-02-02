@@ -20,11 +20,10 @@ public class ComunicaRimborsoSiglaService {
 	@Autowired
     private CommonService commonService;
 	
-	public MissioneBulk comunica(MissioneBulk missione) throws AwesomeException {
-		String risp = null;
+	public MissioneBulk comunica(MissioneBulk missione) throws Exception {
 		String body = null;
 		if (missione != null){
-			String app = Costanti.APP_SIGLA;
+			String app = Costanti.APP_AA;
 			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA;
 	    	try {
 	    		ObjectMapper mapper = new ObjectMapper();
