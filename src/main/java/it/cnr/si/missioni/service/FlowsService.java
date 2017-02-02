@@ -39,43 +39,55 @@ public class FlowsService {
 	CMISRimborsoMissioneService cmisRimborsoMissioneService;
 	
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void aggiornaOrdiniMissioneFlowsNewTransaction(Principal principal, OrdineMissione ordineMissione) throws Exception {
-    	aggiornaOrdineMissioneFlows(principal, ordineMissione);
+    public ResultFlows aggiornaOrdineMissioneFlowsNewTransaction(Principal principal, OrdineMissione ordineMissione) throws Exception {
+    	return aggiornaOrdineMissioneFlows(principal, ordineMissione);
     }
 
-	public void aggiornaOrdineMissioneFlows(Principal principal, OrdineMissione ordineMissione)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public ResultFlows aggiornaRimborsoMissioneFlowsNewTransaction(Principal principal, RimborsoMissione rimborsoMissione) throws Exception {
+    	return aggiornaRimborsoMissioneFlows(principal, rimborsoMissione);
+    }
+
+	public ResultFlows aggiornaOrdineMissioneFlows(Principal principal, OrdineMissione ordineMissione)
 			throws ComponentException, Exception {
 		if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
 			ResultFlows result = retrieveDataFromFlows(ordineMissione);
 			if (result.isApprovato()){
-				log.info("Trovato Ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+				log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 				ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
+				return result;
+			} else if (result.isAnnullato()){
+    			log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} annullato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+				ordineMissioneService.aggiornaOrdineMissioneAnnullato(principal, ordineMissione);
+				return result;
+			} else if (result.isStateReject()){
+    			log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+				ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
+		    	return result;
 			}
 		}
+		return null;
 	}
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void aggiornaRimborsiMissioneFlows(Principal principal) {
-    	try {
-    		log.info("Cron per Aggiornamenti Rimborso Missione");
-    		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
-    		filtroRimborso.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-    		filtroRimborso.setValidato("S");
-    		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
-    		if (listaRimborsiMissione != null){
-    			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
-    				if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
-    					ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
-    					if (result.isApprovato()){
-    						log.info("Trovato Rimborso missione con id {} della uo {}, anno {}, numero {} approvato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-    						rimborsoMissioneService.aggiornaRimborsoMissioneApprovato(principal, rimborsoMissione);
-    					}
-    				}
-    			}
-    		}
-    	} catch (Exception e) {
-    		log.error("Errore nell'aggiornamento del rimborso missione con i dati del flusso "+Utility.getMessageException(e) );
+    public ResultFlows aggiornaRimborsoMissioneFlows(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException, Exception {
+    	if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
+    		ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
+    		if (result.isApprovato()){
+    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} approvato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
+    			rimborsoMissioneService.aggiornaRimborsoMissioneApprovato(principal, rimborsoMissione);
+				return result;
+    		} else if (result.isAnnullato()){
+    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} annullato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
+				rimborsoMissioneService.aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissione);
+				return result;
+			} else if (result.isStateReject()){
+    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} respinto.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
+				rimborsoMissioneService.aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissione);
+		    	return result;
+			}
     	}
+    	return null;
     }
 
 	private ResultFlows retrieveDataFromFlows(OrdineMissione ordineMissione)
@@ -89,5 +101,4 @@ public class FlowsService {
 		ResultFlows result = cmisRimborsoMissioneService.getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
 		return result;
 	}
-
 }

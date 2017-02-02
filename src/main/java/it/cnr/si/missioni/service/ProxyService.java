@@ -142,7 +142,7 @@ public class ProxyService implements EnvironmentAware{
         	} else {
         		headers.add("Authorization", authorization);
         	}
-        	headers.setContentType(MediaType.APPLICATION_JSON);
+        	headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         	
         	if (restContextHeader){
         		addContextToHeader(app, headers);

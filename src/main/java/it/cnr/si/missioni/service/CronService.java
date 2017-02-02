@@ -19,10 +19,8 @@ import org.springframework.util.StringUtils;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
 
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
-import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
@@ -30,7 +28,9 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Banca;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.DivisaTappa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
@@ -42,6 +42,7 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.SpeseMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
+import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
@@ -54,6 +55,24 @@ public class CronService {
     @Value("${cron.comunicaDati.name}")
     private String lockKey;
     
+    @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
+    private String subjectErrorFlowsOrdine;
+    
+    @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.testo}")
+    private String textErrorFlowsOrdine;
+    
+    @Value("${spring.mail.messages.erroreLetturaFlussoRimborso.oggetto}")
+    private String subjectErrorFlowsRimborso;
+    
+    @Value("${spring.mail.messages.erroreLetturaFlussoRimborso.testo}")
+    private String textErrorFlowsRimborso;
+    
+    @Value("${spring.mail.messages.erroreComunicazioneRimborsoSigla.oggetto}")
+    private String subjectErrorComunicazioneRimborso;
+    
+    @Value("${spring.mail.messages.erroreComunicazioneRimborsoSigla.testo}")
+    private String textErrorComunicazioneRimborso;
+    
     @Autowired
     private HazelcastInstance hazelcastInstance;
 
@@ -63,6 +82,12 @@ public class CronService {
 	@Autowired
 	private ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
+	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
+	private MailService mailService;
+	
 	@Autowired
 	private OrdineMissioneService ordineMissioneService;
 
@@ -92,33 +117,7 @@ public class CronService {
         		aggiornaRimborsiMissioneFlows(principal);
 
         		comunicaRimborsoSigla(principal);
-        		
 
-//        		for (Attestato attestato : resultList) {
-//                    LOGGER.info("doing verificaFlussoDocumentale for sede {} e periodo {}", attestato.getSede().getCodiceSede(), attestato.getPeriodo());
-//    				attestato = utilityService.verificaFlussoDocumentale(principal, attestato);
-//
-//        			if (attestato.isFlussoValidato()) {
-//    					String userNameRichiedente = (String)utilityService.getFieldValueFlussoDocumentale(principal, attestato.getSede().getCodiceSede(), attestato.getAnnoPeriodo(), attestato.getMesePeriodo(), UtilityService.FIELD_FLUSSO_USERNAME_RICHIEDENTE);
-//        				if (userNameRichiedente!=null) {
-//        					JsonFactory jsonFactory = new JsonFactory();
-//        					ObjectMapper mapper = new ObjectMapper(jsonFactory);
-//        					try {
-//            					LOGGER.info("doing comunicaAttestatoToNsip for sede {} e periodo {}", attestato.getSede().getCodiceSede(), attestato.getPeriodo());
-//            					Response responseRichiedente = cmisService.invokeGET(new UrlBuilder(cmisService.getRepositoryURL()+"service/cnr/person/person/"+userNameRichiedente));
-//            					TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-//            					HashMap<String,Object> mapFirmatario = mapper.readValue(responseRichiedente.getStream(), typeRef);
-//
-//            					String emailRichiedente = (String)mapFirmatario.get("email");
-//
-//           						stralcioService.comunicaAttestatoToNsip(principal, attestato.getSede().getCodiceSede(), attestato.getAnnoPeriodo(), attestato.getMesePeriodo(), true);
-//                               	mailService.sendEmail(emailRichiedente, "Comunicazione Dati a NSIP - Sede "+attestato.getSede().getCodiceSede()+" - Periodo "+attestato.getPeriodo()+ " - COMUNICAZIONE EFFETTUATA", "Si segnala che è stata effettuata in automatico la comunicazione dati a NSIP per la sede ed il periodo indicato in oggetto.", false, true);
-//                            } catch (Exception e) {
-//                               	mailService.sendEmailError("Errore CronAttestati Sede "+attestato.getSede().getCodiceSede()+" - Periodo "+attestato.getPeriodo(), "Errore: "+ExceptionUtils.getStackTrace(e), false, true);
-//                            }
-//        				}
-//        			}
-//        		}
                 LOGGER.info("work done.");
             } finally {
                 LOGGER.info("unlocking {}", lockKey);
@@ -131,10 +130,30 @@ public class CronService {
     }
 
 	public void aggiornaRimborsiMissioneFlows(Principal principal) throws Exception, CloneNotSupportedException {
-		flowsService.aggiornaRimborsiMissioneFlows(principal);
+		LOGGER.info("Cron per Aggiornamenti Rimborso Missione");
+		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
+		filtroRimborso.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+		filtroRimborso.setValidato("S");
+		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
+		if (listaRimborsiMissione != null){
+			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
+				try {
+					flowsService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione);
+				} catch (Exception e) {
+					String error = Utility.getMessageException(e);
+					String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
+					LOGGER.error(testoErrore);
+					try {
+						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+					} catch (Exception e1) {
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+					}
+				}
+			}
+		}
 	}
 
-	public void comunicaRimborsoSigla(Principal principal) throws Exception, CloneNotSupportedException {
+	public void comunicaRimborsoSigla(Principal principal) throws CloneNotSupportedException {
 		LOGGER.info("Cron per Comunicazioni Rimborsi Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
@@ -142,7 +161,16 @@ public class CronService {
 		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
-				comunicaRimborsoSigla(principal, rimborsoMissione);
+				try {
+					comunicaRimborsoSigla(principal, rimborsoMissione);
+				} catch (Exception e) {
+					LOGGER.error("comunicaRimborsoSigla",e);
+					try {
+						mailService.sendEmailError(subjectErrorFlowsOrdine, getTextErrorRimborso(rimborsoMissione, error), false, true);
+					} catch (Exception e1) {
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+					}
+				}
 			}
 		}
 	}
@@ -311,7 +339,7 @@ public class CronService {
 		return null;
 	}
 
-	private void aggiornaOrdiniMissioneFlows(Principal principal) throws Exception {
+	private void aggiornaOrdiniMissioneFlows(Principal principal) {
 		MissioneFilter filtro = new MissioneFilter();
 		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 		filtro.setValidato("S");
@@ -319,13 +347,38 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				try {
-					flowsService.aggiornaOrdiniMissioneFlowsNewTransaction(principal,ordineMissione);
+					flowsService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					String error = Utility.getMessageException(e);
+					String testoErrore = getTextErrorOrdine(ordineMissione, error);
+					LOGGER.error(testoErrore);
+					try {
+						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+					} catch (Exception e1) {
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+					}
 				}
 			}
 		}
+	}
+
+	private String getTextErrorOrdine(OrdineMissione ordineMissione, String error) {
+		return textErrorFlowsOrdine+" con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+	}
+
+	private String getTextErrorRimborso(RimborsoMissione rimborsoMissione, String error) {
+		return textErrorFlowsRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+	}
+
+	private List<String> getTosMail(OrdineMissione ordineMissione) {
+		List<String> mails = new ArrayList<>();
+		Account utenteMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
+		mails.add(utenteMissione.getEmailComunicazioni());
+		if (!ordineMissione.getUid().equals(ordineMissione.getUidInsert())){
+			Account utenteInserimentoMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
+			mails.add(utenteInserimentoMissione.getEmailComunicazioni());
+		}
+		return mails;
 	}
 
 	private void impostaTappe(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk)
