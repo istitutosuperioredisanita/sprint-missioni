@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,11 +39,13 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
@@ -112,12 +115,21 @@ public class OrdineMissioneService {
     @Autowired
     private ConfigService configService;
 
+	@Autowired
+	private MailService mailService;
+	
 	@Inject
 	private CRUDComponentSession crudServiceBean;
 
 	@Autowired
 	private AccountService accountService;
 	
+    @Value("${spring.mail.messages.invioResponsabileGruppo.oggetto}")
+    private String subjectSendToManagerOrdine;
+    
+    @Value("${spring.mail.messages.ritornoMissioneMittente.oggetto}")
+    private String subjectReturnToSenderOrdine;
+    
     @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
     	MissioneFilter filter = new MissioneFilter();
@@ -515,7 +527,11 @@ public class OrdineMissioneService {
 		return anno;
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
+	private Boolean isInvioOrdineAlResponsabileGruppo(OrdineMissione ordineMissione){
+		return Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("M");
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione)  throws AwesomeException, 
     ComponentException, Exception{
     	return updateOrdineMissione(principal, ordineMissione, false);
@@ -532,11 +548,16 @@ public class OrdineMissioneService {
     ComponentException, Exception {
 
     	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
-
+    	boolean isCambioResponsabileGruppo = false;
+       	boolean isRitornoMissioneMittente = false;
 		if (ordineMissioneDB==null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
 		}
 		
+		if (ordineMissione.getResponsabileGruppo() != null && ordineMissioneDB.getResponsabileGruppo() != null && 
+				!ordineMissione.getResponsabileGruppo().equals(ordineMissioneDB.getResponsabileGruppo())){
+			isCambioResponsabileGruppo = true;
+		}
 		if (ordineMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
 			if (ordineMissioneDB.isStatoFlussoApprovato()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare l'ordine di missione. E' già stato approvato.");
@@ -577,10 +598,11 @@ public class OrdineMissioneService {
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
 			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
 				ordineMissioneDB.setStato(Costanti.STATO_INSERITO);
+				isRitornoMissioneMittente = true;
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
 			}
-		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("M")){
+		} else if (isInvioOrdineAlResponsabileGruppo(ordineMissione)){
 			if (ordineMissione.getResponsabileGruppo() != null){
 				if (ordineMissioneDB.isMissioneInserita()) {
 					ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -659,9 +681,43 @@ public class OrdineMissioneService {
     	
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
-
-    	return ordineMissioneDB;
+    	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissione.isMissioneInviataResponsabile())){
+    		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(ordineMissioneDB), false, true, getEmail(ordineMissione.getResponsabileGruppo()));
+    	}
+    	if (isRitornoMissioneMittente){
+    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(ordineMissioneDB), false, true, getEmail(ordineMissione.getUidInsert()));
+    	}
+		return ordineMissioneDB;
     }
+
+    private String getEmail(String user){
+		Account utente = accountService.loadAccountFromRest(user);
+		return utente.getEmailComunicazioni();
+    }
+
+    private String getNominativo(String user){
+		Account utente = accountService.loadAccountFromRest(user);
+		return utente.getCognome()+ " "+ utente.getNome();
+    }
+
+    private List<String> getTosMail(OrdineMissione ordineMissione) {
+		List<String> mails = new ArrayList<>();
+		Account utenteMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
+		mails.add(utenteMissione.getEmailComunicazioni());
+		if (!ordineMissione.getUid().equals(ordineMissione.getUidInsert())){
+			Account utenteInserimentoMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
+			mails.add(utenteInserimentoMissione.getEmailComunicazioni());
+		}
+		return mails;
+	}
+
+	private String getTextMailSendToManager(OrdineMissione ordineMissione) {
+		return "L'ordine di missione "+ordineMissione.getAnno()+" "+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo.";
+	}
+
+	private String getTextMailReturnToSender(OrdineMissione ordineMissione) {
+		return "L'ordine di missione "+ordineMissione.getAnno()+" "+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata restituito per apportare delle correzioni.";
+	}
 
 //    @Transactional(readOnly = true)
 //	public void salvaStampaOrdineMissioneSuCMIS(Principal principal, Long idMissione, byte[] stampa) throws AwesomeException, ComponentException {
@@ -852,7 +908,7 @@ public class OrdineMissioneService {
 				}
 			}
 		} else {
-			if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())){
+			if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) && StringUtils.isEmpty(ordineMissione.getFondi())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
 			}
 			ordineMissione.setCdCdsObbligazione(null);
