@@ -86,6 +86,18 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
     @Column(name = "STATO", length = 3, nullable = false)
     private String stato;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_MOTIVI_ISPETTIVI", length = 1, nullable = true)
+    public String utilizzoMotiviIspettivi;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_MOTIVI_URGENZA", length = 1, nullable = true)
+    public String utilizzoMotiviUrgenza;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_MOTIVI_TRASPORTO", length = 1, nullable = true)
+    public String utilizzoMotiviTrasporto;
+
 	@Transient
     List<SpostamentiAutoPropria> listSpostamenti;
     
@@ -253,6 +265,30 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
 	@Transient
     public String getFileName() {
 		return "AutoPropriaOrdineMissione"+getId()+".pdf";
+	}
+
+	public String getUtilizzoMotiviIspettivi() {
+		return utilizzoMotiviIspettivi;
+	}
+
+	public void setUtilizzoMotiviIspettivi(String utilizzoMotiviIspettivi) {
+		this.utilizzoMotiviIspettivi = utilizzoMotiviIspettivi;
+	}
+
+	public String getUtilizzoMotiviUrgenza() {
+		return utilizzoMotiviUrgenza;
+	}
+
+	public void setUtilizzoMotiviUrgenza(String utilizzoMotiviUrgenza) {
+		this.utilizzoMotiviUrgenza = utilizzoMotiviUrgenza;
+	}
+
+	public String getUtilizzoMotiviTrasporto() {
+		return utilizzoMotiviTrasporto;
+	}
+
+	public void setUtilizzoMotiviTrasporto(String utilizzoMotiviTrasporto) {
+		this.utilizzoMotiviTrasporto = utilizzoMotiviTrasporto;
 	}
 	
 }
