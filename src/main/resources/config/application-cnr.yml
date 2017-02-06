@@ -36,11 +36,13 @@ spring:
         host: smtp.cnr.it
         protocol: smtp
         port: 25
-        from: gianfranco.gasparro@cnr.it
+        from: missioni@cnr.it
         tls: false
         auth: false
         send.error.to: gianfranco.gasparro@cnr.it
         messages:
+            erroreGenerico:
+                oggetto: Missioni. Errore Generico.
             erroreLetturaFlussoOrdine:
                 oggetto: Missioni. Errore durante l'aggiornamento dell'Ordine da Scrivania Digitale.
                 testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per l'ordine di missione
@@ -48,8 +50,12 @@ spring:
                 oggetto: Missioni. Errore durante l'aggiornamento del Rimborso da Scrivania Digitale.
                 testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per il rimborso missione
             erroreComunicazioneRimborsoSigla:
-                oggetto: Missioni. Errore durante l'aggiornamento del Rimborso da Scrivania Digitale.
-                testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per il rimborso missione
+                oggetto: Missioni. Errore durante la comunicazione a SIGLA del Rimborso Missione.
+                testo: Si segnala che la comunicazione a SIGLA del rimborso missione 
+            invioResponsabileGruppo:
+                oggetto: Missioni. Invio Ordine di Missione per Autorizzazione.
+            ritornoMissioneMittente:
+                oggetto: Missioni. Ordine di Missione ritornato al mittente.
 
 ajp:
     port: 8009
