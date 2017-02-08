@@ -55,7 +55,7 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-4" ng-hide="anticipoOrdineMissioneModel.id" >
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" ng-disabled="form.$invalid" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
              <div class="col-md-3" ng-show="anticipoOrdineMissioneModel.id">

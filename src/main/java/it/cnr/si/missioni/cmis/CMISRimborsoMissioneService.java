@@ -40,8 +40,6 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -390,8 +388,8 @@ public class CMISRimborsoMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof CmisConstraintException)
-				throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - File ["+rimborsoMissione.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
-			throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
+				throw new ComponentException("CMIS - File ["+rimborsoMissione.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -472,8 +470,8 @@ public class CMISRimborsoMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof CmisConstraintException)
-				throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
-			throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
+				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -626,7 +624,7 @@ public class CMISRimborsoMissioneService {
 				jGenerator.writeEndObject();
 				jGenerator.close();
 			} catch (IOException e) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: "+e);
+				throw new ComponentException("Errore in fase avvio flusso documentale. Errore: "+e,e);
 			}
 			
 			try {
@@ -647,7 +645,7 @@ public class CMISRimborsoMissioneService {
 			} catch (AwesomeException e) {
 				throw e;
 			} catch (Exception e) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+				throw new ComponentException("Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".",e);
 			}
 		} else {
 			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
@@ -850,7 +848,7 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeEndObject();
 			jGenerator.close();
 		} catch (IOException e) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di scrittura dei file del flusso per l'avanzamento del documentale. Errore: "+e);
+			throw new ComponentException("Errore in fase di scrittura dei file del flusso per l'avanzamento del documentale. Errore: "+e,e);
 		}
 		return stringWriter;
 	}
@@ -866,7 +864,7 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeEndObject();
 			jGenerator.close();
 		} catch (IOException e) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di scrittura dei file del flusso per l'avanzamento del documentale. Errore: "+e);
+			throw new ComponentException("Errore in fase di scrittura dei file del flusso per l'avanzamento del documentale. Errore: "+e,e);
 		}
 		return stringWriter;
 	}

@@ -185,7 +185,7 @@ public class OrdineMissioneService {
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissione(ordineMissione);
 			} catch (Exception e1) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")");
+				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){
         		fileName = content.getFileName();
@@ -193,13 +193,13 @@ public class OrdineMissioneService {
     			try {
     				is = content.getStream();
     			} catch (Exception e) {
-    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")");
+    				throw new ComponentException("Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")",e);
     			}
         		if (is != null){
             		try {
     					printOrdineMissione = IOUtils.toByteArray(is);
     				} catch (IOException e) {
-    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")");
+    					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
     				}
         		}
     		} else {
@@ -712,11 +712,11 @@ public class OrdineMissioneService {
 	}
 
 	private String getTextMailSendToManager(OrdineMissione ordineMissione) {
-		return "L'ordine di missione "+ordineMissione.getAnno()+" "+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo.";
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo.";
 	}
 
 	private String getTextMailReturnToSender(OrdineMissione ordineMissione) {
-		return "L'ordine di missione "+ordineMissione.getAnno()+" "+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata restituito per apportare delle correzioni.";
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata restituito dal responsabile del gruppo "+getNominativo(ordineMissione.getResponsabileGruppo())+" per apportare delle correzioni.";
 	}
 
 //    @Transactional(readOnly = true)
@@ -804,7 +804,7 @@ public class OrdineMissioneService {
 		}
 		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
 			if (ordineMissione.getUtilizzoTaxi().equals("N") && ordineMissione.getUtilizzoAutoNoleggio().equals("N")){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
 			}
 		}
 		if (StringUtils.isEmpty(ordineMissione.getIdFlusso()) &&  ordineMissione.isStatoInviatoAlFlusso()){
@@ -817,6 +817,9 @@ public class OrdineMissioneService {
             getAutoPropria(ordineMissione) != null ){
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto a noleggio e dell'auto propria.");
         } 
+		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio se si è scelto il loro utilizzo");
+		}
         if (ordineMissione.isFondiCompetenza() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione()) && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) 
         		&&  ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) != 0){
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Incongruenza tra fondi e esercizio obbligazione.");
