@@ -1,14 +1,5 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.JSONClause;
-import it.cnr.si.missioni.util.proxy.json.object.Nazione;
-import it.cnr.si.missioni.util.proxy.json.object.NazioneJson;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +8,15 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.JSONClause;
+import it.cnr.si.missioni.util.proxy.json.object.Nazione;
+import it.cnr.si.missioni.util.proxy.json.object.NazioneJson;
 
 @Service
 public class NazioneService {
@@ -27,7 +27,7 @@ public class NazioneService {
 		return loadNazione(ordineMissione.getNazione());
 	}
 
-	public Nazione loadNazione(Long nazione) throws AwesomeException {
+	public Nazione loadNazione(Long nazione) throws ComponentException {
 		if (nazione != null){
 			List<JSONClause> clauses = prepareJSONClause(nazione);
 			String app = Costanti.APP_SIGLA;
@@ -44,7 +44,7 @@ public class NazioneService {
 					}
 				}
 			} catch (Exception ex) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per le nazioni ("+Utility.getMessageException(ex)+").");
+				throw new ComponentException("Errore nella lettura del file JSON per le nazioni ("+Utility.getMessageException(ex)+").",ex);
 			}
 		}
 		return null;

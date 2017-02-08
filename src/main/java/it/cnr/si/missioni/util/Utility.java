@@ -142,6 +142,7 @@ public class Utility {
 	}
 	
 	public static String getMessageException(Exception e){
+		e.printStackTrace();
 		String obj = e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();
 
 		ErrorRestSigla errorRest = null;

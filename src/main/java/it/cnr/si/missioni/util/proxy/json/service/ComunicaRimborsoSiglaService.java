@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -205,7 +206,7 @@ public class ComunicaRimborsoSiglaService {
 	public MissioneBulk comunica(MissioneBulk missione) {
 		String body = null;
 		if (missione != null){
-			String app = Costanti.APP_AA;
+			String app = Costanti.APP_SIGLA;
 			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA;
 	    	body = prepareBody(missione, body);
 
@@ -215,7 +216,7 @@ public class ComunicaRimborsoSiglaService {
 	    		MissioneBulk missioneBulk = mapper.readValue(risposta, MissioneBulk.class);
 	    		return missioneBulk;
 	    	} catch (Exception ex) {
-	    		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file di risposta.");
+	    		throw new ComponentException("Errore nella lettura del file di risposta.",ex);
 	    	}
 		}
 		return null;
@@ -225,7 +226,7 @@ public class ComunicaRimborsoSiglaService {
 			ObjectMapper mapper = new ObjectMapper();
 			body = mapper.writeValueAsString(missione);
 		} catch (Exception ex) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+			throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").",ex);
 		}
 		return body;
 	}

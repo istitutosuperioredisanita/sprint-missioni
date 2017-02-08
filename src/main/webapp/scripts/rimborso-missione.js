@@ -561,7 +561,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }
             var postGae = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
+            $scope.workingRestGae = true;
             $http.post(urlRestProxy + app+'/', postGae, {params: {proxyURL: url}}).success(function (data) {
+            $scope.workingRestGae = false;
                 if (data){
                     if (data.elements){
                         $scope.elencoGae = data.elements;
@@ -573,6 +575,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     }
                 }
             }).error(function (data) {
+                $scope.workingRestGae = false;
             });
         } else {
             $scope.elencoGae = [];

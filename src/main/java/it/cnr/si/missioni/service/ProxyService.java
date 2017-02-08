@@ -1,20 +1,7 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.ResultProxy;
-import it.cnr.si.missioni.util.proxy.cache.CallCache;
-import it.cnr.si.missioni.util.proxy.json.JSONBody;
-import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
-import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
-import it.cnr.si.missioni.web.rest.ProxyResource;
-
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +27,18 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.ResultProxy;
+import it.cnr.si.missioni.util.proxy.cache.CallCache;
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
+import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
+import it.cnr.si.missioni.web.rest.ProxyResource;
 
 /**
  * Service for proxy to other application.
@@ -81,7 +80,7 @@ public class ProxyService implements EnvironmentAware{
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+				throw new ComponentException(Utility.getMessageException(e),e);
 			}
 //			if (callCache.getUrl().equals("ConsProgettiAction.json")){
 //				Path p = Paths.get("c:\\app\\prg.txt");
@@ -98,7 +97,7 @@ public class ProxyService implements EnvironmentAware{
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+				throw new ComponentException(Utility.getMessageException(e),e);
 			}
 	    	resultProxy.setCommonJsonResponse(commonJson);
 	    	resultProxy.setBody("");
@@ -116,7 +115,7 @@ public class ProxyService implements EnvironmentAware{
     		ObjectMapper mapper = new ObjectMapper();
     		body = mapper.writeValueAsString(jsonBody);
     	} catch (Exception ex) {
-    		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+    		throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").",ex);
     	}
         return process(httpMethod, body, app, url, queryString, authorization, restContextHeader);    	
     }
@@ -173,14 +172,14 @@ public class ProxyService implements EnvironmentAware{
         } catch (HttpClientErrorException _ex) {
         	String errResponse = _ex.getResponseBodyAsString();
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
-        	throw new ApplicationContextException(errResponse);
+        	throw new ApplicationContextException(errResponse,_ex);
         } catch (HttpServerErrorException _ex) {
         	String errResponse = _ex.getResponseBodyAsString();
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
-        	throw new ApplicationContextException(errResponse);
+        	throw new ApplicationContextException(errResponse,_ex);
         } catch (Exception _ex) {
         	log.error(_ex.getMessage(), _ex.getLocalizedMessage());
-        	throw new ApplicationContextException("Servizio REST "+ proxyURL+" Eccezione: "+ _ex.getLocalizedMessage());
+        	throw new ApplicationContextException("Servizio REST "+ proxyURL+" Eccezione: "+ _ex.getLocalizedMessage(),_ex);
         }
 	}
 

@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -23,7 +24,7 @@ public class UnitaOrganizzativaService {
 	@Autowired
     private CommonService commonService;
 
-	public UnitaOrganizzativa loadUo(String uo, String cds, Integer anno) throws AwesomeException {
+	public UnitaOrganizzativa loadUo(String uo, String cds, Integer anno) throws ComponentException {
 		if (uo != null){
 			List<JSONClause> clauses = prepareJSONClause(uo, cds, anno);
 			String app = Costanti.APP_SIGLA;
@@ -39,7 +40,7 @@ public class UnitaOrganizzativaService {
 					}
 				}
 			} catch (Exception ex) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per le Unità Organizzative ("+Utility.getMessageException(ex)+").");
+				throw new ComponentException("Errore nella lettura del file JSON per le Unità Organizzative ("+Utility.getMessageException(ex)+").",ex);
 			}
 		}
 		return null;

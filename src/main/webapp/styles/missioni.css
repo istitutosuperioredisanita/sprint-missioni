@@ -148,6 +148,10 @@ input:-webkit-autofill {
   vertical-align: middle;  
 }
 
+#missioni i{
+  margin-top:5px;
+}
+
 #missioni selectize-input{
   padding: 0px 8px !important;
 }
