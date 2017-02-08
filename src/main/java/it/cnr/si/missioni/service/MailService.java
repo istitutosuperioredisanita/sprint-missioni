@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.util.Utility;
 
 @Service("MailService")
@@ -66,8 +67,8 @@ public class MailService {
             javaMailSender.send(mimeMessage);
             log.debug("Sent e-mail to User '{}'", to);
         } catch (Exception e) {
-            log.error("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
-            Utility.getMessageException(e);            
+            log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
+            throw new ComponentException("Errore nell'invio dell'e-mail: "+Utility.getMessageException(e),e);
         }
     }
 

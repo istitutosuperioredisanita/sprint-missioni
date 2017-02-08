@@ -1,10 +1,6 @@
 package it.cnr.si.missioni.service;
 
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.security.Principal;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -13,37 +9,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
 
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
-import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.Banca;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.DivisaTappa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneSigla;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.ModalitaPagamento;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.Nazione;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.RifInquadramento;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.SpeseMissioneColl;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
@@ -147,11 +125,11 @@ public class CronService {
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
-					LOGGER.error(testoErrore);
+					LOGGER.error(testoErrore+" "+e);
 					try {
 						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
 					} catch (Exception e1) {
-						LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 					}
 				}
 			}
@@ -168,11 +146,11 @@ public class CronService {
 			listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
 		} catch (ComponentException e2) {
 			String error = Utility.getMessageException(e2);
-			LOGGER.error(error);
+			LOGGER.error(error+" "+e2);
 			try {
 				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
 			} catch (Exception e1) {
-				LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 			}
 		}
 		if (listaRimborsiMissione != null){
@@ -182,11 +160,11 @@ public class CronService {
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
-					LOGGER.error(testoErrore);
+					LOGGER.error(testoErrore+" "+e);
 					try {
 						mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
 					} catch (Exception e1) {
-						LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 					}
 				}
 			}
@@ -202,11 +180,11 @@ public class CronService {
 			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
 		} catch (ComponentException e2) {
 			String error = Utility.getMessageException(e2);
-			LOGGER.error(error);
+			LOGGER.error(error + " "+e2);
 			try {
 				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
 			} catch (Exception e1) {
-				LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 			}
 		}
 		if (listaOrdiniMissione != null){
@@ -216,11 +194,11 @@ public class CronService {
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorOrdine(ordineMissione, error);
-					LOGGER.error(testoErrore);
+					LOGGER.error(testoErrore + " "+e);
 					try {
 						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
 					} catch (Exception e1) {
-						LOGGER.error("Errore durante l'invio dell'e-mail: "+Utility.getMessageException(e1));
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 					}
 				}
 			}
@@ -228,14 +206,14 @@ public class CronService {
 	}
 
 	private String getTextErrorOrdine(OrdineMissione ordineMissione, String error) {
-		return textErrorFlowsOrdine+" con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+		return textErrorFlowsOrdine+" con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
 	}
 
 	private String getTextErrorRimborso(RimborsoMissione rimborsoMissione, String error) {
-		return textErrorFlowsRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+		return textErrorFlowsRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
 	}
 
 	private String getTextErrorComunicaRimborso(RimborsoMissione rimborsoMissione, String error) {
-		return textErrorComunicazioneRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+		return textErrorComunicazioneRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
 	}
 }

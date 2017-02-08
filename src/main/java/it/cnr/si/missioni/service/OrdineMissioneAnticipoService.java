@@ -200,9 +200,9 @@ public class OrdineMissioneAnticipoService {
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAnticipo(ordineMissioneAnticipo);
 			} catch (Exception e1) {
-				throw new AwesomeException(CodiciErrore.ERRGEN,
+				throw new ComponentException(
 						"Errore nel recupero del contenuto del file Anticipo sul documentale ("
-								+ Utility.getMessageException(e1) + ")");
+								+ Utility.getMessageException(e1) + ")",e1);
 			}
 			if (content != null) {
 				fileName = content.getFileName();
@@ -210,17 +210,17 @@ public class OrdineMissioneAnticipoService {
 				try {
 					is = content.getStream();
 				} catch (Exception e) {
-					throw new AwesomeException(CodiciErrore.ERRGEN,
+					throw new ComponentException(
 							"Errore nel recupero dello stream del file Anticipo sul documentale ("
-									+ Utility.getMessageException(e) + ")");
+									+ Utility.getMessageException(e) + ")",e);
 				}
 				if (is != null) {
 					try {
 						printOrdineMissione = IOUtils.toByteArray(is);
 					} catch (IOException e) {
-						throw new AwesomeException(CodiciErrore.ERRGEN,
+						throw new ComponentException(
 								"Errore nella conversione dello stream in byte del file Anticipo ("
-										+ Utility.getMessageException(e) + ")");
+										+ Utility.getMessageException(e) + ")",e);
 					}
 				}
 			} else {

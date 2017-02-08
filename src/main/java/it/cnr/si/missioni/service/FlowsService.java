@@ -1,7 +1,6 @@
 package it.cnr.si.missioni.service;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +15,6 @@ import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.web.filter.MissioneFilter;
-import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
 @Service
 public class FlowsService {
@@ -52,6 +47,9 @@ public class FlowsService {
 			throws ComponentException, Exception {
 		if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
 			ResultFlows result = retrieveDataFromFlows(ordineMissione);
+			if (result == null){
+				return null;
+			}
 			if (result.isApprovato()){
 				log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 				ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
@@ -73,6 +71,9 @@ public class FlowsService {
     public ResultFlows aggiornaRimborsoMissioneFlows(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException, Exception {
     	if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
     		ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
+			if (result == null){
+				return null;
+			}
     		if (result.isApprovato()){
     			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} approvato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
     			rimborsoMissioneService.aggiornaRimborsoMissioneApprovato(principal, rimborsoMissione);

@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.cmis;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.config.AlfrescoConfiguration;
 import it.cnr.si.missioni.cmis.acl.ACLType;
 import it.cnr.si.missioni.cmis.acl.Permission;
@@ -251,6 +252,7 @@ public class MissioniCMISService {
 			try{
 				return getResource(getNodeByNodeRef(id));
 			}catch (CmisObjectNotFoundException _ex){
+				throw new ComponentException(_ex);
 			}
 		}
 		return null;
@@ -261,6 +263,7 @@ public class MissioniCMISService {
 			try{
 				return getContent(getNodeByNodeRef(id));
 			}catch (CmisObjectNotFoundException _ex){
+				throw new ComponentException(_ex);
 			}
 		}
 		return null;

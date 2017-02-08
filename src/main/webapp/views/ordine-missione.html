@@ -104,7 +104,7 @@
                     <div class="col-md-4">
                         <p class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.distanza">to</span>
-                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" style="text-align:right" class="input-sm form-control" name="distanza" ng-model="ordineMissioneModel.distanzaDallaSede"/>
+                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="number" style="text-align:right" class="input-sm form-control" name="distanza" ng-model="ordineMissioneModel.distanzaDallaSede"/>
                         </p>
                     </div>
             </form>
@@ -188,17 +188,21 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-                    <select ng-disabled="!ordineMissioneModel.cdrSpesa || validazione === 'S' || disabilitaOrdineMissione" ng-change="reloadModulo(ordineMissioneModel.pgProgetto, ordineMissioneModel.cdrSpesa, ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
+                    <select ng-disabled="!elencoModuli || elencoModuli.length == 0 || !ordineMissioneModel.cdrSpesa || validazione === 'S' || disabilitaOrdineMissione" ng-change="reloadModulo(ordineMissioneModel.pgProgetto, ordineMissioneModel.cdrSpesa, ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
                         </span>
                     </p>
             </form>
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                    <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 || !ordineMissioneModel.cdrSpesa || validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
                         </span>
+                    </p>
+                    <p class="col-md-1">
+                    <i ng-show="workingRestGae" class="fa fa-spinner fa-spin" style="font-size:16px"></i>
+                    <i ng-show="!workingRestGae" style="font-size:16px" class="fa">&#xf110;</i>
                     </p>
             </form>
 

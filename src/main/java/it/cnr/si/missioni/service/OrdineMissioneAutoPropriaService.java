@@ -194,6 +194,9 @@ public class OrdineMissioneAutoPropriaService {
 		ordineMissioneAutoPropriaDB.setModello(ordineMissioneAutoPropria.getModello());
 		ordineMissioneAutoPropriaDB.setCartaCircolazione(ordineMissioneAutoPropria.getCartaCircolazione());
 		ordineMissioneAutoPropriaDB.setEntePatente(ordineMissioneAutoPropria.getEntePatente());
+		ordineMissioneAutoPropriaDB.setUtilizzoMotiviIspettivi(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
+		ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
+		ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
 		
 		ordineMissioneAutoPropriaDB.setToBeUpdated();
 
@@ -313,7 +316,7 @@ public class OrdineMissioneAutoPropriaService {
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
 			} catch (Exception e1) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")");
+				throw new ComponentException("Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){
         		fileName = content.getFileName();
@@ -321,13 +324,13 @@ public class OrdineMissioneAutoPropriaService {
     			try {
     				is = content.getStream();
     			} catch (Exception e) {
-    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file Auto Propria sul documentale (" + Utility.getMessageException(e) + ")");
+    				throw new ComponentException("Errore nel recupero dello stream del file Auto Propria sul documentale (" + Utility.getMessageException(e) + ")",e);
     			}
         		if (is != null){
             		try {
     					printOrdineMissione = IOUtils.toByteArray(is);
     				} catch (IOException e) {
-    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")");
+    					throw new ComponentException("Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")",e);
     				}
         		}
     		} else {

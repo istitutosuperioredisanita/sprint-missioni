@@ -890,7 +890,7 @@ public class RimborsoMissioneService {
 			try {
 				content = cmisRimborsoMissioneService.getContentStreamRimborsoMissione(rimborsoMissione);
 			} catch (Exception e1) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")");
+				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){
         		fileName = content.getFileName();
@@ -898,13 +898,13 @@ public class RimborsoMissioneService {
     			try {
     				is = content.getStream();
     			} catch (Exception e) {
-    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")");
+    				throw new ComponentException("Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")",e);
     			}
         		if (is != null){
             		try {
     					printRimborsoMissione = IOUtils.toByteArray(is);
     				} catch (IOException e) {
-    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")");
+    					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
     				}
         		}
     		} else {

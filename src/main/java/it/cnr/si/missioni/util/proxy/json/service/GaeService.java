@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -57,7 +58,7 @@ public class GaeService {
 				}
 			}
 		} catch (Exception ex) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per le GAE ("+Utility.getMessageException(ex)+").");
+			throw new ComponentException("Errore nella lettura del file JSON per le GAE ("+Utility.getMessageException(ex)+").",ex);
 		}
 		return null;
 	}
