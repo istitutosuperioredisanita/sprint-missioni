@@ -19,6 +19,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.Spostamenti;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -72,6 +73,9 @@ public class PrintOrdineMissioneAutoPropriaService {
 		printOrdineMissioneAutoPropria.setTarga(ordineMissioneAutoPropria.getTarga());
 		printOrdineMissioneAutoPropria.setPolizzaAssicurativa(ordineMissioneAutoPropria.getPolizzaAssicurativa());
 		printOrdineMissioneAutoPropria.setNumeroPatente(ordineMissioneAutoPropria.getNumeroPatente());
+    	printOrdineMissioneAutoPropria.setMotiviIspettivi(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
+    	printOrdineMissioneAutoPropria.setMotiviUrgenza(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
+    	printOrdineMissioneAutoPropria.setMotiviTrasporto(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
 
 		if (ordineMissioneAutoPropria.getListSpostamenti() != null){
 			List<Spostamenti> listSpostamentiPrint = new ArrayList<Spostamenti>();

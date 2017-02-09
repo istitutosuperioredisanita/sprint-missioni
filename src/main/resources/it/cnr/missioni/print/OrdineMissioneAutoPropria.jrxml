@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrdineMissioneAutoPropria" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
-	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="355"/>
+	<property name="ireport.y" value="1345"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
 		</box>
 	</style>
 	<style name="bold" fontName="Times New Roman" fontSize="10" isBold="true" pdfFontName="Times-Bold"/>
-	<parameter name="DIR_IMAGE" class="java.lang.String" isForPrompting="false">
+	<parameter name="DIR_IMAGE" class="java.io.InputStream" isForPrompting="false">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -119,6 +119,15 @@
 	</field>
 	<field name="entePatente" class="java.lang.String">
 		<fieldDescription><![CDATA[entePatente]]></fieldDescription>
+	</field>
+	<field name="motiviIspettivi" class="java.lang.String">
+		<fieldDescription><![CDATA[motiviIspettivi]]></fieldDescription>
+	</field>
+	<field name="motiviUrgenza" class="java.lang.String">
+		<fieldDescription><![CDATA[motiviUrgenza]]></fieldDescription>
+	</field>
+	<field name="motiviTrasporto" class="java.lang.String">
+		<fieldDescription><![CDATA[motiviTrasporto]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -309,7 +318,13 @@
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="43" splitType="Stretch">
+		<band height="181" splitType="Stretch">
+			<rectangle>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="110" width="554" height="50" uuid="ad06b655-b284-4f45-9705-a2386ccb3fa4"/>
+				<graphicElement>
+					<pen lineWidth="0.0" lineColor="#FFFFFF"/>
+				</graphicElement>
+			</rectangle>
 			<staticText>
 				<reportElement positionType="Float" x="3" y="1" width="552" height="39" uuid="652342d0-aafd-4859-8f3f-cf140fa43b98"/>
 				<textElement textAlignment="Justified">
@@ -317,6 +332,40 @@
 				</textElement>
 				<text><![CDATA[Ai sensi di quanto disposto dall’art. 6 c. 12 del D.L. 78/2010, dalla circolare n. 36 del 22/10/2010 del Ministero dell’Economia e delle Finanze – Dipartimento della Ragioneria Generale dello Stato e della delibera della Corte dei Conti a Sezioni Riunite n. 8/CONTR/11 del 7 febbraio 2011, si allega alla  presente la copia dei tariffari forniti dagli esercenti dei trasporti pubblici per le tratte sopra indicate.]]></text>
 			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="3" y="73" width="552" height="34" uuid="10d39fca-e610-4c42-9d3b-a7fd0a82673c"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Times New Roman" size="9" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Nel rispetto delle disposizioni normative in materia (Art. 6 c. 12 del D.L. 78/2010, Circ. 36 del 22/10/2010 del M.E.F. – Dip.tp della Ragioneria Generale dello Stato e delibera della Corte dei Conti a Sezioni riunite n. 8/CONTR/11 del 7 febbraio 2011)  e trattandosi di una circostanza eccezionale e non ricorrente, si autorizza l’uso del mezzo proprio per le seguenti motivazioni:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="110" width="549" height="14" isRemoveLineWhenBlank="true" uuid="00504e92-6afa-477f-8143-cd4b40e37c2b">
+					<printWhenExpression><![CDATA[$F{motiviIspettivi}.equals( "S" )]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" - Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="125" width="549" height="17" isRemoveLineWhenBlank="true" uuid="33d90e21-a453-4b31-a291-09df3f29ed2f">
+					<printWhenExpression><![CDATA[$F{motiviUrgenza}.equals( "S" )]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" - Per Attività caratterizzata da emergenza, urgenza, indifferibilità"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="143" width="549" height="17" isRemoveLineWhenBlank="true" uuid="99c34b20-86a5-49f1-a21a-30c81021fc6b">
+					<printWhenExpression><![CDATA[$F{motiviTrasporto}.equals( "S" )]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" - Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione"]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnFooter>
 	<pageFooter>
