@@ -32,6 +32,10 @@
 			<title>Allegati all'Ordine di Missione</title>
 			<description>Allegati all'Ordine di Missione</description>
 		</aspect>
+		<aspect name="missioni_ordine_attachment:allegati_anticipo">
+			<title>Allegati all'Anticipo dell'Ordine di Missione</title>
+			<description>Allegati all'Anticipo dell'Ordine di Missione</description>
+		</aspect>
 		<aspect name="missioni_ordine_attachment:richiesta_anticipo">
 			<title>Richiesta Anticipo per l'Ordine di Missione</title>
 			<description>Richiesta Anticipo per l'Ordine di Missione</description>

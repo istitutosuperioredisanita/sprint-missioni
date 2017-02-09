@@ -7,6 +7,8 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
@@ -50,6 +52,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -842,11 +845,11 @@ public class CMISOrdineMissioneService {
 		return metadataProperties;
 	}
 	
-	public Map<String, Object> createMetadataForFileOrdineMissioneAllegati(String currentLogin, OrdineMissione ordineMissione){
+	public Map<String, Object> createMetadataForFileOrdineMissioneAllegati(String currentLogin, OrdineMissione ordineMissione, String fileName){
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
-		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Allegato all'Ordine Missione - anno "+ordineMissione.getAnno()+" numero "+ordineMissione.getNumero()));
-		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Allegato Ordine di Missione"));
+		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(fileName));
+		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename(fileName));
 		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ALLEGATO);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
@@ -905,5 +908,80 @@ public class CMISOrdineMissioneService {
 	private Document creaDocumentoAutoPropria(String username, OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException, ComponentException{
 		byte[] print = printOrdineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(ordineMissioneAutoPropria, username);
 		return salvaStampaAutoPropriaSuCMIS(username, print, ordineMissioneAutoPropria);
+	}
+
+	public List<CMISFileAttachment> getAttachmentsAnticipo(Principal principal, OrdineMissione ordineMissione, Long idAnticipo) throws ComponentException{
+		ItemIterable<QueryResult> documents = getAttachmentsAnticipo(ordineMissione);
+		if (documents != null){
+	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
+	        for (QueryResult object : documents){
+	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+	        	cmisFileAttachment.setNomeFile(object.getPropertyValueById(PropertyIds.NAME));
+	        	cmisFileAttachment.setId(object.getPropertyValueById(PropertyIds.OBJECT_ID));
+	        	cmisFileAttachment.setIdMissione(idAnticipo);
+	        	lista.add(cmisFileAttachment);
+	        }
+	        return lista;
+		}
+		return null;
+	}
+		
+	public ItemIterable<QueryResult> getAttachmentsAnticipo(OrdineMissione ordineMissione) throws ComponentException{
+		Folder folder = recuperoFolderOrdineMissione(ordineMissione);
+		if (folder != null){
+			ItemIterable<QueryResult> results = getDocuments(folder, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
+	        return results;
+		}
+		return null;
+	}
+
+	private ItemIterable<QueryResult> getDocuments(Folder node, String tipoFile){
+		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID);
+		StringBuffer query = new StringBuffer("select doc.cmis:objectId from cmis:document doc ");
+		query.append(" join missioni_ordine_attachment:"+tipoFile+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
+		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
+		ItemIterable<QueryResult> results = missioniCMISService.search(query);
+		return results;
+	}
+
+	public CMISFileAttachment uploadAttachmentAnticipo(Principal principal, OrdineMissione ordineMissione, Long idAnticipo, InputStream inputStream, String name, MimeTypes mimeTypes){
+		Document doc = salvaAllegatoAnticipoCMIS(principal, ordineMissione, inputStream, name, mimeTypes);
+		if (doc != null){
+			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+			cmisFileAttachment.setId(doc.getId());
+			cmisFileAttachment.setNomeFile(name);
+	        cmisFileAttachment.setIdMissione(idAnticipo);
+			return cmisFileAttachment;
+		}
+		return null;
+	}
+	
+	private Document salvaAllegatoAnticipoCMIS(Principal principal,
+			OrdineMissione ordineMissione, InputStream stream, String fileName,MimeTypes mimeTypes) {
+		
+		Folder folder = (Folder) recuperoFolderOrdineMissione(ordineMissione);
+		CmisPath cmisPath = null;
+		if (folder == null){
+			cmisPath = createFolderOrdineMissione(ordineMissione);
+		} else {
+			cmisPath = CmisPath.construct(folder.getPath());
+		}
+
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione, fileName);
+		try{
+			Document node = missioniCMISService.restoreSimpleDocument(
+					metadataProperties,
+					stream,
+					mimeTypes.mimetype(),
+					fileName, 
+					cmisPath);
+			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
+			missioniCMISService.makeVersionable(node);
+			return node;
+		} catch (Exception e) {
+			if (e.getCause() instanceof CmisConstraintException)
+				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+		}
 	}
 }

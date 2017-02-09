@@ -4,6 +4,7 @@ import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneAspect;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CmisPath;
@@ -12,6 +13,7 @@ import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAnticipoRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -259,4 +262,35 @@ public class OrdineMissioneAnticipoService {
 		return printOrdineMissioneAnticipoService.createJsonPrintOrdineMissioneAnticipo(ordineMissioneAnticipo,
 				principal.getName());
 	}
+
+	@Transactional(readOnly = true)
+	public List<CMISFileAttachment> getAttachments(Principal principal, Long idAnticipo)
+			throws ComponentException {
+		if (idAnticipo != null) {
+			OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(principal,
+					OrdineMissioneAnticipo.class, idAnticipo);
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
+					ordineMissioneAnticipo.getOrdineMissione().getId());
+			List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsAnticipo(principal,
+					ordineMissione, idAnticipo);
+			return lista;
+		}
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	public CMISFileAttachment uploadAllegato(Principal principal, Long idAnticipo,
+			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
+		OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(principal,
+				OrdineMissioneAnticipo.class, idAnticipo);
+		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
+				ordineMissioneAnticipo.getOrdineMissione().getId());
+		if (ordineMissione != null) {
+			CMISFileAttachment attachment = cmisOrdineMissioneService.uploadAttachmentAnticipo(principal, ordineMissione,
+					inputStream, name, mimeTypes);
+			return attachment;
+		}
+		return null;
+	}
+
 }

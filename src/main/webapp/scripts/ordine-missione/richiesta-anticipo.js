@@ -38,7 +38,6 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
         }
     });
 
-
     $scope.today = function() {
             // Today + 1 day - needed if the current day must be included
             var today = new Date();
@@ -96,5 +95,55 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
 
     $scope.previousPage = function () {
       parent.history.back();
+    }
+
+    $scope.confirmDeleteAttachment = function (attachment) {
+        ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
+    }
+
+    var deleteAttachment = function (attachment) {
+        $rootScope.salvataggio = true;
+        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
+        var y = x.then(function (result) {
+            var attachments = $scope.attachments;
+            if (attachments && Object.keys(attachments).length > 0){
+                var newAttachments = attachments.filter(function(el){
+                    return el.id !== attachment.id;
+                });
+                $scope.attachments = newAttachments;
+                if (Object.keys(newAttachments).length = 0){
+                    $scope.attachmentsExists = false;
+                }
+            }
+            $rootScope.salvataggio = false;
+            ui.ok();
+        });
+        x.error(function (data) {
+            $rootScope.salvataggio = false;
+        });
+    }
+
+    $scope.deselect = function () {
+        delete $scope.viewAttachment;
+    }
+
+    $scope.viewAttachments = function (idAnticipo) {
+        if (!$scope.anticipoOrdineMissioneModel.isFireSearchAttachments){
+            $http.get('app/rest/ordineMissione/anticipo/viewAttachments/' + idAnticipo).then(function (data) {
+                $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = true;
+                var attachments = data.data;
+                if (attachments && Object.keys(attachments).length > 0){
+                    $scope.attachmentsExists = true;  
+                } else {
+                    $scope.attachmentsExists = false;
+                }
+                $scope.attachments = attachments;
+            }, function () {
+                $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = false;
+                $scope.attachmentsExists = false;
+                $scope.attachments = {};
+            });
+        }
+        $scope.viewAttachment = true;
     }
 });
