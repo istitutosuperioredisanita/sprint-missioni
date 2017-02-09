@@ -44,10 +44,10 @@
                         </span>
                 </p>
             </form>
-          </form>
-          <div ng-show="viewAttachment">
-            <ul class="list-unstyled attachments" ng-show="attachmentsExists=true">
-              <li ng-repeat="attachment in attachments">
+<!--
+          <div >
+            <ul class="list-unstyled anticipoOrdineMissioneModel.attachments" ng-show="anticipoOrdineMissioneModel.attachmentsExists=true">
+              <li ng-repeat="attachment in anticipoOrdineMissioneModel.attachments">
                 <span class="glyphicon glyphicon-download-alt"></span>
                 <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
                 <button ng-show="!disabilita  && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
@@ -55,15 +55,30 @@
             </ul>
             <h4 >
               <div class="row fileupload-buttonbar">
-                <span ng-hide="attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="isFireSearchAttachments" url="app/rest/ordineMissione/anticipo/uploadAllegati/{{anticipoOrdineMissioneModel.id}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
+                <span ng-hide="anticipoOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                <form class="fileupload" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+                  <div ng-show="(anticipoOrdineMissioneModel.isFireSearchAttachments == true || anticipoOrdineMissioneModel.isFireSearchAttachments == false) && !disabilita  && validazione == 'N'" class="row fileupload-buttonbar">
+                    <div class="col-lg-4">
+                      <span class="btn btn-sm btn-success fileinput-button" ng-class="{disabled: disabled}">
+                      <i class="glyphicon glyphicon-plus"></i>
+                      <span>Aggiungi Allegato</span>
+                      <input type="file" name="file" multiple ng-disabled="disabled">
+                      </span>
+                    </div>
+                  </div>
+                </form>                
+                
+                <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="anticipoOrdineMissioneModel.isFireSearchAttachments" url="app/rest/ordineMissione/
+                anticipo/uploadAllegati/{{anticipoOrdineMissioneModel.id}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
+
               </div>
             </h4>
-          </div>
+          </div> 
           <div class="col-md-1-button-large col-md-1 text-right">
-            <button ng-hide="viewAttachment" class="btn btn-sm btn-default" ng-click="viewAttachments(anticipoOrdineMissioneModel.id)">Allegati</button>
-            <button ng-show="viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect()">Nascondi allegati</button>
-          </div>
+            <button ng-hide="anticipoOrdineMissioneModel.viewAttachment || !anticipoOrdineMissioneModel.id" class="btn btn-sm btn-default" ng-click="viewAttachments(anticipoOrdineMissioneModel.id)">Allegati</button>
+            <button ng-show="anticipoOrdineMissioneModel.viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect()">Nascondi allegati</button>
+          </div>-->
+          </form>
   </div>
 </div>
 

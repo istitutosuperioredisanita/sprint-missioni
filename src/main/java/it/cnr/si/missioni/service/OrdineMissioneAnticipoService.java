@@ -286,7 +286,7 @@ public class OrdineMissioneAnticipoService {
 		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 				ordineMissioneAnticipo.getOrdineMissione().getId());
 		if (ordineMissione != null) {
-			CMISFileAttachment attachment = cmisOrdineMissioneService.uploadAttachmentAnticipo(principal, ordineMissione,
+			CMISFileAttachment attachment = cmisOrdineMissioneService.uploadAttachmentAnticipo(principal, ordineMissione,idAnticipo,
 					inputStream, name, mimeTypes);
 			return attachment;
 		}
