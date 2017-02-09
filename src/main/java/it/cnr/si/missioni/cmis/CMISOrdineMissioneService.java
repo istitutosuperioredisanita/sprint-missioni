@@ -696,7 +696,7 @@ public class CMISOrdineMissioneService {
     		fileName = "Allegato"+UUID.randomUUID();
     	}
     	CmisPath cmisPath = createFolderOrdineMissione(ordineMissione);
-		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione);
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione, fileName);
 		MimeTypes mime = null;
 		try {
 			mime = MimeTypes.valueOf(contentType);
