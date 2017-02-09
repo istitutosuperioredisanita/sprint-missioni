@@ -2,6 +2,7 @@ package it.cnr.si.missioni.cmis;
 
 public enum CMISOrdineMissioneAspect {
 	ORDINE_MISSIONE_ATTACHMENT_ALLEGATI("P:missioni_ordine_attachment:allegati"),
+	ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO("P:missioni_ordine_attachment:allegati_anticipo"),
 	ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA("P:missioni_ordine_attachment:uso_auto_propria"),
 	ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO("P:missioni_ordine_attachment:richiesta_anticipo"),
 	ORDINE_MISSIONE_ATTACHMENT_DOCUMENT("D:missioni_ordine_attachment:document"),

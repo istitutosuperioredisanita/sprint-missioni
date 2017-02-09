@@ -4,7 +4,7 @@ angular.module('missioniApp')
   .directive('ngUploadForm', [function () {
       return {
         restrict: 'E',
-        templateUrl: 'views/file-upload-dettagli-rimborso.html',
+        templateUrl: 'views/file-upload.html',
         scope: {
           allowed: '@',
           url: '@',
@@ -12,6 +12,7 @@ angular.module('missioniApp')
           sizeLimit: '@',
           ngModel: '=',
           name: '@',
+          oggetto: '=',
           dettagliSpese: '=',
           disabilita: '=',
           validazione: '=',
@@ -22,19 +23,31 @@ angular.module('missioniApp')
           $scope.$on('fileuploaddone', function (e, data) {
             $rootScope.salvataggio = false;
             if (data && data.result && data.result.idMissione){
-                if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
-                    for (var i=0; i<$scope.dettagliSpese.length; i++) {
-                        var dettaglio = $scope.dettagliSpese[i];
-                        if (dettaglio.id === data.result.idMissione){
-                            var attachments = dettaglio.attachments;
-                            if (!attachments){
-                                attachments = [];
-                            }
-                            $scope.dettagliSpese[i].attachmentsExists = true;
-                            $scope.dettagliSpese[i].attachments = attachments;
-                            $scope.dettagliSpese[i].attachments.push(data.result);
-                        }
+                if ($scope.oggetto){
+                  if ($scope.oggetto.id === data.result.idMissione){
+                    var attachments = $scope.oggetto.attachments;
+                    if (!attachments){
+                      attachments = [];
                     }
+                    $scope.oggetto.attachmentsExists = true;
+                    $scope.oggetto.attachments = attachments;
+                    $scope.oggetto.attachments.push(data.result);
+                  }
+                } else {
+                  if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
+                      for (var i=0; i<$scope.dettagliSpese.length; i++) {
+                          var dettaglio = $scope.dettagliSpese[i];
+                          if (dettaglio.id === data.result.idMissione){
+                              var attachments = dettaglio.attachments;
+                              if (!attachments){
+                                  attachments = [];
+                              }
+                              $scope.dettagliSpese[i].attachmentsExists = true;
+                              $scope.dettagliSpese[i].attachments = attachments;
+                              $scope.dettagliSpese[i].attachments.push(data.result);
+                          }
+                      }
+                  }
                 }
             }
           });

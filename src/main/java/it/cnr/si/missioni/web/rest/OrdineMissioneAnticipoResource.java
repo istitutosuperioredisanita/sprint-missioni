@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -36,6 +38,8 @@ import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
@@ -223,4 +227,61 @@ public class OrdineMissioneAnticipoResource {
             return JSONResponseEntity.badRequest(error);
     	}
     }
+
+    @RequestMapping(value = "/rest/ordineMissione/anticipo/viewAttachments/{idAnticipo}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getAttachments(HttpServletRequest request,
+    		@PathVariable Long idAnticipo) {
+        log.debug("REST request per visualizzare gli allegati dell'anticipo" );
+        try {
+            List<CMISFileAttachment> lista = ordineMissioneAnticipoService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idAnticipo);
+            return JSONResponseEntity.ok(lista);
+		} catch (ComponentException e) {
+			log.error("getAttachments", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		} 
+    }
+
+    @RequestMapping(value = "/rest/ordineMissione/anticipo/uploadAllegati/{idAnticipo}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Timed
+    public ResponseEntity<?> uploadAllegatiAnticipo(@PathVariable Long idAnticipo, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+        log.debug("REST request per l'upload di allegati dell'anticipo" );
+        if (idAnticipo != null){
+            	try {
+            		if (file != null && file.getContentType() != null){
+            			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
+            			if (mimeTypes == null){
+                			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
+            			} else {
+        					CMISFileAttachment cmisFileAttachment = ordineMissioneAnticipoService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idAnticipo, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+        	                if (cmisFileAttachment != null){
+        	                    return JSONResponseEntity.ok(cmisFileAttachment);
+        	                } else {
+        	                	String error = "Non è stato possibile salvare il file.";
+        	        			log.error("uploadAllegatiAnticipo", error);
+        	                    return JSONResponseEntity.badRequest(error);
+        	                }
+            			}
+            		}else {
+	                	String error = "File vuoto o con tipo non specificato.";
+	        			log.error("uploadAllegatiAnticipo", error);
+	                    return JSONResponseEntity.badRequest(error);
+            		}
+            	} catch (ComponentException | AwesomeException | IOException e1) {
+        			log.error("uploadAllegatiAnticipo", e1);
+                    return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
+				}
+    	} else {
+        	String error = "Id Dettaglio non valorizzato.";
+			log.error("uploadAllegatiAnticipo", error);
+            return JSONResponseEntity.badRequest(error);
+    	}
+    }
+
+
 }
