@@ -826,8 +826,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         var today = $scope.today();
         $scope.rimborsoMissioneModel.dataInserimento = today;
         $scope.rimborsoMissioneModel.anno = today.getFullYear();
-        $scope.rimborsoMissioneModel.cdTerzoSigla = $scope.terzoSigla.cd_terzo;
         $scope.showObbligoRientro = null;
+        if ($scope.terzoSigla && $scope.terzoSigla.cd_terzo){
+            $scope.rimborsoMissioneModel.cdTerzoSigla = $scope.terzoSigla.cd_terzo;
+        }
         $scope.disabilitaRimborsoMissione = false;
     }
 
@@ -1033,6 +1035,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (model.uid == $sessionStorage.account.login){
                     $scope.accountModel = $sessionStorage.account;
                     $sessionStorage.accountWork = $scope.accountModel;
+                    $scope.recuperoDatiTerzoSigla($scope.accountModel);
+                    if (model.tipoPagamento){
+                        $scope.recuperoDatiTerzoModalitaPagamento(model.cdTerzoSigla, model.tipoPagamento);
+                    }
                 } else {
                     var person = ProxyService.getPerson(model.uid).then(function(result){
                         if (result){
@@ -1055,7 +1061,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
                 $scope.restCapitoli(model.anno);
                 $scope.rimborsoMissioneModel = model;
-                $scope.inizializzaFormPerModifica();
+               $scope.inizializzaFormPerModifica();
             }
         });
     } else {
@@ -1085,8 +1091,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         } else {
             $scope.accountModel = $sessionStorage.account;
             $sessionStorage.accountWork = $scope.accountModel;
-            $scope.inizializzaFormPerInserimento($scope.accountModel);
-            serviziRestInizialiInserimento();
+            $scope.restOrdiniMissioneDaRimborsare($sessionStorage.accountWork);
+            $scope.recuperoDatiTerzoSigla($scope.accountModel);
         }
     }
 });
