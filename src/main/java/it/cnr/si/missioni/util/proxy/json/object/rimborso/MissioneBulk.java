@@ -50,13 +50,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "modalita_pagamento",
     "tappeMissioneColl",
     "speseMissioneColl",
-
     "annoMandatoAnticipo",
     "numeroMandatoAnticipo",
     "importoMandatoAnticipo",
     "idRimborsoMissione",
     "idFlusso",
-    "TAM?",
+    "idFlussoOrdineMissione",
+    "idFolderRimborsoMissione",
+    "idFolderOrdineMissione",
+    "tam",
     "cdCdsObbligazione",
     "esercizioObbligazione",
     "esercizioOriObbligazione",
@@ -124,7 +126,6 @@ public class MissioneBulk implements Cloneable, Serializable{
     private String dtFineMissione;
     @JsonProperty("ti_anagrafico")
     private String tiAnagrafico;
-
     @JsonProperty("annoMandatoAnticipo")
     private Integer annoMandatoAnticipo;
     @JsonProperty("numeroMandatoAnticipo")
@@ -135,6 +136,12 @@ public class MissioneBulk implements Cloneable, Serializable{
     private Long idRimborsoMissione;
     @JsonProperty("idFlusso")
     private String idFlusso;
+    @JsonProperty("idFlussoOrdineMissione")
+    private String idFlussoOrdineMissione;
+    @JsonProperty("idFolderRimborsoMissione")
+    private String idFolderRimborsoMissione;
+    @JsonProperty("idFolderOrdineMissione")
+    private String idFolderOrdineMissione;
     @JsonProperty("tam")
     private String tam;
     @JsonProperty("cdsObblGeMis")
@@ -147,7 +154,6 @@ public class MissioneBulk implements Cloneable, Serializable{
     private Long pgObblGeMis;
     @JsonProperty("gaeGeMis")
     private String gaeGeMis;
-    
     @JsonProperty("tipo_rapporto")
     private TipoRapporto tipoRapporto;
     @JsonProperty("banca")
@@ -967,6 +973,30 @@ public class MissioneBulk implements Cloneable, Serializable{
 
 	public void setGaeGeMis(String gaeGeMis) {
 		this.gaeGeMis = gaeGeMis;
+	}
+
+	public String getIdFlussoOrdineMissione() {
+		return idFlussoOrdineMissione;
+	}
+
+	public void setIdFlussoOrdineMissione(String idFlussoOrdineMissione) {
+		this.idFlussoOrdineMissione = idFlussoOrdineMissione;
+	}
+
+	public String getIdFolderRimborsoMissione() {
+		return idFolderRimborsoMissione;
+	}
+
+	public void setIdFolderRimborsoMissione(String idFolderRimborsoMissione) {
+		this.idFolderRimborsoMissione = idFolderRimborsoMissione;
+	}
+
+	public String getIdFolderOrdineMissione() {
+		return idFolderOrdineMissione;
+	}
+
+	public void setIdFolderOrdineMissione(String idFolderOrdineMissione) {
+		this.idFolderOrdineMissione = idFolderOrdineMissione;
 	}
 
 }
