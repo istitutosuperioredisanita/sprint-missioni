@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import ch.qos.logback.classic.pattern.Util;
+
 /**
  * Service class for managing users.
  */
@@ -141,6 +143,11 @@ public class OrdineMissioneAutoPropriaService {
     			StringUtils.isEmpty(ordineMissioneAutoPropria.getEntePatente())  ||
     			StringUtils.isEmpty(ordineMissioneAutoPropria.getNumeroPatente())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
+    	}
+    	if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi()).equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza()).equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto()).equals("N")){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto propria.");
     	}
 	}
 
