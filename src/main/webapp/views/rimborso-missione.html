@@ -293,7 +293,7 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                    <select ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !ordineMissioneModel.cdrSpesa || validazione === 'S' || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+                    <select ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || validazione === 'S' || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
                         </span>
                     </p>
                     <p class="col-md-1">

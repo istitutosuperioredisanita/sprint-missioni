@@ -24,7 +24,7 @@ import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
-import it.cnr.si.missioni.repository.CRUDServiceBean;
+import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -48,7 +48,7 @@ public class ComunicaRimborsoSiglaService {
     private CommonService commonService;
 	
 	@Autowired
-	private CRUDServiceBean crudServiceBean;
+	private CRUDComponentSession crudServiceBean;
 	
 	@Autowired
 	private RimborsoMissioneService rimborsoMissioneService;
