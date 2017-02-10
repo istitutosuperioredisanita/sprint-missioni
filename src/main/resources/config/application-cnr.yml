@@ -55,7 +55,7 @@ spring:
             invioResponsabileGruppo:
                 oggetto: Missioni. Invio Ordine di Missione per Autorizzazione.
             ritornoMissioneMittente:
-                oggetto: Missioni. Ordine di Missione ritornato al mittente.
+                oggetto: Missioni. Ordine di Missione reinviato al mittente.
 
 ajp:
     port: 8009

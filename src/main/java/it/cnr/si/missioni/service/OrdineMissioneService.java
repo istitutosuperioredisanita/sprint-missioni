@@ -118,7 +118,7 @@ public class OrdineMissioneService {
 	@Autowired
 	private MailService mailService;
 	
-	@Inject
+	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
 	@Autowired
