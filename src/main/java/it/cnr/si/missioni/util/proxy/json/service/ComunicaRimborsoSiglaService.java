@@ -6,6 +6,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
+import it.cnr.si.missioni.repository.CRUDServiceBean;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -43,10 +48,16 @@ public class ComunicaRimborsoSiglaService {
     private CommonService commonService;
 	
 	@Autowired
+	private CRUDServiceBean crudServiceBean;
+	
+	@Autowired
 	private RimborsoMissioneService rimborsoMissioneService;
 	
 	@Autowired
 	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
+	
+	@Autowired
+	private CMISOrdineMissioneService cmisOrdineMissioneService;
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public MissioneBulk comunicaRimborsoSigla(Principal principal, RimborsoMissione rimborsoApprovato) throws Exception {
@@ -93,8 +104,24 @@ public class ComunicaRimborsoSiglaService {
 		if (rimborsoApprovato.getAnticipoImporto() != null){
 			oggettoBulk.setImportoMandatoAnticipo(rimborsoApprovato.getAnticipoImporto());
 		}
-//						oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
-//						oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
+		oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
+		oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
+		Folder folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
+		if (folder != null){
+			oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(PropertyIds.OBJECT_ID));
+		}
+		if (rimborsoApprovato.getOrdineMissione() != null && rimborsoApprovato.getOrdineMissione().getId() != null){
+			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
+			if (ordineMissione != null){
+				if (ordineMissione.getIdFlusso() != null){
+					oggettoBulk.setIdFlussoOrdineMissione(ordineMissione.getIdFlusso());
+				}
+				Folder folderOrdine = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
+				if (folderOrdine != null){
+					oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getPropertyValue(PropertyIds.OBJECT_ID));
+				}
+			}
+		}
 		if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
 			oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
 		}
