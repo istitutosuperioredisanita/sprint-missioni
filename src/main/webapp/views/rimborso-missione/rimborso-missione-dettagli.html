@@ -35,7 +35,9 @@
                             <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
                             <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.decodeSpesaAnticipata}}
                             <br>
+<!--
                             <span ng-show="dettaglioSpesa.dsNoGiustificativo"><b>{{'rimborso-missione-dettagli.form.dettaglio-spese.mancanza-giustificativo' | translate}}:</b>  {{dettaglioSpesa.dsNoGiustificativo}}</span>
+-->                            
                             <br>
                             <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro}}
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
@@ -54,13 +56,6 @@
                                   <div class="row fileupload-buttonbar">
                                     <span ng-hide="dettaglioSpesa.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
                                     <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="dettaglioSpesa.isFireSearchAttachments" url="app/rest/rimborsoMissione/dettaglio/uploadAllegati/{{dettaglioSpesa.id}}" name="file" auto-upload="true" dettagli-spese="dettagliSpese" size-limit="500000"></ng-upload-form>
-<!--                                    <form ng-if="fileDetailUpload.url" id="fileupload" method="POST" enctype="multipart/form-data" file-upload="fileDetailUpload">
-                                      <span ng-show="!disabilita  && validazione == 'N'" class="btn-sm btn-success fileinput-button" ng-class="{disabled: disabled}">
-                                        <i class="glyphicon glyphicon-plus"></i>
-                                        <span>Aggiungi Allegato</span>
-                                        <input type="file" name="file" multiple ng-disabled="disabled">
-                                      </span>
-                                    </form> -->
                                 </div>
                               </h4>
                             </div>
@@ -104,7 +99,7 @@
                                         </span>
                                     </p>
                             </form>
-                            <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.giustificativo = 'S'">
+<!--                            <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.giustificativo = 'S'">
                                     <p class="col-md-12">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.mancanza-giustificativo">mancanza giustificativo</span>
@@ -112,6 +107,7 @@
                                         </span>
                                     </p>
                             </form>
+-->
                             <form class="form-inline" role="form" id="missioni">
                                     <p class="col-md-2" ng-hide="dettaglioSpesa.rimborso">
                                          <span class="input-group">
@@ -193,6 +189,7 @@
                         </span>
                     </p>
             </form>
+<!--
             <form class="form-inline" role="form" id="missioni" ng-show="newDettaglioSpesa.giustificativo == 'S'">
                     <p class="col-md-12">
                         <span class="input-group">
@@ -201,6 +198,7 @@
                         </span>
                     </p>
             </form>
+-->            
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-2" ng-hide="rimborso">
                          <span class="input-group">

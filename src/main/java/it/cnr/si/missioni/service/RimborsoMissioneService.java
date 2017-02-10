@@ -30,6 +30,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -78,6 +79,9 @@ public class RimborsoMissioneService {
 
 	@Autowired
 	private AccountService accountService;
+
+	@Autowired
+	private OrdineMissioneService ordineMissioneService;
 
 	@Autowired
 	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
@@ -642,7 +646,17 @@ public class RimborsoMissioneService {
     	rimborsoMissione.setToBeCreated();
     }
 
-	private Integer recuperoAnno(RimborsoMissione rimborsoMissione) {
+    private OrdineMissioneAutoPropria getAutoPropriaOrdineMissione(Principal principal, RimborsoMissione rimborsoMissione){
+    	if (rimborsoMissione.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+        	if (ordineMissione != null){
+        		return ordineMissioneService.getAutoPropria(ordineMissione);
+        	}
+    	}
+    	return null;
+    }
+    
+    private Integer recuperoAnno(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getDataInserimento() == null){
 			rimborsoMissione.setDataInserimento(LocalDate.now());
 		}
@@ -835,6 +849,13 @@ public class RimborsoMissioneService {
 			if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N")){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
 			}
+		}
+        if (rimborsoMissione.getUtilizzoAutoNoleggio() != null && rimborsoMissione.getUtilizzoAutoNoleggio().equals("S") && 
+                getAutoPropriaOrdineMissione(principal, rimborsoMissione) != null ){
+                throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione prevede l'utilizo dell'auto propria. Non è possibile indicare l'utilizzo dell'auto a noleggio.");
+        } 
+		if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio se si è scelto il loro utilizzo");
 		}
 		if (rimborsoMissione.isMissioneEstera()) {
 			if (rimborsoMissione.getDataInizioEstero().isBefore(rimborsoMissione.getDataInizioMissione())){
