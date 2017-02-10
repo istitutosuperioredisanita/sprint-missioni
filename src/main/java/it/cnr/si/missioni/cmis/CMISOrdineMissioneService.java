@@ -241,6 +241,7 @@ public class CMISOrdineMissioneService {
 		cmisOrdineMissione.setUserNameFirmatarioSpesa(userNameFirmatarioSpesa);
 		cmisOrdineMissione.setUserNamePrimoFirmatario(userNameFirmatario);
 		cmisOrdineMissione.setUserNameResponsabileModulo("");
+		cmisOrdineMissione.setUsernameResponsabileGruppo("");
 		cmisOrdineMissione.setUsernameRichiedente(username);
 		cmisOrdineMissione.setUsernameUtenteOrdine(ordineMissione.getUid());
 		cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "false" : "true");
@@ -261,8 +262,10 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setSecondoMotivoAutoPropria("");
 			cmisOrdineMissione.setTerzoMotivoAutoPropria("");
 		}
-		cmisOrdineMissione.setUsernameResponsabileGruppo(ordineMissione.getResponsabileGruppo());
-		cmisOrdineMissione.setUserNameResponsabileModulo(ordineMissione.getResponsabileGruppo());
+		if (!StringUtils.isEmpty(ordineMissione.getResponsabileGruppo())){
+			cmisOrdineMissione.setUsernameResponsabileGruppo(ordineMissione.getResponsabileGruppo());
+			cmisOrdineMissione.setUserNameResponsabileModulo(ordineMissione.getResponsabileGruppo());
+		}
 
 		return cmisOrdineMissione;
 	}
