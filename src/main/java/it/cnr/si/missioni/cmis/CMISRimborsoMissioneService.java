@@ -660,21 +660,24 @@ public class CMISRimborsoMissioneService {
 	public void aggiungiAllegatiDettagli(Principal principal, RimborsoMissione rimborsoMissione, StringBuffer nodeRefs)
 			throws ComponentException {
 		List<String> list = new ArrayList<>();
+		List<String> listName = new ArrayList<>();
 		for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
 			ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
 			if (children != null){
 				for (CmisObject object : children){
 			    	Document doc = (Document)object;
 			    	String nodeRef = (String)doc.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF);
-			    	if (!list.contains(nodeRef)){
+			    	String nodeName = (String)doc.getPropertyValue(PropertyIds.NAME);
+			    	if (!list.contains(nodeRef) && !listName.contains(nodeName)){
 						aggiungiDocumento(nodeRef, nodeRefs);
 						list.add(nodeRef);
+						listName.add(nodeName);
 			    	}
 			    }
 			} else {
 				if (dettaglio.isGiustificativoObbligatorio()){
 					if (!StringUtils.hasLength(dettaglio.getDsNoGiustificativo())){
-						throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo oppure il motivo della mancanza.");
+						throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
 					}
 				}
 			}
