@@ -302,6 +302,7 @@ src: [
                         'views/*.html',
                         'views/**/*.html',
                         'images/**/*.{png,gif,webp}',
+                        'protected/**/*.gif',
                         'fonts/*'
                     ]
                 }, {
