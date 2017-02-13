@@ -90,6 +90,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
+                    $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+                    $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                 }
                 if ($scope.rimborsoMissioneModel.cdsCompetenza){
                     $scope.restCdsCompetenza($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsCompetenza);
@@ -99,12 +101,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 }
                 if ($scope.rimborsoMissioneModel.cdrSpesa){
                     $scope.restCdr($scope.rimborsoMissioneModel.uoSpesa, "S");
-                }
-                if ($scope.rimborsoMissioneModel.uoSpesa){
-                    $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
-                }
-                if ($scope.rimborsoMissioneModel.gae){
-                    $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                 }
                 $scope.rimborsoMissioneModel.anticipoRicevuto = "N";
                 $scope.rimborsoMissioneModel.speseTerziRicevute = "N";
@@ -438,6 +434,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     
     $scope.restCdr = function(uo, daQuery){
         if (uo){
+            $scope.elencoCdr = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.CDR;
             var objectPostCdrOrderBy = [{name: 'cd_centro_responsabilita', type: 'ASC'}];
@@ -467,6 +464,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     
     $scope.restModuli = function(anno, uo){
         if (uo){
+            $scope.elencoModuli = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.MODULO;
             var varOrderBy = [{name: 'cd_progetto', type: 'ASC'}];
@@ -533,6 +531,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     
     $scope.restGae = function(anno, modulo, cdr, uo){
         if (cdr || modulo || uo){
+            $scope.elencoGae = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.GAE;
             var varOrderBy = [{name: 'cd_linea_attivita', type: 'ASC'}];

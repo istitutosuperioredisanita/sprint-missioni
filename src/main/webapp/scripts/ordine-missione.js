@@ -240,6 +240,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     $scope.restCdr = function(uo, daQuery){
         if (uo){
+            $scope.elencoCdr = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.CDR;
             var objectPostCdrOrderBy = [{name: 'cd_centro_responsabilita', type: 'ASC'}];
@@ -269,6 +270,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     $scope.restModuli = function(anno, uo){
         if (uo){
+            $scope.elencoModuli = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.MODULO;
             var varOrderBy = [{name: 'cd_progetto', type: 'ASC'}];
@@ -335,6 +337,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     $scope.restGae = function(anno, modulo, cdr, uo){
         if (cdr || modulo || uo){
+            $scope.elencoGae = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.GAE;
             var varOrderBy = [{name: 'cd_linea_attivita', type: 'ASC'}];

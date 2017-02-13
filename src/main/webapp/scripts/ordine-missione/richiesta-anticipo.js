@@ -30,6 +30,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
             $scope.isOrdineMissioneConfermato = false;
         } else {
             $scope.anticipoOrdineMissioneModel = datiAnticipoOrdineMissione;
+            $scope.viewAttachments($scope.anticipoOrdineMissioneModel.id);
             if ($scope.anticipoOrdineMissioneModel.ordineMissione.stato==='CON'){
                 $scope.isOrdineMissioneConfermato = true;
             } else {
@@ -50,6 +51,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
             if ($scope.anticipoOrdineMissioneModel.id){
                 $http.put('app/rest/ordineMissione/anticipo/modify', $scope.anticipoOrdineMissioneModel).success(function(data){
                     $rootScope.salvataggio = false;
+                    $scope.viewAttachments($scope.anticipoOrdineMissioneModel.id);
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
                 });
@@ -96,7 +98,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
     $scope.previousPage = function () {
       parent.history.back();
     }
-/*
+
     $scope.confirmDeleteAttachment = function (attachment) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
@@ -123,10 +125,6 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
         });
     }
 
-    $scope.deselect = function () {
-        delete $scope.anticipoOrdineMissioneModel.viewAttachment;
-    }
-
     $scope.viewAttachments = function (idAnticipo) {
         if (!$scope.anticipoOrdineMissioneModel.isFireSearchAttachments){
             $http.get('app/rest/ordineMissione/anticipo/viewAttachments/' + idAnticipo).then(function (data) {
@@ -144,7 +142,12 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
                 $scope.anticipoOrdineMissioneModel.attachments = {};
             });
         }
-        $scope.anticipoOrdineMissioneModel.viewAttachment = true;
+//        $scope.anticipoOrdineMissioneModel.viewAttachment = true;
+    }
+
+/*
+    $scope.deselect = function () {
+        delete $scope.anticipoOrdineMissioneModel.viewAttachment;
     }
 
     $('#fileupload')
