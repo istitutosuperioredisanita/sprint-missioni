@@ -940,8 +940,10 @@ public class CMISOrdineMissioneService {
 
 	private ItemIterable<QueryResult> getDocuments(Folder node, String tipoFile){
 		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID);
-		StringBuffer query = new StringBuffer("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:"+tipoFile+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
+		StringBuffer query = new StringBuffer("select doc.cmis:objectId, doc.cmis:name from cmis:document doc ");
+		query.append(" join missioni_ordine_attachment:allegati_anticipo"
+//		+tipoFile
+		+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
 		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
 		ItemIterable<QueryResult> results = missioniCMISService.search(query);
 		return results;
