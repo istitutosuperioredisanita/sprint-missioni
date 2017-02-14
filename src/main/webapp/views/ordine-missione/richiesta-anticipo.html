@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <h4 center translate="ordine-missione-anticipo.title" translate-values="{numeroOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Ordine di missione</b></h4>
+  <h4 center translate="ordine-missione-anticipo.title" translate-values="{numeroOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Ordine di missione</h4>
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-success" ng-show="success" translate="global.messages.success">
@@ -32,6 +32,31 @@
                           <input ng-disabled="validazione != 'N' || isOrdineMissioneConfermato" type="text" class="input-sm form-control" required style="text-align:right" ng-currency name="importo" currency-symbol="€" ng-model="anticipoOrdineMissioneModel.importo">
                         </span>
                     </p>
+            </form>
+
+            <form class="form-inline col-md-7" role="form" id="missioni">
+<div class="panel panel-default" ng-if="anticipoOrdineMissioneModel.id && (anticipoOrdineMissioneModel.isFireSearchAttachments == true || anticipoOrdineMissioneModel.isFireSearchAttachments == false )">
+  <div class="panel-heading color-verde-chiaro text-center">
+    <h1 class="panel-title">Allegati</h1>
+  </div>
+  <div class="panel-body my-panel-body">
+          <div ">
+            <ul class="list-unstyled anticipoOrdineMissioneModel.attachments" ng-show="anticipoOrdineMissioneModel.attachmentsExists=true">
+              <li ng-repeat="attachment in anticipoOrdineMissioneModel.attachments">
+                <span class="glyphicon glyphicon-download-alt"></span>
+                <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                <button ng-show="!disabilita  && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              </li>
+            </ul>
+            <h4 >
+              <div class="row fileupload-buttonbar">
+                <span ng-hide="anticipoOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="anticipoOrdineMissioneModel.isFireSearchAttachments" url="app/rest/ordineMissione/anticipo/uploadAllegati/{{anticipoOrdineMissioneModel.id}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
+              </div>
+            </h4>
+          </div> 
+  </div>
+</div>
             </form>
 
             <form class="form-inline" role="form" id="missioni">
@@ -78,26 +103,6 @@
   </div>
         </div>
     </div>
-<div class="panel panel-success">
-  <div class="panel-heading color-rosso-mattone text-center">
-    <h3 class="panel-title color-rosso-mattone" translate="rimborso-missione-dettagli.form.box-dettaglio-spese">Dettaglio Spese</h3>
   </div>
-     <div class="panel-body my-panel-body">
-  </div>
-          <div ng-if="anticipoOrdineMissioneModel.id && (anticipoOrdineMissioneModel.isFireSearchAttachments == true || anticipoOrdineMissioneModel.isFireSearchAttachments == false )">
-            <ul class="list-unstyled anticipoOrdineMissioneModel.attachments" ng-show="anticipoOrdineMissioneModel.attachmentsExists=true">
-              <li ng-repeat="attachment in anticipoOrdineMissioneModel.attachments">
-                <span class="glyphicon glyphicon-download-alt"></span>
-                <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-                <button ng-show="!disabilita  && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
-              </li>
-            </ul>
-            <h4 >
-              <div class="row fileupload-buttonbar">
-                <span ng-hide="anticipoOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="anticipoOrdineMissioneModel.isFireSearchAttachments" url="app/rest/ordineMissione/anticipo/uploadAllegati/{{anticipoOrdineMissioneModel.id}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
-              </div>
-            </h4>
-          </div> 
 </div>
 </div>

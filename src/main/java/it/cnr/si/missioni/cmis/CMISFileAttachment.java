@@ -4,6 +4,7 @@ public class CMISFileAttachment {
 	private Long idMissione;
 	private String id;
 	private String nomeFile;
+	private String nodeRef;
 	private String tipo;
 	public Long getIdMissione() {
 		return idMissione;
@@ -28,5 +29,11 @@ public class CMISFileAttachment {
 	}
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
+	}
+	public String getNodeRef() {
+		return nodeRef;
+	}
+	public void setNodeRef(String nodeRef) {
+		this.nodeRef = nodeRef;
 	}
 }

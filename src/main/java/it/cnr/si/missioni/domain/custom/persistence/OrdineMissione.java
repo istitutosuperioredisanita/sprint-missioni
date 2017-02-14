@@ -53,6 +53,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			CMIS_PROPERTY_NAME_DOC_ORDINE = "Principale",
 			CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegato",
 			CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO = "Allegati",
+			CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO = "Allegati Anticipo",
 			CMIS_PROPERTY_NAME_TIPODOC_ORDINE = "Ordine di Missione",
 			CMIS_PROPERTY_FLOW_DESCRIZIONE	= "cnrmissioni:descrizioneOrdine",
 			CMIS_PROPERTY_FLOW_NOTE	= "cnrmissioni:note",
@@ -95,7 +96,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO	= "cnrmissioni:impegnoNumero",
 			CMIS_PROPERTY_FLOW_DESCRIZIONE_IMPEGNO	= "cnrmissioni:descrizioneImpegno",
 			CMIS_PROPERTY_FLOW_IMPORTO_MISSIONE	= "cnrmissioni:importoMissione",
-			CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO	= "cnrmissioni:disponibilita";
+			CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO	= "cnrmissioni:disponibilita",
+			ORDINE_MISSIONE_ATTACHMENT_QUERY_CMIS = "missioni_ordine_attachment",
+			ATTACHMENT_ALLEGATO_ANTICIPO = ":allegati_anticipo";
 	
     @Size(min = 0, max = 1)
     @Column(name = "OBBLIGO_RIENTRO", length = 1, nullable = false)

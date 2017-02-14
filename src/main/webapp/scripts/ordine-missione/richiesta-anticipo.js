@@ -59,6 +59,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
                 $http.post('app/rest/ordineMissione/anticipo/create', $scope.anticipoOrdineMissioneModel).success(function(data){
                     $rootScope.salvataggio = false;
                     $scope.anticipoOrdineMissioneModel = data;
+                    $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = false;
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
                 });
