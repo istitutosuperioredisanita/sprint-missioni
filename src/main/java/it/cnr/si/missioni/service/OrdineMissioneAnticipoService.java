@@ -1,28 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.CMISFileAttachment;
-import it.cnr.si.missioni.cmis.CMISOrdineMissioneAspect;
-import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
-import it.cnr.si.missioni.cmis.CmisPath;
-import it.cnr.si.missioni.cmis.MimeTypes;
-import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
-import it.cnr.si.missioni.repository.OrdineMissioneAnticipoRepository;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
@@ -33,9 +10,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
-import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +19,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import it.cnr.jada.ejb.session.BusyResourceException;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
+import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
+import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneAnticipoRepository;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
 
 /**
  * Service class for managing users.
@@ -184,9 +177,20 @@ public class OrdineMissioneAnticipoService {
 	@Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaOrdineMissioneAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws ComponentException {
-		ordineMissioneAnticipo.setToBeUpdated();
-		ordineMissioneAnticipo.setStato(Costanti.STATO_ANNULLATO);
-		crudServiceBean.modificaConBulk(principal, ordineMissioneAnticipo);
+		if (ordineMissioneAnticipo.isStatoNonInviatoAlFlusso()){
+			ordineMissioneAnticipo.setToBeUpdated();
+			ordineMissioneAnticipo.setStato(Costanti.STATO_ANNULLATO);
+			crudServiceBean.modificaConBulk(principal, ordineMissioneAnticipo);
+			List<CMISFileAttachment> allegati = getAttachments(principal, new Long(ordineMissioneAnticipo.getId().toString()));
+			if (allegati != null){
+		        for (CMISFileAttachment allegato : allegati){
+		        	missioniCMISService.deleteNode(allegato.getId());
+		        }
+			}
+		} else {
+			throw new AwesomeException(CodiciErrore.ERRGEN,
+					"Non è possibile cancellare l'anticipo. E' già stato inviato al flusso per l'approvazione.");
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -292,5 +296,4 @@ public class OrdineMissioneAnticipoService {
 		}
 		return null;
 	}
-
 }
