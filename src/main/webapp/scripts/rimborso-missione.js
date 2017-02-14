@@ -713,7 +713,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.onChangeTipoMissione = function() {
         if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
-            $scope.rimborsoMissioneModel.trattamento = "R";
+            if (!$scope.rimborsoMissioneModel.trattamento){
+                $scope.rimborsoMissioneModel.trattamento = "R";
+            }
             $scope.missioneEstera = true;
         } else {
             $scope.rimborsoMissioneModel.trattamento = "R";
