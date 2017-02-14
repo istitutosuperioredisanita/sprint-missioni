@@ -449,9 +449,14 @@ public class CMISOrdineMissioneService {
 //			ordineMissione.setUtilizzoAutoPropria("N");
 //		}
 		Document documentoAnticipo = null;
+		List<CMISFileAttachment> allegati = new ArrayList<>();
 		if (anticipo != null){
 			anticipo.setOrdineMissione(ordineMissione);
 			documentoAnticipo = creaDocumentoAnticipo(username, anticipo);
+			List<CMISFileAttachment> allegatiAnticipo = getAttachmentsAnticipo(principal, ordineMissione, new Long(anticipo.getId().toString()));
+			if (allegatiAnticipo != null && !allegatiAnticipo.isEmpty()){
+				allegati.addAll(allegatiAnticipo);
+			}
 		}
 		
 		Document documentoAutoPropria = null;
@@ -475,6 +480,7 @@ public class CMISOrdineMissioneService {
 				 aggiungiDocumento(documento, nodeRefs);
 				 aggiungiDocumento(documentoAnticipo, nodeRefs);
 				 aggiungiDocumento(documentoAutoPropria, nodeRefs);
+				 aggiungiAllegati(allegati, nodeRefs);
 				 
 				 jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
 				 jGenerator.writeStringField("assoc_packageItems_removed" , "");
@@ -575,6 +581,18 @@ public class CMISOrdineMissioneService {
 				 nodeRefs.append(",");
 			}
 			nodeRefs.append((String)documentoAnticipo.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
+		 }
+	}
+
+	private void aggiungiAllegati(List<CMISFileAttachment> allegati,
+			StringBuffer nodeRefs) {
+		if (allegati != null && !allegati.isEmpty()){
+			for (CMISFileAttachment cmisFileAttachment : allegati){
+				if (nodeRefs.length() > 0){
+					 nodeRefs.append(",");
+				}
+				nodeRefs.append(cmisFileAttachment.getNodeRef());
+			}
 		 }
 	}
 
@@ -699,7 +717,7 @@ public class CMISOrdineMissioneService {
     		fileName = "Allegato"+UUID.randomUUID();
     	}
     	CmisPath cmisPath = createFolderOrdineMissione(ordineMissione);
-		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione, fileName);
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione, fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
 		MimeTypes mime = null;
 		try {
 			mime = MimeTypes.valueOf(contentType);
@@ -848,15 +866,15 @@ public class CMISOrdineMissioneService {
 		return metadataProperties;
 	}
 	
-	public Map<String, Object> createMetadataForFileOrdineMissioneAllegati(String currentLogin, OrdineMissione ordineMissione, String fileName){
+	public Map<String, Object> createMetadataForFileOrdineMissioneAllegati(String currentLogin, OrdineMissione ordineMissione, String fileName, String tipoAllegato){
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
 		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(fileName));
 		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename(fileName));
 		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissione.CMIS_PROPERTY_NAME_DOC_ALLEGATO);
-		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
-		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, tipoAllegato);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, tipoAllegato);
 		return metadataProperties;
 	}
 
@@ -921,6 +939,7 @@ public class CMISOrdineMissioneService {
 	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 	        	cmisFileAttachment.setNomeFile(object.getPropertyValueById(PropertyIds.NAME));
 	        	cmisFileAttachment.setId(object.getPropertyValueById(PropertyIds.OBJECT_ID));
+	        	cmisFileAttachment.setNodeRef(object.getPropertyValueById(MissioniCMISService.ALFCMIS_NODEREF));
 	        	cmisFileAttachment.setIdMissione(idAnticipo);
 	        	lista.add(cmisFileAttachment);
 	        }
@@ -932,7 +951,7 @@ public class CMISOrdineMissioneService {
 	public ItemIterable<QueryResult> getAttachmentsAnticipo(OrdineMissione ordineMissione) throws ComponentException{
 		Folder folder = recuperoFolderOrdineMissione(ordineMissione);
 		if (folder != null){
-			ItemIterable<QueryResult> results = getDocuments(folder, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
+			ItemIterable<QueryResult> results = getDocuments(folder, OrdineMissione.ATTACHMENT_ALLEGATO_ANTICIPO);
 	        return results;
 		}
 		return null;
@@ -940,8 +959,8 @@ public class CMISOrdineMissioneService {
 
 	private ItemIterable<QueryResult> getDocuments(Folder node, String tipoFile){
 		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID);
-		StringBuffer query = new StringBuffer("select doc.cmis:objectId, doc.cmis:name from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:allegati_anticipo"
+		StringBuffer query = new StringBuffer("select doc.cmis:objectId, doc.alfcmis:nodeRef, doc.cmis:name from cmis:document doc ");
+		query.append(" join "+OrdineMissione.ORDINE_MISSIONE_ATTACHMENT_QUERY_CMIS+ tipoFile
 //		+tipoFile
 		+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
 		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
@@ -972,7 +991,7 @@ public class CMISOrdineMissioneService {
 			cmisPath = CmisPath.construct(folder.getPath());
 		}
 
-		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione, fileName);
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), ordineMissione, fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO);
 		try{
 			Document node = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,

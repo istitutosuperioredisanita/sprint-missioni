@@ -6,7 +6,8 @@ missioniApp.controller('MainController', function ($scope, $sessionStorage, $loc
 });
 
 missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService) {
-    $scope.endSearchCmis = false;
+    $scope.endSearchCmisOrdine = false;
+    $scope.endSearchCmisRimborso = false;
     if (!$sessionStorage.account || !$sessionStorage.account.login) {
       $location.path('/login');
     } else {
@@ -48,9 +49,10 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                     }
                 }
             }
+            $scope.endSearchCmisOrdine = true;
         },
         function(error){
-            $scope.endSearchCmis = true;
+            $scope.endSearchCmisOrdine = true;
         });        
 
         ElencoRimborsiMissioneService.findListToValidate().then(function(response){
@@ -77,10 +79,10 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                     }
                 }
             }
-            $scope.endSearchCmis = true;
+            $scope.endSearchCmisRimborso = true;
         },
         function(error){
-            $scope.endSearchCmis = true;
+            $scope.endSearchCmisRimborso = true;
         });        
     }
     
