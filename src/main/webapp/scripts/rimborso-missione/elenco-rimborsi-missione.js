@@ -57,6 +57,8 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($scope, $lo
     };
 
     $scope.ricerca = function () {
+        $scope.endSearching = false;
+        $scope.rimborsiMissione = null;
         ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine).then(function(data){
             if (data && data.length > 0){
                 $scope.rimborsiMissione = data;
@@ -64,6 +66,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($scope, $lo
             } else {
                 $scope.messageRimborsiNonEsistenti = true;
             }
+            $scope.endSearching = true;
         });        
     }
 

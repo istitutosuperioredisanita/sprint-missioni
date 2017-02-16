@@ -29,6 +29,7 @@ import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -306,6 +307,12 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
 			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
 			if (confirm){
+	    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno());
+	    		if (istituto.isAttivaGestioneResponsabileModulo()){
+	    			if (StringUtils.isEmpty(rimborsoMissioneDB.getPgProgetto())){
+	    				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
+	    			}
+    			}
 				aggiornaValidazione(rimborsoMissioneDB);
 			} else {
 				rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
@@ -832,9 +839,9 @@ public class RimborsoMissioneService {
 				}
 			}
 		} else {
-			if (!StringUtils.isEmpty(rimborsoMissione.getEsercizioOriginaleObbligazione())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
-			}
+//			if (!StringUtils.isEmpty(rimborsoMissione.getEsercizioOriginaleObbligazione())){
+//				throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
+//			}
 			rimborsoMissione.setCdCdsObbligazione(null);
 			rimborsoMissione.setEsercizioObbligazione(null);
 		}
