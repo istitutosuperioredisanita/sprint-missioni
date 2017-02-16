@@ -5,7 +5,7 @@
                 <b>{{'missione.form.numero' | translate}}:</b> {{rimborsoMissioneModel.numero}}  --  
                 <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  --  
                 <b>  {{'missione.form.stato' | translate}}: </b>{{rimborsoMissioneModel.decodeStato}}  --  
-                <b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}  --  
+                <span ng-show="rimborsoMissioneModel.statoFlusso && rimborsoMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}  --  
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.stato-invio-sigla' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoInvioSigla}}  --  
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.id-sigla' | translate}}: </b>{{rimborsoMissioneModel.idSigla}}
   </div>
