@@ -63,6 +63,8 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($scope, $loca
     };
 
     $scope.ricerca = function () {
+        $scope.endSearching = false;
+        $scope.ordiniMissione = null;
         ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData).then(function(data){
             if (data && data.length > 0){
                 $scope.ordiniMissione = data;
@@ -70,6 +72,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($scope, $loca
             } else {
                 $scope.messageOrdiniNonEsistenti = true;
             }
+            $scope.endSearching = true;
         });        
     }
 

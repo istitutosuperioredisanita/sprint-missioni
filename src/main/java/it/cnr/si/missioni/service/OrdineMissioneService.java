@@ -613,6 +613,10 @@ public class OrdineMissioneService {
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "E' obbligatorio indicare il responsabile del gruppo.");
 			}
+			if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
+			}
+
 		} else {
 			ordineMissioneDB.setStato(ordineMissione.getStato());
 			ordineMissioneDB.setStatoFlusso(ordineMissione.getStatoFlusso());
@@ -648,7 +652,6 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setUtilizzoAutoNoleggio(ordineMissione.getUtilizzoAutoNoleggio());
 			ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
 			ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
-			ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
 			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
 			ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -659,6 +662,9 @@ public class OrdineMissioneService {
     		if (istituto.isAttivaGestioneResponsabileModulo()){
     			if (StringUtils.isEmpty(ordineMissioneDB.getResponsabileGruppo())){
     				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
+    			}
+    			if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())){
+    				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
     			}
     			if (ordineMissioneDB.isMissioneInserita() && !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())){
     				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma l'ordine di missione non è stato inviato alla sua approvazione.");
