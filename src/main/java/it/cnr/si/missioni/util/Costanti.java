@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,6 +81,7 @@ public class Costanti {
     public final static String TIPO_RIMBORSO_MISSIONE = "R";
     public final static String CODICE_DIVISA_DEFAULT_SIGLA = "EURO";
 	public final static Long NAZIONE_ITALIA_SIGLA = new Long ("1");
+	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
 	
 	public final static Map<String, String> PRIORITA;
     static {
