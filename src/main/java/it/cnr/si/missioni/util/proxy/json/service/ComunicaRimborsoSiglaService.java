@@ -157,6 +157,7 @@ public class ComunicaRimborsoSiglaService {
 		for (RimborsoMissioneDettagli dettaglio : rimborsoApprovato.getRimborsoMissioneDettagli()){
 			SpeseMissioneColl spesaMissione = new SpeseMissioneColl();
 			spesaMissione.setCdTiSpesa(dettaglio.getCdTiSpesa());
+			spesaMissione.setTiCdTiSpesa(dettaglio.getTiCdTiSpesa());
 			spesaMissione.setDsTiSpesa(dettaglio.getDsTiSpesa());
 			String dataTappa = recuperoDataTappa(oggettoBulk.getTappeMissioneColl(), dettaglio);
 			if (dataTappa != null){
@@ -175,13 +176,14 @@ public class ComunicaRimborsoSiglaService {
 			spesaMissione.setImQuotaEsente(BigDecimal.ZERO);
 			spesaMissione.setPercentualeMaggiorazione(BigDecimal.ZERO);
 			spesaMissione.setImRimborso(BigDecimal.ZERO);
-			spesaMissione.setImSpesaMax(BigDecimal.ZERO);
-			spesaMissione.setImSpesaMaxDivisa(BigDecimal.ZERO);
+			spesaMissione.setImSpesaMax(Costanti.IMPORTO_SPESA_MAX_DEFAULT);
+			spesaMissione.setImSpesaMaxDivisa(Costanti.IMPORTO_SPESA_MAX_DEFAULT);
 			spesaMissione.setImSpesaDivisa(dettaglio.getImportoDivisa());
 			spesaMissione.setImSpesaEuro(dettaglio.getImportoEuro());
 			spesaMissione.setImTotaleSpesa(dettaglio.getImportoEuro());
+			spesaMissione.setCdDivisaSpesa(Costanti.CODICE_DIVISA_DEFAULT_SIGLA);
+			spesaMissione.setCambioSpesa(BigDecimal.ONE);
 			spesaMissione.setPgRiga(dettaglio.getRiga().intValue());
-			spesaMissione.setTiAuto("A");
 			String idFolderDettaglio = cmisRimborsoMissioneService.getNodeRefFolderDettaglioRimborso(new Long (dettaglio.getId().toString()));
 			if (idFolderDettaglio != null){
 				spesaMissione.setDsGiustificativo(idFolderDettaglio);
@@ -199,8 +201,11 @@ public class ComunicaRimborsoSiglaService {
 				spesaMissione.setCdTiPasto(dettaglio.getCdTiPasto());
 			}
 			if (dettaglio.isDettaglioIndennitaKm()){
+				spesaMissione.setTiAuto("P");
 				spesaMissione.setChilometri(dettaglio.getKmPercorsi());
 				spesaMissione.setLocalitaSpostamento(dettaglio.getLocalitaSpostamento());
+			} else {
+				spesaMissione.setChilometri(new Long(0));
 			}
 			if (dettaglio.getDsSpesa() != null){
 				if (dettaglio.getDsSpesa().length() > 100){
@@ -273,10 +278,10 @@ public class ComunicaRimborsoSiglaService {
 		TappeMissioneColl tappa = new TappeMissioneColl();
 		impostaDivisaTappa(tappa);
 		if (rimborsoApprovato.isTrattamentoAlternativoMissione()){
-			tappa.setFlRimborso(false);
+			tappa.setFlRimborso(true);
 			tappa.setFlNoDiaria(false);
 		} else {
-			tappa.setFlRimborso(true);
+			tappa.setFlRimborso(false);
 			tappa.setFlNoDiaria(true);
 		}
 		tappa.setFlComuneAltro(oggettoBulk.getFlComuneAltro());

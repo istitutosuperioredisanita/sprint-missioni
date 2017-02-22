@@ -115,6 +115,10 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "GIUSTIFICATIVO", length = 1, nullable = true)
     private String giustificativo;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "TI_CD_TI_SPESA", length = 1, nullable = true)
+    private String tiCdTiSpesa;
+
 	@Transient
     private String decodeSpesaAnticipata;
 	
@@ -345,6 +349,9 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		if (!StringUtils.isEmpty(getGiustificativo()) && getGiustificativo().equals("N")){
 			return false;
 		} else {
+			if (!StringUtils.isEmpty(getTiCdTiSpesa()) && getTiCdTiSpesa().equals("R")){
+				return false;
+			}
 			return true;
 		}
 	}
@@ -380,6 +387,14 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 
 	public void setLocalitaSpostamento(String localitaSpostamento) {
 		this.localitaSpostamento = localitaSpostamento;
+	}
+
+	public String getTiCdTiSpesa() {
+		return tiCdTiSpesa;
+	}
+
+	public void setTiCdTiSpesa(String tiCdTiSpesa) {
+		this.tiCdTiSpesa = tiCdTiSpesa;
 	}
 
 }

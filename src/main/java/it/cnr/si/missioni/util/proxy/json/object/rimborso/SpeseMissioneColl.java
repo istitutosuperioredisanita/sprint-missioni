@@ -41,7 +41,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "indennita_chilometrica",
     "ds_giustificativo",
     "id_giustificativo",
-    "ds_no_giustificativo"
+    "ds_no_giustificativo",
+    "cd_divisa_spesa",
+    "cambio_spesa",
+    "ti_cd_ti_spesa"
 })
 public class SpeseMissioneColl {
 
@@ -103,6 +106,12 @@ public class SpeseMissioneColl {
     private String dsNoGiustificativo;
     @JsonProperty("id_giustificativo")
     private String idGiustificativo;
+    @JsonProperty("cambio_spesa")
+    private BigDecimal cambioSpesa;
+    @JsonProperty("cd_divisa_spesa")
+    private String cdDivisaSpesa;
+    @JsonProperty("ti_cd_ti_spesa")
+    private String tiCdTiSpesa;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -586,6 +595,30 @@ public class SpeseMissioneColl {
 
 	public void setIdGiustificativo(String idGiustificativo) {
 		this.idGiustificativo = idGiustificativo;
+	}
+
+	public BigDecimal getCambioSpesa() {
+		return cambioSpesa;
+	}
+
+	public void setCambioSpesa(BigDecimal cambioSpesa) {
+		this.cambioSpesa = cambioSpesa;
+	}
+
+	public String getCdDivisaSpesa() {
+		return cdDivisaSpesa;
+	}
+
+	public void setCdDivisaSpesa(String cdDivisaSpesa) {
+		this.cdDivisaSpesa = cdDivisaSpesa;
+	}
+
+	public String getTiCdTiSpesa() {
+		return tiCdTiSpesa;
+	}
+
+	public void setTiCdTiSpesa(String tiCdTiSpesa) {
+		this.tiCdTiSpesa = tiCdTiSpesa;
 	}
 
 }

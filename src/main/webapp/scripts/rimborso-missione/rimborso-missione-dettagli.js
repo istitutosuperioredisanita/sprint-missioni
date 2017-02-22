@@ -100,7 +100,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.onChangeKm= function (kmPercorsi) {
         if (kmPercorsi && $scope.rimborsoKm && $scope.rimborsoKm.indennita_chilometrica){
-            $scope.newDettaglioSpesa.importoEuro = kmPercorsi * $scope.rimborsoKm.indennita_chilometrica;
+            $scope.newDettaglioSpesa.importoEuro = Math.round((kmPercorsi * $scope.rimborsoKm.indennita_chilometrica) * 100) / 100;
         }
     }
 
@@ -208,6 +208,17 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         $scope.alloggio = tipo_spesa.fl_alloggio;
                         $scope.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;
                         if ($scope.pasto){
+                            $scope.newDettaglioSpesa.tiCdTiSpesa = "P";
+                        } else if ($scope.rimborso){
+                            $scope.newDettaglioSpesa.tiCdTiSpesa = "R";
+                        } else if ($scope.trasporto){
+                            $scope.newDettaglioSpesa.tiCdTiSpesa = "T";
+                        } else if ($scope.alloggio){
+                            $scope.newDettaglioSpesa.tiCdTiSpesa = "A";
+                        } else {
+                            $scope.newDettaglioSpesa.tiCdTiSpesa = "N";
+                        }
+                        if ($scope.pasto){
                             var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
                             var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
                                 if (result && result.data){
@@ -313,6 +324,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     if (data){
                         var dettaglio = angular.copy(data);
                         dettaglio.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglio.dataSpesa);
+                        dettaglio.importo = Math.round(dettaglio.importoEuro * 100) / 100
                         $scope.dettagliSpese.push(dettaglio);
                     }
                     $scope.undoAddDettaglioSpesa();

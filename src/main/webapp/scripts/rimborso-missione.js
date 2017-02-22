@@ -88,6 +88,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
                 $scope.rimborsoMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
+                $scope.rimborsoMissioneModel.importoPresunto = ordineMissioneSelected.importoPresunto;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                     $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
