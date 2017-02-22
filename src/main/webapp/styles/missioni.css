@@ -134,13 +134,13 @@ input:-webkit-autofill {
 }
 
 .subscriptions > li:not(:first-child) {
-    background-color: #f9f9f9
+    border-top: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
 }
 
 
 .subscriptions > li:nth-of-type(odd) {
-    border-top: 1px solid #DDD;
-    border-bottom: 1px solid #DDD;
+    background-color: #f9f9f9
 }
 
 #missioni select{

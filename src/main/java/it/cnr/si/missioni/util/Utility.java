@@ -135,7 +135,7 @@ public class Utility {
 			formatter.setDecimalFormatSymbols(symbols);
 			formatter.setMaximumFractionDigits(2);
 			formatter.setMinimumFractionDigits(2);
-	    	return formatter.format((importo.setScale(2)).longValue());
+	    	return formatter.format((importo.setScale(2)).doubleValue());
 		} else {
 	    	return "";
 		}
