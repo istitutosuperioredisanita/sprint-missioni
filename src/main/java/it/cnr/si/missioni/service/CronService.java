@@ -121,7 +121,7 @@ public class CronService {
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
 				try {
-					flowsService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione);
+					flowsService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
@@ -156,7 +156,7 @@ public class CronService {
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
 				try {
-					MissioneBulk missione = comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione);
+					MissioneBulk missione = comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
@@ -190,7 +190,7 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				try {
-					flowsService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione);
+					flowsService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorOrdine(ordineMissione, error);
