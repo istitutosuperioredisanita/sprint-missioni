@@ -100,8 +100,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "SPESE_TERZI_IMPORTO", length = 28, nullable = true)
     private BigDecimal speseTerziImporto;
 
-    @Size(min = 0, max = 1000)
-    @Column(name = "NOTE_DIFFERENZE_ORDINE", length = 1000, nullable = true)
+    @Size(min = 0, max = 2000)
+    @Column(name = "NOTE_DIFFERENZE_ORDINE", length = 2000, nullable = true)
     private String noteDifferenzeOrdine;
 
     @Column(name = "PG_BANCA", length = 4, nullable = true)
