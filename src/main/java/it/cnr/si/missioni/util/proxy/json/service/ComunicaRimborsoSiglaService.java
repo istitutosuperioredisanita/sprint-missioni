@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.ZonedDateTime;
@@ -60,7 +61,9 @@ public class ComunicaRimborsoSiglaService {
 	private CMISOrdineMissioneService cmisOrdineMissioneService;
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public MissioneBulk comunicaRimborsoSigla(Principal principal, RimborsoMissione rimborsoApprovato) throws Exception {
+	public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) throws Exception {
+		RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoApprovatoId);
+
 		rimborsoMissioneService.retrieveDetails(principal, rimborsoApprovato);
 		MissioneSigla missioneSigla = new MissioneSigla();
 		impostaUserContext(principal, rimborsoApprovato, missioneSigla);
