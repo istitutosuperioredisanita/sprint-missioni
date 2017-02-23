@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
@@ -23,11 +21,11 @@ public class NazioneService {
 	@Inject
     private CommonService commonService;
 
-	public Nazione loadNazione(OrdineMissione ordineMissione) throws AwesomeException {
+	public Nazione loadNazione(OrdineMissione ordineMissione) throws Exception {
 		return loadNazione(ordineMissione.getNazione());
 	}
 
-	public Nazione loadNazione(Long nazione) throws ComponentException {
+	public Nazione loadNazione(Long nazione) throws Exception {
 		if (nazione != null){
 			List<JSONClause> clauses = prepareJSONClause(nazione);
 			String app = Costanti.APP_SIGLA;
@@ -44,7 +42,7 @@ public class NazioneService {
 					}
 				}
 			} catch (Exception ex) {
-				throw new ComponentException("Errore nella lettura del file JSON per le nazioni ("+Utility.getMessageException(ex)+").",ex);
+				throw new Exception("Errore nella lettura del file JSON per le nazioni ("+Utility.getMessageException(ex)+").",ex);
 			}
 		}
 		return null;
