@@ -50,7 +50,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato",
 			CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "D:missioni_rimborso_attachment:document",
 			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero",
-			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero";
+			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero",
+			CMIS_PROPERTY_FLOW_DIFFERENZE_ORDINE_RIMBORSO = "cnrmissioni:differenzeOrdineRimborso";
 
     @Column(name = "DATA_INIZIO_ESTERO", nullable = true)
     private ZonedDateTime dataInizioEstero;
