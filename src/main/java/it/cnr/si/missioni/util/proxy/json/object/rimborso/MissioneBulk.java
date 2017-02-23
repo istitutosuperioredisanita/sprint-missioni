@@ -63,7 +63,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "esercizioObbligazione",
     "esercizioOriObbligazione",
     "pgObbligazione",
-    "gae"})
+    "gae",
+    "cognome",
+    "nome",
+    "codice_fiscale"})
 public class MissioneBulk implements Cloneable, Serializable{
 
     @JsonProperty("esercizio")
@@ -130,8 +133,6 @@ public class MissioneBulk implements Cloneable, Serializable{
     private Integer annoMandatoAnticipo;
     @JsonProperty("numeroMandatoAnticipo")
     private Long numeroMandatoAnticipo;
-    @JsonProperty("importoMandatoAnticipo")
-    private BigDecimal importoMandatoAnticipo;
     @JsonProperty("idRimborsoMissione")
     private Long idRimborsoMissione;
     @JsonProperty("idFlusso")
@@ -166,6 +167,18 @@ public class MissioneBulk implements Cloneable, Serializable{
     private List<TappeMissioneColl> tappeMissioneColl = null;
     @JsonProperty("speseMissioneColl")
     private List<SpeseMissioneColl> speseMissioneColl = null;
+    @JsonProperty("cdsAnticipoGeMis")
+    private String cdsAnticipoGeMis;
+    @JsonProperty("esercizioAnticipoGeMis")
+    private Integer esercizioAnticipoGeMis;
+    @JsonProperty("pgAnticipoGeMis")
+    private Long pgAnticipoGeMis;
+    @JsonProperty("cognome")
+    private String cognome;
+    @JsonProperty("nome")
+    private String nome;
+    @JsonProperty("codice_fiscale")
+    private String codice_fiscale;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -895,14 +908,6 @@ public class MissioneBulk implements Cloneable, Serializable{
 		this.numeroMandatoAnticipo = numeroMandatoAnticipo;
 	}
 
-	public BigDecimal getImportoMandatoAnticipo() {
-		return importoMandatoAnticipo;
-	}
-
-	public void setImportoMandatoAnticipo(BigDecimal importoMandatoAnticipo) {
-		this.importoMandatoAnticipo = importoMandatoAnticipo;
-	}
-
 	public Long getIdRimborsoMissione() {
 		return idRimborsoMissione;
 	}
@@ -997,6 +1002,54 @@ public class MissioneBulk implements Cloneable, Serializable{
 
 	public void setIdFolderOrdineMissione(String idFolderOrdineMissione) {
 		this.idFolderOrdineMissione = idFolderOrdineMissione;
+	}
+
+	public String getCdsAnticipoGeMis() {
+		return cdsAnticipoGeMis;
+	}
+
+	public void setCdsAnticipoGeMis(String cdsAnticipoGeMis) {
+		this.cdsAnticipoGeMis = cdsAnticipoGeMis;
+	}
+
+	public Integer getEsercizioAnticipoGeMis() {
+		return esercizioAnticipoGeMis;
+	}
+
+	public void setEsercizioAnticipoGeMis(Integer esercizioAnticipoGeMis) {
+		this.esercizioAnticipoGeMis = esercizioAnticipoGeMis;
+	}
+
+	public Long getPgAnticipoGeMis() {
+		return pgAnticipoGeMis;
+	}
+
+	public void setPgAnticipoGeMis(Long pgAnticipoGeMis) {
+		this.pgAnticipoGeMis = pgAnticipoGeMis;
+	}
+
+	public String getCognome() {
+		return cognome;
+	}
+
+	public void setCognome(String cognome) {
+		this.cognome = cognome;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getCodice_fiscale() {
+		return codice_fiscale;
+	}
+
+	public void setCodice_fiscale(String codice_fiscale) {
+		this.codice_fiscale = codice_fiscale;
 	}
 
 }
