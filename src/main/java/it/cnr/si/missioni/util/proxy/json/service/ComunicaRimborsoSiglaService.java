@@ -31,6 +31,7 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Banca;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.DivisaTappa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
@@ -59,6 +60,9 @@ public class ComunicaRimborsoSiglaService {
 	
 	@Autowired
 	private CMISOrdineMissioneService cmisOrdineMissioneService;
+	
+	@Autowired
+	private AccountService accountService;
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) throws Exception {
@@ -99,16 +103,18 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getAltreSpeseAntImporto()));
 		oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborso());
 		if (rimborsoApprovato.getAnticipoAnnoMandato() != null){
-			oggettoBulk.setAnnoMandatoAnticipo(rimborsoApprovato.getAnticipoAnnoMandato());
+			oggettoBulk.setEsercizioAnticipoGeMis(rimborsoApprovato.getAnticipoAnnoMandato());
 		}
 		if (rimborsoApprovato.getAnticipoNumeroMandato() != null){
-			oggettoBulk.setNumeroMandatoAnticipo(rimborsoApprovato.getAnticipoNumeroMandato());
-		}
-		if (rimborsoApprovato.getAnticipoImporto() != null){
-			oggettoBulk.setImportoMandatoAnticipo(rimborsoApprovato.getAnticipoImporto());
+			oggettoBulk.setPgAnticipoGeMis(rimborsoApprovato.getAnticipoNumeroMandato());
+			oggettoBulk.setCdsAnticipoGeMis(rimborsoApprovato.getCdsSpesa());
 		}
 		oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
 		oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
+		Account account = accountService.loadAccountFromRest(rimborsoApprovato.getUid());
+		oggettoBulk.setCognome(account.getCognome());
+		oggettoBulk.setNome(account.getNome());
+		oggettoBulk.setCodice_fiscale(account.getCodiceFiscale());
 		Folder folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
 		if (folder != null){
 			oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(PropertyIds.OBJECT_ID));
