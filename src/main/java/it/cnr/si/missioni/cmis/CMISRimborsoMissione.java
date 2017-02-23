@@ -11,6 +11,7 @@ public class CMISRimborsoMissione extends CMISMissione {
 	private String annoMandato;
 	private String numeroMandato;
 	private String importoMandato;
+	private String differenzeOrdineRimborso;
 	private BigDecimal totaleRimborsoMissione;
 	public String getWfOrdineMissione() {
 		return wfOrdineMissione;
@@ -65,6 +66,12 @@ public class CMISRimborsoMissione extends CMISMissione {
 	}
 	public void setTotaleRimborsoMissione(BigDecimal totaleRimborsoMissione) {
 		this.totaleRimborsoMissione = totaleRimborsoMissione;
+	}
+	public String getDifferenzeOrdineRimborso() {
+		return differenzeOrdineRimborso;
+	}
+	public void setDifferenzeOrdineRimborso(String differenzeOrdineRimborso) {
+		this.differenzeOrdineRimborso = differenzeOrdineRimborso;
 	}
 
 }
