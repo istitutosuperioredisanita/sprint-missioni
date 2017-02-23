@@ -2,8 +2,10 @@ package it.cnr.si.missioni.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +30,11 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
@@ -47,6 +51,7 @@ import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
+import it.cnr.si.missioni.util.proxy.json.object.Nazione;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
@@ -55,6 +60,7 @@ import it.cnr.si.missioni.util.proxy.json.service.CdrService;
 import it.cnr.si.missioni.util.proxy.json.service.GaeService;
 import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
 import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
+import it.cnr.si.missioni.util.proxy.json.service.NazioneService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.TerzoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
@@ -107,6 +113,9 @@ public class RimborsoMissioneService {
 	
 	@Autowired
 	ImpegnoService impegnoService;
+	
+	@Autowired
+	NazioneService nazioneService;
 	
 	@Autowired
 	GaeService gaeService;
@@ -963,4 +972,183 @@ public class RimborsoMissioneService {
 		map.put(fileName, printRimborsoMissione);
 		return map;
 	}
+	public String getDifferenzeRimborsoOrdine(Principal principal, RimborsoMissione rimborso){
+		StringBuffer buffer = new StringBuffer();
+		OrdineMissione ordine = rimborso.getOrdineMissione();
+		if (isDiverso(rimborso.getUoSpesa(), ordine.getUoSpesa())){
+			aggiungiDifferenza(buffer, "UO Spesa: ", Utility.nvl(rimborso.getUoSpesa(),"Non valorizzata"));
+		}
+		if (isDiverso(rimborso.getCdrSpesa(), ordine.getCdrSpesa())){
+			aggiungiDifferenza(buffer, "CDR Spesa: ", Utility.nvl(rimborso.getCdrSpesa(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getCdsCompetenza(), ordine.getCdsCompetenza())){
+			aggiungiDifferenza(buffer, "CDS Competenza: ", Utility.nvl(rimborso.getCdsCompetenza(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getUoCompetenza(), ordine.getUoCompetenza())){
+			aggiungiDifferenza(buffer, "UO Competenza: ", Utility.nvl(rimborso.getUoCompetenza(),"Non valorizzata"));
+		}
+		if (isDiverso(rimborso.getOggetto(), ordine.getOggetto())){
+			aggiungiDifferenza(buffer, "Oggetto: ", Utility.nvl(rimborso.getOggetto(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getDestinazione(), ordine.getDestinazione())){
+			aggiungiDifferenza(buffer, "Destinazione: ", Utility.nvl(rimborso.getDestinazione(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getTipoMissione(), ordine.getTipoMissione())){
+			aggiungiDifferenza(buffer, "Tipo Missione: ", Utility.nvl(rimborso.decodeTipoMissione(),"Non valorizzata"));
+		}
+		if (isDiverso(rimborso.getNazione(), ordine.getNazione())){
+			Nazione nazione;
+			try {
+				nazione = nazioneService.loadNazione(rimborso.getNazione());
+				if (nazione != null){
+					aggiungiDifferenza(buffer, "Nazione: ", Utility.nvl(nazione.getDs_nazione(),"Non valorizzata"));
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (isDiverso(rimborso.getTrattamento(), ordine.getTrattamento())){
+			aggiungiDifferenza(buffer, "Trattamento: ", Utility.nvl(rimborso.decodeTrattamento(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getUtilizzoTaxi(), ordine.getUtilizzoTaxi())){
+			aggiungiDifferenza(buffer, "Utilizzo Taxi: ", Utility.nvl(rimborso.getUtilizzoTaxi(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getUtilizzoAutoNoleggio(), ordine.getUtilizzoAutoNoleggio())){
+			aggiungiDifferenza(buffer, "Utilizzo Auto Noleggio: ", Utility.nvl(rimborso.getUtilizzoAutoNoleggio(),"Non valorizzato"));
+		}
+		if (isDiverso(rimborso.getNoteUtilizzoTaxiNoleggio(), ordine.getNoteUtilizzoTaxiNoleggio())){
+			aggiungiDifferenza(buffer, "Note Utilizzo Taxi-Noleggio: ", Utility.nvl(rimborso.getNoteUtilizzoTaxiNoleggio(),"Non valorizzate"));
+		}
+		if (isDiverso(rimborso.getDataInizioMissione(), ordine.getDataInizioMissione())){
+			aggiungiDifferenza(buffer, "Data Inizio Missione: ", DateUtils.getDateAsString(rimborso.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE));
+		}
+		if (isDiverso(rimborso.getDataFineMissione(), ordine.getDataFineMissione())){
+			aggiungiDifferenza(buffer, "Data Fine Missione: ", DateUtils.getDateAsString(rimborso.getDataFineMissione(), DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE));
+		}
+		if (isDiverso(rimborso.getVoce(), ordine.getVoce())){
+			aggiungiDifferenza(buffer, "Voce: ", Utility.nvl(rimborso.getVoce(),"Non valorizzata"));
+		}
+		if (isDiverso(rimborso.getGae(), ordine.getGae())){
+			aggiungiDifferenza(buffer, "GAE: ", Utility.nvl(rimborso.getGae(),"Non valorizzata"));
+		}
+		if (isDiverso(rimborso.getPgProgetto(), ordine.getPgProgetto())){
+			Progetto progetto = progettoService.loadModulo(rimborso.getPgProgetto(), rimborso.getAnno(), rimborso.getUoSpesa());
+			if (progetto != null){
+				aggiungiDifferenza(buffer, "Progetto: ", Utility.nvl(progetto.getCd_progetto(),"Non valorizzato"));
+			}
+		}
+		if (isDiverso(rimborso.getEsercizioObbligazione(), ordine.getEsercizioObbligazione())){
+			if (rimborso.getEsercizioObbligazione() != null){
+				aggiungiDifferenza(buffer, "Esercizio Obbligazione: ", rimborso.getEsercizioObbligazione().toString());
+			} else {
+				aggiungiDifferenza(buffer, "Esercizio Obbligazione: ", "Non valorizzato");
+			}
+		}
+		if (isDiverso(rimborso.getEsercizioOriginaleObbligazione(), ordine.getEsercizioOriginaleObbligazione())){
+			if (rimborso.getEsercizioOriginaleObbligazione() != null){
+				aggiungiDifferenza(buffer, "Esercizio Origine Obbligazione: ", rimborso.getEsercizioOriginaleObbligazione().toString());
+			} else {
+				aggiungiDifferenza(buffer, "Esercizio Origine Obbligazione: ", "Non valorizzato");
+			}
+		}
+		if (isDiverso(rimborso.getPgObbligazione(), ordine.getPgObbligazione())){
+			if (rimborso.getPgObbligazione() != null){
+				aggiungiDifferenza(buffer, "Obbligazione: ", rimborso.getPgObbligazione().toString());
+			} else {
+				aggiungiDifferenza(buffer, "Obbligazione: ", "Non valorizzata");
+			}
+		}
+		try {
+			OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(principal, ordine);
+			String anticipoOrdine = "N";
+			BigDecimal importoAnticipoOrdine = BigDecimal.ZERO;
+			if (anticipo != null){
+				anticipoOrdine = "S";
+				importoAnticipoOrdine = anticipo.getImporto();
+			}
+			if (isDiverso(Utility.nvl(rimborso.getAnticipoRicevuto(),"N"), anticipoOrdine)){
+				aggiungiDifferenza(buffer, "Anticipo Ricevuto: ", Utility.nvl(rimborso.getAnticipoRicevuto(),"Non valorizzato"));
+			}
+			if (isDiverso(Utility.nvl(rimborso.getAnticipoImporto()), importoAnticipoOrdine)){
+				if (rimborso.getAnticipoImporto() != null){
+					aggiungiDifferenza(buffer, "Importo Anticipo: ", Utility.numberFormat(rimborso.getAnticipoImporto()));
+				} else {
+					aggiungiDifferenza(buffer, "Importo Anticipo: ", "Non valorizzato");
+				}
+			}
+		} catch (ComponentException e) {
+			e.printStackTrace();
+		}
+		try {
+			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordine);
+			String autoPropriaOrdine = "N";
+			String autoPropriaRimborso = "N";
+			if (autoPropria != null){
+				autoPropriaOrdine = "S";
+			}
+			retrieveDetails(principal, rimborso);
+			
+			if (rimborso.getRimborsoMissioneDettagli() != null){
+				for (RimborsoMissioneDettagli dettaglio : rimborso.getRimborsoMissioneDettagli()){
+					if (dettaglio.isDettaglioIndennitaKm()){
+						autoPropriaRimborso = "S";
+					}
+				}
+			}
+			
+			if (isDiverso(autoPropriaRimborso, autoPropriaOrdine)){
+				if (autoPropriaRimborso.equals("S")){
+					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Non autorizzato in fase d'ordine");
+				} else {
+					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Autorizzato in fase d'ordine ma non utilizzato in fase di rimborso");
+				}
+			}
+		} catch (ComponentException e) {
+			e.printStackTrace();
+		}
+		return buffer.toString();
+	}
+	private Boolean isDiverso(Object obj1, Object obj2){
+		if (obj1 == null && obj2 == null){
+			return false;
+		} else if (obj1 != null && obj2 == null || 
+				obj2 != null && obj1 == null){
+			return true;
+		} 
+		if (obj1 instanceof String){
+			String str1 = (String)obj1; 
+			String str2 = (String)obj2;
+			if (!str1.equals(str2)){
+				return true;
+			}
+		} else if (obj1 instanceof ZonedDateTime){
+			ZonedDateTime str1 = (ZonedDateTime)obj1; 
+			ZonedDateTime str2 = (ZonedDateTime)obj2;
+			if (str1.compareTo(str2) != 0){
+				return true;
+			}
+		} else if (obj1 instanceof Long){
+			Long str1 = (Long)obj1; 
+			Long str2 = (Long)obj2;
+			if (str1.compareTo(str2) != 0){
+				return true;
+			}
+		} else if (obj1 instanceof Integer){
+			Integer str1 = (Integer)obj1; 
+			Integer str2 = (Integer)obj2;
+			if (str1.compareTo(str2) != 0){
+				return true;
+			}
+		}
+		return false;
+	}
+	private StringBuffer aggiungiDifferenza(StringBuffer buffer, String label, String value){
+		if (buffer.length() > 0){
+			buffer.append(System.getProperty("line.separator"));
+		}
+		buffer.append(label+value);
+		return buffer;
+	}
 }
+

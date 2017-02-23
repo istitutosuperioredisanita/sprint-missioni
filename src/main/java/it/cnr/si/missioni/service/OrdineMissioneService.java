@@ -275,12 +275,18 @@ public class OrdineMissioneService {
 		ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
 		ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
-		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissioneDaAggiornare.getId().toString()));
+		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
 		if (anticipo != null){
 			anticipo.setStato(Costanti.STATO_INSERITO);
 			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
 		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+	}
+
+	public OrdineMissioneAnticipo getAnticipo(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
+			throws ComponentException {
+		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissioneDaAggiornare.getId().toString()));
+		return anticipo;
 	}
 
 	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
