@@ -2,10 +2,8 @@ package it.cnr.si.missioni.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -33,7 +32,6 @@ import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
@@ -50,7 +48,6 @@ import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
-import it.cnr.si.missioni.util.proxy.json.object.Nazione;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
@@ -82,6 +79,9 @@ public class RimborsoMissioneService {
 
 	@Autowired
 	private UoService uoService;
+
+    @Autowired
+    private Environment env;
 
 	@Autowired
 	private AccountService accountService;
@@ -158,8 +158,17 @@ public class RimborsoMissioneService {
 		rimborsoMissione.setRimborsoMissioneDettagli(list);
 	}
 
+	private boolean isDevProfile(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return true;
+   		}
+   		return false;
+	}
+
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
-    	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
+    	if (isDevProfile()){
+        	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
+    	}
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
     	if (lista != null){
     		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
