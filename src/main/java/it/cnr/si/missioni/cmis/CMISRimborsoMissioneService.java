@@ -326,8 +326,7 @@ public class CMISRimborsoMissioneService {
 					aggiungiDifferenza(buffer, "Nazione. ", null);
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new ComponentException("Errore durante il recupero dei dati della Nazione", e); 
 			}
 		}
 		if (isDiverso(rimborso.getTrattamento(), ordine.getTrattamento())){
@@ -347,7 +346,6 @@ public class CMISRimborsoMissioneService {
 		}
 		if (isDiverso(rimborso.getDataFineMissione(), ordine.getDataFineMissione())){
 			aggiungiDifferenza(buffer, "Data Fine Missione. ", null);
-			throw new ComponentException("Errore"); 
 		}
 		
 		if (isDiverso(rimborso.getVoce(), ordine.getVoce())){
@@ -395,7 +393,7 @@ public class CMISRimborsoMissioneService {
 				}
 			}
 		} catch (ComponentException e) {
-			e.printStackTrace();
+			throw new ComponentException("Errore durante il recupero dei dati dell'anticipo", e); 
 		}
 		try {
 			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordine);
@@ -421,7 +419,7 @@ public class CMISRimborsoMissioneService {
 				}
 			}
 		} catch (ComponentException e) {
-			e.printStackTrace();
+			throw new ComponentException("Errore durante il recupero dei dati dell'auto propria", e); 
 		}
 		return buffer.toString();
 	}
