@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -290,7 +291,7 @@ public class CMISRimborsoMissioneService {
 		return cmisRimborsoMissione;
 	}
 	
-	private String getDifferenzeRimborsoOrdine(Principal principal, RimborsoMissione rimborso){
+	private String getDifferenzeRimborsoOrdine(Principal principal, RimborsoMissione rimborso) throws ComponentException{
 		StringBuffer buffer = new StringBuffer();
 		OrdineMissione ordine = rimborso.getOrdineMissione();
 		if (ordine.getCdsRich() != null){
@@ -346,7 +347,9 @@ public class CMISRimborsoMissioneService {
 		}
 		if (isDiverso(rimborso.getDataFineMissione(), ordine.getDataFineMissione())){
 			aggiungiDifferenza(buffer, "Data Fine Missione. ", null);
+			throw new ComponentException("Errore"); 
 		}
+		
 		if (isDiverso(rimborso.getVoce(), ordine.getVoce())){
 			aggiungiDifferenza(buffer, "Voce. ", null);
 		}
@@ -436,8 +439,16 @@ public class CMISRimborsoMissioneService {
 				return true;
 			}
 		} else if (obj1 instanceof ZonedDateTime){
-			ZonedDateTime str1 = (ZonedDateTime)obj1; 
-			ZonedDateTime str2 = (ZonedDateTime)obj2;
+			ZonedDateTime zd1 = (ZonedDateTime)obj1; 
+			ZonedDateTime zd2 = (ZonedDateTime)obj2;
+			String str1 = DateUtils.getDateAsString(zd1, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
+			String str2 = DateUtils.getDateAsString(zd2, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
+			if (str1.equals(str2)){
+				return true;
+			}
+		} else if (obj1 instanceof LocalDate){
+			LocalDate str1 = (LocalDate)obj1; 
+			LocalDate str2 = (LocalDate)obj2;
 			if (str1.compareTo(str2) != 0){
 				return true;
 			}

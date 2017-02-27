@@ -241,7 +241,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var caricaCds = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
-                $scope.rimborsoMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
+                $scope.rimborsoMissioneModel.cdsRich = $scope.formatResultCds(listaCds[0]);
             } else {
                 if (cds){
                     $scope.elencoCds = [];
@@ -256,9 +256,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                             $scope.elencoCds[ind] = $scope.formatResultCds(listaCds[i]);
                         }
                     }
-                    if ($scope.rimborsoMissioneModel){
-                        $scope.rimborsoMissioneModel.cdsSpesa = cds;
-                    }
+//                    if ($scope.rimborsoMissioneModel){
+//                        $scope.rimborsoMissioneModel.cdsRich = cds;
+//                    }
                 }
             }
         } else {
