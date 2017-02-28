@@ -2,6 +2,7 @@ package it.cnr.si.missioni.util.proxy.cache.json;
 
 import it.cnr.si.missioni.util.DateUtils;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,9 +29,9 @@ public class Clause {
 
 	public final static String ANNO_CORRENTE = "ANNO_CORRENTE";
 
-	public final static Map<String, Object> SPECIAL_VALUES;
+	public final static Map<String, Serializable> SPECIAL_VALUES;
     static {
-        Map<String, Object> aMap = new HashMap<String, Object>();
+        Map<String, Serializable> aMap = new HashMap<String, Serializable>();
         aMap.put(ANNO_CORRENTE, DateUtils.getCurrentYear());
         SPECIAL_VALUES = Collections.unmodifiableMap(aMap);
     }
@@ -42,7 +43,7 @@ public class Clause {
 	@JsonProperty("operator")
 	private String operator;
 	@JsonProperty("fieldValue")
-	private Object fieldValue;
+	private Serializable fieldValue;
 	@JsonProperty("specialValue")
 	private String specialValue;
 	@JsonIgnore
@@ -114,7 +115,7 @@ public class Clause {
 	 * The fieldValue
 	 */
 	@JsonProperty("fieldValue")
-	public Object getFieldValue() {
+	public Serializable getFieldValue() {
 		return fieldValue;
 	}
 
@@ -124,7 +125,7 @@ public class Clause {
 	 * The fieldValue
 	 */
 	@JsonProperty("fieldValue")
-	public void setFieldValue(Object fieldValue) {
+	public void setFieldValue(Serializable fieldValue) {
 		this.fieldValue = fieldValue;
 	}
 
@@ -155,9 +156,9 @@ public class Clause {
 		return false;
 	}
 	
-	public Object getValueFromSpecialValue(){
+	public Serializable getValueFromSpecialValue(){
 		if (getSpecialValue() != null){
-			Object value = SPECIAL_VALUES.get(getSpecialValue());
+			Serializable value = SPECIAL_VALUES.get(getSpecialValue());
 			return value;
 		}
 		return null;

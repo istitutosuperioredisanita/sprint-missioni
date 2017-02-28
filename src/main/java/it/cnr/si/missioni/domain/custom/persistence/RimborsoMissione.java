@@ -118,7 +118,6 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
     @GeneratedValue(strategy = GenerationType.AUTO)
-//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
 	@Size(min = 0, max = 256)
@@ -344,7 +343,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     private String statoFlussoRitornoHome;
 	
 	@Transient
-    List<RimborsoMissioneDettagli> rimborsoMissioneDettagli;
+    private List<RimborsoMissioneDettagli> rimborsoMissioneDettagli;
 
 	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
 			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato){

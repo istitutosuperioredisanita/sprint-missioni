@@ -1,12 +1,11 @@
 package it.cnr.si.missioni.service;
 
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
-import java.io.InputStream;
-import java.math.BigDecimal;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.slf4j.Logger;
@@ -31,7 +30,6 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
 /**
@@ -78,8 +76,7 @@ public class RimborsoMissioneDettagliService {
 	public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissioneDettagli)
 			throws ComponentException {
 		if (idRimborsoMissioneDettagli != null) {
-			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(principal,
-					idRimborsoMissioneDettagli);
+			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(idRimborsoMissioneDettagli);
 			return lista;
 		}
 		return null;
@@ -174,7 +171,6 @@ public class RimborsoMissioneDettagliService {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaRimborsoMissioneDettagli(Principal principal,
 			RimborsoMissioneDettagli rimborsoMissioneDettagli, Boolean deleteDocument) throws ComponentException {
 		rimborsoMissioneDettagli.setToBeUpdated();

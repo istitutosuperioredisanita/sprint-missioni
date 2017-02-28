@@ -12,11 +12,11 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import java.security.Principal;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +30,10 @@ public class AutoPropriaService {
 
     private final Logger log = LoggerFactory.getLogger(AutoPropriaService.class);
 
-    @Inject
+    @Autowired
     private AutoPropriaRepository autoPropriaRepository;
 
-	@Inject
+	@Autowired
 	private CRUDComponentSession<AutoPropria> crudServiceBean;
 
     @Transactional(readOnly = true)
@@ -54,7 +54,6 @@ public class AutoPropriaService {
     	autoPropria.setToBeCreated();
 		validaCRUD(autoPropria);
 		autoPropria = (AutoPropria)crudServiceBean.creaConBulk(principal, autoPropria);
-//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Created Information for User: {}", autoPropria);
     	return autoPropria;
     }
@@ -80,7 +79,6 @@ public class AutoPropriaService {
 
 		autoPropria = (AutoPropria)crudServiceBean.modificaConBulk(principal, autoPropriaDB);
     	
-//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Dati Patente: {}", autoPropria);
     	return autoPropria;
     }

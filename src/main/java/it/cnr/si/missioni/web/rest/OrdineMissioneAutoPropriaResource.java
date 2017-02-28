@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +39,6 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
-import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
@@ -132,7 +130,7 @@ public class OrdineMissioneAutoPropriaResource {
     	if (ordineMissioneAutoPropria.getId() != null){
             try {
             	ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAutoPropria);
-    		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    		} catch (Exception e) {
         		log.error("ERRORE modifyAutoPropriaOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
@@ -153,7 +151,7 @@ public class OrdineMissioneAutoPropriaResource {
     	if (spostamentiAutoPropria.getId() != null){
             try {
             	spostamentiAutoPropria = ordineMissioneAutoPropriaService.updateSpostamenti((Principal) SecurityUtils.getCurrentUser(), spostamentiAutoPropria);
-    		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    		} catch (Exception e) {
         		log.error("ERRORE modifySpostamento",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}

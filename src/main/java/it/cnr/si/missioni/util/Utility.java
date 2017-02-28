@@ -10,23 +10,22 @@ import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.bulk.OggettoBulk;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MimeTypes;
-import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.ErrorRestSigla;
 
 public class Utility {
-	public static final java.math.BigDecimal ZERO = new java.math.BigDecimal(0);
+
+    public static final java.math.BigDecimal ZERO = new java.math.BigDecimal(0);
+    private static final Logger log = LoggerFactory.getLogger(Utility.class);
 	public static boolean equalsNull(Object object1, Object object2){
 		if (object1 == null && object2 == null)
 			return true;
@@ -142,8 +141,8 @@ public class Utility {
 	}
 	
 	public static String getMessageException(Exception e){
-		e.printStackTrace();
-		String obj = e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();
+		String obj = e.getLocalizedMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getLocalizedMessage();
+		log.error("Errore", e);
 
 		ErrorRestSigla errorRest = null;
 		try {
@@ -151,6 +150,7 @@ public class Utility {
 			errorRest = (ErrorRestSigla)new ObjectMapper().readValue(obj,classJson);
 			return errorRest.getError();
 		} catch (IOException ex) {
+			log.info("Non Rest Generico SIGLA", ex);
 				try {
 					JSONObject json = new JSONObject(obj);
 					String message = json.getString("userMessage");
@@ -158,6 +158,7 @@ public class Utility {
 						return message;
 					}
 				} catch (JSONException e1) {
+					log.info("Non userMessage SIGLA", e1);
 					try {
 						JSONObject json = new JSONObject(obj);
 						String message = json.getString("originalMessage");
@@ -165,6 +166,7 @@ public class Utility {
 							return message;
 						}
 					} catch (JSONException e2) {
+						log.info("Non originalMessage SIGLA", e2);
 						return obj;		
 					}
 				}

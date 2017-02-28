@@ -154,4 +154,9 @@ public class JSONBody implements Cloneable, Serializable{
 	public void setMissioneBulk(MissioneBulk missioneBulk) {
 		this.missioneBulk = missioneBulk;
 	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

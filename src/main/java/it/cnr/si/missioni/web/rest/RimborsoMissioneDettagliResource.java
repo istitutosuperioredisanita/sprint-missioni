@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
-import javax.persistence.OptimisticLockException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,9 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISFileContent;
@@ -89,9 +86,6 @@ public class RimborsoMissioneDettagliResource {
     	if (dettaglio.getId() != null){
             try {
             	dettaglio = rimborsoMissioneDettagliService.updateRimborsoMissioneDettagli((Principal) SecurityUtils.getCurrentUser(), dettaglio);
-    		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
-    			log.error("ERRORE getDettagli",e);
-                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		} catch (Exception e) {
     			log.error("ERRORE getDettagli",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -137,7 +131,7 @@ public class RimborsoMissioneDettagliResource {
 		} catch (AwesomeException e) {
 			log.error("deleteDettaglio", e);
             return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+		} catch (Exception e) {
 			log.error("createDettaglio", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
@@ -187,7 +181,7 @@ public class RimborsoMissioneDettagliResource {
 	        			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
 	                    return JSONResponseEntity.badRequest(error);
             		}
-            	} catch (ComponentException | AwesomeException | IOException e1) {
+            	} catch (Exception e1) {
         			log.error("uploadAllegatiDettaglioRimborsoMissione", e1);
                     return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
 				}
@@ -234,7 +228,7 @@ public class RimborsoMissioneDettagliResource {
             	}
     		} catch (AwesomeException e) {
                 log.error("getAttachment", e);
-    			throw new RuntimeException(Utility.getMessageException(e));
+    			throw new AwesomeException(Utility.getMessageException(e));
     		} 
         }
     }
