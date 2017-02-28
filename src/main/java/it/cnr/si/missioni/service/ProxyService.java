@@ -1,14 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.ResultProxy;
-import it.cnr.si.missioni.util.proxy.cache.CallCache;
-import it.cnr.si.missioni.util.proxy.json.JSONBody;
-import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,14 +17,28 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.ResultProxy;
+import it.cnr.si.missioni.util.proxy.cache.CallCache;
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
+import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
+import it.cnr.si.missioni.web.rest.ProxyResource;
 
 /**
  * Service for proxy to other application.
@@ -75,7 +80,7 @@ public class ProxyService implements EnvironmentAware{
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+				throw new ComponentException(Utility.getMessageException(e),e);
 			}
 //			if (callCache.getUrl().equals("ConsProgettiAction.json")){
 //				Path p = Paths.get("c:\\app\\prg.txt");
@@ -92,7 +97,7 @@ public class ProxyService implements EnvironmentAware{
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+				throw new ComponentException(Utility.getMessageException(e),e);
 			}
 	    	resultProxy.setCommonJsonResponse(commonJson);
 	    	resultProxy.setBody("");
@@ -101,8 +106,23 @@ public class ProxyService implements EnvironmentAware{
 	}
     
     public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization) {
+    	return process(httpMethod, jsonBody, app, url, queryString, authorization, false);
+    }
+    public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
         log.info("REST request from app ", app);
-        String appUrl = propertyResolver.getProperty(app + ".url");
+		String body = null;
+    	try {
+    		ObjectMapper mapper = new ObjectMapper();
+    		body = mapper.writeValueAsString(jsonBody);
+    	} catch (Exception ex) {
+    		throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").",ex);
+    	}
+        return process(httpMethod, body, app, url, queryString, authorization, restContextHeader);    	
+    }
+
+	public ResultProxy process(HttpMethod httpMethod, String body, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
+		String appUrl = propertyResolver.getProperty(app + ".url");
+		String proxyURL = null;
         if (appUrl == null) {
         	log.error("Cannot find properties for app: " + app + " Current profile are: ", Arrays.toString(environment.getActiveProfiles()));
         	throw new ApplicationContextException("Cannot find properties for app: " + app);
@@ -121,31 +141,58 @@ public class ProxyService implements EnvironmentAware{
         	} else {
         		headers.add("Authorization", authorization);
         	}
+        	headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         	
-    		String body = null;
-        	try {
-        		ObjectMapper mapper = new ObjectMapper();
-        		body = mapper.writeValueAsString(jsonBody);
-        	} catch (Exception ex) {
-        		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").");
+        	if (restContextHeader){
+        		addContextToHeader(app, headers);
         	}
-        	String proxyURL = appUrl.concat(url);
-    		if (queryString != null)
-    			proxyURL = proxyURL.concat("?").concat(queryString);        	
+        	
+        	proxyURL = appUrl.concat(url);
+    		if (queryString != null){
+    			String valueToDelete = ProxyResource.PROXY_URL+"="+url;
+    			int numberCharacter = valueToDelete.length(); 
+    			String newValue = queryString;
+    			if (queryString.startsWith(valueToDelete)){
+    				newValue = queryString.substring(numberCharacter);
+    			}
+    			proxyURL = proxyURL.concat("?").concat(newValue);        	
+    		}
         	HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);  
+        	log.info("Url: "+proxyURL);
+        	log.info("Header: "+headers);
+        	log.info("Body: "+body);
             ResponseEntity<String> result = getRestTemplate(app).
             		exchange(proxyURL, httpMethod, requestEntity, String.class);
             ResultProxy resultProxy = new ResultProxy();
             resultProxy.setBody(result.getBody());
             resultProxy.setType(result.getHeaders().getContentType().getType());
-            resultProxy.setStatus(result.getStatusCode().value());
+            resultProxy.setStatus(result.getStatusCode());
             log.debug("Response for url : " + proxyURL, resultProxy);
             return resultProxy;
         } catch (HttpClientErrorException _ex) {
-        	log.error(_ex.getMessage(), _ex);
-        	throw new ApplicationContextException(_ex.getMessage(), _ex);
-        }    	
-    }
+        	String errResponse = _ex.getResponseBodyAsString();
+        	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
+        	throw new ApplicationContextException(errResponse,_ex);
+        } catch (HttpServerErrorException _ex) {
+        	String errResponse = _ex.getResponseBodyAsString();
+        	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
+        	throw new ApplicationContextException(errResponse,_ex);
+        } catch (Exception _ex) {
+        	log.error(_ex.getMessage(), _ex.getLocalizedMessage());
+        	throw new ApplicationContextException("Servizio REST "+ proxyURL+" Eccezione: "+ _ex.getLocalizedMessage(),_ex);
+        }
+	}
+
+	private void addContextToHeader(String app, HttpHeaders headers) {
+		Context context = getDefaultContext(app);
+		if (context != null){
+			headers.add("X-sigla-cd-cds", context.getCd_cds());
+			headers.add("X-sigla-cd-unita-organizzativa", context.getCd_unita_organizzativa());
+			headers.add("X-sigla-cd-cdr", context.getCd_cdr());
+			int anno = DateUtils.getCurrentYear();
+			headers.add("X-sigla-esercizio", new Integer(anno).toString());
+		}
+	}
 
 	private RestTemplate getRestTemplate(String app) {
     	if (!restTemplateMap.containsKey(app))
@@ -160,6 +207,20 @@ public class ProxyService implements EnvironmentAware{
         this.restTemplateMap = new HashMap<String, RestTemplate>();
 	}
 
+	public Context getDefaultContext(String app){
+		String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
+		Context context = new Context();
+    	if (!StringUtils.isEmpty(uoContext)){
+    		context.setCd_unita_organizzativa(uoContext);
+    		if (StringUtils.isEmpty(context.getCd_cds())){
+    			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
+    		}
+    		if (StringUtils.isEmpty(context.getCd_cdr())){
+    			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
+    		}
+    	}
+    	return context;
+	}
 	public JSONBody inizializzaJson() {
 		JSONBody jBody = new JSONBody();
 		jBody.setActivePage(0);

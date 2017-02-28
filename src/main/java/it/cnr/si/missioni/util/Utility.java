@@ -1,14 +1,29 @@
 package it.cnr.si.missioni.util;
 
-import it.cnr.jada.bulk.OggettoBulk;
-
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.jada.bulk.OggettoBulk;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.util.proxy.json.object.sigla.ErrorRestSigla;
 
 public class Utility {
 	public static final java.math.BigDecimal ZERO = new java.math.BigDecimal(0);
@@ -37,7 +52,7 @@ public class Utility {
 	
 	public static BigDecimal nvl(BigDecimal imp){
 		if (imp != null)
-		  return imp;
+		  return imp.setScale(2);
 		return ZERO;  
 	}
 
@@ -107,6 +122,11 @@ public class Utility {
 	    return dataSenzaOre;
 	}
 
+	public static ZonedDateTime getDateWithoutHours(ZonedDateTime data){
+		ZonedDateTime zdt = data.truncatedTo(ChronoUnit.DAYS);		
+		return zdt;
+	}
+
 	public static String numberFormat(BigDecimal importo) {
 		if (importo != null){
 			DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.ITALIAN);
@@ -115,13 +135,49 @@ public class Utility {
 			formatter.setDecimalFormatSymbols(symbols);
 			formatter.setMaximumFractionDigits(2);
 			formatter.setMinimumFractionDigits(2);
-	    	return formatter.format((importo.setScale(2)).longValue());
+	    	return formatter.format((importo.setScale(2)).doubleValue());
 		} else {
 	    	return "";
 		}
 	}
 	
 	public static String getMessageException(Exception e){
-		return e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();		
+		e.printStackTrace();
+		String obj = e.getMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getMessage();
+
+		ErrorRestSigla errorRest = null;
+		try {
+			Class<?> classJson= ErrorRestSigla.class;
+			errorRest = (ErrorRestSigla)new ObjectMapper().readValue(obj,classJson);
+			return errorRest.getError();
+		} catch (IOException ex) {
+				try {
+					JSONObject json = new JSONObject(obj);
+					String message = json.getString("userMessage");
+					if (message != null){
+						return message;
+					}
+				} catch (JSONException e1) {
+					try {
+						JSONObject json = new JSONObject(obj);
+						String message = json.getString("originalMessage");
+						if (message != null){
+							return message;
+						}
+					} catch (JSONException e2) {
+						return obj;		
+					}
+				}
+				return obj;		
+		}
 	}
+	public static MimeTypes getMimeType(String contentType){
+		for(MimeTypes m : MimeTypes.values()) {
+			if (m.mimetype().equals(contentType)){
+				return m;
+			}
+		}
+		return null;
+	}
+	
 }

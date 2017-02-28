@@ -1,7 +1,7 @@
 <div ng-cloak>
     <div class="row">
-        <h2 ng-show="!endSearchCmis" class="text-center" translate="main.wait"></h2>
-           <div ng-show="!endSearchCmis" class="progress">
+        <h2 ng-show="!endSearchCmisOrdine || !endSearchCmisRimborso" class="text-center" translate="main.wait"></h2>
+           <div ng-show="!endSearchCmisOrdine || !endSearchCmisRimborso" class="progress">
               <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
               </div>
             </div>
@@ -10,17 +10,18 @@
     </div>
 
 
+  <div ng-show="endSearchCmisOrdine && endSearchCmisRimborso">
     <table ng-show="esistonoOrdiniRespinti" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.stato' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
             <th style="text-align: left">{{'main.comment' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
         </tr>
@@ -43,19 +44,87 @@
     </table>
 
     <div class="row">
+        <h2 ng-show="esistonoRimborsiRespinti" class="text-center color-rosso-mattone" translate="main.subtitle_ko_rimborso"></h2>
+    </div>
+    <table ng-show="esistonoRimborsiRespinti" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'main.comment' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listRimborsiMissioniToValidate | filter: {statoFlussoRitornoHome:'R'}" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStatoFlusso}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.commentFlows}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
+        <h2 ng-show="esistonoOrdiniResponsabileGruppo" class="text-center color-rosso-mattone" translate="main.subtitle_resp_gruppo"></h2>
+    </div>
+    <table ng-show="esistonoOrdiniResponsabileGruppo" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'ordine-missione.form.responsabile-gruppo' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="ordineMissione in listOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'M'}" ng-click="doSelectOrdineMissione(ordineMissione)" data-method="get">
+              <td style="text-align: center" >{{ordineMissione.anno}}</td>
+              <td style="text-align: right">{{ordineMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{ordineMissione.uid}}</td>
+              <td class="col-md-2" style="text-align: left">{{ordineMissione.responsabileGruppo}}</td>
+              <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{ordineMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
         <h2 ng-show="esistonoOrdiniApprovati" class="text-center" translate="main.subtitle_approvato"></h2>
     </div>
     <table ng-show="esistonoOrdiniApprovati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.stato' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
             <th style="text-align: left">{{'main.comment' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
         </tr>
@@ -78,19 +147,54 @@
     </table>
 
     <div class="row">
+        <h2 ng-show="esistonoRimborsiApprovati" class="text-center" translate="main.subtitle_approvato_rimborso"></h2>
+    </div>
+    <table ng-show="esistonoRimborsiApprovati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'rimborsoMissione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'main.comment' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listRimborsoMissioniToValidate | filter: {statoFlussoRitornoHome:'A'}" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStatoFlusso}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.commentFlows}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
         <h2 ng-show="esistonoOrdiniAnnullati" class="text-center" translate="main.subtitle_annullato"></h2>
     </div>
     <table ng-show="esistonoOrdiniAnnullati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.stato' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
             <th style="text-align: left">{{'main.comment' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
         </tr>
@@ -113,18 +217,115 @@
     </table>
 
     <div class="row">
+        <h2 ng-show="esistonoRimborsiAnnullati" class="text-center" translate="main.subtitle_annullato_rimborso"></h2>
+    </div>
+    <table ng-show="esistonoRimborsiAnnullati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'main.comment' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listRimborsiMissioniToValidate | filter: {statoFlussoRitornoHome:'N'}" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStatoFlusso}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.commentFlows}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
+        <h2 ng-show="esistonoOrdiniDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare"></h2>
+    </div>
+    <table ng-show="esistonoOrdiniDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="ordineMissione in listOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'V'}" ng-click="doSelectOrdineMissioneValidazione(ordineMissione)" data-method="get">
+              <td style="text-align: center" >{{ordineMissione.anno}}</td>
+              <td style="text-align: right">{{ordineMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{ordineMissione.uid}}</td>
+              <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{ordineMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
+        <h2 ng-show="esistonoRimborsiDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare_rimborso"></h2>
+    </div>
+    <table ng-show="esistonoRimborsiDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listRimborsiMissioniToValidate | filter: {statoFlussoRitornoHome:'V'}" ng-click="doSelectRimborsoMissioneValidazione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
         <h2 ng-show="esistonoOrdiniDaConfermare" class="text-center" translate="main.subtitle_da_confermare"></h2>
     </div>
     <table ng-show="esistonoOrdiniDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.stato' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
         </tr>
@@ -146,32 +347,34 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoOrdiniDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare"></h2>
+        <h2 ng-show="esistonoRimborsiDaConfermare" class="text-center" translate="main.subtitle_da_confermare_rimborso"></h2>
     </div>
-    <table ng-show="esistonoOrdiniDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
         </tr>
       </thead>
 
       <tbody id ="missioni">
-        <tr ng-repeat="ordineMissione in listOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'V'}" ng-click="doSelectOrdineMissioneValidazione(ordineMissione)" data-method="get">
-              <td style="text-align: center" >{{ordineMissione.anno}}</td>
-              <td style="text-align: right">{{ordineMissione.numero}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{ordineMissione.uid}}</td>
-              <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
-              <td class="col-md-3" style="text-align: left">{{ordineMissione.oggetto}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        <tr ng-repeat="rimborsoMissione in listRimborsiMissioniToValidate | filter: {statoFlussoRitornoHome:'C'}" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStatoFlusso}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
         </tr>
       </tbody>  
     </table>
@@ -182,13 +385,13 @@
     <table ng-show="esistonoOrdiniDaApprovare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.stato' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
             <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
         </tr>
@@ -208,4 +411,69 @@
         </tr>
       </tbody>  
     </table>
+    <div class="row">
+        <h2 ng-show="esistonoRimborsiDaApprovare" class="text-center" translate="main.subtitle_da_approvare_rimborso"></h2>
+    </div>
+    <table ng-show="esistonoRimborsiDaApprovare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listRimborsiMissioniToValidate | filter: {statoFlussoRitornoHome:'D'}" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStatoFlusso}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+    <div class="row">
+        <h2 ng-show="esistonoOrdiniDaRendereDefinitivi" class="text-center" translate="main.subtitle_da_rendere_definitivi"></h2>
+    </div>
+    <table ng-show="esistonoOrdiniDaRendereDefinitivi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="ordineMissione in listOrdiniMissioniToFinalize | filter: {statoFlussoRitornoHome:'F'}" ng-click="doSelectOrdineMissioneToFinalize(ordineMissione)" data-method="get">
+              <td style="text-align: center" >{{ordineMissione.anno}}</td>
+              <td style="text-align: right">{{ordineMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{ordineMissione.uid}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeStatoFlusso}}</td>
+              <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{ordineMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+    </div>
 </div>

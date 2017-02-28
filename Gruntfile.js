@@ -1,4 +1,4 @@
-// Generated on 2015-03-25 using generator-jhipster 1.9.0 -> backend upgraded to 2.24.0 on 2015-02-16
+// Generated on 2015-03-25 using generator-jhipster 1.9.0 -> backend upgraded to 2.24.0 on 2016-02-16
 'use strict';
 
 var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
@@ -11,7 +11,7 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'src/main/webapp/dist'
+            dist: 'target/www'
         },
         watch: {
             styles: {
@@ -279,6 +279,18 @@ module.exports = function (grunt) {
         },
         // Put files not handled in other tasks here
         copy: {
+i18n: {
+
+
+files: [{                                                                                                                                          
+expand: true,
+cwd: 'src/main/webapp',
+dest: '<%= yeoman.dist %>/',
+src: [
+'i18n/**'
+]
+}]
+},
             dist: {
                 files: [{
                     expand: true,
@@ -290,6 +302,7 @@ module.exports = function (grunt) {
                         'views/*.html',
                         'views/**/*.html',
                         'images/**/*.{png,gif,webp}',
+                        'protected/**/*.gif',
                         'fonts/*'
                     ]
                 }, {
@@ -333,7 +346,6 @@ module.exports = function (grunt) {
             ],
             dist: [
                 'copy:styles',
-                'imagemin',
                 'svgmin'
             ]
         },
@@ -426,6 +438,7 @@ module.exports = function (grunt) {
         'concurrent:dist',
         'autoprefixer',
         'concat',
+        'copy:i18n',
         'copy:dist',
         'ngAnnotate',
         'cssmin',
