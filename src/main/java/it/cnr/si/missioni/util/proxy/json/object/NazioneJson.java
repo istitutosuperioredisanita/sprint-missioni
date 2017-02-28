@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class NazioneJson extends CommonJsonRest<Nazione> implements Serializable {
-	List<Nazione> elements;
+	private List<Nazione> elements;
 	public List<Nazione> getElements() {
 		return elements;
 	}
