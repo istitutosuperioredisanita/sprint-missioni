@@ -60,7 +60,7 @@ public class Banca extends RestServiceBean implements Serializable {
     @JsonProperty("ds_terzo_delegato")
     private String dsTerzoDelegato;
     @JsonIgnore
-    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -323,12 +323,12 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     @JsonAnyGetter
-    public Map<String, Serializable> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Serializable value) {
+    public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 

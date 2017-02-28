@@ -32,9 +32,9 @@ public class ClauseToIterate implements Serializable{
 
 	public static final String ANNO_CORRENTE = "ANNO_CORRENTE";
 
-	public static final Map<String, Serializable> SPECIAL_VALUES;
+	public static final Map<String, Object> SPECIAL_VALUES;
     static {
-        Map<String, Serializable> aMap = new HashMap<String, Serializable>();
+        Map<String, Object> aMap = new HashMap<String, Object>();
         aMap.put(ANNO_CORRENTE, DateUtils.getCurrentYear());
         SPECIAL_VALUES = Collections.unmodifiableMap(aMap);
     }
@@ -57,7 +57,7 @@ public class ClauseToIterate implements Serializable{
 	@JsonProperty("fieldGetForSpecialValue")
 	private String fieldGetForSpecialValue;
 	@JsonIgnore
-	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
+	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	/**
 	 *
@@ -226,21 +226,21 @@ public class ClauseToIterate implements Serializable{
 		return false;
 	}
 	
-	public Serializable getValueFromToSpecialValue(){
+	public Object getValueFromToSpecialValue(){
 		if (getToSpecialValue() != null){
-			Serializable value = SPECIAL_VALUES.get(getToSpecialValue());
+			Object value = SPECIAL_VALUES.get(getToSpecialValue());
 			return value;
 		}
 		return null;
 	}
 	
 	@JsonAnyGetter
-	public Map<String, Serializable> getAdditionalProperties() {
+	public Map<String, Object> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Serializable value) {
+	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
 	}
 

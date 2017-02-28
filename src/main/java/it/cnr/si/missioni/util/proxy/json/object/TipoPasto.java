@@ -51,13 +51,13 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     @JsonProperty("dt_fine_validita")
     private Integer dtFineValidita;
     @JsonProperty("dt_cancellazione")
-    private Serializable dtCancellazione;
+    private Object dtCancellazione;
     @JsonProperty("cd_area_estera")
     private String cdAreaEstera;
     @JsonProperty("ds_area_estera")
     private String dsAreaEstera;
     @JsonIgnore
-    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -245,7 +245,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
      *     The dtCancellazione
      */
     @JsonProperty("dt_cancellazione")
-    public Serializable getDtCancellazione() {
+    public Object getDtCancellazione() {
         return dtCancellazione;
     }
 
@@ -255,7 +255,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
      *     The dt_cancellazione
      */
     @JsonProperty("dt_cancellazione")
-    public void setDtCancellazione(Serializable dtCancellazione) {
+    public void setDtCancellazione(Object dtCancellazione) {
         this.dtCancellazione = dtCancellazione;
     }
 
@@ -300,12 +300,12 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     @JsonAnyGetter
-    public Map<String, Serializable> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Serializable value) {
+    public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 

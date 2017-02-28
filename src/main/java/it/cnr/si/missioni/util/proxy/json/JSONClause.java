@@ -7,13 +7,13 @@ public class JSONClause  implements Serializable{
 	private String fieldName;
 	private String operator;
 
-	private Serializable fieldValue;
+	private Object fieldValue;
 	
 	public JSONClause(){
 		super();
 	}
 
-	public JSONClause(String condition, String fieldName, String operator, Serializable fieldValue){
+	public JSONClause(String condition, String fieldName, String operator, Object fieldValue){
 		super();
 		this.condition = condition;
 		this.fieldName = fieldName;
@@ -46,7 +46,7 @@ public class JSONClause  implements Serializable{
 	public Object getFieldValue() {
 		return fieldValue;
 	}
-	public void setFieldValue(Serializable fieldValue) {
+	public void setFieldValue(Object fieldValue) {
 		this.fieldValue = fieldValue;
 	}
 }

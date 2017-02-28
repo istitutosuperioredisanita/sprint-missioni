@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class TipoSpesaJson extends  CommonJsonRest<TipoSpesa> implements Serializable {
-	List<TipoSpesa> elements;
+	private List<TipoSpesa> elements;
 	public List<TipoSpesa> getElements() {
 		return elements;
 	}

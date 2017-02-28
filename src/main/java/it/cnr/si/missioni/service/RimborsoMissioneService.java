@@ -678,8 +678,7 @@ public class RimborsoMissioneService {
 		if (rimborsoMissione.getDataInserimento() == null){
 			rimborsoMissione.setDataInserimento(LocalDate.now());
 		}
-		Integer anno = 	rimborsoMissione.getDataInserimento().getYear();
-		return anno;
+		return rimborsoMissione.getDataInserimento().getYear();
 	}
 
     private void controlloDatiObbligatoriDaGUI(RimborsoMissione rimborsoMissione){
@@ -687,9 +686,7 @@ public class RimborsoMissioneService {
 			if (!StringUtils.isEmpty(rimborsoMissione.getMatricola())){
 				if (StringUtils.isEmpty(rimborsoMissione.getInquadramento()))
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato possibile recuperare il valore dell'Inquadramento SIGLA. Verificare i dati");
-			} else {
-				
-			}
+			} 
 			if (StringUtils.isEmpty(rimborsoMissione.getCdsRich())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Cds Richiedente");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getCdsSpesa())){
