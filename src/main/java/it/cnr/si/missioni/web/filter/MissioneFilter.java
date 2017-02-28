@@ -1,10 +1,15 @@
 package it.cnr.si.missioni.web.filter;
 
 import java.util.Date;
+import java.util.List;
 
-public class OrdineMissioneFilter {
+public class MissioneFilter {
+	private List<String> listaStatiMissione;
+	private List<String> listaStatiFlussoMissione;
 	private String user;
 	private String stato;
+	private String statoFlusso;
+	private String validato;
 	private Integer anno;
 	private Long daId;
 	private Long aId;
@@ -86,5 +91,29 @@ public class OrdineMissioneFilter {
 	}
 	public void setStato(String stato) {
 		this.stato = stato;
+	}
+	public String getStatoFlusso() {
+		return statoFlusso;
+	}
+	public void setStatoFlusso(String statoFlusso) {
+		this.statoFlusso = statoFlusso;
+	}
+	public String getValidato() {
+		return validato;
+	}
+	public void setValidato(String validato) {
+		this.validato = validato;
+	}
+	public List<String> getListaStatiMissione() {
+		return listaStatiMissione;
+	}
+	public void setListaStatiMissione(List<String> listaStatiMissione) {
+		this.listaStatiMissione = listaStatiMissione;
+	}
+	public List<String> getListaStatiFlussoMissione() {
+		return listaStatiFlussoMissione;
+	}
+	public void setListaStatiFlussoMissione(List<String> listaStatiFlussoMissione) {
+		this.listaStatiFlussoMissione = listaStatiFlussoMissione;
 	}
 }

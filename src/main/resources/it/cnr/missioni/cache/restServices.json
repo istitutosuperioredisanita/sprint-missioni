@@ -1,6 +1,11 @@
 {
     "restService": [
         {
+            "app": "SIPER",
+            "url": "json/sedi/",
+            "skipLoadStartup": "S"
+        },
+        {
             "app": "SIGLA",
             "url": "ConsUnitaOrganizzativaAction.json",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativaJson",
@@ -173,19 +178,13 @@
                 },
                 {
                     "condition": "AND",
-                    "fieldName": "esercizio_inizio",
-                    "operator": "<=",
+                    "fieldName": "esercizio",
+                    "operator": "=",
                     "fieldValue": ""
                 },
                 {
                     "condition": "AND",
-                    "fieldName": "esercizio_fine",
-                    "operator": ">=",
-                    "fieldValue": ""
-                },
-                {
-                    "condition": "AND",
-                    "fieldName": "cd_centro_responsabilita",
+                    "fieldName": "centro_responsabilita.cd_centro_responsabilita",
                     "operator": "=",
                     "fieldValue": ""
                 },
@@ -261,6 +260,36 @@
                 {
                     "name": "cd_progetto",
                     "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsTerzoAction.json",
+            "skipLoadStartup": "S",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.TerzoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Terzo",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "anagrafico.codice_fiscale",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsInquadramentoAction.json",
+            "skipLoadStartup": "S",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.InquadramentoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Inquadramento",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_anag",
+                    "operator": "=",
+                    "fieldValue": ""
                 }
             ]
         }

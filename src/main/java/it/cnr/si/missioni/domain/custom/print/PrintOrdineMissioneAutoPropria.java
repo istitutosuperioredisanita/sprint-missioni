@@ -44,6 +44,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"dataScadenzaPatente",
 	"entePatente",
 	"stato",
+	"motiviIspettivi",
+	"motiviUrgenza",
+	"motiviTrasporto",
 	"spostamenti"
 })
 public class PrintOrdineMissioneAutoPropria {
@@ -106,6 +109,12 @@ public class PrintOrdineMissioneAutoPropria {
 	private String entePatente;
 	@JsonProperty("stato")
 	private String stato;
+	@JsonProperty("motiviIspettivi")
+	private String motiviIspettivi;
+	@JsonProperty("motiviUrgenza")
+	private String motiviUrgenza;
+	@JsonProperty("motiviTrasporto")
+	private String motiviTrasporto;
 	@JsonProperty("spostamenti")
 	private List<Spostamenti> spostamenti = new ArrayList<Spostamenti>();
 	@JsonIgnore
@@ -719,6 +728,30 @@ public class PrintOrdineMissioneAutoPropria {
 	@JsonAnySetter
 	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
+	}
+
+	public String getMotiviIspettivi() {
+		return motiviIspettivi;
+	}
+
+	public void setMotiviIspettivi(String motiviIspettivi) {
+		this.motiviIspettivi = motiviIspettivi;
+	}
+
+	public String getMotiviUrgenza() {
+		return motiviUrgenza;
+	}
+
+	public void setMotiviUrgenza(String motiviUrgenza) {
+		this.motiviUrgenza = motiviUrgenza;
+	}
+
+	public String getMotiviTrasporto() {
+		return motiviTrasporto;
+	}
+
+	public void setMotiviTrasporto(String motiviTrasporto) {
+		this.motiviTrasporto = motiviTrasporto;
 	}
 
 }

@@ -5,8 +5,14 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -34,6 +40,12 @@ public class DateUtils {
 	 */
 	public static final String PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE = "yyyy-MM-dd HH:mm";
 
+	/**
+	 * PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE
+	 */
+	public static final String PATTERN_DATETIME_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	
+	
 	/**
 	 * PATTERN_DATETIME
 	 */
@@ -98,6 +110,11 @@ public class DateUtils {
 		return date.before(date1) ? date : date1;
 	}
 
+	public static LocalDate truncate(ZonedDateTime data) {
+		return data.truncatedTo(ChronoUnit.DAYS).toLocalDate();
+	}
+
+	
 	public static Timestamp truncate(Timestamp timestamp) {
 		return new Timestamp(truncate(((Date)(timestamp))).getTime());
 	}
@@ -269,6 +286,41 @@ public class DateUtils {
 	 * @return
 	 * @throws {@link AwesomeException}
 	 */
+	public static LocalDate parseLocalDate(String aDate) throws AwesomeException {
+		return parseLocalDate(aDate,PATTERN_DATE);
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @throws {@link AwesomeException}
+	 */
+	public static LocalDate parseLocalDate(String aDate, String aPattern)
+					throws AwesomeException {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(aPattern);
+
+		return LocalDate.parse(aDate, formatter);
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @throws {@link AwesomeException}
+	 */
+	public static ZonedDateTime parseZonedDateTime(String aDate, String aPattern)
+					throws AwesomeException {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(aPattern);
+
+		return ZonedDateTime.parse(aDate, formatter);
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @throws {@link AwesomeException}
+	 */
 	public static Date parseDateWithDefaultPattern(String aDate)
 					throws AwesomeException {
 
@@ -375,6 +427,22 @@ public class DateUtils {
 		return sdf.format(data);
 	}
 
+	public static String getDateAsString(ZonedDateTime data, String pattern) {
+		return data.format(DateTimeFormatter.ofPattern(pattern));
+	}
+	
+	public static GregorianCalendar getDate(ZonedDateTime data){
+		return GregorianCalendar.from(data);
+	}
+	
+	public static GregorianCalendar getDate(LocalDate data){
+		return GregorianCalendar.from(data.atStartOfDay(ZoneId.systemDefault()));
+	}
+	
+	public static String getDateAsString(LocalDate data, String pattern) {
+		return data.format(DateTimeFormatter.ofPattern(pattern));
+	}
+
 	/**
 	 * Metodo che torna la data in formato stringa dd/MM/yyyy.
 	 * 
@@ -383,6 +451,14 @@ public class DateUtils {
 	 * @return la data in formato stringa dd/MM/yyyy
 	 */
 	public static String getDefaultDateAsString(Date data) {
+		return getDateAsString(data,PATTERN_DATE);
+	}
+
+	public static String getDefaultDateAsString(LocalDate data) {
+		return getDateAsString(data,PATTERN_DATE);
+	}
+
+	public static String getDefaultDateAsString(ZonedDateTime data) {
 		return getDateAsString(data,PATTERN_DATE);
 	}
 

@@ -17,6 +17,7 @@ public interface CodiciErrore {
 	final static String INVALID_REQUEST = "INVALID_REQUEST";
 	final static String TARGA_GIA_INSERITA = "TARGA_ALREADY_EXISTS";
 	final static String CAMPO_OBBLIGATORIO = "Campo Obbligatorio";
+	final static String DATI_GIA_INSERITI = "Dati già inseriti";
 	final static String DATI_INCONGRUENTI = "DATI_INCONGRUENTI";
 	final static String ERR_DATE_INCONGRUENTI = "ERR_DATE_INCONGRUENTI";
 	public final static String[] text = {

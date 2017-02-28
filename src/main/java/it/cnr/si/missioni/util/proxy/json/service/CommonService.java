@@ -1,5 +1,12 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+
 import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
@@ -9,13 +16,6 @@ import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CommonService {
@@ -63,5 +63,28 @@ public class CommonService {
 			risposta = result.getBody();
 		}
 		return risposta;
+	}
+	public String process(JSONBody jBody, String app, String url) {
+		cacheService.setContext(jBody, app);
+		return process(jBody, app, url, false);
+	}
+	public String processWithContextHeader(JSONBody jBody, String app, String url) {
+		return process(jBody, app, url, true);
+	}
+
+	public String process(String body, String app, String url, Boolean value, HttpMethod httpMethod) {
+		String risposta = null;
+		ResultProxy result = proxyService.process(httpMethod, body, app, url, "proxyURL="+url, null, value);
+		risposta = result.getBody();
+		return risposta;
+	}
+	public String process(JSONBody jBody, String app, String url, Boolean value, HttpMethod httpMethod) {
+		String risposta = null;
+		ResultProxy result = proxyService.process(httpMethod, jBody, app, url, "proxyURL="+url, null, value);
+		risposta = result.getBody();
+		return risposta;
+	}
+	private String process(JSONBody jBody, String app, String url, Boolean value) {
+		return process(jBody, app, url, value, HttpMethod.POST);
 	}
 }

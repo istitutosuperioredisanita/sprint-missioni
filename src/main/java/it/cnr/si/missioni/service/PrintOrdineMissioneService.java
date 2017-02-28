@@ -1,5 +1,14 @@
 package it.cnr.si.missioni.service;
 
+import java.util.Date;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -20,15 +29,6 @@ import it.cnr.si.missioni.util.proxy.json.service.NazioneService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.util.proxy.json.service.VoceService;
-
-import java.util.Date;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PrintOrdineMissioneService {
@@ -72,7 +72,7 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setCdsRich(ordineMissione.getCdsRich());
     	printOrdineMissione.setCdsSpesa(ordineMissione.getCdsSpesa());
     	printOrdineMissione.setCodiceFiscaleRich(account.getCodiceFiscale());
-    	printOrdineMissione.setComuneResidenzaRich(ordineMissione.getComuneResidenzaRich());
+    	printOrdineMissione.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
     		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissione.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
@@ -91,7 +91,7 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setDomicilioFiscaleRich(Utility.nvl(ordineMissione.getDomicilioFiscaleRich()));
        	printOrdineMissione.setImportoPresunto(Utility.numberFormat(ordineMissione.getImportoPresunto()));
 
-       	printOrdineMissione.setIndirizzoResidenzaRich(ordineMissione.getIndirizzoResidenzaRich());
+       	printOrdineMissione.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissione.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
     	printOrdineMissione.setLuogoDiNascitaRich(account.getComuneNascita());
     	printOrdineMissione.setMatricolaRich(account.getMatricola());

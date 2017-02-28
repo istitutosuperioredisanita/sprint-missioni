@@ -143,6 +143,13 @@ angular.module('missioniApp')
             }
             return input;
         };
+    }).filter('dateMissioni', function () {
+        return function (input) {
+            if (input) {
+              input = moment(input).format("DD/MM/YYYY");
+            }
+            return input;
+        };
   }).filter('myNumberFilter', function(){
 
     return function(number) {
@@ -225,8 +232,13 @@ angular.module('missioniApp')
             } else {
               scope.accountBanner.nominativo = account.lastName+" "+account.firstName;
             }
-            scope.accountBanner.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza; 
-            scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_residenza+" "+account.num_civico_residenza; 
+            if (account.comune_residenza && account.cap_residenza){
+              scope.accountBanner.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza; 
+            }
+            if (account.indirizzo_completo_residenza){
+              scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
+            }
+
             scope.accountBanner.qualificaRich = account.profilo; 
             scope.accountBanner.livelloRich = account.livello; 
             scope.accountBanner.codiceFiscale = account.codice_fiscale; 
@@ -265,41 +277,11 @@ angular.module('missioniApp')
         });
       },
     };
-  }).directive('modalShow', function ($parse, modalService) {
-    return {
-      restrict: 'A',
-      link: function (scope, element, attrs) {
-        var body = element.children('div');
-        var item = modalService.modal(attrs.modalTitle, body);
-        element.append(item);
-        //Hide or show the modal
-        scope.showModal = function (visible, elem) {
-          if (!elem) {
-            elem = element;
-          }
-          if (visible) {
-            $(elem).modal('show');
-          } else {
-            $(elem).modal('hide');
-          }
-        };
-        //Watch for changes to the modal-visible attribute
-        scope.$watch(attrs.modalShow, function (newValue) {
-          scope.showModal(newValue, attrs.$$element);
-        });
-        //Update the visible value when the dialog is closed through UI actions (Ok, cancel, etc.)
-        $(element).bind('hide.bs.modal', function () {
-          $parse(attrs.modalShow).assign(scope, false);
-          if (!scope.$$phase && !scope.$root.$$phase) {
-            scope.$apply();
-          }
-        });
-      }
-    };
   }).directive('cnrModalInfoImpegno', function ($log, $http, APP_FOR_REST, SIGLA_REST, URL_REST, ui) {
     return {
       restrict: 'E',
       scope: {
+        fondi: '=',
         anno: '=',
         cds: '=',
         gae: '=',
@@ -312,49 +294,55 @@ angular.module('missioniApp')
         scope.validateImpegno = function () {
           $log.debug('sono in debug');
 	        if (scope.annoImpegno && scope.numero){
-	            var app = APP_FOR_REST.SIGLA;
-	            var url = null;
-	            var varClauses = [];
-			    var urlRestProxy = URL_REST.STANDARD;
-	            if (scope.gae){
-	                url = SIGLA_REST.IMPEGNO_GAE;
-	                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:scope.anno},
-	                              {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:scope.cds},
-	                              {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:scope.annoImpegno},
-	                              {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:scope.numero},
-	                              {condition: 'AND', fieldName: 'cdLineaAttivita', operator: "=", fieldValue:scope.gae}];
-	            } else {
-	                url = SIGLA_REST.IMPEGNO;
-	                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:scope.anno},
-	                              {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:scope.cds},
-	                              {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:scope.annoImpegno},
-	                              {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:scope.numero}];
-	            }
-	            var varOrderBy = [{name: 'esercizio', type: 'DESC'}];
-	            var postImpegno = {activePage:0, maxItemsPerPage:1000, orderBy:varOrderBy, clauses:varClauses}
-	            $http.post(urlRestProxy + app+'/', postImpegno, {params: {proxyURL: url}}).success(function (data) {
-	                if (data){
-	                    if (data.elements){
-	                        var impegnoSelected = data.elements[0];
-	                        if (impegnoSelected){
-	          					scope.pgObbligazione = impegnoSelected.pgObbligazione;
-	          					scope.descrizione = impegnoSelected.dsObbligazione;
-	          					if (impegnoSelected.esercizio === impegnoSelected.esercizioOriginale){
-	          						scope.disponibilita = impegnoSelected.imScadenzaComp - impegnoSelected.imAssociatoDocAmmComp;
-	          					} else {
-	          						scope.disponibilita = impegnoSelected.imScadenzaRes - impegnoSelected.imAssociatoDocAmmRes;
-	          					}
-         						scope.disponibilita = scope.disponibilita.toString().replace(".",",");
-		                    } else {
-				                ui.error("Impegno non esistente");
-	    	                }
-	                    } else {
-			                ui.error("Impegno non esistente");
-	                    }
-	                }
-	            }).error(function (data) {
-	                ui.error(data);
-	            });
+            if (scope.fondi && scope.fondi == 'C' && scope.anno != scope.annoImpegno){
+                ui.error("Incongruenza tra fondi e anno impegno");
+            } else if (scope.fondi && scope.fondi == 'R' && scope.anno <= scope.annoImpegno){
+                ui.error("Incongruenza tra fondi e anno impegno");
+	          } else {
+              var app = APP_FOR_REST.SIGLA;
+              var url = null;
+              var varClauses = [];
+              var urlRestProxy = URL_REST.STANDARD;
+              if (scope.gae){
+                  url = SIGLA_REST.IMPEGNO_GAE;
+                  varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:scope.anno},
+                                {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:scope.cds},
+                                {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:scope.annoImpegno},
+                                {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:scope.numero},
+                                {condition: 'AND', fieldName: 'cdLineaAttivita', operator: "=", fieldValue:scope.gae}];
+              } else {
+                  url = SIGLA_REST.IMPEGNO;
+                  varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:scope.anno},
+                                {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:scope.cds},
+                                {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:scope.annoImpegno},
+                                {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:scope.numero}];
+              }
+              var varOrderBy = [{name: 'esercizio', type: 'DESC'}];
+              var postImpegno = {activePage:0, maxItemsPerPage:1000, orderBy:varOrderBy, clauses:varClauses}
+              $http.post(urlRestProxy + app+'/', postImpegno, {params: {proxyURL: url}}).success(function (data) {
+                  if (data){
+                      if (data.elements){
+                          var impegnoSelected = data.elements[0];
+                          if (impegnoSelected){
+                      scope.pgObbligazione = impegnoSelected.pgObbligazione;
+                      scope.descrizione = impegnoSelected.dsObbligazione;
+                      $('#exampleModal').modal('toggle');
+                      if (impegnoSelected.esercizio === impegnoSelected.esercizioOriginale){
+                        scope.disponibilita = impegnoSelected.imScadenzaComp - impegnoSelected.imAssociatoDocAmmComp;
+                      } else {
+                        scope.disponibilita = impegnoSelected.imScadenzaRes - impegnoSelected.imAssociatoDocAmmRes;
+                      }
+                    scope.disponibilita = scope.disponibilita.toString().replace(".",",");
+                        } else {
+                        ui.error("Impegno non esistente");
+                        }
+                      } else {
+                      ui.error("Impegno non esistente");
+                      }
+                  }
+              }).error(function (data) {
+              });
+            }
 	        } else {
 	        }
     

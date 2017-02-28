@@ -5,8 +5,9 @@
 missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
 });
 
-missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService) {
-    $scope.endSearchCmis = false;
+missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService) {
+    $scope.endSearchCmisOrdine = false;
+    $scope.endSearchCmisRimborso = false;
     if (!$sessionStorage.account || !$sessionStorage.account.login) {
       $location.path('/login');
     } else {
@@ -21,6 +22,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
 
         ElencoOrdiniMissioneService.findListToValidate().then(function(response){
             $scope.listOrdiniMissioniToValidate = response.data;
+            $scope.esistonoOrdiniDaRendereDefinitivi = false;
             $scope.esistonoOrdiniDaApprovare = false;
             $scope.esistonoOrdiniAnnullati = false;
             $scope.esistonoOrdiniApprovati = false;
@@ -40,18 +42,64 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoOrdiniAnnullati = true;
                     } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
                         $scope.esistonoOrdiniDaValidare = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'F'){
+                        $scope.esistonoOrdiniDaRendereDefinitivi = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'M'){
+                        $scope.esistonoOrdiniResponsabileGruppo = true;
                     }
                 }
             }
-            $scope.endSearchCmis = true;
+            $scope.endSearchCmisOrdine = true;
+        },
+        function(error){
+            $scope.endSearchCmisOrdine = true;
+        });        
+
+        ElencoRimborsiMissioneService.findListToValidate().then(function(response){
+            $scope.listRimborsiMissioniToValidate = response.data;
+            $scope.esistonoRimborsiDaApprovare = false;
+            $scope.esistonoRimborsiAnnullati = false;
+            $scope.esistonoRimborsiApprovati = false;
+            $scope.esistonoRimborsiRespinti = false;
+            $scope.esistonoRimborsiDaConfermare = false;
+            if ($scope.listRimborsiMissioniToValidate){
+                for (var i=0; i< $scope.listRimborsiMissioniToValidate.length; i++) {
+                    if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
+                        $scope.esistonoRimborsiDaApprovare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'R'){
+                        $scope.esistonoRimborsiRespinti = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'C'){
+                        $scope.esistonoRimborsiDaConfermare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'A'){
+                        $scope.esistonoRimborsiApprovati = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'N'){
+                        $scope.esistonoRimborsiAnnullati = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoRimborsiDaValidare = true;
+                    }
+                }
+            }
+            $scope.endSearchCmisRimborso = true;
+        },
+        function(error){
+            $scope.endSearchCmisRimborso = true;
         });        
     }
     
+    $scope.doSelectRimborsoMissioneValidazione = function (rimborsoMissione) {
+        $location.path('/rimborso-missione/'+rimborsoMissione.id+'/'+"S");
+    };
+    $scope.doSelectRimborsoMissione = function (rimborsoMissione) {
+        $location.path('/rimborso-missione/'+rimborsoMissione.id);
+    };
     $scope.doSelectOrdineMissione = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id);
     };
     $scope.doSelectOrdineMissioneValidazione = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id+'/'+"S");
+    };
+    $scope.doSelectOrdineMissioneToFinalize = function (ordineMissione) {
+        $location.path('/ordine-missione/'+ordineMissione.id+'/'+"D");
     };
 });
 
