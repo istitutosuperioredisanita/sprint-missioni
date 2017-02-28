@@ -21,4 +21,9 @@ public class JSONSIGLABody implements Cloneable, Serializable {
 	public void setContext(Context context) {
 		this.context = context;
 	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

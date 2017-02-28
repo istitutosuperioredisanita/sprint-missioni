@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class CdrJson extends CommonJsonRest<Cdr> implements Serializable {
-	List<Cdr> elements;
+	private List<Cdr> elements;
 	public List<Cdr> getElements() {
 		return elements;
 	}

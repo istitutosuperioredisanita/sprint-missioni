@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class BancaJson extends CommonJsonRest<Banca> implements Serializable {
-	List<Banca> elements;
+	private List<Banca> elements;
 	public List<Banca> getElements() {
 		return elements;
 	}

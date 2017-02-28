@@ -15,19 +15,19 @@
                     "condition": "AND",
                     "fieldName": "cd_unita_padre",
                     "operator": "=",
-                    "fieldValue": ""
+                    "fieldValue": "a"
                 },
                 {
                     "condition": "AND",
                     "fieldName": "cd_unita_organizzativa",
                     "operator": "=",
-                    "fieldValue": ""
+                    "fieldValue": "a"
                 },
                 {
                     "condition": "AND",
                     "fieldName": "esercizio_fine",
                     "operator": ">=",
-                    "fieldValue": ""
+                    "fieldValue": "2012"
                 }
             ],
             "order": [
@@ -76,7 +76,7 @@
                     "condition": "AND",
                     "fieldName": "pg_nazione",
                     "operator": "=",
-                    "fieldValue": ""
+                    "fieldValue": "1"
                 }
             ],
             "order": [

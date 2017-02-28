@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class CdsJson extends CommonJsonRest<Cds> implements Serializable {
-	List<Cds> elements;
+	private List<Cds> elements;
 	public List<Cds> getElements() {
 		return elements;
 	}

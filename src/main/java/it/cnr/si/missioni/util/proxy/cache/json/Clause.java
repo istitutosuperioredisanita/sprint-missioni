@@ -25,11 +25,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"fieldValue",
 	"specialValue"
 })
-public class Clause {
+public class Clause implements Serializable{
 
-	public final static String ANNO_CORRENTE = "ANNO_CORRENTE";
+	public static final String ANNO_CORRENTE = "ANNO_CORRENTE";
 
-	public final static Map<String, Serializable> SPECIAL_VALUES;
+	public static final Map<String, Serializable> SPECIAL_VALUES;
     static {
         Map<String, Serializable> aMap = new HashMap<String, Serializable>();
         aMap.put(ANNO_CORRENTE, DateUtils.getCurrentYear());
@@ -47,7 +47,7 @@ public class Clause {
 	@JsonProperty("specialValue")
 	private String specialValue;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
 	/**
 	 *
@@ -165,12 +165,12 @@ public class Clause {
 	}
 	
 	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
+	public Map<String, Serializable> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
+	public void setAdditionalProperty(String name, Serializable value) {
 		this.additionalProperties.put(name, value);
 	}
 

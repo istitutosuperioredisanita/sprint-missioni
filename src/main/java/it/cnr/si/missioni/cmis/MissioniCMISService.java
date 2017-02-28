@@ -63,18 +63,18 @@ public class MissioniCMISService {
 	@Autowired
 	private ApplicationContext appContext;
 	
-	public static final String ASPECT_TITLED = "P:cm:titled",
-			ASPECT_FLUSSO = "P:wfcnr:parametriFlusso",
-			ASPECT_FLUSSO_MISSIONI = "P:cnrmissioni:parametriFlussoMissioni",
-			PROPERTY_TITLE = "cm:title", 
-			PROPERTY_DESCRIPTION = "cm:description", 
-			PROPERTY_AUTHOR = "cm:author",
-			ASPECT_AUTHOR = "P:"+PROPERTY_AUTHOR,
-			ALFCMIS_NODEREF = "alfcmis:nodeRef",
-			PROPERTY_AUTOVERSION = "cm:autoVersion", 
-			PROPERTY_AUTOVERSION_ON_UPDATE = "cm:autoVersionOnUpdateProps",
-			PROPERTY_FOLDER = "cmis:folder",
-			PATH_SERVICE_PERMISSIONS = "service/cnr/nodes/permissions/";
+	public static final String ASPECT_TITLED = "P:cm:titled";
+	public static final String ASPECT_FLUSSO = "P:wfcnr:parametriFlusso";
+	public static final String ASPECT_FLUSSO_MISSIONI = "P:cnrmissioni:parametriFlussoMissioni";
+	public static final String PROPERTY_TITLE = "cm:title"; 
+	public static final String PROPERTY_DESCRIPTION = "cm:description"; 
+	public static final String PROPERTY_AUTHOR = "cm:author";
+	public static final String ASPECT_AUTHOR = "P:"+PROPERTY_AUTHOR;
+	public static final String ALFCMIS_NODEREF = "alfcmis:nodeRef";
+	public static final String PROPERTY_AUTOVERSION = "cm:autoVersion"; 
+	public static final String PROPERTY_AUTOVERSION_ON_UPDATE = "cm:autoVersionOnUpdateProps";
+	public static final String PROPERTY_FOLDER = "cmis:folder";
+	public static final String PATH_SERVICE_PERMISSIONS = "service/cnr/nodes/permissions/";
 
 	@Value("${cmis.alfresco}")
 	private String baseURL;
@@ -101,8 +101,7 @@ public class MissioniCMISService {
 		Pattern pattern = Pattern.compile("([\\/:@()&<>?\"])");
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
-			String str1 = matcher.replaceAll("_"); 
-			return str1;
+			return matcher.replaceAll("_"); 
 		} else {
 			return name;
 		}		
@@ -113,8 +112,7 @@ public class MissioniCMISService {
 		Pattern pattern = Pattern.compile("([\\/:@()&<>?\"])");
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
-			String str1 = matcher.replaceAll("'"); 
-			return str1;
+			return matcher.replaceAll("'"); 
 		} else {
 			return name;
 		}		
@@ -154,8 +152,7 @@ public class MissioniCMISService {
 	}
 	
 	public CmisPath getBasePath() {
-		CmisPath cmisPath = (CmisPath)appContext.getBean("cmisPath");
-		return cmisPath;
+		return (CmisPath)appContext.getBean("cmisPath");
 	}
 	
 	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName) {
