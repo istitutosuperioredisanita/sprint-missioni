@@ -1,8 +1,9 @@
 package it.cnr.si.missioni.util.proxy.json.object;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class CommonJsonRest<T extends RestServiceBean> {
+public abstract class CommonJsonRest<T extends RestServiceBean> implements Serializable{
 	private Integer totalNumItems;
 	private Integer maxItemsPerPage;
 	private Integer activePage;

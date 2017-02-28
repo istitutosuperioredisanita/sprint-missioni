@@ -60,9 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MissioniCMISService {
 	private transient static final Log logger = LogFactory.getLog(MissioniCMISService.class);
 
-//	@Autowired
-//	private CmisPath cmisPath;
-
 	@Autowired
 	private ApplicationContext appContext;
 	
@@ -161,7 +158,7 @@ public class MissioniCMISService {
 		return cmisPath;
 	}
 	
-	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName){
+	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName) {
 		CmisObject cmisObject = getNodeByPath(cmisPath);
 		try{
 			metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspectsToAdd);
@@ -175,7 +172,8 @@ public class MissioniCMISService {
 				folder.updateProperties(metadataProperties, true);
 				return CmisPath.construct(folder.getPath());
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			logger.error("Errore nella creazione della folder.", e);
+			throw new ComponentException(e);
 		}
 	}
 	
@@ -242,7 +240,8 @@ public class MissioniCMISService {
 		}catch (CmisBaseException e) {
 			throw e;
 		}catch (Exception e) {
-			throw new RuntimeException(e);
+			logger.error("Errore nel salvataggio del documento.", e);
+			throw new ComponentException(e);
 		}
 	}
 	
@@ -307,7 +306,8 @@ public class MissioniCMISService {
 			}
 			node.updateProperties(metadataProperties, true);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			logger.error("Errore nell'aggiornamento delle properties.", e);
+			throw new ComponentException(e);
 		}
 	}
 
@@ -330,15 +330,15 @@ public class MissioniCMISService {
 		source.addToFolder(target, true);
 	}
 	
-	public ItemIterable<QueryResult> search(StringBuffer query){
+	public ItemIterable<QueryResult> search(StringBuilder query){
 		return search(query, session.getDefaultContext());
 	}
 
-	public ItemIterable<QueryResult> search(StringBuffer query, OperationContext operationContext){
+	public ItemIterable<QueryResult> search(StringBuilder query, OperationContext operationContext){
 		return session.query(query.toString(), false, operationContext);
 	}
 	
-	public List<CmisObject> searchAndFetchNode(StringBuffer query){
+	public List<CmisObject> searchAndFetchNode(StringBuilder query){
 		List<CmisObject> results = new ArrayList<CmisObject>();
 		for (QueryResult queryResult : search(query)) {
 			results.add(getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID)));
@@ -502,12 +502,13 @@ public class MissioniCMISService {
 		} catch (CMISException e) {
 			throw e;
 		} catch (Exception e) {
+			logger.error("Errore nel recuperoNodeRefUtente.", e);
 			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Utente " + username + " non registrato.");
 		}
 
     }
     
-	public Response startFlowOrdineMissione(StringWriter stringWriter) throws Exception{
+	public Response startFlowOrdineMissione(StringWriter stringWriter) throws ComponentException{
 		String simpleUrl = getUrlOrdineMissione();
 		return startFlow(stringWriter, simpleUrl);
 	}
@@ -520,7 +521,7 @@ public class MissioniCMISService {
 		return "service/api/workflow/activiti$flussoMissioniRimborso/formprocessor";
 	}
 	
-	public Response startFlowRimborsoMissione(StringWriter stringWriter) throws Exception{
+	public Response startFlowRimborsoMissione(StringWriter stringWriter) throws ComponentException{
 		String simpleUrl = getUrlRimborsoMissione();
 		return startFlow(stringWriter, simpleUrl);
 	}

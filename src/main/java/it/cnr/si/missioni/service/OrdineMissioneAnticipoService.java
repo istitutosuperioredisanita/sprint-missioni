@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -46,7 +45,7 @@ public class OrdineMissioneAnticipoService {
 
 	private final Logger log = LoggerFactory.getLogger(OrdineMissioneAnticipoService.class);
 
-	@Inject
+	@Autowired
 	private OrdineMissioneAnticipoRepository ordineMissioneAnticipoRepository;
 
 	@Autowired
@@ -58,7 +57,7 @@ public class OrdineMissioneAnticipoService {
 	@Autowired
 	private PrintOrdineMissioneAnticipoService printOrdineMissioneAnticipoService;
 
-	@Inject
+	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
 	@Transactional(readOnly = true)
@@ -174,7 +173,6 @@ public class OrdineMissioneAnticipoService {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaOrdineMissioneAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws ComponentException {
 		if (ordineMissioneAnticipo.isStatoNonInviatoAlFlusso()){
@@ -206,7 +204,7 @@ public class OrdineMissioneAnticipoService {
 			ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAnticipo(ordineMissioneAnticipo);
-			} catch (Exception e1) {
+			} catch (ComponentException e1) {
 				throw new ComponentException(
 						"Errore nel recupero del contenuto del file Anticipo sul documentale ("
 								+ Utility.getMessageException(e1) + ")",e1);
@@ -253,12 +251,6 @@ public class OrdineMissioneAnticipoService {
 		return printOrdineMissione;
 	}
 
-//	public Document creaDocumentoAnticipo(String username, OrdineMissioneAnticipo ordineMissioneAnticipo)
-//			throws ComponentException {
-//		byte[] printOrdineMissione = printAnticipo(username, ordineMissioneAnticipo);
-//		return cmisOrdineMissioneService.salvaStampaAnticipoSuCMIS(username, printOrdineMissione, ordineMissioneAnticipo);
-//	}
-//
 	@Transactional(readOnly = true)
 	public String jsonForPrintOrdineMissione(Principal principal, Long idMissione)
 			throws AwesomeException, ComponentException {
@@ -275,8 +267,7 @@ public class OrdineMissioneAnticipoService {
 					OrdineMissioneAnticipo.class, idAnticipo);
 			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 					ordineMissioneAnticipo.getOrdineMissione().getId());
-			List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsAnticipo(principal,
-					ordineMissione, idAnticipo);
+			List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsAnticipo(ordineMissione, idAnticipo);
 			return lista;
 		}
 		return null;

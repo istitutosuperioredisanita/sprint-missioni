@@ -8,8 +8,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,9 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
@@ -59,7 +55,7 @@ public class OrdineMissioneAnticipoResource {
     @Autowired
     private TokenStore tokenStore;
 
-	@Inject
+	@Autowired
     private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
     /**
@@ -111,7 +107,7 @@ public class OrdineMissioneAnticipoResource {
     	if (ordineMissioneAnticipo.getId() != null){
             try {
             	ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo);
-    		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    		} catch (Exception e) {
     			log.error("ERRORE modifyAnticipoOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
@@ -135,7 +131,7 @@ public class OrdineMissioneAnticipoResource {
 		} catch (AwesomeException e) {
 			log.error("ERRORE deleteAnticipo",e);
 			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+		} catch (Exception e) {
 			log.error("ERRORE deleteAnticipo",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
@@ -176,13 +172,13 @@ public class OrdineMissioneAnticipoResource {
         					}
         				} catch (IOException e) {
         					log.error("ERRORE printOrdineMissioneAnticipo",e);
-        					throw new RuntimeException(Utility.getMessageException(e));
+        					throw new AwesomeException(Utility.getMessageException(e));
         				} 
         			}
     			}
         	} catch (ComponentException e) {
     			log.error("ERRORE printOrdineMissioneAnticipo",e);
-        		throw new RuntimeException(Utility.getMessageException(e));
+        		throw new AwesomeException(Utility.getMessageException(e));
         	} 
         }
     }
@@ -216,7 +212,7 @@ public class OrdineMissioneAnticipoResource {
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmOrdineMissioneAnticipo",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (ComponentException|OptimisticLockException e) {
+    		} catch (Exception e) {
     			log.error("ERRORE confirmOrdineMissioneAnticipo",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
@@ -272,7 +268,7 @@ public class OrdineMissioneAnticipoResource {
 	        			log.error("uploadAllegatiAnticipo", error);
 	                    return JSONResponseEntity.badRequest(error);
             		}
-            	} catch (ComponentException | AwesomeException | IOException e1) {
+            	} catch (Exception e1) {
         			log.error("uploadAllegatiAnticipo", e1);
                     return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
 				}

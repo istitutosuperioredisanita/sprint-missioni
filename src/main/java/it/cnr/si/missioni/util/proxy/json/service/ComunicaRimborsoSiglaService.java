@@ -245,11 +245,10 @@ public class ComunicaRimborsoSiglaService {
 		return missioneBulk;
 	}
 	public MissioneBulk comunica(MissioneBulk missione) {
-		String body = null;
 		if (missione != null){
 			String app = Costanti.APP_SIGLA;
 			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA;
-	    	body = prepareBody(missione, body);
+			String body = prepareBody(missione);
 
 			String risposta = commonService.process(body, app, url, true, HttpMethod.PUT);
 	    	try {
@@ -262,14 +261,15 @@ public class ComunicaRimborsoSiglaService {
 		}
 		return null;
 	}
-	public String prepareBody(MissioneBulk missione, String body) {
+	public String prepareBody(MissioneBulk missione) {
+		String body = null;
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			body = mapper.writeValueAsString(missione);
+			return body;
 		} catch (Exception ex) {
 			throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST ("+Utility.getMessageException(ex)+").",ex);
 		}
-		return body;
 	}
 
 	private String recuperoDataTappa(List<TappeMissioneColl> tappe, RimborsoMissioneDettagli dettaglio){

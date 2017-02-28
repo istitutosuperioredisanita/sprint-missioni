@@ -38,7 +38,7 @@ public class Gae extends RestServiceBean implements Serializable {
 	@JsonProperty("esercizio_fine")
 	private Integer esercizio_fine;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
 	/**
 	 *
@@ -161,12 +161,12 @@ public class Gae extends RestServiceBean implements Serializable {
 	}
 
 	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
+	public Map<String, Serializable> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
+	public void setAdditionalProperty(String name, Serializable value) {
 		this.additionalProperties.put(name, value);
 	}
 

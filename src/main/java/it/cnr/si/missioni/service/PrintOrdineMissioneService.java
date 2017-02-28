@@ -2,8 +2,6 @@ package it.cnr.si.missioni.service;
 
 import java.util.Date;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,25 +35,25 @@ public class PrintOrdineMissioneService {
     @Autowired
     private PrintService printService;
 
-    @Inject
+    @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
 
-    @Inject
+    @Autowired
     private CdrService cdrService;
 
-    @Inject
+    @Autowired
     private NazioneService nazioneService;
 
-    @Inject
+    @Autowired
     private GaeService gaeService;
 
-    @Inject
+    @Autowired
     private ProgettoService progettoService;
 
-    @Inject
+    @Autowired
     private AccountService accountService;
 
-    @Inject
+    @Autowired
     private VoceService voceService;
     
 //    private PrintOrdineMissione getPrintOrdineMissione(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException {

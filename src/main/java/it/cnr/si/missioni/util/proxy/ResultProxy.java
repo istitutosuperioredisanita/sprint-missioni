@@ -1,17 +1,17 @@
 package it.cnr.si.missioni.util.proxy;
 
-import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
-import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
-
 import java.io.Serializable;
 
 import org.springframework.http.HttpStatus;
+
+import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
+import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 
 public class ResultProxy implements Serializable {
     private String type;
     private HttpStatus status;
     private String body;
-	CommonJsonRest<RestServiceBean> commonJsonResponse;
+    private CommonJsonRest<RestServiceBean> commonJsonResponse;
     
 	public String getType() {
 		return type;

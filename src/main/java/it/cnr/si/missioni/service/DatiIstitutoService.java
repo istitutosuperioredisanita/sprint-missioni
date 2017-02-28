@@ -1,26 +1,25 @@
 package it.cnr.si.missioni.service;
 
+import java.security.Principal;
+
+import javax.persistence.OptimisticLockException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.DatiIstitutoRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-
-import java.security.Principal;
-
-import javax.inject.Inject;
-import javax.persistence.OptimisticLockException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing users.
@@ -30,10 +29,10 @@ public class DatiIstitutoService {
 
     private final Logger log = LoggerFactory.getLogger(DatiIstitutoService.class);
 
-	@Inject
+	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
-    @Inject
+    @Autowired
     private DatiIstitutoRepository datiIstitutoRepository;
 
     @Transactional(readOnly = true)
@@ -41,14 +40,12 @@ public class DatiIstitutoService {
         return datiIstitutoRepository.getDatiIstituto(istituto, anno);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
     private DatiIstituto getDatiIstitutoAndLock(String istituto, Integer anno) {
         return datiIstitutoRepository.getDatiIstitutoAndLock(istituto, anno);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Long getNextPG (Principal principal, String istituto, Integer anno, String tipo) 
-    		throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public Long getNextPG (Principal principal, String istituto, Integer anno, String tipo)throws ComponentException{
     	DatiIstituto datiIstituto = null;
    		datiIstituto = getDatiIstitutoAndLock(istituto, anno);
     	Long pgCorrente = null;
@@ -63,7 +60,6 @@ public class DatiIstitutoService {
     		datiIstituto.setUser(principal.getName());
     		datiIstituto.setToBeUpdated();
     		datiIstituto = (DatiIstituto)crudServiceBean.modificaConBulk(principal, datiIstituto);
-    		//			    	autoPropriaRepository.save(autoPropria);
     		log.debug("Updated Information for Dati Istituto: {}", datiIstituto);
     	} else {
     		DatiIstituto datiIstitutoInsert = null;
@@ -91,7 +87,6 @@ public class DatiIstitutoService {
 		return creaDatiIstituto(principal, istituto, anno, Costanti.TIPO_RIMBORSO_MISSIONE);
 	}
     
-    @Transactional(propagation = Propagation.REQUIRED)
 	private DatiIstituto creaDatiIstituto(Principal principal, String istituto, Integer anno, String tipo) throws ComponentException {
 		DatiIstituto datiIstitutoInsert = new DatiIstituto();
 		datiIstitutoInsert.setAnno(anno);
@@ -138,7 +133,7 @@ public class DatiIstitutoService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-	public void deleteDatiIstituto(Principal principal, Long idDatiIstituto) throws Exception {
+	public void deleteDatiIstituto(Principal principal, Long idDatiIstituto) throws ComponentException {
     	DatiIstituto datiIstituto = (DatiIstituto)crudServiceBean.findById(principal, DatiIstituto.class, idDatiIstituto);
 
 		//effettuo controlli di validazione operazione CRUD

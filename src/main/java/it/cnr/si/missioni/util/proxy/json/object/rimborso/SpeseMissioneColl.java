@@ -1,6 +1,7 @@
 
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "cambio_spesa",
     "ti_cd_ti_spesa"
 })
-public class SpeseMissioneColl {
+public class SpeseMissioneColl implements Serializable {
 
     @JsonProperty("pg_riga")
     private Integer pgRiga;
@@ -113,7 +114,7 @@ public class SpeseMissioneColl {
     @JsonProperty("ti_cd_ti_spesa")
     private String tiCdTiSpesa;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
     /**
      * 
@@ -516,12 +517,12 @@ public class SpeseMissioneColl {
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
+    public Map<String, Serializable> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
+    public void setAdditionalProperty(String name, Serializable value) {
         this.additionalProperties.put(name, value);
     }
 

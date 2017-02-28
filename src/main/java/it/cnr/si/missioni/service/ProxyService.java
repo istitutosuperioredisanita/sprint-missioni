@@ -78,25 +78,14 @@ public class ProxyService implements EnvironmentAware{
 			try {
 				clazzJson = Class.forName(callCache.getClasseJson());
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("Errore", e);
 				throw new ComponentException(Utility.getMessageException(e),e);
 			}
-//			if (callCache.getUrl().equals("ConsProgettiAction.json")){
-//				Path p = Paths.get("c:\\app\\prg.txt");
-//				byte data[] = resultProxy.getBody().getBytes();
-//				try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
-//					out.write(data);
-//				} catch (Exception e) {
-//					log.debug("errore" + e.getMessage());
-//				}
-//			}
 			CommonJsonRest commonJson = null;
 			try {
 				commonJson = (CommonJsonRest)new ObjectMapper().readValue(resultProxy.getBody(), clazzJson);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("Errore", e);
 				throw new ComponentException(Utility.getMessageException(e),e);
 			}
 	    	resultProxy.setCommonJsonResponse(commonJson);

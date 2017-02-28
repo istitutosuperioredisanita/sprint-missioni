@@ -180,7 +180,7 @@ public class MissioneBulk implements Cloneable, Serializable{
     @JsonProperty("codice_fiscale")
     private String codice_fiscale;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
     /**
      * 
@@ -883,12 +883,12 @@ public class MissioneBulk implements Cloneable, Serializable{
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
+    public Map<String, Serializable> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
+    public void setAdditionalProperty(String name, Serializable value) {
         this.additionalProperties.put(name, value);
     }
 
@@ -1050,6 +1050,11 @@ public class MissioneBulk implements Cloneable, Serializable{
 
 	public void setCodice_fiscale(String codice_fiscale) {
 		this.codice_fiscale = codice_fiscale;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 }

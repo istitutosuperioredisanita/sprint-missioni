@@ -85,7 +85,7 @@ public class DatiPatenteResource {
         		datiPatente = datiPatenteService.updateDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
         		log.debug("modificata patente");
                 return JSONResponseEntity.ok();
-    		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    		} catch (Exception e) {
             	log.error("registerDatiPatente", e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}    		

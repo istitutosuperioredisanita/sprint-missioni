@@ -165,7 +165,7 @@ public class RimborsoMissioneService {
    		return false;
 	}
 
-    public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
+    public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws ComponentException{
     	if (isDevProfile()){
         	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
     	}
@@ -212,7 +212,7 @@ public class RimborsoMissioneService {
     }
 
 	public void aggiornaRimborsoMissioneRespinto(Principal principal, ResultFlows result,
-			RimborsoMissione rimborsoMissioneDaAggiornare) throws Exception {
+			RimborsoMissione rimborsoMissioneDaAggiornare) throws ComponentException{
 		aggiornaValidazione(rimborsoMissioneDaAggiornare);
 		rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
 		rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
@@ -221,13 +221,13 @@ public class RimborsoMissioneService {
 	}
 
 	public void aggiornaRimborsoMissioneAnnullato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
-			throws Exception {
+			throws ComponentException {
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
 	}
 
 	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
-			throws Exception {
+			throws ComponentException {
 		rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
@@ -235,7 +235,7 @@ public class RimborsoMissioneService {
 	}
 
 	public RimborsoMissione aggiornaRimborsoMissioneComunicata(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, MissioneBulk missioneBulk)
-			throws Exception {
+			throws ComponentException {
 		rimborsoMissioneDaAggiornare.setEsercizioSigla(missioneBulk.getEsercizio());
 		rimborsoMissioneDaAggiornare.setPgMissioneSigla(missioneBulk.getPgMissione());
 		rimborsoMissioneDaAggiornare.setCdCdsSigla(missioneBulk.getCdCds());
@@ -245,20 +245,16 @@ public class RimborsoMissioneService {
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws AwesomeException, 
-    ComponentException, Exception{
+    public RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws ComponentException{
     	return updateRimborsoMissione(principal, rimborsoMissione, false);
     }
     
-    @Transactional(propagation = Propagation.REQUIRED)
-    private RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows)  throws AwesomeException, 
-    ComponentException, Exception{
+    private RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows)  throws ComponentException{
     	return updateRimborsoMissione(principal, rimborsoMissione, fromFlows, false);
     }
     
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm)  throws AwesomeException, 
-    ComponentException, Exception {
+    public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm)  throws ComponentException{
 
     	RimborsoMissione rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
 
@@ -426,7 +422,7 @@ public class RimborsoMissioneService {
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
-	public void deleteRimborsoMissione(Principal principal, Long idRimborsoMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+	public void deleteRimborsoMissione(Principal principal, Long idRimborsoMissione) throws ComponentException{
     	RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
 		if (rimborsoMissione != null){
 			controlloOperazioniCRUDDaGui(rimborsoMissione);
@@ -620,7 +616,7 @@ public class RimborsoMissioneService {
 
     
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione createRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws Exception {
+    public RimborsoMissione createRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws ComponentException{
     	controlloDatiObbligatoriDaGUI(rimborsoMissione);
     	inizializzaCampiPerInserimento(principal, rimborsoMissione);
 		validaCRUD(principal, rimborsoMissione);
@@ -629,10 +625,8 @@ public class RimborsoMissioneService {
     	return rimborsoMissione;
     }
 
-    @Transactional(readOnly = true)
     private void inizializzaCampiPerInserimento(Principal principal,
-    		RimborsoMissione rimborsoMissione) throws ComponentException,
-    		PersistencyException, BusyResourceException {
+    		RimborsoMissione rimborsoMissione) throws ComponentException{
     	rimborsoMissione.setUidInsert(principal.getName());
     	rimborsoMissione.setUser(principal.getName());
     	Integer anno = recuperoAnno(rimborsoMissione);
@@ -766,8 +760,7 @@ public class RimborsoMissioneService {
 		}
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
-	private void validaCRUD(Principal principal, RimborsoMissione rimborsoMissione) throws AwesomeException {
+	private void validaCRUD(Principal principal, RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione != null){
 			controlloCampiObbligatori(rimborsoMissione); 
 			controlloCongruenzaDatiInseriti(principal, rimborsoMissione);
@@ -775,8 +768,7 @@ public class RimborsoMissioneService {
 		}
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
-	private void controlloDatiFinanziari(Principal principal, RimborsoMissione rimborsoMissione) throws AwesomeException {
+	private void controlloDatiFinanziari(Principal principal, RimborsoMissione rimborsoMissione) {
     	UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno());
     	if (uo == null){
     		throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La UO "+ rimborsoMissione.getUoSpesa() + " non è corretta rispetto al CDS "+rimborsoMissione.getCdsSpesa());
@@ -865,7 +857,7 @@ public class RimborsoMissioneService {
     
     }
 	
-    private void controlloCongruenzaDatiInseriti(Principal principal, RimborsoMissione rimborsoMissione) throws AwesomeException {
+    private void controlloCongruenzaDatiInseriti(Principal principal, RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getDataFineMissione().isBefore(rimborsoMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
@@ -925,7 +917,7 @@ public class RimborsoMissioneService {
 	}
 
 	@Transactional(readOnly = true)
-   	public Map<String, byte[]> printRimborsoMissione(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
+   	public Map<String, byte[]> printRimborsoMissione(Authentication auth, Long idMissione) throws ComponentException {
     	Principal principal = (Principal)auth;
     	RimborsoMissione rimborsoMissione = getRimborsoMissione(principal, idMissione, true);
     	byte[] printRimborsoMissione = null;
@@ -934,7 +926,7 @@ public class RimborsoMissioneService {
     		ContentStream content = null;
 			try {
 				content = cmisRimborsoMissioneService.getContentStreamRimborsoMissione(rimborsoMissione);
-			} catch (Exception e1) {
+			} catch (ComponentException e1) {
 				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){

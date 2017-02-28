@@ -7,10 +7,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ public class PrintService{
 
     private final Logger log = LoggerFactory.getLogger(PrintService.class);
 
-	@Inject	
+	@Autowired	
 	private Environment env;
 
 	private RelaxedPropertyResolver propertyResolver;

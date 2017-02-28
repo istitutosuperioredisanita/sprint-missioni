@@ -217,7 +217,7 @@ public class CacheService implements EnvironmentAware{
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();
 				if (!StringUtils.isEmpty(rest.getUrl()) && rest.getUrl().equals(url) && 
-						!StringUtils.isEmpty(rest.getUrl()) && rest.getApp().equals(app)	){
+						!StringUtils.isEmpty(rest.getApp()) && rest.getApp().equals(app)	){
 					setOrderBy(rest, jBody);
 				}
 			}
@@ -238,7 +238,7 @@ public class CacheService implements EnvironmentAware{
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();
 				if (!StringUtils.isEmpty(rest.getUrl()) && rest.getUrl().equals(url) && 
-						!StringUtils.isEmpty(rest.getUrl()) && rest.getApp().equals(app)	){
+						!StringUtils.isEmpty(rest.getApp()) && rest.getApp().equals(app)	){
 					return rest;
 				}
 			}

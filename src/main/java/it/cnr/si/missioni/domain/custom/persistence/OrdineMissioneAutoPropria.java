@@ -1,8 +1,6 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import it.cnr.si.missioni.util.Costanti;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +19,8 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
+import it.cnr.si.missioni.util.Costanti;
+
 /**
  * A user.
  */
@@ -34,10 +34,8 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
     @GeneratedValue(strategy = GenerationType.AUTO)
-//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
-//    @JsonIgnore
     @Size(min = 0, max = 50)
     @Column(name = "TARGA", length = 50, nullable = false)
     private String targa;
@@ -99,21 +97,8 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
     public String utilizzoMotiviTrasporto;
 
 	@Transient
-    List<SpostamentiAutoPropria> listSpostamenti;
+    private List<SpostamentiAutoPropria> listSpostamenti;
     
-//    @JsonIgnore
-//    @ManyToMany
-//    @JoinTable(
-//            name = "T_USER_AUTHORITY",
-//            joinColumns = {@JoinColumn(name = "login", referencedColumnName = "login")},
-//            inverseJoinColumns = {@JoinColumn(name = "name", referencedColumnName = "name")})
-//    private Set<Authority> authorities = new HashSet<>();
-//
-//    @JsonIgnore
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
-//    private Set<PersistentToken> persistentTokens = new HashSet<>();
-//
-
     public String getTarga() {
 		return targa;
 	}
@@ -158,31 +143,6 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
 		this.id = id;
 	}
 
-	//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = 1;
-//		result = prime * result + ((id == null) ? 0 : id.hashCode());
-//		return result;
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (!super.equals(obj))
-//			return false;
-//		if (getClass() != obj.getClass())
-//			return false;
-//		AutoPropria other = (AutoPropria) obj;
-//		if (id == null) {
-//			if (other.id != null)
-//				return false;
-//		} else if (!id.equals(other.id))
-//			return false;
-//		return true;
-//	}
-//
 	@Override
 	public Serializable getId() {
 		return id;

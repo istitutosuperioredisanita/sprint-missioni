@@ -43,9 +43,6 @@ public class DatiIstitutoResource {
     private final Logger log = LoggerFactory.getLogger(DatiIstitutoResource.class);
 
 
-//    @Inject
-//    private AutoPropriaRepository autoPropriaRepository;
-
 	@Autowired
     private DatiIstitutoService datiIstitutoService;
 

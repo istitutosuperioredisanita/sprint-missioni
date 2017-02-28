@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -73,7 +72,7 @@ public class OrdineMissioneService {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
 
-    @Inject
+    @Autowired
     private DatiIstitutoService datiIstitutoService;
 
     @Autowired
@@ -88,28 +87,28 @@ public class OrdineMissioneService {
     @Autowired
     OrdineMissioneAutoPropriaRepository OrdineMissioneAutoPropriaRepository;
 
-    @Inject
+    @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
 
-    @Inject
+    @Autowired
     private CdrService cdrService;
     
-    @Inject
+    @Autowired
     private GaeService gaeService;
     
-    @Inject
+    @Autowired
     private ProgettoService progettoService;
     
-    @Inject
+    @Autowired
     private ImpegnoService impegnoService;
     
-    @Inject
+    @Autowired
     private ImpegnoGaeService impegnoGaeService;
 
-    @Inject
+    @Autowired
     private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
-    @Inject
+    @Autowired
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
 
     @Autowired
@@ -158,7 +157,6 @@ public class OrdineMissioneService {
 		return getOrdineMissione(principal, idMissione, false);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
 	private void caricaDatiDerivati(Principal principal, OrdineMissione ordineMissione) throws ComponentException {
 		if (ordineMissione != null){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
@@ -173,7 +171,7 @@ public class OrdineMissioneService {
 	}
 
     @Transactional(readOnly = true)
-   	public Map<String, byte[]> printOrdineMissione(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
+   	public Map<String, byte[]> printOrdineMissione(Authentication auth, Long idMissione) throws ComponentException {
     	String username = SecurityUtils.getCurrentUserLogin();
     	Principal principal = (Principal)auth;
     	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
@@ -184,7 +182,7 @@ public class OrdineMissioneService {
     		ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissione(ordineMissione);
-			} catch (Exception e1) {
+			} catch (ComponentException e1) {
 				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){
@@ -218,12 +216,12 @@ public class OrdineMissioneService {
     }
     
     @Transactional(readOnly = true)
-	public String jsonForPrintOrdineMissione(Principal principal, Long idMissione) throws AwesomeException, ComponentException {
+	public String jsonForPrintOrdineMissione(Principal principal, Long idMissione) throws ComponentException {
     	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
     	return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, principal.getName());
     }
 
-    public List<OrdineMissione> getOrdiniMissioneForValidateFlows(Principal principal, MissioneFilter filter,  Boolean isServiceRest) throws AwesomeException, ComponentException, Exception {
+    public List<OrdineMissione> getOrdiniMissioneForValidateFlows(Principal principal, MissioneFilter filter,  Boolean isServiceRest) throws ComponentException{
     	List<OrdineMissione> lista = getOrdiniMissione(principal, filter, isServiceRest, true);
     	if (lista != null){
         	List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
@@ -270,7 +268,7 @@ public class OrdineMissioneService {
     }
 
 	public void aggiornaOrdineMissioneRespinto(Principal principal, ResultFlows result,
-			OrdineMissione ordineMissioneDaAggiornare) throws Exception {
+			OrdineMissione ordineMissioneDaAggiornare) throws ComponentException {
 		aggiornaValidazione(ordineMissioneDaAggiornare);
 		ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
 		ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
@@ -289,14 +287,12 @@ public class OrdineMissioneService {
 		return anticipo;
 	}
 
-	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
-			throws Exception {
+	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 	}
 
-	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
-			throws Exception {
+	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
@@ -316,7 +312,7 @@ public class OrdineMissioneService {
 	}
 
     @Transactional(readOnly = true)
-    public void uploadAllegatoOrdineMissione(Principal principal, Long idMissione, InputStream uploadedAllegatoInputStream, String fileName, String contentType) throws AwesomeException, ComponentException {
+    public void uploadAllegatoOrdineMissione(Principal principal, Long idMissione, InputStream uploadedAllegatoInputStream, String fileName, String contentType) throws ComponentException {
     	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
     	cmisOrdineMissioneService.uploadAllegatoOrdineMissione(principal, ordineMissione, uploadedAllegatoInputStream, fileName, contentType);
     }
@@ -483,8 +479,7 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione createOrdineMissione(Principal principal, OrdineMissione ordineMissione)  throws AwesomeException, 
-    ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public OrdineMissione createOrdineMissione(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
     	controlloDatiObbligatoriDaGUI(ordineMissione);
     	inizializzaCampiPerInserimento(principal, ordineMissione);
 		validaCRUD(principal, ordineMissione);
@@ -495,10 +490,8 @@ public class OrdineMissioneService {
     }
 
 
-    @Transactional(readOnly = true)
     private void inizializzaCampiPerInserimento(Principal principal,
-    		OrdineMissione ordineMissione) throws ComponentException,
-    		PersistencyException, BusyResourceException {
+    		OrdineMissione ordineMissione) throws ComponentException {
     	ordineMissione.setUidInsert(principal.getName());
     	ordineMissione.setUser(principal.getName());
     	Integer anno = recuperoAnno(ordineMissione);
@@ -538,20 +531,16 @@ public class OrdineMissioneService {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione)  throws AwesomeException, 
-    ComponentException, Exception{
+    public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
     	return updateOrdineMissione(principal, ordineMissione, false);
     }
     
-    @Transactional(propagation = Propagation.REQUIRED)
-    private OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows)  throws AwesomeException, 
-    ComponentException, Exception{
+    private OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows)  throws ComponentException{
     	return updateOrdineMissione(principal, ordineMissione, fromFlows, false);
     }
     
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm)  throws AwesomeException, 
-    ComponentException, Exception {
+    public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm)  {
 
     	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
     	boolean isCambioResponsabileGruppo = false;
@@ -731,14 +720,8 @@ public class OrdineMissioneService {
 		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata restituito dal responsabile del gruppo "+getNominativo(ordineMissione.getResponsabileGruppo())+" per apportare delle correzioni.";
 	}
 
-//    @Transactional(readOnly = true)
-//	public void salvaStampaOrdineMissioneSuCMIS(Principal principal, Long idMissione, byte[] stampa) throws AwesomeException, ComponentException {
-//    	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
-//		cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione);
-//    }
-//
     @Transactional(propagation = Propagation.REQUIRED)
-	public void deleteOrdineMissione(Principal principal, Long idOrdineMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+	public void deleteOrdineMissione(Principal principal, Long idOrdineMissione) {
 		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
 		if (ordineMissione != null){
 			controlloOperazioniCRUDDaGui(ordineMissione);
@@ -810,7 +793,7 @@ public class OrdineMissioneService {
 			}
 		}
     }
-	private void controlloCongruenzaDatiInseriti(Principal principal, OrdineMissione ordineMissione) throws AwesomeException {
+	private void controlloCongruenzaDatiInseriti(Principal principal, OrdineMissione ordineMissione) {
 		if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
@@ -842,8 +825,7 @@ public class OrdineMissioneService {
         } 
 	}
 	
-    @Transactional(propagation = Propagation.REQUIRED)
-	private void controlloDatiFinanziari(Principal principal, OrdineMissione ordineMissione) throws AwesomeException {
+	private void controlloDatiFinanziari(Principal principal, OrdineMissione ordineMissione) {
     	UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(ordineMissione.getUoSpesa(), ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
     	if (uo == null){
     		throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La UO "+ ordineMissione.getUoSpesa() + " non è corretta rispetto al CDS "+ordineMissione.getCdsSpesa());
@@ -932,8 +914,7 @@ public class OrdineMissioneService {
     
     }
 	
-    @Transactional(propagation = Propagation.REQUIRED)
-	private void validaCRUD(Principal principal, OrdineMissione ordineMissione) throws AwesomeException {
+	private void validaCRUD(Principal principal, OrdineMissione ordineMissione) {
 		if (ordineMissione != null){
 			controlloCampiObbligatori(ordineMissione); 
 			controlloCongruenzaDatiInseriti(principal, ordineMissione);

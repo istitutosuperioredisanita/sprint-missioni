@@ -99,4 +99,9 @@ public class JSONRESTBody extends JSONSIGLABody implements Cloneable, Serializab
 	public void setImportoSpesa(String importoSpesa) {
 		this.importoSpesa = importoSpesa;
 	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,9 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
@@ -179,7 +176,7 @@ public class OrdineMissioneResource {
     		} catch (AwesomeException e) {
     			log.error("ERRORE createOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
+    		} catch (Exception e) {
     			log.error("ERRORE createOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
     		}
@@ -290,13 +287,13 @@ public class OrdineMissioneResource {
                     		}
             			} catch (IOException e) {
                 			log.error("ERRORE printOrdineMissione",e);
-                			throw new RuntimeException(Utility.getMessageException(e));
+                			throw new AwesomeException(Utility.getMessageException(e));
                 		} 
             		}
             	}
     		} catch (Exception e) {
     			log.error("ERRORE printOrdineMissione",e);
-    			throw new RuntimeException(Utility.getMessageException(e));
+    			throw new AwesomeException(Utility.getMessageException(e));
     		} 
         }
     }
@@ -313,7 +310,7 @@ public class OrdineMissioneResource {
             return JSONResponseEntity.ok(json);
 		} catch (ComponentException e) {
 			log.error("ERRORE jsonForPrintOrdineMissione",e);
-			throw new RuntimeException(Utility.getMessageException(e));
+			throw new AwesomeException(Utility.getMessageException(e));
 		} 
     }
 }

@@ -3,8 +3,7 @@ package it.cnr.si.missioni.util.proxy.json.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +18,7 @@ import it.cnr.si.missioni.util.proxy.json.object.NazioneJson;
 
 @Service
 public class NazioneService {
-	@Inject
+	@Autowired
     private CommonService commonService;
 
 	public Nazione loadNazione(OrdineMissione ordineMissione) throws AwesomeException {

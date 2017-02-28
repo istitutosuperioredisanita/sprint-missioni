@@ -1,6 +1,7 @@
 
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "dt_fine_tappa",
     "nazione"
 })
-public class TappeMissioneColl implements Cloneable{
+public class TappeMissioneColl implements Cloneable, Serializable{
 
     @JsonProperty("cambio_tappa")
     private Integer cambioTappa;
@@ -58,7 +59,7 @@ public class TappeMissioneColl implements Cloneable{
     @JsonProperty("nazione")
     private Nazione nazione;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
     /**
      * 
@@ -341,12 +342,12 @@ public class TappeMissioneColl implements Cloneable{
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
+    public Map<String, Serializable> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
+    public void setAdditionalProperty(String name, Serializable value) {
         this.additionalProperties.put(name, value);
     }
 
