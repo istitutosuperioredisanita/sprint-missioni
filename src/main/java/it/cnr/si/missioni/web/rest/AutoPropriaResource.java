@@ -1,16 +1,5 @@
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
-import it.cnr.si.missioni.service.AutoPropriaService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.SecurityUtils;
-
 import java.security.Principal;
 import java.util.List;
 
@@ -21,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.jada.ejb.session.BusyResourceException;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
+import it.cnr.si.missioni.service.AutoPropriaService;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.missioni.util.Utility;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -43,10 +43,7 @@ public class AutoPropriaResource {
     private final Logger log = LoggerFactory.getLogger(AutoPropriaResource.class);
 
 
-//    @Inject
-//    private AutoPropriaRepository autoPropriaRepository;
-
-	@Inject
+	@Autowired
     private AutoPropriaService autoPropriaService;
 
     /**
@@ -95,13 +92,11 @@ public class AutoPropriaResource {
     @Timed
     public ResponseEntity<?> modifyAutoPropria(@RequestBody AutoPropria autoPropria, HttpServletRequest request,
                                              HttpServletResponse response) {
-    	if (autoPropria.getId() != null){
+    	if (autoPropria != null && autoPropria.getId() != null){
         	AutoPropria auto = autoPropriaService.getAutoPropria(autoPropria.getUid(), autoPropria.getTarga());
-        	if (auto != null){
-        		if (!auto.getId().equals(autoPropria.getId())){
-        			log.error("ERRORE modifyAutoPropria ",CodiciErrore.TARGA_GIA_INSERITA);
-                    return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
-        		}
+        	if (auto != null && !autoPropria.getId().equals(auto.getId())){
+        		log.error("ERRORE modifyAutoPropria ",CodiciErrore.TARGA_GIA_INSERITA);
+        		return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         	}
             try {
 				autoPropria = autoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria);

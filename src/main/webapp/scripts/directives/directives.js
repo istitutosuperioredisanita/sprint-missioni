@@ -221,7 +221,7 @@ angular.module('missioniApp')
           }
         });
       },
-      templateUrl: 'views/select2.html',
+      templateUrl: 'views/select2.html'
     };
   }).directive('infoAccount', function () {
         function viewBanner (scope, account){
@@ -258,7 +258,7 @@ angular.module('missioniApp')
         scope.$watch('account', function(account){
           viewBanner(scope, account);
         });
-      },
+      }
     };
   }).directive('barWorking', function () {
         function viewBar (scope, salvataggio){
@@ -275,7 +275,7 @@ angular.module('missioniApp')
         scope.$watch('salvataggio', function(salvataggio){
           viewBar(scope, salvataggio);
         });
-      },
+      }
     };
   }).directive('cnrModalInfoImpegno', function ($log, $http, APP_FOR_REST, SIGLA_REST, URL_REST, ui) {
     return {

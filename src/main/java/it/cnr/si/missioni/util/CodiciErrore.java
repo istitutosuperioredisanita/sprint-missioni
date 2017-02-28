@@ -20,7 +20,7 @@ public interface CodiciErrore {
 	final static String DATI_GIA_INSERITI = "Dati già inseriti";
 	final static String DATI_INCONGRUENTI = "DATI_INCONGRUENTI";
 	final static String ERR_DATE_INCONGRUENTI = "ERR_DATE_INCONGRUENTI";
-	public final static String[] text = {
+	final static String[] text = {
 			"OK",
 			"ERRGEN",
 			"ERRSQL",

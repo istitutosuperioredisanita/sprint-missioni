@@ -35,7 +35,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	@JsonProperty("pg_progetto")
 	private Long pg_progetto;
 	@JsonProperty("dt_proroga")
-	private Object dt_proroga;
+	private Serializable dt_proroga;
 	@JsonProperty("ds_progetto")
 	private String ds_progetto;
 	@JsonProperty("cd_responsabile_terzo")
@@ -43,9 +43,9 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	@JsonProperty("codice_fiscale_responsabile")
 	private String codice_fiscale_responsabile;
 	@JsonProperty("dt_inizio")
-	private Object dt_inizio;
+	private Serializable dt_inizio;
 	@JsonProperty("dt_fine")
-	private Object dt_fine;
+	private Serializable dt_fine;
 	@JsonProperty("stato")
 	private String stato;
 	@JsonProperty("esercizio")
@@ -53,7 +53,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	@JsonProperty("cd_unita_organizzativa")
 	private String cd_unita_organizzativa;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
 	/**
 	 *
@@ -101,7 +101,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	 * The dt_proroga
 	 */
 	@JsonProperty("dt_proroga")
-	public Object getDt_proroga() {
+	public Serializable getDt_proroga() {
 		return dt_proroga;
 	}
 
@@ -111,7 +111,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	 * The dt_proroga
 	 */
 	@JsonProperty("dt_proroga")
-	public void setDt_proroga(Object dt_proroga) {
+	public void setDt_proroga(Serializable dt_proroga) {
 		this.dt_proroga = dt_proroga;
 	}
 
@@ -162,7 +162,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	 * The dt_inizio
 	 */
 	@JsonProperty("dt_inizio")
-	public Object getDt_inizio() {
+	public Serializable getDt_inizio() {
 		return dt_inizio;
 	}
 
@@ -172,7 +172,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	 * The dt_inizio
 	 */
 	@JsonProperty("dt_inizio")
-	public void setDt_inizio(Object dt_inizio) {
+	public void setDt_inizio(Serializable dt_inizio) {
 		this.dt_inizio = dt_inizio;
 	}
 
@@ -182,7 +182,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	 * The dt_fine
 	 */
 	@JsonProperty("dt_fine")
-	public Object getDt_fine() {
+	public Serializable getDt_fine() {
 		return dt_fine;
 	}
 
@@ -192,7 +192,7 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	 * The dt_fine
 	 */
 	@JsonProperty("dt_fine")
-	public void setDt_fine(Object dt_fine) {
+	public void setDt_fine(Serializable dt_fine) {
 		this.dt_fine = dt_fine;
 	}
 
@@ -217,12 +217,12 @@ public class Progetto extends RestServiceBean  implements Serializable {
 	}
 
 	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
+	public Map<String, Serializable> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
+	public void setAdditionalProperty(String name, Serializable value) {
 		this.additionalProperties.put(name, value);
 	}
 

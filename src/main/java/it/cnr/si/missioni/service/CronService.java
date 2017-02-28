@@ -84,32 +84,37 @@ public class CronService {
 	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
 
     @Transactional
-	public void verificaFlussoEComunicaDatiRimborsoSigla(Principal principal) throws Exception {
+	public void verificaFlussoEComunicaDatiRimborsoSigla(Principal principal) throws ComponentException {
         ILock lock = hazelcastInstance.getLock(lockKey);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
-        if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
+			try {
+				if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
 
-            LOGGER.info("got lock {}", lockKey);
+				    LOGGER.info("got lock {}", lockKey);
 
-            try {
-        		LOGGER.info("Cron per Aggiornamenti Ordine Missione");
+				    try {
+						LOGGER.info("Cron per Aggiornamenti Ordine Missione");
 
-        		aggiornaOrdiniMissioneFlows(principal);
+						aggiornaOrdiniMissioneFlows(principal);
 
-        		aggiornaRimborsiMissioneFlows(principal);
+						aggiornaRimborsiMissioneFlows(principal);
 
-        		comunicaRimborsoSigla(principal);
+						comunicaRimborsoSigla(principal);
 
-                LOGGER.info("work done.");
-            } finally {
-                LOGGER.info("unlocking {}", lockKey);
-				lock.unlock();
+				        LOGGER.info("work done.");
+				    } finally {
+				        LOGGER.info("unlocking {}", lockKey);
+						lock.unlock();
+					}
+
+				} else {
+				    LOGGER.warn("unable to get lock {}", lockKey);
+				}
+			} catch (Exception e) {
+				LOGGER.error("Errore", e);
+				throw new ComponentException(e);
 			}
-
-        } else {
-            LOGGER.warn("unable to get lock {}", lockKey);
-        }
     }
 
 	public void aggiornaRimborsiMissioneFlows(Principal principal) throws Exception, CloneNotSupportedException {

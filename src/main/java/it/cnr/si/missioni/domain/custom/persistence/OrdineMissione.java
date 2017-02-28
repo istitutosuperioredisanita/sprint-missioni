@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,10 +16,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;

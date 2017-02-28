@@ -1,13 +1,31 @@
 package it.cnr.si.missioni.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.OptimisticLockException;
+
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.CMISOrdineMissioneAspect;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
-import it.cnr.si.missioni.cmis.CmisPath;
-import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
@@ -20,33 +38,6 @@ import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.persistence.OptimisticLockException;
-
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import ch.qos.logback.classic.pattern.Util;
-
 /**
  * Service class for managing users.
  */
@@ -55,10 +46,10 @@ public class OrdineMissioneAutoPropriaService {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneAutoPropriaService.class);
 
-    @Inject
+    @Autowired
     private OrdineMissioneAutoPropriaRepository ordineMissioneAutoPropriaRepository;
 
-    @Inject
+    @Autowired
     private SpostamentiAutoPropriaRepository spostamentiAutoPropriaRepository;
 
     @Autowired
@@ -74,7 +65,7 @@ public class OrdineMissioneAutoPropriaService {
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
 
-	@Inject
+	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
 
@@ -125,7 +116,6 @@ public class OrdineMissioneAutoPropriaService {
     	ordineMissioneAutoPropria.setToBeCreated();
 		validaCRUD(principal, ordineMissioneAutoPropria);
 		ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.creaConBulk(principal, ordineMissioneAutoPropria);
-//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Created Information for OrdineMissioneAutoPropria: {}", ordineMissioneAutoPropria);
     	return ordineMissioneAutoPropria;
     }
@@ -211,7 +201,6 @@ public class OrdineMissioneAutoPropriaService {
 		validaCRUD(principal, ordineMissioneAutoPropriaDB);
 		ordineMissioneAutoPropriaDB = (OrdineMissioneAutoPropria)crudServiceBean.modificaConBulk(principal, ordineMissioneAutoPropriaDB);
     	
-//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Auto Propria Ordine di Missione: {}", ordineMissioneAutoPropriaDB);
     	return ordineMissioneAutoPropria;
     }
@@ -230,7 +219,7 @@ public class OrdineMissioneAutoPropriaService {
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
-	public void deleteAutoPropria(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+	public void deleteAutoPropria(Principal principal, OrdineMissione ordineMissione) {
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
 
 		if (ordineMissioneAutoPropria != null){
@@ -238,7 +227,6 @@ public class OrdineMissioneAutoPropriaService {
 		}
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaOrdineMissioneAutoPropria(Principal principal,
 			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
 			throws ComponentException {
@@ -246,7 +234,6 @@ public class OrdineMissioneAutoPropriaService {
 		cancellaDatiAutoPropriaOrdineMissione(principal, ordineMissioneAutoPropria);
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaDatiAutoPropriaOrdineMissione(Principal principal,
 			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
 			throws ComponentException {
@@ -255,7 +242,6 @@ public class OrdineMissioneAutoPropriaService {
 		crudServiceBean.modificaConBulk(principal, ordineMissioneAutoPropria);
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaSpostamenti(Principal principal,
 			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
 			throws ComponentException {
@@ -278,7 +264,6 @@ public class OrdineMissioneAutoPropriaService {
 		}
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
 	private void cancellaSpostamento(Principal principal, SpostamentiAutoPropria spostamentiAutoPropria) throws ComponentException {
 		spostamentiAutoPropria.setToBeUpdated();
 		spostamentiAutoPropria.setStato(Costanti.STATO_ANNULLATO);
@@ -305,7 +290,6 @@ public class OrdineMissioneAutoPropriaService {
 
 		spostamentiAutoPropriaDB = (SpostamentiAutoPropria)crudServiceBean.modificaConBulk(principal, spostamentiAutoPropriaDB);
     	
-//    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Spostamenti: {}", spostamentiAutoPropriaDB);
     	return spostamentiAutoPropria;
     }
@@ -322,7 +306,7 @@ public class OrdineMissioneAutoPropriaService {
     		ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
-			} catch (Exception e1) {
+			} catch (ComponentException e1) {
 				throw new ComponentException("Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){
@@ -362,12 +346,4 @@ public class OrdineMissioneAutoPropriaService {
 		return print;
 	}
     
-//    @Transactional(readOnly = true)
-//	public Document creaDocumentoRichiestaAutoPropria(String username,
-//			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-//			throws ComponentException {
-//		byte[] printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
-//		return cmisOrdineMissioneService.salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
-//	}
-//    
 }
