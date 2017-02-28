@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ModalitaPagamentoJson extends CommonJsonRest<ModalitaPagamento> implements Serializable {
-	List<ModalitaPagamento> elements;
+	private List<ModalitaPagamento> elements;
 	public List<ModalitaPagamento> getElements() {
 		return elements;
 	}

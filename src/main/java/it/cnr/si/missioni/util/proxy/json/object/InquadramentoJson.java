@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class InquadramentoJson extends  CommonJsonRest<Inquadramento> implements Serializable {
-	List<Inquadramento> elements;
+	private List<Inquadramento> elements;
 	public List<Inquadramento> getElements() {
 		return elements;
 	}

@@ -23,7 +23,7 @@ public class Services implements Serializable{
 	@JsonProperty("restService")
 	private List<RestService> restService = new ArrayList<RestService>();
 	@JsonIgnore
-	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
+	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	/**
 	 *
@@ -46,12 +46,12 @@ public class Services implements Serializable{
 	}
 
 	@JsonAnyGetter
-	public Map<String, Serializable> getAdditionalProperties() {
+	public Map<String, Object> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Serializable value) {
+	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
 	}
 

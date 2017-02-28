@@ -75,10 +75,9 @@ import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 public class CMISOrdineMissioneService {
 	private static final Log logger = LogFactory.getLog(MissioniCMISService.class);
 
-	public static final String 
-			PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC",
-			PROPERTY_TIPOLOGIA_DOC_SPECIFICA = "wfcnr:tipologiaDocSpecifica",
-			PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
+	public static final String PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC";
+	public static final String PROPERTY_TIPOLOGIA_DOC_SPECIFICA = "wfcnr:tipologiaDocSpecifica";
+	public static final String PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
 
 	@Autowired
 	private DatiIstitutoService datiIstitutoService;

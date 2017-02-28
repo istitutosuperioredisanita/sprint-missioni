@@ -20,7 +20,7 @@ public class Banca implements Serializable{
     @JsonProperty("pg_banca")
     private Integer pgBanca;
     @JsonIgnore
-    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -43,12 +43,12 @@ public class Banca implements Serializable{
     }
 
     @JsonAnyGetter
-    public Map<String, Serializable> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Serializable value) {
+    public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 

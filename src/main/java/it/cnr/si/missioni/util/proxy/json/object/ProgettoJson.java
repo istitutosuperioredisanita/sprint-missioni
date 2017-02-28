@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ProgettoJson extends CommonJsonRest<Progetto> implements Serializable {
-	List<Progetto> elements;
+	private List<Progetto> elements;
 	public List<Progetto> getElements() {
 		return elements;
 	}

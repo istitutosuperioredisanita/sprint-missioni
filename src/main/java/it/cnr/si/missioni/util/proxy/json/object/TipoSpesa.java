@@ -54,7 +54,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     @JsonProperty("dt_inizio_validita")
     private Integer dtInizioValidita;
     @JsonProperty("dataFineValidita")
-    private Serializable dataFineValidita;
+    private Object dataFineValidita;
     @JsonProperty("fl_giustificativo_richiesto")
     private Boolean flGiustificativoRichiesto;
     @JsonProperty("fl_pasto")
@@ -74,11 +74,11 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     @JsonProperty("limite_max_spesa")
     private Integer limiteMaxSpesa;
     @JsonProperty("dt_cancellazione")
-    private Serializable dtCancellazione;
+    private Object dtCancellazione;
     @JsonProperty("fl_ammissibile_con_rimborso")
     private Boolean flAmmissibileConRimborso;
     @JsonIgnore
-    private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -226,7 +226,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
      *     The dataFineValidita
      */
     @JsonProperty("dataFineValidita")
-    public Serializable getDataFineValidita() {
+    public Object getDataFineValidita() {
         return dataFineValidita;
     }
 
@@ -236,7 +236,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
      *     The dataFineValidita
      */
     @JsonProperty("dataFineValidita")
-    public void setDataFineValidita(Serializable dataFineValidita) {
+    public void setDataFineValidita(Object dataFineValidita) {
         this.dataFineValidita = dataFineValidita;
     }
 
@@ -426,7 +426,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
      *     The dtCancellazione
      */
     @JsonProperty("dt_cancellazione")
-    public Serializable getDtCancellazione() {
+    public Object getDtCancellazione() {
         return dtCancellazione;
     }
 
@@ -436,7 +436,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
      *     The dt_cancellazione
      */
     @JsonProperty("dt_cancellazione")
-    public void setDtCancellazione(Serializable dtCancellazione) {
+    public void setDtCancellazione(Object dtCancellazione) {
         this.dtCancellazione = dtCancellazione;
     }
 
@@ -461,12 +461,12 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     @JsonAnyGetter
-    public Map<String, Serializable> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Serializable value) {
+    public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 

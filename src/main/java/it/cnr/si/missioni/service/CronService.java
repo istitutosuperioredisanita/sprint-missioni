@@ -117,7 +117,7 @@ public class CronService {
 			}
     }
 
-	public void aggiornaRimborsiMissioneFlows(Principal principal) throws Exception, CloneNotSupportedException {
+	public void aggiornaRimborsiMissioneFlows(Principal principal) throws ComponentException {
 		LOGGER.info("Cron per Aggiornamenti Rimborso Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -141,7 +141,7 @@ public class CronService {
 		}
 	}
 
-	public void comunicaRimborsoSigla(Principal principal) throws CloneNotSupportedException {
+	public void comunicaRimborsoSigla(Principal principal) {
 		LOGGER.info("Cron per Comunicazioni Rimborsi Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);

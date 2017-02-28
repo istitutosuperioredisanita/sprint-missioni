@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class MandatoJson extends CommonJsonRest<Mandato> implements Serializable {
-	List<Mandato> elements;
+	private List<Mandato> elements;
 	public List<Mandato> getElements() {
 		return elements;
 	}

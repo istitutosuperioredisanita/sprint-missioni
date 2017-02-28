@@ -254,13 +254,13 @@ public class OrdineMissioneAutoPropriaResource {
                     		}
             			} catch (IOException e) {
                     		log.error("ERRORE printOrdineMissioneAutoPropria",e);
-                			throw new RuntimeException(Utility.getMessageException(e));
+                			throw new AwesomeException(Utility.getMessageException(e));
                 		} 
             		}
             	}
     		} catch (ComponentException e) {
         		log.error("ERRORE printOrdineMissioneAutoPropria",e);
-    			throw new RuntimeException(Utility.getMessageException(e));
+    			throw new AwesomeException(Utility.getMessageException(e));
     		} 
         }
     }

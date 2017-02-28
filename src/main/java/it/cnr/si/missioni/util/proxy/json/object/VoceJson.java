@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class VoceJson extends  CommonJsonRest<Voce> implements Serializable {
-	List<Voce> elements;
+	private List<Voce> elements;
 	public List<Voce> getElements() {
 		return elements;
 	}

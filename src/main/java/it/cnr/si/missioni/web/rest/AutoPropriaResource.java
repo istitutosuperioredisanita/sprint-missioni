@@ -3,7 +3,6 @@ package it.cnr.si.missioni.web.rest;
 import java.security.Principal;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

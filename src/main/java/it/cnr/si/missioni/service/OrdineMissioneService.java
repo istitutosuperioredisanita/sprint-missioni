@@ -283,8 +283,7 @@ public class OrdineMissioneService {
 
 	public OrdineMissioneAnticipo getAnticipo(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
 			throws ComponentException {
-		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissioneDaAggiornare.getId().toString()));
-		return anticipo;
+		return ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissioneDaAggiornare.getId().toString()));
 	}
 
 	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
@@ -522,8 +521,7 @@ public class OrdineMissioneService {
 		if (ordineMissione.getDataInserimento() == null){
 			ordineMissione.setDataInserimento(LocalDate.now());
 		}
-		Integer anno = 	ordineMissione.getDataInserimento().getYear();
-		return anno;
+		return ordineMissione.getDataInserimento().getYear();
 	}
 
 	private Boolean isInvioOrdineAlResponsabileGruppo(OrdineMissione ordineMissione){
