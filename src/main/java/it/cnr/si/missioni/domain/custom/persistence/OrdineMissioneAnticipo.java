@@ -199,4 +199,10 @@ public class OrdineMissioneAnticipo extends OggettoBulkXmlTransient implements S
 	public void setStatoFlusso(String statoFlusso) {
 		this.statoFlusso = statoFlusso;
 	}
+	public Boolean isStatoNonInviatoAlFlusso(){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INSERITO)){
+			return true;
+		}
+		return false;
+	}
 }

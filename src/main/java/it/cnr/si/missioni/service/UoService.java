@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Uo;
+import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
@@ -69,4 +70,9 @@ public class UoService {
 		}
 		return null;
 	}
+
+	public String getUoSigla(UoForUsersSpecial uo) {
+		return getUo(uo.getCodice_uo(), true);
+	}
+
 }

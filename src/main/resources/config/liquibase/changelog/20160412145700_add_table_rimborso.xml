@@ -18,14 +18,14 @@
 			    <column name="NUMERO" type="bigint">
 			        <constraints nullable="true"/>
 			    </column>
-			    <column name="DATA_INSERIMENTO" type="timestamp">
+			    <column name="DATA_INSERIMENTO" type="date">
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="COMUNE_RESIDENZA_RICH" type="varchar(40)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="INDIRIZZO_RESIDENZA_RICH" type="varchar(80)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="DOMICILIO_FISCALE_RICH" type="varchar(80)">
 			        <constraints nullable="true"/>
@@ -136,10 +136,10 @@
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="UO_COMPETENZA" type="varchar(30)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="CDS_COMPETENZA" type="varchar(30)">
-			        <constraints nullable="false"/>
+			        <constraints nullable="true"/>
 			    </column>
 			    <column name="CDS_RICH" type="varchar(30)">
 			        <constraints nullable="false"/>
@@ -209,7 +209,7 @@
 			    <column name="UID" type="varchar(256)">
 			        <constraints nullable="false"/>
 			    </column>
-			    <column name="DATA_SPESA" type="timestamp">
+			    <column name="DATA_SPESA" type="date">
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="STATO" type="varchar(3)">

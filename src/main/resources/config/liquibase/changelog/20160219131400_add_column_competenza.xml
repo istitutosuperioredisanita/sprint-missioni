@@ -3,11 +3,11 @@
     <changeSet author="missioni" id="20160219131400">
     	<addColumn 
             tableName="ORDINE_MISSIONE">
-        <column name="CDS_COMPETENZA" type="varchar(28)"/>
+        <column name="CDS_COMPETENZA" type="character varying(28)"/>
     	</addColumn>
     	<addColumn 
             tableName="ORDINE_MISSIONE">
-        <column name="UO_COMPETENZA" type="varchar(28)"/>
+        <column name="UO_COMPETENZA" type="character varying(28)"/>
     	</addColumn>
     </changeSet>
 </databaseChangeLog>

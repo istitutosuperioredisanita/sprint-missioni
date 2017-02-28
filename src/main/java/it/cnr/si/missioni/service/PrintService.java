@@ -1,10 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Utility;
-
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -14,6 +9,17 @@ import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.util.Utility;
 import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRParameter;
@@ -24,14 +30,6 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class PrintService{
@@ -49,7 +47,7 @@ public class PrintService{
 		try {
 			myJson = mapper.writeValueAsString(object);
 		} catch (Exception ex) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella generazione del file JSON per l'esecuzione della stampa ("+Utility.getMessageException(ex)+").");
+			throw new ComponentException("Errore nella generazione del file JSON per l'esecuzione della stampa ("+Utility.getMessageException(ex)+").",ex);
 		}
 		return myJson;
     }
@@ -90,7 +88,7 @@ public class PrintService{
 			JasperPrint jasperPrint = fillmgr.fill(this.getClass().getResourceAsStream(dir+printNameJasper), parameters);
 			return JasperExportManager.exportReportToPdf(jasperPrint);
 		} catch (Exception e) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Error in JASPER ("+ e + ").");
+			throw new ComponentException("Error in JASPER ("+ e + ").",e);
 		}
 	}
 }

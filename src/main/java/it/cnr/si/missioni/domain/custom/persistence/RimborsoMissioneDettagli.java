@@ -2,9 +2,11 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -28,6 +30,14 @@ import org.springframework.util.StringUtils;
 @Table(name = "RIMBORSO_MISSIONE_DETTAGLI")
 public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements Serializable {
 
+	public final static String CMIS_PROPERTY_ID_DETTAGLIO_RIMBORSO = "missioni_rimborso_dettaglio:id",			
+			CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:riga",
+			CMIS_PROPERTY_CD_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:cdTiSpesa",
+			CMIS_PROPERTY_DS_TIPO_SPESA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:dsTiSpesa",
+			CMIS_PROPERTY_DATA_SPESA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:dataSpesa",
+			CMIS_PROPERTY_MAIN = "F:missioni_rimborso_dettaglio:main";
+
+	
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,19 +47,23 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "UID", length = 256, nullable = false)
     private String uid;
 
-    @Column(name = "IMPORTO", length = 28, nullable = true)
-    private BigDecimal importo;
-
     @Size(min = 0, max = 1000)
-    @Column(name = "NOTE", length = 3, nullable = true)
+    @Column(name = "NOTE", length = 1000, nullable = true)
     private String note;
+
+    @Size(min = 0, max = 100)
+    @Column(name = "DS_NO_GIUSTIFICATIVO", length = 100, nullable = true)
+    private String dsNoGiustificativo;
+
+    @Size(min = 0, max = 200)
+    @Column(name = "LOCALITA_SPOSTAMENTO", length = 200, nullable = true)
+    private String localitaSpostamento;
 
     @Column(name = "RIGA", length = 50, nullable = false)
     private Long riga;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_SPESA", nullable = false)
-    private Date dataSpesa;
+    private LocalDate dataSpesa;
 
     @ManyToOne
 	@JoinColumn(name="ID_RIMBORSO_MISSIONE", nullable=false)
@@ -82,6 +96,9 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "KM_PERCORSI", length = 10, nullable = true)
     private Long kmPercorsi;
 
+    @Column(name = "FL_SPESA_ANTICIPATA", length = 1, nullable = true)
+    private String flSpesaAnticipata;
+
     @Size(min = 0, max = 10)
     @Column(name = "CD_DIVISA", length = 10, nullable = true)
     private String cdDivisa;
@@ -95,6 +112,16 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "CAMBIO", length = 19, nullable = true)
     private BigDecimal cambio;
 
+    @Column(name = "GIUSTIFICATIVO", length = 1, nullable = true)
+    private String giustificativo;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "TI_CD_TI_SPESA", length = 1, nullable = true)
+    private String tiCdTiSpesa;
+
+	@Transient
+    private String decodeSpesaAnticipata;
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -145,14 +172,6 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.stato = stato;
 	}
 
-	public BigDecimal getImporto() {
-		return importo;
-	}
-
-	public void setImporto(BigDecimal importo) {
-		this.importo = importo;
-	}
-
 	public String getNote() {
 		return note;
 	}
@@ -189,11 +208,6 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     	return false;
     }
 
-	@Transient
-    public String getFileName() {
-		return "AnticipoOrdineMissione"+getId()+".pdf";
-	}
-
 	public Long getRiga() {
 		return riga;
 	}
@@ -202,11 +216,11 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.riga = riga;
 	}
 
-	public Date getDataSpesa() {
+	public LocalDate getDataSpesa() {
 		return dataSpesa;
 	}
 
-	public void setDataSpesa(Date dataSpesa) {
+	public void setDataSpesa(LocalDate dataSpesa) {
 		this.dataSpesa = dataSpesa;
 	}
 
@@ -266,6 +280,14 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.kmPercorsi = kmPercorsi;
 	}
 
+	public String getFlSpesaAnticipata() {
+		return flSpesaAnticipata;
+	}
+
+	public void setFlSpesaAnticipata(String flSpesaAnticipata) {
+		this.flSpesaAnticipata = flSpesaAnticipata;
+	}
+
 	public String getCdDivisa() {
 		return cdDivisa;
 	}
@@ -298,5 +320,81 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.cambio = cambio;
 	}
 	
+	@Transient
+	public String constructCMISNomeFile() {
+		StringBuffer nomeFile = new StringBuffer();
+		nomeFile = nomeFile.append(Utility.lpad(this.getRiga().toString(),4,'0'));
+		return nomeFile.toString();
+	}
+
+	@Transient
+	public String getDecodeSpesaAnticipata() {
+		if (!StringUtils.isEmpty(getFlSpesaAnticipata())){
+			return Costanti.SI_NO.get(getFlSpesaAnticipata());
+		} else {
+			return Costanti.SI_NO.get("N");
+		}
+	}
+
+	public String getGiustificativo() {
+		return giustificativo;
+	}
+
+	public void setGiustificativo(String giustificativo) {
+		this.giustificativo = giustificativo;
+	}
+
+	@Transient
+	public Boolean isGiustificativoObbligatorio() {
+		if (!StringUtils.isEmpty(getGiustificativo()) && getGiustificativo().equals("N")){
+			return false;
+		} else {
+			if (!StringUtils.isEmpty(getTiCdTiSpesa()) && getTiCdTiSpesa().equals("R")){
+				return false;
+			}
+			return true;
+		}
+	}
+
+	@Transient
+	public Boolean isDettaglioPasto() {
+		if (!StringUtils.isEmpty(getCdTiPasto())){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	@Transient
+	public Boolean isDettaglioIndennitaKm() {
+		if (!StringUtils.isEmpty(getKmPercorsi())){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public String getDsNoGiustificativo() {
+		return dsNoGiustificativo;
+	}
+
+	public void setDsNoGiustificativo(String dsNoGiustificativo) {
+		this.dsNoGiustificativo = dsNoGiustificativo;
+	}
+
+	public String getLocalitaSpostamento() {
+		return localitaSpostamento;
+	}
+
+	public void setLocalitaSpostamento(String localitaSpostamento) {
+		this.localitaSpostamento = localitaSpostamento;
+	}
+
+	public String getTiCdTiSpesa() {
+		return tiCdTiSpesa;
+	}
+
+	public void setTiCdTiSpesa(String tiCdTiSpesa) {
+		this.tiCdTiSpesa = tiCdTiSpesa;
+	}
 
 }

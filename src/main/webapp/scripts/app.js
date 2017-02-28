@@ -4,7 +4,7 @@
 var httpHeaders;
 
 var missioniApp = angular.module('missioniApp', ['http-auth-interceptor', 'tmh.dynamicLocale', 'ng-currency',
-    'ngResource', 'ngRoute', 'ngCookies', 'ngStorage', 'missioniAppUtils', 'pascalprecht.translate', 'truncate','selectize']);
+    'ngResource', 'ngRoute', 'ngCookies', 'ngStorage', 'missioniAppUtils', 'pascalprecht.translate', 'truncate','selectize', 'blueimp.fileupload']);
 
 missioniApp
   .service('ui', function () {
@@ -69,6 +69,20 @@ missioniApp
       }
     };
   })
+    .factory('missioniHttpInterceptor', function ($q, ui) {
+        return {
+            responseError: function (rejection) {
+                if (rejection.status === 400 || rejection.status === 401 ||
+                    rejection.status === 403 || rejection.status === 406 ||
+                    rejection.status === 412 || rejection.status === 500) {
+                    if (rejection.data.isFromApplication)
+                        ui.error(rejection.data.message);
+                }
+                return $q.reject(rejection);
+            }
+        };
+    })
+
     .config(function ($routeProvider, $httpProvider, $translateProvider, tmhDynamicLocaleProvider, USER_ROLES) {
             $routeProvider
                 .when('/', {
@@ -140,6 +154,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/rimborso-missione/:idMissione?/:validazione?', {
+                    templateUrl: 'views/rimborso-missione.html',
+                    controller: 'RimborsoMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/elenco-ordini-missione', {
                     templateUrl: 'views/elenco-ordini-missione.html',
                     controller: 'ElencoOrdiniMissioneController',
@@ -150,6 +171,20 @@ missioniApp
                 .when('/ordini-missione-da-rendere-definitivi', {
                     templateUrl: 'views/ordini-missione-da-rendere-definitivi.html',
                     controller: 'OrdiniMissioneDaRendereDefinitiviController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
+                .when('/elenco-rimborsi-missione', {
+                    templateUrl: 'views/elenco-rimborsi-missione.html',
+                    controller: 'ElencoRimborsiMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
+                .when('/rimborso-missione/rimborso-missione-dettagli/:idRimborsoMissione/:validazione?/:inizioMissione/:fineMissione', {
+                    templateUrl: 'views/rimborso-missione/rimborso-missione-dettagli.html',
+                    controller: 'RimborsoMissioneDettagliController',
                     access: {
                         authorizedRoles: [USER_ROLES.user]
                     }
@@ -258,6 +293,8 @@ missioniApp
                 prefix: 'i18n/',
                 suffix: '.json'
             });
+
+            $httpProvider.interceptors.push('missioniHttpInterceptor');
 
             $translateProvider.preferredLanguage('it');
 

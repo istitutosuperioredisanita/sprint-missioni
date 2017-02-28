@@ -38,6 +38,9 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "PROGRESSIVO_ORDINE", length = 20, nullable = true)
     private Long progressivoOrdine;
 
+    @Column(name = "PROGRESSIVO_RIMBORSO", length = 20, nullable = true)
+    private Long progressivoRimborso;
+
     @Size(min = 0, max = 250)
     @Column(name = "DESCR_ISTITUTO", length = 250, nullable = false)
     private String descrIstituto;
@@ -102,6 +105,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setProgressivoOrdine(Long progressivoOrdine) {
 		this.progressivoOrdine = progressivoOrdine;
+	}
+
+	public Long getProgressivoRimborso() {
+		return progressivoRimborso;
+	}
+
+	public void setProgressivoRimborso(Long progressivoRimborso) {
+		this.progressivoRimborso = progressivoRimborso;
 	}
 
 	public String getDescrIstituto() {

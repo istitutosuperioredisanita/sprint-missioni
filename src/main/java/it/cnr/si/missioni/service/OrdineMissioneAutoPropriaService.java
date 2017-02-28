@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import ch.qos.logback.classic.pattern.Util;
+
 /**
  * Service class for managing users.
  */
@@ -62,6 +64,10 @@ public class OrdineMissioneAutoPropriaService {
     @Autowired
     private PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
 
+    @Autowired
+    private OrdineMissioneService ordineMissioneService;
+
+    
     @Autowired
     private MissioniCMISService missioniCMISService;
 
@@ -111,6 +117,9 @@ public class OrdineMissioneAutoPropriaService {
     	ordineMissioneAutoPropria.setUid(principal.getName());
     	ordineMissioneAutoPropria.setUser(principal.getName());
     	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissioneAutoPropria.getOrdineMissione().getId());
+    	if (ordineMissione != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
+    	}
     	ordineMissioneAutoPropria.setOrdineMissione(ordineMissione);
     	ordineMissioneAutoPropria.setStato(Costanti.STATO_INSERITO);
     	ordineMissioneAutoPropria.setToBeCreated();
@@ -135,6 +144,11 @@ public class OrdineMissioneAutoPropriaService {
     			StringUtils.isEmpty(ordineMissioneAutoPropria.getNumeroPatente())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
     	}
+    	if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi()).equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza()).equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto()).equals("N")){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto propria.");
+    	}
 	}
 
     private void validaCRUD(Principal principal, SpostamentiAutoPropria spostamentiAutoPropria) {
@@ -151,6 +165,10 @@ public class OrdineMissioneAutoPropriaService {
     	spostamentoAutoPropria.setUser(principal.getName());
     	spostamentoAutoPropria.setStato(Costanti.STATO_INSERITO);
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.findById(principal, OrdineMissioneAutoPropria.class, spostamentoAutoPropria.getOrdineMissioneAutoPropria().getId());
+    	if (ordineMissioneAutoPropria != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropria.getOrdineMissione());
+    	}
+
     	spostamentoAutoPropria.setOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
     	Long maxRiga = spostamentiAutoPropriaRepository.getMaxRigaSpostamenti(ordineMissioneAutoPropria);
     	if (maxRiga == null ){
@@ -175,11 +193,17 @@ public class OrdineMissioneAutoPropriaService {
 		if (ordineMissioneAutoPropriaDB==null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Auto Propria Ordine di Missione da aggiornare inesistente.");
 		
+    	if (ordineMissioneAutoPropriaDB.getOrdineMissione() != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropriaDB.getOrdineMissione());
+    	}
 		ordineMissioneAutoPropriaDB.setTarga(ordineMissioneAutoPropria.getTarga());
 		ordineMissioneAutoPropriaDB.setMarca(ordineMissioneAutoPropria.getMarca());
 		ordineMissioneAutoPropriaDB.setModello(ordineMissioneAutoPropria.getModello());
 		ordineMissioneAutoPropriaDB.setCartaCircolazione(ordineMissioneAutoPropria.getCartaCircolazione());
 		ordineMissioneAutoPropriaDB.setEntePatente(ordineMissioneAutoPropria.getEntePatente());
+		ordineMissioneAutoPropriaDB.setUtilizzoMotiviIspettivi(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
+		ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
+		ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
 		
 		ordineMissioneAutoPropriaDB.setToBeUpdated();
 
@@ -197,10 +221,9 @@ public class OrdineMissioneAutoPropriaService {
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.findById(principal, OrdineMissioneAutoPropria.class, idAutoPropriaOrdineMissione);
 
 		if (ordineMissioneAutoPropria != null){
-			Document documentoAutoPropria = null;
-			documentoAutoPropria = creaDocumentoRichiestaAutoPropria(principal.getName(), ordineMissioneAutoPropria);
-			if (documentoAutoPropria != null){
-				missioniCMISService.deleteNode(documentoAutoPropria);
+			String nodeRef = cmisOrdineMissioneService.getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+			if (nodeRef != null){
+				missioniCMISService.deleteNode(nodeRef);
 			}
 			cancellaOrdineMissioneAutoPropria(principal, ordineMissioneAutoPropria);
 		}
@@ -271,6 +294,9 @@ public class OrdineMissioneAutoPropriaService {
 		if (spostamentiAutoPropriaDB==null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Spostamenti Auto Propria Ordine di Missione da aggiornare inesistente.");
 		
+    	if (spostamentiAutoPropriaDB.getOrdineMissioneAutoPropria().getOrdineMissione() != null){
+    		ordineMissioneService.controlloOperazioniCRUDDaGui(spostamentiAutoPropriaDB.getOrdineMissioneAutoPropria().getOrdineMissione());
+    	}
 		spostamentiAutoPropriaDB.setPercorsoDa(spostamentiAutoPropria.getPercorsoDa());
 		spostamentiAutoPropriaDB.setPercorsoA(spostamentiAutoPropria.getPercorsoA());
 		
@@ -297,7 +323,7 @@ public class OrdineMissioneAutoPropriaService {
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
 			} catch (Exception e1) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")");
+				throw new ComponentException("Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")",e1);
 			}
     		if (content != null){
         		fileName = content.getFileName();
@@ -305,13 +331,13 @@ public class OrdineMissioneAutoPropriaService {
     			try {
     				is = content.getStream();
     			} catch (Exception e) {
-    				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero dello stream del file Auto Propria sul documentale (" + Utility.getMessageException(e) + ")");
+    				throw new ComponentException("Errore nel recupero dello stream del file Auto Propria sul documentale (" + Utility.getMessageException(e) + ")",e);
     			}
         		if (is != null){
             		try {
     					printOrdineMissione = IOUtils.toByteArray(is);
     				} catch (IOException e) {
-    					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")");
+    					throw new ComponentException("Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")",e);
     				}
         		}
     		} else {
@@ -322,7 +348,7 @@ public class OrdineMissioneAutoPropriaService {
     		fileName = "OrdineMissioneAutoPropria"+idMissione+".pdf";
     		printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
     		if (ordineMissioneAutoPropria.isRichiestaAutoPropriaInserita()){
-    			salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
+    			cmisOrdineMissioneService.salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
     		}
     		map.put(fileName, printOrdineMissione);
     	}
@@ -336,33 +362,12 @@ public class OrdineMissioneAutoPropriaService {
 		return print;
 	}
     
-	public Document creaDocumentoRichiestaAutoPropria(String username,
-			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-			throws ComponentException {
-		byte[] printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
-		return salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
-	}
-    
-    @Transactional(readOnly = true)
-    private Document salvaStampaAutoPropriaSuCMIS(String currentLogin, byte[] stampa,
-			OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
-		InputStream streamStampa = new ByteArrayInputStream(stampa);
-		CmisPath cmisPath = cmisOrdineMissioneService.createFolderOrdineMissione(ordineMissioneAutoPropria.getOrdineMissione());
-		Map<String, Object> metadataProperties = cmisOrdineMissioneService.createMetadataForFileOrdineMissioneAutoPropria(currentLogin, ordineMissioneAutoPropria);
-		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
-					metadataProperties,
-					streamStampa,
-					MimeTypes.PDF.mimetype(),
-					ordineMissioneAutoPropria.getFileName(), 
-					cmisPath);
-			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
-			missioniCMISService.makeVersionable(node);
-			return node;
-		} catch (Exception e) {
-			if (e.getCause() instanceof CmisConstraintException)
-				throw new ComponentException("CMIS - File ["+ordineMissioneAutoPropria.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
-		}
-	}
+//    @Transactional(readOnly = true)
+//	public Document creaDocumentoRichiestaAutoPropria(String username,
+//			OrdineMissioneAutoPropria ordineMissioneAutoPropria)
+//			throws ComponentException {
+//		byte[] printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);
+//		return cmisOrdineMissioneService.salvaStampaAutoPropriaSuCMIS(username, printOrdineMissione, ordineMissioneAutoPropria);
+//	}
+//    
 }

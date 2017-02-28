@@ -56,7 +56,7 @@ public class AccountService {
 		return null;
 	}
 
-	public String manageResponseForAccountRest(String uid, 
+	private String manageResponseForAccountRest(String uid, 
 			String body, Boolean loadSpecialUserData) {
 		Account account = getAccount(body);
 		if (account != null){

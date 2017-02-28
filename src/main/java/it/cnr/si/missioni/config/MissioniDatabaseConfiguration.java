@@ -29,7 +29,6 @@ public class MissioniDatabaseConfiguration extends DatabaseConfiguration {
 
     private Environment environment;
 
-    @Override
 	public SpringLiquibase liquibase(DataSource dataSource,
 			DataSourceProperties dataSourceProperties,
 			LiquibaseProperties liquibaseProperties) {

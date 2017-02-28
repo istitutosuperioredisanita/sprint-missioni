@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json;
 
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
 import java.io.Serializable;
@@ -14,18 +15,39 @@ public class JSONBody implements Cloneable, Serializable{
 	private List<JSONOrderBy> orderBy;
 	private List<JSONClause> clauses;
 	private Context context;
+	String data;
+	Long nazione;
+	Long inquadramento;
+	String cdTipoSpesa;
+	String cdTipoPasto;
+	String divisa;
+	String km;
+	String importoSpesa;
+	MissioneBulk missioneBulk;
 	
 	public JSONBody() {
 		super();
 	}
 
 	public JSONBody(Integer activePage, Integer maxItemsPerPage,
-			List<JSONOrderBy> orderBy, List<JSONClause> clauses) {
+			List<JSONOrderBy> orderBy, List<JSONClause> clauses,String data, Long nazione,
+			Long inquadramento, String cdTipoSpesa,
+			String cdTipoPasto, String divisa,
+			String km, String importoSpesa, MissioneBulk missioneBulk) {
 		super();
 		this.activePage = activePage;
 		this.maxItemsPerPage = maxItemsPerPage;
 		this.orderBy = orderBy;
 		this.clauses = clauses;
+		this.data = data;
+		this.nazione = nazione;
+		this.inquadramento = inquadramento;
+		this.cdTipoSpesa = cdTipoSpesa;
+		this.cdTipoPasto = cdTipoPasto;
+		this.divisa = divisa;
+		this.km = km;
+		this.importoSpesa = importoSpesa;
+		this.missioneBulk = missioneBulk;
 	}
 
 	public Integer getActivePage() {
@@ -59,5 +81,77 @@ public class JSONBody implements Cloneable, Serializable{
 
 	public void setContext(Context context) {
 		this.context = context;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
+	public Long getNazione() {
+		return nazione;
+	}
+
+	public void setNazione(Long nazione) {
+		this.nazione = nazione;
+	}
+
+	public Long getInquadramento() {
+		return inquadramento;
+	}
+
+	public void setInquadramento(Long inquadramento) {
+		this.inquadramento = inquadramento;
+	}
+
+	public String getCdTipoSpesa() {
+		return cdTipoSpesa;
+	}
+
+	public void setCdTipoSpesa(String cdTipoSpesa) {
+		this.cdTipoSpesa = cdTipoSpesa;
+	}
+
+	public String getCdTipoPasto() {
+		return cdTipoPasto;
+	}
+
+	public void setCdTipoPasto(String cdTipoPasto) {
+		this.cdTipoPasto = cdTipoPasto;
+	}
+
+	public String getDivisa() {
+		return divisa;
+	}
+
+	public void setDivisa(String divisa) {
+		this.divisa = divisa;
+	}
+
+	public String getKm() {
+		return km;
+	}
+
+	public void setKm(String km) {
+		this.km = km;
+	}
+
+	public String getImportoSpesa() {
+		return importoSpesa;
+	}
+
+	public void setImportoSpesa(String importoSpesa) {
+		this.importoSpesa = importoSpesa;
+	}
+
+	public MissioneBulk getMissioneBulk() {
+		return missioneBulk;
+	}
+
+	public void setMissioneBulk(MissioneBulk missioneBulk) {
+		this.missioneBulk = missioneBulk;
 	}
 }

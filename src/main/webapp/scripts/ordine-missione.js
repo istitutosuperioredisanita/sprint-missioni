@@ -1,219 +1,63 @@
 'use strict';
 
-missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, DirettoreUoService) {
-    var recuperoUo = function(anno, cds, uoRich){
-        var urlRestProxy = URL_REST.STANDARD;
-        var uos = [];
-        var app = APP_FOR_REST.SIGLA;
-        var url = SIGLA_REST.UO;
-        var objectPostUoOrderBy = [{name: 'cd_unita_organizzativa', type: 'ASC'}];
-        var objectPostUoClauses = null;
-        if (cds){
-            objectPostUoClauses = [{condition: 'AND', fieldName: 'cd_unita_padre', operator: "=", fieldValue:cds},
-                                    {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
-        } else {
-            objectPostUoClauses = [{condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno}];
-        }
-        var objectPostUo = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostUoOrderBy, clauses:objectPostUoClauses}
-        return $http.post(urlRestProxy + app+'/', objectPostUo, {params: {proxyURL: url}}).success(function (data) {
-            if (data){
-                if (data.elements){
-                    var listaUo = data.elements;
-                    if (uoRich){
-                        uos = [];
-                        var ind = -1;
-                        for (var i=0; i<listaUo.length; i++) {
-                            if (listaUo[i].cd_unita_organizzativa === uoRich){
-                                ind ++;
-                                uos[ind] = listaUo[i];
-                            }
-                        }
-
-                        for (var i=0; i<listaUo.length; i++) {
-                            if (listaUo[i].cd_unita_organizzativa != uoRich){
-                                ind ++;
-                                uos[ind] = listaUo[i];
-                            }
-                        }
-                        return uos;
-                    }
-                } else {
-                    return uos;
-                }
-            } else {
-                return uos;
-            }
-        }).error(function (data) {
-            ui.error(data);
-        });
-    }
-
-    var estraiUo = function(codice){
-        return codice.substring(0,3)+'.'+codice.substring(3,6);
-    }
-
-    var estraiUoRichFromAccount = function(account){
-        if (account.codice_uo){
-            return estraiUo(account.codice_uo);
-        }
-        return "";
-    }
-
-    var isPersonaGiaPresente = function(persons, codice_fiscale){
-        for (var i=0; i<persons.length; i++) {
-            if (persons[i].codice_fiscale == codice_fiscale){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    var recuperoDirettoreUo = function(uo){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
-        var y = x.then(function (result) {
-            if (result.data){
-                return createPerson(result.data);
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
-    var recuperoDatiPerson = function(username){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
-        var y = x.then(function (result) {
-            if (result.data){
-                return createPerson(result.data);
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
-    var recuperoPersonsForUo = function(uo){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.PERSONS_FOR_UO;
-        var persons = [];
-        var uoSiper = uo.replace('.','');
-        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: uoSiper, userinfo:true}});
-        var y = x.then(function (result) {
-            if (result.data){
-                var listaPersons = result.data;
-                var ind = -1;
-
-                var personPromise = DirettoreUoService.getDirettore(uoSiper);
-                return personPromise.then(function(result){
-                    if (result && result.data){
-                        var direttore = result.data;
-                        var trovatoDirettore = false;
-                        for (var z=0; z<persons.length; z++) {
-                            if (persons[z].uid == direttore.uid){
-                                trovatoDirettore = true;
-                            }
-                        }
-                        if (!trovatoDirettore){
-                            listaPersons.push(direttore);
-                        }
-                    }
-                    for (var k=0; k<listaPersons.length; k++) {
-                        var person = null;
-                        var cognome = null;
-                        var cf = null;
-                        var nome = null;
-                        for (var i=0; i<listaPersons.length; i++) {
-                            if ((ind == -1 || !isPersonaGiaPresente(persons, listaPersons[i].codice_fiscale)) && (cognome == null || 
-                                (listaPersons[i].cognome < cognome && 
-                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                (listaPersons[i].cognome == cognome && listaPersons[i].nome < nome && 
-                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                (listaPersons[i].cognome == cognome && listaPersons[i].nome == nome && listaPersons[i].codice_fiscale < cf ) ) ) {
-                                person = listaPersons[i];
-                                cognome = person.cognome;
-                                nome = person.nome;
-                                cf = person.codice_fiscale;
-                            }
-                        }
-                        if (person != null){
-                            ind ++;
-                            persons[ind] = person;
-                        }
-                    }
-                    return persons;
-                });
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-            ui.error(data);
-        });
-        return y;
-    }
-
-    var createPerson = function(data){
-        var userWork = {};
-        userWork.login = data.uid;
-        userWork.matricola = data.matricola;
-        userWork.firstName = data.nome;
-        userWork.lastName = data.cognome;
-        userWork.email = data.email_comunicazioni;
-        userWork.userRoles = ['ROLE_USER'];
-        userWork.comune_nascita = data.comune_nascita; 
-        userWork.data_nascita = data.data_nascita;
-        userWork.comune_residenza = data.comune_residenza; 
-        userWork.indirizzo_residenza = data.indirizzo_residenza; 
-        userWork.num_civico_residenza = data.num_civico_residenza;
-        userWork.cap_residenza = data.cap_residenza;
-        userWork.provincia_residenza = data.provincia_residenza;
-        userWork.codice_fiscale = data.codice_fiscale;
-        userWork.profilo = data.profilo;
-        userWork.struttura_appartenenza = data.struttura_appartenenza;
-        userWork.codice_sede = data.codice_sede;
-        userWork.codice_uo = data.codice_uo;
-        userWork.livello = data.livello_profilo;
-        userWork.allUoForUsersSpecial = data.allUoForUsersSpecial;
-        userWork.uoForUsersSpecial = data.uoForUsersSpecial;
-        userWork.isAccountLDAP = true;
-        return userWork;
-    }
-
-    return { getUos: recuperoUo,
-             getPersons: recuperoPersonsForUo,
-             getPerson: recuperoDatiPerson ,
-             buildPerson: createPerson ,
-             buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
-             buildUoSiglaFromUoSiper: estraiUo };
-});
-
-missioniApp.factory('OrdineMissioneService', function ($resource) {
+missioniApp.factory('OrdineMissioneService', function ($resource, DateUtils) {
         return $resource('app/rest/ordineMissione/:ids', {}, {
             'get': { method: 'GET', isArray: true},
-            'add':  { method: 'POST'},
-            'modify':  { method: 'PUT'},
+            'add':  { method: 'POST',
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'modify':  { method: 'PUT', 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
             'delete':  { method: 'DELETE'},
-            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
-            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}},
-            'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}}
+            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'send_to_manager':  { method: 'PUT', params:{confirm:false, daValidazione:"M"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
+            'finalize':  { method: 'PUT', params:{confirm:false, daValidazione:"D"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            }
         });
     });
 
 missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
-            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session) {
+            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session, DatiIstitutoService) {
 
     var urlRestProxy = URL_REST.STANDARD;
     $scope.today = function() {
@@ -246,6 +90,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.undoCds = function(){
         $scope.ordineMissioneModel.cdsSpesa = null;
+        $scope.showResponsabile = false;
     };
 
     $scope.undoVoce = function(){
@@ -256,6 +101,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if (listaCds){
             if (listaCds.length === 1){
                 $scope.ordineMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
+                $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.cdsSpesa);
             } else {
                 if (cds){
                     $scope.elencoCds = [];
@@ -272,6 +118,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                     if ($scope.ordineMissioneModel){
                         $scope.ordineMissioneModel.cdsSpesa = cds;
+                        $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.cdsSpesa);
                     }
                 }
             }
@@ -321,7 +168,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         $http.post(urlRestProxy + app+'/', objectPostCds, {params: {proxyURL: url}}).success(function (data) {
             caricaCds(cdsRich, data.elements);
         }).error(function (data) {
-                ui.error(data);
         });
         var a = 1;
     }
@@ -342,7 +188,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 }
 //            caricaCdsCompetenza(cds, data.elements);
         }).error(function (data) {
-                ui.error(data);
         });
         var a = 1;
     }
@@ -395,6 +240,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     $scope.restCdr = function(uo, daQuery){
         if (uo){
+            $scope.elencoCdr = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.CDR;
             var objectPostCdrOrderBy = [{name: 'cd_centro_responsabilita', type: 'ASC'}];
@@ -416,7 +262,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.elencoCdr = [];
@@ -425,6 +270,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     $scope.restModuli = function(anno, uo){
         if (uo){
+            $scope.elencoModuli = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.MODULO;
             var varOrderBy = [{name: 'cd_progetto', type: 'ASC'}];
@@ -447,7 +293,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.elencoModuli = [];
@@ -484,7 +329,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
             });
         } else {
             $scope.impegnoSelected = [];
@@ -493,39 +337,38 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     
     $scope.restGae = function(anno, modulo, cdr, uo){
         if (cdr || modulo || uo){
+            $scope.elencoGae = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.GAE;
             var varOrderBy = [{name: 'cd_linea_attivita', type: 'ASC'}];
             var varClauses = [];
             if (modulo){
                 if (cdr){
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
+                              {condition: 'AND', fieldName: 'centro_responsabilita.cd_centro_responsabilita', operator: "=", fieldValue:cdr},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
+                              {condition: 'AND', fieldName: 'centro_responsabilita.cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
                 } else if (uo) {
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:uo.substring(0,3)+"%"}];
+                              {condition: 'AND', fieldName: 'centro_responsabilita.cd_centro_responsabilita', operator: "LIKE", fieldValue:uo.substring(0,3)+"%"}];
                 }
             } else if (cdr){
-                varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
+                              {condition: 'AND', fieldName: 'centro_responsabilita.cd_centro_responsabilita', operator: "=", fieldValue:cdr},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
+                              {condition: 'AND', fieldName: 'centro_responsabilita.cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }  else if (uo) {
-                varClauses = [{condition: 'AND', fieldName: 'esercizio_inizio', operator: "<=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'esercizio_fine', operator: ">=", fieldValue:anno},
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
+                              {condition: 'AND', fieldName: 'centro_responsabilita.cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }
             var postGae = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
+            $scope.workingRestGae = true;
             $http.post(urlRestProxy + app+'/', postGae, {params: {proxyURL: url}}).success(function (data) {
+                $scope.workingRestGae = false;
                 if (data){
                     if (data.elements){
                         $scope.elencoGae = data.elements;
@@ -537,7 +380,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                 }
             }).error(function (data) {
-                ui.error(data);
+                $scope.workingRestGae = false;
             });
         } else {
             $scope.elencoGae = [];
@@ -574,7 +417,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 		            $scope.elencoVoci = [];
 		        }
             }).error(function (data) {
-                ui.error(data);
             });
     }
     
@@ -616,6 +458,19 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.reloadCds = function(cds) {
       $scope.annullaUo();  
       $scope.restUo($scope.ordineMissioneModel.anno, cds, $scope.ordineMissioneModel.uoRich);
+      $scope.impostaGestioneResponsabileGruppo(cds);      
+    }
+
+    $scope.impostaGestioneResponsabileGruppo = function(cds){
+      DatiIstitutoService.get(cds, $scope.ordineMissioneModel.anno).then(function(data){
+        if (data.gestioneRespModulo != null && data.gestioneRespModulo == 'S'){
+            $scope.showResponsabile = true;
+            $scope.disableResponsabileGruppo = true;
+        } else {
+            $scope.showResponsabile = false;
+            $scope.ordineMissioneModel.responsabileGruppo = null;
+        }
+      });
     }
 
     $scope.reloadCdsCompetenza = function(cds) {
@@ -640,8 +495,21 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
+    $scope.getRestForResponsabileGruppo = function (uo){
+        $scope.disableResponsabileGruppo = true;
+        if (uo){
+            var persons = ProxyService.getPersons(uo, true).then(function(result){
+                if (result ){
+                    $scope.elencoResponsabiliGruppo = result;
+                    $scope.disableResponsabileGruppo = false;
+                }
+            });
+        }
+    }
+
     $scope.reloadUo = function(uo) {
       $scope.annullaCdr();  
+      $scope.getRestForResponsabileGruppo(uo);
       $scope.restCdr(uo, "N");
     }
 
@@ -674,6 +542,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.trattamenti = {
         'Rimborso Documentato': 'R',
         'Trattamento Alternativo di Missione': 'T'
+    };
+
+    $scope.fondi = {
+        'Competenza': 'C',
+        'Residuo': 'R'
     };
 
     $scope.obblighiRientro = {
@@ -726,7 +599,9 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     var impostaDisabilitaOrdineMissione = function() {
-        if ($scope.esisteOrdineMissione && ($scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || ($scope.ordineMissioneModel.stato === 'CON' && 
+        if ($scope.esisteOrdineMissione && 
+            (($scope.ordineMissioneModel.stato === 'INR' && $scope.ordineMissioneModel.responsabileGruppo != $sessionStorage.account.login) || 
+              $scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || ($scope.ordineMissioneModel.stato === 'CON' && 
             ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
                 $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||
                 $scope.ordineMissioneModel.stateFlows === 'FIRMA UO' ||
@@ -766,12 +641,18 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.inizializzaFormPerInserimento = function(account){
         $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
-                                        comuneResidenzaRich:account.comune_residenza+" - "+account.cap_residenza, 
-                                        indirizzoResidenzaRich:account.indirizzo_residenza+" "+account.num_civico_residenza, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
             uoRich:ProxyService.buildUoRichiedenteSiglaFromUoSiper(account), cdsRich:$scope.estraiCdsRichFromAccount(account)};
+        
+        if (account.comune_residenza && account.cap_residenza){
+            $scope.ordineMissioneModel.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza;
+        }
+        if (account.indirizzo_completo_residenza){
+            $scope.ordineMissioneModel.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
+        }
+
         $scope.missioneEstera = null;
         $scope.ordineMissioneModel.uid = account.login;
         var today = $scope.today();
@@ -797,6 +678,18 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         ui.confirmCRUD("Si sta per confermare l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e l'ordine non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
     }
 
+    $scope.sendToManagerOrdineMissione = function () {
+        if ($scope.ordineMissioneModel && $scope.ordineMissioneModel.responsabileGruppo){
+          if ($scope.ordineMissioneModel.responsabileGruppo == $scope.ordineMissioneModel.uid){
+            $scope.confirm();
+          } else {
+            ui.confirmCRUD("Si sta per inviare al responsabile del gruppo l'Ordine di Missione Numero: "+$scope.ordineMissioneModel.numero+" del "+$filter('date')($scope.ordineMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA)+". L'ordine non sarà più modificabile. Si desidera Continuare?", inviaResponsabileGruppo);
+          }
+        } else {
+            ui.error("Valorizzare il responsabile del gruppo");
+        }
+    }
+
     var confirmOrdineMissione = function () {
             $rootScope.salvataggio = true;
             OrdineMissioneService.confirm($scope.ordineMissioneModel,
@@ -810,14 +703,40 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
+                    }
+            );
+    }
+
+    $scope.ritornaMittenteOrdineMissione = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.return_sender($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione sbloccato.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                    }
+            );
+    }
+
+    var inviaResponsabileGruppo = function () {
+            $rootScope.salvataggio = true;
+            OrdineMissioneService.send_to_manager($scope.ordineMissioneModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Ordine di Missione inviato al responsabile del gruppo.");
+                        ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
+                            $scope.ordineMissioneModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
                     }
             );
     }
@@ -835,14 +754,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -860,14 +771,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -883,14 +786,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
     }
@@ -961,7 +856,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 //            window.open(fileURL);
         }).error(function (data) {
             delete $scope.ordineMissioneModel.stampaInCorso;
-            ui.error(data);
         }); 
     }
 
@@ -976,14 +870,10 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             OrdineMissioneService.modify($scope.ordineMissioneModel,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
+                        $scope.ordineMissioneModel = value;
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
                     }
             );
         } else {
@@ -1000,14 +890,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
-                        if (httpResponse.status === 200) {
-                        } else {
-                            if (httpResponse.data.message){
-                                ui.error(httpResponse.data.message);
-                            } else {
-                                ui.error(httpResponse.data);
-                            }
-                        }
                     }
             );
         }
@@ -1041,6 +923,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.restCdr(model.uoSpesa, "S");
                 $scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
+                $scope.getRestForResponsabileGruppo(model.uoSpesa);
                 $scope.restCapitoli(model.anno);
                 $scope.ordineMissioneModel = model;
                 $scope.inizializzaFormPerModifica();

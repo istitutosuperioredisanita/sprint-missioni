@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.cmis;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.config.AlfrescoConfiguration;
 import it.cnr.si.missioni.cmis.acl.ACLType;
 import it.cnr.si.missioni.cmis.acl.Permission;
@@ -185,7 +186,12 @@ public class MissioniCMISService {
 		else	
 			session.delete(cmisObject);
 	}
-	
+
+	public void deleteNode(String nodeRef){
+        CmisObject obj = getNodeByNodeRef(nodeRef);
+        deleteNode(obj);
+	}
+
 	public InputStream getResource(CmisObject cmisObject){
 		ContentStream content = getContent(cmisObject);
 		if (content != null){
@@ -246,6 +252,7 @@ public class MissioniCMISService {
 			try{
 				return getResource(getNodeByNodeRef(id));
 			}catch (CmisObjectNotFoundException _ex){
+				throw new ComponentException(_ex);
 			}
 		}
 		return null;
@@ -256,6 +263,7 @@ public class MissioniCMISService {
 			try{
 				return getContent(getNodeByNodeRef(id));
 			}catch (CmisObjectNotFoundException _ex){
+				throw new ComponentException(_ex);
 			}
 		}
 		return null;
@@ -500,8 +508,26 @@ public class MissioniCMISService {
     }
     
 	public Response startFlowOrdineMissione(StringWriter stringWriter) throws Exception{
+		String simpleUrl = getUrlOrdineMissione();
+		return startFlow(stringWriter, simpleUrl);
+	}
+
+	private String getUrlOrdineMissione() {
+		return "service/api/workflow/activiti$flussoMissioniOrdine/formprocessor";
+	}
+	
+	private String getUrlRimborsoMissione() {
+		return "service/api/workflow/activiti$flussoMissioniRimborso/formprocessor";
+	}
+	
+	public Response startFlowRimborsoMissione(StringWriter stringWriter) throws Exception{
+		String simpleUrl = getUrlRimborsoMissione();
+		return startFlow(stringWriter, simpleUrl);
+	}
+
+	private Response startFlow(StringWriter stringWriter, String simpleUrl) {
 		try {
-			String url = getRepositoryURL()+"service/api/workflow/activiti$flussoMissioni/formprocessor";
+			String url = getRepositoryURL()+simpleUrl;
 			logger.info("Start Flow. Url: "+url+" - Content: "+stringWriter.getBuffer().toString());
 			Response responsePost = invokePOST(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
 			if (responsePost.getResponseCode()!=200) 
@@ -514,7 +540,7 @@ public class MissioniCMISService {
 		}
 	}
 	
-	public void restartFlowOrdineMissione(StringWriter stringWriter, ResultFlows result) {
+	public void restartFlow(StringWriter stringWriter, ResultFlows result) {
 
 		try {
 			String url = getRepositoryURL()+"service/api/task/"+result.getTaskId()+"/formprocessor";
@@ -529,7 +555,7 @@ public class MissioniCMISService {
 		}
 	}
 
-	private void nextStepForRestartFlowOrdineMissione(ResultFlows result) {
+	private void nextStepForRestartFlow(ResultFlows result) {
 		try {
 			String next = "next";
 			Response responseNext = invokePOST(new UrlBuilder(getRepositoryURL()+"service/api/workflow/task/end/"+result.getTaskId()+"/Next" ), MimeTypes.JSON, next.getBytes());
@@ -542,7 +568,7 @@ public class MissioniCMISService {
 		}
 	}
 
-	public void abortFlowOrdineMissione(StringWriter stringWriter, ResultFlows result) {
+	public void abortFlow(StringWriter stringWriter, ResultFlows result) {
 
 		try {
 			String url = getRepositoryURL()+"service/api/task-instances/"+result.getTaskId();
@@ -550,12 +576,23 @@ public class MissioniCMISService {
 			Response responsePut = invokePUT(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes(), null);
 			if (responsePut.getResponseCode()!=200) 
 				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: "+ responsePut.getErrorContent()+".");
-			nextStepForRestartFlowOrdineMissione(result);
+			nextStepForRestartFlow(result);
 		} catch (CMISException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
+	public CMISFileContent getAttachment(String nodeRef){
+		CMISFileContent cmisFileContent = new CMISFileContent();
+        CmisObject obj = getNodeByNodeRef(nodeRef);
+        if (obj != null){
+        	cmisFileContent.setStream(getResource(obj));
+        	cmisFileContent.setFileName(obj.getName());
+        	cmisFileContent.setMimeType(obj.getPropertyValue(PropertyIds.CONTENT_STREAM_MIME_TYPE));
+        	return cmisFileContent;
+        }
 
+		return null;
+	}
 }

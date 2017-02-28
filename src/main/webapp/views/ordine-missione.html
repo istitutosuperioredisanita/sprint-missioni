@@ -1,10 +1,19 @@
 <div class="container-fluid">
 
   <h4 center translate="ordine-missione.title">Ordine di missione</b></h4>
+  <div  class="my-panel-body panel panel-success" ng-show="ordineMissioneModel.id" align="center">
+                <b>{{'missione.form.numero' | translate}}:</b> {{ordineMissioneModel.numero}}  -  
+                <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{ordineMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  -  
+                <b>  {{'missione.form.stato' | translate}}: </b>{{ordineMissioneModel.decodeStato}}  -  
+                <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{ordineMissioneModel.decodeStatoFlusso}}
+  </div>
+  <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
+                <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{ordineMissioneModel.commentFlows}}  -  
+  </div>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-userid-missione">uo</span>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
                     <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
                         </span>
                     </p>
@@ -12,7 +21,7 @@
             <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.userid-missione">user</span>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
                     <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
                         </span>
                     </p>
@@ -22,15 +31,15 @@
 
 <div class="panel panel-primary">
   <div class="panel-heading color-celeste-avion text-center">
-    <h3 class="panel-title color-celeste-avion" translate="ordine-missione.form.box-info">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
   </div>
           <div class="panel-body my-panel-body">
             <info-account account="accountModel"></info-account>
 
             <div class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon" translate="ordine-missione.form.domicilio-fiscale">Domicilio</span>
-                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" name="domicilioFiscale" placeholder="{{'ordine-missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="ordineMissioneModel.domicilioFiscale"/>
+                          <span class="input-group-addon" translate="missione.form.domicilio-fiscale">Domicilio</span>
+                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="ordineMissioneModel.domicilioFiscaleRich"/>
                         </span>
             </div>
           </div>
@@ -38,39 +47,9 @@
 
 <div class="panel panel-success">
   <div class="panel-heading color-verde-scuro text-center">
-    <h3 class="panel-title color-verde-scuro" translate="ordine-missione.form.box-dati">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Informazioni anagrafiche</h3>
   </div>
      <div class="panel-body my-panel-body">
-            <div class="col-md-2">
-              <dl class="align-left dl-horizontal" ng-show="showEsisteOrdineMissione">
-                <dt translate="ordine-missione.form.numero"> Numero</dt>
-                <dd>{{ordineMissioneModel.numero}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-3">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showEsisteOrdineMissione">
-                <dt translate="ordine-missione.form.data-inserimento"> Data</dt>
-                <dd>{{ordineMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-3">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showEsisteOrdineMissione">
-                <dt translate="ordine-missione.form.stato"> Stato</dt>
-                <dd>{{ordineMissioneModel.decodeStato}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-4">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showEsisteOrdineMissione">
-                <dt translate="ordine-missione.form.stato-flusso"> Stato</dt>
-                <dd>{{ordineMissioneModel.decodeStatoFlusso}}</dd>
-              </dl>
-            </div>
-            <div class="col-md-12">
-              <dl class="dl-horizontal" style="text-align: left" ng-show="showCommentFlows">
-                <dt translate="ordine-missione.form.motivazione-flusso"> Motivazione</dt>
-                <dd>{{ordineMissioneModel.commentFlows}}</dd>
-              </dl>
-            </div>
             <form class="form-inline" role="form" id ="missioni">
                 <div class="col-md-3">
                         <span class="input-group">
@@ -80,13 +59,13 @@
                 </div>
                 <p class="col-md-3">
                         <span class="input-group">
-                          <span class="input-group-addon" translate="ordine-missione.form.tipo-missione">Tipo Missione</span>
+                          <span class="input-group-addon" translate="missione.form.tipo-missione">Tipo Missione</span>
                           <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissione" ng-model="ordineMissioneModel.tipoMissione" ng-options="value as tipoMissione for (tipoMissione,value) in tipiMissione" ng-change="onChangeTipoMissione()"></select>
                         </span>
                 </p>
                 <p class="col-md-6">
                         <span class="input-group" ng-show="missioneEstera">
-                          <span class="input-group-addon" translate="ordine-missione.form.trattamento">Tipo Missione</span>
+                          <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
                           <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.trattamento" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
                         </span>
               </p>
@@ -94,23 +73,23 @@
             <form class="form-inline" role="form" id="missioni">
                 <div class="col-md-5">
                         <span class="input-group" ng-show="missioneEstera">
-                          <span class="input-group-addon" translate="ordine-missione.form.nazione">nazione</span>
+                          <span class="input-group-addon" translate="missione.form.nazione">nazione</span>
                           <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.nazione" ng-options="nazione.pg_nazione as nazione.ds_nazione for nazione in nazioni"></select>
                         </span>
               </div>
                 <p class="col-md-7">
                         <span class="input-group">
-                          <span class="input-group-addon" translate="ordine-missione.form.destinazione">Tipo Missione</span>
-                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" name="destinazione" placeholder="{{'ordine-missione.form.destinazione.placeholder' | translate}}" ng-model="ordineMissioneModel.destinazione"/>
+                          <span class="input-group-addon" translate="missione.form.destinazione">Tipo Missione</span>
+                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" name="destinazione" placeholder="{{'missione.form.destinazione.placeholder' | translate}}" ng-model="ordineMissioneModel.destinazione"/>
                         </span>
               </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-12">
                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.oggetto">oggetto</span>
+                            <span class="input-group-addon" translate="missione.form.oggetto">oggetto</span>
                             <textarea ng-disabled="validazione || disabilitaOrdineMissione" 
-                              class="input-sm form-control" name="oggetto" placeholder="{{'ordine-missione.form.oggetto.placeholder' | translate}}" ng-model="ordineMissioneModel.oggetto" rows = "2">
+                              class="input-sm form-control" name="oggetto" placeholder="{{'missione.form.oggetto.placeholder' | translate}}" ng-model="ordineMissioneModel.oggetto" rows = "2">
                             </textarea> 
                         </span>
                 </p>
@@ -125,7 +104,7 @@
                     <div class="col-md-4">
                         <p class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.distanza">to</span>
-                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" style="text-align:right" class="input-sm form-control" name="distanza" ng-model="ordineMissioneModel.distanzaDallaSede"/>
+                            <input ng-disabled="validazione || disabilitaOrdineMissione" type="number" style="text-align:right" class="input-sm form-control" name="distanza" ng-model="ordineMissioneModel.distanzaDallaSede"/>
                         </p>
                     </div>
             </form>
@@ -145,9 +124,9 @@
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-12">
                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.note">note</span>
+                            <span class="input-group-addon" translate="missione.form.note">note</span>
                             <textarea ng-disabled="validazione || disabilitaOrdineMissione" 
-                              class="input-sm form-control" placeholder="{{'ordine-missione.form.note.placeholder' | translate}}" name="note" ng-model="ordineMissioneModel.note" rows = "2">
+                              class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="ordineMissioneModel.note" rows = "2">
                             </textarea> 
                         </span>
                 </p>
@@ -155,16 +134,16 @@
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.cds-competenza">cds</span>
-                    <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(ordineMissioneModel.cdsCompetenza)" placeholder="{{'ordine-missione.form.cds-competenza.placeholder' | translate}}" ng-model="ordineMissioneModel.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
+                    <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(ordineMissioneModel.cdsCompetenza)" placeholder="{{'missione.form.cds-competenza.placeholder' | translate}}" ng-model="ordineMissioneModel.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
                         </span>
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-competenza">uo</span>
-                    <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.uo-competenza.placeholder' | translate}}" ng-model="ordineMissioneModel.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
+                    <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" id="missioni" placeholder="{{'missione.form.uo-competenza.placeholder' | translate}}" ng-model="ordineMissioneModel.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
                         </span>
                     </p>
             </form>
@@ -173,13 +152,13 @@
 
 <div class="panel panel-danger">
   <div class="panel-heading color-rosso-mattone text-center">
-    <h3 class="panel-title color-rosso-mattone" translate="ordine-missione.form.box-dati-fin">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-rosso-mattone" translate="missione.form.box-dati-fin">Informazioni anagrafiche</h3>
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-11">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.cds-spesa">cds</span>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-spesa">cds</span>
                     <selectize ng-disabled="validazione || disabilitaOrdineMissione" options='elencoCds' config="{maxItems: 1}" ng-change="reloadCds(ordineMissioneModel.cdsSpesa)" ng-model="ordineMissioneModel.cdsSpesa"></selectize>
                         </span>
                     </p>
@@ -192,34 +171,38 @@
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-spesa">uo</span>
-                    <select ng-disabled="!ordineMissioneModel.cdsSpesa || validazione || disabilitaOrdineMissione" ng-change="reloadUo(ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.uo-spesa.placeholder' | translate}}" ng-model="ordineMissioneModel.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-spesa">uo</span>
+                    <select ng-disabled="!ordineMissioneModel.cdsSpesa || validazione || disabilitaOrdineMissione" ng-change="reloadUo(ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.uo-spesa.placeholder' | translate}}" ng-model="ordineMissioneModel.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
                         </span>
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.cdr-spesa">cdr</span>
-                    <select ng-disabled="!ordineMissioneModel.uoSpesa || validazione==='S' || disabilitaOrdineMissione" ng-change="reloadCdr(ordineMissioneModel.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.cdr-spesa.placeholder' | translate}}" ng-model="ordineMissioneModel.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cdr-spesa">cdr</span>
+                    <select ng-disabled="!ordineMissioneModel.uoSpesa || validazione==='S' || disabilitaOrdineMissione" ng-change="reloadCdr(ordineMissioneModel.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.cdr-spesa.placeholder' | translate}}" ng-model="ordineMissioneModel.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
                         </span>
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.modulo">modulo</span>
-                    <select ng-disabled="!ordineMissioneModel.cdrSpesa || validazione === 'S' || disabilitaOrdineMissione" ng-change="reloadModulo(ordineMissioneModel.pgProgetto, ordineMissioneModel.cdrSpesa, ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
+                    <select ng-disabled="!elencoModuli || elencoModuli.length == 0 || !ordineMissioneModel.cdrSpesa || validazione === 'S' || disabilitaOrdineMissione" ng-change="reloadModulo(ordineMissioneModel.pgProgetto, ordineMissioneModel.cdrSpesa, ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
                         </span>
                     </p>
             </form>
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                    <p class="col-md-11">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.gae">gae</span>
-                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="validazione === 'S' || disabilitaOrdineMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
+                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 || !ordineMissioneModel.cdrSpesa || validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
                         </span>
+                    </p>
+                    <p class="col-md-1">
+                    <i ng-show="workingRestGae" class="fa fa-spinner fa-spin" style="font-size:16px"></i>
+                    <i ng-show="!workingRestGae" style="font-size:16px" class="fa">&#xf110;</i>
                     </p>
             </form>
 
@@ -227,43 +210,51 @@
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-11">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.voce">voce</span>
-                    <selectize ng-disabled="validazione === 'S' || disabilitaOrdineMissione" options='elencoVoci' config="{maxItems: 1}" ng-model="ordineMissioneModel.voce"></selectize>
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
+                    <selectize ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" options='elencoVoci' config="{maxItems: 1}" ng-model="ordineMissioneModel.voce"></selectize>
                         </span>
                     </p>
             </form>
                     <p class="col-md-1">
-            <button ng-disabled="validazione === 'S' || disabilitaOrdineMissione" type="button" class="btn" ng-click="undoVoce()">{{'global.button.simpleUndo' | translate}}</button>
+            <button ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="button" class="btn" ng-click="undoVoce()">{{'global.button.simpleUndo' | translate}}</button>
                     </p>
 
 
 
             <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-2">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="ordine-missione.form.fondi">Fondi</span>
+                          <select ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" ng-model="ordineMissioneModel.fondi" ng-options="value as compRes for (compRes,value) in fondi"></select>
+                        </span>
+              </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-3">
                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.anno-impegno">anno</span>
+                            <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
                             <input ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
                         </span>
                     </p>
             </form>
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                    <p class="col-md-3">
                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.numero-impegno">numero</span>
+                            <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
                             <input ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
                         </span>
                     </p>
             </form>
 
                     <p class="col-md-1">
-            <cnr-modal-info-impegno anno="ordineMissioneModel.anno" cds="ordineMissioneModel.cdsSpesa" gae="ordineMissioneModel.gae" anno-impegno="ordineMissioneModel.esercizioOriginaleObbligazione" numero="ordineMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
+            <cnr-modal-info-impegno fondi="ordineMissioneModel.fondi" anno="ordineMissioneModel.anno" cds="ordineMissioneModel.cdsSpesa" gae="ordineMissioneModel.gae" anno-impegno="ordineMissioneModel.esercizioOriginaleObbligazione" numero="ordineMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
                     </p>
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                    <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="ordine-missione.form.importo-presunto">obbligo</span>
-                          <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-presunto" ng-model="ordineMissioneModel.importoPresunto">
+                          <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-presunto" ng-model="ordineMissioneModel.importoPresunto" currency-symbol="">
                         </span>
                     </p>
             </form>
@@ -272,9 +263,17 @@
 
 <div class="panel panel-info">
   <div class="panel-heading color-verde-giada text-center">
-    <h3 class="panel-title color-verde-giada" translate="ordine-missione.form.box-add-auth">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
   </div>
      <div class="panel-body my-panel-body">
+            <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.responsabile-gruppo">resp</span>
+                    <select ng-disabled="disableResponsabileGruppo || disabilitaOrdineMissione||validazione" class="form-control" id="missioni" ng-model="ordineMissioneModel.responsabileGruppo" ng-options="responsabile.uid as responsabile.cognome+' - '+responsabile.nome for responsabile in elencoResponsabiliGruppo"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-6">
                          <span class="input-group">
@@ -307,7 +306,7 @@
             <div class="col-md-12">
               <ul class="pager" ng-show="showEsisteOrdineMissione">
                 <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
-                <li><a ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria"></a></li>
+                <li ng-hide="ordineMissioneModel.utilizzoAutoNoleggio == 'S'"><a ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria"></a></li>
                 <li><a ng-click="goAnticipo()" translate="ordine-missione.button.anticipo">Anticipo</a></li>
               </ul>
             </div>
@@ -318,14 +317,29 @@
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
+        <!--    <form name="form-inline" role="form" ng-submit="addAttach()">
+              <div class="col-md-3" ng-show="showEsisteOrdineMissione">
+                  <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+              </div>
+            </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && (!showResponsabile||ordineMissioneModel.stato === 'INR')  && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.stato === 'INS'">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToManager' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateOrdineMissione()">
                     <div class="col-md-4" ng-show="showEsisteOrdineMissione && validazione === 'S'">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
+                    <div class="col-md-4" ng-show="showEsisteOrdineMissione && validazione === 'S'">
+                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="finalizeOrdineMissione()">
@@ -335,21 +349,45 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-3" ng-show="showEsisteOrdineMissione">
-
-                    <div class="col-md-3" ng-show="showEsisteOrdineMissione">
                       <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
 <!--
                       <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(ordineMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
 -->
-                    </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-md-1" ng-show="showEsisteOrdineMissione && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-md-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato != 'INR' && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
                     </div>
             </form>
+            <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
+                    <div class="col-md-1" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && ordineMissioneModel.stato === 'INR'">
+                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span></button>
+                    </div>
+            </form>
+<!--  <div class="col-md-12">
+    <span class="btn btn-success fileinput-button" ng-hide="loading">
+      <i class="glyphicon glyphicon-plus"></i>
+      <span>Upload files...</span>
+      <input id="fileupload" type="file" name="file" multiple>
+    </span>
+    <br>
+    <br>
+    <div id="progress" class="progress">
+      <div class="progress-bar progress-bar-success"></div>
+    </div>
+    <div id="files" class="files"></div>
+  </div>
+
+  <div class="col-md-8 well highlight" id="message">
+    <h4><div id="messageTitle">{{messageTitle}}</div></h4>
+    <ul style="text-align:left">
+      <li ng-repeat="message in messages">
+        {{message}}
+      </li>
+    </ul>
+  </div> -->
         </div>
     </div>
 </div>

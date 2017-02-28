@@ -38,5 +38,4 @@ public class Inquadramento extends RestServiceBean  implements Serializable {
 	public void setDt_fin_validita(Object dt_fin_validita) {
 		this.dt_fin_validita = dt_fin_validita;
 	}
-
 }

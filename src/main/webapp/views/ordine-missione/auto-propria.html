@@ -5,7 +5,7 @@
 
 <div class="panel panel-primary">
   <div class="panel-heading color-celeste-avion text-center">
-    <h3 class="panel-title color-celeste-avion" translate="ordine-missione.form.box-info">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
   </div>
           <div class="panel-body my-panel-body">
             <info-account account="accountModel"></info-account>
@@ -23,6 +23,36 @@
           </div>
 
           <div class="col-md-12 well highlight" ng-show="isDisabilitataModificaAuto()"> 
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.motivi-ispettivi">motivi ispettivi</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="autoPropriaOrdineMissioneModel.id" type="checkbox" ng-model="autoPropriaOrdineMissioneModel.utilizzoMotiviIspettivi" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.motivi-urgenza">motivi urgenza</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="autoPropriaOrdineMissioneModel.id" type="checkbox" ng-model="autoPropriaOrdineMissioneModel.utilizzoMotiviUrgenza" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.motivi-trasporto">motivi trasporto</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="autoPropriaOrdineMissioneModel.id" type="checkbox" ng-model="autoPropriaOrdineMissioneModel.utilizzoMotiviTrasporto" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
            <div class="col-md-11"> 
                 <dt translate="ordine-missione-auto-propria.form.auto-propria">Dati </dt>
                 <dd> <b>{{'autoPropria.form.targa' | translate}}:</b> {{autoPropriaOrdineMissioneModel.targa}} - <b>{{'autoPropria.form.marca' | translate}}:</b> {{autoPropriaOrdineMissioneModel.marca}} - <b>{{'autoPropria.form.modello' | translate}}:</b> {{autoPropriaOrdineMissioneModel.modello}} - <b>{{'autoPropria.form.cartaCircolazione' | translate}}:</b> {{autoPropriaOrdineMissioneModel.cartaCircolazione}} - <b>{{'autoPropria.form.polizzaAssicurativa' | translate}}:</b> {{autoPropriaOrdineMissioneModel.polizzaAssicurativa}}</dd>
@@ -35,6 +65,36 @@
 
 
           <div class="col-md-12 well highlight" ng-hide="isDisabilitataModificaAuto()"> 
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.motivi-ispettivi">motivi ispettivi</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione != 'N'" type="checkbox" ng-model="autoPropriaOrdineMissioneModel.utilizzoMotiviIspettivi" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.motivi-urgenza">motivi urgenza</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione != 'N'" type="checkbox" ng-model="autoPropriaOrdineMissioneModel.utilizzoMotiviUrgenza" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.motivi-trasporto">motivi trasporto</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione != 'N'" type="checkbox" ng-model="autoPropriaOrdineMissioneModel.utilizzoMotiviTrasporto" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
            <div class="col-md-10"> 
             <form class="form-inline" role="form" id ="missioni">
                <p class="input-group">
@@ -76,11 +136,11 @@
             <tr ng-repeat="spostamentoAutoPropria in spostamentiAutoPropria">
               <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left" >{{spostamentoAutoPropria.percorsoDa}}</td>
               <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256"></input>
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoDa" required maxlength="256">
               </td>
               <td ng-hide="spostamentoAutoPropria.editing" class="col-md-6" style="text-align: left">{{spostamentoAutoPropria.percorsoA}}</td>
               <td ng-show="spostamentoAutoPropria.editing" class="col-xs-6" style="text-align:left">
-                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256"></input>
+                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoAutoPropria.percorsoA" required maxlength="256">
               </td>
               <td ng-hide="spostamentoAutoPropria.editing">
                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editSpostamento(spostamentoAutoPropria)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>

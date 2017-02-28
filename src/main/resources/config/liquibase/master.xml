@@ -10,6 +10,22 @@
     <include file="classpath:config/liquibase/changelog/20160219131400_add_column_competenza.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160219152200_add_column_validato.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160412145700_add_table_rimborso.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20160627152200_add_column_note.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20160906152200_add_column_partenza" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161128152200_add_column_pg_banca.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161107152200_add_column_inquadramento.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20160913152200_add_column_progr_rimborso.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161210152200_add_column_giustificativo.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161214152200_add_column_matricola.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161214152300_add_column_dettaglio_rimborso.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170117103500_add_column_tipo_pagamento.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170120104200_add_column_missione_sigla.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170126145400_add_column_responsabile" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170131182000_add_column_tipo_rapporto.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170201112000_add_column_fondi.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170203111000_add_column_motivo_auto_propria.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170222111000_add_column_ti_cd_ti_spesa.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170222165000_modify_column_note_differenze.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

@@ -4,18 +4,28 @@ angular.module('missioniApp')
   .directive('cnrWidgetDate', function () {
     function setDatetime (scope, element){
               var data = element.find('input');
+              var dataInizio = null;
+              var dataFine = null;
+              if (scope.startDate){
+                dataInizio = new Date(scope.startDate);
+              }
+              if (scope.endDate){
+                dataFine = new Date(scope.endDate);
+              }
               data.datepicker({
                 language: "it", 
+                autoclose: true, 
                 todayBtn: "linked",
                 todayHighlight: true,
-                endDate: scope.endDate, 
-                startDate: scope.startDate, 
+                endDate: dataFine, 
+                startDate: dataInizio, 
                 format: "dd/mm/yyyy",
                 weekStart: 1
               }).on('changeDate', function (event) {
                 var newDate = event.date;
                 scope.ngModelDate = newDate;
                 scope.$apply();
+                scope.$emit('cambioData', newDate);
               }).on('show', function (event) {
                 var newDate = event.date;
                 scope.ngModelDate = newDate;
@@ -29,11 +39,14 @@ angular.module('missioniApp')
       scope: {
         ngModelDate: '=',
         dateName: '=',
+        disabilitato: '=',
         labelDate: '=',
         endDate: '=',
         startDate: '='
       },
+      templateUrl: 'views/datepicker.html',
       link: function link(scope, element, attrs) {
+          scope.label = attrs.label;
           var init = true;
           scope.$watch('ngModelDate', function (startValue) {
             if (startValue){
@@ -46,11 +59,6 @@ angular.module('missioniApp')
                 setDatetime(scope, element);
             }
           });
-      },
-      template: function(element, args) {
-        return '<div>' +
-                    '<input type="text" class="input-sm form-control" name="dateName" data-date-format="DD/MM/YYYY"/>' +
-                '</div>';
       }
     };
   });

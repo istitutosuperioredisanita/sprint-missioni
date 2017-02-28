@@ -1,7 +1,9 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
@@ -23,49 +25,57 @@ public class GaeService {
 	@Autowired
     private CommonService commonService;
 
-	public Gae loadGae(OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getGae() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione);
-			List<JSONClause> clausesAdd = prepareJSONClauseToAdd(ordineMissione);
-			String app = Costanti.APP_SIGLA;
-			String url = Costanti.REST_GAE;
-			String risposta = commonService.process(clauses, app, url, clausesAdd);
-
-			try {
-				ObjectMapper mapper = new ObjectMapper();
-				GaeJson gaeJson = mapper.readValue(risposta, GaeJson.class);
-				if (gaeJson != null){
-					List<Gae> lista = gaeJson.getElements();
-					if (lista != null && !lista.isEmpty()){
-						return lista.get(0);
-					}
-				}
-			} catch (Exception ex) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per le GAE ("+Utility.getMessageException(ex)+").");
-			}
+	public Gae loadGae(RimborsoMissione rimborsoMissione) throws AwesomeException {
+		if (rimborsoMissione.getGae() != null){
+			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getGae(), rimborsoMissione.getAnno(), rimborsoMissione.getCdrSpesa());
+			List<JSONClause> clausesAdd = prepareJSONClauseToAdd(rimborsoMissione.getCdsSpesa());
+			return loadGae(clauses, clausesAdd);
 		}
 		return null;
 	}
 
-	private List<JSONClause> prepareJSONClause(OrdineMissione ordineMissione) {
+	public Gae loadGae(OrdineMissione ordineMissione) throws AwesomeException {
+		if (ordineMissione.getGae() != null){
+			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getGae(), ordineMissione.getAnno(), ordineMissione.getCdrSpesa());
+			List<JSONClause> clausesAdd = prepareJSONClauseToAdd(ordineMissione.getCdsSpesa());
+			return loadGae(clauses, clausesAdd);
+		}
+		return null;
+	}
+
+	private Gae loadGae(List<JSONClause> clauses, List<JSONClause> clausesAdd) throws AwesomeException {
+		String app = Costanti.APP_SIGLA;
+		String url = Costanti.REST_GAE;
+		String risposta = commonService.process(clauses, app, url, clausesAdd);
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			GaeJson gaeJson = mapper.readValue(risposta, GaeJson.class);
+			if (gaeJson != null){
+				List<Gae> lista = gaeJson.getElements();
+				if (lista != null && !lista.isEmpty()){
+					return lista.get(0);
+				}
+			}
+		} catch (Exception ex) {
+			throw new ComponentException("Errore nella lettura del file JSON per le GAE ("+Utility.getMessageException(ex)+").",ex);
+		}
+		return null;
+	}
+	
+	private List<JSONClause> prepareJSONClause(String gae, Integer anno, String cdrSpesa) {
 		JSONClause clause = new JSONClause();
 		clause.setFieldName("cd_linea_attivita");
-		clause.setFieldValue(ordineMissione.getGae());
+		clause.setFieldValue(gae);
 		clause.setCondition("AND");
 		clause.setOperator("=");
 		List<JSONClause> clauses = new ArrayList<JSONClause>();
 		clauses.add(clause);
 		clause = new JSONClause();
-		clause.setFieldName("esercizio_inizio");
-		clause.setFieldValue(ordineMissione.getAnno());
+		clause.setFieldName("esercizio");
+		clause.setFieldValue(anno);
 		clause.setCondition("AND");
-		clause.setOperator("<=");
-		clauses.add(clause);
-		clause = new JSONClause();
-		clause.setFieldName("esercizio_fine");
-		clause.setFieldValue(ordineMissione.getAnno());
-		clause.setCondition("AND");
-		clause.setOperator(">=");
+		clause.setOperator("=");
 		clauses.add(clause);
 		clause = new JSONClause();
 		clause.setFieldName("ti_gestione");
@@ -77,7 +87,7 @@ public class GaeService {
 		clause.setFieldName("cd_centro_responsabilita");
 		clause.setCondition("AND");
 //			if (!StringUtils.isEmpty(ordineMissione.getCdrSpesa())){
-			clause.setFieldValue(ordineMissione.getCdrSpesa());
+			clause.setFieldValue(cdrSpesa);
 			clause.setOperator("=");
 //			} else {
 //				clause.setFieldValue(ordineMissione.getUoSpesa()+"%");
@@ -87,12 +97,12 @@ public class GaeService {
 		return clauses;
 	}
 
-	private List<JSONClause> prepareJSONClauseToAdd(OrdineMissione ordineMissione) {
+	private List<JSONClause> prepareJSONClauseToAdd(String cdsSpesa) {
 		JSONClause clause = new JSONClause();
 		List<JSONClause> clauses = new ArrayList<JSONClause>();
 		clause.setFieldName("cd_centro_responsabilita");
 		clause.setCondition("AND");
-		clause.setFieldValue(ordineMissione.getCdsSpesa()+"%");
+		clause.setFieldValue(cdsSpesa+"%");
 		clause.setOperator("LIKE");
 		clauses.add(clause);
 		return clauses;

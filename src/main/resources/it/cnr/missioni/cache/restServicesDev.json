@@ -1,6 +1,11 @@
 {
     "restService": [
         {
+            "app": "SIPER",
+            "url": "json/sedi/",
+            "skipLoadStartup": "S"
+        },
+        {
             "app": "SIGLA",
             "url": "ConsUnitaOrganizzativaAction.json",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativaJson",

@@ -6,6 +6,7 @@
     "moment": "^2.8.4"
   },
   "devDependencies": {
+    "bower": "^1.7.9",
     "event-stream": "3.1.5",
     "grunt": "0.4.5",
     "grunt-autoprefixer": "0.7.5",

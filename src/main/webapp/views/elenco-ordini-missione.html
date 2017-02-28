@@ -4,7 +4,7 @@
         <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                <p class="col-md-12">
                   <span class="input-group">
-                  <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.uo-userid-missione">uo</span>
+                  <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
                     <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
                    </span>
                </p>
@@ -12,7 +12,7 @@
             <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
                 <p class="col-md-12">
                     <span class="input-group">
-                    <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.userid-missione">user</span>
+                    <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
                        <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
                     </span>
                 </p>
@@ -22,7 +22,7 @@
 
 <div class="panel panel-primary">
   <div class="panel-heading color-celeste-avion text-center">
-    <h3 class="panel-title color-celeste-avion" translate="ordine-missione.form.box-info">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
   </div>
           <div class="panel-body my-panel-body">
             <info-account account="accountModel"></info-account>
@@ -61,33 +61,34 @@
     </div>
     </div>
 
+    <div ng-show="endSearching">
+      <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
+        <thead>
+          <tr>
+              <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+              <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+              <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+              <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+              <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+              <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+              <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+              <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+          </tr>
+        </thead>
 
-    <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
-      <thead>
-        <tr>
-            <th style="text-align: center">{{'ordine-missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'ordine-missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.stato' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'ordine-missione.form.oggetto' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
-        </tr>
-      </thead>
-
-      <tbody id ="missioni">
-        <tr ng-repeat="ordineMissione in ordiniMissione" ng-click="doSelectOrdineMissione(ordineMissione)" data-method="get">
-              <td style="text-align: center" >{{ordineMissione.anno}}</td>
-              <td style="text-align: right">{{ordineMissione.numero}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeStato}}</td>
-              <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
-              <td class="col-md-5" style="text-align: left">{{ordineMissione.oggetto}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-              <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-        </tr>
-      </tbody>  
-    </table>
+        <tbody id ="missioni">
+          <tr ng-repeat="ordineMissione in ordiniMissione" ng-click="doSelectOrdineMissione(ordineMissione)" data-method="get">
+                <td style="text-align: center" >{{ordineMissione.anno}}</td>
+                <td style="text-align: right">{{ordineMissione.numero}}</td>
+                <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+                <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeStato}}</td>
+                <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
+                <td class="col-md-5" style="text-align: left">{{ordineMissione.oggetto}}</td>
+                <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+          </tr>
+        </tbody>  
+      </table>
+    </div>
   </div>
 </div>

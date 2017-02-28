@@ -1,17 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
-import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.print.Spostamenti;
-import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
-import it.cnr.si.missioni.util.proxy.json.service.AccountService;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
+import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.print.Spostamenti;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
+import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
 @Service
 public class PrintOrdineMissioneAutoPropriaService {
@@ -41,14 +42,14 @@ public class PrintOrdineMissioneAutoPropriaService {
     	PrintOrdineMissioneAutoPropria printOrdineMissioneAutoPropria = new PrintOrdineMissioneAutoPropria();
     	printOrdineMissioneAutoPropria.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAutoPropria.setCodiceFiscaleRich(account.getCodiceFiscale());
-    	printOrdineMissioneAutoPropria.setComuneResidenzaRich(ordineMissione.getComuneResidenzaRich());
+    	printOrdineMissioneAutoPropria.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
     		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissioneAutoPropria.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
     	}
     	printOrdineMissioneAutoPropria.setDatoreLavoroRich(ordineMissione.getDatoreLavoroRich());
     	printOrdineMissioneAutoPropria.setDomicilioFiscaleRich(Utility.nvl(ordineMissione.getDomicilioFiscaleRich()));
-    	printOrdineMissioneAutoPropria.setIndirizzoResidenzaRich(ordineMissione.getIndirizzoResidenzaRich());
+    	printOrdineMissioneAutoPropria.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissioneAutoPropria.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
     	printOrdineMissioneAutoPropria.setLuogoDiNascitaRich(account.getComuneNascita());
     	printOrdineMissioneAutoPropria.setMatricolaRich(account.getMatricola());
@@ -72,6 +73,9 @@ public class PrintOrdineMissioneAutoPropriaService {
 		printOrdineMissioneAutoPropria.setTarga(ordineMissioneAutoPropria.getTarga());
 		printOrdineMissioneAutoPropria.setPolizzaAssicurativa(ordineMissioneAutoPropria.getPolizzaAssicurativa());
 		printOrdineMissioneAutoPropria.setNumeroPatente(ordineMissioneAutoPropria.getNumeroPatente());
+    	printOrdineMissioneAutoPropria.setMotiviIspettivi(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
+    	printOrdineMissioneAutoPropria.setMotiviUrgenza(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
+    	printOrdineMissioneAutoPropria.setMotiviTrasporto(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
 
 		if (ordineMissioneAutoPropria.getListSpostamenti() != null){
 			List<Spostamenti> listSpostamentiPrint = new ArrayList<Spostamenti>();

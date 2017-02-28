@@ -116,41 +116,6 @@ missioniApp.factory('LogsService', function ($resource) {
 
 'use strict';
 
-missioniApp.factory('modalService', function () {
-
-    function modal (modalTitle, bodyContent) {
-
-      var modalContent = $('<div class="modal-content"></div>');
-
-      if (modalTitle) {
-        $('<div class="modal-header"></div>')
-          .append('<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>')
-          .append('<h4 class="modal-title">' + modalTitle + '</h4>')
-          .appendTo(modalContent);
-      }
-
-      $('<div class="modal-body"></div>')
-        .append(bodyContent)
-        .appendTo(modalContent);
-
-      $('<div class="modal-footer"></div>')
-        .append('<button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>')
-        .appendTo(modalContent);
-
-      return $('<div class="modal-dialog modal-lg"></div>').append(modalContent);
-
-    }
-
-    return {
-      modal: modal,
-      simpleModal: function (title, url) {
-        var modalContent = modal(title, '<img src="' + url + '" />');
-        $('<div class="modal fade role="dialog" tabindex="-1"></div>').append(modalContent).modal();
-      }
-    };
-
-  });
-
 missioniApp.factory('AuditsService', function ($http) {
         return {
             findAll: function() {
@@ -181,6 +146,15 @@ missioniApp.factory('Session', function () {
             this.comune_residenza = comune_residenza;
             this.indirizzo_residenza = indirizzo_residenza;
             this.num_civico_residenza = num_civico_residenza;
+            if (this.num_civico_residenza){
+                this.indirizzo_completo_residenza = this.indirizzo_residenza+" "+this.num_civico_residenza;
+            } else {
+                if (this.indirizzo_residenza){
+                    this.indirizzo_completo_residenza = this.indirizzo_residenza;
+                } else {
+                    this.indirizzo_completo_residenza = null;
+                }
+            }
             this.cap_residenza = cap_residenza;
             this.provincia_residenza = provincia_residenza;
             this.codice_fiscale = codice_fiscale;
@@ -216,6 +190,7 @@ missioniApp.factory('Session', function () {
             this.comune_residenza = null;
             this.indirizzo_residenza = null;
             this.num_civico_residenza = null;
+            this.indirizzo_completo_residenza = null;
             this.cap_residenza = null;
             this.provincia_residenza = null;
             this.codice_fiscale = null;

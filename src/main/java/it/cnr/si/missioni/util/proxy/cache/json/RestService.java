@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
 	"app",
 	"url",
+	"skipLoadStartup",
 	"classeJson",
 	"classe",
 	"clause",
@@ -33,6 +34,8 @@ public class RestService {
 	private String app;
 	@JsonProperty("url")
 	private String url;
+	@JsonProperty("skipLoadStartup")
+	private String skipLoadStartup;
 	@JsonProperty("classeJson")
 	private String classeJson;
 	@JsonProperty("classe")
@@ -86,6 +89,26 @@ public class RestService {
 	@JsonProperty("url")
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	/**
+	 *
+	 * @return
+	 * The skipLoadStartup
+	 */
+	@JsonProperty("skipLoadStartup")
+	public String getSkipLoadStartup() {
+		return skipLoadStartup;
+	}
+
+	/**
+	 *
+	 * @param skipLoadStartup
+	 * The skipLoadStartup
+	 */
+	@JsonProperty("skipLoadStartup")
+	public void setSkipLoadStartup(String skipLoadStartup) {
+		this.skipLoadStartup = skipLoadStartup;
 	}
 
 	/**
