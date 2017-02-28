@@ -1,5 +1,6 @@
 README for missioni
 ==========================
 
+configurazione DB postgres <http://git.si.cnr.it/docker/postgres-missioni>
 
-[docker-compose.yml](http://git.si.cnr.it/devops/containers/blob/master/centos-missioni/docker-compose.yml)
+deployato su test: <http://sprint-missioni.test.si.cnr.it/>
