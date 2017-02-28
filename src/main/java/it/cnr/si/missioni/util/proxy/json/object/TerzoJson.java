@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class TerzoJson extends  CommonJsonRest<Terzo> implements Serializable {
-	List<Terzo> elements;
+	private List<Terzo> elements;
 	public List<Terzo> getElements() {
 		return elements;
 	}

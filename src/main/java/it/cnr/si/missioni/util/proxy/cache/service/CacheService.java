@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.cache.service;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.util.Introspector;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.service.ConfigService;
@@ -137,7 +138,8 @@ public class CacheService implements EnvironmentAware{
 							}
 						}
 					} catch (Exception ex) {
-						log.info("Errore nella lettura del servizio REST: " + rest.getUrl());
+						log.error("Errore nella lettura del servizio REST: " + rest.getUrl(), ex);
+						throw new ComponentException("Errore", ex);
 					}
 				}
 			}
@@ -247,7 +249,7 @@ public class CacheService implements EnvironmentAware{
 	}
 
 	private JSONClause getClause(Clause clauseDefault) {
-		JSONClause clause = null;
+		JSONClause clause;
 		if (clauseDefault.containsSpecialValue()){
 			clause = new JSONClause(clauseDefault.getCondition(), clauseDefault.getFieldName(), clauseDefault.getOperator(), clauseDefault.getValueFromSpecialValue());
 		} else {

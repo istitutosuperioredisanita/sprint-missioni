@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class UnitaOrganizzativaJson extends CommonJsonRest<UnitaOrganizzativa> implements Serializable {
-	List<UnitaOrganizzativa> elements;
+	private List<UnitaOrganizzativa> elements;
 
 	@Override
 	public List<UnitaOrganizzativa> getElements() {

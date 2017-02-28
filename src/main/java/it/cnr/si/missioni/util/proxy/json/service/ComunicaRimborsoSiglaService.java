@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -46,6 +49,7 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 
 @Service
 public class ComunicaRimborsoSiglaService {
+    private final Logger log = LoggerFactory.getLogger(ComunicaRimborsoSiglaService.class);
 	@Autowired
     private CommonService commonService;
 	
@@ -282,7 +286,7 @@ public class ComunicaRimborsoSiglaService {
 	}
 
 	private void impostaTappe(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk)
-			throws Exception {
+			throws ComponentException {
 		List<TappeMissioneColl> tappeMissioneColl = new ArrayList<TappeMissioneColl>();
 		TappeMissioneColl tappa = new TappeMissioneColl();
 		impostaDivisaTappa(tappa);
@@ -296,12 +300,10 @@ public class ComunicaRimborsoSiglaService {
 		tappa.setFlComuneAltro(oggettoBulk.getFlComuneAltro());
 		tappa.setFlComuneEstero(oggettoBulk.getFlComuneEstero());
 		tappa.setFlComuneProprio(oggettoBulk.getFlComuneProprio());
-//TODO: GGGG Da verificare sul db Gestione vitto e alloggio gratuito con gli abbattimenti
 		tappa.setFlAlloggioGratuito(false);
 		tappa.setFlNavigazione(false);
 		tappa.setFlVittoAlloggioGratuito(false);
 		tappa.setFlVittoGratuito(false);
-//TODO: GGGG Fine da verificare sul db Gestione vitto e alloggio gratuito con gli abbattimenti 								
 		if (!rimborsoApprovato.isMissioneEstera()){
 			impostaNazioneRimborso(rimborsoApprovato, tappa);
 			tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
@@ -318,16 +320,22 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setTappeMissioneColl(tappeMissioneColl);
 	}
 
-	private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws Exception {
+	private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws ComponentException {
 		return impostaTappeDaDate(daData, aData, tappa, tappeMissioneColl, null, null);
 	}
-	private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws Exception {
+	private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws ComponentException {
 		ZonedDateTime ultimaDataInizioUsata = null;
 		if (dataInizioMissione != null && !DateUtils.truncate(daData).equals(DateUtils.truncate(dataInizioMissione))){
 			for (ZonedDateTime data = dataInizioMissione; DateUtils.truncate(data).isBefore(DateUtils.truncate(daData)); data = data.plusDays(1))
 			{
 				ultimaDataInizioUsata = data;
-				TappeMissioneColl newDayTappa = (TappeMissioneColl)tappa.clone();
+				TappeMissioneColl newDayTappa;
+				try {
+					newDayTappa = (TappeMissioneColl)tappa.clone();
+				} catch (CloneNotSupportedException e) {
+					log.error("Errore",e);
+					throw new ComponentException("Errore nel clone.",e);
+				}
 				impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, newDayTappa);
 				ZonedDateTime dataFine = data.plusDays(1);
 				if (dataFine.isAfter(dataFineMissione)){
@@ -343,7 +351,13 @@ public class ComunicaRimborsoSiglaService {
 		for (ZonedDateTime data = daData; DateUtils.truncate(data).isBefore(DateUtils.truncate(aData)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(aData)); data = data.plusDays(1))
 		{
 			ultimaDataInizioUsata = data;
-			TappeMissioneColl newDayTappa = (TappeMissioneColl)tappa.clone();
+			TappeMissioneColl newDayTappa;
+			try {
+				newDayTappa = (TappeMissioneColl)tappa.clone();
+			} catch (CloneNotSupportedException e) {
+				log.error("Errore",e);
+				throw new ComponentException("Errore nel clone.",e);
+			}
 			ZonedDateTime dataFine = data.plusDays(1);
 			if (dataFine.isAfter(aData)){
 				if (dataFineMissione == null){
@@ -366,7 +380,13 @@ public class ComunicaRimborsoSiglaService {
 				if (dataInizio.isAfter(dataFineMissione)){
 					dataInizio = dataFineMissione;
 				}
-				TappeMissioneColl newDayTappa = (TappeMissioneColl)tappa.clone();
+				TappeMissioneColl newDayTappa;
+				try {
+					newDayTappa = (TappeMissioneColl)tappa.clone();
+				} catch (CloneNotSupportedException e) {
+					log.error("Errore",e);
+					throw new ComponentException("Errore nel clone.",e);
+				}
 				ZonedDateTime dataFine = dataInizio.plusDays(1);
 				if (dataFine.isAfter(dataFineMissione)){
 					dataFine = dataFineMissione;
