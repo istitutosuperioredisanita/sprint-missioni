@@ -117,13 +117,11 @@ public class Utility {
 	    cal.set( Calendar.MINUTE, 0 );
 	    cal.set( Calendar.SECOND, 0 );
 	    cal.set( Calendar.MILLISECOND, 0 );		
-	    Date dataSenzaOre = cal.getTime();
-	    return dataSenzaOre;
+	    return cal.getTime();
 	}
 
 	public static ZonedDateTime getDateWithoutHours(ZonedDateTime data){
-		ZonedDateTime zdt = data.truncatedTo(ChronoUnit.DAYS);		
-		return zdt;
+		return data.truncatedTo(ChronoUnit.DAYS);
 	}
 
 	public static String numberFormat(BigDecimal importo) {

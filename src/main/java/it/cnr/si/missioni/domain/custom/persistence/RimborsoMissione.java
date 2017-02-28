@@ -36,24 +36,24 @@ import net.bzdyl.ejb3.criteria.projections.Projections;
 @Entity
 @Table(name = "RIMBORSO_MISSIONE")
 public class RimborsoMissione extends OggettoBulkXmlTransient {
-	public final static String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale",
-			CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati",
-			CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione",
-			CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo",
-			CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id",
-			CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione",
-			CMIS_PROPERTY_FLOW_TOTALE_RIMBORSO_MISSIONE = "cnrmissioni:totaleRimborsoMissione",
-			CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso",
-			CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto",
-			CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato",
-			CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandato",
-			CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato",
-			CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "D:missioni_rimborso_attachment:document",
-			CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero",
-			CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero",
-			CMIS_PROPERTY_FLOW_DIFFERENZE_ORDINE_RIMBORSO = "cnrmissioni:differenzeOrdineRimborso";
+	public static final String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale";
+	public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati";
+	public static final String CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione";
+	public static final String CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo";
+	public static final String CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id";
+	public static final String CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione";
+	public static final String CMIS_PROPERTY_FLOW_TOTALE_RIMBORSO_MISSIONE = "cnrmissioni:totaleRimborsoMissione";
+	public static final String CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso";
+	public static final String CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto";
+	public static final String CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato";
+	public static final String CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandato";
+	public static final String CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato";
+	public static final String CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "D:missioni_rimborso_attachment:document";
+	public static final String CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero";
+	public static final String CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero";
+	public static final String CMIS_PROPERTY_FLOW_DIFFERENZE_ORDINE_RIMBORSO = "cnrmissioni:differenzeOrdineRimborso";
 
-    @Column(name = "DATA_INIZIO_ESTERO", nullable = true)
+	@Column(name = "DATA_INIZIO_ESTERO", nullable = true)
     private ZonedDateTime dataInizioEstero;
 
     @Column(name = "DATA_FINE_ESTERO", nullable = true)

@@ -2,6 +2,7 @@ package it.cnr.si.missioni.util.proxy.cache.json;
 
 import it.cnr.si.missioni.util.DateUtils;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +28,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"urlInCache",
 	"fieldGetForSpecialValue"
 })
-public class ClauseToIterate {
+public class ClauseToIterate implements Serializable{
 
-	public final static String ANNO_CORRENTE = "ANNO_CORRENTE";
+	public static final String ANNO_CORRENTE = "ANNO_CORRENTE";
 
-	public final static Map<String, Object> SPECIAL_VALUES;
+	public static final Map<String, Serializable> SPECIAL_VALUES;
     static {
-        Map<String, Object> aMap = new HashMap<String, Object>();
+        Map<String, Serializable> aMap = new HashMap<String, Serializable>();
         aMap.put(ANNO_CORRENTE, DateUtils.getCurrentYear());
         SPECIAL_VALUES = Collections.unmodifiableMap(aMap);
     }
@@ -56,7 +57,7 @@ public class ClauseToIterate {
 	@JsonProperty("fieldGetForSpecialValue")
 	private String fieldGetForSpecialValue;
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
 	/**
 	 *
@@ -225,21 +226,21 @@ public class ClauseToIterate {
 		return false;
 	}
 	
-	public Object getValueFromToSpecialValue(){
+	public Serializable getValueFromToSpecialValue(){
 		if (getToSpecialValue() != null){
-			Object value = SPECIAL_VALUES.get(getToSpecialValue());
+			Serializable value = SPECIAL_VALUES.get(getToSpecialValue());
 			return value;
 		}
 		return null;
 	}
 	
 	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
+	public Map<String, Serializable> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
+	public void setAdditionalProperty(String name, Serializable value) {
 		this.additionalProperties.put(name, value);
 	}
 

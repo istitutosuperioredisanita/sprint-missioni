@@ -2,6 +2,7 @@ package it.cnr.si.missioni.util.proxy.cache.json;
 
 import it.cnr.si.missioni.util.proxy.json.JSONOrderBy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"clauseVariable",
 	"clauseFixed"
 })
-public class RestService {
+public class RestService implements Serializable{
 
 	@JsonProperty("app")
 	private String app;
@@ -49,7 +50,7 @@ public class RestService {
 	@JsonProperty("order")
 	private List<JSONOrderBy> order = new ArrayList<JSONOrderBy>();
 	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Map<String, Serializable> additionalProperties = new HashMap<String, Serializable>();
 
 	/**
 	 *
@@ -232,12 +233,12 @@ public class RestService {
 	}
 
 	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
+	public Map<String, Serializable> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
 	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
+	public void setAdditionalProperty(String name, Serializable value) {
 		this.additionalProperties.put(name, value);
 	}
 
