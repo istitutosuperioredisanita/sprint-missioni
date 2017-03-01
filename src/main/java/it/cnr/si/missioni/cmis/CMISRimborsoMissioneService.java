@@ -747,103 +747,126 @@ public class CMISRimborsoMissioneService {
 		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
 		Document documento = salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
 		StringBuilder nodeRefs = new StringBuilder();
+		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisRimborsoMissione.getUserNamePrimoFirmatario());
+
+		StringWriter stringWriter = new StringWriter();
+		JsonFactory jsonFactory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
+		try {
+			JsonGenerator jGenerator = jsonFactory.createJsonGenerator(stringWriter);
+			jGenerator.writeStartObject();
+			jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
+			jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
+			aggiungiDocumento(documento, nodeRefs);
+			aggiungiAllegatiDettagli(rimborsoMissione, nodeRefs);
+
+			jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
+			jGenerator.writeStringField("assoc_packageItems_removed" , "");
+			if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
+				jGenerator.writeStringField("prop_bpm_comment" , "");
+				jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
+			}
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisRimborsoMissione.getOggetto());
+			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisRimborsoMissione.getNote());
+			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisRimborsoMissione.getWfDescription());
+			jGenerator.writeStringField("prop_bpm_sendEMailNotifications" , "false");
+			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisRimborsoMissione.getWfDueDate());
+			jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
+			jGenerator.writeStringField("prop_bpm_workflowPriority" , Utility.nvl(cmisRimborsoMissione.getPriorita(),Costanti.PRIORITA_MEDIA));
+			jGenerator.writeStringField("prop_wfcnr_groupName" , "GENERICO");
+			jGenerator.writeStringField("prop_wfcnr_wfCounterIndex" , "");
+			jGenerator.writeStringField("prop_wfcnr_wfCounterId" , "");
+			jGenerator.writeStringField("prop_wfcnr_wfCounterAnno" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_validazioneSpesaFlag" , cmisRimborsoMissione.getValidazioneSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameUtenteOrdineMissione" , cmisRimborsoMissione.getUsernameUtenteOrdine());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisRimborsoMissione.getUsernameRichiedente());
+			jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisRimborsoMissione.getUserNamePrimoFirmatario());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisRimborsoMissione.getUserNameFirmatarioSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisRimborsoMissione.getUoOrdine());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisRimborsoMissione.getDescrizioneUoOrdine());
+			jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisRimborsoMissione.getUoSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisRimborsoMissione.getDescrizioneUoSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisRimborsoMissione.getUoCompetenza());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisRimborsoMissione.getDescrizioneUoCompetenza());
+			jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisRimborsoMissione.getCapitolo());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisRimborsoMissione.getDescrizioneCapitolo());
+			jGenerator.writeStringField("prop_cnrmissioni_gae" , cmisRimborsoMissione.getGae());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneGae" , cmisRimborsoMissione.getDescrizioneGae());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoResiduo" , cmisRimborsoMissione.getImpegnoAnnoResiduo() == null ? "": cmisRimborsoMissione.getImpegnoAnnoResiduo().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoCompetenza" , cmisRimborsoMissione.getImpegnoAnnoCompetenza() == null ? "": cmisRimborsoMissione.getImpegnoAnnoCompetenza().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoNumero" , cmisRimborsoMissione.getImpegnoNumero() == null ? "": cmisRimborsoMissione.getImpegnoNumero().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneImpegno" , cmisRimborsoMissione.getDescrizioneImpegno());
+			jGenerator.writeStringField("prop_cnrmissioni_importoMissione" , cmisRimborsoMissione.getImportoMissione() == null ? "": cmisRimborsoMissione.getImportoMissione().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_disponibilita" , cmisRimborsoMissione.getDisponibilita() == null ? "": cmisRimborsoMissione.getDisponibilita().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_missioneEsteraFlag" , cmisRimborsoMissione.getMissioneEsteraFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_destinazione" , cmisRimborsoMissione.getDestinazione());
+			jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisRimborsoMissione.getDataInizioMissione());
+			jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisRimborsoMissione.getDataFineMissione());
+			jGenerator.writeStringField("prop_cnrmissioni_trattamento" , cmisRimborsoMissione.getTrattamento());
+			jGenerator.writeStringField("prop_cnrmissioni_dataInizioEstero" , cmisRimborsoMissione.getDataInizioEstero() == null ? "" : cmisRimborsoMissione.getDataInizioEstero());
+			jGenerator.writeStringField("prop_cnrmissioni_dataFineEstero" , cmisRimborsoMissione.getDataFineEstero() == null ? "" : cmisRimborsoMissione.getDataFineEstero());
+			jGenerator.writeStringField("prop_cnrmissioni_anticipoRicevuto" , cmisRimborsoMissione.getAnticipoRicevuto());
+			jGenerator.writeStringField("prop_cnrmissioni_annoMandato" , cmisRimborsoMissione.getAnnoMandato());
+			jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());
+			jGenerator.writeStringField("prop_cnrmissioni_importoMandato" , cmisRimborsoMissione.getImportoMandato());
+			jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRimborso" , cmisRimborsoMissione.getWfOrdineMissione());
+			jGenerator.writeStringField("prop_cnrmissioni_differenzeOrdineRimborso" , cmisRimborsoMissione.getDifferenzeOrdineRimborso());
+			jGenerator.writeStringField("prop_cnrmissioni_totaleRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione() == null ? "": cmisRimborsoMissione.getTotaleRimborsoMissione().toString());
+			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+				jGenerator.writeStringField("prop_bpm_comment" , "AVANZAMENTO");
+				jGenerator.writeStringField("prop_wfcnr_reviewOutcome" , FlowResubmitType.RESTART_FLOW.operation());
+				jGenerator.writeStringField("prop_transitions" , "Next");
+			}
+			jGenerator.writeEndObject();
+			jGenerator.close();
+		} catch (IOException e) {
+			throw new ComponentException("Errore in fase avvio flusso documentale. Errore: "+e,e);
+		}
+
+		avviaFlusso(rimborsoMissione, stringWriter, mapper);
+	}
+
+	private void avviaFlusso(RimborsoMissione rimborsoMissione, StringWriter stringWriter, ObjectMapper mapper) {
 		if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
-			String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisRimborsoMissione.getUserNamePrimoFirmatario());
-
-			StringWriter stringWriter = new StringWriter();
-			JsonFactory jsonFactory = new JsonFactory();
-			ObjectMapper mapper = new ObjectMapper(jsonFactory); 
-			try {
-				 JsonGenerator jGenerator = jsonFactory.createJsonGenerator(stringWriter);
-				 jGenerator.writeStartObject();
-				 jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
-				 jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
-				 aggiungiDocumento(documento, nodeRefs);
-			     aggiungiAllegatiDettagli(rimborsoMissione, nodeRefs);
-
-				 jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
-				 jGenerator.writeStringField("assoc_packageItems_removed" , "");
-				 jGenerator.writeStringField("prop_bpm_comment" , "");
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisRimborsoMissione.getOggetto());
-				 jGenerator.writeStringField("prop_cnrmissioni_note" , cmisRimborsoMissione.getNote());
-				 jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisRimborsoMissione.getWfDescription());
-				 jGenerator.writeStringField("prop_bpm_sendEMailNotifications" , "false");
-				 jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisRimborsoMissione.getWfDueDate());
-				 jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
-				 jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
-				 jGenerator.writeStringField("prop_bpm_workflowPriority" , Utility.nvl(cmisRimborsoMissione.getPriorita(),Costanti.PRIORITA_MEDIA));
-				 jGenerator.writeStringField("prop_wfcnr_groupName" , "GENERICO");
-				 jGenerator.writeStringField("prop_wfcnr_wfCounterIndex" , "");
-				 jGenerator.writeStringField("prop_wfcnr_wfCounterId" , "");
-				 jGenerator.writeStringField("prop_wfcnr_wfCounterAnno" , "");
-				 jGenerator.writeStringField("prop_cnrmissioni_validazioneSpesaFlag" , cmisRimborsoMissione.getValidazioneSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameUtenteOrdineMissione" , cmisRimborsoMissione.getUsernameUtenteOrdine());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisRimborsoMissione.getUsernameRichiedente());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisRimborsoMissione.getUserNamePrimoFirmatario());
-				 jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisRimborsoMissione.getUserNameFirmatarioSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisRimborsoMissione.getUoOrdine());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisRimborsoMissione.getDescrizioneUoOrdine());
-				 jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisRimborsoMissione.getUoSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisRimborsoMissione.getDescrizioneUoSpesa());
-				 jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisRimborsoMissione.getUoCompetenza());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisRimborsoMissione.getDescrizioneUoCompetenza());
-				 jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisRimborsoMissione.getCapitolo());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisRimborsoMissione.getDescrizioneCapitolo());
-				 jGenerator.writeStringField("prop_cnrmissioni_gae" , cmisRimborsoMissione.getGae());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneGae" , cmisRimborsoMissione.getDescrizioneGae());
-				 jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoResiduo" , cmisRimborsoMissione.getImpegnoAnnoResiduo() == null ? "": cmisRimborsoMissione.getImpegnoAnnoResiduo().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoCompetenza" , cmisRimborsoMissione.getImpegnoAnnoCompetenza() == null ? "": cmisRimborsoMissione.getImpegnoAnnoCompetenza().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_impegnoNumero" , cmisRimborsoMissione.getImpegnoNumero() == null ? "": cmisRimborsoMissione.getImpegnoNumero().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_descrizioneImpegno" , cmisRimborsoMissione.getDescrizioneImpegno());
-				 jGenerator.writeStringField("prop_cnrmissioni_importoMissione" , cmisRimborsoMissione.getImportoMissione() == null ? "": cmisRimborsoMissione.getImportoMissione().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_disponibilita" , cmisRimborsoMissione.getDisponibilita() == null ? "": cmisRimborsoMissione.getDisponibilita().toString());
-				 jGenerator.writeStringField("prop_cnrmissioni_missioneEsteraFlag" , cmisRimborsoMissione.getMissioneEsteraFlag());
-				 jGenerator.writeStringField("prop_cnrmissioni_destinazione" , cmisRimborsoMissione.getDestinazione());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisRimborsoMissione.getDataInizioMissione());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisRimborsoMissione.getDataFineMissione());
-				 jGenerator.writeStringField("prop_cnrmissioni_trattamento" , cmisRimborsoMissione.getTrattamento());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataInizioEstero" , cmisRimborsoMissione.getDataInizioEstero() == null ? "" : cmisRimborsoMissione.getDataInizioEstero());
-				 jGenerator.writeStringField("prop_cnrmissioni_dataFineEstero" , cmisRimborsoMissione.getDataFineEstero() == null ? "" : cmisRimborsoMissione.getDataFineEstero());
-				 jGenerator.writeStringField("prop_cnrmissioni_anticipoRicevuto" , cmisRimborsoMissione.getAnticipoRicevuto());
-				 jGenerator.writeStringField("prop_cnrmissioni_annoMandato" , cmisRimborsoMissione.getAnnoMandato());
-				 jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());
-				 jGenerator.writeStringField("prop_cnrmissioni_importoMandato" , cmisRimborsoMissione.getImportoMandato());
-				 jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRimborso" , cmisRimborsoMissione.getWfOrdineMissione());
-				 jGenerator.writeStringField("prop_cnrmissioni_differenzeOrdineRimborso" , cmisRimborsoMissione.getDifferenzeOrdineRimborso());
-				 jGenerator.writeStringField("prop_cnrmissioni_totaleRimborsoMissione" , cmisRimborsoMissione.getTotaleRimborsoMissione() == null ? "": cmisRimborsoMissione.getTotaleRimborsoMissione().toString());
-				jGenerator.writeEndObject();
-				jGenerator.close();
-			} catch (IOException e) {
-				throw new ComponentException("Errore in fase avvio flusso documentale. Errore: "+e,e);
-			}
-			
-			try {
-				Response responsePost = missioniCMISService.startFlowRimborsoMissione(stringWriter);
-				TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-				HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
-				String idFlusso = null;
-				
-				String text = mapRichiedente.get("persistedObject").toString();
-				String patternString1 = "id=(activiti\\$[0-9]+)";
-
-				Pattern pattern = Pattern.compile(patternString1);
-				Matcher matcher = pattern.matcher(text);
-				if (matcher.find())
-					idFlusso = matcher.group(1);
-				rimborsoMissione.setIdFlusso(idFlusso);
-				rimborsoMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-			} catch (AwesomeException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new ComponentException("Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".",e);
-			}
+			startFlow(rimborsoMissione, stringWriter, mapper);
 		} else {
 			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
-		        aggiungiAllegatiDettagli(rimborsoMissione, nodeRefs);
-				avanzaFlusso(rimborsoMissione, nodeRefs);
+				restartFlow(rimborsoMissione, stringWriter);
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
 			}
+		}
+	}
+
+	private void startFlow(RimborsoMissione rimborsoMissione, StringWriter stringWriter, ObjectMapper mapper) {
+		try {
+			Response responsePost = missioniCMISService.startFlowRimborsoMissione(stringWriter);
+			TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+			HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
+			String idFlusso = null;
+
+			String text = mapRichiedente.get("persistedObject").toString();
+			String patternString1 = "id=(activiti\\$[0-9]+)";
+
+			Pattern pattern = Pattern.compile(patternString1);
+			Matcher matcher = pattern.matcher(text);
+			if (matcher.find())
+				idFlusso = matcher.group(1);
+			rimborsoMissione.setIdFlusso(idFlusso);
+			rimborsoMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+		} catch (AwesomeException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ComponentException("Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".",e);
+		}
+	}
+
+	private void restartFlow(RimborsoMissione rimborsoMissione, StringWriter stringWriter) {
+		ResultFlows result = getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
+		if (!StringUtils.isEmpty(result.getTaskId())){
+			missioniCMISService.restartFlow(stringWriter, result);
+		} else {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
 		}
 	}
 
@@ -938,22 +961,11 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 	
-	private void avanzaFlusso(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs) throws AwesomeException {
-    	avanzaFlusso(rimborsoMissione, nodeRefs, FlowResubmitType.RESTART_FLOW);
-    }
-
     public void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException {
-    	avanzaFlusso(rimborsoMissione, null, FlowResubmitType.ABORT_FLOW);
+    	abortFlowRimborsoMissione(rimborsoMissione);
     	rimborsoMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }
 
-    private void avanzaFlusso(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs, FlowResubmitType step) throws AwesomeException {
-    	try {
-    		restartFlowRimborsoMissione(rimborsoMissione, nodeRefs, step);
-    	} catch (AwesomeException e) {
-    		throw e;
-    	}
-    }
 	public ResultFlows getFlowsRimborsoMissione(String idFlusso)throws AwesomeException{
 		String fieldStato = "wfcnr:statoFlusso"; 
 		String fieldTaskId = "wfcnr:taskId"; 
@@ -969,19 +981,14 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 
-	public void restartFlowRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs, FlowResubmitType step) throws AwesomeException {
-    	ResultFlows result = getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
-    	if (!StringUtils.isEmpty(result.getTaskId())){
-    		if (step.equals(FlowResubmitType.ABORT_FLOW.operation())){
-        		StringWriter stringWriter = createJsonForAbortFlowOrdineMissione();
-        		missioniCMISService.abortFlow(stringWriter, result);
-    		} else {
-    			StringWriter stringWriter = createJsonForRestartFlowOrdineMissione(nodeRefs);
-        		missioniCMISService.restartFlow(stringWriter, result);
-    		}
-    	} else {
-    		throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
-    	}
+	private void abortFlowRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
+		ResultFlows result = getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
+		if (!StringUtils.isEmpty(result.getTaskId())){
+			StringWriter stringWriter = createJsonForAbortFlowOrdineMissione();
+			missioniCMISService.abortFlow(stringWriter, result);
+		} else {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
+		}
     }
 
 	public QueryResult recuperoFlusso(String idFlusso)throws AwesomeException{
@@ -999,26 +1006,6 @@ public class CMISRimborsoMissioneService {
 			}
 		}
 		return null;
-	}
-
-	private StringWriter createJsonForRestartFlowOrdineMissione(StringBuilder nodeRefs) {
-		StringWriter stringWriter = new StringWriter();
-		try {
-			JsonFactory jsonFactory = new JsonFactory();
-			JsonGenerator jGenerator = jsonFactory.createJsonGenerator(stringWriter);
-			jGenerator.writeStartObject();
-			if (nodeRefs != null){
-				jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
-			}
-			jGenerator.writeStringField("prop_bpm_comment" , "AVANZAMENTO");
-			jGenerator.writeStringField("prop_wfcnr_reviewOutcome" , FlowResubmitType.RESTART_FLOW.operation());
-			jGenerator.writeStringField("prop_transitions" , "Next");
-			jGenerator.writeEndObject();
-			jGenerator.close();
-		} catch (IOException e) {
-			throw new ComponentException("Errore in fase di scrittura dei file del flusso per l'avanzamento del documentale. Errore: "+e,e);
-		}
-		return stringWriter;
 	}
 
 	private StringWriter createJsonForAbortFlowOrdineMissione() {
