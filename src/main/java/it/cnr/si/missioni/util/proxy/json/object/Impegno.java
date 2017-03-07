@@ -49,7 +49,7 @@ public class Impegno extends RestServiceBean  implements Serializable {
 	@JsonProperty("cdCdsOrigine")
 	private String cdCdsOrigine;
 	@JsonProperty("pgObbligazione")
-	private Integer pgObbligazione;
+	private Long pgObbligazione;
 	@JsonProperty("dsObbligazione")
 	private String dsObbligazione;
 	@JsonProperty("cdUoOrigine")
@@ -183,7 +183,7 @@ public class Impegno extends RestServiceBean  implements Serializable {
 	 * The pgObbligazione
 	 */
 	@JsonProperty("pgObbligazione")
-	public Integer getPgObbligazione() {
+	public Long getPgObbligazione() {
 		return pgObbligazione;
 	}
 
@@ -193,7 +193,7 @@ public class Impegno extends RestServiceBean  implements Serializable {
 	 * The pgObbligazione
 	 */
 	@JsonProperty("pgObbligazione")
-	public void setPgObbligazione(Integer pgObbligazione) {
+	public void setPgObbligazione(Long pgObbligazione) {
 		this.pgObbligazione = pgObbligazione;
 	}
 
