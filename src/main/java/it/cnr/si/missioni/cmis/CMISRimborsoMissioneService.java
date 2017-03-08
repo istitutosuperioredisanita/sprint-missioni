@@ -485,9 +485,9 @@ public class CMISRimborsoMissioneService {
 	
 	private void caricaDatiDerivati(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
 		if (rimborsoMissione != null){
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno());
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
 			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno());
+				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
 			}
 			rimborsoMissione.setDatiIstituto(dati);
 			if (rimborsoMissione.getDatiIstituto() == null){

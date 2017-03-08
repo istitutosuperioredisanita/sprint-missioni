@@ -320,7 +320,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
 			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
 			if (confirm){
-	    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno());
+	    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
 	    		if (istituto.isAttivaGestioneResponsabileModulo()){
 	    			if (StringUtils.isEmpty(rimborsoMissioneDB.getPgProgetto())){
 	    				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
@@ -631,7 +631,7 @@ public class RimborsoMissioneService {
     	rimborsoMissione.setUser(principal.getName());
     	Integer anno = recuperoAnno(rimborsoMissione);
     	rimborsoMissione.setAnno(anno);
-    	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getCdsRich(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
+    	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoRich(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
     	if (StringUtils.isEmpty(rimborsoMissione.getTrattamento())){
     		rimborsoMissione.setTrattamento("R");
     	}
