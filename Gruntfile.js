@@ -282,12 +282,24 @@ module.exports = function (grunt) {
 i18n: {
 
 
-files: [{                                                                                                                                          
+files: [{
 expand: true,
 cwd: 'src/main/webapp',
 dest: '<%= yeoman.dist %>/',
 src: [
 'i18n/**'
+]
+}]
+},
+bower: {
+
+
+files: [{
+expand: true,
+cwd: 'src/main/webapp',
+dest: '<%= yeoman.dist %>/',
+src: [
+'bower_components/angular-i18n/**'
 ]
 }]
 },
@@ -439,6 +451,7 @@ src: [
         'autoprefixer',
         'concat',
         'copy:i18n',
+        'copy:bower',
         'copy:dist',
         'ngAnnotate',
         'cssmin',
