@@ -148,7 +148,7 @@ public class Utility {
 			errorRest = (ErrorRestSigla)new ObjectMapper().readValue(obj,classJson);
 			return errorRest.getError();
 		} catch (IOException ex) {
-			log.info("Non Rest Generico SIGLA", ex);
+			log.info("Non Rest Generico SIGLA");
 				try {
 					JSONObject json = new JSONObject(obj);
 					String message = json.getString("userMessage");
@@ -156,7 +156,7 @@ public class Utility {
 						return message;
 					}
 				} catch (JSONException e1) {
-					log.info("Non userMessage SIGLA", e1);
+					log.info("Non userMessage SIGLA");
 					try {
 						JSONObject json = new JSONObject(obj);
 						String message = json.getString("originalMessage");
@@ -164,7 +164,7 @@ public class Utility {
 							return message;
 						}
 					} catch (JSONException e2) {
-						log.info("Non originalMessage SIGLA", e2);
+						log.info("Non originalMessage SIGLA");
 						return obj;		
 					}
 				}

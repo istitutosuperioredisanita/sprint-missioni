@@ -287,9 +287,9 @@ public class CMISOrdineMissioneService {
 	
 	private void caricaDatiDerivati(Principal principal, OrdineMissione ordineMissione) {
 		if (ordineMissione != null){
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 			}
 			ordineMissione.setDatiIstituto(dati);
 			if (ordineMissione.getDatiIstituto() == null){

@@ -159,9 +159,9 @@ public class OrdineMissioneService {
 
 	private void caricaDatiDerivati(Principal principal, OrdineMissione ordineMissione) throws ComponentException {
 		if (ordineMissione != null){
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 			}
 			ordineMissione.setDatiIstituto(dati);
 			if (ordineMissione.getDatiIstituto() == null){
@@ -495,7 +495,7 @@ public class OrdineMissioneService {
     	ordineMissione.setUser(principal.getName());
     	Integer anno = recuperoAnno(ordineMissione);
     	ordineMissione.setAnno(anno);
-    	ordineMissione.setNumero(datiIstitutoService.getNextPG(principal, ordineMissione.getCdsRich(), anno , Costanti.TIPO_ORDINE_DI_MISSIONE));
+    	ordineMissione.setNumero(datiIstitutoService.getNextPG(principal, ordineMissione.getUoRich(), anno , Costanti.TIPO_ORDINE_DI_MISSIONE));
     	if (StringUtils.isEmpty(ordineMissione.getTrattamento())){
     		ordineMissione.setTrattamento("R");
     	}
@@ -651,7 +651,7 @@ public class OrdineMissioneService {
 		}
 		
     	if (confirm){
-    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
     		if (istituto.isAttivaGestioneResponsabileModulo()){
     			if (StringUtils.isEmpty(ordineMissioneDB.getResponsabileGruppo())){
     				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
