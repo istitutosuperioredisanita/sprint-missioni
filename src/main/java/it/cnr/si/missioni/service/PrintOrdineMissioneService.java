@@ -90,7 +90,7 @@ public class PrintOrdineMissioneService {
        	printOrdineMissione.setImportoPresunto(Utility.numberFormat(ordineMissione.getImportoPresunto()));
 
        	printOrdineMissione.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
-    	printOrdineMissione.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
+    	printOrdineMissione.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich());
     	printOrdineMissione.setLuogoDiNascitaRich(account.getComuneNascita());
     	printOrdineMissione.setMatricolaRich(account.getMatricola());
     	if (progetto != null){

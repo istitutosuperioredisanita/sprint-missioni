@@ -26,6 +26,7 @@
     <include file="classpath:config/liquibase/changelog/20170203111000_add_column_motivo_auto_propria.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170222111000_add_column_ti_cd_ti_spesa.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170222165000_modify_column_note_differenze.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170309155000_modify_column_livello_rich.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

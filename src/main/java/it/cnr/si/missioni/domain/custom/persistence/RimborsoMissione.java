@@ -166,7 +166,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     public String qualificaRich;
 
     @Column(name = "LIVELLO_RICH", length = 4, nullable = true)
-    public Integer livelloRich;
+    public String livelloRich;
 
     @Size(min = 0, max = 1000)
     @Column(name = "OGGETTO", length = 1000, nullable = false)
@@ -725,11 +725,11 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.qualificaRich = qualificaRich;
 	}
 
-	public Integer getLivelloRich() {
+	public String getLivelloRich() {
 		return livelloRich;
 	}
 
-	public void setLivelloRich(Integer livelloRich) {
+	public void setLivelloRich(String livelloRich) {
 		this.livelloRich = livelloRich;
 	}
 

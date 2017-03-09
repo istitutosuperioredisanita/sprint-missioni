@@ -54,7 +54,7 @@ public class PrintRimborsoMissioneService {
     	printRimborsoMissione.setDatoreLavoroRich(rimborsoMissione.getDatoreLavoroRich());
     	printRimborsoMissione.setDomicilioFiscaleRich(Utility.nvl(rimborsoMissione.getDomicilioFiscaleRich()));
     	printRimborsoMissione.setIndirizzoResidenzaRich(Utility.nvl(rimborsoMissione.getIndirizzoResidenzaRich()));
-    	printRimborsoMissione.setLivelloRich(rimborsoMissione.getLivelloRich() == null ? "" : rimborsoMissione.getLivelloRich().toString());
+    	printRimborsoMissione.setLivelloRich(rimborsoMissione.getLivelloRich() == null ? "" : rimborsoMissione.getLivelloRich());
     	printRimborsoMissione.setLuogoDiNascitaRich(account.getComuneNascita());
     	printRimborsoMissione.setMatricolaRich(account.getMatricola());
     	printRimborsoMissione.setCognomeRich(account.getCognome());
