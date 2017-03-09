@@ -220,6 +220,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var url = SIGLA_REST.MANDATO;
         var objectPostManClauses = [{condition: 'AND', fieldName: 'cd_tipo_documento_cont', operator: "=", fieldValue:"MAN"},
                                     {condition: 'AND', fieldName: 'soloAnticipi', operator: "=", fieldValue:"S"},
+                                    {condition: 'AND', fieldName: 'stato', operator: "=", fieldValue:"P"},
                                     {condition: 'AND', fieldName: 'cd_terzo', operator: "=", fieldValue:cdTerzo},
                                     {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:annoMandato},
                                     {condition: 'AND', fieldName: 'pg_documento_cont', operator: "=", fieldValue:numeroMandato}];
