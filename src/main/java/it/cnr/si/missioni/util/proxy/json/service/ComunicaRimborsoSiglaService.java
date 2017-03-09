@@ -77,7 +77,7 @@ public class ComunicaRimborsoSiglaService {
 		impostaUserContext(principal, rimborsoApprovato, missioneSigla);
 		MissioneBulk oggettoBulk = new MissioneBulk();
 		oggettoBulk.setCdCds(rimborsoApprovato.getCdsSpesa());
-		oggettoBulk.setPgMissione(rimborsoApprovato.getNumero());
+//		oggettoBulk.setPgMissione(rimborsoApprovato.getNumero());
 		
 		impostaBanca(rimborsoApprovato, oggettoBulk);
 		
