@@ -291,12 +291,11 @@ public class ComunicaRimborsoSiglaService {
 		List<TappeMissioneColl> tappeMissioneColl = new ArrayList<TappeMissioneColl>();
 		TappeMissioneColl tappa = new TappeMissioneColl();
 		impostaDivisaTappa(tappa);
+		tappa.setFlNoDiaria(true);
 		if (rimborsoApprovato.isTrattamentoAlternativoMissione()){
 			tappa.setFlRimborso(true);
-			tappa.setFlNoDiaria(false);
 		} else {
 			tappa.setFlRimborso(false);
-			tappa.setFlNoDiaria(true);
 		}
 		tappa.setFlComuneAltro(oggettoBulk.getFlComuneAltro());
 		tappa.setFlComuneEstero(oggettoBulk.getFlComuneEstero());
