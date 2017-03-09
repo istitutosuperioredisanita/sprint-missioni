@@ -46,7 +46,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public static final String CMIS_PROPERTY_FLOW_ID_FLOW_ORDINE = "cnrmissioni:wfOrdineDaRimborso";
 	public static final String CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO = "cnrmissioni:anticipoRicevuto";
 	public static final String CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato";
-	public static final String CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandato";
+	public static final String CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandatoOk";
 	public static final String CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato";
 	public static final String CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "D:missioni_rimborso_attachment:document";
 	public static final String CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero";

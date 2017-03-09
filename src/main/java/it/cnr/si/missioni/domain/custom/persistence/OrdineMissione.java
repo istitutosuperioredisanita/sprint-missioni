@@ -89,7 +89,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE_GAE	= "cnrmissioni:descrizioneGae";                        
 	public static final String CMIS_PROPERTY_FLOW_ANNO_IMPEGNO_RES	= "cnrmissioni:impegnoAnnoResiduo";                    
 	public static final String CMIS_PROPERTY_FLOW_ANNO_IMPEGNO_COMP	= "cnrmissioni:impegnoAnnoCompetenza";               
-	public static final String CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO	= "cnrmissioni:impegnoNumero";                           
+	public static final String CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO	= "cnrmissioni:impegnoNumeroOk";                           
 	public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE_IMPEGNO	= "cnrmissioni:descrizioneImpegno";                
 	public static final String CMIS_PROPERTY_FLOW_IMPORTO_MISSIONE	= "cnrmissioni:importoMissione";                       
 	public static final String CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO	= "cnrmissioni:disponibilita";                   
