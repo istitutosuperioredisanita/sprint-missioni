@@ -39,6 +39,58 @@
         },
         {
             "app": "SIGLA",
+            "url": "ConsCapitoloAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.VoceJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Voce",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_elemento_voce",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "fl_solo_residuo",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_gestione",
+                    "operator": "=",
+                    "fieldValue": "S"
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_elemento_voce",
+                    "operator": "=",
+                    "fieldValue": "C"
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "ti_appartenenza",
+                    "operator": "=",
+                    "fieldValue": "D"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_elemento_voce",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
             "url": "ConsCdSAction.json",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.CdsJson",
             "classe": "it.cnr.si.missioni.util.proxy.json.object.Cds",
@@ -54,6 +106,32 @@
             "order": [
                 {
                     "name": "cd_proprio_unita",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsCdRAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.CdrJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Cdr",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "fieldValue": ""
+                },
+								{
+                    "condition": "AND",
+                    "fieldName": "cd_centro_responsabilita",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_centro_responsabilita",
                     "type": "ASC"
                 }
             ]
@@ -83,6 +161,36 @@
                 {
                     "name": "ds_nazione",
                     "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsTerzoAction.json",
+            "skipLoadStartup": "S",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.TerzoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Terzo",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "anagrafico.codice_fiscale",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsInquadramentoAction.json",
+            "skipLoadStartup": "S",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.InquadramentoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Inquadramento",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "cd_anag",
+                    "operator": "=",
+                    "fieldValue": ""
                 }
             ]
         }
