@@ -5,11 +5,11 @@
 						columnName="LIVELLO_RICH"
             newDataType="CHARACTER VARYING(4)"
             tableName="ORDINE_MISSIONE"
-    	</modifyDataType>
+    	/>
     	<modifyDataType 
 						columnName="LIVELLO_RICH"
             newDataType="CHARACTER VARYING(4)"
             tableName="RIMBORSO_MISSIONE"
-    	</modifyDataType>
+    	/>
     </changeSet>
 </databaseChangeLog>
