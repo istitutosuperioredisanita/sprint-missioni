@@ -794,7 +794,7 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneGae" , cmisRimborsoMissione.getDescrizioneGae());
 			jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoResiduo" , cmisRimborsoMissione.getImpegnoAnnoResiduo() == null ? "": cmisRimborsoMissione.getImpegnoAnnoResiduo().toString());
 			jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoCompetenza" , cmisRimborsoMissione.getImpegnoAnnoCompetenza() == null ? "": cmisRimborsoMissione.getImpegnoAnnoCompetenza().toString());
-			jGenerator.writeStringField("prop_cnrmissioni_impegnoNumero" , cmisRimborsoMissione.getImpegnoNumero() == null ? "": cmisRimborsoMissione.getImpegnoNumero().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoNumeroOk" , cmisRimborsoMissione.getImpegnoNumero() == null ? "": cmisRimborsoMissione.getImpegnoNumero().toString());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneImpegno" , cmisRimborsoMissione.getDescrizioneImpegno());
 			jGenerator.writeStringField("prop_cnrmissioni_importoMissione" , cmisRimborsoMissione.getImportoMissione() == null ? "": cmisRimborsoMissione.getImportoMissione().toString());
 			jGenerator.writeStringField("prop_cnrmissioni_disponibilita" , cmisRimborsoMissione.getDisponibilita() == null ? "": cmisRimborsoMissione.getDisponibilita().toString());
@@ -807,7 +807,7 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_dataFineEstero" , cmisRimborsoMissione.getDataFineEstero() == null ? "" : cmisRimborsoMissione.getDataFineEstero());
 			jGenerator.writeStringField("prop_cnrmissioni_anticipoRicevuto" , cmisRimborsoMissione.getAnticipoRicevuto());
 			jGenerator.writeStringField("prop_cnrmissioni_annoMandato" , cmisRimborsoMissione.getAnnoMandato());
-			jGenerator.writeStringField("prop_cnrmissioni_numeroMandato" , cmisRimborsoMissione.getNumeroMandato());
+			jGenerator.writeStringField("prop_cnrmissioni_numeroMandatoOk" , cmisRimborsoMissione.getNumeroMandato());
 			jGenerator.writeStringField("prop_cnrmissioni_importoMandato" , cmisRimborsoMissione.getImportoMandato());
 			jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRimborso" , cmisRimborsoMissione.getWfOrdineMissione());
 			jGenerator.writeStringField("prop_cnrmissioni_differenzeOrdineRimborso" , cmisRimborsoMissione.getDifferenzeOrdineRimborso());
