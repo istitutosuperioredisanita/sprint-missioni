@@ -194,10 +194,10 @@ public class RimborsoMissioneDettagliService {
 
 		RimborsoMissioneDettagli rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli) crudServiceBean
 				.findById(principal, RimborsoMissioneDettagli.class, rimborsoMissioneDettagli.getId());
-
 		if (rimborsoMissioneDettagliDB == null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Rimborso Missione da aggiornare inesistente.");
 		rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissioneDettagli.getRimborsoMissione());
+		controlloDatiObbligatoriDaGui(rimborsoMissioneDettagli);
 
 		rimborsoMissioneDettagliDB.setCdTiPasto(rimborsoMissioneDettagli.getCdTiPasto());
 		rimborsoMissioneDettagliDB.setCdTiSpesa(rimborsoMissioneDettagli.getCdTiSpesa());

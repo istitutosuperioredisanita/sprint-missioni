@@ -255,6 +255,8 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setNote(rimborsoMissione.getNote() == null ? "" : rimborsoMissione.getNote());
 		cmisRimborsoMissione.setOggetto(rimborsoMissione.getOggetto());
 		cmisRimborsoMissione.setTaxiFlag(rimborsoMissione.getUtilizzoTaxi().equals("S") ? "true" : "false");
+		cmisRimborsoMissione.setAutoServizioFlag(rimborsoMissione.getUtilizzoAutoServizio().equals("S") ? "true" : "false");
+		cmisRimborsoMissione.setPersonaSeguitoFlag(rimborsoMissione.getPersonaleAlSeguito().equals("S") ? "true" : "false");
 		cmisRimborsoMissione.setUoOrdine(uoRichPerFlusso);
 		cmisRimborsoMissione.setUoSpesa(uoSpesaPerFlusso);
 		cmisRimborsoMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
@@ -332,6 +334,12 @@ public class CMISRimborsoMissioneService {
 		}
 		if (isDiverso(rimborso.getUtilizzoTaxi(), ordine.getUtilizzoTaxi())){
 			aggiungiDifferenza(buffer, "Utilizzo Taxi. ", null);
+		}
+		if (isDiverso(rimborso.getUtilizzoAutoServizio(), ordine.getUtilizzoAutoServizio())){
+			aggiungiDifferenza(buffer, "Utilizzo Auto Servizio. ", null);
+		}
+		if (isDiverso(rimborso.getPersonaleAlSeguito(), ordine.getPersonaleAlSeguito())){
+			aggiungiDifferenza(buffer, "Personale Al Seguito. ", null);
 		}
 		if (isDiverso(rimborso.getUtilizzoAutoNoleggio(), ordine.getUtilizzoAutoNoleggio())){
 			aggiungiDifferenza(buffer, "Utilizzo Auto Noleggio. ", null);
@@ -716,6 +724,8 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisRimborsoMissione.getNote());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisRimborsoMissione.getImpegnoNumero());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisRimborsoMissione.getTaxiFlag().equals("true"));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisRimborsoMissione.getAutoServizioFlag().equals("true"));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisRimborsoMissione.getPersonaSeguitoFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESTINAZIONE, cmisRimborsoMissione.getDestinazione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ESTERA_FLAG, cmisRimborsoMissione.getMissioneEsteraFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DATA_INIZIO_MISSIONE, cmisRimborsoMissione.getDataInizioMissione());

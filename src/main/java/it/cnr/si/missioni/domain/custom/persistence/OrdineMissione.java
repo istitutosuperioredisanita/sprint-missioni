@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -80,6 +79,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String CMIS_PROPERTY_FLOW_AUTO_PROPRIA	= "cnrmissioni:autoPropriaFlag";                           
 	public static final String CMIS_PROPERTY_FLOW_NOLEGGIO	= "cnrmissioni:noleggioFlag";                                  
 	public static final String CMIS_PROPERTY_FLOW_TAXI	= "cnrmissioni:taxiFlag";                                          
+	public static final String CMIS_PROPERTY_FLOW_AUTO_SERVIZIO	= "cnrmissioni:servizioFlag";                                          
+	public static final String CMIS_PROPERTY_FLOW_PERSONA_SEGUITO	= "cnrmissioni:personaSeguitoFlag";                                          
 	public static final String CMIS_PROPERTY_FLOW_CAPITOLO	= "cnrmissioni:capitolo";                                      
 	public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE_CAPITOLO	= "cnrmissioni:descrizioneCapitolo";               
 	public static final String CMIS_PROPERTY_FLOW_MODULO	= "cnrmissioni:modulo";                                          
@@ -292,6 +293,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Size(min = 0, max = 250)
     @Column(name = "RESPONSABILE_GRUPPO", length = 250, nullable = true)
     private String responsabileGruppo;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_AUTO_SERVIZIO", length = 1, nullable = false)
+    public String utilizzoAutoServizio;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "PERSONALE_AL_SEGUITO", length = 1, nullable = false)
+    public String personaleAlSeguito;
 
     @Transient
     private String daValidazione;
@@ -1078,5 +1087,21 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setFondi(String fondi) {
 		this.fondi = fondi;
+	}
+
+	public String getUtilizzoAutoServizio() {
+		return utilizzoAutoServizio;
+	}
+
+	public void setUtilizzoAutoServizio(String utilizzoAutoServizio) {
+		this.utilizzoAutoServizio = utilizzoAutoServizio;
+	}
+
+	public String getPersonaleAlSeguito() {
+		return personaleAlSeguito;
+	}
+
+	public void setPersonaleAlSeguito(String personaleAlSeguito) {
+		this.personaleAlSeguito = personaleAlSeguito;
 	}
 }
