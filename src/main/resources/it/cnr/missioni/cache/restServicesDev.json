@@ -169,30 +169,14 @@
             "url": "ConsTerzoAction.json",
             "skipLoadStartup": "S",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.TerzoJson",
-            "classe": "it.cnr.si.missioni.util.proxy.json.object.Terzo",
-            "clauseVariable": [
-                {
-                    "condition": "AND",
-                    "fieldName": "anagrafico.codice_fiscale",
-                    "operator": "=",
-                    "fieldValue": ""
-                }
-            ]
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Terzo"
         },
         {
             "app": "SIGLA",
             "url": "ConsInquadramentoAction.json",
             "skipLoadStartup": "S",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.InquadramentoJson",
-            "classe": "it.cnr.si.missioni.util.proxy.json.object.Inquadramento",
-            "clauseVariable": [
-                {
-                    "condition": "AND",
-                    "fieldName": "cd_anag",
-                    "operator": "=",
-                    "fieldValue": ""
-                }
-            ]
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Inquadramento"
         }
     ]
 }
