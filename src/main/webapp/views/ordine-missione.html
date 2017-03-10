@@ -275,7 +275,7 @@
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-6">
+                <p class="col-md-3">
                          <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.utilizzo-taxi">Taxi</span>
                             <label class="checkbox">
@@ -283,11 +283,27 @@
                             </label>
                         </span>
                 </p>
-                <div class="col-md-6">
+                <div class="col-md-3">
                          <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">note</span>
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </div>
+                <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </div>
+                <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">personale al seguito</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
                 </div>

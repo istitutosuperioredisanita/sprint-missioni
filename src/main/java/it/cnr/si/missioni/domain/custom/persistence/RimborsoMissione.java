@@ -303,6 +303,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "CD_TIPO_RAPPORTO", length = 10, nullable = true)
     public String cdTipoRapporto;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_AUTO_SERVIZIO", length = 1, nullable = false)
+    public String utilizzoAutoServizio;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "PERSONALE_AL_SEGUITO", length = 1, nullable = false)
+    public String personaleAlSeguito;
+
 	@Transient
     private String daValidazione;
 	
@@ -1222,5 +1230,21 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setCdTipoRapporto(String cdTipoRapporto) {
 		this.cdTipoRapporto = cdTipoRapporto;
+	}
+
+	public String getUtilizzoAutoServizio() {
+		return utilizzoAutoServizio;
+	}
+
+	public void setUtilizzoAutoServizio(String utilizzoAutoServizio) {
+		this.utilizzoAutoServizio = utilizzoAutoServizio;
+	}
+
+	public String getPersonaleAlSeguito() {
+		return personaleAlSeguito;
+	}
+
+	public void setPersonaleAlSeguito(String personaleAlSeguito) {
+		this.personaleAlSeguito = personaleAlSeguito;
 	}
 }

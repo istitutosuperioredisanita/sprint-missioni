@@ -508,6 +508,13 @@ public class OrdineMissioneService {
     	if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())){
     		ordineMissione.setUtilizzoTaxi("N");
     	}
+    	if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())){
+    		ordineMissione.setUtilizzoAutoServizio("N");
+    	}
+    	if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())){
+    		ordineMissione.setPersonaleAlSeguito("N");
+    	}
+    	
     	
     	aggiornaValidazione(ordineMissione);
     	
@@ -644,6 +651,8 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setNoteUtilizzoTaxiNoleggio(ordineMissione.getNoteUtilizzoTaxiNoleggio());
 			ordineMissioneDB.setUtilizzoAutoNoleggio(ordineMissione.getUtilizzoAutoNoleggio());
 			ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
+			ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
+			ordineMissioneDB.setUtilizzoAutoServizio(ordineMissione.getUtilizzoAutoServizio());
 			ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
 			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
@@ -796,11 +805,6 @@ public class OrdineMissioneService {
 		if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
-		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
-			if (ordineMissione.getUtilizzoTaxi().equals("N") && ordineMissione.getUtilizzoAutoNoleggio().equals("N")){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
-			}
-		}
 		if (StringUtils.isEmpty(ordineMissione.getIdFlusso()) &&  ordineMissione.isStatoInviatoAlFlusso()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
 		} 
@@ -811,8 +815,26 @@ public class OrdineMissioneService {
             getAutoPropria(ordineMissione) != null ){
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto a noleggio e dell'auto propria.");
         } 
-		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio se si è scelto il loro utilizzo");
+        if (ordineMissione.getUtilizzoTaxi() != null && ordineMissione.getUtilizzoTaxi().equals("S") && 
+        		getAutoPropria(ordineMissione) != null ){
+        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo del taxi e dell'auto propria.");
+        } 
+		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
+			if (ordineMissione.getUtilizzoTaxi().equals("N") && ordineMissione.getUtilizzoAutoNoleggio().equals("N") && ordineMissione.getUtilizzoAutoServizio().equals("N")){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio se non si è scelto il loro utilizzo");
+			}
+		}
+        if (ordineMissione.getUtilizzoAutoServizio() != null && ordineMissione.getUtilizzoAutoServizio().equals("S") && 
+        		getAutoPropria(ordineMissione) != null ){
+        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto di servizio e dell'auto propria.");
+        } 
+		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S") || Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio se si è scelto il loro utilizzo");
+		}
+		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) || 
+			(Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) || 
+			(Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S"))){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
 		}
         if (ordineMissione.isFondiCompetenza() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione()) && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) 
         		&&  ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) != 0){
@@ -922,9 +944,9 @@ public class OrdineMissioneService {
 	}
     
 	private void controlloCampiObbligatori(OrdineMissione ordineMissione) {
-		if (!ordineMissione.isToBeCreated()){
+//		if (!ordineMissione.isToBeCreated()){
 			controlloDatiObbligatoriDaGUI(ordineMissione);
-		}
+//		}
 		if (StringUtils.isEmpty(ordineMissione.getAnno())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Anno");
 		} else if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())){
@@ -933,6 +955,10 @@ public class OrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utente");
 		} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utilizzo del Taxi");
+		} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utilizzo dell'auto di servizio");
+		} else if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Personale al seguito");
 		} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Utilizzo auto a noleggio");
 		} else if (StringUtils.isEmpty(ordineMissione.getStato())){

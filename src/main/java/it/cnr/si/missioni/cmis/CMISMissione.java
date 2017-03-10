@@ -23,6 +23,8 @@ public class CMISMissione {
 	private String descrizioneUoSpesa;
 	private String descrizioneUoCompetenza;
 	private String autoPropriaFlag;
+	private String autoServizioFlag;
+	private String personaSeguitoFlag;
 	private String noleggioFlag;
 	private String taxiFlag;
 	private String capitolo;
@@ -262,5 +264,17 @@ public class CMISMissione {
 	}
 	public void setTrattamento(String trattamento) {
 		this.trattamento = trattamento;
+	}
+	public String getAutoServizioFlag() {
+		return autoServizioFlag;
+	}
+	public void setAutoServizioFlag(String autoServizioFlag) {
+		this.autoServizioFlag = autoServizioFlag;
+	}
+	public String getPersonaSeguitoFlag() {
+		return personaSeguitoFlag;
+	}
+	public void setPersonaSeguitoFlag(String personaSeguitoFlag) {
+		this.personaSeguitoFlag = personaSeguitoFlag;
 	}
 }

@@ -85,6 +85,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.esercizioObbligazione = ordineMissioneSelected.esercizioObbligazione;
                 $scope.rimborsoMissioneModel.pgObbligazione = ordineMissioneSelected.pgObbligazione;
                 $scope.rimborsoMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
+                $scope.rimborsoMissioneModel.utilizzoAutoServizio = ordineMissioneSelected.utilizzoAutoServizio;
+                $scope.rimborsoMissioneModel.personaleAlSeguito = ordineMissioneSelected.personaleAlSeguito;
                 $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
                 $scope.rimborsoMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
