@@ -866,36 +866,25 @@ public class RimborsoMissioneService {
 		if (rimborsoMissione.getDataFineMissione().isBefore(rimborsoMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
-		if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
-			if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N")){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio se non si è scelto il loro utilizzo");
-			}
-		}
-        if (rimborsoMissione.getUtilizzoAutoNoleggio() != null && rimborsoMissione.getUtilizzoAutoNoleggio().equals("S") && 
-                getAutoPropriaOrdineMissione(principal, rimborsoMissione) != null ){
-                throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione prevede l'utilizo dell'auto propria. Non è possibile indicare l'utilizzo dell'auto a noleggio.");
-        } 
-        if (rimborsoMissione.getUtilizzoTaxi() != null && rimborsoMissione.getUtilizzoTaxi().equals("S") && 
-        		getAutoPropriaOrdineMissione(principal, rimborsoMissione) != null ){
-        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo del taxi e dell'auto propria.");
-        } 
+//        if (rimborsoMissione.getUtilizzoAutoNoleggio() != null && rimborsoMissione.getUtilizzoAutoNoleggio().equals("S") ){
+//                throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione prevede l'utilizo dell'auto propria. Non è possibile indicare l'utilizzo dell'auto a noleggio.");
+//        } 
+//        if (rimborsoMissione.getUtilizzoTaxi() != null && rimborsoMissione.getUtilizzoTaxi().equals("S") ){
+//        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo del taxi e dell'auto propria.");
+//        } 
 		if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
 			if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N") && rimborsoMissione.getUtilizzoAutoServizio().equals("N")){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio se non si è scelto il loro utilizzo");
 			}
 		}
-        if (rimborsoMissione.getUtilizzoAutoServizio() != null && rimborsoMissione.getUtilizzoAutoServizio().equals("S") && 
-        		getAutoPropriaOrdineMissione(principal, rimborsoMissione) != null ){
-        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto di servizio e dell'auto propria.");
-        } 
 		if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio se si è scelto il loro utilizzo");
 		}
-		if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S")) || 
-			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S")) || 
-			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S"))){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
-		}
+//		if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S")) || 
+//			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S")) || 
+//			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S"))){
+//			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
+//		}
 		if (rimborsoMissione.isMissioneEstera()) {
 			if (rimborsoMissione.getDataInizioEstero().isBefore(rimborsoMissione.getDataInizioMissione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di inizio attraversamento frontiera non può essere precedente alla data di inizio missione");
