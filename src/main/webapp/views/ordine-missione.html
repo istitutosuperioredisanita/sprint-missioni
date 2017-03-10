@@ -322,7 +322,7 @@
             <div class="col-md-12">
               <ul class="pager" ng-show="showEsisteOrdineMissione">
                 <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
-                <li ng-hide="ordineMissioneModel.utilizzoAutoNoleggio == 'S'"><a ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria"></a></li>
+                <li ng-hide="ordineMissioneModel.utilizzoAutoNoleggio == 'S' || ordineMissioneModel.utilizzoTaxi == 'S' || ordineMissioneModel.utilizzoAutoServizio == 'S'"><a ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria"></a></li>
                 <li><a ng-click="goAnticipo()" translate="ordine-missione.button.anticipo">Anticipo</a></li>
               </ul>
             </div>

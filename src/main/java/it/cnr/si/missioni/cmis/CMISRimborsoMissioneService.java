@@ -798,6 +798,10 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisRimborsoMissione.getDescrizioneUoSpesa());
 			jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisRimborsoMissione.getUoCompetenza());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisRimborsoMissione.getDescrizioneUoCompetenza());
+			jGenerator.writeStringField("prop_cnrmissioni_noleggioFlag" , cmisRimborsoMissione.getNoleggioFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_taxiFlag" , cmisRimborsoMissione.getTaxiFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_servizioFlagOk" , cmisRimborsoMissione.getAutoServizioFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_personaSeguitoFlagOk" , cmisRimborsoMissione.getPersonaSeguitoFlag());
 			jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisRimborsoMissione.getCapitolo());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisRimborsoMissione.getDescrizioneCapitolo());
 			jGenerator.writeStringField("prop_cnrmissioni_gae" , cmisRimborsoMissione.getGae());

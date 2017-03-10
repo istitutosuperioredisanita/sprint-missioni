@@ -811,31 +811,31 @@ public class OrdineMissioneService {
 		if (!ordineMissione.isMissioneEstera()){
 			ordineMissione.setNazione(new Long("1"));
 		} 
-        if (ordineMissione.getUtilizzoAutoNoleggio() != null && ordineMissione.getUtilizzoAutoNoleggio().equals("S") && 
-            getAutoPropria(ordineMissione) != null ){
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto a noleggio e dell'auto propria.");
-        } 
-        if (ordineMissione.getUtilizzoTaxi() != null && ordineMissione.getUtilizzoTaxi().equals("S") && 
-        		getAutoPropria(ordineMissione) != null ){
-        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo del taxi e dell'auto propria.");
-        } 
+//        if (ordineMissione.getUtilizzoAutoNoleggio() != null && ordineMissione.getUtilizzoAutoNoleggio().equals("S") && 
+//        		!ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) != null ){
+//            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto a noleggio e dell'auto propria.");
+//        } 
+//        if (ordineMissione.getUtilizzoTaxi() != null && ordineMissione.getUtilizzoTaxi().equals("S") && 
+//        		!ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) != null ){
+//        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo del taxi e dell'auto propria.");
+//        } 
 		if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
 			if (ordineMissione.getUtilizzoTaxi().equals("N") && ordineMissione.getUtilizzoAutoNoleggio().equals("N") && ordineMissione.getUtilizzoAutoServizio().equals("N")){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio se non si è scelto il loro utilizzo");
 			}
 		}
-        if (ordineMissione.getUtilizzoAutoServizio() != null && ordineMissione.getUtilizzoAutoServizio().equals("S") && 
-        		getAutoPropria(ordineMissione) != null ){
-        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto di servizio e dell'auto propria.");
-        } 
+//        if (ordineMissione.getUtilizzoAutoServizio() != null && ordineMissione.getUtilizzoAutoServizio().equals("S") && 
+//        		!ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) != null ){
+//        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo dell'auto di servizio e dell'auto propria.");
+//        } 
 		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S") || Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio se si è scelto il loro utilizzo");
 		}
-		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) || 
-			(Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) || 
-			(Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S"))){
-			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
-		}
+//		if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) || 
+//			(Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) || 
+//			(Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S"))){
+//			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
+//		}
         if (ordineMissione.isFondiCompetenza() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione()) && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) 
         		&&  ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) != 0){
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Incongruenza tra fondi e esercizio obbligazione.");

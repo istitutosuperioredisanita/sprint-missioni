@@ -508,8 +508,8 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaFlag" , cmisOrdineMissione.getAutoPropriaFlag());
 			jGenerator.writeStringField("prop_cnrmissioni_noleggioFlag" , cmisOrdineMissione.getNoleggioFlag());
 			jGenerator.writeStringField("prop_cnrmissioni_taxiFlag" , cmisOrdineMissione.getTaxiFlag());
-			jGenerator.writeStringField("prop_cnrmissioni_servizioFlag" , cmisOrdineMissione.getAutoServizioFlag());
-			jGenerator.writeStringField("prop_cnrmissioni_personaSeguitoFlag" , cmisOrdineMissione.getPersonaSeguitoFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_servizioFlagOk" , cmisOrdineMissione.getAutoServizioFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_personaSeguitoFlagOk" , cmisOrdineMissione.getPersonaSeguitoFlag());
 			jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisOrdineMissione.getCapitolo());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisOrdineMissione.getDescrizioneCapitolo());
 			jGenerator.writeStringField("prop_cnrmissioni_modulo" , cmisOrdineMissione.getModulo());

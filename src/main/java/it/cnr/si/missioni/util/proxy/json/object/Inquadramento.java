@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class Inquadramento extends RestServiceBean  implements Serializable {
 	private Object dt_ini_validita;
+	private java.lang.String cd_tipo_rapporto;
 	private java.lang.String ds_inquadramento;
 	private java.lang.Integer pg_rif_inquadramento;
 	private java.lang.Integer cd_anag;
@@ -37,5 +38,11 @@ public class Inquadramento extends RestServiceBean  implements Serializable {
 	}
 	public void setDt_fin_validita(Object dt_fin_validita) {
 		this.dt_fin_validita = dt_fin_validita;
+	}
+	public java.lang.String getCd_tipo_rapporto() {
+		return cd_tipo_rapporto;
+	}
+	public void setCd_tipo_rapporto(java.lang.String cd_tipo_rapporto) {
+		this.cd_tipo_rapporto = cd_tipo_rapporto;
 	}
 }

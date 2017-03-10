@@ -79,8 +79,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String CMIS_PROPERTY_FLOW_AUTO_PROPRIA	= "cnrmissioni:autoPropriaFlag";                           
 	public static final String CMIS_PROPERTY_FLOW_NOLEGGIO	= "cnrmissioni:noleggioFlag";                                  
 	public static final String CMIS_PROPERTY_FLOW_TAXI	= "cnrmissioni:taxiFlag";                                          
-	public static final String CMIS_PROPERTY_FLOW_AUTO_SERVIZIO	= "cnrmissioni:servizioFlag";                                          
-	public static final String CMIS_PROPERTY_FLOW_PERSONA_SEGUITO	= "cnrmissioni:personaSeguitoFlag";                                          
+	public static final String CMIS_PROPERTY_FLOW_AUTO_SERVIZIO	= "cnrmissioni:servizioFlagOk";                                          
+	public static final String CMIS_PROPERTY_FLOW_PERSONA_SEGUITO	= "cnrmissioni:personaSeguitoFlagOk";                                          
 	public static final String CMIS_PROPERTY_FLOW_CAPITOLO	= "cnrmissioni:capitolo";                                      
 	public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE_CAPITOLO	= "cnrmissioni:descrizioneCapitolo";               
 	public static final String CMIS_PROPERTY_FLOW_MODULO	= "cnrmissioni:modulo";                                          
