@@ -63,6 +63,7 @@ public class Costanti {
 	public final static String STATO_FIRMA_UO_RIMBORSO_FROM_CMIS = "FIRMA UO RIMBORSO";
 	public final static String STATO_FIRMA_SPESA_RIMBORSO_FROM_CMIS = "FIRMA SPESA RIMBORSO";
 	public final static String STATO_INVIO_SIGLA_DA_COMUNICARE = "DAC";
+	public final static String STATO_INVIO_DA_NON_COMUNICARE = "DNC";
 	public final static String STATO_INVIO_SIGLA_COMUNICATA = "COM";
 	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 1000000;
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
@@ -174,6 +175,7 @@ public class Costanti {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(null, "Non Completa");
         aMap.put("", "Non Completa");
+        aMap.put(STATO_INVIO_DA_NON_COMUNICARE, "Da Non Comunicare");
         aMap.put(STATO_INVIO_SIGLA_DA_COMUNICARE, "Da Comunicare");
         aMap.put(STATO_INVIO_SIGLA_COMUNICATA, "Comunicato");
         STATO_INVIO_SIGLA = Collections.unmodifiableMap(aMap);

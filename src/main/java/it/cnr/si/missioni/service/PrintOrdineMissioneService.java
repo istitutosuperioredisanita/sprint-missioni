@@ -141,6 +141,7 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setUtilizzoAutoNoleggio(ordineMissione.decodeUtilizzoAutoNoleggio());
     	printOrdineMissione.setUtilizzoTaxi(ordineMissione.decodeUtilizzoTaxi());
     	printOrdineMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(ordineMissione.getNoteUtilizzoTaxiNoleggio()));
+    	printOrdineMissione.setCup(ordineMissione.getCup() == null ? "" : ordineMissione.getCup());
     	return printOrdineMissione; 
     }
 
