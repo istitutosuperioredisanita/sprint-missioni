@@ -253,8 +253,17 @@
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-3">
                         <span class="input-group">
-                          <span class="input-group-addon" translate="ordine-missione.form.importo-presunto">obbligo</span>
+                          <span class="input-group-addon" translate="ordine-missione.form.importo-presunto">Importo Presunto</span>
                           <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-presunto" ng-model="ordineMissioneModel.importoPresunto" currency-symbol="">
+                        </span>
+                    </p>
+            </form>
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-6">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.cup">cup</span>
+                            <input ng-disabled="validazione === 'S' || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="ordineMissioneModel.cup"/>
                         </span>
                     </p>
             </form>

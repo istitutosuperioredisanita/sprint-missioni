@@ -311,6 +311,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "PERSONALE_AL_SEGUITO", length = 1, nullable = false)
     public String personaleAlSeguito;
 
+    @Size(min = 0, max = 50)
+    @Column(name = "CUP", length = 50, nullable = true)
+    public String cup;
+
 	@Transient
     private String daValidazione;
 	
@@ -1153,7 +1157,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
 	public BigDecimal getTotaleRimborso(){
 		BigDecimal totRimborso = BigDecimal.ZERO;
-		if (getRimborsoMissioneDettagli() != null){
+		if (getRimborsoMissioneDettagli() != null && !getRimborsoMissioneDettagli().isEmpty()){
 			for (Iterator<RimborsoMissioneDettagli> iterator = getRimborsoMissioneDettagli().iterator(); iterator.hasNext();){
 	    		RimborsoMissioneDettagli dettagli = iterator.next();
 	    		totRimborso = totRimborso.add(dettagli.getImportoEuro());
@@ -1246,5 +1250,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setPersonaleAlSeguito(String personaleAlSeguito) {
 		this.personaleAlSeguito = personaleAlSeguito;
+	}
+
+	public String getCup() {
+		return cup;
+	}
+
+	public void setCup(String cup) {
+		this.cup = cup;
 	}
 }
