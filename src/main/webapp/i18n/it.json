@@ -383,7 +383,8 @@
             "modulo.placeholder": "Progetto",
             "anno-impegno": "Anno Impegno",
             "numero-impegno": "Numero Impegno",
-            "info-disponibilita": "Informazioni sulla Disponibilità"
+            "info-disponibilita": "Informazioni sulla Disponibilità",
+            "CUP": "Codice CUP"
         },
         "button": {
             "sendToSign": "Invia alla Firma",

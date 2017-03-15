@@ -658,6 +658,7 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
 			ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
 			ordineMissioneDB.setFondi(ordineMissione.getFondi());
+			ordineMissioneDB.setCup(ordineMissione.getCup());
 		}
 		
     	if (confirm){
