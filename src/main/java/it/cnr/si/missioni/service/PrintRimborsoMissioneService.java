@@ -122,7 +122,7 @@ public class PrintRimborsoMissioneService {
     	}
 		printRimborsoMissione.setTrattamento(rimborsoMissione.decodeTrattamento());
 		BigDecimal totMissione = BigDecimal.ZERO;
-		if (rimborsoMissione.getRimborsoMissioneDettagli() != null){
+		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
 			List<PrintRimborsoMissioneDettagli> listDettagliPrint = new ArrayList<PrintRimborsoMissioneDettagli>();
 	    	for (Iterator<RimborsoMissioneDettagli> iterator = rimborsoMissione.getRimborsoMissioneDettagli().iterator(); iterator.hasNext();){
 	    		RimborsoMissioneDettagli dettagli = iterator.next();
@@ -151,6 +151,7 @@ public class PrintRimborsoMissioneService {
 	    	printRimborsoMissione.setPrintDettagliSpeseRimborsoMissione(listDettagliPrint);
 		}
 		printRimborsoMissione.setTotMissione(Utility.numberFormat(totMissione));
+    	printRimborsoMissione.setCup(rimborsoMissione.getCup() == null ? "" : rimborsoMissione.getCup());
 		return printRimborsoMissione; 
     }
 
