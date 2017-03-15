@@ -384,7 +384,7 @@
             "anno-impegno": "Anno Impegno",
             "numero-impegno": "Numero Impegno",
             "info-disponibilita": "Informazioni sulla Disponibilità",
-            "CUP": "Codice CUP"
+            "cup": "Codice CUP"
         },
         "button": {
             "sendToSign": "Invia alla Firma",
