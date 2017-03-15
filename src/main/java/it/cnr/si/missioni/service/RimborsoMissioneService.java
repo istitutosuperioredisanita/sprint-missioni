@@ -2,8 +2,10 @@ package it.cnr.si.missioni.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -228,7 +230,16 @@ public class RimborsoMissioneService {
 
 	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws ComponentException {
-		rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
+		if (!rimborsoMissioneDaAggiornare.isTrattamentoAlternativoMissione()){
+			retrieveDetails(principal, rimborsoMissioneDaAggiornare);
+			if (rimborsoMissioneDaAggiornare.getTotaleRimborso().compareTo(BigDecimal.ZERO) == 0){
+				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_DA_NON_COMUNICARE);
+			} else {
+				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
+			}
+		} else {
+			rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
+		}
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
@@ -369,6 +380,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setCdTipoRapporto(rimborsoMissione.getCdTipoRapporto());
 			rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
 			rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
+			rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 		}
 		
@@ -415,7 +427,8 @@ public class RimborsoMissioneService {
 	}
 
 	private Boolean assenzaDettagli(RimborsoMissione rimborsoMissione) throws ComponentException {
-		if (rimborsoMissione.getRimborsoMissioneDettagli() == null || rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
+		if (rimborsoMissione.getRimborsoMissioneDettagli() == null || rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() && 
+				!rimborsoMissione.isTrattamentoAlternativoMissione()){
 			return true;
 		} else {
 			cmisRimborsoMissioneService.controlloEsitenzaGiustificativoDettaglio(rimborsoMissione);
@@ -901,6 +914,12 @@ public class RimborsoMissioneService {
 		} 
 		if (!rimborsoMissione.isMissioneEstera()){
 			rimborsoMissione.setNazione(new Long("1"));
+		}
+		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+			long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione());
+			if (oreDifferenza < 24 ){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
+			}
 		}
 	}
 	

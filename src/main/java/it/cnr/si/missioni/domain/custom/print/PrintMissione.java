@@ -68,6 +68,8 @@ public class PrintMissione {
 
     private String cdsSpesa;
 
+    private String cup;
+
 	public Integer getAnno() {
 		return anno;
 	}
@@ -322,6 +324,14 @@ public class PrintMissione {
 
 	public void setItaliaEstero(String italiaEstero) {
 		this.italiaEstero = italiaEstero;
+	}
+
+	public String getCup() {
+		return cup;
+	}
+
+	public void setCup(String cup) {
+		this.cup = cup;
 	}
 
 }

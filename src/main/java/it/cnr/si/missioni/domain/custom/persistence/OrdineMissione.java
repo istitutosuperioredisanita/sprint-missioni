@@ -302,6 +302,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "PERSONALE_AL_SEGUITO", length = 1, nullable = false)
     public String personaleAlSeguito;
 
+    @Size(min = 0, max = 50)
+    @Column(name = "CUP", length = 50, nullable = true)
+    public String cup;
+
     @Transient
     private String daValidazione;
 	
@@ -1103,5 +1107,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setPersonaleAlSeguito(String personaleAlSeguito) {
 		this.personaleAlSeguito = personaleAlSeguito;
+	}
+
+	public String getCup() {
+		return cup;
+	}
+
+	public void setCup(String cup) {
+		this.cup = cup;
 	}
 }
