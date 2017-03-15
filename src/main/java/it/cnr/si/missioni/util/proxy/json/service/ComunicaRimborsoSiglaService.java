@@ -306,19 +306,27 @@ public class ComunicaRimborsoSiglaService {
 		tappa.setFlNavigazione(false);
 		tappa.setFlVittoAlloggioGratuito(false);
 		tappa.setFlVittoGratuito(false);
+		impostaNazioneRimborso(rimborsoApprovato, tappa);
+		ZonedDateTime dataInizio = null;
+		ZonedDateTime dataFine = null;
 		if (!rimborsoApprovato.isMissioneEstera()){
-			impostaNazioneRimborso(rimborsoApprovato, tappa);
-			tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
+			dataInizio = rimborsoApprovato.getDataInizioMissione();
+			dataFine = rimborsoApprovato.getDataFineMissione();
 		} else {
-			if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0 && 
-					DateUtils.truncate(rimborsoApprovato.getDataFineMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataFineEstero())) == 0){
-				impostaNazioneRimborso(rimborsoApprovato, tappa);
-				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
-			} else {
-				impostaNazioneRimborso(rimborsoApprovato, tappa);
-				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
-			}
-		}
+			dataInizio = rimborsoApprovato.getDataInizioEstero();
+			dataFine = rimborsoApprovato.getDataFineEstero();
+			
+		} 
+		tappeMissioneColl = impostaTappeDaDate(dataInizio, dataFine, tappa, tappeMissioneColl);
+//			if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0 && 
+//					DateUtils.truncate(rimborsoApprovato.getDataFineMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataFineEstero())) == 0){
+//				impostaNazioneRimborso(rimborsoApprovato, tappa);
+//				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione(), tappa, tappeMissioneColl);
+//			} else {
+//				impostaNazioneRimborso(rimborsoApprovato, tappa);
+//				tappeMissioneColl = impostaTappeDaDate(rimborsoApprovato.getDataInizioEstero(), rimborsoApprovato.getDataFineEstero(), tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
+//			}
+//		}
 		oggettoBulk.setTappeMissioneColl(tappeMissioneColl);
 	}
 
@@ -373,30 +381,30 @@ public class ComunicaRimborsoSiglaService {
 			impostaDateTappa(data, dataFine, newDayTappa);
 			tappeMissioneColl.add(newDayTappa);
 		}
-		if (dataFineMissione != null && !DateUtils.truncate(aData).equals(DateUtils.truncate(dataFineMissione))){
-			ultimaDataInizioUsata = ultimaDataInizioUsata.plusDays(1);
-			impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
-			for (ZonedDateTime data = ultimaDataInizioUsata; DateUtils.truncate(data).isBefore(DateUtils.truncate(dataFineMissione)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(dataFineMissione)); data = data.plusDays(1))
-			{
-				ZonedDateTime dataInizio = data;
-				if (dataInizio.isAfter(dataFineMissione)){
-					dataInizio = dataFineMissione;
-				}
-				TappeMissioneColl newDayTappa;
-				try {
-					newDayTappa = (TappeMissioneColl)tappa.clone();
-				} catch (CloneNotSupportedException e) {
-					log.error("Errore",e);
-					throw new ComponentException("Errore nel clone.",e);
-				}
-				ZonedDateTime dataFine = dataInizio.plusDays(1);
-				if (dataFine.isAfter(dataFineMissione)){
-					dataFine = dataFineMissione;
-				}
-				impostaDateTappa(dataInizio, dataFine, newDayTappa);
-				tappeMissioneColl.add(newDayTappa);
-			}
-		}
+//		if (dataFineMissione != null && !DateUtils.truncate(aData).equals(DateUtils.truncate(dataFineMissione))){
+//			ultimaDataInizioUsata = ultimaDataInizioUsata.plusDays(1);
+//			impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
+//			for (ZonedDateTime data = ultimaDataInizioUsata; DateUtils.truncate(data).isBefore(DateUtils.truncate(dataFineMissione)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(dataFineMissione)); data = data.plusDays(1))
+//			{
+//				ZonedDateTime dataInizio = data;
+//				if (dataInizio.isAfter(dataFineMissione)){
+//					dataInizio = dataFineMissione;
+//				}
+//				TappeMissioneColl newDayTappa;
+//				try {
+//					newDayTappa = (TappeMissioneColl)tappa.clone();
+//				} catch (CloneNotSupportedException e) {
+//					log.error("Errore",e);
+//					throw new ComponentException("Errore nel clone.",e);
+//				}
+//				ZonedDateTime dataFine = dataInizio.plusDays(1);
+//				if (dataFine.isAfter(dataFineMissione)){
+//					dataFine = dataFineMissione;
+//				}
+//				impostaDateTappa(dataInizio, dataFine, newDayTappa);
+//				tappeMissioneColl.add(newDayTappa);
+//			}
+//		}
 
 		
 		return tappeMissioneColl;

@@ -962,13 +962,29 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.goDettagliSpesa = function () {
       if ($scope.rimborsoMissioneModel.id){
+        var dataInizio = null;
+        var dataFine = null;
+        if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
+            if (!$scope.rimborsoMissioneModel.dataInizioEstero || !$scope.rimborsoMissioneModel.dataFineEstero){
+                ui.error("Valorizzare le date inizio e fine attraversamento frontiera.");
+            }
+            dataInizio = $scope.rimborsoMissioneModel.dataInizioEstero;
+            dataFine = $scope.rimborsoMissioneModel.dataFineEstero;
+        } else {
+            if (!$scope.rimborsoMissioneModel.dataInizioMissione || !$scope.rimborsoMissioneModel.dataFineMissione){
+                ui.error("Valorizzare le date inizio e fine missione.");
+            }
+            dataInizio = $scope.rimborsoMissioneModel.dataInizioMissione;
+            dataFine = $scope.rimborsoMissioneModel.dataFineMissione;
+        } 
+
         if ($scope.validazione){
-            $location.path('/rimborso-missione/rimborso-missione-dettagli/'+$scope.rimborsoMissioneModel.id+'/'+$scope.validazione+'/'+$scope.rimborsoMissioneModel.dataInizioMissione+'/'+$scope.rimborsoMissioneModel.dataFineMissione);
+            $location.path('/rimborso-missione/rimborso-missione-dettagli/'+$scope.rimborsoMissioneModel.id+'/'+$scope.validazione+'/'+dataInizio+'/'+dataFine);
         } else {
             if ($scope.disabilitaRimborsoMissione){
-                $location.path('/rimborso-missione/rimborso-missione-dettagli/'+$scope.rimborsoMissioneModel.id+'/'+"D"+'/'+$scope.rimborsoMissioneModel.dataInizioMissione+'/'+$scope.rimborsoMissioneModel.dataFineMissione);
+                $location.path('/rimborso-missione/rimborso-missione-dettagli/'+$scope.rimborsoMissioneModel.id+'/'+"D"+'/'+dataInizio+'/'+dataFine);
             } else {
-                $location.path('/rimborso-missione/rimborso-missione-dettagli/'+$scope.rimborsoMissioneModel.id+'/'+"N"+'/'+$scope.rimborsoMissioneModel.dataInizioMissione+'/'+$scope.rimborsoMissioneModel.dataFineMissione);
+                $location.path('/rimborso-missione/rimborso-missione-dettagli/'+$scope.rimborsoMissioneModel.id+'/'+"N"+'/'+dataInizio+'/'+dataFine);
             }
         }
       } else {
