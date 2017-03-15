@@ -28,6 +28,7 @@
     <include file="classpath:config/liquibase/changelog/20170222165000_modify_column_note_differenze.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170309155000_modify_column_livello_rich.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170310083000_add_column_auto_servizio.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170313192200_add_column_cup.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 
