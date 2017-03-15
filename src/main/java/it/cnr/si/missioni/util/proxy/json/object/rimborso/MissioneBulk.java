@@ -151,6 +151,8 @@ public class MissioneBulk implements Cloneable, Serializable{
     private Integer esercizioObblGeMis;
     @JsonProperty("esercizioOriObblGeMis")
     private Integer esercizioOriObblGeMis;
+    @JsonProperty("pgMissioneFromGeMis")
+    private Long pgMissioneFromGeMis;
     @JsonProperty("pgObblGeMis")
     private Long pgObblGeMis;
     @JsonProperty("gaeGeMis")
@@ -1055,6 +1057,14 @@ public class MissioneBulk implements Cloneable, Serializable{
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return super.clone();
+	}
+
+	public Long getPgMissioneFromGeMis() {
+		return pgMissioneFromGeMis;
+	}
+
+	public void setPgMissioneFromGeMis(Long pgMissioneFromGeMis) {
+		this.pgMissioneFromGeMis = pgMissioneFromGeMis;
 	}
 
 }
