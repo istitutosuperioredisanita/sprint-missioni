@@ -916,7 +916,7 @@ public class RimborsoMissioneService {
 			rimborsoMissione.setNazione(new Long("1"));
 		}
 		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
-			long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione());
+			long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
 			if (oreDifferenza < 24 ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
 			}

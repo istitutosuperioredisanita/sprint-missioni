@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RimborsoMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="285"/>
+	<property name="ireport.y" value="123"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -137,6 +137,9 @@
 	<field name="totMissione" class="java.lang.String">
 		<fieldDescription><![CDATA[totMissione]]></fieldDescription>
 	</field>
+	<field name="cup" class="java.lang.String">
+		<fieldDescription><![CDATA[cup]]></fieldDescription>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -260,7 +263,7 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Missione  </style>"+$F{italiaEstero}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="12" y="172" width="542" height="20" uuid="9a458775-ff21-464f-99c2-3a22ebd72fed">
+				<reportElement positionType="Float" x="12" y="172" width="310" height="20" uuid="9a458775-ff21-464f-99c2-3a22ebd72fed">
 					<printWhenExpression><![CDATA[$F{tipoMissione}.equalsIgnoreCase( "ESTERO" )]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle" markup="styled">
@@ -447,6 +450,13 @@
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{dataFineEstero}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="325" y="172" width="229" height="20" uuid="ba7bf9b6-fa45-49bd-bf88-bbf28431b582"/>
+				<textElement verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>CUP </style>"+$F{cup}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
