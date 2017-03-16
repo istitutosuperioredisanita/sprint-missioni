@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -42,10 +47,13 @@ import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
+import it.cnr.si.web.rest.errors.ErrorConstants;
+import it.cnr.si.web.rest.errors.ErrorVM;
 
 /**
  * REST controller for managing the current user's account.
  */
+@RestControllerAdvice
 @RestController
 @RequestMapping("/app")
 public class OrdineMissioneResource {
@@ -258,6 +266,7 @@ public class OrdineMissioneResource {
 
     @RequestMapping(value = "/rest/public/printOrdineMissione",
             method = RequestMethod.GET)
+    @ExceptionHandler(Exception.class)
     @Timed
     public @ResponseBody void printOrdineMissione(HttpServletRequest request,
     		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {

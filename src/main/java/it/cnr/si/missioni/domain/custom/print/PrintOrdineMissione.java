@@ -3,10 +3,6 @@ package it.cnr.si.missioni.domain.custom.print;
 
 public class PrintOrdineMissione extends PrintMissione{
 
-    private String pgObbligazione;
-
-    private String esercizioOriginaleObbligazione;
-
     private String obbligoRientro;
 
 	private String partenzaDa;
@@ -96,21 +92,5 @@ public class PrintOrdineMissione extends PrintMissione{
 	public void setNoteUtilizzoTaxiNoleggio(String noteUtilizzoTaxiNoleggio) {
 		this.noteUtilizzoTaxiNoleggio = noteUtilizzoTaxiNoleggio;
 	} 
-
-    public String getPgObbligazione() {
-		return pgObbligazione;
-	}
-
-	public void setPgObbligazione(String pgObbligazione) {
-		this.pgObbligazione = pgObbligazione;
-	}
-
-	public String getEsercizioOriginaleObbligazione() {
-		return esercizioOriginaleObbligazione;
-	}
-
-	public void setEsercizioOriginaleObbligazione(String esercizioOriginaleObbligazione) {
-		this.esercizioOriginaleObbligazione = esercizioOriginaleObbligazione;
-	}
 
 }

@@ -22,9 +22,19 @@ import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissioneDettagli;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
+import it.cnr.si.missioni.util.proxy.json.object.Cdr;
+import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Nazione;
+import it.cnr.si.missioni.util.proxy.json.object.Progetto;
+import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import it.cnr.si.missioni.util.proxy.json.object.Voce;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import it.cnr.si.missioni.util.proxy.json.service.CdrService;
+import it.cnr.si.missioni.util.proxy.json.service.GaeService;
 import it.cnr.si.missioni.util.proxy.json.service.NazioneService;
+import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
+import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
+import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 
 @Service
 public class PrintRimborsoMissioneService {
@@ -39,9 +49,27 @@ public class PrintRimborsoMissioneService {
     @Autowired
     private NazioneService nazioneService;
 
+    @Autowired
+    private UnitaOrganizzativaService unitaOrganizzativaService;
+
+    @Autowired
+    private CdrService cdrService;
+
+    @Autowired
+    private GaeService gaeService;
+
+    @Autowired
+    private ProgettoService progettoService;
+
+    @Autowired
+    private VoceService voceService;
+    
     private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
+		Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), rimborsoMissione.getAnno(), null);
+		Voce voce = voceService.loadVoce(rimborsoMissione);
+		Gae gae = gaeService.loadGae(rimborsoMissione);
     	PrintRimborsoMissione printRimborsoMissione = new PrintRimborsoMissione();
     	printRimborsoMissione.setAnno(rimborsoMissione.getAnno());
     	printRimborsoMissione.setNumero(rimborsoMissione.getNumero());
@@ -68,6 +96,30 @@ public class PrintRimborsoMissioneService {
     	printRimborsoMissione.setDestinazione(rimborsoMissione.getDestinazione());
     	printRimborsoMissione.setAltreSpese(rimborsoMissione.getAltreSpeseAntDescrizione() == null ? "" : rimborsoMissione.getAltreSpeseAntDescrizione());
     	printRimborsoMissione.setAltreSpeseImporto(Utility.numberFormat(rimborsoMissione.getAltreSpeseAntImporto()));
+    	if (progetto != null){
+    		printRimborsoMissione.setModulo(progetto.getCd_progetto()+" "+progetto.getDs_progetto());
+    	} else {
+    		printRimborsoMissione.setModulo("");
+    	}
+    	if (voce != null){
+    		printRimborsoMissione.setVoce(voce.getCd_elemento_voce()+" "+voce.getDs_elemento_voce());
+    	} else {
+    		printRimborsoMissione.setVoce("");
+    	}
+    	if (gae != null){
+    		printRimborsoMissione.setGae(gae.getCd_linea_attivita()+" "+gae.getDs_linea_attivita());
+    	} else {
+    		printRimborsoMissione.setGae("");
+    	}
+    	printRimborsoMissione.setUoSpesa(caricaUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()));
+    	printRimborsoMissione.setCdrSpesa(caricaCdr(rimborsoMissione.getCdrSpesa()));
+    	if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
+    		printRimborsoMissione.setPgObbligazione(rimborsoMissione.getPgObbligazione().toString());
+    		printRimborsoMissione.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione().toString());
+    	} else {
+    		printRimborsoMissione.setPgObbligazione("");
+    		printRimborsoMissione.setEsercizioOriginaleObbligazione("");
+    	}
     	if (rimborsoMissione.getAnticipoAnnoMandato() != null){
         	printRimborsoMissione.setAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato().toString());
     	} else {
@@ -155,6 +207,22 @@ public class PrintRimborsoMissioneService {
 		return printRimborsoMissione; 
     }
 
+	private String caricaUo(String cdUo, Integer anno) {
+    	if (cdUo != null){
+    		UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(cdUo, null, anno);
+    		return uo.getCd_unita_organizzativa() + " "+ uo.getDs_unita_organizzativa();
+    	}
+   		return "";
+	}
+    
+	private String caricaCdr(String cdCdr) {
+    	if (cdCdr != null){
+    		Cdr cdr = cdrService.loadCdr(cdCdr, null);
+    		return cdr.getCd_centro_responsabilita() + " "+ cdr.getDs_cdr();
+    	}
+   		return "";
+	}
+	
 	public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintRimborsoMissione(rimborsoMissione, currentLogin);
 		Map<String, String> mapSubReport = new HashMap<String, String>();

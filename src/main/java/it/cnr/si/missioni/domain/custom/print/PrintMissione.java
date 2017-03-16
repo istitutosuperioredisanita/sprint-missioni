@@ -70,6 +70,10 @@ public class PrintMissione {
 
     private String cup;
 
+    private String pgObbligazione;
+
+    private String esercizioOriginaleObbligazione;
+
 	public Integer getAnno() {
 		return anno;
 	}
@@ -332,6 +336,22 @@ public class PrintMissione {
 
 	public void setCup(String cup) {
 		this.cup = cup;
+	}
+
+    public String getPgObbligazione() {
+		return pgObbligazione;
+	}
+
+	public void setPgObbligazione(String pgObbligazione) {
+		this.pgObbligazione = pgObbligazione;
+	}
+
+	public String getEsercizioOriginaleObbligazione() {
+		return esercizioOriginaleObbligazione;
+	}
+
+	public void setEsercizioOriginaleObbligazione(String esercizioOriginaleObbligazione) {
+		this.esercizioOriginaleObbligazione = esercizioOriginaleObbligazione;
 	}
 
 }
