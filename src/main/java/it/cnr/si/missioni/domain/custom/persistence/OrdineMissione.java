@@ -1116,4 +1116,12 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public void setCup(String cup) {
 		this.cup = cup;
 	}
+	@Transient
+	public Boolean isTrattamentoAlternativoMissione() {
+		if (getTrattamento() != null && getTrattamento().equals(Costanti.TAM)){
+			return true;
+		}
+		return false;
+	}
+
 }
