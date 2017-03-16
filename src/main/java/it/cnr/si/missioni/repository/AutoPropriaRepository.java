@@ -2,15 +2,15 @@ package it.cnr.si.missioni.repository;
 
 import java.util.List;
 
-import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 
 /**
  * Spring Data JPA repository for the AutoPropria entity.
  */
-public interface AutoPropriaRepository extends JpaRepository<AutoPropria, String> {
+public interface AutoPropriaRepository extends JpaRepository<AutoPropria, Long> {
     
     @Query("select a from AutoPropria a where a.uid = ?1")
     List<AutoPropria> getAutoProprie(String user);
