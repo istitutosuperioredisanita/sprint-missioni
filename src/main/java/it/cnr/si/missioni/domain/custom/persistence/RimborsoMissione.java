@@ -1163,7 +1163,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	    		totRimborso = totRimborso.add(dettagli.getImportoEuro());
 			}
 		}
-		return totRimborso;
+		return Utility.nvl(totRimborso);
 	}
 
 	public String getMatricola() {
