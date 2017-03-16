@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
  * Spring Data JPA repository for the AutoPropria entity.
  */
 public interface OrdineMissioneRepository extends
-		JpaRepository<OrdineMissione, String> {
+		JpaRepository<OrdineMissione, Long> {
 
 	@Query("select a from OrdineMissione a where a.uid = ?1")
     List<OrdineMissione> getOrdiniMissione(String user);

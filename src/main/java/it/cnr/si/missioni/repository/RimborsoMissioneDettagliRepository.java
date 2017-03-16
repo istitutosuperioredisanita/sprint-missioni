@@ -12,7 +12,7 @@ import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
  * Spring Data JPA repository for the AutoPropria entity.
  */
 public interface RimborsoMissioneDettagliRepository extends
-		JpaRepository<RimborsoMissione, String> {
+		JpaRepository<RimborsoMissioneDettagli, Long> {
 
 	@Query("select a from RimborsoMissioneDettagli a where a.rimborsoMissione = ?1 and stato != 'ANN' order by riga")
     List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(RimborsoMissione rimborsoMissione);

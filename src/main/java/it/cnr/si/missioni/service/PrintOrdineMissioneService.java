@@ -36,13 +36,16 @@ public class PrintOrdineMissioneService {
     private PrintService printService;
 
     @Autowired
+    private NazioneService nazioneService;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
 
     @Autowired
     private CdrService cdrService;
-
-    @Autowired
-    private NazioneService nazioneService;
 
     @Autowired
     private GaeService gaeService;
@@ -51,17 +54,14 @@ public class PrintOrdineMissioneService {
     private ProgettoService progettoService;
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
     private VoceService voceService;
     
 //    private PrintOrdineMissione getPrintOrdineMissione(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+		Nazione nazione = nazioneService.loadNazione(ordineMissione);
 		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), null);
 		Voce voce = voceService.loadVoce(ordineMissione);
-		Nazione nazione = nazioneService.loadNazione(ordineMissione);
 		Gae gae = gaeService.loadGae(ordineMissione);
     	PrintOrdineMissione printOrdineMissione = new PrintOrdineMissione();
     	printOrdineMissione.setAnno(ordineMissione.getAnno());
