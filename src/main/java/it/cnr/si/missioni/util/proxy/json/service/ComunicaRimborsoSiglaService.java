@@ -136,20 +136,22 @@ public class ComunicaRimborsoSiglaService {
 				}
 			}
 		}
-		if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
-			oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
-		}
-		if (rimborsoApprovato.getEsercizioObbligazione() != null){
-			oggettoBulk.setEsercizioObblGeMis(rimborsoApprovato.getEsercizioObbligazione());
-		}
-		if (rimborsoApprovato.getEsercizioOriginaleObbligazione() != null){
-			oggettoBulk.setEsercizioOriObblGeMis(rimborsoApprovato.getEsercizioOriginaleObbligazione());
-		}
-		if (rimborsoApprovato.getPgObbligazione() != null){
-			oggettoBulk.setPgObblGeMis(rimborsoApprovato.getPgObbligazione());
-		}
-		if (rimborsoApprovato.getGae() != null){
-			oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
+		if (!rimborsoApprovato.isTrattamentoAlternativoMissione()){
+			if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
+				oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
+			}
+			if (rimborsoApprovato.getEsercizioObbligazione() != null){
+				oggettoBulk.setEsercizioObblGeMis(rimborsoApprovato.getEsercizioObbligazione());
+			}
+			if (rimborsoApprovato.getEsercizioOriginaleObbligazione() != null){
+				oggettoBulk.setEsercizioOriObblGeMis(rimborsoApprovato.getEsercizioOriginaleObbligazione());
+			}
+			if (rimborsoApprovato.getPgObbligazione() != null){
+				oggettoBulk.setPgObblGeMis(rimborsoApprovato.getPgObbligazione());
+			}
+			if (rimborsoApprovato.getGae() != null){
+				oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
+			}
 		}
 		impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
 		

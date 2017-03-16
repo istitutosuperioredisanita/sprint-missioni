@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import it.cnr.si.missioni.util.Utility;
+
 public class ImpegnoGae extends RestServiceBean  implements Serializable {
 
 	@JsonProperty("cdCds")
@@ -445,9 +447,9 @@ public class ImpegnoGae extends RestServiceBean  implements Serializable {
 
 	public BigDecimal getDisponibilitaImpegno(){
 		if (getEsercizio().compareTo(getEsercizioOriginale()) == 0){
-			return getImScadenzaComp().subtract(getImAssociatoDocAmmComp());
+			return Utility.nvl(getImScadenzaComp().subtract(getImAssociatoDocAmmComp()));
 		} else {
-			return getImScadenzaRes().subtract(getImAssociatoDocAmmRes());
+			return Utility.nvl(getImScadenzaRes().subtract(getImAssociatoDocAmmRes()));
 		}
 	}
 }

@@ -227,7 +227,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setImpegnoAnnoCompetenza(ordineMissione.getEsercizioObbligazione() == null ? null : new Long(ordineMissione.getEsercizioObbligazione()));
 			cmisOrdineMissione.setImpegnoAnnoResiduo(ordineMissione.getEsercizioOriginaleObbligazione() == null ? null : new Long(ordineMissione.getEsercizioOriginaleObbligazione()));
 			cmisOrdineMissione.setImpegnoNumero(ordineMissione.getPgObbligazione());
-			cmisOrdineMissione.setImportoMissione(ordineMissione.getImportoPresunto() == null ? null : ordineMissione.getImportoPresunto());
+			cmisOrdineMissione.setImportoMissione(ordineMissione.getImportoPresunto() == null ? null : Utility.nvl(ordineMissione.getImportoPresunto()));
 			cmisOrdineMissione.setModulo(progetto == null ? "" : progetto.getCd_progetto());
 			cmisOrdineMissione.setNoleggioFlag(ordineMissione.getUtilizzoAutoNoleggio().equals("S") ? "true" : "false");
 			cmisOrdineMissione.setTrattamento(ordineMissione.decodeTrattamento());
