@@ -14,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import it.cnr.si.missioni.util.Utility;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
@@ -449,9 +451,9 @@ public class Impegno extends RestServiceBean  implements Serializable {
 
 	public BigDecimal getDisponibilitaImpegno(){
 		if (getEsercizio().compareTo(getEsercizioOriginale()) == 0){
-			return getImScadenzaComp().subtract(getImAssociatoDocAmmComp());
+			return Utility.nvl(getImScadenzaComp().subtract(getImAssociatoDocAmmComp()));
 		} else {
-			return getImScadenzaRes().subtract(getImAssociatoDocAmmRes());
+			return Utility.nvl(getImScadenzaRes().subtract(getImAssociatoDocAmmRes()));
 		}
 	}
 }

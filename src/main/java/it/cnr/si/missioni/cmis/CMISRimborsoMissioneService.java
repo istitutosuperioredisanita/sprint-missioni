@@ -267,7 +267,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto().equals("S") ? "true" : "false");
 		cmisRimborsoMissione.setAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato() == null ? "" : rimborsoMissione.getAnticipoAnnoMandato().toString());
 		cmisRimborsoMissione.setNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato() == null ? "" : rimborsoMissione.getAnticipoNumeroMandato().toString());
-		cmisRimborsoMissione.setImportoMandato(rimborsoMissione.getAnticipoImporto() == null ? "" : rimborsoMissione.getAnticipoImporto().toString());
+		cmisRimborsoMissione.setImportoMandato(rimborsoMissione.getAnticipoImporto() == null ? "" : Utility.nvl(rimborsoMissione.getAnticipoImporto()).toString());
 		cmisRimborsoMissione.setUsernameUtenteOrdine(rimborsoMissione.getUid());
 		cmisRimborsoMissione.setUsernameUtenteOrdine(rimborsoMissione.getUid());
 		cmisRimborsoMissione.setValidazioneSpesa(impostaValidazioneSpesa(userNameFirmatario, userNameFirmatarioSpesa));
