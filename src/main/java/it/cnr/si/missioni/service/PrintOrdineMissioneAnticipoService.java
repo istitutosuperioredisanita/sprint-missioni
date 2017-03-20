@@ -33,7 +33,7 @@ public class PrintOrdineMissioneAnticipoService {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
     	PrintOrdineMissioneAnticipo printOrdineMissioneAnticipo = new PrintOrdineMissioneAnticipo();
     	printOrdineMissioneAnticipo.setAnno(ordineMissione.getAnno());
-    	printOrdineMissioneAnticipo.setNumero(new Integer(ordineMissione.getNumero().toString()));
+    	printOrdineMissioneAnticipo.setNumero(ordineMissione.getNumero());
     	printOrdineMissioneAnticipo.setCodiceFiscaleRich(account.getCodiceFiscale());
     	printOrdineMissioneAnticipo.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
