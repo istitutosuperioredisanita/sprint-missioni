@@ -55,7 +55,7 @@ public class PrintOrdineMissioneAnticipo {
 	@JsonProperty("anno")
 	private Integer anno;
 	@JsonProperty("numero")
-	private Integer numero;
+	private Long numero;
 	@JsonProperty("dataInserimento")
 	private String dataInserimento;
 	@JsonProperty("cognomeRich")
@@ -145,7 +145,7 @@ public class PrintOrdineMissioneAnticipo {
 	 * The numero
 	 */
 	@JsonProperty("numero")
-	public Integer getNumero() {
+	public Long getNumero() {
 		return numero;
 	}
 
@@ -155,7 +155,7 @@ public class PrintOrdineMissioneAnticipo {
 	 * The numero
 	 */
 	@JsonProperty("numero")
-	public void setNumero(Integer numero) {
+	public void setNumero(Long numero) {
 		this.numero = numero;
 	}
 
