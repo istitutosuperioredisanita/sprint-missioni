@@ -19,7 +19,6 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.Spostamenti;
-import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -41,6 +40,7 @@ public class PrintOrdineMissioneAutoPropriaService {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
     	PrintOrdineMissioneAutoPropria printOrdineMissioneAutoPropria = new PrintOrdineMissioneAutoPropria();
     	printOrdineMissioneAutoPropria.setAnno(ordineMissione.getAnno());
+    	printOrdineMissioneAutoPropria.setNumero(ordineMissione.getNumero());
     	printOrdineMissioneAutoPropria.setCodiceFiscaleRich(account.getCodiceFiscale());
     	printOrdineMissioneAutoPropria.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
     	if (account.getDataNascita() != null){
