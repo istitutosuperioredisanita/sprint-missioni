@@ -101,7 +101,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if (listaCds){
             if (listaCds.length === 1){
                 $scope.ordineMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
-                $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.cdsSpesa);
             } else {
                 if (cds){
                     $scope.elencoCds = [];
@@ -118,7 +117,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     }
                     if ($scope.ordineMissioneModel){
                         $scope.ordineMissioneModel.cdsSpesa = cds;
-                        $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.cdsSpesa);
                     }
                 }
             }
@@ -211,7 +209,8 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 		        $scope.elencoUo = result.data.elements;
 		        if ($scope.elencoUo){
 		            if ($scope.elencoUo.length === 1){
-		                $scope.ordineMissioneModel.uoSpesa = $scope.elencoUo[0];
+		                $scope.ordineMissioneModel.uoSpesa = $scope.elencoUo[0].cd_unita_organizzativa;
+                        $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.uoSpesa);
 		            }
 		        }
         	} else {
@@ -228,7 +227,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     $scope.elencoUoCompetenza = result.data.elements;
                     if ($scope.elencoUoCompetenza){
                         if ($scope.elencoUoCompetenza.length === 1){
-                            $scope.ordineMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0];
+                            $scope.ordineMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0].cd_unita_organizzativa;
                         }
                     }
                 } else {
@@ -453,16 +452,17 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.annullaUo = function(){
       $scope.annullaCdr();
       $scope.ordineMissioneModel.uoSpesa = null;
+      $scope.ordineMissioneModel.responsabileGruppo = null;
+      $scope.showResponsabile = false;
     }
 
     $scope.reloadCds = function(cds) {
       $scope.annullaUo();  
       $scope.restUo($scope.ordineMissioneModel.anno, cds, $scope.ordineMissioneModel.uoRich);
-      $scope.impostaGestioneResponsabileGruppo(cds);      
     }
 
-    $scope.impostaGestioneResponsabileGruppo = function(cds){
-      DatiIstitutoService.get(cds, $scope.ordineMissioneModel.anno).then(function(data){
+    $scope.impostaGestioneResponsabileGruppo = function(uo){
+      DatiIstitutoService.get(uo, $scope.ordineMissioneModel.anno).then(function(data){
         if (data.gestioneRespModulo != null && data.gestioneRespModulo == 'S'){
             $scope.showResponsabile = true;
             $scope.disableResponsabileGruppo = true;
@@ -510,6 +510,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.reloadUo = function(uo) {
       $scope.annullaCdr();  
       $scope.getRestForResponsabileGruppo(uo);
+      $scope.impostaGestioneResponsabileGruppo(uo);
       $scope.restCdr(uo, "N");
     }
 
