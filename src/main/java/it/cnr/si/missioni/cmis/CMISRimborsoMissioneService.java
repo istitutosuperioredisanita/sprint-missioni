@@ -366,14 +366,11 @@ public class CMISRimborsoMissioneService {
 				aggiungiDifferenza(buffer, "Progetto. ", null);
 			}
 		}
-		if (isDiverso(rimborso.getEsercizioObbligazione(), ordine.getEsercizioObbligazione())){
-			aggiungiDifferenza(buffer, "Esercizio Obbligazione. ", null);
-		}
 		if (isDiverso(rimborso.getEsercizioOriginaleObbligazione(), ordine.getEsercizioOriginaleObbligazione())){
-			aggiungiDifferenza(buffer, "Esercizio Origine Obbligazione. ", null);
+			aggiungiDifferenza(buffer, "Anno Impegno. ", null);
 		}
 		if (isDiverso(rimborso.getPgObbligazione(), ordine.getPgObbligazione())){
-			aggiungiDifferenza(buffer, "Obbligazione. ", null);
+			aggiungiDifferenza(buffer, "Numero Impegno. ", null);
 		}
 		try {
 			OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(principal, ordine);
