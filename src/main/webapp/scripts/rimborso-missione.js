@@ -409,7 +409,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 		        $scope.elencoUo = result.data.elements;
 		        if ($scope.elencoUo){
 		            if ($scope.elencoUo.length === 1){
-		                $scope.rimborsoMissioneModel.uoSpesa = $scope.elencoUo[0];
+		                $scope.rimborsoMissioneModel.uoSpesa = $scope.elencoUo[0].cd_unita_organizzativa;
 		            }
 		        }
         	} else {
@@ -426,7 +426,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     $scope.elencoUoCompetenza = result.data.elements;
                     if ($scope.elencoUoCompetenza){
                         if ($scope.elencoUoCompetenza.length === 1){
-                            $scope.rimborsoMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0];
+                            $scope.rimborsoMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0].cd_unita_organizzativa;
                         }
                     }
                 } else {
