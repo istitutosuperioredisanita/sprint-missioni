@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RimborsoMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="384"/>
+	<property name="ireport.y" value="4"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -399,7 +399,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Andata]]></text>
+				<text><![CDATA[Ritorno]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="bold" mode="Transparent" x="387" y="205" width="152" height="17" uuid="f6a5b4ce-57c9-42ba-aaa6-2a651a2aedc4"/>
@@ -650,13 +650,13 @@
 		</band>
 	</columnFooter>
 	<pageFooter>
-		<band height="84" splitType="Stretch">
+		<band height="70" splitType="Stretch">
 			<staticText>
-				<reportElement positionType="Float" x="7" y="12" width="543" height="70" uuid="652342d0-aafd-4859-8f3f-cf140fa43b98"/>
+				<reportElement positionType="Float" x="7" y="3" width="543" height="61" uuid="652342d0-aafd-4859-8f3f-cf140fa43b98"/>
 				<textElement textAlignment="Justified" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Dichiaro sotto la mia responsabilità che relativamente all’ eventuale procedura di acquisto online dei biglietti aerei o ferroviari, di averne sostenuto la spesa; che la stessa è rimasta interamente a mio carico e che non ne  è stato richiesto a terzi ulteriore rimborso. Si dichiara inoltre che i dati sopra indicati corrispondono a verità e  di essere a conoscenza della responsabilità penale prevista, dall’art. 76 del D.P.R. 445/2000, per le ipotesi di falsità in atti e dichiarazioni mendaci ivi indicate in merito alla presente richiesta di rimborso spese di missione.]]></text>
+				<text><![CDATA[Dichiaro sotto la mia responsabilità che la documentazione allegata è conforme all'originale, di averne sostenuto la spesa e che non è stato e non sarà richiesto a terzi ulteriore rimborso. Si dichiara inoltre che i dati sopra indicati corrispondono a verità e  di essere a conoscenza della responsabilità penale prevista, dall’art. 76 del D.P.R. 445/2000, per le ipotesi di falsità in atti e dichiarazioni mendaci ivi indicate in merito alla presente richiesta di rimborso spese di missione.]]></text>
 			</staticText>
 		</band>
 	</pageFooter>
