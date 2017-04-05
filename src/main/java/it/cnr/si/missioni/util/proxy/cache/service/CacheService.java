@@ -63,6 +63,10 @@ public class CacheService implements EnvironmentAware{
 	
 	@PostConstruct
 	public void init(){
+		loadInCache();
+	}
+
+	public void loadInCache() {
 		if (configService.getServices()!= null && configService.getServices().getRestService() != null ){
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();

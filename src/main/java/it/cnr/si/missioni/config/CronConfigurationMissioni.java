@@ -15,6 +15,12 @@ public class CronConfigurationMissioni {
     @Value("${cron.comunicaDati.active}")
     private boolean cronComunicaDatiActive;
 
+    @Value("${cron.evictCache.active}")
+    private boolean cronEvictCacheActive;
+
+    @Value("${cron.loadCache.active}")
+    private boolean cronLoadCacheActive;
+
     @Autowired
     private CronService cronService;
     
@@ -22,5 +28,17 @@ public class CronConfigurationMissioni {
     public void cronComunicaDati() throws Exception {
     	if (cronComunicaDatiActive)
     		cronService.verificaFlussoEComunicaDatiRimborsoSigla(new GenericPrincipal("cronMissioni"));
+    }
+
+	@Scheduled(cron = "${cron.evictCache.cronExpression}")
+    public void evictCache() throws Exception {
+    	if (cronEvictCacheActive)
+    		cronService.evictCache();
+    }
+
+	@Scheduled(cron = "${cron.loadCache.cronExpression}")
+    public void loadCache() throws Exception {
+    	if (cronLoadCacheActive)
+    		cronService.loadCache();
     }
 }

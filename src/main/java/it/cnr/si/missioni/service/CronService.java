@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,14 +16,11 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
 
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
-import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
@@ -60,14 +58,8 @@ public class CronService {
     private HazelcastInstance hazelcastInstance;
 
 	@Autowired
-	private CRUDComponentSession crudServiceBean;
-
-	@Autowired
 	private ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
-	@Autowired
-	private AccountService accountService;
-	
 	@Autowired
 	private MailService mailService;
 	
@@ -78,10 +70,59 @@ public class CronService {
 	private FlowsService flowsService;
 	
 	@Autowired
+	private CacheService cacheService;
+	
+	@Autowired
 	private RimborsoMissioneService rimborsoMissioneService;
 
-	@Autowired
-	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
+	@CacheEvict(Costanti.NOME_CACHE_PROXY)
+	public void evictCache() throws ComponentException {
+		ILock lock = hazelcastInstance.getLock(lockKey);
+		LOGGER.info("requested lock: " + lock.getPartitionKey());
+
+		try {
+			if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
+
+				LOGGER.info("got lock {}", lockKey);
+				LOGGER.info("Cron per Svuotare la Cache");
+			}
+
+
+		} catch (Exception e) {
+			LOGGER.error("Errore", e);
+			throw new ComponentException(e);
+		}
+	}
+
+	@Transactional
+	public void loadCache() throws ComponentException {
+		ILock lock = hazelcastInstance.getLock(lockKey);
+		LOGGER.info("requested lock: " + lock.getPartitionKey());
+
+		try {
+			if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
+
+				LOGGER.info("got lock {}", lockKey);
+
+				try {
+					LOGGER.info("Cron per Caricare la Cache");
+
+					cacheService.loadInCache();
+
+					LOGGER.info("Cron per Caricare la Cache terminato");
+				} finally {
+					LOGGER.info("unlocking {}", lockKey);
+					lock.unlock();
+				}
+
+			} else {
+				LOGGER.warn("unable to get lock {}", lockKey);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Errore", e);
+			throw new ComponentException(e);
+		}
+	}
 
     @Transactional
 	public void verificaFlussoEComunicaDatiRimborsoSigla(Principal principal) throws ComponentException {
@@ -161,7 +202,7 @@ public class CronService {
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
 				try {
-					MissioneBulk missione = comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
+					comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
