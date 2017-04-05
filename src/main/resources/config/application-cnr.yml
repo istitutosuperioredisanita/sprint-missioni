@@ -62,10 +62,10 @@ ajp:
     timeout: 120000
 
 siper:
-  url: https://siper.cnr.it/siper/json/userinfo/
-  urldett: https://siper.cnr.it/siper/json/userinfodett/
-  username: app.selezioni
-  password: pentagono
+  url: ${spring.proxy.SIPER.url}json/use info/
+  urldett: ${spring.proxy.SIPER.url}json/userinfodett/
+  username: ${spring.proxy.SIPER.username}
+  password: ${spring.proxy.SIPER.password}
 
 cmis:
     alfresco: http://as1dock.si.cnr.it:8080/alfresco/
