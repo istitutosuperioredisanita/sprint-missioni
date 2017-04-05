@@ -86,17 +86,17 @@ cron:
     comunicaDati:
         name: comunicaDati
         active: false
-        cronExpression: "0 00 01 ? * MON-SAT"
+        cronExpression: "0 0 1 * * MON-SAT"
 
     evictCache:
         name: evictCache
         active: false
-        cronExpression: "0 00 02 ? * MON-SAT"
+        cronExpression: "0 0 2 * * MON-SAT"
 
     loadCache:
         name: loadCache
         active: false
-        cronExpression: "0 00 03 ? * MON-SAT"
+        cronExpression: "0 0 3 * * MON-SAT"
 
 jhipster:
     security:
