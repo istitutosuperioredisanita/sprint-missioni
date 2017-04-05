@@ -31,7 +31,13 @@ public class CronService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CronService.class);
 
     @Value("${cron.comunicaDati.name}")
-    private String lockKey;
+    private String lockKeyComunicaDati;
+    
+    @Value("${cron.evictCache.name}")
+    private String lockKeyEvictCache;
+    
+    @Value("${cron.loadCache.name}")
+    private String lockKeyLoadCache;
     
     @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
     private String subjectErrorFlowsOrdine;
@@ -75,15 +81,15 @@ public class CronService {
 	@Autowired
 	private RimborsoMissioneService rimborsoMissioneService;
 
-	@CacheEvict(Costanti.NOME_CACHE_PROXY)
+	@CacheEvict(value = Costanti.NOME_CACHE_PROXY, allEntries = true)
 	public void evictCache() throws ComponentException {
-		ILock lock = hazelcastInstance.getLock(lockKey);
+		ILock lock = hazelcastInstance.getLock(lockKeyEvictCache);
 		LOGGER.info("requested lock: " + lock.getPartitionKey());
 
 		try {
 			if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
 
-				LOGGER.info("got lock {}", lockKey);
+				LOGGER.info("got lock {}", lockKeyEvictCache);
 				LOGGER.info("Cron per Svuotare la Cache");
 			}
 
@@ -96,13 +102,13 @@ public class CronService {
 
 	@Transactional
 	public void loadCache() throws ComponentException {
-		ILock lock = hazelcastInstance.getLock(lockKey);
+		ILock lock = hazelcastInstance.getLock(lockKeyLoadCache);
 		LOGGER.info("requested lock: " + lock.getPartitionKey());
 
 		try {
 			if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
 
-				LOGGER.info("got lock {}", lockKey);
+				LOGGER.info("got lock {}", lockKeyLoadCache);
 
 				try {
 					LOGGER.info("Cron per Caricare la Cache");
@@ -111,12 +117,12 @@ public class CronService {
 
 					LOGGER.info("Cron per Caricare la Cache terminato");
 				} finally {
-					LOGGER.info("unlocking {}", lockKey);
+					LOGGER.info("unlocking {}", lockKeyLoadCache);
 					lock.unlock();
 				}
 
 			} else {
-				LOGGER.warn("unable to get lock {}", lockKey);
+				LOGGER.warn("unable to get lock {}", lockKeyLoadCache);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Errore", e);
@@ -126,13 +132,13 @@ public class CronService {
 
     @Transactional
 	public void verificaFlussoEComunicaDatiRimborsoSigla(Principal principal) throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKey);
+        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDati);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
 			try {
 				if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
 
-				    LOGGER.info("got lock {}", lockKey);
+				    LOGGER.info("got lock {}", lockKeyComunicaDati);
 
 				    try {
 						LOGGER.info("Cron per Aggiornamenti Ordine Missione");
@@ -145,12 +151,12 @@ public class CronService {
 
 				        LOGGER.info("work done.");
 				    } finally {
-				        LOGGER.info("unlocking {}", lockKey);
+				        LOGGER.info("unlocking {}", lockKeyComunicaDati);
 						lock.unlock();
 					}
 
 				} else {
-				    LOGGER.warn("unable to get lock {}", lockKey);
+				    LOGGER.warn("unable to get lock {}", lockKeyComunicaDati);
 				}
 			} catch (Exception e) {
 				LOGGER.error("Errore", e);
