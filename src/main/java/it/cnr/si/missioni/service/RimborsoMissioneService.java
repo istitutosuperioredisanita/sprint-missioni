@@ -642,7 +642,7 @@ public class RimborsoMissioneService {
     	rimborsoMissione.setUser(principal.getName());
     	Integer anno = recuperoAnno(rimborsoMissione);
     	rimborsoMissione.setAnno(anno);
-    	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoRich(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
+    	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
     	if (StringUtils.isEmpty(rimborsoMissione.getTrattamento())){
     		rimborsoMissione.setTrattamento("R");
     	}
