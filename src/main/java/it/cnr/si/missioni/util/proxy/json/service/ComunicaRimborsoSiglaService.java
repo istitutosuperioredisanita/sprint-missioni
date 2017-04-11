@@ -76,7 +76,6 @@ public class ComunicaRimborsoSiglaService {
 		impostaUserContext(principal, rimborsoApprovato, missioneSigla);
 		MissioneBulk oggettoBulk = new MissioneBulk();
 		oggettoBulk.setCdCds(rimborsoApprovato.getCdsSpesa());
-//		oggettoBulk.setPgMissione(rimborsoApprovato.getNumero());
 		
 		impostaBanca(rimborsoApprovato, oggettoBulk);
 		
@@ -88,7 +87,7 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 		oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 /*GGGG TODO...VERIFICARE QUALE ESERCIZIO PASSARE*/                                oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
-//		oggettoBulk.setPgMissioneFromGeMis(rimborsoApprovato.getNumero());
+		oggettoBulk.setPgMissioneFromGeMis(rimborsoApprovato.getNumero());
 		oggettoBulk.setFlAssociatoCompenso(false);
 		if (rimborsoApprovato.isMissioneEstera()){
 			oggettoBulk.setFlComuneAltro(false);
@@ -204,7 +203,8 @@ public class ComunicaRimborsoSiglaService {
 				spesaMissione.setPgRiga(dettaglio.getRiga().intValue());
 				String idFolderDettaglio = cmisRimborsoMissioneService.getNodeRefFolderDettaglioRimborso(new Long (dettaglio.getId().toString()));
 				if (idFolderDettaglio != null){
-					spesaMissione.setDsGiustificativo(idFolderDettaglio);
+					spesaMissione.setIdFolderDettagliGemis(idFolderDettaglio);
+					spesaMissione.setDsGiustificativo("DETTAGLIO DA GESTIONE AUTOMATICA MISSIONI");
 					spesaMissione.setIdGiustificativo(dettaglio.getRiga().toString());
 				} else {
 					if (dettaglio.isGiustificativoObbligatorio()){
