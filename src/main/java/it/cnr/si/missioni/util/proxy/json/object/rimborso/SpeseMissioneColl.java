@@ -107,6 +107,8 @@ public class SpeseMissioneColl implements Serializable {
     private String dsNoGiustificativo;
     @JsonProperty("id_giustificativo")
     private String idGiustificativo;
+    @JsonProperty("idFolderDettagliGemis")
+    private String idFolderDettagliGemis;
     @JsonProperty("cambio_spesa")
     private BigDecimal cambioSpesa;
     @JsonProperty("cd_divisa_spesa")
@@ -620,6 +622,14 @@ public class SpeseMissioneColl implements Serializable {
 
 	public void setTiCdTiSpesa(String tiCdTiSpesa) {
 		this.tiCdTiSpesa = tiCdTiSpesa;
+	}
+
+	public String getIdFolderDettagliGemis() {
+		return idFolderDettagliGemis;
+	}
+
+	public void setIdFolderDettagliGemis(String idFolderDettagliGemis) {
+		this.idFolderDettagliGemis = idFolderDettagliGemis;
 	}
 
 }
