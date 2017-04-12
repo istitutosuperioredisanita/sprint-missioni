@@ -57,6 +57,14 @@ spring:
             ritornoMissioneMittente:
                 oggetto: Missioni. Ordine di Missione reinviato al mittente.
 
+    rabbitmq:
+        host: as4dock.si.cnr.it
+        username: cnr
+        password: bubbazza
+        virtualHost: missioni
+        exchange: missioni
+        routing-key: some-routing-keyz
+
 ajp:
     port: 8009
     timeout: 120000

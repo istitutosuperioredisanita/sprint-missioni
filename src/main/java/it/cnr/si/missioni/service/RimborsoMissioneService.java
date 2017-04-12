@@ -25,6 +25,9 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.amq.domain.Missione;
+import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
@@ -42,6 +45,7 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
@@ -126,6 +130,9 @@ public class RimborsoMissioneService {
     @Autowired
     private DatiIstitutoService datiIstitutoService;
 
+    @Autowired
+    private RabbitMQService rabbitMQService;
+
     @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -148,6 +155,7 @@ public class RimborsoMissioneService {
 				retrieveDetails(principal, rimborsoMissione);
 			}
 		}
+//		popolaCoda(rimborsoMissione);
 		return rimborsoMissione;
     }
 
@@ -238,7 +246,22 @@ public class RimborsoMissioneService {
 		}
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+		RimborsoMissione rimborso = updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+		popolaCoda(rimborso);
+		return rimborso;
+	}
+
+	private void popolaCoda(RimborsoMissione rimborsoMissione) {
+		if (rimborsoMissione.getMatricola() != null){
+			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+			String idSede = null;
+			if (account != null){
+				idSede = account.getCodiceSede();
+			}
+			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
+					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()));
+			rabbitMQService.send(missione);
+		}
 	}
 
 	public RimborsoMissione aggiornaRimborsoMissioneComunicata(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, MissioneBulk missioneBulk)
@@ -712,6 +735,8 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Uo Richiedente");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getUoSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Uo Spesa");
+			} else if (StringUtils.isEmpty(rimborsoMissione.getCdrSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Cdr Spesa");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getDataInizioMissione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Inizio Missione");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getDataFineMissione())){
