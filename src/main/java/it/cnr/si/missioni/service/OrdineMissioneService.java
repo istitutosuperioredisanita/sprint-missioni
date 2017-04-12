@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.OptimisticLockException;
-
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -25,9 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
-import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
+import it.cnr.si.missioni.amq.domain.Missione;
+import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
@@ -121,6 +120,9 @@ public class OrdineMissioneService {
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
+    @Autowired
+    private RabbitMQService rabbitMQService;
+
 	@Autowired
 	private AccountService accountService;
 	
@@ -150,6 +152,7 @@ public class OrdineMissioneService {
 			}
 			
 		}
+//		popolaCoda(ordineMissione);
 		return ordineMissione;
     }
 
@@ -296,6 +299,20 @@ public class OrdineMissioneService {
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+		popolaCoda(ordineMissioneDaAggiornare);
+	}
+
+	private void popolaCoda(OrdineMissione ordineMissione) {
+		if (ordineMissione.getMatricola() != null){
+			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+			String idSede = null;
+			if (account != null){
+				idSede = account.getCodiceSede();
+			}
+			Missione missione = new Missione(TypeMissione.ORDINE, new Long(ordineMissione.getId().toString()), idSede, 
+					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null);
+			rabbitMQService.send(missione);
+		}
 	}
 
 	private void aggiornaValidazione(OrdineMissione ordineMissione) {
@@ -763,6 +780,8 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Uo Richiedente");
 			} else if (StringUtils.isEmpty(ordineMissione.getUoSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Uo Spesa");
+			} else if (StringUtils.isEmpty(ordineMissione.getCdrSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Cdr Spesa");
 			} else if (StringUtils.isEmpty(ordineMissione.getDataInizioMissione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Inizio Missione");
 			} else if (StringUtils.isEmpty(ordineMissione.getDataFineMissione())){
