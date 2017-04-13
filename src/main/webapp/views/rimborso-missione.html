@@ -268,7 +268,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-spesa">uo</span>
-                    <select ng-disabled="!rimborsoMissioneModel.cdsSpesa || validazione || disabilitaRimborsoMissione" ng-change="reloadUo(rimborsoMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.uo-spesa.placeholder' | translate}}" ng-model="rimborsoMissioneModel.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
+                    <select ng-disabled="!rimborsoMissioneModel.cdsSpesa || validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" ng-change="reloadUo(rimborsoMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.uo-spesa.placeholder' | translate}}" ng-model="rimborsoMissioneModel.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
                         </span>
                     </p>
             </form>
