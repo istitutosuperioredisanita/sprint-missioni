@@ -340,7 +340,10 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setStatoFlusso(rimborsoMissione.getStatoFlusso());
 			rimborsoMissioneDB.setCdrSpesa(rimborsoMissione.getCdrSpesa());
 			rimborsoMissioneDB.setCdsSpesa(rimborsoMissione.getCdsSpesa());
-			rimborsoMissioneDB.setUoSpesa(rimborsoMissione.getUoSpesa());
+			if (rimborsoMissione.getUoSpesa() != null && rimborsoMissioneDB.getUoSpesa() != null && 
+					rimborsoMissione.getUoSpesa() != rimborsoMissioneDB.getUoSpesa()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare la uo di Spesa. Nel caso fosse necessaria la modifica è necessario cancellare il rimborso missione e reinserirlo.");
+			}
 			rimborsoMissioneDB.setCdsCompetenza(rimborsoMissione.getCdsCompetenza());
 			rimborsoMissioneDB.setUoCompetenza(rimborsoMissione.getUoCompetenza());
 			rimborsoMissioneDB.setDomicilioFiscaleRich(rimborsoMissione.getDomicilioFiscaleRich());
@@ -350,12 +353,6 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
 			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
 			if (confirm){
-	    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
-	    		if (istituto.isAttivaGestioneResponsabileModulo()){
-	    			if (StringUtils.isEmpty(rimborsoMissioneDB.getPgProgetto())){
-	    				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-	    			}
-    			}
 				aggiornaValidazione(rimborsoMissioneDB);
 			} else {
 				rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
@@ -423,6 +420,7 @@ public class RimborsoMissioneService {
 		controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
     	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare()){
     		cmisRimborsoMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), rimborsoMissioneDB);
+    		rimborsoMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_RIMBORSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_RIMBORSO_FROM_CMIS));
     	}
     	rimborsoMissioneDB.setRimborsoMissioneDettagli(null);
     	rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissioneDB);

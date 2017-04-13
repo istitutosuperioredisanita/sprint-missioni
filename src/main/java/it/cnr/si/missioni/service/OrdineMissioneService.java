@@ -681,7 +681,7 @@ public class OrdineMissioneService {
 		
     	if (confirm){
     		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-    		if (istituto.isAttivaGestioneResponsabileModulo()){
+    		if (istituto != null && istituto.isAttivaGestioneResponsabileModulo()){
     			if (StringUtils.isEmpty(ordineMissioneDB.getResponsabileGruppo())){
     				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
     			}
@@ -693,6 +693,7 @@ public class OrdineMissioneService {
     			}
     		}
         	ordineMissioneDB.setStato(Costanti.STATO_CONFERMATO);
+        	
     	} 
 
     	ordineMissioneDB.setToBeUpdated();
@@ -704,6 +705,7 @@ public class OrdineMissioneService {
 
     	if (confirm && !ordineMissioneDB.isMissioneDaValidare()){
     		cmisOrdineMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneDB);
+        	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
     	}
 		ordineMissioneDB = (OrdineMissione)crudServiceBean.modificaConBulk(principal, ordineMissioneDB);
     	
