@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -133,6 +134,12 @@ public class RimborsoMissioneService {
     @Autowired
     private RabbitMQService rabbitMQService;
 
+	@Autowired
+	private MailService mailService;
+
+	@Value("${spring.mail.messages.ritornoMissioneMittente.oggetto}")
+    private String subjectReturnToSenderOrdine;
+    
     @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -287,6 +294,7 @@ public class RimborsoMissioneService {
     public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm)  throws ComponentException{
 
     	RimborsoMissione rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
+       	boolean isRitornoMissioneMittente = false;
 
 		if (rimborsoMissioneDB==null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
@@ -332,6 +340,7 @@ public class RimborsoMissioneService {
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
 			if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isMissioneDaValidare()) {
 				rimborsoMissioneDB.setStato(Costanti.STATO_INSERITO);
+				isRitornoMissioneMittente = true;
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un rimborso missione se è stato già inviato al flusso.");
 			}
@@ -427,8 +436,25 @@ public class RimborsoMissioneService {
     	
     	log.debug("Updated Information for Rimborso Missione: {}", rimborsoMissioneDB);
 
+    	if (isRitornoMissioneMittente){
+    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, rimborsoMissioneDB), false, true, getEmail(rimborsoMissioneDB.getUidInsert()));
+    	}
     	return rimborsoMissioneDB;
     }
+
+    private String getEmail(String user){
+		Account utente = accountService.loadAccountFromRest(user);
+		return utente.getEmailComunicazioni();
+    }
+
+    private String getNominativo(String user){
+		Account utente = accountService.loadAccountFromRest(user);
+		return utente.getCognome()+ " "+ utente.getNome();
+    }
+
+	private String getTextMailReturnToSender(Principal principal, RimborsoMissione rimborsoMissione) {
+		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per apportare delle correzioni.";
+	}
 
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){

@@ -715,7 +715,7 @@ public class OrdineMissioneService {
     		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(ordineMissioneDB), false, true, getEmail(ordineMissione.getResponsabileGruppo()));
     	}
     	if (isRitornoMissioneMittente){
-    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, ordineMissioneDB), false, true, getEmail(ordineMissione.getUidInsert()));
+    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, ordineMissioneDB), false, true, getEmail(ordineMissioneDB.getUidInsert()));
     	}
 		return ordineMissioneDB;
     }
@@ -749,7 +749,7 @@ public class OrdineMissioneService {
 		if (ordineMissione.getResponsabileGruppo() != null){
 			return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata restituito dal responsabile del gruppo "+getNominativo(ordineMissione.getResponsabileGruppo())+" per apportare delle correzioni.";
 		} else {
-			return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata respinto da "+principal.getName()+" per apportare delle correzioni.";
+			return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per apportare delle correzioni.";
 		}
 	}
 
