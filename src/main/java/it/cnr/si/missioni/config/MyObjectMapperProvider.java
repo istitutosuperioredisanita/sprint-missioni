@@ -3,6 +3,7 @@ package it.cnr.si.missioni.config;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 @Configuration
+@EnableRabbit
 public class MyObjectMapperProvider {
  
 	public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");

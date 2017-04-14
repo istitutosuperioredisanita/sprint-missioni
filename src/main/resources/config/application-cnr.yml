@@ -65,7 +65,7 @@ spring:
         exchange: missioni
         routing-key: some-routing-keyz
         consumer:
-            name: pisa
+            name: missioni-loopback
 
 ajp:
     port: 8009
