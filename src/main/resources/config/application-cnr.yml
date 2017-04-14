@@ -58,12 +58,14 @@ spring:
                 oggetto: Missioni. Ordine di Missione reinviato al mittente.
 
     rabbitmq:
-        host: as4dock.si.cnr.it
+        host: rabbitmq.cedrc.cnr.it
         username: cnr
         password: bubbazza
         virtualHost: missioni
         exchange: missioni
         routing-key: some-routing-keyz
+        consumer:
+            name: pisa
 
 ajp:
     port: 8009

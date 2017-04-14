@@ -35,13 +35,12 @@ public class RabbitMQService {
 		
 		try {
 			String json = om.writeValueAsString(missione);
-			LOGGER.info("Sending Queue {}", json);
+			LOGGER.info("JSON invio coda {}", json);
 			this.rabbitTemplate.convertAndSend(exchange,
 					Utility.nvl(routingKey), json);
+			LOGGER.info("Coda Inviata");
 		} catch (JsonProcessingException e) {
 			LOGGER.error("json error {}", missione, e);
-
-
 		}
 	}
 
