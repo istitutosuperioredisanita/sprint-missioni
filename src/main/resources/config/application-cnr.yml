@@ -62,7 +62,7 @@ spring:
 #        host: missioni-rabbit.test.si.cnr.it
         username: cnr
         password: bubbazza
-        virtualHost: missioni-prova
+        virtualHost: missioni
         exchange: missioni
         routing-key: 
         consumer:
