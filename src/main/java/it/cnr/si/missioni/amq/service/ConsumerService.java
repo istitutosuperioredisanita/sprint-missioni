@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Service;
 
 @RabbitListener(queues = "${spring.rabbitmq.consumer.name}")
 @Configuration

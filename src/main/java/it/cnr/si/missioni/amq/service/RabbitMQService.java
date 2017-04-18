@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,12 +37,23 @@ public class RabbitMQService {
 		try {
 			String json = om.writeValueAsString(missione);
 			LOGGER.info("JSON invio coda {}", json);
+			String routingKeySede = buildRoutingKey(missione);
 			this.rabbitTemplate.convertAndSend(exchange,
-					Utility.nvl(routingKey), json);
+					Utility.nvl(routingKeySede), json);
 			LOGGER.info("Coda Inviata");
 		} catch (JsonProcessingException e) {
 			LOGGER.error("json error {}", missione, e);
 		}
+	}
+
+	private String buildRoutingKey(Missione missione) {
+		String routingKeySede = null;
+		if (StringUtils.isEmpty(routingKey)){
+			routingKeySede = missione.getCodice_sede();
+		} else {
+			routingKeySede = routingKey + "." + missione.getCodice_sede();
+		}
+		return routingKeySede;
 	}
 
 }
