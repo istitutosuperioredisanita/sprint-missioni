@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 
 @RabbitListener(queues = "${spring.rabbitmq.consumer.name}")
@@ -12,10 +13,11 @@ import org.springframework.messaging.handler.annotation.Payload;
 public class ConsumerService {
 	private static final Logger LOGGER  = LoggerFactory.getLogger(ConsumerService.class);
 
+	
 	@RabbitHandler
-	public void process(@Payload String json) {
+	public void process(@Payload String json, @Header("amqp_receivedRoutingKey") String rk) {
 
-		LOGGER.info("JSON Verifica Coda {}", json);
+		LOGGER.info("JSON Verifica Coda {}", "Routing-key: "+rk+". Message:"+json);
 
 	}
 
