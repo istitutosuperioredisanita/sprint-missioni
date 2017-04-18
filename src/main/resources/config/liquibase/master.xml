@@ -10,7 +10,6 @@
     <include file="classpath:config/liquibase/changelog/20160219131400_add_column_competenza.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160219152200_add_column_validato.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160412145700_add_table_rimborso.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/20160627152200_add_column_note.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160906152200_add_column_partenza" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20161128152200_add_column_pg_banca.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20161107152200_add_column_inquadramento.xml" relativeToChangelogFile="false"/>
@@ -25,11 +24,10 @@
     <include file="classpath:config/liquibase/changelog/20170201112000_add_column_fondi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170203111000_add_column_motivo_auto_propria.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170222111000_add_column_ti_cd_ti_spesa.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/20170222165000_modify_column_note_differenze.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170309155000_modify_column_livello_rich.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170310083000_add_column_auto_servizio.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170313192200_add_column_cup.xml" relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog/20170418132200_add_column_responsabile_gruppo.xml" relativeToChangelogFile="false"/>
     <!-- JHipster will add liquibase changelogs here -->
 
 </databaseChangeLog>
