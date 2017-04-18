@@ -36,10 +36,9 @@ public class RabbitMQService {
 		
 		try {
 			String json = om.writeValueAsString(missione);
-			LOGGER.info("JSON invio coda {}", json);
 			String routingKeySede = buildRoutingKey(missione);
-			this.rabbitTemplate.convertAndSend(exchange,
-					Utility.nvl(routingKeySede), json);
+			LOGGER.info("JSON invio coda "+ "Routing-key: "+routingKeySede +". |||{}", json);
+			this.rabbitTemplate.convertAndSend(exchange, Utility.nvl(routingKeySede), json);
 			LOGGER.info("Coda Inviata");
 		} catch (JsonProcessingException e) {
 			LOGGER.error("json error {}", missione, e);

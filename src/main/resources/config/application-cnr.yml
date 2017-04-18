@@ -59,13 +59,14 @@ spring:
 
     rabbitmq:
         host: rabbitmq.cedrc.cnr.it
+#        host: missioni-rabbit.test.si.cnr.it
         username: cnr
         password: bubbazza
-        virtualHost: missioni
+        virtualHost: missioni-prova
         exchange: missioni
         routing-key: 
         consumer:
-            name: missioni-loopback
+            name: loopback
 
 ajp:
     port: 8009
