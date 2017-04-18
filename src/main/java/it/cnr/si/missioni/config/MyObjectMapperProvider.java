@@ -20,7 +20,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 @Configuration
-@EnableRabbit
 public class MyObjectMapperProvider {
  
 	public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
