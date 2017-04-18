@@ -58,8 +58,8 @@ spring:
                 oggetto: Missioni. Ordine di Missione reinviato al mittente.
 
     rabbitmq:
-        host: rabbitmq.cedrc.cnr.it
-#        host: missioni-rabbit.test.si.cnr.it
+#        host: rabbitmq.cedrc.cnr.it
+        host: missioni-rabbit.test.si.cnr.it
         username: cnr
         password: bubbazza
         virtualHost: missioni
