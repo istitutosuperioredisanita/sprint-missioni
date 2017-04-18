@@ -63,7 +63,7 @@ spring:
         password: bubbazza
         virtualHost: missioni
         exchange: missioni
-        routing-key: some-routing-keyz
+        routing-key: 
         consumer:
             name: missioni-loopback
 

@@ -101,10 +101,6 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "SPESE_TERZI_IMPORTO", length = 28, nullable = true)
     private BigDecimal speseTerziImporto;
 
-    @Size(min = 0, max = 2000)
-    @Column(name = "NOTE_DIFFERENZE_ORDINE", length = 2000, nullable = true)
-    private String noteDifferenzeOrdine;
-
     @Column(name = "PG_BANCA", length = 4, nullable = true)
     public Integer pgBanca;
 
@@ -649,13 +645,6 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.cdTerzoSigla = cdTerzoSigla;
 	}
 
-	public String getNoteDifferenzeOrdine() {
-		return noteDifferenzeOrdine;
-	}
-
-	public void setNoteDifferenzeOrdine(String noteDifferenzeOrdine) {
-		this.noteDifferenzeOrdine = noteDifferenzeOrdine;
-	}
 	public void setId(Long id) {
 		this.id = id;
 	}

@@ -1,11 +1,17 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
-    <changeSet author="missioni" id="20160627152200">
+    <changeSet author="missioni" id="20170418132200">
     	<addColumn 
-            tableName="RIMBORSO_MISSIONE">
-        <column name="NOTE_DIFFERENZE_ORDINE" type="character varying(1000)">
-            <constraints nullable="true"/>
-				</column>
+            tableName="ORDINE_MISSIONE">
+            <column name="RESPONSABILE_GRUPPO" type="character varying(250)">
+                <constraints nullable="true"/>
+            </column>
+    	</addColumn>
+    	<addColumn 
+            tableName="ORDINE_MISSIONE">
+            <column name="MATRICOLA" type="character varying(6)">
+                <constraints nullable="true"/>
+            </column>
     	</addColumn>
     </changeSet>
 </databaseChangeLog>
