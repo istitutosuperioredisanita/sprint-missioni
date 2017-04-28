@@ -349,7 +349,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setCdrSpesa(rimborsoMissione.getCdrSpesa());
 			rimborsoMissioneDB.setCdsSpesa(rimborsoMissione.getCdsSpesa());
 			if (rimborsoMissione.getUoSpesa() != null && rimborsoMissioneDB.getUoSpesa() != null && 
-					rimborsoMissione.getUoSpesa() != rimborsoMissioneDB.getUoSpesa()){
+					!rimborsoMissione.getUoSpesa().equals(rimborsoMissioneDB.getUoSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare la uo di Spesa. Nel caso fosse necessaria la modifica è necessario cancellare il rimborso missione e reinserirlo.");
 			}
 			rimborsoMissioneDB.setCdsCompetenza(rimborsoMissione.getCdsCompetenza());
