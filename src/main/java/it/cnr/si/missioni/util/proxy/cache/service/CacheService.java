@@ -1,5 +1,8 @@
 package it.cnr.si.missioni.util.proxy.cache.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.util.Introspector;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
@@ -20,14 +23,6 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +30,16 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class CacheService implements EnvironmentAware{
@@ -53,6 +51,9 @@ public class CacheService implements EnvironmentAware{
 	
     @Autowired
     CacheManager cacheManager;
+
+    @Autowired
+	private TaskExecutor taskExecutor;
     
 	@Autowired
 	private ConfigService configService;
@@ -63,7 +64,11 @@ public class CacheService implements EnvironmentAware{
 	
 	@PostConstruct
 	public void init(){
-		loadInCache();
+		taskExecutor.execute(() -> {
+			log.info("loading data from SIGLA rest");
+			loadInCache();
+			log.info("loading data from SIGLA rest finished.");
+		});
 	}
 
 	public void loadInCache() {
