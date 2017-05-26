@@ -628,7 +628,9 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if ($scope.validazione === 'S') {
             $scope.ordineMissioneModel.daValidazione = "S";
         }
-
+        if ($scope.ordineMissioneModel.uoSpesa){
+            $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.uoSpesa);
+        }
         $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
         dateInizioFineDiverse();
     }
