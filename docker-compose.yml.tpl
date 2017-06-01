@@ -16,6 +16,7 @@ services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
     network_mode: bridge
+    hostname: 4d3645a27c68 # in order to mount rabbitmq/lib/mnesia/rabbit@4d3645a27c68
     environment:
     - RABBITMQ_DEFAULT_USER=cnr
     - RABBITMQ_DEFAULT_PASS=bubbazza
