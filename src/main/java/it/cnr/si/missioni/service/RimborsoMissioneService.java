@@ -360,6 +360,7 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
 			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
 			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
+			rimborsoMissioneDB.setNoteSegreteria(rimborsoMissione.getNoteSegreteria());
 			if (confirm){
 				aggiornaValidazione(rimborsoMissioneDB);
 			} else {

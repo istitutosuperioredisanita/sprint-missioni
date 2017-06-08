@@ -652,6 +652,7 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setImportoPresunto(ordineMissione.getImportoPresunto());
 			ordineMissioneDB.setModulo(ordineMissione.getModulo());
 			ordineMissioneDB.setNote(ordineMissione.getNote());
+			ordineMissioneDB.setNoteSegreteria(ordineMissione.getNoteSegreteria());
 			ordineMissioneDB.setObbligoRientro(ordineMissione.getObbligoRientro());
 			if (confirm){
 				aggiornaValidazione(ordineMissioneDB);
