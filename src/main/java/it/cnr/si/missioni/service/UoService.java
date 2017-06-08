@@ -3,6 +3,7 @@ package it.cnr.si.missioni.service;
 import java.util.Iterator;
 import java.util.List;
 
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
@@ -12,6 +13,7 @@ import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,20 +28,31 @@ public class UoService {
     @Autowired
     AccountService accountService;
     
+    @Autowired
+    private Environment env;
+
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getDirettore(String uo) {
-    	DatiUo datiUo = configService.getDatiUo();
-    	if (datiUo != null && datiUo.getUo() != null){
-	    	for (Uo unita : datiUo.getUo()){
-	    		if (unita != null && unita.getCodiceUo().equals(uo)){
-	    			return accountService.loadAccountFromRest(unita.getUidDirettore());
-	    		}
-	    	}
-    	}
-    	return null;
+    	String direttore = null;
+    	if (isDevProfile()){
+			Uo unitaOrg = recuperoUo(uo);
+			if (unitaOrg != null && unitaOrg.getCodiceUo() != null && unitaOrg.getCodiceUo().equals(uo)){
+				direttore = unitaOrg.getUidDirettore();
+			}
+		} else {
+			direttore = accountService.getDirector(uo);		
+		}
+    	return accountService.loadAccountFromRest(direttore);
     }
 
-    public Uo recuperoUo(String codiceUo){
+	private boolean isDevProfile(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return true;
+   		}
+   		return false;
+	}
+
+	public Uo recuperoUo(String codiceUo){
     	DatiUo datiUo = configService.getDatiUo();
 		return recuperoUo(datiUo, codiceUo, false);
 	}

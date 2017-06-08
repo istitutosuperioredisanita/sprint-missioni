@@ -64,6 +64,10 @@
 					<title>Note Missione</title>
 					<type>d:text</type>
 				</property>
+				<property name="missioni:noteSegreteria">
+					<title>Note di Segreteria</title>
+					<type>d:text</type>
+				</property>
 				<property name="missioni:dataInizio">
 					<title>Data Inizio Missione</title>
 					<type>d:datetime</type>
