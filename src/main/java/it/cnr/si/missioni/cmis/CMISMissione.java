@@ -7,6 +7,7 @@ public class CMISMissione {
 	private String numero;
 	private String oggetto;
 	private String note;
+	private String noteSegreteria;
 	private String wfDescription;
 	private String wfDueDate;
 	private String priorita;
@@ -276,5 +277,11 @@ public class CMISMissione {
 	}
 	public void setPersonaSeguitoFlag(String personaSeguitoFlag) {
 		this.personaSeguitoFlag = personaSeguitoFlag;
+	}
+	public String getNoteSegreteria() {
+		return noteSegreteria;
+	}
+	public void setNoteSegreteria(String noteSegreteria) {
+		this.noteSegreteria = noteSegreteria;
 	}
 }

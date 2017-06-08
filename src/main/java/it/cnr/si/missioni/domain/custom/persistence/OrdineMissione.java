@@ -40,7 +40,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String CMIS_PROPERTY_NAME_MODULO = "missioni:modulo";                                             
 	public static final String CMIS_PROPERTY_NAME_OGGETTO = "missioni:oggetto";                                           
 	public static final String CMIS_PROPERTY_NAME_DESTINAZIONE = "missioni:destinazione";                                 
-	public static final String CMIS_PROPERTY_NAME_NOTE = "missioni:note";                                                 
+	public static final String CMIS_PROPERTY_NAME_NOTE = "missioni:note";
+	public static final String CMIS_PROPERTY_NAME_NOTE_SEGRETERIA = "missioni:noteSegreteria";
 	public static final String CMIS_PROPERTY_NAME_DATA_INIZIO = "missioni:dataInizio";                                    
 	public static final String CMIS_PROPERTY_NAME_DATA_FINE = "missioni:dataFine";                                        
 	public static final String CMIS_PROPERTY_NAME_DATA_INSERIMENTO = "missioni:dataInserimento";                          
@@ -51,7 +52,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO = "Allegati Anticipo";                        
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_ORDINE = "Ordine di Missione";                                  
 	public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE	= "cnrmissioni:descrizioneOrdine";                         
-	public static final String CMIS_PROPERTY_FLOW_NOTE	= "cnrmissioni:note";                                              
+	public static final String CMIS_PROPERTY_FLOW_NOTE	= "cnrmissioni:note";
+	public static final String CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA	= "cnrmissioni:noteSegreteria";
 	public static final String CMIS_PROPERTY_FLOW_DUE_DATE	= "bpm:workflowDueDate";                                       
 	public static final String CMIS_PROPERTY_FLOW_PRIORITY	= "bpm:workflowPriority";                                      
 	public static final String CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA	= "cnrmissioni:validazioneSpesaFlag";                
@@ -209,6 +211,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE", length = 1000, nullable = true)
     public String note;
+
+    @Size(min = 0, max = 1000)
+    @Column(name = "NOTE_SEGRETERIA", length = 1000, nullable = true)
+    public String noteSegreteria;
 
     @Size(min = 0, max = 28)
     @Column(name = "VOCE", length = 28, nullable = true)
@@ -1122,6 +1128,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 			return true;
 		}
 		return false;
+	}
+
+	public String getNoteSegreteria() {
+		return noteSegreteria;
+	}
+
+	public void setNoteSegreteria(String noteSegreteria) {
+		this.noteSegreteria = noteSegreteria;
 	}
 
 }

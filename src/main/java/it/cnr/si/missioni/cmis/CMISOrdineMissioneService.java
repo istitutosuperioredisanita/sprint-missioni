@@ -180,28 +180,16 @@ public class CMISOrdineMissioneService {
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
-			if (isDevProfile()){
-				userNameFirmatario = recuperoUidDirettoreUo(uoRichPerFlusso);
-			} else {
-				userNameFirmatario = accountService.getDirector(uoRichPerFlusso);		
-			}
+			userNameFirmatario = recuperoDirettore(uoRichPerFlusso);
 			
 			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 				if (uoCompetenzaPerFlusso != null){
-					if (isDevProfile()){
-						userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoCompetenzaPerFlusso);
-					} else {
-						userNameFirmatarioSpesa = accountService.getDirector(uoCompetenzaPerFlusso);
-					}
+					userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso);
 				} else {
 					userNameFirmatarioSpesa = userNameFirmatario;
 				}
 			} else {
-				if (isDevProfile()){
-					userNameFirmatarioSpesa = recuperoUidDirettoreUo(uoSpesaPerFlusso);
-				} else {
-					userNameFirmatarioSpesa = accountService.getDirector(uoSpesaPerFlusso);
-				}
+				userNameFirmatarioSpesa = recuperoDirettore(uoSpesaPerFlusso);
 			}
 			
 			GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
@@ -232,6 +220,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setNoleggioFlag(ordineMissione.getUtilizzoAutoNoleggio().equals("S") ? "true" : "false");
 			cmisOrdineMissione.setTrattamento(ordineMissione.decodeTrattamento());
 			cmisOrdineMissione.setNote(ordineMissione.getNote() == null ? "" : ordineMissione.getNote());
+			cmisOrdineMissione.setNoteSegreteria(ordineMissione.getNoteSegreteria() == null ? "" : ordineMissione.getNoteSegreteria());
 			cmisOrdineMissione.setOggetto(ordineMissione.getOggetto());
 			cmisOrdineMissione.setPriorita(ordineMissione.getPriorita());
 			cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "true" : "false");
@@ -272,6 +261,16 @@ public class CMISOrdineMissioneService {
 			return cmisOrdineMissione;
 		}
 		return null;
+	}
+
+	private String recuperoDirettore(String uo) {
+		String userNameFirmatario;
+		if (isDevProfile()){
+			userNameFirmatario = recuperoUidDirettoreUo(uo);
+		} else {
+			userNameFirmatario = accountService.getDirector(uo);		
+		}
+		return userNameFirmatario;
 	}
 	
 	private boolean isDevProfile(){
@@ -332,6 +331,7 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_OGGETTO, ordineMissione.getOggetto());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DESTINAZIONE, ordineMissione.getDestinazione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE, ordineMissione.getNote());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE_SEGRETERIA, ordineMissione.getNoteSegreteria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, DateUtils.getDate(ordineMissione.getDataInizioMissione()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, DateUtils.getDate(ordineMissione.getDataFineMissione()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, DateUtils.getDate(ordineMissione.getDataInserimento()));
@@ -407,6 +407,7 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TRATTAMENTO, cmisOrdineMissione.getTrattamento());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOLEGGIO, cmisOrdineMissione.getNoleggioFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisOrdineMissione.getNote());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisOrdineMissione.getNoteSegreteria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisOrdineMissione.getImpegnoNumero());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisOrdineMissione.getTaxiFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisOrdineMissione.getPersonaSeguitoFlag().equals("true"));
@@ -483,6 +484,7 @@ public class CMISOrdineMissioneService {
 
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
+			jGenerator.writeStringField("prop_cnrmissioni_note_segreteria" , cmisOrdineMissione.getNoteSegreteria());
 			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
 			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
 			jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
