@@ -39,6 +39,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public static final String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale";
 	public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati";
 	public static final String CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione";
+	public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO = "Allegati al Rimborso Missione";
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo";
 	public static final String CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id";
 	public static final String CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione";
@@ -48,6 +49,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public static final String CMIS_PROPERTY_FLOW_ANNO_MANDATO = "cnrmissioni:annoMandato";
 	public static final String CMIS_PROPERTY_FLOW_NUMERO_MANDATO = "cnrmissioni:numeroMandatoOk";
 	public static final String CMIS_PROPERTY_FLOW_IMPORTO_MANDATO = "cnrmissioni:importoMandato";
+	public static final String RIMBORSO_MISSIONE_ATTACHMENT_QUERY_CMIS = "missioni_rimborso_attachment";                      
 	public static final String CMIS_PROPERTY_ATTACHMENT_DOCUMENT = "D:missioni_rimborso_attachment:document";
 	public static final String CMIS_PROPERTY_NAME_DATA_INIZIO_MISSIONE_ESTERO = "missioni:dataInizioMissioneEstero";
 	public static final String CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero";

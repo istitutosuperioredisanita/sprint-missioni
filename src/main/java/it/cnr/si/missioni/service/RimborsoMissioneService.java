@@ -30,7 +30,9 @@ import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
@@ -1051,6 +1053,30 @@ public class RimborsoMissioneService {
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
 		map.put(fileName, printRimborsoMissione);
 		return map;
+	}
+
+	@Transactional(readOnly = true)
+	public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissione)
+			throws ComponentException {
+		if (idRimborsoMissione != null) {
+			RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
+			if (rimborsoMissione != null){
+				List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsRimborsoMissione(rimborsoMissione, idRimborsoMissione);
+				return lista;
+			}
+		}
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissione,
+			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
+		if (rimborsoMissione != null) {
+			return cmisRimborsoMissioneService.uploadAttachmentRimborsoMissione(principal, rimborsoMissione,idRimborsoMissione,
+					inputStream, name, mimeTypes);
+		}
+		return null;
 	}
 }
 
