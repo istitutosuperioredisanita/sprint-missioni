@@ -28,7 +28,9 @@ import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -327,12 +329,6 @@ public class OrdineMissioneService {
 	public String retrieveStateFromFlows(ResultFlows result) {
 		return result.getState();
 	}
-
-    @Transactional(readOnly = true)
-    public void uploadAllegatoOrdineMissione(Principal principal, Long idMissione, InputStream uploadedAllegatoInputStream, String fileName, String contentType) throws ComponentException {
-    	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
-    	cmisOrdineMissioneService.uploadAllegatoOrdineMissione(principal, ordineMissione, uploadedAllegatoInputStream, fileName, contentType);
-    }
 
     @Transactional(readOnly = true)
     public List<OrdineMissione> getOrdiniMissione(Principal principal, MissioneFilter filter, Boolean isServiceRest) throws ComponentException {
@@ -1002,5 +998,29 @@ public class OrdineMissioneService {
 		} else if (StringUtils.isEmpty(ordineMissione.getNumero())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Numero");
 		}
+	}
+
+	@Transactional(readOnly = true)
+	public List<CMISFileAttachment> getAttachments(Principal principal, Long idOrdineMissione)
+			throws ComponentException {
+		if (idOrdineMissione != null) {
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
+			if (ordineMissione != null){
+				List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsOrdineMissione(ordineMissione, idOrdineMissione);
+				return lista;
+			}
+		}
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	public CMISFileAttachment uploadAllegato(Principal principal, Long idOrdineMissione,
+			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
+		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
+		if (ordineMissione != null) {
+			return cmisOrdineMissioneService.uploadAttachmentOrdineMissione(principal, ordineMissione,idOrdineMissione,
+					inputStream, name, mimeTypes);
+		}
+		return null;
 	}
 }

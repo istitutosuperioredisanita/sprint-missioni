@@ -654,7 +654,7 @@ public class CMISRimborsoMissioneService {
 
 		cmisPath = createLastFolderDettaglioIfNotPresent(cmisPath, dettaglio);
 
-		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneDettaglio(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
 		try{
 			Document node = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,
@@ -685,7 +685,7 @@ public class CMISRimborsoMissioneService {
 	}
 
 
-	public Map<String, Object> createMetadataForFileRimborsoMissioneDettaglio(String currentLogin, String fileName, String tipoDocumento){
+	private Map<String, Object> createMetadataForFileRimborsoMissioneAllegati(String currentLogin, String fileName, String tipoDocumento){
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, RimborsoMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
 		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(fileName));
@@ -1048,4 +1048,83 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 	
+	public CmisPath buildFolderRimborsoMissione(RimborsoMissione rimborsoMissione) {
+		Folder folder = (Folder) recuperoFolderRimborsoMissione(rimborsoMissione);
+		CmisPath cmisPath;
+		if (folder == null){
+			cmisPath = createFolderRimborsoMissione(rimborsoMissione);
+		} else {
+			cmisPath = CmisPath.construct(folder.getPath());
+		}
+		return cmisPath;
+	}
+
+	public CMISFileAttachment uploadAttachmentRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Long idRimborsoMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
+		Document doc = salvaAllegatoRimborsoMissioneCMIS(principal, rimborsoMissione, inputStream, name, mimeTypes);
+		if (doc != null){
+			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+			cmisFileAttachment.setId(doc.getId());
+			cmisFileAttachment.setNomeFile(name);
+	        cmisFileAttachment.setIdMissione(idRimborsoMissione);
+			return cmisFileAttachment;
+		}
+		return null;
+	}
+
+	private Document salvaAllegatoRimborsoMissioneCMIS(Principal principal,
+			RimborsoMissione rimborsoMissione, InputStream stream, String fileName,MimeTypes mimeTypes) {
+		
+		CmisPath cmisPath = buildFolderRimborsoMissione(rimborsoMissione);
+
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
+		try{
+			Document node = missioniCMISService.restoreSimpleDocument(
+					metadataProperties,
+					stream,
+					mimeTypes.mimetype(),
+					fileName, 
+					cmisPath);
+			missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI.value());
+			missioniCMISService.makeVersionable(node);
+			return node;
+		} catch (Exception e) {
+			if (e.getCause() instanceof CmisConstraintException)
+				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+		}
+	}
+
+	public List<CMISFileAttachment> getAttachmentsRimborsoMissione(RimborsoMissione rimborsoMissione, Long idRimborsoMissione) {
+		ItemIterable<QueryResult> documents = getDocumentsRimborsoMissione(rimborsoMissione);
+		if (documents != null){
+	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
+	        for (QueryResult object : documents){
+	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+	        	cmisFileAttachment.setNomeFile(object.getPropertyValueById(PropertyIds.NAME));
+	        	cmisFileAttachment.setId(object.getPropertyValueById(PropertyIds.OBJECT_ID));
+	        	cmisFileAttachment.setNodeRef(object.getPropertyValueById(MissioniCMISService.ALFCMIS_NODEREF));
+	        	cmisFileAttachment.setIdMissione(idRimborsoMissione);
+	        	lista.add(cmisFileAttachment);
+	        }
+	        return lista;
+		}
+		return Collections.<CMISFileAttachment>emptyList();
+	}
+
+	public ItemIterable<QueryResult> getDocumentsRimborsoMissione(RimborsoMissione rimborsoMissione) {
+		Folder folder = recuperoFolderRimborsoMissione(rimborsoMissione);
+		if (folder != null){
+			return getDocuments(folder, OrdineMissione.ATTACHMENT_ALLEGATO_ORDINE_MISSIONE);
+		}
+		return null;
+	}
+	public ItemIterable<QueryResult> getDocuments(Folder node, String tipoFile){
+		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID);
+		StringBuilder query = new StringBuilder("select doc.cmis:objectId, doc.alfcmis:nodeRef, doc.cmis:name from cmis:document doc ");
+		query.append(" join "+RimborsoMissione.RIMBORSO_MISSIONE_ATTACHMENT_QUERY_CMIS+ tipoFile
+		+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
+		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
+		ItemIterable<QueryResult> results = missioniCMISService.search(query);
+		return results;
+	}
 }
