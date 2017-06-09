@@ -16,7 +16,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,14 +30,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.CMISFileAttachment;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.Costanti;
@@ -47,8 +47,6 @@ import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
-import it.cnr.si.web.rest.errors.ErrorConstants;
-import it.cnr.si.web.rest.errors.ErrorVM;
 
 /**
  * REST controller for managing the current user's account.
@@ -321,5 +319,60 @@ public class OrdineMissioneResource {
 			log.error("ERRORE jsonForPrintOrdineMissione",e);
 			throw new AwesomeException(Utility.getMessageException(e));
 		} 
+    }
+
+    @RequestMapping(value = "/rest/ordineMissione/viewAttachments/{idOrdineMissione}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getAttachments(HttpServletRequest request,
+    		@PathVariable Long idOrdineMissione) {
+        log.debug("REST request per visualizzare gli allegati dell'ordine di missione" );
+        try {
+            List<CMISFileAttachment> lista = ordineMissioneService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione);
+            return JSONResponseEntity.ok(lista);
+		} catch (ComponentException e) {
+			log.error("getAttachments", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		} 
+    }
+
+    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Timed
+    public ResponseEntity<?> uploadAllegati(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+        log.debug("REST request per l'upload di allegati dell'ordine di missione" );
+        if (idOrdineMissione != null){
+            	try {
+            		if (file != null && file.getContentType() != null){
+            			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
+            			if (mimeTypes == null){
+                			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
+            			} else {
+        					CMISFileAttachment cmisFileAttachment = ordineMissioneService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+        	                if (cmisFileAttachment != null){
+        	                    return JSONResponseEntity.ok(cmisFileAttachment);
+        	                } else {
+        	                	String error = "Non è stato possibile salvare il file.";
+        	        			log.error("uploadAllegatiOrdineMissione", error);
+        	                    return JSONResponseEntity.badRequest(error);
+        	                }
+            			}
+            		}else {
+	                	String error = "File vuoto o con tipo non specificato.";
+	        			log.error("uploadAllegatiOrdineMissione", error);
+	                    return JSONResponseEntity.badRequest(error);
+            		}
+            	} catch (Exception e1) {
+        			log.error("uploadAllegatiOrdineMissione", e1);
+                    return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
+				}
+    	} else {
+        	String error = "Id Dettaglio non valorizzato.";
+			log.error("uploadAllegatiOrdineMissione", error);
+            return JSONResponseEntity.badRequest(error);
+    	}
     }
 }

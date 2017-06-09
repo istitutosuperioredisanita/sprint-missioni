@@ -280,6 +280,4 @@ public class OrdineMissioneAnticipoResource {
             return JSONResponseEntity.badRequest(error);
     	}
     }
-
-
 }
