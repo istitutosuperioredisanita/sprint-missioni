@@ -285,7 +285,7 @@ public class OrdineMissioneService {
 
 	public void aggiornaOrdineMissioneRespinto(Principal principal, ResultFlows result,
 			OrdineMissione ordineMissioneDaAggiornare) throws ComponentException {
-		aggiornaValidazione(ordineMissioneDaAggiornare);
+		aggiornaValidazione(principal, ordineMissioneDaAggiornare);
 		ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
 		ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
@@ -555,7 +555,7 @@ public class OrdineMissioneService {
     		ordineMissione.setPersonaleAlSeguito("N");
     	}
     	
-    	aggiornaValidazione(ordineMissione);
+    	aggiornaValidazione(principal, ordineMissione);
     	
     	ordineMissione.setStato(Costanti.STATO_INSERITO);
     	ordineMissione.setStatoFlusso(Costanti.STATO_INSERITO);
@@ -620,7 +620,7 @@ public class OrdineMissioneService {
 			if (!confirm){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
 			}
-			aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
+			aggiornaDatiOrdineMissione(principal, ordineMissione, confirm, ordineMissioneDB);
 			ordineMissioneDB.setValidato("S");
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
 			if (ordineMissione.getEsercizioOriginaleObbligazione() == null || ordineMissione.getPgObbligazione() == null ){
@@ -658,7 +658,7 @@ public class OrdineMissioneService {
 			}
 
 		} else {
-			aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
+			aggiornaDatiOrdineMissione(principal, ordineMissione, confirm, ordineMissioneDB);
 		}
 		
     	if (confirm){
@@ -703,7 +703,7 @@ public class OrdineMissioneService {
 		return ordineMissioneDB;
     }
 
-	private void aggiornaDatiOrdineMissione(OrdineMissione ordineMissione, Boolean confirm,
+	private void aggiornaDatiOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean confirm,
 			OrdineMissione ordineMissioneDB) {
 		ordineMissioneDB.setStato(ordineMissione.getStato());
 		ordineMissioneDB.setStatoFlusso(ordineMissione.getStatoFlusso());
@@ -724,7 +724,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setNoteSegreteria(ordineMissione.getNoteSegreteria());
 		ordineMissioneDB.setObbligoRientro(ordineMissione.getObbligoRientro());
 		if (confirm){
-			aggiornaValidazione(ordineMissioneDB);
+			aggiornaValidazione(principal, ordineMissioneDB);
 		} else {
 			ordineMissioneDB.setValidato(ordineMissione.getValidato());
 		}
