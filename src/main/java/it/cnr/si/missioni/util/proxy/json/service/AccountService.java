@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -45,6 +47,29 @@ public class AccountService {
 			}
 		}
 		return null;
+	}
+	
+	public List<UsersSpecial> getUserSpecialForUo(String uo){
+		List<UsersSpecial> listaUtenti = new ArrayList<UsersSpecial>();
+		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
+			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
+				UsersSpecial user = iteratorUsers.next();
+				if ((user.getAll() != null && user.getAll().equals("S")) || (isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo))){
+					listaUtenti.add(user);
+				}
+			}
+		}
+		return listaUtenti;
+	}
+	
+	public Boolean isUtenteAbilitatoUo(List<UoForUsersSpecial> listUo, String uo){
+		for (Iterator<UoForUsersSpecial> iteratorUo = listUo.iterator(); iteratorUo.hasNext();){
+			UoForUsersSpecial uoForUsersSpecial = iteratorUo.next();
+			if (uoForUsersSpecial.getCodice_uo() != null && uoForUsersSpecial.getCodice_uo().equals(uo)){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public String manageResponseForAccountRest(String body) {

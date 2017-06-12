@@ -701,6 +701,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 	                    ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
+                            $scope.viewAttachments($scope.ordineMissioneModel.id);
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -718,6 +719,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         ui.ok_message("Ordine di Missione sbloccato.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
+                            $scope.viewAttachments($scope.ordineMissioneModel.id);
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -735,6 +737,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         ui.ok_message("Ordine di Missione inviato al responsabile del gruppo.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
+                            $scope.viewAttachments($scope.ordineMissioneModel.id);
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -752,6 +755,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
+                            $scope.viewAttachments($scope.ordineMissioneModel.id);
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -769,6 +773,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         ui.ok_message("Ordine di Missione Completato.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
+                            $scope.viewAttachments($scope.ordineMissioneModel.id);
                             $scope.inizializzaFormPerModifica();
                         });
                     },
@@ -849,6 +854,52 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
       }
     }
 
+    $scope.confirmDeleteAttachment = function (attachment) {
+        ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
+    }
+
+    var deleteAttachment = function (attachment) {
+        $rootScope.salvataggio = true;
+        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
+        var y = x.then(function (result) {
+            var attachments = $scope.ordineMissioneModel.attachments;
+            if (attachments && Object.keys(attachments).length > 0){
+                var newAttachments = attachments.filter(function(el){
+                    return el.id !== attachment.id;
+                });
+                $scope.ordineMissioneModel.attachments = newAttachments;
+                if (Object.keys(newAttachments).length = 0){
+                    $scope.ordineMissioneModel.attachmentsExists = false;
+                }
+            }
+            $rootScope.salvataggio = false;
+            ui.ok();
+        });
+        x.error(function (data) {
+            $rootScope.salvataggio = false;
+        });
+    }
+
+    $scope.viewAttachments = function (idOrdineMissione) {
+        if (!$scope.ordineMissioneModel.isFireSearchAttachments){
+            $http.get('app/rest/ordineMissione/viewAttachments/' + idOrdineMissione).then(function (data) {
+                $scope.ordineMissioneModel.isFireSearchAttachments = true;
+                var attachments = data.data;
+                if (attachments && Object.keys(attachments).length > 0){
+                    $scope.attachmentsExists = true;  
+                } else {
+                    $scope.attachmentsExists = false;
+                }
+                $scope.ordineMissioneModel.attachments = attachments;
+            }, function () {
+                $scope.ordineMissioneModel.isFireSearchAttachments = false;
+                $scope.ordineMissioneModel.attachmentsExists = false;
+                $scope.ordineMissioneModel.attachments = {};
+            });
+        }
+//        $scope.anticipoOrdineMissioneModel.viewAttachment = true;
+    }
+
     $scope.doPrintOrdineMissione = function(idOrdineMissione){
       $scope.ordineMissioneModel.stampaInCorso=true;
       $http.get('app/rest/ordineMissione/print/json',{params: {idMissione: idOrdineMissione}})
@@ -874,6 +925,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
                         $scope.ordineMissioneModel = value;
+                        $scope.viewAttachments($scope.ordineMissioneModel.id);
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;
@@ -887,6 +939,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $scope.ordineMissioneModel = value;
                         $scope.elencoPersone = null;
                         $scope.uoForUsersSpecial = null;
+                        $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = false;
                         $scope.inizializzaFormPerModifica();
                         var path = $location.path();
                         $location.path(path+'/'+$scope.ordineMissioneModel.id);
@@ -929,6 +982,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.getRestForResponsabileGruppo(model.uoSpesa);
                 $scope.restCapitoli(model.anno);
                 $scope.ordineMissioneModel = model;
+                $scope.viewAttachments($scope.ordineMissioneModel.id);
                 $scope.inizializzaFormPerModifica();
             }
         });
