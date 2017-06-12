@@ -63,7 +63,7 @@
 .color-celeste-avion {
   background-color: #b0b2ff !important;
   border-color: #b0b2ff !important;
-  color: #fff;
+  color: #fff !important;
 }
 
 .align-left {
