@@ -324,6 +324,7 @@ public class RimborsoMissioneService {
 			if (!confirm){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un rimborso di missione durante la fase di validazione. Rieseguire la ricerca.");
 			}
+			aggiornaDatiRimborsoMissione(rimborsoMissione, confirm, rimborsoMissioneDB);
 			rimborsoMissioneDB.setValidato("S");
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			if (rimborsoMissione.getEsercizioOriginaleObbligazione() == null || rimborsoMissione.getPgObbligazione() == null ){
@@ -346,69 +347,7 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un rimborso missione se è stato già inviato al flusso.");
 			}
 		} else {
-			rimborsoMissioneDB.setStato(rimborsoMissione.getStato());
-			rimborsoMissioneDB.setStatoFlusso(rimborsoMissione.getStatoFlusso());
-			rimborsoMissioneDB.setCdrSpesa(rimborsoMissione.getCdrSpesa());
-			rimborsoMissioneDB.setCdsSpesa(rimborsoMissione.getCdsSpesa());
-			if (rimborsoMissione.getUoSpesa() != null && rimborsoMissioneDB.getUoSpesa() != null && 
-					!rimborsoMissione.getUoSpesa().equals(rimborsoMissioneDB.getUoSpesa())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare la uo di Spesa. Nel caso fosse necessaria la modifica è necessario cancellare il rimborso missione e reinserirlo.");
-			}
-			rimborsoMissioneDB.setCdsCompetenza(rimborsoMissione.getCdsCompetenza());
-			rimborsoMissioneDB.setUoCompetenza(rimborsoMissione.getUoCompetenza());
-			rimborsoMissioneDB.setDomicilioFiscaleRich(rimborsoMissione.getDomicilioFiscaleRich());
-			rimborsoMissioneDB.setDataInizioMissione(rimborsoMissione.getDataInizioMissione());
-			rimborsoMissioneDB.setDataFineMissione(rimborsoMissione.getDataFineMissione());
-			rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
-			rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
-			rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
-			rimborsoMissioneDB.setNoteSegreteria(rimborsoMissione.getNoteSegreteria());
-			if (confirm){
-				aggiornaValidazione(rimborsoMissioneDB);
-			} else {
-				rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
-			}
-			rimborsoMissioneDB.setOggetto(rimborsoMissione.getOggetto());
-			rimborsoMissioneDB.setTipoMissione(rimborsoMissione.getTipoMissione());
-			rimborsoMissioneDB.setVoce(rimborsoMissione.getVoce());
-			rimborsoMissioneDB.setTrattamento(rimborsoMissione.getTrattamento());
-			rimborsoMissioneDB.setNazione(rimborsoMissione.getNazione());
-
-			rimborsoMissioneDB.setNoteUtilizzoTaxiNoleggio(rimborsoMissione.getNoteUtilizzoTaxiNoleggio());
-			rimborsoMissioneDB.setUtilizzoAutoNoleggio(rimborsoMissione.getUtilizzoAutoNoleggio());
-			rimborsoMissioneDB.setUtilizzoTaxi(rimborsoMissione.getUtilizzoTaxi());
-			rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
-			rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
-			rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
-			rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
-
-			rimborsoMissioneDB.setDataInizioEstero(rimborsoMissione.getDataInizioEstero());
-			rimborsoMissioneDB.setDataFineEstero(rimborsoMissione.getDataFineEstero());
-			rimborsoMissioneDB.setCdTerzoSigla(rimborsoMissione.getCdTerzoSigla());
-			rimborsoMissioneDB.setModpag(rimborsoMissione.getModpag());
-			rimborsoMissioneDB.setIban(rimborsoMissione.getIban());
-			rimborsoMissioneDB.setPgBanca(rimborsoMissione.getPgBanca());
-			rimborsoMissioneDB.setTipoPagamento(rimborsoMissione.getTipoPagamento());
-			rimborsoMissioneDB.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto());
-			rimborsoMissioneDB.setAnticipoAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato());
-			rimborsoMissioneDB.setAnticipoNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato());
-			rimborsoMissioneDB.setAnticipoImporto(rimborsoMissione.getAnticipoImporto());
-			rimborsoMissioneDB.setAltreSpeseAntDescrizione(rimborsoMissione.getAltreSpeseAntDescrizione());
-			rimborsoMissioneDB.setAltreSpeseAntImporto(rimborsoMissione.getAltreSpeseAntImporto());
-			rimborsoMissioneDB.setSpeseTerziImporto(rimborsoMissione.getSpeseTerziImporto());
-			rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
-//			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
-			rimborsoMissioneDB.setInquadramento(rimborsoMissione.getInquadramento());
-			rimborsoMissioneDB.setCdCdsSigla(rimborsoMissione.getCdCdsSigla());
-			rimborsoMissioneDB.setCdUoSigla(rimborsoMissione.getCdUoSigla());
-			rimborsoMissioneDB.setEsercizioSigla(rimborsoMissione.getEsercizioSigla());
-			rimborsoMissioneDB.setPgMissioneSigla(rimborsoMissione.getPgMissioneSigla());
-			rimborsoMissioneDB.setStatoInvioSigla(rimborsoMissione.getStatoInvioSigla());
-			rimborsoMissioneDB.setCdTipoRapporto(rimborsoMissione.getCdTipoRapporto());
-			rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
-			rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
-			rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
-//			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
+			aggiornaDatiRimborsoMissione(rimborsoMissione, confirm, rimborsoMissioneDB);
 		}
 		
 		
@@ -443,6 +382,73 @@ public class RimborsoMissioneService {
     	}
     	return rimborsoMissioneDB;
     }
+
+	private void aggiornaDatiRimborsoMissione(RimborsoMissione rimborsoMissione, Boolean confirm,
+			RimborsoMissione rimborsoMissioneDB) {
+		rimborsoMissioneDB.setStato(rimborsoMissione.getStato());
+		rimborsoMissioneDB.setStatoFlusso(rimborsoMissione.getStatoFlusso());
+		rimborsoMissioneDB.setCdrSpesa(rimborsoMissione.getCdrSpesa());
+		rimborsoMissioneDB.setCdsSpesa(rimborsoMissione.getCdsSpesa());
+		if (rimborsoMissione.getUoSpesa() != null && rimborsoMissioneDB.getUoSpesa() != null && 
+				!rimborsoMissione.getUoSpesa().equals(rimborsoMissioneDB.getUoSpesa())){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare la uo di Spesa. Nel caso fosse necessaria la modifica è necessario cancellare il rimborso missione e reinserirlo.");
+		}
+		rimborsoMissioneDB.setCdsCompetenza(rimborsoMissione.getCdsCompetenza());
+		rimborsoMissioneDB.setUoCompetenza(rimborsoMissione.getUoCompetenza());
+		rimborsoMissioneDB.setDomicilioFiscaleRich(rimborsoMissione.getDomicilioFiscaleRich());
+		rimborsoMissioneDB.setDataInizioMissione(rimborsoMissione.getDataInizioMissione());
+		rimborsoMissioneDB.setDataFineMissione(rimborsoMissione.getDataFineMissione());
+		rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
+		rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
+		rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
+		rimborsoMissioneDB.setNoteSegreteria(rimborsoMissione.getNoteSegreteria());
+		if (confirm){
+			aggiornaValidazione(rimborsoMissioneDB);
+		} else {
+			rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
+		}
+		rimborsoMissioneDB.setOggetto(rimborsoMissione.getOggetto());
+		rimborsoMissioneDB.setTipoMissione(rimborsoMissione.getTipoMissione());
+		rimborsoMissioneDB.setVoce(rimborsoMissione.getVoce());
+		rimborsoMissioneDB.setTrattamento(rimborsoMissione.getTrattamento());
+		rimborsoMissioneDB.setNazione(rimborsoMissione.getNazione());
+
+		rimborsoMissioneDB.setNoteUtilizzoTaxiNoleggio(rimborsoMissione.getNoteUtilizzoTaxiNoleggio());
+		rimborsoMissioneDB.setUtilizzoAutoNoleggio(rimborsoMissione.getUtilizzoAutoNoleggio());
+		rimborsoMissioneDB.setUtilizzoTaxi(rimborsoMissione.getUtilizzoTaxi());
+		rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+		rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+		rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
+		rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
+
+		rimborsoMissioneDB.setDataInizioEstero(rimborsoMissione.getDataInizioEstero());
+		rimborsoMissioneDB.setDataFineEstero(rimborsoMissione.getDataFineEstero());
+		rimborsoMissioneDB.setCdTerzoSigla(rimborsoMissione.getCdTerzoSigla());
+		rimborsoMissioneDB.setModpag(rimborsoMissione.getModpag());
+		rimborsoMissioneDB.setIban(rimborsoMissione.getIban());
+		rimborsoMissioneDB.setPgBanca(rimborsoMissione.getPgBanca());
+		rimborsoMissioneDB.setTipoPagamento(rimborsoMissione.getTipoPagamento());
+		rimborsoMissioneDB.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto());
+		rimborsoMissioneDB.setAnticipoAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato());
+		rimborsoMissioneDB.setAnticipoNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato());
+		rimborsoMissioneDB.setAnticipoImporto(rimborsoMissione.getAnticipoImporto());
+		rimborsoMissioneDB.setAltreSpeseAntDescrizione(rimborsoMissione.getAltreSpeseAntDescrizione());
+		rimborsoMissioneDB.setAltreSpeseAntImporto(rimborsoMissione.getAltreSpeseAntImporto());
+		rimborsoMissioneDB.setSpeseTerziImporto(rimborsoMissione.getSpeseTerziImporto());
+		rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
+//			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
+		rimborsoMissioneDB.setInquadramento(rimborsoMissione.getInquadramento());
+		rimborsoMissioneDB.setCdCdsSigla(rimborsoMissione.getCdCdsSigla());
+		rimborsoMissioneDB.setCdUoSigla(rimborsoMissione.getCdUoSigla());
+		rimborsoMissioneDB.setEsercizioSigla(rimborsoMissione.getEsercizioSigla());
+		rimborsoMissioneDB.setPgMissioneSigla(rimborsoMissione.getPgMissioneSigla());
+		rimborsoMissioneDB.setStatoInvioSigla(rimborsoMissione.getStatoInvioSigla());
+		rimborsoMissioneDB.setCdTipoRapporto(rimborsoMissione.getCdTipoRapporto());
+		rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
+		rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
+		rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
+//			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
+	}
 
     private String getEmail(String user){
 		Account utente = accountService.loadAccountFromRest(user);

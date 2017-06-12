@@ -347,6 +347,30 @@
             </div>
   </div>
 </div>
+<form class="form-inline col-md-12" role="form" id="missioni">
+<div class="panel panel-default" ng-if="ordineMissioneModel.id && (ordineMissioneModel.isFireSearchAttachments == true || ordineMissioneModel.isFireSearchAttachments == false )">
+  <div class="panel-heading color-verde-chiaro text-center">
+    <h1 class="panel-title">Allegati</h1>
+  </div>
+  <div class="panel-body my-panel-body">
+          <div>
+            <ul class="list-unstyled ordineMissioneModel.attachments" ng-show="ordineMissioneModel.attachmentsExists=true">
+              <li ng-repeat="attachment in ordineMissioneModel.attachments">
+                <span class="glyphicon glyphicon-download-alt"></span>
+                <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                <button ng-show="!disabilita  && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              </li>
+            </ul>
+            <h4 >
+              <div class="row fileupload-buttonbar">
+                <span ng-hide="ordineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="ordineMissioneModel.isFireSearchAttachments" url="app/rest/ordineMissione/uploadAllegati/{{ordineMissioneModel.id}}" name="file" auto-upload="true" oggetto="ordineMissioneModel" size-limit="500000"></ng-upload-form>
+              </div>
+            </h4>
+          </div> 
+  </div>
+</div>
+</form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
                     <div class="col-md-4" ng-show="!validazione && !disabilitaOrdineMissione">
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>

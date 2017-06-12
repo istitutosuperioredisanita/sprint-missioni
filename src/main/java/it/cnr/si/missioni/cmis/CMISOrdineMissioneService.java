@@ -484,7 +484,7 @@ public class CMISOrdineMissioneService {
 
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
-			jGenerator.writeStringField("prop_cnrmissioni_note_segreteria" , cmisOrdineMissione.getNoteSegreteria());
+			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisOrdineMissione.getNoteSegreteria());
 			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
 			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
 			jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
@@ -501,6 +501,9 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_userNameResponsabileModulo" , cmisOrdineMissione.getUserNameResponsabileModulo());
 			jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisOrdineMissione.getUserNamePrimoFirmatario());
 			jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisOrdineMissione.getUserNameFirmatarioSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
 			jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisOrdineMissione.getUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisOrdineMissione.getDescrizioneUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisOrdineMissione.getUoSpesa());

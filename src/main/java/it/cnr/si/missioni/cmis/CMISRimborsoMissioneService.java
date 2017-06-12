@@ -204,26 +204,20 @@ public class CMISRimborsoMissioneService {
 		String uoCompetenzaPerFlusso = Utility.replace(rimborsoMissione.getUoCompetenza(), ".", "");
 		String uoSpesaPerFlusso = Utility.replace(rimborsoMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(rimborsoMissione.getUoRich(), ".", "");
-		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 		String userNameFirmatario;
 		String userNameFirmatarioSpesa;
 		userNameFirmatario = recuperoDirettore(uoRichPerFlusso);
 		
-		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-			if (uoCompetenzaPerFlusso != null){
-				userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso);
-			} else {
-				userNameFirmatarioSpesa = userNameFirmatario;
-			}
+		if (uoCompetenzaPerFlusso != null){
+			userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso);
 		} else {
-			userNameFirmatarioSpesa = recuperoDirettore(uoSpesaPerFlusso);
+			userNameFirmatarioSpesa = userNameFirmatario;
 		}
 		
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
 		dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
 		dataScadenzaFlusso.add(Calendar.DATE, 14);
 		dataScadenzaFlusso.add(Calendar.MONTH, 1);
-
 
 		cmisRimborsoMissione.setAnno(rimborsoMissione.getAnno().toString());
 		cmisRimborsoMissione.setNumero(rimborsoMissione.getNumero().toString());
@@ -776,7 +770,7 @@ public class CMISRimborsoMissioneService {
 			}
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisRimborsoMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisRimborsoMissione.getNote());
-			jGenerator.writeStringField("prop_cnrmissioni_note_segreteria" , cmisRimborsoMissione.getNoteSegreteria());
+			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisRimborsoMissione.getNoteSegreteria());
 			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisRimborsoMissione.getWfDescription());
 			jGenerator.writeStringField("prop_bpm_sendEMailNotifications" , "false");
 			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisRimborsoMissione.getWfDueDate());
@@ -791,6 +785,9 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisRimborsoMissione.getUsernameRichiedente());
 			jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisRimborsoMissione.getUserNamePrimoFirmatario());
 			jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisRimborsoMissione.getUserNameFirmatarioSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
 			jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisRimborsoMissione.getUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisRimborsoMissione.getDescrizioneUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisRimborsoMissione.getUoSpesa());

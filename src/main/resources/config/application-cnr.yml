@@ -54,6 +54,10 @@ spring:
                 testo: Si segnala che la comunicazione a SIGLA del rimborso missione 
             invioResponsabileGruppo:
                 oggetto: Missioni. Invio Ordine di Missione per Autorizzazione.
+            invioOrdinePerValidazioneDatiFinanziari:
+                oggetto: Missioni. Invio Ordine di Missione per Verifica dati Finanziari.
+            invioRimborsoPerValidazioneDatiFinanziari:
+                oggetto: Missioni. Invio Rimborso Missione per Verifica dati Finanziari.
             ritornoMissioneMittente:
                 oggetto: Missioni. Ordine di Missione reinviato al mittente.
 
