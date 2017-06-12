@@ -211,6 +211,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 		            if ($scope.elencoUo.length === 1){
 		                $scope.ordineMissioneModel.uoSpesa = $scope.elencoUo[0].cd_unita_organizzativa;
                         $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.uoSpesa);
+                        $scope.restCdr($scope.ordineMissioneModel.uoSpesa,"N");
 		            }
 		        }
         	} else {
@@ -939,7 +940,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $scope.ordineMissioneModel = value;
                         $scope.elencoPersone = null;
                         $scope.uoForUsersSpecial = null;
-                        $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = false;
+                        $scope.ordineMissioneModel.isFireSearchAttachments = false;
                         $scope.inizializzaFormPerModifica();
                         var path = $location.path();
                         $location.path(path+'/'+$scope.ordineMissioneModel.id);
