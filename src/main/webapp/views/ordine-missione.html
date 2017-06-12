@@ -46,8 +46,8 @@
 </div>
 
 <div class="panel panel-success">
-  <div class="panel-heading color-verde-scuro text-center">
-    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Informazioni anagrafiche</h3>
+  <div class="panel-heading color-verde-giada text-center">
+    <h3 class="panel-title color-verde-giada" translate="missione.form.box-dati">Informazioni anagrafiche</h3>
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id ="missioni">
@@ -242,7 +242,7 @@
                     <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
-                            <input ng-disabled="|| ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
+                            <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
                         </span>
                     </p>
             </form>
@@ -281,8 +281,8 @@
 </div>
 
 <div class="panel panel-info">
-  <div class="panel-heading color-verde-giada text-center">
-    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
+  <div class="panel-heading color-verde-scuro text-center">
+    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile">
@@ -358,7 +358,7 @@
               <li ng-repeat="attachment in ordineMissioneModel.attachments">
                 <span class="glyphicon glyphicon-download-alt"></span>
                 <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-                <button ng-show="!disabilita  && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                <button ng-show="!disabilita  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </li>
             </ul>
             <h4 >

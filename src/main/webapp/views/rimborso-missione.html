@@ -276,7 +276,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cdr-spesa">cdr</span>
-                    <select ng-disabled="!rimborsoMissioneModel.uoSpesa || validazione==='S' || disabilitaRimborsoMissione" ng-change="reloadCdr(rimborsoMissioneModel.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.cdr-spesa.placeholder' | translate}}" ng-model="rimborsoMissioneModel.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
+                    <select ng-disabled="!rimborsoMissioneModel.uoSpesa || disabilitaRimborsoMissione" ng-change="reloadCdr(rimborsoMissioneModel.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.cdr-spesa.placeholder' | translate}}" ng-model="rimborsoMissioneModel.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
                         </span>
                     </p>
             </form>
@@ -284,7 +284,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-                    <select ng-disabled="!elencoModuli || elencoModuli.length == 0 || !rimborsoMissioneModel.cdrSpesa || validazione === 'S' || disabilitaRimborsoMissione" ng-change="reloadModulo(rimborsoMissioneModel.pgProgetto, rimborsoMissioneModel.cdrSpesa, rimborsoMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
+                    <select ng-disabled="!elencoModuli || elencoModuli.length == 0 || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" ng-change="reloadModulo(rimborsoMissioneModel.pgProgetto, rimborsoMissioneModel.cdrSpesa, rimborsoMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
                         </span>
                     </p>
             </form>
@@ -293,7 +293,7 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                    <select ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || validazione === 'S' || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+                    <select ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
                         </span>
                     </p>
                     <p class="col-md-1">
@@ -307,7 +307,7 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
-                    <selectize ng-disabled="validazione === 'S' || disabilitaRimborsoMissione" options='elencoVoci' config="{maxItems: 1}" ng-model="rimborsoMissioneModel.voce"></selectize>
+                    <selectize ng-disabled="disabilitaRimborsoMissione" options='elencoVoci' config="{maxItems: 1}" ng-model="rimborsoMissioneModel.voce"></selectize>
                         </span>
                     </p>
             </form>
@@ -321,7 +321,7 @@
                     <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
-                            <input ng-disabled="validazione === 'S' || ((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
+                            <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
                         </span>
                     </p>
             </form>
@@ -330,7 +330,7 @@
                     <p class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
-                            <input ng-disabled="validazione === 'S' || ((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="rimborsoMissioneModel.pgObbligazione"/>
+                            <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="rimborsoMissioneModel.pgObbligazione"/>
                         </span>
                     </p>
             </form>
@@ -343,11 +343,20 @@
                     <p class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
-                            <input ng-disabled="validazione === 'S' || ((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>
+                            <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>
                         </span>
                     </p>
             </form>
-
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group" ng-show="validazione === 'S'">
+                            <span class="input-group-addon" translate="ordine-missione.form.note-segreteria">Note Segreteria</span>
+                            <textarea
+                              class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="rimborsoMissioneModel.noteSegreteria" rows = "2">
+                            </textarea> 
+                        </span>
+                    </p>
+            </form>
   </div>
 </div>
 
@@ -420,7 +429,7 @@
               <li ng-repeat="attachment in rimborsoMissioneModel.attachments">
                 <span class="glyphicon glyphicon-download-alt"></span>
                 <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-                <button ng-show="!disabilita  && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                <button ng-show="!disabilita  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </li>
             </ul>
             <h4 >
