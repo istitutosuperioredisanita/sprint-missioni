@@ -220,7 +220,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setNoleggioFlag(ordineMissione.getUtilizzoAutoNoleggio().equals("S") ? "true" : "false");
 			cmisOrdineMissione.setTrattamento(ordineMissione.decodeTrattamento());
 			cmisOrdineMissione.setNote(ordineMissione.getNote() == null ? "" : ordineMissione.getNote());
-			cmisOrdineMissione.setNoteSegreteria(ordineMissione.getNoteSegreteria() == null ? "" : ordineMissione.getNoteSegreteria());
+			//GG_DA_RIMETTERE						cmisOrdineMissione.setNoteSegreteria(ordineMissione.getNoteSegreteria() == null ? "" : ordineMissione.getNoteSegreteria());
 			cmisOrdineMissione.setOggetto(ordineMissione.getOggetto());
 			cmisOrdineMissione.setPriorita(ordineMissione.getPriorita());
 			cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "true" : "false");
@@ -331,7 +331,7 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_OGGETTO, ordineMissione.getOggetto());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DESTINAZIONE, ordineMissione.getDestinazione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE, ordineMissione.getNote());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE_SEGRETERIA, ordineMissione.getNoteSegreteria());
+		//GG_DA_RIMETTERE					metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE_SEGRETERIA, ordineMissione.getNoteSegreteria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, DateUtils.getDate(ordineMissione.getDataInizioMissione()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, DateUtils.getDate(ordineMissione.getDataFineMissione()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, DateUtils.getDate(ordineMissione.getDataInserimento()));
@@ -407,7 +407,7 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TRATTAMENTO, cmisOrdineMissione.getTrattamento());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOLEGGIO, cmisOrdineMissione.getNoleggioFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisOrdineMissione.getNote());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisOrdineMissione.getNoteSegreteria());
+		//GG_DA_RIMETTERE				metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisOrdineMissione.getNoteSegreteria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisOrdineMissione.getImpegnoNumero());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisOrdineMissione.getTaxiFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisOrdineMissione.getPersonaSeguitoFlag().equals("true"));
@@ -484,7 +484,7 @@ public class CMISOrdineMissioneService {
 
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
-			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisOrdineMissione.getNoteSegreteria());
+//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisOrdineMissione.getNoteSegreteria());
 			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
 			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
 			jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
@@ -501,9 +501,9 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_userNameResponsabileModulo" , cmisOrdineMissione.getUserNameResponsabileModulo());
 			jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisOrdineMissione.getUserNamePrimoFirmatario());
 			jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisOrdineMissione.getUserNameFirmatarioSpesa());
-			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
-			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
-			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
+//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
+//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
+//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
 			jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisOrdineMissione.getUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisOrdineMissione.getDescrizioneUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisOrdineMissione.getUoSpesa());

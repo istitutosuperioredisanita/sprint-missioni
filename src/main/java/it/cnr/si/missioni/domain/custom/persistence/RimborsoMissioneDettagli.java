@@ -336,6 +336,15 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		}
 	}
 
+	@Transient
+	public Boolean isSpesaAnticipata() {
+		if (Utility.nvl(getFlSpesaAnticipata(),"N").equals("S")){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public String getGiustificativo() {
 		return giustificativo;
 	}
