@@ -66,7 +66,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "gae",
     "cognome",
     "nome",
-    "codice_fiscale"})
+    "codice_fiscale",
+    "importoDaRimborsare"})
 public class MissioneBulk implements Cloneable, Serializable{
 
     @JsonProperty("esercizio")
@@ -85,6 +86,8 @@ public class MissioneBulk implements Cloneable, Serializable{
     private BigDecimal imSpese;
     @JsonProperty("im_diaria_netto")
     private BigDecimal imDiariaNetto;
+    @JsonProperty("importoDaRimborsare")
+    private BigDecimal importoDaRimborsare;
     @JsonProperty("im_totale_missione")
     private BigDecimal imTotaleMissione;
     @JsonProperty("im_lordo_percepiente")
@@ -334,6 +337,11 @@ public class MissioneBulk implements Cloneable, Serializable{
         return imTotaleMissione;
     }
 
+    @JsonProperty("importoDaRimborsare")
+    public BigDecimal getImportoDaRimborsare() {
+        return importoDaRimborsare;
+    }
+
     /**
      * 
      * @param imTotaleMissione
@@ -343,7 +351,12 @@ public class MissioneBulk implements Cloneable, Serializable{
     public void setImTotaleMissione(BigDecimal imTotaleMissione) {
         this.imTotaleMissione = imTotaleMissione;
     }
-
+    
+    @JsonProperty("importoDaRimborsare")
+    public void setImportoDaRimborsare(BigDecimal importoDaRimborsare) {
+        this.importoDaRimborsare = importoDaRimborsare;
+    }
+    
     /**
      * 
      * @return
