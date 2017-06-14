@@ -20,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.UsersSpecial;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
+import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
 @Service("MailService")
 public class MailService {
@@ -41,6 +44,9 @@ public class MailService {
      */
     private String from;
 
+	@Autowired
+	private AccountService accountService;
+	
     @PostConstruct
     public void init() {
         this.from = env.getProperty("spring.mail.from");
@@ -50,6 +56,23 @@ public class MailService {
        	this.mailToError = Arrays.asList(s);
     }
     
+	public String[] prepareTo(List<UsersSpecial> lista) {
+		String[] elencoMail = new String[lista.size()];
+		for (int i = 0; i < lista.size(); i++){
+			UsersSpecial user = lista.get(i);
+			String mail = getEmail(user.getUid());
+			if (mail != null){
+				elencoMail[i] = mail;
+			}
+		}
+		return elencoMail;
+	}
+
+    private String getEmail(String user){
+		Account utente = accountService.loadAccountFromRest(user);
+		return utente.getEmailComunicazioni();
+    }
+
     private void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isMultipart, boolean isHtml, String... to) {
         log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}', content={}",
                 isMultipart, isHtml, to, subject, content);

@@ -49,6 +49,10 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "GESTIONE_RESP_MODULO", length = 1, nullable = false)
     private String gestioneRespModulo;
 
+    @Size(min = 0, max = 250)
+    @Column(name = "RESPONSABILE", length = 250, nullable = false)
+    private String responsabile;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -140,4 +144,12 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     	}
     	return false;
     }
+
+	public String getResponsabile() {
+		return responsabile;
+	}
+
+	public void setResponsabile(String responsabile) {
+		this.responsabile = responsabile;
+	}
 }
