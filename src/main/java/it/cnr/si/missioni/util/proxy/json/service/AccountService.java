@@ -156,7 +156,7 @@ public class AccountService {
 	}
 
 	public String getDirector(String uo) {
-		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, "titCa="+uo+"&userinfo=true&ruolo=dir", null, null);
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, "titCa="+uo+"&userinfo=true&ruolo=resp", null, null);
 		ResultProxy result = proxyService.processInCache(callCache);
 		String risposta = result.getBody();
 		try {
@@ -164,6 +164,8 @@ public class AccountService {
 			DatiDirettore [] lista = mapper.readValue(risposta, DatiDirettore[].class);
 			if (lista != null && lista.length > 0){
 				return lista[0].getUid();
+			} else if (lista == null || lista.length == 0){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato possibile recuperare il direttore per la uo." + uo);
 			}
 		} catch (Exception ex) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i Direttori ("+Utility.getMessageException(ex)+").");
@@ -232,5 +234,10 @@ public class AccountService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella generazione del body della response dall'oggetto JSON dei dati dell'Account ("+Utility.getMessageException(ex)+").");
 		}
 	}
+
+    public String getEmail(String user){
+		Account utente = loadAccountFromRest(user);
+		return utente.getEmailComunicazioni();
+    }
 
 }
