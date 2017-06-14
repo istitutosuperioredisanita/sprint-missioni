@@ -230,7 +230,7 @@ public class RimborsoMissioneService {
 
 	public void aggiornaRimborsoMissioneRespinto(Principal principal, ResultFlows result,
 			RimborsoMissione rimborsoMissioneDaAggiornare) throws ComponentException{
-		aggiornaValidazione(rimborsoMissioneDaAggiornare);
+		aggiornaValidazione(principal, rimborsoMissioneDaAggiornare);
 		rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
 		rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
@@ -665,22 +665,15 @@ public class RimborsoMissioneService {
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
 					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
 					    		if (uo != null){
-						    		listaUoUtente.add(uoService.getUoSigla(uoUser));
+					    			condizioneOr.add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser)));
 						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-							    			condizioneOr.add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser)));
-							    		} else {
-							    			esisteUoConValidazioneConUserNonAbilitato = true;
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "S")));
+							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "N")).add(Restrictions.eq("stato", "CON")));
 						    			}
 						    		}
 					    		}
 					    	}
-					    	if (esisteUoConValidazioneConUserNonAbilitato){
-						    	criterionList.add(condizioneOr);
-					    	} else {
-						    	criterionList.add(Restrictions.in("uoRich", listaUoUtente));
-					    	}
+					    	criterionList.add(condizioneOr);
 						} else {
 							criterionList.add(Restrictions.eq("uid", principal.getName()));
 						}
@@ -746,7 +739,7 @@ public class RimborsoMissioneService {
     		rimborsoMissione.setSpeseTerziRicevute("N");
     	}
     	
-    	aggiornaValidazione(rimborsoMissione);
+    	aggiornaValidazione(principal, rimborsoMissione);
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
     	rimborsoMissione.setStatoFlusso(Costanti.STATO_INSERITO);
@@ -848,27 +841,7 @@ public class RimborsoMissioneService {
     }
 
 	private void aggiornaValidazione(Principal principal, RimborsoMissione rimborsoMissione) {
-		UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
-		if (userSpecial != null){
-			if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
-				if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
-			    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
-			    		if (uoUser != null && uoUser.getCodice_uo() != null && uoUser.getCodice_uo().equals(rimborsoMissione.getUoSpesa()) && 
-			    				uoUser.getOrdine_da_validare() != null && uoUser.getOrdine_da_validare().equals("S")){
-			    			rimborsoMissione.setValidato("S");
-			    			return;
-			    		}
-		    		}
-	    		}
-    		}
-		}
-
-		rimborsoMissione.setValidato("N");
-	}
-
-	private void aggiornaValidazione(RimborsoMissione rimborsoMissione) {
-		Uo uo = uoService.recuperoUoSigla(rimborsoMissione.getUoRich());
-		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("N")){
+		if (accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoSpesa())){
 			rimborsoMissione.setValidato("S");
 		} else {
 			rimborsoMissione.setValidato("N");
