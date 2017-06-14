@@ -328,26 +328,11 @@ public class OrdineMissioneService {
 	}
 
 	private void aggiornaValidazione(Principal principal, OrdineMissione ordineMissione) {
-		UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
-		if (userSpecial != null){
-			if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
-				if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
-			    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
-			    		if (uoUser != null && uoUser.getCodice_uo() != null && uoUser.getCodice_uo().equals(ordineMissione.getUoSpesa()) && 
-			    				uoUser.getOrdine_da_validare() != null && uoUser.getOrdine_da_validare().equals("S")){
-			    			ordineMissione.setValidato("S");
-			    			return;
-			    		}
-		    		}
-	    		}
-    		}
+		if (accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissione.getUoSpesa())){
+			ordineMissione.setValidato("S");
+		} else {
+			ordineMissione.setValidato("N");
 		}
-//		Uo uo = uoService.recuperoUoSigla(ordineMissione.getUoSpesa());
-//		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("N")){
-//			ordineMissione.setValidato("S");
-//		} else {
-		ordineMissione.setValidato("N");
-//		}
 	}
 
 	public String retrieveStateFromFlows(ResultFlows result) {
@@ -456,25 +441,16 @@ public class OrdineMissioneService {
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
 					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
 					    		if (uo != null){
-						    		listaUoUtente.add(uoService.getUoSigla(uoUser));
+					    			condizioneOr.add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser)));
 						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-							    			condizioneOr.add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser)));
-							    		} else {
-							    			esisteUoConValidazioneConUserNonAbilitato = true;
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "S")));
+							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "N")).add(Restrictions.eq("stato", "CON")));
 						    			}
 						    		}
 					    		}
 					    	}
 					    	condizioneResponsabileGruppo(principal, condizioneOr);
-					    	if (esisteUoConValidazioneConUserNonAbilitato){
-					    		criterionList.add(condizioneOr);
-					    	} else {
-								Disjunction condizioneNuovaOr = Restrictions.disjunction();
-					    		condizioneNuovaOr.add(Restrictions.in("uoSpesa", listaUoUtente));
-					    		criterionList.add(condizioneNuovaOr);
-					    	}
+					    	criterionList.add(condizioneOr);
 						} else {
 							condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
 						}
@@ -691,12 +667,12 @@ public class OrdineMissioneService {
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
     	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissione.isMissioneInviataResponsabile())){
-    		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(ordineMissioneDB), false, true, getEmail(ordineMissione.getResponsabileGruppo()));
+    		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
     	} else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
     		sendMailToAdministrative(ordineMissioneDB);
     	}
     	if (isRitornoMissioneMittente){
-    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, ordineMissioneDB), false, true, getEmail(ordineMissioneDB.getUidInsert()));
+    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, ordineMissioneDB), false, true, accountService.getEmail(ordineMissioneDB.getUidInsert()));
     	}
 		return ordineMissioneDB;
     }

@@ -60,18 +60,13 @@ public class MailService {
 		String[] elencoMail = new String[lista.size()];
 		for (int i = 0; i < lista.size(); i++){
 			UsersSpecial user = lista.get(i);
-			String mail = getEmail(user.getUid());
+			String mail = accountService.getEmail(user.getUid());
 			if (mail != null){
 				elencoMail[i] = mail;
 			}
 		}
 		return elencoMail;
 	}
-
-    private String getEmail(String user){
-		Account utente = accountService.loadAccountFromRest(user);
-		return utente.getEmailComunicazioni();
-    }
 
     private void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isMultipart, boolean isHtml, String... to) {
         log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}', content={}",

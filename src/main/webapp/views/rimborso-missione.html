@@ -132,22 +132,6 @@
                         </span>
                 </p>
             </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
-                        <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(rimborsoMissioneModel.cdsCompetenza)" placeholder="{{'missione.form.cds-competenza.placeholder' | translate}}" ng-model="rimborsoMissioneModel.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
-                        </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
-                    <p class="col-md-12">
-                        <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'missione.form.uo-competenza.placeholder' | translate}}" ng-model="rimborsoMissioneModel.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
-                        </span>
-                    </p>
-            </form>
             <form class="form-inline" role="form" id="missioni" ng-show="rimborsoMissioneModel.anno">
                     <p class="col-md-12">
                         <span class="input-group">
@@ -357,6 +341,22 @@
                         </span>
                     </p>
             </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
+                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(rimborsoMissioneModel.cdsCompetenza)" placeholder="{{'missione.form.cds-competenza.placeholder' | translate}}" ng-model="rimborsoMissioneModel.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
+                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'missione.form.uo-competenza.placeholder' | translate}}" ng-model="rimborsoMissioneModel.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
   </div>
 </div>
 
@@ -429,13 +429,13 @@
               <li ng-repeat="attachment in rimborsoMissioneModel.attachments">
                 <span class="glyphicon glyphicon-download-alt"></span>
                 <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-                <button ng-show="!disabilita  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                <button ng-show="!disabilitaRimborsoMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </li>
             </ul>
             <h4 >
               <div class="row fileupload-buttonbar">
                 <span ng-hide="rimborsoMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="app/rest/rimborsoMissione/uploadAllegati/{{rimborsoMissioneModel.id}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
+                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="app/rest/rimborsoMissione/uploadAllegati/{{rimborsoMissioneModel.id}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
               </div>
             </h4>
           </div> 
