@@ -342,14 +342,12 @@ public class OrdineMissioneService {
 	    		}
     		}
 		}
-
-		
-		Uo uo = uoService.recuperoUoSigla(ordineMissione.getUoRich());
-		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("N")){
-			ordineMissione.setValidato("S");
-		} else {
-			ordineMissione.setValidato("N");
-		}
+//		Uo uo = uoService.recuperoUoSigla(ordineMissione.getUoSpesa());
+//		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("N")){
+//			ordineMissione.setValidato("S");
+//		} else {
+		ordineMissione.setValidato("N");
+//		}
 	}
 
 	public String retrieveStateFromFlows(ResultFlows result) {
@@ -749,37 +747,20 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setCup(ordineMissione.getCup());
 	}
 
-	public void sendMailToAdministrative(OrdineMissione ordineMissioneDB) {
-		List<UsersSpecial> lista = accountService.getUserSpecialForUo(ordineMissioneDB.getUoSpesa());
+	private void sendMailToAdministrative(OrdineMissione ordineMissioneDB) {
+		List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
 		String testoMail = getTextMailSendToAdministrative(ordineMissioneDB);
 		sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
 	}
 
-	public void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
+	private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
 		if (lista != null && lista.size() > 0){
-			String[] elencoMail = prepareTo(lista);
+			String[] elencoMail = mailService.prepareTo(lista);
 			if (elencoMail.length > 0){
 				mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
 			}
 		}
 	}
-
-	private String[] prepareTo(List<UsersSpecial> lista) {
-		String[] elencoMail = new String[lista.size()];
-		for (int i = 0; i < lista.size(); i++){
-			UsersSpecial user = lista.get(i);
-			String mail = getEmail(user.getUid());
-			if (mail != null){
-				elencoMail[i] = mail;
-			}
-		}
-		return elencoMail;
-	}
-
-    private String getEmail(String user){
-		Account utente = accountService.loadAccountFromRest(user);
-		return utente.getEmailComunicazioni();
-    }
 
     private String getNominativo(String user){
 		Account utente = accountService.loadAccountFromRest(user);

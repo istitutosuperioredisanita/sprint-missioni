@@ -206,10 +206,10 @@ public class CMISRimborsoMissioneService {
 		String uoRichPerFlusso = Utility.replace(rimborsoMissione.getUoRich(), ".", "");
 		String userNameFirmatario;
 		String userNameFirmatarioSpesa;
-		userNameFirmatario = recuperoDirettore(uoRichPerFlusso);
+		userNameFirmatario = recuperoDirettore(uoRichPerFlusso, rimborsoMissione.getAnno());
 		
 		if (uoCompetenzaPerFlusso != null){
-			userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso);
+			userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso, rimborsoMissione.getAnno());
 		} else {
 			userNameFirmatarioSpesa = userNameFirmatario;
 		}
@@ -274,12 +274,17 @@ public class CMISRimborsoMissioneService {
 		return cmisRimborsoMissione;
 	}
 
-	private String recuperoDirettore(String uo) {
+	private String recuperoDirettore(String uo, Integer anno) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			userNameFirmatario = accountService.getDirector(uo);		
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, anno);
+			if (dati != null && dati.getResponsabile() != null){
+				userNameFirmatario = dati.getResponsabile();
+			} else {
+				userNameFirmatario = accountService.getDirector(uo);		
+			}
 		}
 		return userNameFirmatario;
 	}

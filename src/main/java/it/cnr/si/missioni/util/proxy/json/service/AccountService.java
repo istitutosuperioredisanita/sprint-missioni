@@ -49,12 +49,12 @@ public class AccountService {
 		return null;
 	}
 	
-	public List<UsersSpecial> getUserSpecialForUo(String uo){
+	public List<UsersSpecial> getUserSpecialForUo(String uo, Boolean isPerValidazione){
 		List<UsersSpecial> listaUtenti = new ArrayList<UsersSpecial>();
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
 				UsersSpecial user = iteratorUsers.next();
-				if ((user.getAll() != null && user.getAll().equals("S")) || (isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo))){
+				if (isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo, isPerValidazione)){
 					listaUtenti.add(user);
 				}
 			}
@@ -62,11 +62,23 @@ public class AccountService {
 		return listaUtenti;
 	}
 	
-	public Boolean isUtenteAbilitatoUo(List<UoForUsersSpecial> listUo, String uo){
+	public List<UsersSpecial> getUserSpecialForUoPerValidazione(String uo){
+		return getUserSpecialForUo(uo, true);
+	}
+	
+	public Boolean isUtenteAbilitatoUo(List<UoForUsersSpecial> listUo, String uo, Boolean isPerValidazione){
 		for (Iterator<UoForUsersSpecial> iteratorUo = listUo.iterator(); iteratorUo.hasNext();){
 			UoForUsersSpecial uoForUsersSpecial = iteratorUo.next();
 			if (uoForUsersSpecial.getCodice_uo() != null && uoForUsersSpecial.getCodice_uo().equals(uo)){
-				return true;
+				if (isPerValidazione){
+					if (uoForUsersSpecial.getOrdine_da_validare().equals("S")){
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return true;
+				}
 			}
 		}
 		return false;
