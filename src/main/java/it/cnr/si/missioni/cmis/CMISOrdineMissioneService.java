@@ -31,6 +31,7 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.hibernate.internal.util.type.PrimitiveWrapperHelper.IntegerDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -180,16 +181,16 @@ public class CMISOrdineMissioneService {
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
-			userNameFirmatario = recuperoDirettore(uoRichPerFlusso);
+			userNameFirmatario = recuperoDirettore(uoRichPerFlusso, ordineMissione.getAnno());
 			
 			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 				if (uoCompetenzaPerFlusso != null){
-					userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso);
+					userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso, ordineMissione.getAnno());
 				} else {
 					userNameFirmatarioSpesa = userNameFirmatario;
 				}
 			} else {
-				userNameFirmatarioSpesa = recuperoDirettore(uoSpesaPerFlusso);
+				userNameFirmatarioSpesa = recuperoDirettore(uoSpesaPerFlusso, ordineMissione.getAnno());
 			}
 			
 			GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
@@ -263,12 +264,17 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private String recuperoDirettore(String uo) {
+	private String recuperoDirettore(String uo, Integer anno) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			userNameFirmatario = accountService.getDirector(uo);		
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, anno);
+			if (dati != null && dati.getResponsabile() != null){
+				userNameFirmatario = dati.getResponsabile();
+			} else {
+				userNameFirmatario = accountService.getDirector(uo);		
+			}
 		}
 		return userNameFirmatario;
 	}
