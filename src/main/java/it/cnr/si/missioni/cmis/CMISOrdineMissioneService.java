@@ -13,7 +13,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +30,6 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.hibernate.internal.util.type.PrimitiveWrapperHelper.IntegerDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -275,6 +273,9 @@ public class CMISOrdineMissioneService {
 			} else {
 				userNameFirmatario = accountService.getDirector(uo);		
 			}
+		}
+		if (StringUtils.isEmpty(userNameFirmatario)){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la uo "+uo);
 		}
 		return userNameFirmatario;
 	}

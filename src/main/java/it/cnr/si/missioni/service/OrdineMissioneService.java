@@ -2,19 +2,13 @@ package it.cnr.si.missioni.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
@@ -143,6 +137,9 @@ public class OrdineMissioneService {
     
     @Value("${spring.mail.messages.ritornoMissioneMittente.oggetto}")
     private String subjectReturnToSenderOrdine;
+    
+    @Value("${spring.mail.messages.approvazioneAnticipo.oggetto}")
+    private String subjectAnticipo;
     
     @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
@@ -310,6 +307,12 @@ public class OrdineMissioneService {
 	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
+		if (anticipo != null){
+			anticipo.setStato(Costanti.STATO_DEFINITIVO);
+			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
+    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa())));
+		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 		popolaCoda(ordineMissioneDaAggiornare);
 	}
@@ -756,6 +759,10 @@ public class OrdineMissioneService {
 
 	private String getTextMailSendToManager(OrdineMissione ordineMissione) {
 		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo.";
+	}
+
+	private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
+		return "E'  stata approvata la richiesta di anticipo di € "+Utility.numberFormat(anticipo.getImporto()) + " relativa all'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto();
 	}
 
 	private String getTextMailSendToAdministrative(OrdineMissione ordineMissione) {

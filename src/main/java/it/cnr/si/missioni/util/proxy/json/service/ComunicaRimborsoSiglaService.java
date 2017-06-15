@@ -106,7 +106,7 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setImSpese(BigDecimal.ZERO);
 		oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getAltreSpeseAntImporto()));
 		oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborso());
-		oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
+//GG TODO DA Togliere		oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
 		if (rimborsoApprovato.getAnticipoAnnoMandato() != null){
 			oggettoBulk.setEsercizioAnticipoGeMis(rimborsoApprovato.getAnticipoAnnoMandato());
 		}
