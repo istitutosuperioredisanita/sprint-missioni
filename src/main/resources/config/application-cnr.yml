@@ -60,6 +60,8 @@ spring:
                 oggetto: Missioni. Invio Rimborso Missione per Verifica dati Finanziari.
             ritornoMissioneMittente:
                 oggetto: Missioni. Ordine di Missione reinviato al mittente.
+            approvazioneAnticipo:
+                oggetto: Missioni. Anticipo su Ordine di Missione.
 
     rabbitmq:
 #        host: rabbitmq.cedrc.cnr.it
