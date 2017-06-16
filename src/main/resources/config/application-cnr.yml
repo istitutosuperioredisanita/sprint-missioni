@@ -5,15 +5,15 @@ spring:
         name: missioni
         username: missioni
         password: missionipw
+
     jpa:
         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
-    print:
-        baseDir: /it/cnr/missioni/print/
+
     proxy:
         SIGLA:
-            url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
-        #    url: http://localhost:8080/SIGLA/
+        #    url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
+            url: http://localhost:8080/SIGLA/
             username: MISSIONI
             password: M15510N1
             context:
@@ -40,28 +40,6 @@ spring:
         tls: false
         auth: false
         send.error.to: gianfranco.gasparro@cnr.it
-        messages:
-            erroreGenerico:
-                oggetto: Missioni. Errore Generico.
-            erroreLetturaFlussoOrdine:
-                oggetto: Missioni. Errore durante l'aggiornamento dell'Ordine da Scrivania Digitale.
-                testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per l'ordine di missione
-            erroreLetturaFlussoRimborso:
-                oggetto: Missioni. Errore durante l'aggiornamento del Rimborso da Scrivania Digitale.
-                testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per il rimborso missione
-            erroreComunicazioneRimborsoSigla:
-                oggetto: Missioni. Errore durante la comunicazione a SIGLA del Rimborso Missione.
-                testo: Si segnala che la comunicazione a SIGLA del rimborso missione 
-            invioResponsabileGruppo:
-                oggetto: Missioni. Invio Ordine di Missione per Autorizzazione.
-            invioOrdinePerValidazioneDatiFinanziari:
-                oggetto: Missioni. Invio Ordine di Missione per Verifica dati Finanziari.
-            invioRimborsoPerValidazioneDatiFinanziari:
-                oggetto: Missioni. Invio Rimborso Missione per Verifica dati Finanziari.
-            ritornoMissioneMittente:
-                oggetto: Missioni. Ordine di Missione reinviato al mittente.
-            approvazioneAnticipo:
-                oggetto: Missioni. Anticipo su Ordine di Missione.
 
     rabbitmq:
 #        host: rabbitmq.cedrc.cnr.it
@@ -85,7 +63,7 @@ siper:
   password: ${spring.proxy.SIPER.password}
 
 cmis:
-    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
+    alfresco: http://as3dock.si.cnr.it:8080/alfresco/
     url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
     username: app.missioni
     password: bubbazza
@@ -95,7 +73,6 @@ cmis:
 
 cache:
     init_cache: true
-    hazelcast.packages: it.cnr.si.missioni.domain.*,it.cnr.si.missioni.service.*
 
 logging.config: classpath:logback-local.xml
 
@@ -116,15 +93,12 @@ cron:
         cronExpression: "0 0 3 * * MON-SAT"
 
 jhipster:
-    security:
-        authentication:
-            oauth:
-                clientid: sprintapp
-                secret: mySecretOAuthSecret
+    mail:
+        from: missioni@cnr.it
 
 cache.hazelcast:
     name: sprint-missioni
     members: 127.0.0.1
 
 server:
-    port: 8080
+    port: 8081

@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.qos.logback.classic.pattern.Util;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
@@ -83,7 +84,6 @@ public class ComunicaRimborsoSiglaService {
 		    oggettoBulk.setCdTerzo(rimborsoApprovato.getCdTerzoSigla().intValue());
 		}
 		oggettoBulk.setCdUnitaOrganizzativa(rimborsoApprovato.getUoSpesa());
-		oggettoBulk.setDsMissione(rimborsoApprovato.getOggetto());
 		oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 		oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 /*GGGG TODO...VERIFICARE QUALE ESERCIZIO PASSARE*/                                oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
@@ -104,9 +104,9 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setImQuotaEsente(BigDecimal.ZERO);
 		oggettoBulk.setImRimborso(BigDecimal.ZERO);
 		oggettoBulk.setImSpese(BigDecimal.ZERO);
-		oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getAltreSpeseAntImporto()));
-		oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborso());
-//GG TODO DA Togliere		oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
+		oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getTotaleSpeseAnticipate()));
+		oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate());
+		oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
 		if (rimborsoApprovato.getAnticipoAnnoMandato() != null){
 			oggettoBulk.setEsercizioAnticipoGeMis(rimborsoApprovato.getAnticipoAnnoMandato());
 		}
@@ -119,6 +119,11 @@ public class ComunicaRimborsoSiglaService {
 		Account account = accountService.loadAccountFromRest(rimborsoApprovato.getUid());
 		oggettoBulk.setCognome(account.getCognome());
 		oggettoBulk.setNome(account.getNome());
+		String descrizioneMissione = "Missione a "+rimborsoApprovato.getDestinazione()+" del "+DateUtils.getDefaultDateAsString(rimborsoApprovato.getDataInizioMissione())+" di "+Utility.nvl(oggettoBulk.getCognome())+" "+ Utility.nvl(oggettoBulk.getNome())+" - "+rimborsoApprovato.getOggetto();
+		if (descrizioneMissione.length() > 300){
+			descrizioneMissione.substring(0, 300);
+		}
+		oggettoBulk.setDsMissione(descrizioneMissione);
 		oggettoBulk.setCodice_fiscale(account.getCodiceFiscale());
 		Folder folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
 		if (folder != null){

@@ -33,6 +33,8 @@ spring:
             ddl-auto: none
             naming:
                 strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+    print:
+        baseDir: /it/cnr/missioni/print/
     messages:
         basename: i18n/messages
     mvc:
@@ -42,12 +44,38 @@ spring:
         mode: XHTML
     http:
         multipart:
-            maxFileSize: 5Mb
-            maxRequestSize: 5Mb
+            maxFileSize: 10Mb
+            maxRequestSize: 10Mb
+    mail:
+        messages:
+            erroreGenerico:
+                oggetto: Missioni. Errore Generico.
+            erroreLetturaFlussoOrdine:
+                oggetto: Missioni. Errore durante l'aggiornamento dell'Ordine da Scrivania Digitale.
+                testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per l'ordine di missione
+            erroreLetturaFlussoRimborso:
+                oggetto: Missioni. Errore durante l'aggiornamento del Rimborso da Scrivania Digitale.
+                testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per il rimborso missione
+            erroreComunicazioneRimborsoSigla:
+                oggetto: Missioni. Errore durante la comunicazione a SIGLA del Rimborso Missione.
+                testo: Si segnala che la comunicazione a SIGLA del rimborso missione 
+            invioResponsabileGruppo:
+                oggetto: Missioni. Invio Ordine di Missione per Autorizzazione.
+            invioOrdinePerValidazioneDatiFinanziari:
+                oggetto: Missioni. Invio Ordine di Missione per Verifica dati Finanziari.
+            invioRimborsoPerValidazioneDatiFinanziari:
+                oggetto: Missioni. Invio Rimborso Missione per Verifica dati Finanziari.
+            ritornoMissioneMittente:
+                oggetto: Missioni. Ordine di Missione reinviato al mittente.
+            approvazioneAnticipo:
+                oggetto: Missioni. Anticipo su Ordine di Missione.
 
 security:
     basic:
         enabled: false
+
+cache:
+    hazelcast.packages: it.cnr.si.missioni.domain.*,it.cnr.si.missioni.service.*
 
 # ===================================================================
 # JHipster specific properties
@@ -67,6 +95,11 @@ jhipster:
         #max-age: 1800
     mail:
         from: sprint@localhost
+    security:
+        authentication:
+            oauth:
+                clientid: sprintapp
+                secret: mySecretOAuthSecret
     swagger:
         title: sprint API
         description: sprint API documentation
