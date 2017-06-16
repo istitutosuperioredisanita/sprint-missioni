@@ -77,6 +77,12 @@
                 },
                 {
                     "condition": "AND",
+                    "fieldName": "fl_missioni",
+                    "operator": "=",
+                    "fieldValue": true
+                },
+                {
+                    "condition": "AND",
                     "fieldName": "ti_appartenenza",
                     "operator": "=",
                     "fieldValue": "D"
