@@ -594,6 +594,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                               {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
                               {condition: 'AND', fieldName: 'ti_elemento_voce', operator: "=", fieldValue:"C"},
                               {condition: 'AND', fieldName: 'fl_solo_residuo', operator: "=", fieldValue:false},
+                              {condition: 'AND', fieldName: 'fl_missioni', operator: "=", fieldValue:true},
                               {condition: 'AND', fieldName: 'ti_appartenenza', operator: "=", fieldValue:"D"}];
             var postVoce = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
             $http.post(urlRestProxy + app+'/', postVoce, {params: {proxyURL: url}}).success(function (data) {
