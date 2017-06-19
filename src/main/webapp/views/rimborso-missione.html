@@ -239,12 +239,12 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-spesa">cds</span>
-                    <selectize ng-disabled="validazione || disabilitaRimborsoMissione" options='elencoCds' config="{maxItems: 1}" ng-change="reloadCds(rimborsoMissioneModel.cdsSpesa)" ng-model="rimborsoMissioneModel.cdsSpesa"></selectize>
+                    <selectize ng-disabled="validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" options='elencoCds' config="{maxItems: 1}" ng-change="reloadCds(rimborsoMissioneModel.cdsSpesa)" ng-model="rimborsoMissioneModel.cdsSpesa"></selectize>
                         </span>
                     </p>
             </form>
                     <p class="col-md-1">
-            <button ng-disabled="validazione || disabilitaRimborsoMissione" type="button" class="btn" ng-click="undoCds()">{{'global.button.simpleUndo' | translate}}</button>
+            <button ng-disabled="validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" type="button" class="btn" ng-click="undoCds()">{{'global.button.simpleUndo' | translate}}</button>
                     </p>
 
 
