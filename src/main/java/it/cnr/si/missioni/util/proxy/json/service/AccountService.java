@@ -186,7 +186,7 @@ public class AccountService {
 		    		}
 		    	}
 			}
-		} else {
+		} else if (userSpecial.getAll().equals("S")){
 			return true;
 		}
 		return false;
