@@ -590,13 +590,14 @@ public class OrdineMissioneService {
 			if (!ordineMissioneDB.isMissioneDaValidare()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
 			}
-			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissioneDB.getUoRich())){
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissioneDB.getUoSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione.");
 			}
 			
 			if (!confirm){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
 			}
+
 			aggiornaDatiOrdineMissione(principal, ordineMissione, confirm, ordineMissioneDB);
 			ordineMissioneDB.setValidato("S");
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
