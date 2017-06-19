@@ -320,7 +320,7 @@ public class RimborsoMissioneService {
 			if (!rimborsoMissioneDB.isMissioneDaValidare()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione già validato.");
 			}
-			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissioneDB.getUoRich())){
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissioneDB.getUoSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi di missione.");
 			}
 			

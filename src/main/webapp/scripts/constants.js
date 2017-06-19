@@ -58,7 +58,8 @@ missioniApp.constant('COSTANTI', {
         'FORMATO_DATA': 'dd/MM/yyyy',
         'CDS_SAC': '000',
         'UO_STANDARD_SAC': '000.000',
-        'DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST':1000000
+        'DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST':1000000,
+        'DEFAULT_MAX_FILE_SIZE':10240000
     });
 
 /*
