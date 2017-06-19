@@ -768,8 +768,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var impostadisabilitaRimborsoMissione = function() {
         if ($scope.esisteRimborsoMissione && ($scope.rimborsoMissioneModel.stato === 'DEF' || $scope.rimborsoMissioneModel.statoFlusso === 'APP' || ($scope.rimborsoMissioneModel.stato === 'CON' && 
             ($scope.rimborsoMissioneModel.stateFlows === 'ANNULLATO' ||
-                $scope.rimborsoMissioneModel.stateFlows === 'FIRMA SPESA' ||
-                $scope.rimborsoMissioneModel.stateFlows === 'FIRMA UO' ||
+                $scope.rimborsoMissioneModel.stateFlows === 'FIRMA SPESA RIMBORSO' ||
+                $scope.rimborsoMissioneModel.stateFlows === 'FIRMA UO RIMBORSO' ||
                 $scope.rimborsoMissioneModel.stateFlows === 'FIRMATO')))) {
           return true;
         } else {
