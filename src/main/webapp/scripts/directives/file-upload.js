@@ -18,8 +18,8 @@ angular.module('missioniApp')
           validazione: '=',
           isFinishRestAttachments: '='
         },
-        controller: ['$rootScope', '$scope', '$element', 'fileUpload', 'ui', function (
-            $rootScope, $scope, $element, fileUpload, ui) {
+        controller: ['$rootScope', '$scope', '$element', 'fileUpload', 'COSTANTI', 'ui', function (
+            $rootScope, $scope, $element, fileUpload, COSTANTI, ui) {
           $scope.$on('fileuploaddone', function (e, data) {
             $rootScope.salvataggio = false;
             if (data && data.result && data.result.idMissione){
@@ -56,7 +56,15 @@ angular.module('missioniApp')
           });
           $scope.$on('fileuploadfail', function (e, data) {
             $rootScope.salvataggio = false;
-            ui.error("Errore nel caricamento del file. "+ data.jqXHR.responseText);
+            if (data.jqXHR.responseText){
+              ui.error("Errore nel caricamento del file. "+ data.jqXHR.responseText);
+            } else {
+              if (data.total > COSTANTI.DEFAULT_MAX_FILE_SIZE){
+                ui.error("Errore nel caricamento del file. Il file ha dimensioni di "+ data.total+" ed è più grande del limite previsto "+COSTANTI.DEFAULT_MAX_FILE_SIZE);
+              } else {
+                ui.error("Errore generico nel caricamento del file.");
+              }
+            }
           });
 
           $scope.options = {
