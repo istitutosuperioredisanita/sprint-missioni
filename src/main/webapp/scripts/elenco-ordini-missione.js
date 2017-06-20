@@ -35,7 +35,7 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
         }
     });
 
-missioniApp.controller('ElencoOrdiniMissioneController', function ($scope, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService) {
+missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $scope, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService) {
 
     $scope.today = function() {
             // Today + 1 day - needed if the current day must be included
@@ -64,6 +64,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($scope, $loca
 
     $scope.ricerca = function () {
         $scope.endSearching = false;
+        $rootScope.salvataggio = true;
         $scope.ordiniMissione = null;
         ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData).then(function(data){
             if (data && data.length > 0){
@@ -73,6 +74,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($scope, $loca
                 $scope.messageOrdiniNonEsistenti = true;
             }
             $scope.endSearching = true;
+            $rootScope.salvataggio = false;
         });        
     }
 

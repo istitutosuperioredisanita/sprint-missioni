@@ -160,6 +160,10 @@ public class MissioneBulk implements Cloneable, Serializable{
     private Long pgObblGeMis;
     @JsonProperty("gaeGeMis")
     private String gaeGeMis;
+    @JsonProperty("cdrGeMis")
+    private String cdrGeMis;
+    @JsonProperty("voceGeMis")
+    private String voceGeMis;
     @JsonProperty("tipo_rapporto")
     private TipoRapporto tipoRapporto;
     @JsonProperty("banca")
@@ -1078,6 +1082,22 @@ public class MissioneBulk implements Cloneable, Serializable{
 
 	public void setPgMissioneFromGeMis(Long pgMissioneFromGeMis) {
 		this.pgMissioneFromGeMis = pgMissioneFromGeMis;
+	}
+
+	public String getCdrGeMis() {
+		return cdrGeMis;
+	}
+
+	public void setCdrGeMis(String cdrGeMis) {
+		this.cdrGeMis = cdrGeMis;
+	}
+
+	public String getVoceGeMis() {
+		return voceGeMis;
+	}
+
+	public void setVoceGeMis(String voceGeMis) {
+		this.voceGeMis = voceGeMis;
 	}
 
 }

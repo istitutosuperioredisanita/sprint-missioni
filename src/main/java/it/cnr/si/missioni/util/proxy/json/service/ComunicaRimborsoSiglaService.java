@@ -157,6 +157,12 @@ public class ComunicaRimborsoSiglaService {
 			if (rimborsoApprovato.getGae() != null){
 				oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
 			}
+			if (rimborsoApprovato.getCdrSpesa() != null){
+				oggettoBulk.setCdrGeMis(rimborsoApprovato.getCdrSpesa());
+			}
+			if (rimborsoApprovato.getVoce() != null){
+				oggettoBulk.setVoceGeMis(rimborsoApprovato.getVoce());
+			}
 		}
 		impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
 		
