@@ -29,7 +29,7 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         }
     });
 
-missioniApp.controller('ElencoRimborsiMissioneController', function ($scope, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService) {
+missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope, $scope, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService) {
 
     $scope.today = function() {
             // Today + 1 day - needed if the current day must be included
@@ -58,6 +58,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($scope, $lo
 
     $scope.ricerca = function () {
         $scope.endSearching = false;
+        $rootScope.salvataggio = true;
         $scope.rimborsiMissione = null;
         ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine).then(function(data){
             if (data && data.length > 0){
@@ -67,6 +68,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($scope, $lo
                 $scope.messageRimborsiNonEsistenti = true;
             }
             $scope.endSearching = true;
+            $rootScope.salvataggio = false;
         });        
     }
 
