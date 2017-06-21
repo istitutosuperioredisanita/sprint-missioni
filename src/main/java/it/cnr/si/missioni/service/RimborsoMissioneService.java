@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,9 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
@@ -52,6 +55,7 @@ import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
+import it.cnr.si.missioni.util.proxy.json.object.Nazione;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
@@ -390,9 +394,14 @@ public class RimborsoMissioneService {
     }
 
 	private void sendMailToAdministrative(RimborsoMissione rimborsoMissioneDB) {
-		List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
+		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
 		String testoMail = getTextMailSendToAdministrative(rimborsoMissioneDB);
-		sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
+		if (dati != null && dati.getMailNotifiche() != null){
+			mailService.sendEmail(subjectSendToAdministrative, testoMail, false, true, dati.getMailNotifiche());
+		} else {
+			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
+			sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
+		}
 	}
 
 	private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
@@ -405,7 +414,7 @@ public class RimborsoMissioneService {
 	}
 
 	private String getTextMailSendToAdministrative(RimborsoMissione rimborsoMissione) {
-		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" le è stato inviato per la verifica/completamento dei dati finanziari.";
+		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " della uo "+rimborsoMissione.getUoRich()+" "+rimborsoMissione.getDatoreLavoroRich()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  è stato inviato per la verifica/completamento dei dati finanziari.";
 	}
 
 	private void aggiornaDatiRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean confirm,
@@ -942,7 +951,16 @@ public class RimborsoMissioneService {
 			rimborsoMissione.setCdCdsObbligazione(null);
 			rimborsoMissione.setEsercizioObbligazione(null);
 		}
-    
+    	if (rimborsoMissione.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+        	if (ordineMissione != null){
+        		StringBuilder buffer = new StringBuilder();
+        		aggiungiDifferenzaOrdineRimborsoDatiFin(rimborsoMissione, buffer, ordineMissione);
+        		if (buffer.length() > 0 && StringUtils.isEmpty(rimborsoMissione.getNote())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Se si cambiano i dati finanziari è necessario indicarne nelle note il motivo.");
+        		}
+        	}
+    	}
     }
 	
     private void controlloCongruenzaDatiInseriti(Principal principal, RimborsoMissione rimborsoMissione) {
@@ -1100,6 +1118,196 @@ public class RimborsoMissioneService {
 					inputStream, name, mimeTypes);
 		}
 		return null;
+	}
+
+	public String getDifferenzeRimborsoOrdine(Principal principal, RimborsoMissione rimborso) throws ComponentException{
+		StringBuilder buffer = new StringBuilder();
+		OrdineMissione ordine = rimborso.getOrdineMissione();
+		if (ordine.getCdsRich() != null){
+			ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
+		}
+		if (isDiverso(rimborso.getCdsCompetenza(), ordine.getCdsCompetenza())){
+			aggiungiDifferenza(buffer, "CDS Competenza. ", null);
+		}
+		if (isDiverso(rimborso.getUoCompetenza(), ordine.getUoCompetenza())){
+			aggiungiDifferenza(buffer, "UO Competenza. ", null);
+		}
+		if (isDiverso(rimborso.getOggetto(), ordine.getOggetto())){
+			aggiungiDifferenza(buffer, "Oggetto. ", null);
+		}
+		if (isDiverso(rimborso.getDestinazione(), ordine.getDestinazione())){
+			aggiungiDifferenza(buffer, "Destinazione. ", null);
+		}
+		if (isDiverso(rimborso.getTipoMissione(), ordine.getTipoMissione())){
+			aggiungiDifferenza(buffer, "Tipo Missione. ", null);
+		}
+		if (isDiverso(rimborso.getNazione(), ordine.getNazione())){
+			Nazione nazione;
+			try {
+				nazione = nazioneService.loadNazione(rimborso.getNazione());
+				if (nazione != null){
+					aggiungiDifferenza(buffer, "Nazione. ", null);
+				}
+			} catch (Exception e) {
+				throw new ComponentException("Errore durante il recupero dei dati della Nazione", e); 
+			}
+		}
+		if (isDiverso(rimborso.getTrattamento(), ordine.getTrattamento())){
+			aggiungiDifferenza(buffer, "Trattamento. ", null);
+		}
+		if (isDiverso(rimborso.getUtilizzoTaxi(), ordine.getUtilizzoTaxi())){
+			aggiungiDifferenza(buffer, "Utilizzo Taxi. ", null);
+		}
+		if (isDiverso(rimborso.getUtilizzoAutoServizio(), ordine.getUtilizzoAutoServizio())){
+			aggiungiDifferenza(buffer, "Utilizzo Auto Servizio. ", null);
+		}
+		if (isDiverso(rimborso.getPersonaleAlSeguito(), ordine.getPersonaleAlSeguito())){
+			aggiungiDifferenza(buffer, "Personale Al Seguito. ", null);
+		}
+		if (isDiverso(rimborso.getUtilizzoAutoNoleggio(), ordine.getUtilizzoAutoNoleggio())){
+			aggiungiDifferenza(buffer, "Utilizzo Auto Noleggio. ", null);
+		}
+		if (isDiverso(rimborso.getNoteUtilizzoTaxiNoleggio(), ordine.getNoteUtilizzoTaxiNoleggio())){
+			aggiungiDifferenza(buffer, "Note Utilizzo Taxi-Noleggio. ", null);
+		}
+		if (isDiverso(rimborso.getDataInizioMissione(), ordine.getDataInizioMissione())){
+			aggiungiDifferenza(buffer, "Data Inizio Missione. ", null);
+		}
+		if (isDiverso(rimborso.getDataFineMissione(), ordine.getDataFineMissione())){
+			aggiungiDifferenza(buffer, "Data Fine Missione. ", null);
+		}
+		
+		aggiungiDifferenzaOrdineRimborsoDatiFin(rimborso, buffer, ordine);
+		try {
+			OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(principal, ordine);
+			String anticipoOrdine = "N";
+			BigDecimal importoAnticipoOrdine = BigDecimal.ZERO;
+			if (anticipo != null){
+				anticipoOrdine = "S";
+				importoAnticipoOrdine = anticipo.getImporto();
+			}
+			
+			if (isDiverso(Utility.nvl(rimborso.getAnticipoRicevuto(),"N"), anticipoOrdine)){
+				if (anticipoOrdine.equals("S")){
+					aggiungiDifferenza(buffer, "Anticipo: ", "Autorizzato in fase d'ordine ma non indicato in fase di rimborso. ");
+				} else {
+					aggiungiDifferenza(buffer, "Anticipo: ", "Non autorizzato in fase d'ordine. ");
+				}
+			}
+			if (isDiverso(Utility.nvl(rimborso.getAnticipoImporto()), importoAnticipoOrdine)){
+				if (rimborso.getAnticipoImporto() != null){
+					aggiungiDifferenza(buffer, "Importo Anticipo. ", null);
+				} else {
+					aggiungiDifferenza(buffer, "Importo Anticipo. ", "Non valorizzato");
+				}
+			}
+		} catch (ComponentException e) {
+			throw new ComponentException("Errore durante il recupero dei dati dell'anticipo", e); 
+		}
+		try {
+			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordine);
+			String autoPropriaOrdine = "N";
+			String autoPropriaRimborso = "N";
+			if (autoPropria != null){
+				autoPropriaOrdine = "S";
+			}
+			
+			if (rimborso.getRimborsoMissioneDettagli() != null && !rimborso.getRimborsoMissioneDettagli().isEmpty()){
+				for (RimborsoMissioneDettagli dettaglio : rimborso.getRimborsoMissioneDettagli()){
+					if (dettaglio.isDettaglioIndennitaKm()){
+						autoPropriaRimborso = "S";
+					}
+				}
+			}
+			
+			if (isDiverso(autoPropriaRimborso, autoPropriaOrdine)){
+				if (autoPropriaRimborso.equals("S")){
+					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Non autorizzato in fase d'ordine");
+				} else {
+					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Autorizzato in fase d'ordine ma non utilizzato in fase di rimborso");
+				}
+			}
+		} catch (ComponentException e) {
+			throw new ComponentException("Errore durante il recupero dei dati dell'auto propria", e); 
+		}
+		return buffer.toString();
+	}
+
+	private void aggiungiDifferenzaOrdineRimborsoDatiFin(RimborsoMissione rimborso, StringBuilder buffer,
+			OrdineMissione ordine) {
+		if (isDiverso(rimborso.getUoSpesa(), ordine.getUoSpesa())){
+			aggiungiDifferenza(buffer, "UO Spesa. ", null);
+		}
+		if (isDiverso(rimborso.getCdrSpesa(), ordine.getCdrSpesa())){
+			aggiungiDifferenza(buffer, "CDR Spesa. ", null);
+		}
+		if (isDiverso(rimborso.getVoce(), ordine.getVoce())){
+			aggiungiDifferenza(buffer, "Voce. ", null);
+		}
+		if (isDiverso(rimborso.getGae(), ordine.getGae())){
+			aggiungiDifferenza(buffer, "GAE. ", null);
+		}
+		if (isDiverso(rimborso.getPgProgetto(), ordine.getPgProgetto())){
+			Progetto progetto = progettoService.loadModulo(rimborso.getPgProgetto(), rimborso.getAnno(), rimborso.getUoSpesa());
+			if (progetto != null){
+				aggiungiDifferenza(buffer, "Progetto. ", null);
+			}
+		}
+		if (isDiverso(rimborso.getEsercizioOriginaleObbligazione(), ordine.getEsercizioOriginaleObbligazione())){
+			aggiungiDifferenza(buffer, "Anno Impegno. ", null);
+		}
+		if (isDiverso(rimborso.getPgObbligazione(), ordine.getPgObbligazione())){
+			aggiungiDifferenza(buffer, "Numero Impegno. ", null);
+		}
+	}
+	private Boolean isDiverso(Object obj1, Object obj2){
+		if (obj1 == null && obj2 == null){
+			return false;
+		} else if ((obj1 != null && obj2 == null) || 
+				(obj1 == null)){
+			return true;
+		} 
+		if (obj1 instanceof String){
+			String str1 = (String)obj1; 
+			String str2 = (String)obj2;
+			if (!str1.equals(str2)){
+				return true;
+			}
+		} else if (obj1 instanceof ZonedDateTime){
+			ZonedDateTime zd1 = (ZonedDateTime)obj1; 
+			ZonedDateTime zd2 = (ZonedDateTime)obj2;
+			String str1 = DateUtils.getDateAsString(zd1, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
+			String str2 = DateUtils.getDateAsString(zd2, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
+			if (str1.equals(str2)){
+				return true;
+			}
+		} else if (obj1 instanceof LocalDate){
+			LocalDate str1 = (LocalDate)obj1; 
+			LocalDate str2 = (LocalDate)obj2;
+			if (str1.compareTo(str2) != 0){
+				return true;
+			}
+		} else if (obj1 instanceof Long){
+			Long str1 = (Long)obj1; 
+			Long str2 = (Long)obj2;
+			if (str1.compareTo(str2) != 0){
+				return true;
+			}
+		} else if (obj1 instanceof Integer){
+			Integer str1 = (Integer)obj1; 
+			Integer str2 = (Integer)obj2;
+			if (str1.compareTo(str2) != 0){
+				return true;
+			}
+		}
+		return false;
+	}
+	private StringBuilder aggiungiDifferenza(StringBuilder buffer, String label, String value){
+		if (buffer.length() > 0){
+			buffer.append(" - ");
+		}
+		buffer.append(label+Utility.nvl(value));
+		return buffer;
 	}
 }
 

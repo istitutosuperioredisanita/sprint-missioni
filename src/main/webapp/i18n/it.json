@@ -275,6 +275,7 @@
             "priorita": "Priorità*",
             "obbligo-rientro": "Obbligo di Rientro Giornaliero*",
             "partenza": "Partenza Da*",
+            "partenza-da-altro": "Luogo di Partenza*",
             "distanza": "Km. di distanza dalla sede",
             "distanza.placeholder": "Distanza dalla Sede di Servizio: Km.",
             "data-inizio-obbligatoria": "Data Inizio (Presunta)*",

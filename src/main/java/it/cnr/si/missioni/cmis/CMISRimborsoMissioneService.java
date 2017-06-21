@@ -50,6 +50,7 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
+import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -119,7 +120,7 @@ public class CMISRimborsoMissioneService {
 	private PrintRimborsoMissioneService printRimborsoMissioneService;
 
 	@Autowired
-	private OrdineMissioneService ordineMissioneService;
+	private RimborsoMissioneService rimborsoMissioneService;
 
 	@Autowired
 	NazioneService nazioneService;
@@ -258,7 +259,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDestinazione(rimborsoMissione.getDestinazione());
 		cmisRimborsoMissione.setTrattamento(rimborsoMissione.decodeTrattamento());
-		cmisRimborsoMissione.setDifferenzeOrdineRimborso(getDifferenzeRimborsoOrdine(principal, rimborsoMissione));
+		cmisRimborsoMissione.setDifferenzeOrdineRimborso(rimborsoMissioneService.getDifferenzeRimborsoOrdine(principal, rimborsoMissione));
 		cmisRimborsoMissione.setMissioneEsteraFlag(rimborsoMissione.getTipoMissione().equals("E") ? "true" : "false");
 		cmisRimborsoMissione.setDataInizioMissione(DateUtils.getDateAsString(rimborsoMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDataFineMissione(DateUtils.getDateAsString(rimborsoMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
@@ -289,190 +290,6 @@ public class CMISRimborsoMissioneService {
 		return userNameFirmatario;
 	}
 	
-	private String getDifferenzeRimborsoOrdine(Principal principal, RimborsoMissione rimborso) throws ComponentException{
-		StringBuilder buffer = new StringBuilder();
-		OrdineMissione ordine = rimborso.getOrdineMissione();
-		if (ordine.getCdsRich() != null){
-			ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
-		}
-		if (isDiverso(rimborso.getUoSpesa(), ordine.getUoSpesa())){
-			aggiungiDifferenza(buffer, "UO Spesa. ", null);
-		}
-		if (isDiverso(rimborso.getCdrSpesa(), ordine.getCdrSpesa())){
-			aggiungiDifferenza(buffer, "CDR Spesa. ", null);
-		}
-		if (isDiverso(rimborso.getCdsCompetenza(), ordine.getCdsCompetenza())){
-			aggiungiDifferenza(buffer, "CDS Competenza. ", null);
-		}
-		if (isDiverso(rimborso.getUoCompetenza(), ordine.getUoCompetenza())){
-			aggiungiDifferenza(buffer, "UO Competenza. ", null);
-		}
-		if (isDiverso(rimborso.getOggetto(), ordine.getOggetto())){
-			aggiungiDifferenza(buffer, "Oggetto. ", null);
-		}
-		if (isDiverso(rimborso.getDestinazione(), ordine.getDestinazione())){
-			aggiungiDifferenza(buffer, "Destinazione. ", null);
-		}
-		if (isDiverso(rimborso.getTipoMissione(), ordine.getTipoMissione())){
-			aggiungiDifferenza(buffer, "Tipo Missione. ", null);
-		}
-		if (isDiverso(rimborso.getNazione(), ordine.getNazione())){
-			Nazione nazione;
-			try {
-				nazione = nazioneService.loadNazione(rimborso.getNazione());
-				if (nazione != null){
-					aggiungiDifferenza(buffer, "Nazione. ", null);
-				}
-			} catch (Exception e) {
-				throw new ComponentException("Errore durante il recupero dei dati della Nazione", e); 
-			}
-		}
-		if (isDiverso(rimborso.getTrattamento(), ordine.getTrattamento())){
-			aggiungiDifferenza(buffer, "Trattamento. ", null);
-		}
-		if (isDiverso(rimborso.getUtilizzoTaxi(), ordine.getUtilizzoTaxi())){
-			aggiungiDifferenza(buffer, "Utilizzo Taxi. ", null);
-		}
-		if (isDiverso(rimborso.getUtilizzoAutoServizio(), ordine.getUtilizzoAutoServizio())){
-			aggiungiDifferenza(buffer, "Utilizzo Auto Servizio. ", null);
-		}
-		if (isDiverso(rimborso.getPersonaleAlSeguito(), ordine.getPersonaleAlSeguito())){
-			aggiungiDifferenza(buffer, "Personale Al Seguito. ", null);
-		}
-		if (isDiverso(rimborso.getUtilizzoAutoNoleggio(), ordine.getUtilizzoAutoNoleggio())){
-			aggiungiDifferenza(buffer, "Utilizzo Auto Noleggio. ", null);
-		}
-		if (isDiverso(rimborso.getNoteUtilizzoTaxiNoleggio(), ordine.getNoteUtilizzoTaxiNoleggio())){
-			aggiungiDifferenza(buffer, "Note Utilizzo Taxi-Noleggio. ", null);
-		}
-		if (isDiverso(rimborso.getDataInizioMissione(), ordine.getDataInizioMissione())){
-			aggiungiDifferenza(buffer, "Data Inizio Missione. ", null);
-		}
-		if (isDiverso(rimborso.getDataFineMissione(), ordine.getDataFineMissione())){
-			aggiungiDifferenza(buffer, "Data Fine Missione. ", null);
-		}
-		
-		if (isDiverso(rimborso.getVoce(), ordine.getVoce())){
-			aggiungiDifferenza(buffer, "Voce. ", null);
-		}
-		if (isDiverso(rimborso.getGae(), ordine.getGae())){
-			aggiungiDifferenza(buffer, "GAE. ", null);
-		}
-		if (isDiverso(rimborso.getPgProgetto(), ordine.getPgProgetto())){
-			Progetto progetto = progettoService.loadModulo(rimborso.getPgProgetto(), rimborso.getAnno(), rimborso.getUoSpesa());
-			if (progetto != null){
-				aggiungiDifferenza(buffer, "Progetto. ", null);
-			}
-		}
-		if (isDiverso(rimborso.getEsercizioOriginaleObbligazione(), ordine.getEsercizioOriginaleObbligazione())){
-			aggiungiDifferenza(buffer, "Anno Impegno. ", null);
-		}
-		if (isDiverso(rimborso.getPgObbligazione(), ordine.getPgObbligazione())){
-			aggiungiDifferenza(buffer, "Numero Impegno. ", null);
-		}
-		try {
-			OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(principal, ordine);
-			String anticipoOrdine = "N";
-			BigDecimal importoAnticipoOrdine = BigDecimal.ZERO;
-			if (anticipo != null){
-				anticipoOrdine = "S";
-				importoAnticipoOrdine = anticipo.getImporto();
-			}
-			
-			if (isDiverso(Utility.nvl(rimborso.getAnticipoRicevuto(),"N"), anticipoOrdine)){
-				if (anticipoOrdine.equals("S")){
-					aggiungiDifferenza(buffer, "Anticipo: ", "Autorizzato in fase d'ordine ma non indicato in fase di rimborso. ");
-				} else {
-					aggiungiDifferenza(buffer, "Anticipo: ", "Non autorizzato in fase d'ordine. ");
-				}
-			}
-			if (isDiverso(Utility.nvl(rimborso.getAnticipoImporto()), importoAnticipoOrdine)){
-				if (rimborso.getAnticipoImporto() != null){
-					aggiungiDifferenza(buffer, "Importo Anticipo. ", null);
-				} else {
-					aggiungiDifferenza(buffer, "Importo Anticipo. ", "Non valorizzato");
-				}
-			}
-		} catch (ComponentException e) {
-			throw new ComponentException("Errore durante il recupero dei dati dell'anticipo", e); 
-		}
-		try {
-			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordine);
-			String autoPropriaOrdine = "N";
-			String autoPropriaRimborso = "N";
-			if (autoPropria != null){
-				autoPropriaOrdine = "S";
-			}
-			
-			if (rimborso.getRimborsoMissioneDettagli() != null && !rimborso.getRimborsoMissioneDettagli().isEmpty()){
-				for (RimborsoMissioneDettagli dettaglio : rimborso.getRimborsoMissioneDettagli()){
-					if (dettaglio.isDettaglioIndennitaKm()){
-						autoPropriaRimborso = "S";
-					}
-				}
-			}
-			
-			if (isDiverso(autoPropriaRimborso, autoPropriaOrdine)){
-				if (autoPropriaRimborso.equals("S")){
-					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Non autorizzato in fase d'ordine");
-				} else {
-					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Autorizzato in fase d'ordine ma non utilizzato in fase di rimborso");
-				}
-			}
-		} catch (ComponentException e) {
-			throw new ComponentException("Errore durante il recupero dei dati dell'auto propria", e); 
-		}
-		return buffer.toString();
-	}
-	private Boolean isDiverso(Object obj1, Object obj2){
-		if (obj1 == null && obj2 == null){
-			return false;
-		} else if ((obj1 != null && obj2 == null) || 
-				(obj1 == null)){
-			return true;
-		} 
-		if (obj1 instanceof String){
-			String str1 = (String)obj1; 
-			String str2 = (String)obj2;
-			if (!str1.equals(str2)){
-				return true;
-			}
-		} else if (obj1 instanceof ZonedDateTime){
-			ZonedDateTime zd1 = (ZonedDateTime)obj1; 
-			ZonedDateTime zd2 = (ZonedDateTime)obj2;
-			String str1 = DateUtils.getDateAsString(zd1, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
-			String str2 = DateUtils.getDateAsString(zd2, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
-			if (str1.equals(str2)){
-				return true;
-			}
-		} else if (obj1 instanceof LocalDate){
-			LocalDate str1 = (LocalDate)obj1; 
-			LocalDate str2 = (LocalDate)obj2;
-			if (str1.compareTo(str2) != 0){
-				return true;
-			}
-		} else if (obj1 instanceof Long){
-			Long str1 = (Long)obj1; 
-			Long str2 = (Long)obj2;
-			if (str1.compareTo(str2) != 0){
-				return true;
-			}
-		} else if (obj1 instanceof Integer){
-			Integer str1 = (Integer)obj1; 
-			Integer str2 = (Integer)obj2;
-			if (str1.compareTo(str2) != 0){
-				return true;
-			}
-		}
-		return false;
-	}
-	private StringBuilder aggiungiDifferenza(StringBuilder buffer, String label, String value){
-		if (buffer.length() > 0){
-			buffer.append(" - ");
-		}
-		buffer.append(label+Utility.nvl(value));
-		return buffer;
-	}
 	private boolean isDevProfile(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return true;

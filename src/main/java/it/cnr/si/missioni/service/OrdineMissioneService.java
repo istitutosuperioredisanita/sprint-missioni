@@ -311,7 +311,13 @@ public class OrdineMissioneService {
 		if (anticipo != null){
 			anticipo.setStato(Costanti.STATO_DEFINITIVO);
 			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
-    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa())));
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(), ordineMissioneDaAggiornare.getAnno());
+			if (dati != null && dati.getMailNotifiche() != null){
+	    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, dati.getMailNotifiche());
+			} else {
+	    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa())));
+			}
+			
 		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 		popolaCoda(ordineMissioneDaAggiornare);
@@ -591,7 +597,7 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
 			}
 			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissioneDB.getUoSpesa())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione.");
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+ordineMissioneDB.getUoSpesa()+".");
 			}
 			
 			if (!confirm){
@@ -670,7 +676,7 @@ public class OrdineMissioneService {
     	
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
-    	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissione.isMissioneInviataResponsabile())){
+    	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissioneDB.isMissioneInviataResponsabile())){
     		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
     	} else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
     		sendMailToAdministrative(ordineMissioneDB);
@@ -708,6 +714,10 @@ public class OrdineMissioneService {
 		}
 		ordineMissioneDB.setOggetto(ordineMissione.getOggetto());
 		ordineMissioneDB.setPartenzaDa(ordineMissione.getPartenzaDa());
+		ordineMissioneDB.setPartenzaDaAltro(ordineMissione.getPartenzaDa());
+		if (!ordineMissioneDB.getPartenzaDa().equals("A")){
+			ordineMissioneDB.setPartenzaDaAltro(null);
+		}
 		ordineMissioneDB.setPriorita(ordineMissione.getPriorita());
 		ordineMissioneDB.setTipoMissione(ordineMissione.getTipoMissione());
 		ordineMissioneDB.setVoce(ordineMissione.getVoce());
@@ -728,9 +738,14 @@ public class OrdineMissioneService {
 	}
 
 	private void sendMailToAdministrative(OrdineMissione ordineMissioneDB) {
-		List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
+		DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDB.getUoSpesa(), ordineMissioneDB.getAnno());
 		String testoMail = getTextMailSendToAdministrative(ordineMissioneDB);
-		sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
+		if (dati != null && dati.getMailNotifiche() != null){
+			mailService.sendEmail(subjectSendToAdministrative, testoMail, false, true, dati.getMailNotifiche());
+		} else {
+			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
+			sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
+		}
 	}
 
 	private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
@@ -767,7 +782,7 @@ public class OrdineMissioneService {
 	}
 
 	private String getTextMailSendToAdministrative(OrdineMissione ordineMissione) {
-		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stato inviato per la verifica/completamento dei dati finanziari.";
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " della uo "+ordineMissione.getUoRich()+" "+ordineMissione.getDatoreLavoroRich()+" di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" è stato inviato per la verifica/completamento dei dati finanziari.";
 	}
 
 	private String getTextMailReturnToSender(Principal principal, OrdineMissione ordineMissione) {
@@ -836,6 +851,12 @@ public class OrdineMissioneService {
 				} 
 				if (StringUtils.isEmpty(ordineMissione.getTrattamento())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Trattamento");
+				} 
+			}
+
+			if (Utility.nvl(ordineMissione.getPartenzaDa(),"N").equals("A")){
+				if (StringUtils.isEmpty(ordineMissione.getPartenzaDaAltro())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Specificare il luogo di partenza");
 				} 
 			}
 
