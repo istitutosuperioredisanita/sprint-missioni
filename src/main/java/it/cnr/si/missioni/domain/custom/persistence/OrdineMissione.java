@@ -217,6 +217,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "NOTE_SEGRETERIA", length = 1000, nullable = true)
     public String noteSegreteria;
 
+    @Size(min = 0, max = 1000)
+    @Column(name = "PARTENZA_DA_ALTRO", length = 100, nullable = true)
+    public String partenzaDaAltro;
+
     @Size(min = 0, max = 28)
     @Column(name = "VOCE", length = 28, nullable = true)
     public String voce;
@@ -1071,6 +1075,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	@Transient
 	public String decodePartenzaDa(){
 		if (!StringUtils.isEmpty(getPartenzaDa())){
+			if (getPartenzaDa().equals("A")){
+				return getPartenzaDaAltro();
+			}
 			return Costanti.PARTENZA_DA.get(getPartenzaDa());
 		}
 		return "";
@@ -1137,6 +1144,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setNoteSegreteria(String noteSegreteria) {
 		this.noteSegreteria = noteSegreteria;
+	}
+
+	public String getPartenzaDaAltro() {
+		return partenzaDaAltro;
+	}
+
+	public void setPartenzaDaAltro(String partenzaDaAltro) {
+		this.partenzaDaAltro = partenzaDaAltro;
 	}
 
 }
