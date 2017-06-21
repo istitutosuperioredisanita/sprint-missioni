@@ -30,6 +30,8 @@
     <include file="classpath:config/liquibase/changelog/20170418132200_add_column_responsabile_gruppo.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170608114000_add_column_note_segreteria.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170613183000_add_column_responsabile.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170621123000_add_column_partenza_da_altro.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170621130000_add_column_mail_notifiche_spesa.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

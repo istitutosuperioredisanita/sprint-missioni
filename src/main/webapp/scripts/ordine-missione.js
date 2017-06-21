@@ -533,7 +533,8 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.luoghiDiPartenza = {
         'Sede di Lavoro': 'S',
-        'Residenza/Domicilio Fiscale': 'R'
+        'Residenza/Domicilio Fiscale': 'R',
+        'Altro': 'A'
     };
 
     $scope.valoriPriorita = {
@@ -565,6 +566,13 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             $scope.ordineMissioneModel.trattamento = null;
             $scope.missioneEstera = null;
             $scope.ordineMissioneModel.nazione = null;
+        }
+    };
+
+    $scope.onChangePartenzaDa = function() {
+        if ($scope.ordineMissioneModel.partenzaDa === 'A') {
+        } else {
+            $scope.ordineMissioneModel.partenzaDaAltro = null;
         }
     };
 

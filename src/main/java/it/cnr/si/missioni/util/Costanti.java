@@ -50,6 +50,7 @@ public class Costanti {
 	public final static String RIMBORSO_DOCUMENTATO = "R";
 	public final static String RESIDENZA_DOMICILIO = "R";
 	public final static String SEDE_LAVORO = "S";
+	public final static String ALTRO = "A";
 	public final static String FONDI_DI_COMPETENZA = "C";
 	public final static String FONDI_DI_RESIDUO = "R";
 	public final static String STATO_FIRMATO_FROM_CMIS = "FIRMATO";
@@ -106,6 +107,7 @@ public class Costanti {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(RESIDENZA_DOMICILIO, "Residenza/Domicilio Fiscale");
         aMap.put(SEDE_LAVORO, "Sede di Lavoro");
+        aMap.put(ALTRO, "Altro");
         PARTENZA_DA = Collections.unmodifiableMap(aMap);
     }
 
