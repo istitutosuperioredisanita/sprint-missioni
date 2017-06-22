@@ -13,9 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.ProxyService;
+import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
@@ -36,6 +38,9 @@ public class AccountService {
 
 	@Autowired
     private InquadramentoService inquadramentoService;
+
+	@Autowired
+    private UoService uoService;
 
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
@@ -176,6 +181,10 @@ public class AccountService {
 	public Boolean isUserSpecialEnableToValidateOrder(String user, String uo){
 		if (uo == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
+		}
+		Uo datiUo = uoService.recuperoUoSigla(uo);
+		if (datiUo != null && Utility.nvl(datiUo.getOrdineDaValidare(),"N").equals("N")){
+			return true;
 		}
 		UsersSpecial userSpecial = getUoForUsersSpecial(user);
 		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
