@@ -243,11 +243,12 @@ public class OrdineMissioneService {
         			ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
         			if (result != null){
     			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
-        				if (result.isApprovato()){
-        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
-        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-        					listaNew.add(ordineMissione);
-        				} else if (result.isStateReject()){
+//        				if (result.isApprovato()){
+//        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
+//        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+//        					listaNew.add(ordineMissione);
+//        				} else 
+        				if (result.isStateReject()){
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
         			    	aggiornaOrdineMissioneRespinto(principal, result, ordineMissioneDaAggiornare);
