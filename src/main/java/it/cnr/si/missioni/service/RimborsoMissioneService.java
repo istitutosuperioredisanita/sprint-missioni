@@ -198,11 +198,12 @@ public class RimborsoMissioneService {
     				ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
     				if (result != null){
     					RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
-    					if (result.isApprovato()){
-    						aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-    					} else if (result.isStateReject()){
+//    					if (result.isApprovato()){
+//    						aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
+//    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+//    						listaNew.add(rimborsoMissione);
+//    					} else 
+    					if (result.isStateReject()){
     						rimborsoMissione.setCommentFlows(result.getComment());
     						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
     						aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissioneDaAggiornare);
