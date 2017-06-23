@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -73,6 +74,9 @@ import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
 public class OrdineMissioneService {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private DatiIstitutoService datiIstitutoService;
@@ -228,7 +232,14 @@ public class OrdineMissioneService {
 		return map;
     }
     
-    @Transactional(readOnly = true)
+	private boolean isDevProfile(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return true;
+   		}
+   		return false;
+	}
+
+	@Transactional(readOnly = true)
 	public String jsonForPrintOrdineMissione(Principal principal, Long idMissione) throws ComponentException {
     	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
     	return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, principal.getName());
@@ -243,11 +254,6 @@ public class OrdineMissioneService {
         			ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
         			if (result != null){
     			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
-//        				if (result.isApprovato()){
-//        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
-//        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-//        					listaNew.add(ordineMissione);
-//        				} else 
         				if (result.isStateReject()){
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
@@ -257,6 +263,10 @@ public class OrdineMissioneService {
         				} else if (result.isAnnullato()){
         					aggiornaOrdineMissioneAnnullato(principal, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
+        					listaNew.add(ordineMissione);
+        				} else if (isDevProfile() && result.isApprovato()){
+        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
+        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
         					listaNew.add(ordineMissione);
         				} else {
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
