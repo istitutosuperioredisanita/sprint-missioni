@@ -67,6 +67,29 @@ public class AccountService {
 		return listaUtenti;
 	}
 	
+	public Boolean isUserSpecialEnableToValidateOrder(String user, String uo){
+		if (uo == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
+		}
+		Uo datiUo = uoService.recuperoUoSigla(uo);
+		if (datiUo != null && Utility.nvl(datiUo.getOrdineDaValidare(),"N").equals("N")){
+			return true;
+		}
+		UsersSpecial userSpecial = getUoForUsersSpecial(user);
+		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
+		    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
+		    			return true;
+		    		}
+		    	}
+			}
+		} else if (userSpecial.getAll().equals("S")){
+			return true;
+		}
+		return false;
+	}
+	
 	public List<UsersSpecial> getUserSpecialForUoPerValidazione(String uo){
 		return getUserSpecialForUo(uo, true);
 	}
@@ -178,29 +201,6 @@ public class AccountService {
 		return risposta;
 	}
 
-	public Boolean isUserSpecialEnableToValidateOrder(String user, String uo){
-		if (uo == null){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
-		}
-		Uo datiUo = uoService.recuperoUoSigla(uo);
-		if (datiUo != null && Utility.nvl(datiUo.getOrdineDaValidare(),"N").equals("N")){
-			return true;
-		}
-		UsersSpecial userSpecial = getUoForUsersSpecial(user);
-		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
-			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
-		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
-		    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
-		    			return true;
-		    		}
-		    	}
-			}
-		} else if (userSpecial.getAll().equals("S")){
-			return true;
-		}
-		return false;
-	}
-	
 	public Boolean isUserSpecialEnableToFinalizeOrder(String user, String uo){
 		if (uo == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "UO non indicata.");
