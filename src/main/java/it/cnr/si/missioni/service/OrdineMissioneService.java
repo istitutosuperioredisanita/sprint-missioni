@@ -326,7 +326,10 @@ public class OrdineMissioneService {
 			if (dati != null && dati.getMailNotifiche() != null){
 	    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, dati.getMailNotifiche());
 			} else {
-	    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa())));
+				List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
+				if (lista != null && lista.size() > 0){
+		    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(lista));
+				}
 			}
 			
 		}
