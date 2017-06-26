@@ -6,6 +6,7 @@ import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +18,15 @@ import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.util.Costanti;
 
 @Service
 public class FlowsService {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
+
+    @Autowired
+    private Environment env;
 
     @Autowired
 	OrdineMissioneService ordineMissioneService;
@@ -57,7 +62,7 @@ public class FlowsService {
 				if (result == null){
 					return null;
 				}
-				if (result.isApprovato()){
+				if (!isDevProfile() && result.isApprovato()){
 					log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 					ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
 					return result;
@@ -73,6 +78,13 @@ public class FlowsService {
 			}
 		}
 		return null;
+	}
+
+	private boolean isDevProfile(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return true;
+   		}
+   		return false;
 	}
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
