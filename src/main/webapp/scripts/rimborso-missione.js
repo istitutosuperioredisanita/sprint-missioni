@@ -690,6 +690,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.reloadCdr = function(cdr) {
       $scope.annullaModulo();  
       $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+      $scope.restGae($scope.rimborsoMissioneModel.anno, null, cdr, $scope.rimborsoMissioneModel.uoSpesa);
     }
 
     $scope.reloadModulo = function(pgProgetto, cdr, uo) {
