@@ -184,13 +184,7 @@
                 },
                 {
                     "condition": "AND",
-                    "fieldName": "esercizio",
-                    "operator": "=",
-                    "fieldValue": ""
-                },
-                {
-                    "condition": "AND",
-                    "fieldName": "centro_responsabilita.cd_centro_responsabilita",
+                    "fieldName": "cd_centro_responsabilita",
                     "operator": "=",
                     "fieldValue": ""
                 },
@@ -202,6 +196,13 @@
                 }
             ],
             "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "esercizio",
+                    "operator": "=",
+                    "fieldValue": "",
+                    "specialValue": "ANNO_CORRENTE"
+                },
                 {
                     "condition": "AND",
                     "fieldName": "ti_gestione",
