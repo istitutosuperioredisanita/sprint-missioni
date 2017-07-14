@@ -70,6 +70,7 @@ cmis:
     maxItemsPerPage: 10
     folder_path: /Comunicazioni al CNR/Missioni
     folder_path_config: /Config
+    folder_path_manual: /Config/Manuali
 
 cache:
     init_cache: true
