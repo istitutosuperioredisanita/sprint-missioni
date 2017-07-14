@@ -5,6 +5,7 @@
         "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
         "menu": {
             "home": "Home",
+            "manual": "Manuali",
             "entities": {
                 "main": "Anagrafiche",
                 "autoPropria": "Auto Propria",
@@ -488,6 +489,14 @@
             "da-numero-ordine": "Da Numero Ordine",
             "a-numero-ordine": "A Numero Ordine",
             "anno-ordine": "Anno Ordine"
+        }
+    },
+    "manual": {
+        "title": "Manuali",
+        "form": {
+            "name": "Nome",
+            "date": "Data Ultima Modifica",
+            "version": "Versione"
         }
     },
     "activate": {

@@ -16,12 +16,16 @@ public class CmisPath {
 	private final String CMIS_YML = "cmis";
 	private final String FOLDER_PATH_YML = "folder_path";
 	private final String FOLDER_PATH_CONFIG_YML = "folder_path_config";
+	private final String FOLDER_PATH_MANUAL_YML = "folder_path_manual";
 	
 	@Value("${cmis.folder_path}")
 	private String path;
 
 	@Value("${cmis.folder_path_config}")
 	private String folderConfig;
+
+	@Value("${cmis.folder_path_manual}")
+	private String folderManual;
 
 	@Autowired
 	private Environment env;
@@ -58,6 +62,10 @@ public class CmisPath {
 		return getPath()+getFolderConfig();
 	}
 	
+	public String getPathManual(){
+		return getPath()+getFolderManual();
+	}
+	
 	@PostConstruct
 	public void init(){
 		this.propertyResolver = new RelaxedPropertyResolver(env, CMIS_YML+".");
@@ -67,6 +75,9 @@ public class CmisPath {
     	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_CONFIG_YML) != null) {
     		folderConfig = propertyResolver.getProperty(FOLDER_PATH_CONFIG_YML);
     	}
+    	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_MANUAL_YML) != null) {
+    		folderManual = propertyResolver.getProperty(FOLDER_PATH_MANUAL_YML);
+    	}
 	}
 
 	public String getFolderConfig() {
@@ -75,5 +86,13 @@ public class CmisPath {
 
 	public void setFolderConfig(String folderConfig) {
 		this.folderConfig = folderConfig;
+	}
+
+	public String getFolderManual() {
+		return folderManual;
+	}
+
+	public void setFolderManual(String folderManual) {
+		this.folderManual = folderManual;
 	}
 }
