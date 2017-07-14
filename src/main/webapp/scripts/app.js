@@ -92,6 +92,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.all]
                     }
                 })
+                .when('/manual', {
+                    templateUrl: 'views/manual.html',
+                    controller: 'ManualController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/register', {
                     templateUrl: 'views/register.html',
                     controller: 'RegisterController',
