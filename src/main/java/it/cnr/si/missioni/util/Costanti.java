@@ -29,6 +29,9 @@ public class Costanti {
 	public final static String REST_ACCOUNT = "json/userinfo/";
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
+	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
+	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
+	public final static String NOME_CACHE_SERVICES_SIGLA = "cacheServicesSigla";
 	public final static String APP_AA = "AA";
 	public final static String APP_SIGLA = "SIGLA";
 	public final static String APP_SIPER = "SIPER";

@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
@@ -18,7 +19,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 	"firma_spesa",
 	"ordine_da_validare"
 })
-public class Uo {
+public class Uo implements Serializable{
 
 	@JsonProperty("codice_uo")
 	private String codiceUo;

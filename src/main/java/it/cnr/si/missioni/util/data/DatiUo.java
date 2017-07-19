@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 	"title",
 	"uo"
 })
-public class DatiUo {
+public class DatiUo implements Serializable{
 
 	@JsonProperty("title")
 	private String title;
