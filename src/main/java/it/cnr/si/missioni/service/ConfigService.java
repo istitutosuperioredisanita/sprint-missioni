@@ -1,5 +1,20 @@
 package it.cnr.si.missioni.service;
 
+import java.io.InputStream;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -9,44 +24,51 @@ import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
-import java.io.InputStream;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
 public class ConfigService {
 
 	@Autowired
     private MissioniCMISService missioniCMISService;
 
-	private DataUsersSpecial dataUsersSpecial;
-	
     @Autowired
     private Environment env;
 
-	private DatiUo datiUo;
-	
-    private Services services;
-
 	private RelaxedPropertyResolver propertyResolver;	
 	
-    @PostConstruct
+	@PostConstruct
 	public void init(){
-    	reloadConfig();
-    }
+		loadData();
+	}
+
+
 	
 	public void reloadConfig() {
+		evict();
+		loadData();
+	}
+
+	private void loadData() {
 		loadUsersSpecialForUo();
 		loadDatiUo();
 		loadServicesForCache();
+	}
+
+	private void evict() {
+		evictCacheDatiUo();
+		evictCacheServicesSigla();
+		evictCacheUserSpecial();
+	}
+
+	@CacheEvict(value = Costanti.NOME_CACHE_DATI_UO, allEntries = true)
+	private void evictCacheDatiUo() throws ComponentException {
+	}
+
+	@CacheEvict(value = Costanti.NOME_CACHE_SERVICES_SIGLA, allEntries = true)
+	private void evictCacheServicesSigla() throws ComponentException {
+	}
+
+	@CacheEvict(value = Costanti.NOME_CACHE_USER_SPECIAL, allEntries = true)
+	private void evictCacheUserSpecial() throws ComponentException {
 	}
 
 	public void reloadUsersSpecialForUo() {
@@ -61,27 +83,30 @@ public class ConfigService {
 		loadDatiUo();
 	}
 
-	private void loadDatiUo() {
+    @Cacheable(value=Costanti.NOME_CACHE_DATI_UO)
+	private DatiUo loadDatiUo() {
 		InputStream is = getUo();
 		if (is == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle uo non trovato.");
 		}
 		try {
-			this.datiUo = new org.codehaus.jackson.map.ObjectMapper().readValue(is, DatiUo.class); 
+			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, DatiUo.class); 
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle uo." + Utility.getMessageException(e));
 		}
 	}
 
-	private void loadUsersSpecialForUo() {
+    @Cacheable(value=Costanti.NOME_CACHE_USER_SPECIAL)
+	private DataUsersSpecial loadUsersSpecialForUo() {
 		InputStream is = getUsersSpecial();
 		if (is != null){
 			try {
-				this.dataUsersSpecial = new ObjectMapper().readValue(is, DataUsersSpecial.class); 
+				return new ObjectMapper().readValue(is, DataUsersSpecial.class); 
 			} catch (Exception e) {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON dei dati degli utenti speciali per i servizi REST." + Utility.getMessageException(e));
 			}
 		}
+		return null;
 	}
 
 	private InputStream getUsersSpecial() {
@@ -133,23 +158,24 @@ public class ConfigService {
 	}
 	
 	public DataUsersSpecial getDataUsersSpecial() {
-		return dataUsersSpecial;
+    	return loadUsersSpecialForUo();
 	}
 
 	public DatiUo getDatiUo() {
-		return datiUo;
+		return loadDatiUo();
 	}
 	
-	private void loadServicesForCache(){
+    @Cacheable(value=Costanti.NOME_CACHE_SERVICES_SIGLA)
+	private Services loadServicesForCache(){
 		InputStream is = getServicesForCache();
 		if (is != null){
 			try {
-				this.services = new ObjectMapper().readValue(is, Services.class); 
+				return new ObjectMapper().readValue(is, Services.class); 
 			} catch (Exception e) {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON dei servizi REST." + Utility.getMessageException(e));
 			}
 		} else {
-			this.services = null;
+			return null;
 		}
 	}
 
@@ -171,6 +197,6 @@ public class ConfigService {
 	}
 
 	public Services getServices() {
-		return services;
+		return loadServicesForCache();
 	}
 }
