@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 	"uoForUsersSpecial",
 	"all"
 })
-public class UsersSpecial {
+public class UsersSpecial implements Serializable{
 
 	@JsonProperty("uid")
 	private String uid;

@@ -1,11 +1,28 @@
 { "title" : "usersSpecialForUo",
 "usersSpecial":[
 {"uid":"gianfranco.gasparro", "uoForUsersSpecial":[
-{"codice_uo":"000100"},
-{"codice_uo":"000201"},
+{"codice_uo":"000407", "ordine_da_validare":"S"},
 {"codice_uo":"000411", "ordine_da_validare":"S"},
-{"codice_uo":"000412"},
-{"codice_uo":"044000"}]},
-{"uid":"comunicaDati", "all":"S"},
-{"uid":"antonella.verdecchia", "uoForUsersSpecial":[
-{"codice_uo":"000200", "ordine_da_validare":"S"}]}]}
+{"codice_uo":"088000", "ordine_da_validare":"S"},
+{"codice_uo":"044000", "ordine_da_validare":"S"},
+{"codice_uo":"513000", "ordine_da_validare":"S"},
+{"codice_uo":"605000", "ordine_da_validare":"S"}]},
+{"uid":"fabiana.carinci", "uoForUsersSpecial":[
+{"codice_uo":"000407", "ordine_da_validare":"S"},
+{"codice_uo":"088000", "ordine_da_validare":"S"},
+{"codice_uo":"513000", "ordine_da_validare":"S"},
+{"codice_uo":"605000", "ordine_da_validare":"S"}]},
+{"uid":"massimo.fraticelli", "uoForUsersSpecial":[
+{"codice_uo":"000407", "ordine_da_validare":"S"},
+{"codice_uo":"088000", "ordine_da_validare":"S"},
+{"codice_uo":"513000", "ordine_da_validare":"S"},
+{"codice_uo":"605000", "ordine_da_validare":"S"}]},
+{"uid":"sara.mannocchi", "uoForUsersSpecial":[
+{"codice_uo":"088000", "ordine_da_validare":"S"}]},
+{"uid":"valentina.cozza", "uoForUsersSpecial":[
+{"codice_uo":"513000", "ordine_da_validare":"S"}]},
+{"uid":"bianca.piccoli", "uoForUsersSpecial":[
+{"codice_uo":"513000", "ordine_da_validare":"S"},
+{"codice_uo":"605000", "ordine_da_validare":"S"}]},
+{"uid":"paola.giugni", "uoForUsersSpecial":[
+{"codice_uo":"513000", "ordine_da_validare":"S"}]}]}
