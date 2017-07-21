@@ -264,10 +264,10 @@ public class OrdineMissioneService {
         					aggiornaOrdineMissioneAnnullato(principal, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
         					listaNew.add(ordineMissione);
-        				} else if (isDevProfile() && result.isApprovato()){
-        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
-        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-        					listaNew.add(ordineMissione);
+//        				} else if (isDevProfile() && result.isApprovato()){
+//        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
+//        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+//        					listaNew.add(ordineMissione);
         				} else {
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
         					listaNew.add(ordineMissione);
