@@ -187,9 +187,9 @@ public class RimborsoMissioneService {
 	}
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws ComponentException{
-    	if (isDevProfile()){
-        	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
-    	}
+//    	if (isDevProfile()){
+//        	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
+//    	}
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
     	if (lista != null){
     		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
@@ -208,10 +208,10 @@ public class RimborsoMissioneService {
     						aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
     						listaNew.add(rimborsoMissione);
-        				} else if (isDevProfile() && result.isApprovato()){
-        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
-        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-        					listaNew.add(rimborsoMissione);
+//        				} else if (isDevProfile() && result.isApprovato()){
+//        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
+//        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
+//        					listaNew.add(rimborsoMissione);
     					} else {
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
     						listaNew.add(rimborsoMissione);
