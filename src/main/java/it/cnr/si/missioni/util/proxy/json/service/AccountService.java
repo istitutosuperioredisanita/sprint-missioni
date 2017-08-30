@@ -76,16 +76,18 @@ public class AccountService {
 			return true;
 		}
 		UsersSpecial userSpecial = getUoForUsersSpecial(user);
-		if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
-			if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
-		    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
-		    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
-		    			return true;
-		    		}
-		    	}
+		if (userSpecial != null){
+			if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+				if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+			    	for (UoForUsersSpecial uoForUsersSpecial : userSpecial.getUoForUsersSpecials()){
+			    		if (uo.equals(getUoSigla(uoForUsersSpecial)) && Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
+			    			return true;
+			    		}
+			    	}
+				}
+			} else if (userSpecial.getAll().equals("S")){
+				return true;
 			}
-		} else if (userSpecial.getAll().equals("S")){
-			return true;
 		}
 		return false;
 	}
