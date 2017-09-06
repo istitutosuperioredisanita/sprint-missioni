@@ -25,8 +25,6 @@ public class DataUsersSpecial implements Serializable{
 	private String title;
 	@JsonProperty("usersSpecial")
 	private List<UsersSpecial> usersSpecial = new ArrayList<UsersSpecial>();
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	/**
 	 *
@@ -66,16 +64,6 @@ public class DataUsersSpecial implements Serializable{
 	@JsonProperty("usersSpecial")
 	public void setUsersSpecial(List<UsersSpecial> usersSpecial) {
 		this.usersSpecial = usersSpecial;
-	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
 	}
 
 }
