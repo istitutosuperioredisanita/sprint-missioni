@@ -25,9 +25,6 @@ public class DatiUo implements Serializable{
 	private String title;
 	@JsonProperty("uo")
 	private List<Uo> uo = new ArrayList<Uo>();
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
 	/**
 	 *
 	 * @return
@@ -66,16 +63,6 @@ public class DatiUo implements Serializable{
 	@JsonProperty("uo")
 	public void setUo(List<Uo> uo) {
 		this.uo = uo;
-	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
 	}
 
 }
