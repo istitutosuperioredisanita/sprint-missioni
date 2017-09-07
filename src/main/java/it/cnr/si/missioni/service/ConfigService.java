@@ -15,6 +15,9 @@ public class ConfigService {
 	@Autowired
     private LoadFilesService loadFilesService;
 	
+    @Autowired
+    private CronService cronService;
+    
 	Services services = null;
 	DatiUo datiUo = null;
 	DataUsersSpecial dataUsersSpecial = null;
@@ -24,8 +27,11 @@ public class ConfigService {
 		loadData();
 	}
 
+	public void refreshCache() {
+		cronService.evictCache();
+		cronService.loadCache();
+	}
 
-	
 	public void reloadConfig() {
 		loadData();
 	}

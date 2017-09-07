@@ -6,4 +6,9 @@
             $scope.successRefresh = true;
         });
      }
+     $scope.refreshCache = function() {
+        $http.get('api/rest/config/refreshCache').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
  });

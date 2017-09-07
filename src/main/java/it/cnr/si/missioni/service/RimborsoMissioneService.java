@@ -212,7 +212,9 @@ public class RimborsoMissioneService {
 //        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
 //        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
 //        					listaNew.add(rimborsoMissione);
-    					} else {
+            			} else if (result.isApprovato()){
+            				
+            			} else {
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
     						listaNew.add(rimborsoMissione);
     					}

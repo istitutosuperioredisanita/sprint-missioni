@@ -717,7 +717,8 @@
     },
     "config": {
         "title": "Aggiorna i files di Configurazione",
-        "refresh.button": "Aggiorna"
+        "refresh.button": "Aggiorna",
+        "refreshCache.button": "Aggiorna Cache Servizi REST"
     },
     "configuration": {
         "title": "Configuration",

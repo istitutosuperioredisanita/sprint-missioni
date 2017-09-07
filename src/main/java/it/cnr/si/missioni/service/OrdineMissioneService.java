@@ -268,6 +268,8 @@ public class OrdineMissioneService {
 //        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
 //        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
 //        					listaNew.add(ordineMissione);
+            			} else if (result.isApprovato()){
+            				
         				} else {
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
         					listaNew.add(ordineMissione);
