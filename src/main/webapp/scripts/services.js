@@ -37,7 +37,7 @@ missioniApp.factory('Account', function ($resource) {
     });
 
 missioniApp.factory('AccountFromToken', function ($resource) {
-        return $resource('app/rest/ldap/account/token', {}, {
+        return $resource('api/rest/ldap/account/token', {}, {
             'get': { method: 'GET', params: {}, isArray: false}
         });
     });
