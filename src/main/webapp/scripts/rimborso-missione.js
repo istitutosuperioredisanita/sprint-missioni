@@ -1,7 +1,7 @@
 'use strict';
 
 missioniApp.factory('RimborsoMissioneService', function ($resource, DateUtils) {
-        return $resource('app/rest/rimborsoMissione/:ids', {}, {
+        return $resource('api/rest/rimborsoMissione/:ids', {}, {
             'get': { method: 'GET', isArray: true},
             'add':  { method: 'POST',
                  transformRequest: function (data) {
@@ -1001,7 +1001,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.doPrintRimborsoMissione = function(idRimborsoMissione){
       $scope.rimborsoMissioneModel.stampaInCorso=true;
-      $http.get('app/rest/rimborsoMissione/print/json',{params: {idMissione: idRimborsoMissione}})
+      $http.get('api/rest/rimborsoMissione/print/json',{params: {idMissione: idRimborsoMissione}})
         .success(function (data) {
             delete $scope.rimborsoMissioneModel.stampaInCorso;
 //            var file = new Blob([data], {type: 'application/pdf'});
@@ -1022,7 +1022,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
         var y = x.then(function (result) {
             var attachments = $scope.rimborsoMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
@@ -1044,7 +1044,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.viewAttachments = function (idRimborsoMissione) {
         if (!$scope.rimborsoMissioneModel.isFireSearchAttachments){
-            $http.get('app/rest/rimborsoMissione/viewAttachments/' + idRimborsoMissione).then(function (data) {
+            $http.get('api/rest/rimborsoMissione/viewAttachments/' + idRimborsoMissione).then(function (data) {
                 $scope.rimborsoMissioneModel.isFireSearchAttachments = true;
                 var attachments = data.data;
                 if (attachments && Object.keys(attachments).length > 0){

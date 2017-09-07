@@ -24,7 +24,7 @@ missioniApp.constant('APP_FOR_REST', {
 
 missioniApp.constant('URL_REST', {
         'PROXY': 'proxy/',
-        'STANDARD': 'app/proxy/'
+        'STANDARD': 'api/proxy/'
     });
 missioniApp.constant('SIPER_REST', {
         'PERSONS_FOR_UO': 'json/sedi/',

@@ -1,7 +1,7 @@
 'use strict';
 
 missioniApp.factory('RichiestaAnticipoService', function ($resource) {
-        return $resource('app/rest/ordineMissione/anticipo/:ids', {}, {
+        return $resource('api/rest/ordineMissione/anticipo/:ids', {}, {
             'confirm':  { method: 'PUT', params:{confirm:true}}
         });
     });
@@ -23,7 +23,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
             });
     }
 
-    $http.get('app/rest/ordineMissione/anticipo/get', {params: {idMissione: $scope.idOrdineMissione}}).then(function (response) {
+    $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: $scope.idOrdineMissione}}).then(function (response) {
         var datiAnticipoOrdineMissione = response.data;
         if (datiAnticipoOrdineMissione.id === undefined){
             inizializzaDati();
@@ -49,14 +49,14 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
     $scope.save = function () {
             $rootScope.salvataggio = true;
             if ($scope.anticipoOrdineMissioneModel.id){
-                $http.put('app/rest/ordineMissione/anticipo/modify', $scope.anticipoOrdineMissioneModel).success(function(data){
+                $http.put('api/rest/ordineMissione/anticipo/modify', $scope.anticipoOrdineMissioneModel).success(function(data){
                     $rootScope.salvataggio = false;
                     $scope.viewAttachments($scope.anticipoOrdineMissioneModel.id);
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
                 });
             } else {
-                $http.post('app/rest/ordineMissione/anticipo/create', $scope.anticipoOrdineMissioneModel).success(function(data){
+                $http.post('api/rest/ordineMissione/anticipo/create', $scope.anticipoOrdineMissioneModel).success(function(data){
                     $rootScope.salvataggio = false;
                     $scope.anticipoOrdineMissioneModel = data;
                     $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = false;
@@ -85,7 +85,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
     var deleteAnticipo = function () {
         var idAnticipo = $scope.anticipoOrdineMissioneModel.id;
             $rootScope.salvataggio = true;
-            $http.delete('app/rest/ordineMissione/anticipo/' + idAnticipo).success(
+            $http.delete('api/rest/ordineMissione/anticipo/' + idAnticipo).success(
                     function (data) {
                         $rootScope.salvataggio = false;
                         inizializzaDati();
@@ -106,7 +106,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
         var y = x.then(function (result) {
             var attachments = $scope.anticipoOrdineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){

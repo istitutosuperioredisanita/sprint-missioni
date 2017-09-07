@@ -3,7 +3,7 @@
 missioniApp.factory('RimborsoMissioneDettagliService', function (DateUtils, $http) {
         return {
             findDettagli: function(idRimborsoMissione) {
-                var promise = $http.get('app/rest/rimborsoMissione/dettagli/get', {params: {idRimborsoMissione: idRimborsoMissione}}).then(function (response) {
+                var promise = $http.get('api/rest/rimborsoMissione/dettagli/get', {params: {idRimborsoMissione: idRimborsoMissione}}).then(function (response) {
                     if (response.data){
                         var dati = angular.copy(response.data);
                         for (var i=0; i<dati.length; i++) {
@@ -50,7 +50,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     var deleteDettaglioSpesa = function (index) {
         var dettaglioSpesaDaEliminare = $scope.dettagliSpese[index];
         $rootScope.salvataggio = true;
-        $http.delete('app/rest/rimborsoMissione/dettagli/' + dettaglioSpesaDaEliminare.id).success(
+        $http.delete('api/rest/rimborsoMissione/dettagli/' + dettaglioSpesaDaEliminare.id).success(
                     function (data) {
                         $rootScope.salvataggio = false;
                         $scope.dettagliSpese.splice(index,1);
@@ -67,7 +67,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
         var y = x.then(function (result) {
             if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                 for (var i=0; i<$scope.dettagliSpese.length; i++) {
@@ -153,7 +153,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     var dettaglio = $scope.dettagliSpese[i];
                     if (dettaglio.id === idDettaglioSpesa){
                         if (!dettaglio.isFireSearchAttachments){
-                            $http.get('app/rest/rimborsoMissione/dettagli/viewAttachments/' + idDettaglioSpesa).then(function (data) {
+                            $http.get('api/rest/rimborsoMissione/dettagli/viewAttachments/' + idDettaglioSpesa).then(function (data) {
                                   $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
                                   if (attachments && Object.keys(attachments).length > 0){
@@ -316,7 +316,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         newDettaglioSpesa.rimborsoMissione = $scope.rimborsoMissione;
             $rootScope.salvataggio = true;
             newDettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(newDettaglioSpesa.dataSpesa);
-            $http.post('app/rest/rimborsoMissione/dettagli/create', newDettaglioSpesa).success(function(data){
+            $http.post('api/rest/rimborsoMissione/dettagli/create', newDettaglioSpesa).success(function(data){
                     $rootScope.salvataggio = false;
                     if (!$scope.dettagliSpese){
                         $scope.dettagliSpese = [];
@@ -336,7 +336,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
         $rootScope.salvataggio = true;
         dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(dettaglioSpesa.dataSpesa);
-        $http.put('app/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
+        $http.put('api/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
             $rootScope.salvataggio = false;
             dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglioSpesa.dataSpesa);
             undoEditingDettaglioSpesa(dettaglioSpesa);

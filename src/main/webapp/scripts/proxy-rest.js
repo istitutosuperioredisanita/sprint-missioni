@@ -71,7 +71,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.SIPER;
         var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('app/proxy/SIPER?proxyURL=json/userinfo/'+ username);
+        var x = $http.get('api/proxy/SIPER?proxyURL=json/userinfo/'+ username);
         var y = x.then(function (result) {
             if (result.data){
                 return createPerson(result.data);

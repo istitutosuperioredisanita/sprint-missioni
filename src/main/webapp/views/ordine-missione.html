@@ -363,14 +363,14 @@
             <ul class="list-unstyled ordineMissioneModel.attachments" ng-show="ordineMissioneModel.attachmentsExists=true">
               <li ng-repeat="attachment in ordineMissioneModel.attachments">
                 <span class="glyphicon glyphicon-download-alt"></span>
-                <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
                 <button ng-show="!disabilitaOrdineMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </li>
             </ul>
             <h4 >
               <div class="row fileupload-buttonbar">
                 <span ng-hide="ordineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilitaOrdineMissione" validazione="validazione" is-finish-rest-attachments="ordineMissioneModel.isFireSearchAttachments" url="app/rest/ordineMissione/uploadAllegati/{{ordineMissioneModel.id}}" name="file" auto-upload="true" oggetto="ordineMissioneModel" size-limit="500000"></ng-upload-form>
+                <ng-upload-form disabilita="disabilitaOrdineMissione" validazione="validazione" is-finish-rest-attachments="ordineMissioneModel.isFireSearchAttachments" url="api/rest/ordineMissione/uploadAllegati/{{ordineMissioneModel.id}}" name="file" auto-upload="true" oggetto="ordineMissioneModel" size-limit="500000"></ng-upload-form>
               </div>
             </h4>
           </div> 
@@ -414,7 +414,7 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-md-3" ng-show="showEsisteOrdineMissione">
-                      <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                      <a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
 <!--
