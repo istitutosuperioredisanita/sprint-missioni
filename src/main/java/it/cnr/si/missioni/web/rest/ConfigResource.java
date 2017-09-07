@@ -40,6 +40,17 @@ public class ConfigResource {
 	}
 
 	/**
+	 * GET  /rest/config/refreshCache -> refreshCache
+	 */
+	@RequestMapping(value = "/rest/config/refreshCache",
+			method = RequestMethod.GET)
+	@Timed
+	public void refreshCache() {
+		log.debug("REST request per ricaricare la configurazione da Alfresco");
+		configService.refreshCache();
+	}
+
+	/**
 	 * GET  /rest/config/specialUsers -> rechargeSpecialUser.
 	 */
 	@RequestMapping(value = "/rest/config/specialUsers",
