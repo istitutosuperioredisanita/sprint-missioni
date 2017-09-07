@@ -36,7 +36,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class AutoPropriaResource {
 
     private final Logger log = LoggerFactory.getLogger(AutoPropriaResource.class);

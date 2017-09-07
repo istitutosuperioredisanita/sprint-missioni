@@ -50,7 +50,7 @@ import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class RimborsoMissioneResource {
 
     private final Logger log = LoggerFactory.getLogger(RimborsoMissioneResource.class);

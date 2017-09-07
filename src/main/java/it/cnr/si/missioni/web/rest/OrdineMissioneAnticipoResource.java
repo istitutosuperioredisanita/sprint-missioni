@@ -47,7 +47,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class OrdineMissioneAnticipoResource {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneAnticipoResource.class);

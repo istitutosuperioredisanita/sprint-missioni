@@ -3,13 +3,13 @@
 missioniApp.factory('AutoPropriaOrdineMissioneService', function ($http) {
         return {
             findAutoPropria: function(idMissione) {
-                var promise = $http.get('app/rest/ordineMissione/autoPropria/get', {params: {idMissione: idMissione}}).then(function (response) {
+                var promise = $http.get('api/rest/ordineMissione/autoPropria/get', {params: {idMissione: idMissione}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findSpostamenti: function(idAutoPropriaOrdineMissione) {
-                var promise = $http.get('app/rest/ordineMissione/autoPropria/getSpostamenti', {params: {idAutoPropriaOrdineMissione: idAutoPropriaOrdineMissione}}).then(function (response) {
+                var promise = $http.get('api/rest/ordineMissione/autoPropria/getSpostamenti', {params: {idAutoPropriaOrdineMissione: idAutoPropriaOrdineMissione}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -92,13 +92,13 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
         });
     }
 
-    $http.get('app/rest/ordineMissione/autoPropria/get', {params: {idMissione: $scope.idOrdineMissione}}).then(function (response) {
+    $http.get('api/rest/ordineMissione/autoPropria/get', {params: {idMissione: $scope.idOrdineMissione}}).then(function (response) {
         var datiAutoPropriaOrdineMissione = response.data;
         if (datiAutoPropriaOrdineMissione.id === undefined){
             inizializzaDati();
         } else {
             $scope.autoPropriaOrdineMissioneModel = datiAutoPropriaOrdineMissione;
-            $http.get('app/rest/ordineMissione/autoPropria/getSpostamenti', {params: {idAutoPropriaOrdineMissione: $scope.autoPropriaOrdineMissioneModel.id}}).then(function (response) {
+            $http.get('api/rest/ordineMissione/autoPropria/getSpostamenti', {params: {idAutoPropriaOrdineMissione: $scope.autoPropriaOrdineMissioneModel.id}}).then(function (response) {
                 $scope.spostamentiAutoPropria = response.data;
             });
         }
@@ -116,13 +116,13 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
     $scope.save = function () {
             $rootScope.salvataggio = true;
             if ($scope.autoPropriaOrdineMissioneModel.id){
-                $http.put('app/rest/ordineMissione/autoPropria/modify', $scope.autoPropriaOrdineMissioneModel).success(function(data){
+                $http.put('api/rest/ordineMissione/autoPropria/modify', $scope.autoPropriaOrdineMissioneModel).success(function(data){
                     $rootScope.salvataggio = false;
                 }).error(function (data) {
                     $rootScope.salvataggio = false;
                 });
             } else {
-                $http.post('app/rest/ordineMissione/autoPropria/create', $scope.autoPropriaOrdineMissioneModel).success(function(data){
+                $http.post('api/rest/ordineMissione/autoPropria/create', $scope.autoPropriaOrdineMissioneModel).success(function(data){
                     $rootScope.salvataggio = false;
                     $scope.autoPropriaOrdineMissioneModel = data;
                 }).error(function (data) {
@@ -135,7 +135,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
     var deleteSpostamenti = function (index) {
         var idSpostamento = $scope.spostamentiAutoPropria[index].id;
             $rootScope.salvataggio = true;
-            $http.delete('app/rest/ordineMissione/autoPropria/spostamenti/' + idSpostamento).success(
+            $http.delete('api/rest/ordineMissione/autoPropria/spostamenti/' + idSpostamento).success(
                     function (data) {
                         $rootScope.salvataggio = false;
                         $scope.spostamentiAutoPropria.splice(index,1);
@@ -149,7 +149,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
     var deleteAutoPropria = function () {
         var idAutoPropria = $scope.autoPropriaOrdineMissioneModel.id;
                         $rootScope.salvataggio = true;
-            $http.delete('app/rest/ordineMissione/autoPropria/' + idAutoPropria).success(
+            $http.delete('api/rest/ordineMissione/autoPropria/' + idAutoPropria).success(
                     function (data) {
                         $rootScope.salvataggio = false;
                         inizializzaDati();
@@ -175,7 +175,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
     $scope.insertSpostamentoAutoPropria = function (newRigaSpostamento) {
         newRigaSpostamento.ordineMissioneAutoPropria = $scope.autoPropriaOrdineMissioneModel;
             $rootScope.salvataggio = true;
-            $http.post('app/rest/ordineMissione/autoPropria/createSpostamento', newRigaSpostamento).success(function(data){
+            $http.post('api/rest/ordineMissione/autoPropria/createSpostamento', newRigaSpostamento).success(function(data){
                     $rootScope.salvataggio = false;
                     if (!$scope.spostamentiAutoPropria){
                         $scope.spostamentiAutoPropria = [];
@@ -189,7 +189,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
 
     $scope.modifySpostamento = function (spostamentoAutoPropria) {
         $rootScope.salvataggio = true;
-        $http.put('app/rest/ordineMissione/autoPropria/modifySpostamento', spostamentoAutoPropria).success(function(data){
+        $http.put('api/rest/ordineMissione/autoPropria/modifySpostamento', spostamentoAutoPropria).success(function(data){
             $rootScope.salvataggio = false;
             undoEditingSpostamento(spostamentoAutoPropria);
         }).error(function (data) {

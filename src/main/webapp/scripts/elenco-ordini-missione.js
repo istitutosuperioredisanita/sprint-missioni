@@ -3,31 +3,31 @@
 missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtils) {
         return {
             findMissioniDaRimborsare: function(user) {
-                var promise = $http.get('app/rest/ordiniMissione/listDaRimborsare', {params: {user:user}}).then(function (response) {
+                var promise = $http.get('api/rest/ordiniMissione/listDaRimborsare', {params: {user:user}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findMissioni: function(user, anno, cdsRich, daNumero, aNumero, daData, aData) {
-                var promise = $http.get('app/rest/ordiniMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData}}).then(function (response) {
+                var promise = $http.get('api/rest/ordiniMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findMissioniDaRendereDefinitive: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, uoRich) {
-                var promise = $http.get('app/rest/ordiniMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich}}).success(function (response) {
+                var promise = $http.get('api/rest/ordiniMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich}}).success(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findById: function(id) {
-                var promise = $http.get('app/rest/ordineMissione/getById', {params: {id: id}}).then(function (response) {
+                var promise = $http.get('api/rest/ordineMissione/getById', {params: {id: id}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findListToValidate: function() {
-                var promise = $http.get('app/rest/ordiniMissione/listToValidate').success(function (response) {
+                var promise = $http.get('api/rest/ordiniMissione/listToValidate').success(function (response) {
                     return response.data;
                 });
                 return promise;

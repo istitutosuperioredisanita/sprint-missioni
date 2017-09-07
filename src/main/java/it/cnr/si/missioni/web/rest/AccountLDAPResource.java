@@ -22,7 +22,7 @@ import com.codahale.metrics.annotation.Timed;
  * REST controller for current ldap user's account.
  */
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class AccountLDAPResource {
     /**
      * GET  /rest/account -> get the current user.

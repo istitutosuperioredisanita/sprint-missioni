@@ -428,14 +428,14 @@
             <ul class="list-unstyled rimborsoMissioneModel.attachments" ng-show="rimborsoMissioneModel.attachmentsExists=true">
               <li ng-repeat="attachment in rimborsoMissioneModel.attachments">
                 <span class="glyphicon glyphicon-download-alt"></span>
-                <a target="_blank" href="app/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
                 <button ng-show="!disabilitaRimborsoMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
               </li>
             </ul>
             <h4 >
               <div class="row fileupload-buttonbar">
                 <span ng-hide="rimborsoMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="app/rest/rimborsoMissione/uploadAllegati/{{rimborsoMissioneModel.id}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
+                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="api/rest/rimborsoMissione/uploadAllegati/{{rimborsoMissioneModel.id}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
               </div>
             </h4>
           </div> 
@@ -471,7 +471,7 @@
                     <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
 
                     <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
-                      <a target="_blank" href="app/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                      <a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
 <!--

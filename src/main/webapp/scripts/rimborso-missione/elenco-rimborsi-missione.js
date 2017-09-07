@@ -3,25 +3,25 @@
 missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         return {
             findRimborsiMissione: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
-                var promise = $http.get('app/rest/rimborsoMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).then(function (response) {
+                var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findRimborsiMissioneDaRendereDefinitive: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, uoRich, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
-                var promise = $http.get('app/rest/rimborsoMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).success(function (response) {
+                var promise = $http.get('api/rest/rimborsoMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).success(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findById: function(id) {
-                var promise = $http.get('app/rest/rimborsoMissione/getById', {params: {id: id}}).then(function (response) {
+                var promise = $http.get('api/rest/rimborsoMissione/getById', {params: {id: id}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findListToValidate: function() {
-                var promise = $http.get('app/rest/rimborsoMissione/listToValidate').success(function (response) {
+                var promise = $http.get('api/rest/rimborsoMissione/listToValidate').success(function (response) {
                     return response.data;
                 });
                 return promise;
