@@ -53,7 +53,7 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
  */
 @RestControllerAdvice
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class OrdineMissioneResource {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneResource.class);

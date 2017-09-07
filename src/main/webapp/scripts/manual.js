@@ -4,7 +4,7 @@ missioniApp.factory('ManualService', function ($http, $resource) {
 
     return {
             get: function() {
-                var promise = $http.get('app/rest/manual').then(function (response) {
+                var promise = $http.get('api/rest/manual').then(function (response) {
                     return response.data;
                 });
                 return promise;

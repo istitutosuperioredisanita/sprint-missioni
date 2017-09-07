@@ -5,7 +5,7 @@
 missioniApp.factory('AutoProprieService', function ($resource) {
     return {
       get: function(user){
-        return $resource('app/rest/autoPropria/:ids', {}, {
+        return $resource('api/rest/autoPropria/:ids', {}, {
             'get': { method: 'GET', params: {user:user}, isArray: true}
         }).get();
       }
@@ -14,7 +14,7 @@ missioniApp.factory('AutoProprieService', function ($resource) {
 
 missioniApp.factory('AutoProprieServiceCud', function ($resource) {
     
-        return $resource('app/rest/autoPropria/:ids', {}, {
+        return $resource('api/rest/autoPropria/:ids', {}, {
             'add':  { method: 'POST'},
             'modify':  { method: 'PUT'},
             'delete':  { method: 'DELETE'}

@@ -42,7 +42,7 @@ import it.cnr.si.security.AuthoritiesConstants;
  * REST controller for proxy to different application.
  */
 @RestController
-@RequestMapping("app/proxy/{app}")
+@RequestMapping("api/proxy/{app}")
 public class ProxyResource {
 
     private final Logger log = LoggerFactory.getLogger(ProxyResource.class);

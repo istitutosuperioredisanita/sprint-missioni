@@ -1,7 +1,7 @@
 'use strict';
 
 missioniApp.factory('OrdineMissioneService', function ($resource, DateUtils) {
-        return $resource('app/rest/ordineMissione/:ids', {}, {
+        return $resource('api/rest/ordineMissione/:ids', {}, {
             'get': { method: 'GET', isArray: true},
             'add':  { method: 'POST',
                 transformRequest: function (data) {
@@ -871,7 +871,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('app/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
         var y = x.then(function (result) {
             var attachments = $scope.ordineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
@@ -893,7 +893,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.viewAttachments = function (idOrdineMissione) {
         if (!$scope.ordineMissioneModel.isFireSearchAttachments){
-            $http.get('app/rest/ordineMissione/viewAttachments/' + idOrdineMissione).then(function (data) {
+            $http.get('api/rest/ordineMissione/viewAttachments/' + idOrdineMissione).then(function (data) {
                 $scope.ordineMissioneModel.isFireSearchAttachments = true;
                 var attachments = data.data;
                 if (attachments && Object.keys(attachments).length > 0){
@@ -913,7 +913,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.doPrintOrdineMissione = function(idOrdineMissione){
       $scope.ordineMissioneModel.stampaInCorso=true;
-      $http.get('app/rest/ordineMissione/print/json',{params: {idMissione: idOrdineMissione}})
+      $http.get('api/rest/ordineMissione/print/json',{params: {idMissione: idOrdineMissione}})
         .success(function (data) {
             delete $scope.ordineMissioneModel.stampaInCorso;
 //            var file = new Blob([data], {type: 'application/pdf'});

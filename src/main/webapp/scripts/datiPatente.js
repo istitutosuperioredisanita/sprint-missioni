@@ -3,14 +3,14 @@
 /* Dati Patente */
 
 missioniApp.factory('DatiPatenteService', function ($resource) {
-        return $resource('app/rest/datiPatente', {}, {
+        return $resource('api/rest/datiPatente', {}, {
         });
     });
 
 missioniApp.factory('DatiPatenteServiceUser', function ($resource) {
     return {
       get: function(user){
-        return $resource('app/rest/datiPatente', {}, {
+        return $resource('api/rest/datiPatente', {}, {
             'get': { method: 'GET', params: {user:user}, isArray: false}
         }).get();
       }

@@ -22,7 +22,7 @@
         <tbody>
         <tr ng-repeat="manual in manuals">
 <td>
-            <a class="glyphicon glyphicon-download-alt" target="_blank" href="app/rest/public/getAttachment?id={{manual.id}}&token={{accessToken}}" data-toggle="tooltip" >  {{manual.nomeFile}}</td>
+            <a class="glyphicon glyphicon-download-alt" target="_blank" href="api/rest/public/getAttachment?id={{manual.id}}&token={{accessToken}}" data-toggle="tooltip" >  {{manual.nomeFile}}</td>
             <td>{{manual.version}}</td>
             <td>{{manual.date| date:'dd/MM/yyyy'}}</td>
 </tr>        </tr>

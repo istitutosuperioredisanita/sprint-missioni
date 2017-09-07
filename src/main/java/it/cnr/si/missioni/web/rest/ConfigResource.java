@@ -19,7 +19,7 @@ import com.codahale.metrics.annotation.Timed;
  */
 @RolesAllowed({AuthoritiesConstants.ADMIN})
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class ConfigResource {
 
 	private final Logger log = LoggerFactory.getLogger(ConfigResource.class);

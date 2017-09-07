@@ -224,7 +224,7 @@ missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, 
                         if (data.matricola) {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username + ':' + param.password);
                             $http.get(
-                                'app/proxy/SIPER?proxyURL=json/userinfo/' + param.username
+                                'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username
                             ).success(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                                 Session.create(param.username, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
@@ -347,7 +347,7 @@ missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, 
                 $sessionStorage.account = null;
                 AccessToken.remove();
 
-                $http.get('app/logout');
+                $http.get('api/logout');
                 Session.invalidate();
                 delete httpHeaders.common['Authorization'];
                 authService.loginCancelled();

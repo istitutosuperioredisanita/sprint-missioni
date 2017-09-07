@@ -20,7 +20,7 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class UoResource {
 
     private final Logger log = LoggerFactory.getLogger(UoResource.class);
