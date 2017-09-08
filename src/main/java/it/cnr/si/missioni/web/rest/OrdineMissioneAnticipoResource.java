@@ -242,21 +242,26 @@ public class OrdineMissioneAnticipoResource {
 		} 
     }
 
-    @RequestMapping(value = "/rest/ordineMissione/anticipo/uploadAllegati/{idAnticipo}",
+    @RequestMapping(value = "/rest/public/ordineMissione/anticipo/uploadAllegati",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegatiAnticipo(@PathVariable Long idAnticipo, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadAllegatiAnticipo(@RequestParam(value = "idAnticipo") String idAnticipo, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
         log.debug("REST request per l'upload di allegati dell'anticipo" );
         if (idAnticipo != null){
+        	Long idAnticipoLong = new Long (idAnticipo); 
+        	OAuth2Authentication auth = tokenStore.readAuthentication(token);
+
+        	if (auth != null){
+        		Principal principal = (Principal) auth;
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
             			if (mimeTypes == null){
                 			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
             			} else {
-        					CMISFileAttachment cmisFileAttachment = ordineMissioneAnticipoService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idAnticipo, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+        					CMISFileAttachment cmisFileAttachment = ordineMissioneAnticipoService.uploadAllegato(principal, idAnticipoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
         	                if (cmisFileAttachment != null){
         	                    return JSONResponseEntity.ok(cmisFileAttachment);
         	                } else {
@@ -274,6 +279,11 @@ public class OrdineMissioneAnticipoResource {
         			log.error("uploadAllegatiAnticipo", e1);
                     return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
 				}
+        	} else {
+            	String error = "Utente non Autorizzato.";
+    			log.error("uploadAllegatiAnticipo", error);
+                return JSONResponseEntity.badRequest(error);
+        	}
     	} else {
         	String error = "Id Dettaglio non valorizzato.";
 			log.error("uploadAllegatiAnticipo", error);

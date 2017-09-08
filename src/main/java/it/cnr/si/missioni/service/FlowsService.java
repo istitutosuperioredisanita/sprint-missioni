@@ -62,7 +62,7 @@ public class FlowsService {
 				if (result == null){
 					return null;
 				}
-				if (!isDevProfile() && result.isApprovato()){
+				if (result.isApprovato()){
 					log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 					ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
 					return result;

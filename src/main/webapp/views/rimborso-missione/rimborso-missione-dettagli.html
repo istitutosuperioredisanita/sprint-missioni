@@ -55,7 +55,7 @@
                               <h4 >
                                   <div class="row fileupload-buttonbar">
                                     <span ng-hide="dettaglioSpesa.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                                    <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="dettaglioSpesa.isFireSearchAttachments" url="api/rest/rimborsoMissione/dettaglio/uploadAllegati/{{dettaglioSpesa.id}}" name="file" auto-upload="true" dettagli-spese="dettagliSpese" size-limit="500000"></ng-upload-form>
+                                    <ng-upload-form disabilita="disabilita" validazione="validazione" is-finish-rest-attachments="dettaglioSpesa.isFireSearchAttachments" url="api/rest/public/rimborsoMissione/dettaglio/uploadAllegati?idDettaglioRimborso={{dettaglioSpesa.id}}&token={{accessToken}}" name="file" auto-upload="true" dettagli-spese="dettagliSpese" size-limit="500000"></ng-upload-form>
                                 </div>
                               </h4>
                             </div>
