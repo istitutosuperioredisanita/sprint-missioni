@@ -20,6 +20,7 @@ public class MissioneFilter {
 	private String cdsRich;
 	private String uoRich;
 	private String toFinal;
+	private String daCron;
 	public Long getDaNumero() {
 		return daNumero;
 	}
@@ -115,5 +116,11 @@ public class MissioneFilter {
 	}
 	public void setListaStatiFlussoMissione(List<String> listaStatiFlussoMissione) {
 		this.listaStatiFlussoMissione = listaStatiFlussoMissione;
+	}
+	public String getDaCron() {
+		return daCron;
+	}
+	public void setDaCron(String daCron) {
+		this.daCron = daCron;
 	}
 }
