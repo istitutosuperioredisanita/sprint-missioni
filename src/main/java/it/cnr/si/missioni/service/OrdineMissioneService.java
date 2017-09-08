@@ -418,7 +418,9 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
 			}
 		}
-		if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
+		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
+			return crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.asc("dataInserimento"));
+		} else if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
 			if (StringUtils.isEmpty(filter.getUoRich())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
 			}
