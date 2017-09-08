@@ -17,7 +17,7 @@ missioniApp.factory('DatiPatenteServiceUser', function ($resource) {
     }
     });
 
-missioniApp.controller('\', function ($scope, DatiPatenteService, DatiPatenteServiceUser, ProxyService, $sessionStorage) {
+missioniApp.controller('DatiPatenteController', function ($scope, DatiPatenteService, DatiPatenteServiceUser, ProxyService, $sessionStorage) {
     $scope.today = function() {
             // Today + 1 day - needed if the current day must be included
             var today = new Date();
