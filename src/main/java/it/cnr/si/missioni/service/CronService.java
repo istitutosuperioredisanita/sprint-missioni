@@ -194,6 +194,7 @@ public class CronService {
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		filtroRimborso.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
+		filtroRimborso.setDaCron("S");
 		List<RimborsoMissione> listaRimborsiMissione = null;
 		try {
 			listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
