@@ -337,21 +337,26 @@ public class OrdineMissioneResource {
 		} 
     }
 
-    @RequestMapping(value = "/rest/ordineMissione/uploadAllegati/{idOrdineMissione}",
+    @RequestMapping(value = "/rest/public/ordineMissione/uploadAllegati",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegati(@PathVariable Long idOrdineMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idOrdineMissione") String idOrdineMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
         log.debug("REST request per l'upload di allegati dell'ordine di missione" );
         if (idOrdineMissione != null){
+        	Long idMissioneLong = new Long (idOrdineMissione); 
+        	OAuth2Authentication auth = tokenStore.readAuthentication(token);
+
+        	if (auth != null){
+        		Principal principal = (Principal) auth;
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
             			if (mimeTypes == null){
                 			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
             			} else {
-        					CMISFileAttachment cmisFileAttachment = ordineMissioneService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+        					CMISFileAttachment cmisFileAttachment = ordineMissioneService.uploadAllegato(principal, idMissioneLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
         	                if (cmisFileAttachment != null){
         	                    return JSONResponseEntity.ok(cmisFileAttachment);
         	                } else {
@@ -369,6 +374,11 @@ public class OrdineMissioneResource {
         			log.error("uploadAllegatiOrdineMissione", e1);
                     return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
 				}
+        	} else {
+            	String error = "Utente non autorizzato.";
+    			log.error("uploadAllegatiOrdineMissione", error);
+                return JSONResponseEntity.badRequest(error);
+        	}
     	} else {
         	String error = "Id Dettaglio non valorizzato.";
 			log.error("uploadAllegatiOrdineMissione", error);

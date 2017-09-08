@@ -435,7 +435,7 @@
             <h4 >
               <div class="row fileupload-buttonbar">
                 <span ng-hide="rimborsoMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="api/rest/rimborsoMissione/uploadAllegati/{{rimborsoMissioneModel.id}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
+                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="api/rest/public/rimborsoMissione/uploadAllegati?idRimborso={{rimborsoMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
               </div>
             </h4>
           </div> 
