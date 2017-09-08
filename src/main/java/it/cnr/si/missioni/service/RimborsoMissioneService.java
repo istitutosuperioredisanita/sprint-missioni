@@ -678,7 +678,7 @@ public class RimborsoMissioneService {
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
 					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
 					    		if (uo != null){
-					    			condizioneOr.add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser)));
+					    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))));
 						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
 							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))).add(Restrictions.eq("validato", "N")).add(Restrictions.eq("stato", "CON")));
@@ -702,7 +702,7 @@ public class RimborsoMissioneService {
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
-					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.eq("stato", Costanti.STATO_INSERITO))));
+					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
 				rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"));
 			} else
