@@ -169,6 +169,7 @@ public class CronService {
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 		filtroRimborso.setValidato("S");
+		filtroRimborso.setDaCron("S");
 		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
@@ -227,6 +228,7 @@ public class CronService {
 		MissioneFilter filtro = new MissioneFilter();
 		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 		filtro.setValidato("S");
+		filtro.setDaCron("S");
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
 			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
