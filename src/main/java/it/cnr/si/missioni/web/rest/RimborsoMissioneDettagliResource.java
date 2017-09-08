@@ -153,42 +153,52 @@ public class RimborsoMissioneDettagliResource {
 		} 
     }
 
-    @RequestMapping(value = "/rest/rimborsoMissione/dettaglio/uploadAllegati/{idDettaglioRimborsoMissione}",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(value = "/rest/public/rimborsoMissione/dettaglio/uploadAllegati",
+    		method = RequestMethod.POST,
+    		produces = MediaType.APPLICATION_JSON_VALUE,
+    		consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegatiDettaglioRimborsoMissione(@PathVariable Long idDettaglioRimborsoMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
-        log.debug("REST request per l'upload di allegati al dettaglio del Rimborso Missione" );
-        if (idDettaglioRimborsoMissione != null){
-            	try {
-            		if (file != null && file.getContentType() != null){
-            			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
-            			if (mimeTypes == null){
-                			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
-            			} else {
-        					CMISFileAttachment cmisFileAttachment = rimborsoMissioneDettagliService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idDettaglioRimborsoMissione, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
-        	                if (cmisFileAttachment != null){
-        	                    return JSONResponseEntity.ok(cmisFileAttachment);
-        	                } else {
-        	                	String error = "Non è stato possibile salvare il file.";
-        	        			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
-        	                    return JSONResponseEntity.badRequest(error);
-        	                }
-            			}
-            		}else {
-	                	String error = "File vuoto o con tipo non specificato.";
-	        			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
-	                    return JSONResponseEntity.badRequest(error);
-            		}
-            	} catch (Exception e1) {
-        			log.error("uploadAllegatiDettaglioRimborsoMissione", e1);
-                    return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
-				}
+    public ResponseEntity<?> uploadAllegatiDettaglioRimborsoMissione(@RequestParam(value = "idDettaglioRimborso") String idDettaglioRimborsoMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+    	log.debug("REST request per l'upload di allegati al dettaglio del Rimborso Missione" );
+    	if (idDettaglioRimborsoMissione != null){
+    		Long idDettaglioRimborsoLong = new Long (idDettaglioRimborsoMissione); 
+    		OAuth2Authentication auth = tokenStore.readAuthentication(token);
+
+    		if (auth != null){
+    			Principal principal = (Principal) auth;
+    			try {
+    				if (file != null && file.getContentType() != null){
+    					MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
+    					if (mimeTypes == null){
+    						return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
+    					} else {
+    						CMISFileAttachment cmisFileAttachment = rimborsoMissioneDettagliService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idDettaglioRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+    						if (cmisFileAttachment != null){
+    							return JSONResponseEntity.ok(cmisFileAttachment);
+    						} else {
+    							String error = "Non è stato possibile salvare il file.";
+    							log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+    							return JSONResponseEntity.badRequest(error);
+    						}
+    					}
+    				}else {
+    					String error = "File vuoto o con tipo non specificato.";
+    					log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+    					return JSONResponseEntity.badRequest(error);
+    				}
+    			} catch (Exception e1) {
+    				log.error("uploadAllegatiDettaglioRimborsoMissione", e1);
+    				return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
+    			}
+    		} else {
+    			String error = "Utente non autorizzato.";
+    			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+    			return JSONResponseEntity.badRequest(error);
+    		}
     	} else {
-        	String error = "Id Dettaglio non valorizzato.";
-			log.error("uploadAllegatiDettaglioRimborsoMissione", error);
-            return JSONResponseEntity.badRequest(error);
+    		String error = "Id Dettaglio non valorizzato.";
+    		log.error("uploadAllegatiDettaglioRimborsoMissione", error);
+    		return JSONResponseEntity.badRequest(error);
     	}
     }
 

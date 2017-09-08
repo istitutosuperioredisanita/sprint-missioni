@@ -370,7 +370,7 @@
             <h4 >
               <div class="row fileupload-buttonbar">
                 <span ng-hide="ordineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilitaOrdineMissione" validazione="validazione" is-finish-rest-attachments="ordineMissioneModel.isFireSearchAttachments" url="api/rest/ordineMissione/uploadAllegati/{{ordineMissioneModel.id}}" name="file" auto-upload="true" oggetto="ordineMissioneModel" size-limit="500000"></ng-upload-form>
+                <ng-upload-form disabilita="disabilitaOrdineMissione" validazione="validazione" is-finish-rest-attachments="ordineMissioneModel.isFireSearchAttachments" url="api/rest/public/ordineMissione/uploadAllegati?idOrdineMissione={{ordineMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="ordineMissioneModel" size-limit="500000"></ng-upload-form>
               </div>
             </h4>
           </div> 
@@ -418,7 +418,8 @@
                     </div>
 
 <!--
-                      <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(ordineMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                      <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="
+                      intOrdineMissione(ordineMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
 -->
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">

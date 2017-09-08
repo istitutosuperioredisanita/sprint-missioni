@@ -51,7 +51,7 @@
             <h4 >
               <div class="row fileupload-buttonbar">
                 <span ng-hide="anticipoOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="isOrdineMissioneConfermato" validazione="validazione" is-finish-rest-attachments="anticipoOrdineMissioneModel.isFireSearchAttachments" url="api/rest/ordineMissione/anticipo/uploadAllegati/{{anticipoOrdineMissioneModel.id}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
+                <ng-upload-form disabilita="isOrdineMissioneConfermato" validazione="validazione" is-finish-rest-attachments="anticipoOrdineMissioneModel.isFireSearchAttachments" url="api/rest/ordineMissione/anticipo/uploadAllegati?idAnticipo={{anticipoOrdineMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
               </div>
             </h4>
           </div> 
