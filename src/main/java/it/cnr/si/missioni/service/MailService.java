@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -99,7 +100,16 @@ public class MailService {
     }
 
     public void sendEmailError(String subject, String content, boolean isMultipart, boolean isHtml) {
-       	for (String emailTo : mailToError)
-           	sendEmail(subject, content, isMultipart, isHtml, emailTo);
+    	if (!isDevProfile()){
+        	for (String emailTo : mailToError)
+           		sendEmail(subject, content, isMultipart, isHtml, emailTo);
+    		
+    	}
     }
+	private boolean isDevProfile(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return true;
+   		}
+   		return false;
+	}
 }
