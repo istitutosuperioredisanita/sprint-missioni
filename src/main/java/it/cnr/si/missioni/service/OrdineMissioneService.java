@@ -155,6 +155,10 @@ public class OrdineMissioneService {
 		if (listaOrdiniMissione != null && !listaOrdiniMissione.isEmpty()){
 			ordineMissione = listaOrdiniMissione.get(0);
 			if (retrieveDataFromFlows){
+				OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissione);
+				if (anticipo != null){
+					ordineMissione.setRichiestaAnticipo("S");
+				}
 				if (ordineMissione.isStatoInviatoAlFlusso()){
 	    			ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
 	    			if (result != null){
