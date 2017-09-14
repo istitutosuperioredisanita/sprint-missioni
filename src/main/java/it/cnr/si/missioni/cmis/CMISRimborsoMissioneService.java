@@ -592,7 +592,7 @@ public class CMISRimborsoMissioneService {
 			}
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisRimborsoMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisRimborsoMissione.getNote());
-			//GG_DA_RIMETTERE						jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisRimborsoMissione.getNoteSegreteria());
+			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisRimborsoMissione.getNoteSegreteria());
 			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisRimborsoMissione.getWfDescription());
 			jGenerator.writeStringField("prop_bpm_sendEMailNotifications" , "false");
 			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisRimborsoMissione.getWfDueDate());
@@ -607,9 +607,9 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisRimborsoMissione.getUsernameRichiedente());
 			jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisRimborsoMissione.getUserNamePrimoFirmatario());
 			jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisRimborsoMissione.getUserNameFirmatarioSpesa());
-			//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
-			//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
-			//GG_DA_RIMETTERE			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
 			jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisRimborsoMissione.getUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisRimborsoMissione.getDescrizioneUoOrdine());
 			jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisRimborsoMissione.getUoSpesa());
