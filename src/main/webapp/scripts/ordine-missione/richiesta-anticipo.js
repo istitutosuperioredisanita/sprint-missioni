@@ -128,7 +128,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
 
     $scope.viewAttachments = function (idAnticipo) {
         if (!$scope.anticipoOrdineMissioneModel.isFireSearchAttachments){
-            $http.get('api/rest/public/ordineMissione/anticipo/viewAttachments/' + idAnticipo).then(function (data) {
+            $http.get('api/rest/ordineMissione/anticipo/viewAttachments/' + idAnticipo).then(function (data) {
                 $scope.anticipoOrdineMissioneModel.isFireSearchAttachments = true;
                 var attachments = data.data;
                 if (attachments && Object.keys(attachments).length > 0){
