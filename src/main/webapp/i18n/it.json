@@ -462,6 +462,7 @@
             "dettaglio-spese": {
                     "data": "Data*",
                     "totale-dettagli" : "Totale Dettagli Spesa",
+                    "totale-dettagli-non-anticipati" : "Totale Dettagli Spesa Non Anticipati",
                     "tipologia-spesa" : "Tipologia di Spesa*",
                     "ds-spesa" : "Descrizione Spesa*",
                     "tipologia-pasto" : "Tipo Pasto*",

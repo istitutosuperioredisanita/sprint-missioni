@@ -358,6 +358,20 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         return totale;
     }
 
+    $scope.getTotaleDettagliSpesaNonAnticipati = function(){
+        var totale = 0;
+        if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
+            for (var i=0; i<$scope.dettagliSpese.length; i++) {
+                if ($scope.dettagliSpese[i].flSpesaAnticipata =="N"){
+                    totale = totale + $scope.dettagliSpese[i].importoEuro;
+                }
+            }
+        }
+        if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.importoEuro && $scope.newDettaglioSpesa.flSpesaAnticipata =="N"){
+            totale = totale + $scope.newDettaglioSpesa.importoEuro;
+        }
+        return totale;
+    }
 
     var impostadisabilitaRimborsoMissione = function() {
         if ($scope.rimborsoMissione && ($scope.rimborsoMissione.stato === 'DEF' || $scope.rimborsoMissione.statoFlusso === 'APP' || ($scope.rimborsoMissione.stato === 'CON' && 
