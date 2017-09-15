@@ -172,7 +172,7 @@ public class RimborsoMissioneDettagliResource {
     					if (mimeTypes == null){
     						return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
     					} else {
-    						CMISFileAttachment cmisFileAttachment = rimborsoMissioneDettagliService.uploadAllegato((Principal) SecurityUtils.getCurrentUser(), idDettaglioRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+    						CMISFileAttachment cmisFileAttachment = rimborsoMissioneDettagliService.uploadAllegato(principal, idDettaglioRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
     						if (cmisFileAttachment != null){
     							return JSONResponseEntity.ok(cmisFileAttachment);
     						} else {
