@@ -236,7 +236,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setImpegnoNumero(rimborsoMissione.getPgObbligazione());
 		cmisRimborsoMissione.setNoleggioFlag(rimborsoMissione.getUtilizzoAutoNoleggio().equals("S") ? "true" : "false");
 		cmisRimborsoMissione.setNote(rimborsoMissione.getNote() == null ? "" : rimborsoMissione.getNote());
-		//GG_DA_RIMETTERE					cmisRimborsoMissione.setNoteSegreteria(rimborsoMissione.getNoteSegreteria() == null ? "" : rimborsoMissione.getNoteSegreteria());
+		cmisRimborsoMissione.setNoteSegreteria(rimborsoMissione.getNoteSegreteria() == null ? "" : rimborsoMissione.getNoteSegreteria());
 		cmisRimborsoMissione.setOggetto(rimborsoMissione.getOggetto());
 		cmisRimborsoMissione.setTaxiFlag(rimborsoMissione.getUtilizzoTaxi().equals("S") ? "true" : "false");
 		cmisRimborsoMissione.setAutoServizioFlag(rimborsoMissione.getUtilizzoAutoServizio().equals("S") ? "true" : "false");
@@ -347,7 +347,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_OGGETTO, rimborsoMissione.getOggetto());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DESTINAZIONE, rimborsoMissione.getDestinazione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE, rimborsoMissione.getNote());
-		//GG_DA_RIMETTERE					metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE_SEGRETERIA, rimborsoMissione.getNoteSegreteria());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_NOTE_SEGRETERIA, rimborsoMissione.getNoteSegreteria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INIZIO, DateUtils.getDate(rimborsoMissione.getDataInizioMissione()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_FINE, DateUtils.getDate(rimborsoMissione.getDataFineMissione()));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_NAME_DATA_INSERIMENTO, DateUtils.getDate(rimborsoMissione.getDataInserimento()));
@@ -535,7 +535,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO, cmisRimborsoMissione.getDisponibilita());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_GAE, cmisRimborsoMissione.getGae());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisRimborsoMissione.getNote());
-		//GG_DA_RIMETTERE					metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisRimborsoMissione.getNoteSegreteria());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisRimborsoMissione.getNoteSegreteria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisRimborsoMissione.getImpegnoNumero());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisRimborsoMissione.getTaxiFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisRimborsoMissione.getAutoServizioFlag().equals("true"));
