@@ -28,7 +28,7 @@ import it.cnr.si.security.AuthoritiesConstants;
  */
 @RolesAllowed({AuthoritiesConstants.USER})
 @RestController
-@RequestMapping("/app")
+@RequestMapping("/api")
 public class ManualResource {
 
 	private final Logger log = LoggerFactory.getLogger(ManualResource.class);
