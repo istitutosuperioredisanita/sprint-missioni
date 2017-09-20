@@ -99,14 +99,19 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setFlComuneProprio(false);
 		oggettoBulk.setImDiariaLorda(BigDecimal.ZERO);
 		oggettoBulk.setImDiariaNetto(BigDecimal.ZERO);
-		oggettoBulk.setImLordoPercepiente(BigDecimal.ZERO);
-		oggettoBulk.setImNettoPecepiente(BigDecimal.ZERO);
 		oggettoBulk.setImQuotaEsente(BigDecimal.ZERO);
 		oggettoBulk.setImRimborso(BigDecimal.ZERO);
-		oggettoBulk.setImSpese(BigDecimal.ZERO);
+		oggettoBulk.setImSpese(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
 		oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getTotaleSpeseAnticipate()));
 		oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate());
 		oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
+		if (!rimborsoApprovato.isTrattamentoAlternativoMissione()){
+			oggettoBulk.setImLordoPercepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
+			oggettoBulk.setImNettoPecepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
+		} else {
+			oggettoBulk.setImLordoPercepiente(BigDecimal.ZERO);
+			oggettoBulk.setImNettoPecepiente(BigDecimal.ZERO);
+		}
 		if (rimborsoApprovato.getAnticipoAnnoMandato() != null){
 			oggettoBulk.setEsercizioAnticipoGeMis(rimborsoApprovato.getAnticipoAnnoMandato());
 		}
