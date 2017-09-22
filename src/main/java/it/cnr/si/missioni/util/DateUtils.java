@@ -46,6 +46,8 @@ public class DateUtils {
 	public static final String PATTERN_DATETIME_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	
 	
+	public static final String PATTERN_DATETIME_NO_SEC_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mmZ";
+
 	/**
 	 * PATTERN_DATETIME
 	 */
