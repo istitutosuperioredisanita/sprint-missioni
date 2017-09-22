@@ -20,7 +20,6 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.qos.logback.classic.pattern.Util;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
@@ -84,8 +83,8 @@ public class ComunicaRimborsoSiglaService {
 		    oggettoBulk.setCdTerzo(rimborsoApprovato.getCdTerzoSigla().intValue());
 		}
 		oggettoBulk.setCdUnitaOrganizzativa(rimborsoApprovato.getUoSpesa());
-		oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
-		oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
+		oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_WITH_TIMEZONE));
+		oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_WITH_TIMEZONE));
 /*GGGG TODO...VERIFICARE QUALE ESERCIZIO PASSARE*/                                oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
 		oggettoBulk.setPgMissioneFromGeMis(rimborsoApprovato.getNumero());
 		oggettoBulk.setFlAssociatoCompenso(false);
@@ -430,8 +429,8 @@ public class ComunicaRimborsoSiglaService {
 	}
 
 	private void impostaDateTappa(ZonedDateTime dataInizio, ZonedDateTime dataFine, TappeMissioneColl tappa) {
-		tappa.setDtInizioTappa(DateUtils.getDateAsString(dataInizio, DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
-		tappa.setDtFineTappa(DateUtils.getDateAsString(dataFine, DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
+		tappa.setDtInizioTappa(DateUtils.getDateAsString(dataInizio, DateUtils.PATTERN_DATETIME_NO_SEC_WITH_TIMEZONE));
+		tappa.setDtFineTappa(DateUtils.getDateAsString(dataFine, DateUtils.PATTERN_DATETIME_NO_SEC_WITH_TIMEZONE));
 	}
 
 	private void impostaNazioneRimborso(RimborsoMissione rimborsoApprovato, TappeMissioneColl tappa) {
