@@ -365,7 +365,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var terzo = [];
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.TERZO;
-        var objectPostTerzoClauses = [{condition: 'AND', fieldName: 'anagrafico.codice_fiscale', operator: "=", fieldValue:codiceFiscale}];
+        var objectPostTerzoClauses = [{condition: 'AND', fieldName: 'anagrafico.codice_fiscale', operator: "=", fieldValue:codiceFiscale},
+                                    {condition: 'AND', fieldName: 'dt_fine_rapporto', operator: "isnull"}];
         var objectPostTerzo = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostTerzoClauses}
         return $http.post(urlRestProxy + app+'/', objectPostTerzo, {params: {proxyURL: url}}).success(function (data) {
             if (data){
