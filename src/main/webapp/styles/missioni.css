@@ -13,13 +13,6 @@
   padding: 0px;  
 }
 
-.banner-missioni {
-    background-image: url('../images/missioni.png');
-    height: 285px;
-    margin-bottom: 0px;
-    width: 1140px
-}
-
 .progress-bar-striped,.progress-striped .progress-bar{background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:-o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);-webkit-background-size:40px 40px;background-size:40px 40px}
 
 .progress-bar.active,.progress.active .progress-bar{-webkit-animation:progress-bar-stripes 2s linear infinite;-o-animation:progress-bar-stripes 2s linear infinite;animation:progress-bar-stripes 2s linear infinite}
@@ -230,4 +223,35 @@ input:-webkit-autofill {
     height: 40px;
     margin: 0 auto;
     margin-top: 400px;
+}
+
+
+
+@media (max-width: 768px) {
+  .container {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .navbar-header {
+    max-width: 100%
+  }
+
+  .well {
+    padding: 0;
+    margin-bottom: 20px;
+    background-color: #FFF;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none
+  }
+
+  .col-md-12 {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .my-panel-body {
+    background: #FFF !important;
+  }
 }
