@@ -365,6 +365,38 @@
     <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
   </div>
      <div class="panel-body my-panel-body">
+<!--
+<form class="form-inline" role="form" id="missioni">
+                <p class="col-xs-3">
+  <label class="btn" >
+    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoTaxi" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-taxi' | translate}}
+  </label>
+ </p>
+</form>
+
+<form class="form-inline" role="form" id="missioni">
+                <p class="col-xs-3">
+  <label class="btn" >
+    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoNoleggio" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-auto-noleggio' | translate}}
+  </label>
+ </p>
+</form>
+<form class="form-inline" role="form" id="missioni">
+                <p class="col-xs-3">
+  <label class="btn" >
+    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoServizio" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-auto-servizio' | translate}}
+  </label>
+ </p>
+</form>
+<form class="form-inline" role="form" id="missioni">
+                <p class="col-xs-3">
+  <label class="btn" >
+    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.personaleAlSeguito" checked="v" autocomplete="off" > {{'ordine-missione.form.persona-seguito' | translate}}
+  </label>
+ </p>
+</form>
+-->
+
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-3">
                          <span class="input-group">
@@ -443,34 +475,34 @@
 </div>
 </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-md-4" ng-show="!validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione">
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-md-4" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
-                    <div class="col-md-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteRimborsoMissione()">
-                    <div class="col-md-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="finalizeRimborsoMissione()">
-                    <div class="col-md-4" ng-show="showEsisteRimborsoMissione && validazione === 'D'">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'D'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
+                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione">
 
-                    <div class="col-md-3" ng-show="showEsisteRimborsoMissione">
+                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione">
                       <a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                     </div>
 
@@ -480,7 +512,7 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-md-1" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-1" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
                     </div>
             </form>
