@@ -233,11 +233,11 @@
       <li class="previous"><a ng-click="previousPage()" translate="global.button.close"></a></li>
     </ul>
   </div>
-             <div class="col-md-3" ng-show="autoPropriaOrdineMissioneModel.id">
+             <div class="col-xs-3" ng-show="autoPropriaOrdineMissioneModel.id">
                  <a target="_blank" href="api/rest/public/printOrdineMissioneAutoPropria?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-auto-propria.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
              </div>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-md-1" ng-show="autoPropriaOrdineMissioneModel.id">
+                    <div class="col-xs-1" ng-show="autoPropriaOrdineMissioneModel.id">
                             <button ng-show="validazione == 'N'" type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
                     </div>
             </form>

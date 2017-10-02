@@ -187,9 +187,10 @@
             "auto-propria": "Dati Auto Propria",
             "percorso-da": "Percorso Da",
             "percorso-a": "Percorso A",
-            "motivi-ispettivi": "Richiesta auto propria per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
-            "motivi-urgenza": "Richiesta auto propria per Attività caratterizzata da emergenza, urgenza, indifferibilità",
-            "motivi-trasporto": "Richiesta auto propria per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
+            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
+            "motivi-urgenza": "Per Attività caratterizzata da emergenza, urgenza, indifferibilità",
+            "motivi-trasporto": "Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
+            "altri-motivi": "Richiesta per altri motivi",
             "addSpostamento": "Aggiungi Spostamento",
             "box-dati": "Dati Generali",
             "box-spostamenti": "Spostamenti"
