@@ -8,7 +8,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Missioni</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/bootstrap.css">
@@ -41,7 +41,7 @@
                   <a class="navbar-brand" href="#"><span translate="global.title">Missioni</span></a>
                 </div>
                 <div class="collapse navbar-collapse" id="navbar-collapse" ng-switch="authenticated">
-                    <ul class="nav navbar-nav nav-pills navbar-right">
+                    <ul class="nav navbar-nav navbar-right">
                         <li>
                             <a href="#/">
                                 <span class="glyphicon glyphicon-home"></span>
@@ -148,7 +148,9 @@
             </div>
         </nav>
 
-        <div class="container banner-missioni"></div>
+        <div class="container">
+            <img src="../images/missioni.png" class="img-responsive" />
+        </div>
 
         <div class="container">
             <div class="well" ng-view=""></div>
