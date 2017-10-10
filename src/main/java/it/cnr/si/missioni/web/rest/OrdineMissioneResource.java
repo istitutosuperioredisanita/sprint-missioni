@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -226,10 +229,13 @@ public class OrdineMissioneResource {
     @Timed
     public ResponseEntity<?> confirmOrdineMissione(@RequestBody OrdineMissione ordineMissione, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,  
     		HttpServletRequest request, HttpServletResponse response) {
+
+    	String basePath = Arrays.stream(request.getRequestURL().toString().split("/")).limit(3).collect(Collectors.joining("/"));
+    		
     	if (ordineMissione.getId() != null){
     		ordineMissione.setDaValidazione(daValidazione);
             try {
-				ordineMissione = ordineMissioneService.updateOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ordineMissione, false, confirm);
+				ordineMissione = ordineMissioneService.updateOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ordineMissione, false, confirm, basePath);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));

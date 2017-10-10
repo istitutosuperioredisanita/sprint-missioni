@@ -590,6 +590,10 @@ public class OrdineMissioneService {
     
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm)  {
+    	return updateOrdineMissione(principal, ordineMissione, fromFlows, confirm, null);
+    }
+    @Transactional(propagation = Propagation.REQUIRED)
+    public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm, String basePath)  {
 
     	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
     	boolean isCambioResponsabileGruppo = false;
@@ -698,8 +702,8 @@ public class OrdineMissioneService {
     	
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
-    	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissioneDB.isMissioneInviataResponsabile())){
-    		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
+    	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissioneDB.isMissioneInviataResponsabile()) && basePath != null){
+    		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(basePath, ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
     	} else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
     		sendMailToAdministrative(ordineMissioneDB);
     	}
@@ -795,8 +799,9 @@ public class OrdineMissioneService {
 		return mails;
 	}
 
-	private String getTextMailSendToManager(OrdineMissione ordineMissione) {
-		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo.";
+	private String getTextMailSendToManager(String basePath, OrdineMissione ordineMissione) {
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo. "
+				+ "Si prego di confermarla attraverso il link "+basePath+"/#/ordine-missione/"+ordineMissione.getId();
 	}
 
 	private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
