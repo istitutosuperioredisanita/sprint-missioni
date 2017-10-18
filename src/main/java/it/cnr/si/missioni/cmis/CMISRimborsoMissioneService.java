@@ -205,14 +205,19 @@ public class CMISRimborsoMissioneService {
 		String uoCompetenzaPerFlusso = Utility.replace(rimborsoMissione.getUoCompetenza(), ".", "");
 		String uoSpesaPerFlusso = Utility.replace(rimborsoMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(rimborsoMissione.getUoRich(), ".", "");
+		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 		String userNameFirmatario;
 		String userNameFirmatarioSpesa;
-		userNameFirmatario = recuperoDirettore(uoRichPerFlusso, rimborsoMissione.getAnno());
+		userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, rimborsoMissione.getAnno());
 		
-		if (uoCompetenzaPerFlusso != null){
-			userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso, rimborsoMissione.getAnno());
+		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
+			if (uoCompetenzaPerFlusso != null){
+				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, rimborsoMissione.getAnno());
+			} else {
+				userNameFirmatarioSpesa = userNameFirmatario;
+			}
 		} else {
-			userNameFirmatarioSpesa = userNameFirmatario;
+			userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, rimborsoMissione.getAnno());
 		}
 		
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
@@ -275,14 +280,18 @@ public class CMISRimborsoMissioneService {
 		return cmisRimborsoMissione;
 	}
 
-	private String recuperoDirettore(String uo, Integer anno) {
+	private String recuperoDirettore(RimborsoMissione rimborsoMissione, String uo, Integer anno) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, anno);
 			if (dati != null && dati.getResponsabile() != null){
-				userNameFirmatario = dati.getResponsabile();
+				if (!rimborsoMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloPerItalia(),"N").equals("N"))){
+					userNameFirmatario = dati.getResponsabile();
+				} else {
+					userNameFirmatario = accountService.getDirector(uo);		
+				}
 			} else {
 				userNameFirmatario = accountService.getDirector(uo);		
 			}

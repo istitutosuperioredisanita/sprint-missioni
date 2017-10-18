@@ -206,6 +206,11 @@ public class PrintRimborsoMissioneService {
 	    	}
 	    	printRimborsoMissione.setPrintDettagliSpeseRimborsoMissione(listDettagliPrint);
 		}
+    	printRimborsoMissione.setUtilizzoAutoNoleggio(rimborsoMissione.decodeUtilizzoAutoNoleggio());
+    	printRimborsoMissione.setUtilizzoTaxi(rimborsoMissione.decodeUtilizzoTaxi());
+    	printRimborsoMissione.setUtilizzoAutoServizio(rimborsoMissione.decodeUtilizzoAutoServizio());
+    	printRimborsoMissione.setPersonaleAlSeguito(rimborsoMissione.decodePersonaleAlSeguito());
+    	printRimborsoMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(rimborsoMissione.getNoteUtilizzoTaxiNoleggio()));
 		printRimborsoMissione.setTotMissione(Utility.numberFormat(totMissione));
     	printRimborsoMissione.setCup(rimborsoMissione.getCup() == null ? "" : rimborsoMissione.getCup());
 		return printRimborsoMissione; 

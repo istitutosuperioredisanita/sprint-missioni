@@ -994,7 +994,24 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	}
 	
     
-    @Transient
+
+	@Transient
+	public String decodeUtilizzoAutoServizio(){
+		if (!StringUtils.isEmpty(getUtilizzoAutoServizio())){
+			return Costanti.SI_NO.get(getUtilizzoAutoServizio());
+		}
+		return "";
+	}
+	
+	@Transient
+	public String decodePersonaleAlSeguito(){
+		if (!StringUtils.isEmpty(getPersonaleAlSeguito())){
+			return Costanti.SI_NO.get(getPersonaleAlSeguito());
+		}
+		return "";
+	}
+	
+	@Transient
     public Boolean isMissioneConGiorniDivervi() {
     	if (getDataFineMissione() != null && getDataInizioMissione() != null){
     		ZonedDateTime dataInizioSenzaOre = Utility.getDateWithoutHours(getDataInizioMissione());

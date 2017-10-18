@@ -74,6 +74,16 @@ public class PrintMissione {
 
     private String esercizioOriginaleObbligazione;
 
+    private String utilizzoTaxi;
+
+	private String utilizzoAutoNoleggio;
+
+	private String utilizzoAutoServizio;
+
+	private String personaleAlSeguito;
+
+	private String noteUtilizzoTaxiNoleggio;
+			
 	public Integer getAnno() {
 		return anno;
 	}
@@ -352,6 +362,46 @@ public class PrintMissione {
 
 	public void setEsercizioOriginaleObbligazione(String esercizioOriginaleObbligazione) {
 		this.esercizioOriginaleObbligazione = esercizioOriginaleObbligazione;
+	}
+
+	public String getUtilizzoTaxi() {
+		return utilizzoTaxi;
+	}
+
+	public void setUtilizzoTaxi(String utilizzoTaxi) {
+		this.utilizzoTaxi = utilizzoTaxi;
+	}
+
+	public String getUtilizzoAutoNoleggio() {
+		return utilizzoAutoNoleggio;
+	}
+
+	public void setUtilizzoAutoNoleggio(String utilizzoAutoNoleggio) {
+		this.utilizzoAutoNoleggio = utilizzoAutoNoleggio;
+	}
+
+	public String getUtilizzoAutoServizio() {
+		return utilizzoAutoServizio;
+	}
+
+	public void setUtilizzoAutoServizio(String utilizzoAutoServizio) {
+		this.utilizzoAutoServizio = utilizzoAutoServizio;
+	}
+
+	public String getPersonaleAlSeguito() {
+		return personaleAlSeguito;
+	}
+
+	public void setPersonaleAlSeguito(String personaleAlSeguito) {
+		this.personaleAlSeguito = personaleAlSeguito;
+	}
+
+	public String getNoteUtilizzoTaxiNoleggio() {
+		return noteUtilizzoTaxiNoleggio;
+	}
+
+	public void setNoteUtilizzoTaxiNoleggio(String noteUtilizzoTaxiNoleggio) {
+		this.noteUtilizzoTaxiNoleggio = noteUtilizzoTaxiNoleggio;
 	}
 
 }

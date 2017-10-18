@@ -179,16 +179,16 @@ public class CMISOrdineMissioneService {
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
-			userNameFirmatario = recuperoDirettore(uoRichPerFlusso, ordineMissione.getAnno());
+			userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, ordineMissione.getAnno());
 			
 			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 				if (uoCompetenzaPerFlusso != null){
-					userNameFirmatarioSpesa = recuperoDirettore(uoCompetenzaPerFlusso, ordineMissione.getAnno());
+					userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, ordineMissione.getAnno());
 				} else {
 					userNameFirmatarioSpesa = userNameFirmatario;
 				}
 			} else {
-				userNameFirmatarioSpesa = recuperoDirettore(uoSpesaPerFlusso, ordineMissione.getAnno());
+				userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, ordineMissione.getAnno());
 			}
 			
 			GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
@@ -262,14 +262,18 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private String recuperoDirettore(String uo, Integer anno) {
+	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Integer anno) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, anno);
 			if (dati != null && dati.getResponsabile() != null){
-				userNameFirmatario = dati.getResponsabile();
+				if (!ordineMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloPerItalia(),"N").equals("N"))){
+					userNameFirmatario = dati.getResponsabile();
+				} else {
+					userNameFirmatario = accountService.getDirector(uo);		
+				}
 			} else {
 				userNameFirmatario = accountService.getDirector(uo);		
 			}

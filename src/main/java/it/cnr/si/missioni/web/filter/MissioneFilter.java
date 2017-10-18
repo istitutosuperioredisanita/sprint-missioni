@@ -13,6 +13,7 @@ public class MissioneFilter {
 	private Integer anno;
 	private Long daId;
 	private Long aId;
+	private Boolean soloMissioniNonGratuite;
 	private Long daNumero;
 	private Long aNumero;
 	private Date daData;
@@ -122,5 +123,11 @@ public class MissioneFilter {
 	}
 	public void setDaCron(String daCron) {
 		this.daCron = daCron;
+	}
+	public Boolean getSoloMissioniNonGratuite() {
+		return soloMissioniNonGratuite;
+	}
+	public void setSoloMissioniNonGratuite(Boolean soloMissioniNonGratuite) {
+		this.soloMissioniNonGratuite = soloMissioniNonGratuite;
 	}
 }
