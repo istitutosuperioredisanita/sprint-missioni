@@ -250,6 +250,14 @@
             </form>
 
             <form class="form-inline" role="form" id="missioni">
+                  <p class="col-md-2">
+                           <span class="input-group">
+                              <span class="input-group-addon" translate="ordine-missione.form.missione-gratuita">Missione Gratuita</span>
+                              <label class="checkbox">
+                                      <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.missioneGratuita" ng-true-value="S" ng-false-value="N">
+                              </label>
+                          </span>
+                  </p>
                     <p class="col-md-5">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
@@ -291,7 +299,7 @@
     <h3 class="panel-title color-verde-scuro" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
   </div>
      <div class="panel-body my-panel-body">
-            <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile">
+            <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile && ordineMissioneModel.missioneGratuita != 'S'">
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.responsabile-gruppo">resp</span>
@@ -418,12 +426,12 @@
               </div>
             </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (!showResponsabile||ordineMissioneModel.stato === 'INR')  && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (!showResponsabile||ordineMissioneModel.missioneGratuita === 'S'||ordineMissioneModel.stato === 'INR')  && !validazione && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.stato === 'INS'">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.missioneGratuita != 'S' && ordineMissioneModel.stato === 'INS'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToManager' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>

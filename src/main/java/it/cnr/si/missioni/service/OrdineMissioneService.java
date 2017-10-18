@@ -2,6 +2,7 @@ package it.cnr.si.missioni.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import ch.qos.logback.classic.pattern.Util;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
@@ -421,6 +423,9 @@ public class OrdineMissioneService {
 			if (filter.getUoRich() != null){
 				criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
 			}
+			if (filter.getSoloMissioniNonGratuite()){
+				criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita")).add(Restrictions.eq("missioneGratuita", "N")));
+			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
 			return crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.asc("dataInserimento"));
@@ -761,6 +766,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
 		ordineMissioneDB.setFondi(ordineMissione.getFondi());
 		ordineMissioneDB.setCup(ordineMissione.getCup());
+		ordineMissioneDB.setMissioneGratuita(ordineMissione.getMissioneGratuita());
 	}
 
 	private void sendMailToAdministrative(OrdineMissione ordineMissioneDB) {
@@ -950,6 +956,9 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
 			}
 		}
+		if (Utility.nvl(ordineMissione.getMissioneGratuita()).equals("S") &&  ordineMissione.getImportoPresunto() != null && ordineMissione.getImportoPresunto().compareTo(BigDecimal.ZERO) != 0){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire una missione gratuita e l'importo presunto");
+		} 
 	}
 	
 	private void controlloDatiFinanziari(Principal principal, OrdineMissione ordineMissione) {
