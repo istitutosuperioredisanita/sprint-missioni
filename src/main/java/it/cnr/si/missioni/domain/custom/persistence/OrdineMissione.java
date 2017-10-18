@@ -317,6 +317,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "CUP", length = 50, nullable = true)
     public String cup;
 
+    @Column(name = "MISSIONE_GRATUITA", length = 1, nullable = true)
+    public String missioneGratuita;
+
     @Transient
     private String daValidazione;
 	
@@ -896,6 +899,22 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 	
 	@Transient
+	public String decodeUtilizzoAutoServizio(){
+		if (!StringUtils.isEmpty(getUtilizzoAutoServizio())){
+			return Costanti.SI_NO.get(getUtilizzoAutoServizio());
+		}
+		return "";
+	}
+	
+	@Transient
+	public String decodePersonaleAlSeguito(){
+		if (!StringUtils.isEmpty(getPersonaleAlSeguito())){
+			return Costanti.SI_NO.get(getPersonaleAlSeguito());
+		}
+		return "";
+	}
+	
+	@Transient
 	public String decodeUtilizzoAutoNoleggio(){
 		if (!StringUtils.isEmpty(getUtilizzoAutoNoleggio())){
 			return Costanti.SI_NO.get(getUtilizzoAutoNoleggio());
@@ -1152,6 +1171,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setPartenzaDaAltro(String partenzaDaAltro) {
 		this.partenzaDaAltro = partenzaDaAltro;
+	}
+
+	public String getMissioneGratuita() {
+		return missioneGratuita;
+	}
+
+	public void setMissioneGratuita(String missioneGratuita) {
+		this.missioneGratuita = missioneGratuita;
 	}
 
 }

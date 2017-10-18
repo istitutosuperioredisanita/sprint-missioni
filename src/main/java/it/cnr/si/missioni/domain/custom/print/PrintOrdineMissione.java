@@ -15,12 +15,6 @@ public class PrintOrdineMissione extends PrintMissione{
 
     private String importoPresunto;
 
-    private String utilizzoTaxi;
-
-	private String utilizzoAutoNoleggio;
-
-	private String noteUtilizzoTaxiNoleggio;
-			
 	public String getObbligoRientro() {
 		return obbligoRientro;
 	}
@@ -68,29 +62,5 @@ public class PrintOrdineMissione extends PrintMissione{
 	public void setImportoPresunto(String importoPresunto) {
 		this.importoPresunto = importoPresunto;
 	}
-
-	public String getUtilizzoTaxi() {
-		return utilizzoTaxi;
-	}
-
-	public void setUtilizzoTaxi(String utilizzoTaxi) {
-		this.utilizzoTaxi = utilizzoTaxi;
-	}
-
-	public String getUtilizzoAutoNoleggio() {
-		return utilizzoAutoNoleggio;
-	}
-
-	public void setUtilizzoAutoNoleggio(String utilizzoAutoNoleggio) {
-		this.utilizzoAutoNoleggio = utilizzoAutoNoleggio;
-	}
-
-	public String getNoteUtilizzoTaxiNoleggio() {
-		return noteUtilizzoTaxiNoleggio;
-	}
-
-	public void setNoteUtilizzoTaxiNoleggio(String noteUtilizzoTaxiNoleggio) {
-		this.noteUtilizzoTaxiNoleggio = noteUtilizzoTaxiNoleggio;
-	} 
 
 }
