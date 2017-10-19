@@ -76,6 +76,7 @@ public class PrintOrdineMissioneAutoPropriaService {
     	printOrdineMissioneAutoPropria.setMotiviIspettivi(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
     	printOrdineMissioneAutoPropria.setMotiviUrgenza(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
     	printOrdineMissioneAutoPropria.setMotiviTrasporto(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(),"N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
+    	printOrdineMissioneAutoPropria.setAltriMotivi(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi()));
 
 		if (ordineMissioneAutoPropria.getListSpostamenti() != null){
 			List<Spostamenti> listSpostamentiPrint = new ArrayList<Spostamenti>();

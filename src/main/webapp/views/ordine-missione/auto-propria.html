@@ -105,6 +105,16 @@
                         </span>
                 </p>
             </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.altri-motivi">altri motivi</span>
+                            <textarea ng-disabled="validazione != 'N'" 
+                              class="input-sm form-control" name="altriMotivi" ng-model="autoPropriaOrdineMissioneModel.utilizzoAltriMotivi" rows = "2">
+                            </textarea> 
+                        </span>
+                </p>
+            </form>
            <div class="col-md-10"> 
             <form class="form-inline" role="form" id ="missioni">
                <p class="input-group">

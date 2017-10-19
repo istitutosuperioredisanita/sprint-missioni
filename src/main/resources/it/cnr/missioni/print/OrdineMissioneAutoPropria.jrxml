@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrdineMissioneAutoPropria" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
-	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="1345"/>
+	<property name="ireport.y" value="804"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -129,6 +129,9 @@
 	<field name="motiviTrasporto" class="java.lang.String">
 		<fieldDescription><![CDATA[motiviTrasporto]]></fieldDescription>
 	</field>
+	<field name="altriMotivi" class="java.lang.String">
+		<fieldDescription><![CDATA[altriMotivi]]></fieldDescription>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -248,7 +251,7 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="138" splitType="Stretch">
+		<band height="135" splitType="Stretch">
 			<rectangle>
 				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="3" width="555" height="131" uuid="e5584a27-bedc-4ba1-87ae-9b7c6cf73a51"/>
 			</rectangle>
@@ -318,7 +321,7 @@
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="181" splitType="Stretch">
+		<band height="193" splitType="Stretch">
 			<rectangle>
 				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="110" width="554" height="50" uuid="ad06b655-b284-4f45-9705-a2386ccb3fa4"/>
 				<graphicElement>
@@ -365,6 +368,13 @@
 					<font fontName="Times New Roman" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[" - Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="161" width="549" height="17" isRemoveLineWhenBlank="true" uuid="27e4463e-e73f-4839-a33d-a826e34a1452"/>
+				<textElement verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{altriMotivi}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>

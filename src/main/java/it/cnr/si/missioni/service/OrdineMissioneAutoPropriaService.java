@@ -134,10 +134,10 @@ public class OrdineMissioneAutoPropriaService {
     			StringUtils.isEmpty(ordineMissioneAutoPropria.getNumeroPatente())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
     	}
-    	if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi()).equals("N") &&
-    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza()).equals("N") &&
-    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto()).equals("N") &&
-    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi()).equals("N")){
+    	if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(),"N").equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(),"N").equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(),"N").equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi(),"N").equals("N")){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto propria.");
     	}
 	}

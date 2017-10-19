@@ -678,7 +678,7 @@ public class OrdineMissioneService {
 		
     	if (confirm){
     		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-    		if (istituto != null && istituto.isAttivaGestioneResponsabileModulo()){
+    		if (istituto != null && istituto.isAttivaGestioneResponsabileModulo() && !ordineMissione.isMissioneGratuita()){
     			if (StringUtils.isEmpty(ordineMissioneDB.getResponsabileGruppo())){
     				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
     			}

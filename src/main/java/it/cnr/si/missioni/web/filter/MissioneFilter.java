@@ -13,7 +13,7 @@ public class MissioneFilter {
 	private Integer anno;
 	private Long daId;
 	private Long aId;
-	private Boolean soloMissioniNonGratuite;
+	private Boolean soloMissioniNonGratuite = false;
 	private Long daNumero;
 	private Long aNumero;
 	private Date daData;
