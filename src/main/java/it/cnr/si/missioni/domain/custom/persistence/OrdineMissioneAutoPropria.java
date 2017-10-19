@@ -96,6 +96,10 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
     @Column(name = "UTILIZZO_MOTIVI_TRASPORTO", length = 1, nullable = true)
     public String utilizzoMotiviTrasporto;
 
+    @Size(min = 0, max = 1000)
+    @Column(name = "UTILIZZO_ALTRI_MOTIVI", length = 1000, nullable = true)
+    public String utilizzoAltriMotivi;
+
 	@Transient
     private List<SpostamentiAutoPropria> listSpostamenti;
     
@@ -249,6 +253,14 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
 
 	public void setUtilizzoMotiviTrasporto(String utilizzoMotiviTrasporto) {
 		this.utilizzoMotiviTrasporto = utilizzoMotiviTrasporto;
+	}
+
+	public String getUtilizzoAltriMotivi() {
+		return utilizzoAltriMotivi;
+	}
+
+	public void setUtilizzoAltriMotivi(String utilizzoAltriMotivi) {
+		this.utilizzoAltriMotivi = utilizzoAltriMotivi;
 	}
 	
 }

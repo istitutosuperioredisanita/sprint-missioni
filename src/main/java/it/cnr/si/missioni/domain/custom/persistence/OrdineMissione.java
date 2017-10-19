@@ -62,7 +62,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String CMIS_PROPERTY_FLOW_USERNAME_ORDINE = "cnrmissioni:userNameUtenteOrdineMissione";           
 	public static final String CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE	= "cnrmissioni:userNameRichiedente";               
 	public static final String CMIS_PROPERTY_FLOW_USERNAME_RESPONSABILE_MODULO	= "cnrmissioni:userNameResponsabileModulo";
+	public static final String CMIS_PROPERTY_FLOW_MISSIONE_GRATUITA	= "cnrmissioni:missioneGratuita";
+	public static final String CMIS_PROPERTY_FLOW_NOTE_AUTORIZZAZIONI_AGGIUNTIVE	= "cnrmissioni:noteAutorizzazioniAggiuntive";
 	public static final String CMIS_PROPERTY_FLOW_FONDI = "cnrmissioni:competenzaResiduo";                                
+	public static final String CMIS_PROPERTY_AUTO_PROPRIA_ALTRI_MOTIVI = "cnrmissioni:autoPropriaAltriMotivo";            
 	public static final String CMIS_PROPERTY_AUTO_PROPRIA_PRIMO_MOTIVO = "cnrmissioni:autoPropriaPrimoMotivo";            
 	public static final String CMIS_PROPERTY_AUTO_PROPRIA_SECONDO_MOTIVO = "cnrmissioni:autoPropriaSecondoMotivo";        
 	public static final String CMIS_PROPERTY_AUTO_PROPRIA_TERZO_MOTIVO = "cnrmissioni:autoPropriaTerzoMotivo";            
@@ -1180,5 +1183,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public void setMissioneGratuita(String missioneGratuita) {
 		this.missioneGratuita = missioneGratuita;
 	}
-
+	public Boolean isMissioneGratuita(){
+		return Utility.nvl(getMissioneGratuita()).equals("S");
+	}
 }

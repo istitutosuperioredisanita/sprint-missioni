@@ -136,7 +136,8 @@ public class OrdineMissioneAutoPropriaService {
     	}
     	if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi()).equals("N") &&
     			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza()).equals("N") &&
-    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto()).equals("N")){
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto()).equals("N") &&
+    			Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi()).equals("N")){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto propria.");
     	}
 	}
@@ -194,6 +195,7 @@ public class OrdineMissioneAutoPropriaService {
 		ordineMissioneAutoPropriaDB.setUtilizzoMotiviIspettivi(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
 		ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
 		ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
+		ordineMissioneAutoPropriaDB.setUtilizzoAltriMotivi(ordineMissioneAutoPropria.getUtilizzoAltriMotivi());
 		
 		ordineMissioneAutoPropriaDB.setToBeUpdated();
 

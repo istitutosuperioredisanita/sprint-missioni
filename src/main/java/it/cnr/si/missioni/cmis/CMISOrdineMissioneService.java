@@ -181,14 +181,18 @@ public class CMISOrdineMissioneService {
 			String userNameFirmatarioSpesa = null;
 			userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, ordineMissione.getAnno());
 			
-			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-				if (uoCompetenzaPerFlusso != null){
-					userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, ordineMissione.getAnno());
-				} else {
-					userNameFirmatarioSpesa = userNameFirmatario;
-				}
+			if (ordineMissione.isMissioneGratuita()){
+				userNameFirmatarioSpesa = userNameFirmatario;
 			} else {
-				userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, ordineMissione.getAnno());
+				if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
+					if (uoCompetenzaPerFlusso != null){
+						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, ordineMissione.getAnno());
+					} else {
+						userNameFirmatarioSpesa = userNameFirmatario;
+					}
+				} else {
+					userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, ordineMissione.getAnno());
+				}
 			}
 			
 			GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
@@ -232,9 +236,11 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setUserNamePrimoFirmatario(userNameFirmatario);
 			cmisOrdineMissione.setUserNameResponsabileModulo("");
 			cmisOrdineMissione.setUsernameResponsabileGruppo("");
+			cmisOrdineMissione.setNoteAutorizzazioniAggiuntive(ordineMissione.getNoteUtilizzoTaxiNoleggio() == null ? "": ordineMissione.getNoteUtilizzoTaxiNoleggio());
 			cmisOrdineMissione.setUsernameRichiedente(username);
 			cmisOrdineMissione.setUsernameUtenteOrdine(ordineMissione.getUid());
 			cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "false" : "true");
+			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "true" : "false");
 			cmisOrdineMissione.setValidazioneSpesa(impostaValidazioneSpesa(userNameFirmatario, userNameFirmatarioSpesa));
 			cmisOrdineMissione.setWfDescription("Ordine di Missione n. "+ordineMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
 			cmisOrdineMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
@@ -247,10 +253,12 @@ public class CMISOrdineMissioneService {
 				cmisOrdineMissione.setPrimoMotivoAutoPropria(Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(),"N").equals("N") ? "" : CMISOrdineMissione.PRIMO_MOTIVO_UTILIZZO_AUTO_PROPRIA);
 				cmisOrdineMissione.setSecondoMotivoAutoPropria(Utility.nvl(autoPropria.getUtilizzoMotiviUrgenza(),"N").equals("N") ? "" : CMISOrdineMissione.SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA);
 				cmisOrdineMissione.setTerzoMotivoAutoPropria(Utility.nvl(autoPropria.getUtilizzoMotiviTrasporto(),"N").equals("N") ? "" : CMISOrdineMissione.TERZO_MOTIVO_UTILIZZO_AUTO_PROPRIA);
+				cmisOrdineMissione.setAltriMotiviAutoPropria(autoPropria.getUtilizzoAltriMotivi() == null ? "": autoPropria.getUtilizzoAltriMotivi());
 			} else {
 				cmisOrdineMissione.setPrimoMotivoAutoPropria("");
 				cmisOrdineMissione.setSecondoMotivoAutoPropria("");
 				cmisOrdineMissione.setTerzoMotivoAutoPropria("");
+				cmisOrdineMissione.setAltriMotiviAutoPropria("");
 			}
 			if (!StringUtils.isEmpty(ordineMissione.getResponsabileGruppo())){
 				cmisOrdineMissione.setUsernameResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -434,6 +442,8 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO, cmisOrdineMissione.getUserNamePrimoFirmatario());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_ORDINE, cmisOrdineMissione.getUsernameUtenteOrdine());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RESPONSABILE_MODULO, cmisOrdineMissione.getUsernameResponsabileGruppo());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_MISSIONE_GRATUITA, cmisOrdineMissione.getMissioneGratuita());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_AUTORIZZAZIONI_AGGIUNTIVE, cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_FONDI, cmisOrdineMissione.getFondi());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_AUTO_PROPRIA_PRIMO_MOTIVO, cmisOrdineMissione.getPrimoMotivoAutoPropria());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_AUTO_PROPRIA_SECONDO_MOTIVO, cmisOrdineMissione.getSecondoMotivoAutoPropria());
@@ -493,6 +503,9 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
 			jGenerator.writeStringField("assoc_packageItems_removed" , "");
 
+
+			jGenerator.writeStringField("prop_cnrmissioni_noteAutorizzazioniAggiuntive" , cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
+			jGenerator.writeStringField("prop_cnrmissioni_missioneGratuita" , cmisOrdineMissione.getMissioneGratuita());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
 			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisOrdineMissione.getNoteSegreteria());
@@ -544,6 +557,7 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisOrdineMissione.getDataFineMissione());
 			jGenerator.writeStringField("prop_cnrmissioni_trattamento" , cmisOrdineMissione.getTrattamento());
 			jGenerator.writeStringField("prop_cnrmissioni_competenzaResiduo" , cmisOrdineMissione.getFondi());
+			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaAltriMotivi" , cmisOrdineMissione.getAltriMotiviAutoPropria());
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaPrimoMotivo" , cmisOrdineMissione.getPrimoMotivoAutoPropria());
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaSecondoMotivo" , cmisOrdineMissione.getSecondoMotivoAutoPropria());
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaTerzoMotivo" , cmisOrdineMissione.getTerzoMotivoAutoPropria());

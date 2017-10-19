@@ -43,6 +43,7 @@ public class CMISMissione {
 	private String descrizioneImpegno;
 	private BigDecimal importoMissione;
 	private BigDecimal disponibilita;
+	private String noteAutorizzazioniAggiuntive;
 
 	public String getOggetto() {
 		return oggetto;
@@ -283,5 +284,11 @@ public class CMISMissione {
 	}
 	public void setNoteSegreteria(String noteSegreteria) {
 		this.noteSegreteria = noteSegreteria;
+	}
+	public String getNoteAutorizzazioniAggiuntive() {
+		return noteAutorizzazioniAggiuntive;
+	}
+	public void setNoteAutorizzazioniAggiuntive(String noteAutorizzazioniAggiuntive) {
+		this.noteAutorizzazioniAggiuntive = noteAutorizzazioniAggiuntive;
 	}
 }

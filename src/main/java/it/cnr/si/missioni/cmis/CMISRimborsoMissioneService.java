@@ -253,6 +253,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setUserNamePrimoFirmatario(userNameFirmatario);
 		cmisRimborsoMissione.setUserNameResponsabileModulo("");
 		cmisRimborsoMissione.setUsernameRichiedente(username);
+		cmisRimborsoMissione.setNoteAutorizzazioniAggiuntive(rimborsoMissione.getNoteUtilizzoTaxiNoleggio() == null ? "": rimborsoMissione.getNoteUtilizzoTaxiNoleggio());
 		cmisRimborsoMissione.setAnticipoRicevuto(rimborsoMissione.getAnticipoRicevuto().equals("S") ? "true" : "false");
 		cmisRimborsoMissione.setAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato() == null ? "" : rimborsoMissione.getAnticipoAnnoMandato().toString());
 		cmisRimborsoMissione.setNumeroMandato(rimborsoMissione.getAnticipoNumeroMandato() == null ? "" : rimborsoMissione.getAnticipoNumeroMandato().toString());
@@ -545,6 +546,8 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_GAE, cmisRimborsoMissione.getGae());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisRimborsoMissione.getNote());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisRimborsoMissione.getNoteSegreteria());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_AUTORIZZAZIONI_AGGIUNTIVE, cmisRimborsoMissione.getNoteAutorizzazioniAggiuntive());
+		
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisRimborsoMissione.getImpegnoNumero());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisRimborsoMissione.getTaxiFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisRimborsoMissione.getAutoServizioFlag().equals("true"));
@@ -599,6 +602,7 @@ public class CMISRimborsoMissioneService {
 				jGenerator.writeStringField("prop_bpm_comment" , "");
 				jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
 			}
+			jGenerator.writeStringField("prop_cnrmissioni_noteAutorizzazioniAggiuntive" , cmisRimborsoMissione.getNoteAutorizzazioniAggiuntive());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisRimborsoMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisRimborsoMissione.getNote());
 			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisRimborsoMissione.getNoteSegreteria());
