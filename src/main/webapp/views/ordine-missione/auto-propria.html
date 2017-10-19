@@ -53,6 +53,16 @@
                         </span>
                 </p>
             </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione-auto-propria.form.altri-motivi">altri motivi</span>
+                            <textarea ng-disabled="autoPropriaOrdineMissioneModel.id" 
+                              class="input-sm form-control" name="altriMotivi" ng-model="autoPropriaOrdineMissioneModel.utilizzoAltriMotivi" rows = "2">
+                            </textarea> 
+                        </span>
+                </p>
+            </form>
            <div class="col-md-11"> 
                 <dt translate="ordine-missione-auto-propria.form.auto-propria">Dati </dt>
                 <dd> <b>{{'autoPropria.form.targa' | translate}}:</b> {{autoPropriaOrdineMissioneModel.targa}} - <b>{{'autoPropria.form.marca' | translate}}:</b> {{autoPropriaOrdineMissioneModel.marca}} - <b>{{'autoPropria.form.modello' | translate}}:</b> {{autoPropriaOrdineMissioneModel.modello}} - <b>{{'autoPropria.form.cartaCircolazione' | translate}}:</b> {{autoPropriaOrdineMissioneModel.cartaCircolazione}} - <b>{{'autoPropria.form.polizzaAssicurativa' | translate}}:</b> {{autoPropriaOrdineMissioneModel.polizzaAssicurativa}}</dd>

@@ -3,6 +3,7 @@ package it.cnr.si.missioni.cmis;
 public class CMISOrdineMissione extends CMISMissione {
 	private String usernameResponsabileGruppo;
 	private String fondi;
+	private String altriMotiviAutoPropria;
 	private String primoMotivoAutoPropria;
 	private String secondoMotivoAutoPropria;
 	private String terzoMotivoAutoPropria;
@@ -10,6 +11,7 @@ public class CMISOrdineMissione extends CMISMissione {
 	private String validazioneModulo;
 	private String modulo;
 	private String descrizioneModulo;
+	private String missioneGratuita;
 	public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo";
 	public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività caratterizzata da emergenza, urgenza, indifferibilità";
 	public final static String TERZO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione";
@@ -66,5 +68,17 @@ public class CMISOrdineMissione extends CMISMissione {
 	}
 	public void setTerzoMotivoAutoPropria(String terzoMotivoAutoPropria) {
 		this.terzoMotivoAutoPropria = terzoMotivoAutoPropria;
+	}
+	public String getMissioneGratuita() {
+		return missioneGratuita;
+	}
+	public void setMissioneGratuita(String missioneGratuita) {
+		this.missioneGratuita = missioneGratuita;
+	}
+	public String getAltriMotiviAutoPropria() {
+		return altriMotiviAutoPropria;
+	}
+	public void setAltriMotiviAutoPropria(String altriMotiviAutoPropria) {
+		this.altriMotiviAutoPropria = altriMotiviAutoPropria;
 	}
 }
