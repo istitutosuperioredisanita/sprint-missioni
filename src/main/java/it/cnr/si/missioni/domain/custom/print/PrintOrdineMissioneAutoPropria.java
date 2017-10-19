@@ -47,6 +47,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"motiviIspettivi",
 	"motiviUrgenza",
 	"motiviTrasporto",
+	"altriMotivi",
 	"spostamenti"
 })
 public class PrintOrdineMissioneAutoPropria {
@@ -115,6 +116,8 @@ public class PrintOrdineMissioneAutoPropria {
 	private String motiviUrgenza;
 	@JsonProperty("motiviTrasporto")
 	private String motiviTrasporto;
+	@JsonProperty("altriMotivi")
+	private String altriMotivi;
 	@JsonProperty("spostamenti")
 	private List<Spostamenti> spostamenti = new ArrayList<Spostamenti>();
 	@JsonIgnore
@@ -752,6 +755,14 @@ public class PrintOrdineMissioneAutoPropria {
 
 	public void setMotiviTrasporto(String motiviTrasporto) {
 		this.motiviTrasporto = motiviTrasporto;
+	}
+
+	public String getAltriMotivi() {
+		return altriMotivi;
+	}
+
+	public void setAltriMotivi(String altriMotivi) {
+		this.altriMotivi = altriMotivi;
 	}
 
 }
