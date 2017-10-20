@@ -1282,7 +1282,7 @@ public class RimborsoMissioneService {
 			ZonedDateTime zd2 = (ZonedDateTime)obj2;
 			String str1 = DateUtils.getDateAsString(zd1, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
 			String str2 = DateUtils.getDateAsString(zd2, DateUtils.PATTERN_DATETIME_FOR_DOCUMENTALE);
-			if (str1.equals(str2)){
+			if (!str1.equals(str2)){
 				return true;
 			}
 		} else if (obj1 instanceof LocalDate){
