@@ -99,7 +99,7 @@ public class AccountService {
 	public Boolean isUtenteAbilitatoUo(List<UoForUsersSpecial> listUo, String uo, Boolean isPerValidazione){
 		for (Iterator<UoForUsersSpecial> iteratorUo = listUo.iterator(); iteratorUo.hasNext();){
 			UoForUsersSpecial uoForUsersSpecial = iteratorUo.next();
-			if (uoForUsersSpecial.getCodice_uo() != null && uoForUsersSpecial.getCodice_uo().equals(uo)){
+			if (uoForUsersSpecial.getCodice_uo() != null && getUoSigla(uoForUsersSpecial).equals(uo)){
 				if (isPerValidazione){
 					if (uoForUsersSpecial.getOrdine_da_validare().equals("S")){
 						return true;
