@@ -160,15 +160,19 @@ public class ProxyResource {
 		if (isAccountRest(url, uid)){
 			String resp = accountService.manageResponseForAccountRest(uid, result.getBody());
 			if (resp != null){
+				log.info("Response for Account. Url: "+url+" - Resp: "+resp);
 				return resp;
 			} else {
+				log.info("Response for Account. Url: "+url+" - Risposta: "+risposta);
 				return risposta;
 			}
 		} else if (isAccountRestWithAnotherUSer(url)){
 			String resp = accountService.manageResponseForAccountRest(result.getBody());
 			if (resp != null){
+				log.info("Response for Account With Another User. Url: "+url+" - Resp: "+resp);
 				return resp;
 			} else {
+				log.info("Response for Account With Another User. Url: "+url+" - Risposta: "+risposta);
 				return risposta;
 			}
 		}
