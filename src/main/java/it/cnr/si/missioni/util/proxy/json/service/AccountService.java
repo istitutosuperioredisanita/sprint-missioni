@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.service.UoService;
@@ -27,6 +30,8 @@ import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 
 @Service
 public class AccountService {
+	private transient static final Log logger = LogFactory.getLog(AccountService.class);
+
 	@Autowired
     private ProxyService proxyService;
 
@@ -46,7 +51,7 @@ public class AccountService {
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
 				UsersSpecial user = iteratorUsers.next();
-				if (user.getUid() != null && user.getUid().equals(uid)){
+				if (user.getUid() != null && user.getUid().equalsIgnoreCase(uid)){
 					return user;
 				}
 			}
@@ -60,6 +65,7 @@ public class AccountService {
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
 				UsersSpecial user = iteratorUsers.next();
 				if (isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo, isPerValidazione)){
+					logger.info("User special to be able: "+user.getUid());
 					listaUtenti.add(user);
 				}
 			}
