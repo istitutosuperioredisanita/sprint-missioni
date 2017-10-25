@@ -775,6 +775,7 @@ public class OrdineMissioneService {
 		if (dati != null && dati.getMailNotifiche() != null){
 			mailService.sendEmail(subjectSendToAdministrative, testoMail, false, true, dati.getMailNotifiche());
 		} else {
+			log.info("Ricerca amministrativi per mail. Uo: "+ordineMissioneDB.getUoSpesa());
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
 			sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
 		}
