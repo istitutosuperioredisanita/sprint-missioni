@@ -21,7 +21,7 @@
 {"codice_uo":"000403", "uid_direttore":"pietro.piro"},
 {"codice_uo":"000404", "uid_direttore":"angelo.grisanti"},
 {"codice_uo":"000406", "uid_direttore":"pierpaolo.orrico"},
-{"codice_uo":"000407", "uid_direttore":"roberto.tatarelli", "ordine_da_validare":"S", "firma_spesa":"N"},
+{"codice_uo":"000407", "uid_direttore":"angelo.grisanti", "ordine_da_validare":"S", "firma_spesa":"N"},
 {"codice_uo":"000408", "uid_direttore":"giuliano.salberini"},
 {"codice_uo":"000410", "uid_direttore":"massimo.fraticelli"},
 {"codice_uo":"000411", "uid_direttore":"maurizio.lancia", "ordine_da_validare":"S"},
@@ -39,10 +39,10 @@
 {"codice_uo":"002004", "uid_direttore":"laura.giuliano"},
 {"codice_uo":"002005", "uid_direttore":"laura.giuliano"},
 {"codice_uo":"003000", "uid_direttore":"giovanni.rinaldi"},
-{"codice_uo":"004000", "uid_direttore":"roberto.natalini"},
-{"codice_uo":"004001", "uid_direttore":"roberto.natalini"},
-{"codice_uo":"004002", "uid_direttore":"roberto.natalini"},
-{"codice_uo":"004003", "uid_direttore":"roberto.natalini"},
+{"codice_uo":"004000", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
+{"codice_uo":"004001", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
+{"codice_uo":"004002", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
+{"codice_uo":"004003", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
 {"codice_uo":"006000", "uid_direttore":"daniele.malfitana"},
 {"codice_uo":"006001", "uid_direttore":"daniele.malfitana"},
 {"codice_uo":"006002", "uid_direttore":"daniele.malfitana"},
@@ -312,3 +312,6 @@
 {"codice_uo":"512000", "uid_direttore":"tullio.pozzan"},
 {"codice_uo":"513000", "uid_direttore":"marco.conti", "ordine_da_validare":"S"},
 {"codice_uo":"605000", "uid_direttore":"marco.conti", "ordine_da_validare":"S"}]}
+{"codice_uo":"020000", "uid_direttore":"francesco.vizza", "ordine_da_validare":"S"}]}
+{"codice_uo":"020001", "uid_direttore":"caterina.fusco", "ordine_da_validare":"S"}]}
+{"codice_uo":"020003", "uid_direttore":"claudia.forte", "ordine_da_validare":"S"}]}
