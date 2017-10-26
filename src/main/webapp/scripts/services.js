@@ -221,7 +221,7 @@ missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, 
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
-                        if (data.matricola) {
+                        if (data.strutturaAppartenenza) {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username + ':' + param.password);
                             $http.get(
                                 'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username
@@ -270,7 +270,7 @@ missioniApp.factory('AuthenticationSharedService', function ($rootScope, $http, 
                             return;
                         }
                         AccountLDAP.get(function(data) {
-                            if (!data.matricola) {
+                            if (!data.strutturaAppartenenza) {
                                 Account.get(function(data) {
                                     Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
