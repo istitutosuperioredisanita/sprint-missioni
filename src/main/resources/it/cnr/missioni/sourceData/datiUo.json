@@ -140,7 +140,8 @@
 {"codice_uo":"045002", "uid_direttore":"tullio.pozzan"},
 {"codice_uo":"046000", "uid_direttore":"nicola.pirrone", "ordine_da_validare":"S"},
 {"codice_uo":"046001", "uid_direttore":"francesca.sprovieri", "ordine_da_validare":"S"},
-{"codice_uo":"046002", "uid_direttore":"antonio.fardelli", "ordine_da_validare":"S"},
+{"codice_uo":"046002", "uid_direttore":"antonio.fardelli", "ordine_da_validare":"S"}
+
 {"codice_uo":"047000", "uid_direttore":"antonio.lamarra"},
 {"codice_uo":"048000", "uid_direttore":"simonetta.montemagni"},
 {"codice_uo":"049000", "uid_direttore":"eleonora.carletti", "ordine_da_validare":"S"},
@@ -186,7 +187,8 @@
 {"codice_uo":"067000", "uid_direttore":"secondo.rolfo", "ordine_da_validare":"S"},
 {"codice_uo":"067001", "uid_direttore":"mario.nosvelli", "ordine_da_validare":"S"},
 {"codice_uo":"067002", "uid_direttore":"emanuela.reale", "ordine_da_validare":"S"},
-{"codice_uo":"067003", "uid_direttore":"secondo.rolfo", "ordine_da_validare":"S"},
+{"codice_uo":"067003", "uid_direttore":"secondo.rolfo", "ordine_da_validare":"S"}
+
 {"codice_uo":"068000", "uid_direttore":"corrado.bonifazi"},
 {"codice_uo":"068001", "uid_direttore":"corrado.bonifazi"},
 {"codice_uo":"069000", "uid_direttore":"vitofelice.uricchio", "ordine_da_validare":"S"},
@@ -194,7 +196,8 @@
 {"codice_uo":"069002", "uid_direttore":"giuseppe.tullo", "ordine_da_validare":"S"},
 {"codice_uo":"070000", "uid_direttore":"riccardo.chirone"},
 {"codice_uo":"072000", "uid_direttore":"riccardo.lanari"},
-{"codice_uo":"072001", "uid_direttore":"riccardo.lanari"},
+{"codice_uo":"072001", "uid_direttore":"riccardo.lanari"}
+
 {"codice_uo":"074000", "uid_direttore":"claudio.montani"},
 {"codice_uo":"075000", "uid_direttore":"cristina.sabbioni"},
 {"codice_uo":"075001", "uid_direttore":"cristina.sabbioni"},
@@ -276,7 +279,7 @@
 {"codice_uo":"106002", "uid_direttore":"mauro.centritto"},
 {"codice_uo":"107000", "uid_direttore":"gianpaolo.accotto"},
 {"codice_uo":"107001", "uid_direttore":"gianpaolo.accotto"},
-{"codice_uo":"108000", "uid_direttore":"marco.fabri"},
+{"codice_uo":"108000", "uid_direttore":"marco.fabri", "ordine_da_validare":"S"},
 {"codice_uo":"109000", "uid_direttore":"claudio.conti"},
 {"codice_uo":"109001", "uid_direttore":"claudio.conti"},
 {"codice_uo":"110000", "uid_direttore":"gianluca.sotis"},
@@ -297,7 +300,8 @@
 {"codice_uo":"115001", "uid_direttore":"lucia.sorba"},
 {"codice_uo":"116000", "uid_direttore":"giuseppe.sconocchia", "ordine_da_validare":"S"},
 {"codice_uo":"116001", "uid_direttore":"giuseppe.sconocchia", "ordine_da_validare":"S"},
-{"codice_uo":"116002", "uid_direttore":"giuseppe.sconocchia", "ordine_da_validare":"S"},
+{"codice_uo":"116002", "uid_direttore":"giuseppe.sconocchia", "ordine_da_validare":"S"}
+
 {"codice_uo":"117000", "uid_direttore":"fabio.mammano"},
 {"codice_uo":"118000", "uid_direttore":"emiliofortunato.campana"},
 {"codice_uo":"119000", "uid_direttore":"cosimo.carfagna"},
@@ -308,7 +312,7 @@
 {"codice_uo":"501000", "uid_direttore":"enrico.brugnoli"},
 {"codice_uo":"503000", "uid_direttore":"francesco.loreto", "ordine_da_validare":"S"},
 {"codice_uo":"506000", "uid_direttore":"luigi.ambrosio"},
-{"codice_uo":"507000", "uid_direttore":"rosariocorrado.spinella"},
+{"codice_uo":"507000", "uid_direttore":"rosariocorrado.spinella", "ordine_da_validare":"S"},
 {"codice_uo":"512000", "uid_direttore":"tullio.pozzan"},
 {"codice_uo":"513000", "uid_direttore":"marco.conti", "ordine_da_validare":"S"},
 {"codice_uo":"605000", "uid_direttore":"marco.conti", "ordine_da_validare":"S"}]}
