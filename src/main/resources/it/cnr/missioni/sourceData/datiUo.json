@@ -316,6 +316,9 @@
 {"codice_uo":"512000", "uid_direttore":"tullio.pozzan"},
 {"codice_uo":"513000", "uid_direttore":"marco.conti", "ordine_da_validare":"S"},
 {"codice_uo":"605000", "uid_direttore":"marco.conti", "ordine_da_validare":"S"},
+{"codice_uo":"100000", "uid_direttore":"gianluca.debellis", "ordine_da_validare":"S"},
+{"codice_uo":"100002", "uid_direttore":"sabino.liuni", "ordine_da_validare":"S"},
+{"codice_uo":"100004", "uid_direttore":"cinzia.caporale", "ordine_da_validare":"S"},
 {"codice_uo":"020000", "uid_direttore":"francesco.vizza", "ordine_da_validare":"S"},
 {"codice_uo":"020001", "uid_direttore":"caterina.fusco", "ordine_da_validare":"S"},
 {"codice_uo":"020003", "uid_direttore":"claudia.forte", "ordine_da_validare":"S"}]}
