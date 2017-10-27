@@ -64,6 +64,9 @@
 {"codice_uo":"108000"},
 {"codice_uo":"513000"},
 {"codice_uo":"507000"},
+{"codice_uo":"100000"},
+{"codice_uo":"100002"},
+{"codice_uo":"100004"},
 {"codice_uo":"605000"}]},
 {"uid":"fabiana.carinci", "uoForUsersSpecial":[
 {"codice_uo":"000401"},
@@ -128,6 +131,9 @@
 {"codice_uo":"108000"},
 {"codice_uo":"020003"},
 {"codice_uo":"507000"},
+{"codice_uo":"100000"},
+{"codice_uo":"100002"},
+{"codice_uo":"100004"},
 {"codice_uo":"605000"}]},
 {"uid":"massimo.fraticelli", "uoForUsersSpecial":[
 {"codice_uo":"000401"},
@@ -192,6 +198,9 @@
 {"codice_uo":"020003"},
 {"codice_uo":"108000"},
 {"codice_uo":"507000"},
+{"codice_uo":"100000"},
+{"codice_uo":"100002"},
+{"codice_uo":"100004"},
 {"codice_uo":"605000"}]},
 {"uid":"claudio.romano", "uoForUsersSpecial":[
 {"codice_uo":"084000", "ordine_da_validare":"S"}]},
@@ -337,6 +346,16 @@
 
 {"uid":"francesca.calvi", "uoForUsersSpecial":[{"codice_uo":"507000", "ordine_da_validare":"S"}]},
 {"uid":"simonetta.paoluzi", "uoForUsersSpecial":[{"codice_uo":"507000", "ordine_da_validare":"S"}]},
+
+{"uid":"mariagiovanna.torti", "uoForUsersSpecial":[{"codice_uo":"100000", "ordine_da_validare":"S"}]},
+{"uid":"annamaria.giannelli", "uoForUsersSpecial":[{"codice_uo":"100000", "ordine_da_validare":"S"}]},
+{"uid":"maria.vurchio", "uoForUsersSpecial":[{"codice_uo":"100000", "ordine_da_validare":"S"}]},
+{"uid":"valeria.bellettato", "uoForUsersSpecial":[{"codice_uo":"100000", "ordine_da_validare":"S"}]},
+{"uid":"loredana.ansalone", "uoForUsersSpecial":[{"codice_uo":"100000", "ordine_da_validare":"S"}]},
+{"uid":"michela.dicarlo", "uoForUsersSpecial":[{"codice_uo":"100000", "ordine_da_validare":"S"}]},
+{"uid":"michele.piccolo", "uoForUsersSpecial":[{"codice_uo":"100002", "ordine_da_validare":"S"}]},
+{"uid":"giuseppe.sabatelli", "uoForUsersSpecial":[{"codice_uo":"100002", "ordine_da_validare":"S"}]},
+{"uid":"tiziana.pugliatti", "uoForUsersSpecial":[{"codice_uo":"100004", "ordine_da_validare":"S"}]},
 
 {"uid":"sara.mannocchi", "uoForUsersSpecial":[
 {"codice_uo":"088000", "ordine_da_validare":"S"}]},
