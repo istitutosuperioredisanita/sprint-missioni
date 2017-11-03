@@ -4,6 +4,7 @@
 {"codice_uo":"000401"},
 {"codice_uo":"000407"},
 {"codice_uo":"000411"},
+{"codice_uo":"018000"},
 {"codice_uo":"084000"},
 {"codice_uo":"084001"},
 {"codice_uo":"084002"},
@@ -73,7 +74,7 @@
 {"codice_uo":"605000"}]},
 {"uid":"fabiana.carinci", "uoForUsersSpecial":[
 {"codice_uo":"000401"},
-{"codice_uo":"000407"},
+{"codice_uo":"000407", "ordine_da_validare":"S"},
 {"codice_uo":"000411"},
 {"codice_uo":"084000"},
 {"codice_uo":"084001"},
