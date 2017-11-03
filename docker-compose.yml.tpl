@@ -11,7 +11,7 @@ services:
     read_only: true
     command: java -Xmx512m -Xss512k -Dserver.port=8080 -Djava.security.egd=file:/dev/./urandom -jar /opt/missioni.war --spring.profiles.active=dev,cnr
     labels:
-    - SERVICE_NAME:##{SERVICE_NAME}##
+    - SERVICE_NAME: ##{SERVICE_NAME}##
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
