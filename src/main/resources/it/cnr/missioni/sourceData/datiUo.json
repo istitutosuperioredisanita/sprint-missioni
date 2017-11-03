@@ -157,7 +157,7 @@
 {"codice_uo":"055000", "uid_direttore":"vincenzo.lapenna"},
 {"codice_uo":"057000", "uid_direttore":"guglielmo.fortunato", "ordine_da_validare":"S"},
 {"codice_uo":"057001", "uid_direttore":"guglielmo.fortunato", "ordine_da_validare":"S"},
-{"codice_uo":"057002", "uid_direttore":"guglielmo.fortunato"}, "ordine_da_validare":"S",
+{"codice_uo":"057002", "uid_direttore":"guglielmo.fortunato", "ordine_da_validare":"S"},
 {"codice_uo":"057003", "uid_direttore":"rosariocorrado.spinella", "ordine_da_validare":"S"},
 {"codice_uo":"057004", "uid_direttore":"rosariocorrado.spinella", "ordine_da_validare":"S"},
 {"codice_uo":"057005", "uid_direttore":"guglielmo.fortunato", "ordine_da_validare":"S"},
