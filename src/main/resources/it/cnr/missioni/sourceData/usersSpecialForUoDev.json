@@ -203,6 +203,9 @@
                 }, {
                     "codice_uo" : "044000"
                 }, {
+                    "codice_uo" : "032000",
+                    "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "030000"
                 }, {
                     "codice_uo" : "067000"
@@ -337,6 +340,9 @@
                 }, {
                     "codice_uo" : "003000"
                 }, {
+                    "codice_uo" : "032000",
+                    "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "044000"
                 }, {
                     "codice_uo" : "030000"
@@ -367,6 +373,27 @@
                     "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "513000",
+                    "ordine_da_validare" : "S"
+                }
+            ]
+        }, {
+            "uid" : "	lucia.azzari",
+            "uoForUsersSpecial" : [{
+                    "codice_uo" : "032000",
+                    "ordine_da_validare" : "S"
+                }
+            ]
+        }, {
+            "uid" : "	anna.papa",
+            "uoForUsersSpecial" : [{
+                    "codice_uo" : "032000",
+                    "ordine_da_validare" : "S"
+                }
+            ]
+        }, {
+            "uid" : "	angela.azzurrini",
+            "uoForUsersSpecial" : [{
+                    "codice_uo" : "032000",
                     "ordine_da_validare" : "S"
                 }
             ]
