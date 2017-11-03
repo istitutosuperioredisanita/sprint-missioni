@@ -180,19 +180,6 @@ public class OrdineMissioneService {
 		return getOrdineMissione(principal, idMissione, false);
     }
 
-	private void caricaDatiDerivati(Principal principal, OrdineMissione ordineMissione) throws ComponentException {
-		if (ordineMissione != null){
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-			}
-			ordineMissione.setDatiIstituto(dati);
-			if (ordineMissione.getDatiIstituto() == null){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non esistono i dati per istituto per il codice "+ordineMissione.getCdsSpesa()+" nell'anno "+ordineMissione.getAnno());
-			}
-		}
-	}
-
     @Transactional(readOnly = true)
    	public Map<String, byte[]> printOrdineMissione(Authentication auth, Long idMissione) throws ComponentException {
     	String username = SecurityUtils.getCurrentUserLogin();
@@ -1057,6 +1044,10 @@ public class OrdineMissioneService {
 			controlloCampiObbligatori(ordineMissione); 
 			controlloCongruenzaDatiInseriti(principal, ordineMissione);
 			controlloDatiFinanziari(principal, ordineMissione);
+    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+    		if (istituto == null){
+        		throw new AwesomeException(CodiciErrore.ERRGEN, "Dati uo non presenti per il codice "+ordineMissione.getUoSpesa()+" nell'anno "+ordineMissione.getAnno());
+    		}
 		}
 	}
     

@@ -317,7 +317,8 @@ public class CMISRimborsoMissioneService {
 		if (rimborsoMissione != null){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
 			if (dati == null){
-				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non esistono i dati per uo per il codice "+rimborsoMissione.getUoSpesa()+" nell'anno "+rimborsoMissione.getAnno());
+//				dati = datiIstitutoService.creaDatiIstitutoOrdine(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
 			}
 			rimborsoMissione.setDatiIstituto(dati);
 			if (rimborsoMissione.getDatiIstituto() == null){
