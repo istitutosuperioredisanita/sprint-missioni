@@ -58,14 +58,15 @@ public class DatiIstitutoService {
     		datiIstituto = (DatiIstituto)crudServiceBean.modificaConBulk(principal, datiIstituto);
     		log.debug("Updated Information for Dati Istituto: {}", datiIstituto);
     	} else {
-    		DatiIstituto datiIstitutoInsert = null;
-    		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
-        		datiIstitutoInsert = creaDatiIstitutoRimborso(principal, istituto, anno);
-    		} else {
-        		datiIstitutoInsert = creaDatiIstitutoOrdine(principal, istituto, anno);
-    		}
-    		datiIstituto = datiIstitutoInsert;
-    		log.debug("Created Information for Dati Istituto: {}", datiIstitutoInsert);
+    		throw new AwesomeException(CodiciErrore.ERRGEN, "Dati uo non presenti per il codice "+istituto+" nell'anno "+anno);
+//    		DatiIstituto datiIstitutoInsert = null;
+//    		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
+//        		datiIstitutoInsert = creaDatiIstitutoRimborso(principal, istituto, anno);
+//    		} else {
+//        		datiIstitutoInsert = creaDatiIstitutoOrdine(principal, istituto, anno);
+//    		}
+//    		datiIstituto = datiIstitutoInsert;
+//    		log.debug("Created Information for Dati Istituto: {}", datiIstitutoInsert);
     	}
 		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
 			return datiIstituto.getProgressivoRimborso();
