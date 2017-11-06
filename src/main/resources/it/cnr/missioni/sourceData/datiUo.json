@@ -196,7 +196,7 @@
 {"codice_uo":"069001", "uid_direttore":"liciamaria.guzzella", "ordine_da_validare":"S"},
 {"codice_uo":"069002", "uid_direttore":"giuseppe.tullo", "ordine_da_validare":"S"},
 {"codice_uo":"070000", "uid_direttore":"riccardo.chirone"},
-{"codice_uo":"072000", "uid_direttore":"riccardo.lanari"},
+{"codice_uo":"072000", "uid_direttore":"riccardo.lanari", "ordine_da_validare":"S"},
 {"codice_uo":"072001", "uid_direttore":"riccardo.lanari"},
 
 {"codice_uo":"074000", "uid_direttore":"claudio.montani"},
