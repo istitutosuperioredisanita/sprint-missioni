@@ -21,8 +21,8 @@ services:
     - RABBITMQ_DEFAULT_USER=cnr
     - RABBITMQ_DEFAULT_PASS=bubbazza
     labels:
-    - SERVICE_NAME=missioni-rabbit
-    - traefik.port=15672
+      SERVICE_NAME: "missioni-rabbit"
+      traefik.port: "15672"
     read_only: true
     volumes:
     - ./rabbitmq/etc/:/etc/rabbitmq/
