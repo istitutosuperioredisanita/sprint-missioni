@@ -1,11 +1,10 @@
 package it.cnr.si.missioni.util;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +13,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 
 /**
  * @author Gianfranco Gasparro
@@ -430,7 +431,12 @@ public class DateUtils {
 	}
 
 	public static String getDateAsString(ZonedDateTime data, String pattern) {
-		return data.format(DateTimeFormatter.ofPattern(pattern));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+
+		  return LocalDateTime
+		    .ofInstant(data.toInstant(), ZoneId.systemDefault())
+		    .format(formatter);
+		
 	}
 	
 	public static GregorianCalendar getDate(ZonedDateTime data){
