@@ -52,7 +52,7 @@ angular.module('missioniApp')
             if (startValue){
               if (init){
                 init = false;
-                scope.ngModelDate = new Date(startValue);
+                scope.ngModelDate = moment(startValue)._d;
                 setDatetime(scope, element);
               }
             } else {
