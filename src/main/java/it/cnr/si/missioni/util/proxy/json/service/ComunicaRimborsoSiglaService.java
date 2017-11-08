@@ -302,7 +302,7 @@ public class ComunicaRimborsoSiglaService {
 
 	private String recuperoDataTappa(List<TappeMissioneColl> tappe, RimborsoMissioneDettagli dettaglio){
 		for (TappeMissioneColl tappa : tappe){
-			if (dettaglio.getDataSpesa().isEqual(DateUtils.parseLocalDate(tappa.getDtInizioTappa().substring(0, 10), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE))){
+			if (dettaglio.getDataSpesa().isEqual(DateUtils.parseLocalDate(tappa.getDtInizioTappa().substring(0, 10), DateUtils.PATTERN_DATE))){
     			return tappa.getDtInizioTappa();
 			}
 		}

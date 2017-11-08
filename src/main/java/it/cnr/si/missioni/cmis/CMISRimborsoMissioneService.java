@@ -222,8 +222,7 @@ public class CMISRimborsoMissioneService {
 		
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
 		dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
-		dataScadenzaFlusso.add(Calendar.DATE, 14);
-		dataScadenzaFlusso.add(Calendar.MONTH, 1);
+		dataScadenzaFlusso.add(Calendar.DAY_OF_MONTH, 7);
 
 		cmisRimborsoMissione.setAnno(rimborsoMissione.getAnno().toString());
 		cmisRimborsoMissione.setNumero(rimborsoMissione.getNumero().toString());
