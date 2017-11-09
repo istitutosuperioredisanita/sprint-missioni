@@ -6,9 +6,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -21,6 +23,8 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
  */
 public class DateUtils {
 
+	public static final String ZONE_ID_DEFAULT = "Europe/Vatican"; 
+	
 	/**
 	 * PATTERN_DATE
 	 */
@@ -432,13 +436,32 @@ public class DateUtils {
 
 	public static String getDateAsString(ZonedDateTime data, String pattern) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-
-		  return LocalDateTime
-		    .ofInstant(data.toInstant(), ZoneId.systemDefault())
-		    .format(formatter);
+		return ZonedDateTime
+				.ofInstant(data.toInstant(), getDefaultZoneId())
+				.format(formatter);
 		
 	}
+
+	private static ZoneId getDefaultZoneId() {
+		return ZoneId.of(ZONE_ID_DEFAULT);
+	}
 	
+//	public static void main(String[] args) {
+//		ZonedDateTime data = ZonedDateTime.now();
+//		String d = getDateAsString(data, PATTERN_DATE);
+//		String c = getDateAsString(data, PATTERN_DATETIME);
+//		String a = getDateAsString(data, PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
+//		String b = getDateAsString(data, PATTERN_DATETIME_WITH_TIMEZONE);
+//		
+//		System.out.println(ZoneId.getAvailableZoneIds());
+//		System.out.println(data);
+//		System.out.println(a);
+//		System.out.println(b);
+//		System.out.println(c);
+//		System.out.println(d);
+//		
+//	}
+//	
 	public static GregorianCalendar getDate(ZonedDateTime data){
 		return GregorianCalendar.from(data);
 	}
