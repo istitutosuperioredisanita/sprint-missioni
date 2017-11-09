@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -433,10 +434,32 @@ public class DateUtils {
 	public static String getDateAsString(ZonedDateTime data, String pattern) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 
-		  return LocalDateTime
-		    .ofInstant(data.toInstant(), ZoneId.systemDefault())
-		    .format(formatter);
 		
+		  return LocalDateTime
+		    .ofInstant(data.toInstant(), ZoneId.systemDefault()).format(formatter);
+		
+	}
+	
+	public static void main(String[] args) {
+		ZonedDateTime data = ZonedDateTime.now();
+		String a = getDateAsString(data, PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
+		String b = getDateWithSecondAsString(data, PATTERN_DATETIME_WITH_TIMEZONE);
+		System.out.println(a);
+		System.out.println(b);
+		
+	}
+	
+	public static String getDateWithSecondAsString(ZonedDateTime data, String pattern) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+
+		
+		  LocalDateTime loc = LocalDateTime
+		    .ofInstant(data.toInstant(), ZoneId.systemDefault());
+		
+		  return ZonedDateTime
+		    .ofInstant(loc, ZoneOffset.UTC, ZoneId.systemDefault())
+		    .format(formatter);
+			
 	}
 	
 	public static GregorianCalendar getDate(ZonedDateTime data){
