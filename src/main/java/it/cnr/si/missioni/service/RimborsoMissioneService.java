@@ -666,7 +666,11 @@ public class RimborsoMissioneService {
 				if (!StringUtils.isEmpty(filter.getUser())){
 					criterionList.add(Restrictions.eq("uid", filter.getUser()));
 				} else {
-					criterionList.add(Restrictions.eq("uid", principal.getName()));
+					if (StringUtils.isEmpty(filter.getUoRich())){
+						criterionList.add(Restrictions.eq("uid", principal.getName()));
+					} else {
+						criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+					}
 				}
 			} else {
 				UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
