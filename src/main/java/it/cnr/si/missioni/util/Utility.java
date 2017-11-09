@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.bulk.OggettoBulk;
 import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.ErrorRestSigla;
 
 public class Utility {
@@ -180,4 +181,8 @@ public class Utility {
 		return null;
 	}
 	
+	public static String getUoSigla(String uo) {
+		return uo.substring(0,3)+"."+uo.substring(3,6);
+	}
+
 }

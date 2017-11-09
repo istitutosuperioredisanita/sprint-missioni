@@ -442,6 +442,11 @@ public class DateUtils {
 		
 	}
 
+	public static ZonedDateTime getDateWithDefaultZoneId(ZonedDateTime data) {
+		return ZonedDateTime
+				.ofInstant(data.toInstant(), getDefaultZoneId());
+	}
+
 	private static ZoneId getDefaultZoneId() {
 		return ZoneId.of(ZONE_ID_DEFAULT);
 	}

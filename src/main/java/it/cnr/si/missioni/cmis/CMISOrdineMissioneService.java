@@ -270,7 +270,7 @@ public class CMISOrdineMissioneService {
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, anno);
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
 			if (dati != null && dati.getResponsabile() != null){
 				if (!ordineMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloPerItalia(),"N").equals("N"))){
 					userNameFirmatario = dati.getResponsabile();

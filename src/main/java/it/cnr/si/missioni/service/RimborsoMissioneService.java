@@ -503,10 +503,10 @@ public class RimborsoMissioneService {
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() ){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				if (dettaglio.getDataSpesa().isAfter(DateUtils.truncate(rimborsoMissione.getDataFineMissione()))){
+				if (dettaglio.getDataSpesa().isAfter(DateUtils.getDateWithDefaultZoneId(rimborsoMissione.getDataFineMissione()).toLocalDate())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Fine Missione non può essere precedente alla data di una spesa indicata nei dettagli.");
 				}
-				if (dettaglio.getDataSpesa().isBefore(DateUtils.truncate(rimborsoMissione.getDataInizioMissione()))){
+				if (dettaglio.getDataSpesa().isBefore(DateUtils.getDateWithDefaultZoneId(rimborsoMissione.getDataInizioMissione()).toLocalDate())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data di Inizio Missione non può essere successiva alla data di una spesa indicata nei dettagli.");
 				}
 			}
