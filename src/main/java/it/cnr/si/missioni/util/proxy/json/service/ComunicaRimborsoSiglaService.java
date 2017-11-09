@@ -302,7 +302,7 @@ public class ComunicaRimborsoSiglaService {
 
 	private String recuperoDataTappa(List<TappeMissioneColl> tappe, RimborsoMissioneDettagli dettaglio){
 		for (TappeMissioneColl tappa : tappe){
-			if (dettaglio.getDataSpesa().isEqual(DateUtils.parseLocalDate(tappa.getDtInizioTappa().substring(0, 10), DateUtils.PATTERN_DATE))){
+			if (dettaglio.getDataSpesa().isEqual(DateUtils.parseLocalDate(tappa.getDtInizioTappa().substring(0, 10), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE))){
     			return tappa.getDtInizioTappa();
 			}
 		}
@@ -432,8 +432,8 @@ public class ComunicaRimborsoSiglaService {
 	}
 
 	private void impostaDateTappa(ZonedDateTime dataInizio, ZonedDateTime dataFine, TappeMissioneColl tappa) {
-		tappa.setDtInizioTappa(DateUtils.getDateAsString(dataInizio, DateUtils.PATTERN_DATETIME_NO_SEC));
-		tappa.setDtFineTappa(DateUtils.getDateAsString(dataFine, DateUtils.PATTERN_DATETIME_NO_SEC));
+		tappa.setDtInizioTappa(DateUtils.getDateAsString(dataInizio, DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
+		tappa.setDtFineTappa(DateUtils.getDateAsString(dataFine, DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 	}
 
 	private void impostaNazioneRimborso(RimborsoMissione rimborsoApprovato, TappeMissioneColl tappa) {
