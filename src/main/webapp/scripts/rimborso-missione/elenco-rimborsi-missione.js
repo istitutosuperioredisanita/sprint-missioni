@@ -2,8 +2,8 @@
 
 missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         return {
-            findRimborsiMissione: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
-                var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).then(function (response) {
+            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
+                var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -60,7 +60,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.rimborsiMissione = null;
-        ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine).then(function(data){
+        ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine).then(function(data){
             if (data && data.length > 0){
                 $scope.rimborsiMissione = data;
                 $scope.messageRimborsiNonEsistenti = false;
@@ -94,7 +94,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
     $scope.reloadUoWork = function(uo){
         $scope.accountModel = null;
         $scope.elencoPersone = [];
-        $scope.ordiniMissione = [];
+        $scope.rimborsiMissione = [];
         $scope.messageRimborsiNonEsistenti = false;
         $scope.userWork = null;
         if (uo){
