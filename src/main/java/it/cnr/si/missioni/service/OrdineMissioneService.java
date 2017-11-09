@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import ch.qos.logback.classic.pattern.Util;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
@@ -451,7 +450,11 @@ public class OrdineMissioneService {
 				if (!StringUtils.isEmpty(filter.getUser())){
 					criterionList.add(Restrictions.eq("uid", filter.getUser()));
 				} else {
-					criterionList.add(Restrictions.eq("uid", principal.getName()));
+					if (StringUtils.isEmpty(filter.getUoRich())){
+						criterionList.add(Restrictions.eq("uid", principal.getName()));
+					} else {
+						criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+					}
 				}
 			} else {
 				UsersSpecial userSpecial = accountService.getUoForUsersSpecial(principal.getName());
@@ -695,7 +698,7 @@ public class OrdineMissioneService {
 //    	autoPropriaRepository.save(autoPropria);
     	log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
     	if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissioneDB.isMissioneInviataResponsabile()) && basePath != null){
-    		mailService.sendEmail(subjectSendToManagerOrdine, getTextMailSendToManager(basePath, ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
+    		mailService.sendEmail(subjectSendToManagerOrdine+" "+getNominativo(ordineMissioneDB.getUid()), getTextMailSendToManager(basePath, ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
     	} else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
     		sendMailToAdministrative(ordineMissioneDB);
     	}
@@ -759,12 +762,13 @@ public class OrdineMissioneService {
 	private void sendMailToAdministrative(OrdineMissione ordineMissioneDB) {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDB.getUoSpesa(), ordineMissioneDB.getAnno());
 		String testoMail = getTextMailSendToAdministrative(ordineMissioneDB);
+		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(ordineMissioneDB.getUid());
 		if (dati != null && dati.getMailNotifiche() != null){
-			mailService.sendEmail(subjectSendToAdministrative, testoMail, false, true, dati.getMailNotifiche());
+			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
 		} else {
 			log.info("Ricerca amministrativi per mail. Uo: "+ordineMissioneDB.getUoSpesa());
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
-			sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
+			sendMailToAdministrative(lista, testoMail, subjectMail);
 		}
 	}
 
@@ -796,7 +800,7 @@ public class OrdineMissioneService {
 
 	private String getTextMailSendToManager(String basePath, OrdineMissione ordineMissione) {
 		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata inviata per l'approvazione in quanto responsabile del gruppo. "
-				+ "Si prego di confermarla attraverso il link "+basePath+"/#/ordine-missione/"+ordineMissione.getId();
+				+ "Si prega di confermarla attraverso il link "+basePath+"/#/ordine-missione/"+ordineMissione.getId();
 	}
 
 	private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {

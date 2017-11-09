@@ -60,15 +60,15 @@ spring:
                 oggetto: Missioni. Errore durante la comunicazione a SIGLA del Rimborso Missione.
                 testo: Si segnala che la comunicazione a SIGLA del rimborso missione 
             invioResponsabileGruppo:
-                oggetto: Missioni. Invio Ordine di Missione per Autorizzazione.
+                oggetto: Autorizzazione Ordine di Missione di
             invioOrdinePerValidazioneDatiFinanziari:
-                oggetto: Missioni. Invio Ordine di Missione per Verifica dati Finanziari.
+                oggetto: Verifica Ordine di Missione di
             invioRimborsoPerValidazioneDatiFinanziari:
-                oggetto: Missioni. Invio Rimborso Missione per Verifica dati Finanziari.
+                oggetto: Verifica Rimborso Missione di
             ritornoMissioneMittente:
-                oggetto: Missioni. Ordine di Missione reinviato al mittente.
+                oggetto: Ordine di Missione reinviato al mittente.
             approvazioneAnticipo:
-                oggetto: Missioni. Anticipo su Ordine di Missione.
+                oggetto: Anticipo su Ordine di Missione.
 
 security:
     basic:
