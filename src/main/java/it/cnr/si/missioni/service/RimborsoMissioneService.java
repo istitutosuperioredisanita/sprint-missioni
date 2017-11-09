@@ -397,12 +397,13 @@ public class RimborsoMissioneService {
 
 	private void sendMailToAdministrative(RimborsoMissione rimborsoMissioneDB) {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
+		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
 		String testoMail = getTextMailSendToAdministrative(rimborsoMissioneDB);
 		if (dati != null && dati.getMailNotifiche() != null){
-			mailService.sendEmail(subjectSendToAdministrative, testoMail, false, true, dati.getMailNotifiche());
+			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
-			sendMailToAdministrative(lista, testoMail, subjectSendToAdministrative);
+			sendMailToAdministrative(lista, testoMail, subjectMail);
 		}
 	}
 

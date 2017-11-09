@@ -8,8 +8,8 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
                 });
                 return promise;
             },
-            findMissioni: function(user, anno, cdsRich, daNumero, aNumero, daData, aData) {
-                var promise = $http.get('api/rest/ordiniMissione/list', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData}}).then(function (response) {
+            findMissioni: function(user, anno, uoRich, daNumero, aNumero, daData, aData) {
+                var promise = $http.get('api/rest/ordiniMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -66,7 +66,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.ordiniMissione = null;
-        ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, null, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData).then(function(data){
+        ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData).then(function(data){
             if (data && data.length > 0){
                 $scope.ordiniMissione = data;
                 $scope.messageOrdiniNonEsistenti = false;
