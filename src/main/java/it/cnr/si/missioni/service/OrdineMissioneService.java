@@ -735,7 +735,7 @@ public class OrdineMissioneService {
 		}
 		ordineMissioneDB.setOggetto(ordineMissione.getOggetto());
 		ordineMissioneDB.setPartenzaDa(ordineMissione.getPartenzaDa());
-		ordineMissioneDB.setPartenzaDaAltro(ordineMissione.getPartenzaDa());
+		ordineMissioneDB.setPartenzaDaAltro(ordineMissione.getPartenzaDaAltro());
 		if (!ordineMissioneDB.getPartenzaDa().equals("A")){
 			ordineMissioneDB.setPartenzaDaAltro(null);
 		}

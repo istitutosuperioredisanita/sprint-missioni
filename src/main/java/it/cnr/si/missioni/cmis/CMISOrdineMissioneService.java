@@ -195,11 +195,6 @@ public class CMISOrdineMissioneService {
 				}
 			}
 			
-			GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
-			dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
-			dataScadenzaFlusso.add(Calendar.DATE, 14);
-			dataScadenzaFlusso.add(Calendar.MONTH, 1);
-
 
 			cmisOrdineMissione.setAnno(ordineMissione.getAnno().toString());
 			cmisOrdineMissione.setNumero(ordineMissione.getNumero().toString());
@@ -243,7 +238,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "true" : "false");
 			cmisOrdineMissione.setValidazioneSpesa(impostaValidazioneSpesa(userNameFirmatario, userNameFirmatarioSpesa));
 			cmisOrdineMissione.setWfDescription("Ordine di Missione n. "+ordineMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
-			cmisOrdineMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+			cmisOrdineMissione.setWfDueDate(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 			cmisOrdineMissione.setDestinazione(ordineMissione.getDestinazione());
 			cmisOrdineMissione.setMissioneEsteraFlag(ordineMissione.getTipoMissione().equals("E") ? "true" : "false");
 			cmisOrdineMissione.setDataInizioMissione(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
