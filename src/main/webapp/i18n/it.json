@@ -394,11 +394,13 @@
             "anno-impegno": "Anno Impegno",
             "numero-impegno": "Numero Impegno",
             "info-disponibilita": "Informazioni sulla Disponibilità",
-            "cup": "Codice CUP"
+            "cup": "Codice CUP",
+            "motivo-respingi-mittente": "Motivo Respingi al mittente",
+            "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente"
         },
         "button": {
             "sendToSign": "Invia alla Firma",
-            "returnToSender": "Sblocca"
+            "returnToSender": "Respingi al Mittente"
         }
     },
     "elenco-ordini-missione": {

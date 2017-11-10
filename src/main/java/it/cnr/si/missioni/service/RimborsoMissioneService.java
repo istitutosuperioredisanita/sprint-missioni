@@ -311,6 +311,7 @@ public class RimborsoMissioneService {
 		}
 		
 		if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
+			rimborsoMissioneDB.setNoteRespingi(null);
 			if (rimborsoMissioneDB.isStatoFlussoApprovato()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare il rimborso della missione. E' già stato approvato.");
 			}
@@ -335,6 +336,7 @@ public class RimborsoMissioneService {
 			}
 			aggiornaDatiRimborsoMissione(principal, rimborsoMissione, confirm, rimborsoMissioneDB);
 			rimborsoMissioneDB.setValidato("S");
+			rimborsoMissioneDB.setNoteRespingi(null);
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			if (rimborsoMissione.getEsercizioOriginaleObbligazione() == null || rimborsoMissione.getPgObbligazione() == null ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo il rimborso della missione è necessario valorizzare l'impegno.");
@@ -348,20 +350,25 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
 			rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
 			rimborsoMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
+			rimborsoMissioneDB.setNoteRespingi(null);
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
 			if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isMissioneDaValidare()) {
+				if (StringUtils.isEmpty(rimborsoMissione.getNoteRespingi())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione senza indicarne il motivo.");
+				}
 				rimborsoMissioneDB.setStato(Costanti.STATO_INSERITO);
+				rimborsoMissioneDB.setNoteRespingi(rimborsoMissione.getNoteRespingi());
 				isRitornoMissioneMittente = true;
 			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un rimborso missione se è stato già inviato al flusso.");
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione se è stato già inviato al flusso.");
 			}
 		} else {
 			aggiornaDatiRimborsoMissione(principal, rimborsoMissione, confirm, rimborsoMissioneDB);
 		}
 		
-		
     	if (confirm){
     		rimborsoMissioneDB.setStato(Costanti.STATO_CONFERMATO);
+			rimborsoMissioneDB.setNoteRespingi(null);
     	} 
 
     	rimborsoMissioneDB.setToBeUpdated();
@@ -498,7 +505,7 @@ public class RimborsoMissioneService {
     }
 
 	private String getTextMailReturnToSender(Principal principal, RimborsoMissione rimborsoMissione) {
-		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per apportare delle correzioni.";
+		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per il seguente motivo: "+rimborsoMissione.getNoteRespingi();
 	}
 
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {

@@ -323,6 +323,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "MISSIONE_GRATUITA", length = 1, nullable = true)
     public String missioneGratuita;
 
+    @Size(min = 0, max = 1000)
+    @Column(name = "NOTE_RESPINGI", length = 1000, nullable = true)
+    public String noteRespingi;
+
     @Transient
     private String daValidazione;
 	
@@ -1187,5 +1191,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 	public Boolean isMissioneGratuita(){
 		return Utility.nvl(getMissioneGratuita()).equals("S");
+	}
+
+	public String getNoteRespingi() {
+		return noteRespingi;
+	}
+
+	public void setNoteRespingi(String noteRespingi) {
+		this.noteRespingi = noteRespingi;
 	}
 }

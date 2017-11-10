@@ -35,6 +35,7 @@
     <include file="classpath:config/liquibase/changelog/20171018151300_add_column_missione_gratis.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171018151400_add_column_responsabile_solo_italia.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171018181400_add_column_altri_motivi.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20171110181300_add_column_note_respingi.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

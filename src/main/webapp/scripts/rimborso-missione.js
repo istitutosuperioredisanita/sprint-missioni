@@ -214,8 +214,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             var trovatoInquadramento = false;
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
-                if (inquadramento.dt_ini_validita <= $scope.rimborsoMissioneModel.dataInizioMissione && 
-                    inquadramento.dt_fin_validita >= $scope.rimborsoMissioneModel.dataFineMissione){
+                if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
+                    new Date(inquadramento.dt_fin_validita) >= new Date($scope.rimborsoMissioneModel.dataFineMissione)){
                     $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
                     $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                     trovatoInquadramento = true;
@@ -898,7 +898,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             RimborsoMissioneService.return_sender($scope.rimborsoMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
-                        ui.ok_message("Rimborso Missione sbloccato.");
+                        ui.ok_message("Rimborso Missione respinto al mittente.");
                         ElencoRimborsiMissioneService.findById($scope.rimborsoMissioneModel.id).then(function(data){
                             $scope.rimborsoMissioneModel = data;
                             $scope.viewAttachments($scope.rimborsoMissioneModel.id);
