@@ -240,13 +240,13 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
 		rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
-		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 	}
 
 	public void aggiornaRimborsoMissioneAnnullato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws ComponentException {
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
-		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 	}
 
 	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
@@ -263,7 +263,7 @@ public class RimborsoMissioneService {
 		}
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-		RimborsoMissione rimborso = updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+		RimborsoMissione rimborso = updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 		popolaCoda(rimborso);
 		return rimborso;
 	}
@@ -288,20 +288,20 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDaAggiornare.setCdCdsSigla(missioneBulk.getCdCds());
 		rimborsoMissioneDaAggiornare.setCdUoSigla(missioneBulk.getCdUnitaOrganizzativa());
 		rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_COMUNICATA);
-		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true);
+		return updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione)  throws ComponentException{
-    	return updateRimborsoMissione(principal, rimborsoMissione, false);
+    public RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, String basePath)  throws ComponentException{
+    	return updateRimborsoMissione(principal, rimborsoMissione, false, basePath);
     }
     
-    private RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows)  throws ComponentException{
-    	return updateRimborsoMissione(principal, rimborsoMissione, fromFlows, false);
+    private RimborsoMissione updateRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, String basePath)  throws ComponentException{
+    	return updateRimborsoMissione(principal, rimborsoMissione, fromFlows, false, basePath);
     }
     
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm)  throws ComponentException{
+    public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm, String basePath)  throws ComponentException{
 
     	RimborsoMissione rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
        	boolean isRitornoMissioneMittente = false;
@@ -397,7 +397,7 @@ public class RimborsoMissioneService {
 			sendMailToAdministrative(rimborsoMissioneDB);
 	   }
     	if (isRitornoMissioneMittente){
-    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, rimborsoMissioneDB), false, true, getEmail(rimborsoMissioneDB.getUidInsert()));
+    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, rimborsoMissioneDB), false, true, getEmail(rimborsoMissioneDB.getUidInsert()));
     	}
     	return rimborsoMissioneDB;
     }
@@ -504,8 +504,13 @@ public class RimborsoMissioneService {
 		return utente.getCognome()+ " "+ utente.getNome();
     }
 
-	private String getTextMailReturnToSender(Principal principal, RimborsoMissione rimborsoMissione) {
-		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per il seguente motivo: "+rimborsoMissione.getNoteRespingi();
+	private String getTextMailReturnToSender(Principal principal, String basePath, RimborsoMissione rimborsoMissione) {
+		String baseMessage = "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per il seguente motivo: "+rimborsoMissione.getNoteRespingi();
+		if (basePath != null){
+			return baseMessage;
+		} else {
+			return baseMessage+ ". Si prega di effettuare le opportune correzioni attraverso il link "+basePath+"/#/ordine-missione/"+rimborsoMissione.getId();
+		}
 	}
 
 	private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {

@@ -65,8 +65,10 @@ spring:
                 oggetto: Verifica Ordine di Missione di
             invioRimborsoPerValidazioneDatiFinanziari:
                 oggetto: Verifica Rimborso Missione di
-            ritornoMissioneMittente:
+            ritornoOrdineMissioneMittente:
                 oggetto: Ordine di Missione reinviato al mittente.
+            ritornoMissioneMittente:
+                oggetto: Rimborso Missione reinviato al mittente.
             approvazioneAnticipo:
                 oggetto: Anticipo su Ordine di Missione.
 
