@@ -140,7 +140,7 @@ public class OrdineMissioneService {
     private String subjectSendToAdministrative;
     
     
-    @Value("${spring.mail.messages.ritornoMissioneMittente.oggetto}")
+    @Value("${spring.mail.messages.ritornoOrdineMissioneMittente.oggetto}")
     private String subjectReturnToSenderOrdine;
     
     @Value("${spring.mail.messages.approvazioneAnticipo.oggetto}")
@@ -713,7 +713,7 @@ public class OrdineMissioneService {
     		sendMailToAdministrative(basePath, ordineMissioneDB);
     	}
     	if (isRitornoMissioneMittente){
-    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, ordineMissioneDB), false, true, accountService.getEmail(ordineMissioneDB.getUidInsert()));
+    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, ordineMissioneDB), false, true, accountService.getEmail(ordineMissioneDB.getUidInsert()));
     	}
 		return ordineMissioneDB;
     }
@@ -822,8 +822,9 @@ public class OrdineMissioneService {
 				+ "Si prega di verificarlo attraverso il link "+basePath+"/#/ordine-missione/"+ordineMissione.getId()+"/S";
 	}
 
-	private String getTextMailReturnToSender(Principal principal, OrdineMissione ordineMissione) {
-		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per il seguente motivo: "+ordineMissione.getNoteRespingi();
+	private String getTextMailReturnToSender(Principal principal, String basePath, OrdineMissione ordineMissione) {
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per il seguente motivo: "+ordineMissione.getNoteRespingi()
+		+ ". Si prega di effettuare le opportune correzioni attraverso il link "+basePath+"/#/ordine-missione/"+ordineMissione.getId();
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)

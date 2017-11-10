@@ -415,11 +415,11 @@
   </div>
 </div>
 </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="showEsisteOrdineMissione && (validazione === 'S' || ordineMissioneModel.noteRespingi)>
+            <form class="form-inline" role="form" id="missioni" ng-show="showEsisteOrdineMissione && (validazione === 'S' || (ordineMissioneModel.stato === 'INR' && !disabilitaOrdineMissione) || ordineMissioneModel.noteRespingi)">
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
-                            <textarea ng-disabled="!validazione || disabilitaRimborsoMissione"
+                            <textarea ng-disabled="disabilitaOrdineMissione || (ordineMissioneModel.stato != 'INR'  && !validazione  )"
                               class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="ordineMissioneModel.noteRespingi" rows = "2">
                             </textarea>
                         </span>
