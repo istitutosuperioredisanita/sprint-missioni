@@ -600,6 +600,7 @@ public class OrdineMissioneService {
 		if (ordineMissione.getResponsabileGruppo() != null && ordineMissioneDB.getResponsabileGruppo() != null && 
 				!ordineMissione.getResponsabileGruppo().equals(ordineMissioneDB.getResponsabileGruppo())){
 			isCambioResponsabileGruppo = true;
+			ordineMissioneDB.setNoteRespingi(null);
 		}
 		if (ordineMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
 			if (ordineMissioneDB.isStatoFlussoApprovato()){
@@ -608,6 +609,7 @@ public class OrdineMissioneService {
 			if (!ordineMissioneDB.isMissioneDaValidare()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare l'ordine di missione. E' già stato avviato il flusso di approvazione.");
 			}
+			ordineMissioneDB.setNoteRespingi(null);
 		}
 		
 		if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("S")){
@@ -627,6 +629,7 @@ public class OrdineMissioneService {
 
 			aggiornaDatiOrdineMissione(principal, ordineMissione, confirm, ordineMissioneDB);
 			ordineMissioneDB.setValidato("S");
+			ordineMissioneDB.setNoteRespingi(null);
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")){
 			if (ordineMissione.getEsercizioOriginaleObbligazione() == null || ordineMissione.getPgObbligazione() == null ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo l'ordine di missione è necessario valorizzare l'impegno.");
@@ -639,10 +642,15 @@ public class OrdineMissioneService {
 			}
 			ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
 			ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
+			ordineMissioneDB.setNoteRespingi(null);
 			ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
 			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
+				if (StringUtils.isEmpty(ordineMissione.getNoteRespingi())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un ordine di missione senza indicarne il motivo.");
+				}
 				ordineMissioneDB.setStato(Costanti.STATO_INSERITO);
+				ordineMissioneDB.setNoteRespingi(ordineMissione.getNoteRespingi());
 				isRitornoMissioneMittente = true;
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
@@ -652,6 +660,7 @@ public class OrdineMissioneService {
 				if (ordineMissioneDB.isMissioneInserita()) {
 					ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
 					ordineMissioneDB.setStato(Costanti.STATO_INVIATO_RESPONSABILE);
+					ordineMissioneDB.setNoteRespingi(null);
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inviare al responsabile una missione in stato diverso da 'Inserito'.");
 				}
@@ -680,6 +689,7 @@ public class OrdineMissioneService {
     			}
     		}
         	ordineMissioneDB.setStato(Costanti.STATO_CONFERMATO);
+			ordineMissioneDB.setNoteRespingi(null);
     	} 
 
     	ordineMissioneDB.setToBeUpdated();
@@ -813,11 +823,7 @@ public class OrdineMissioneService {
 	}
 
 	private String getTextMailReturnToSender(Principal principal, OrdineMissione ordineMissione) {
-		if (ordineMissione.getResponsabileGruppo() != null){
-			return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata restituito dal responsabile del gruppo "+getNominativo(ordineMissione.getResponsabileGruppo())+" per apportare delle correzioni.";
-		} else {
-			return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per apportare delle correzioni.";
-		}
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" le è stata respinto da "+getNominativo(principal.getName())+" per il seguente motivo: "+ordineMissione.getNoteRespingi();
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
