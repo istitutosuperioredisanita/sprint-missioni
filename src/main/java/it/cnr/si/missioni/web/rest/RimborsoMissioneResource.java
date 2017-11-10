@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -179,7 +181,7 @@ public class RimborsoMissioneResource {
     	if (rimborsoMissione.getId() != null){
     		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
-				rimborsoMissione =  rimborsoMissioneService.updateRimborsoMissione(principal, rimborsoMissione);
+				rimborsoMissione =  rimborsoMissioneService.updateRimborsoMissione(principal, rimborsoMissione, null);
     		} catch (AwesomeException e) {
     			log.error("ERRORE modifyRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -202,10 +204,11 @@ public class RimborsoMissioneResource {
     @Timed
     public ResponseEntity<?> confirmRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,  
     		HttpServletRequest request, HttpServletResponse response) {
+    	String basePath = Arrays.stream(request.getRequestURL().toString().split("/")).limit(3).collect(Collectors.joining("/"));
     	if (rimborsoMissione.getId() != null){
     		rimborsoMissione.setDaValidazione(daValidazione);
             try {
-				rimborsoMissione = rimborsoMissioneService.updateRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione, false, confirm);
+				rimborsoMissione = rimborsoMissioneService.updateRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione, false, confirm, basePath);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
