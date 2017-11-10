@@ -317,6 +317,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "CUP", length = 50, nullable = true)
     public String cup;
 
+    @Size(min = 0, max = 1000)
+    @Column(name = "NOTE_RESPINGI", length = 1000, nullable = true)
+    public String noteRespingi;
+
 	@Transient
     private String daValidazione;
 	
@@ -1308,5 +1312,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setNoteSegreteria(String noteSegreteria) {
 		this.noteSegreteria = noteSegreteria;
+	}
+
+	public String getNoteRespingi() {
+		return noteRespingi;
+	}
+
+	public void setNoteRespingi(String noteRespingi) {
+		this.noteRespingi = noteRespingi;
 	}
 }

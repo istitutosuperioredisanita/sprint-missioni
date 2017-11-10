@@ -727,7 +727,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             OrdineMissioneService.return_sender($scope.ordineMissioneModel,
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
-                        ui.ok_message("Ordine di Missione sbloccato.");
+                        ui.ok_message("Ordine di Missione respinto al mittente.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
                             $scope.viewAttachments($scope.ordineMissioneModel.id);

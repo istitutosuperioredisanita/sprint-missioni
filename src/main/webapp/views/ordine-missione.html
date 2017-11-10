@@ -415,6 +415,16 @@
   </div>
 </div>
 </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="showEsisteOrdineMissione && (validazione === 'S' || ordineMissioneModel.noteRespingi)>
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
+                            <textarea ng-disabled="!validazione || disabilitaRimborsoMissione"
+                              class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="ordineMissioneModel.noteRespingi" rows = "2">
+                            </textarea>
+                        </span>
+                </p>
+            </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
                     <div class="col-xs-4" ng-show="!validazione && !disabilitaOrdineMissione">
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
