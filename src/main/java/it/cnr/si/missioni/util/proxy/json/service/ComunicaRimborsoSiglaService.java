@@ -124,11 +124,7 @@ public class ComunicaRimborsoSiglaService {
 			Account account = accountService.loadAccountFromRest(rimborsoApprovato.getUid());
 			oggettoBulk.setCognome(account.getCognome());
 			oggettoBulk.setNome(account.getNome());
-			String descrizioneMissione = "Missione a "+rimborsoApprovato.getDestinazione()+" del "+DateUtils.getDefaultDateAsString(rimborsoApprovato.getDataInizioMissione())+" di "+Utility.nvl(oggettoBulk.getCognome())+" "+ Utility.nvl(oggettoBulk.getNome())+" - "+rimborsoApprovato.getOggetto();
-			if (descrizioneMissione.length() > 300){
-				descrizioneMissione.substring(0, 300);
-			}
-			oggettoBulk.setDsMissione(descrizioneMissione);
+			impostaDescrizioneMissione(rimborsoApprovato, oggettoBulk);
 			oggettoBulk.setCodice_fiscale(account.getCodiceFiscale());
 			Folder folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
 			if (folder != null){
@@ -271,6 +267,22 @@ public class ComunicaRimborsoSiglaService {
 			return missioneBulk;
 		}
 		return null;
+	}
+	private void impostaDescrizioneMissione(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk) {
+		String descrizioneMissione = "Missione a "+rimborsoApprovato.getDestinazione()+" del "+DateUtils.getDefaultDateAsString(rimborsoApprovato.getDataInizioMissione())+" di "+Utility.nvl(oggettoBulk.getCognome())+" "+ Utility.nvl(oggettoBulk.getNome())+" - "+rimborsoApprovato.getOggetto();
+		if (descrizioneMissione.length() > 300){
+			descrizioneMissione = rimborsoApprovato.getDestinazione()+" del "+DateUtils.getDefaultDateAsString(rimborsoApprovato.getDataInizioMissione())+" di "+Utility.nvl(oggettoBulk.getCognome())+" "+ Utility.nvl(oggettoBulk.getNome())+" - "+rimborsoApprovato.getOggetto();
+			if (descrizioneMissione.length() > 300){
+				descrizioneMissione = rimborsoApprovato.getDestinazione()+" del "+DateUtils.getDefaultDateAsString(rimborsoApprovato.getDataInizioMissione())+" "+rimborsoApprovato.getOggetto();
+				if (descrizioneMissione.length() > 300){
+					descrizioneMissione = rimborsoApprovato.getOggetto();
+					if (descrizioneMissione.length() > 300){
+						descrizioneMissione.substring(0, 299);
+					}
+				}
+			}
+		}
+		oggettoBulk.setDsMissione(descrizioneMissione);
 	}
 	public MissioneBulk comunica(MissioneBulk missione) {
 		if (missione != null){
