@@ -14,6 +14,7 @@ public class MissioneFilter {
 	private Long daId;
 	private Long aId;
 	private Boolean soloMissioniNonGratuite = false;
+	private String includiMissioniAnnullate;
 	private Long daNumero;
 	private Long aNumero;
 	private Date daData;
@@ -129,5 +130,11 @@ public class MissioneFilter {
 	}
 	public void setSoloMissioniNonGratuite(Boolean soloMissioniNonGratuite) {
 		this.soloMissioniNonGratuite = soloMissioniNonGratuite;
+	}
+	public String getIncludiMissioniAnnullate() {
+		return includiMissioniAnnullate;
+	}
+	public void setIncludiMissioniAnnullate(String includiMissioniAnnullate) {
+		this.includiMissioniAnnullate = includiMissioniAnnullate;
 	}
 }

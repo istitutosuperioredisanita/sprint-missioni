@@ -148,6 +148,9 @@ public class RimborsoMissioneService {
     @Value("${spring.mail.messages.invioRimborsoPerValidazioneDatiFinanziari.oggetto}")
     private String subjectSendToAdministrative;
     
+    @Value("${spring.mail.messages.variazioneImportoMissionePerResponsabileGruppo.oggetto}")
+    private String oggettoVariazioneImportoMissioneManager;
+    
     @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -337,6 +340,7 @@ public class RimborsoMissioneService {
 			aggiornaDatiRimborsoMissione(principal, rimborsoMissione, confirm, rimborsoMissioneDB);
 			rimborsoMissioneDB.setValidato("S");
 			rimborsoMissioneDB.setNoteRespingi(null);
+			gestioneMailResponsabileGruppo(principal, rimborsoMissioneDB);
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			if (rimborsoMissione.getEsercizioOriginaleObbligazione() == null || rimborsoMissione.getPgObbligazione() == null ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo il rimborso della missione è necessario valorizzare l'impegno.");
@@ -402,7 +406,19 @@ public class RimborsoMissioneService {
     	return rimborsoMissioneDB;
     }
 
-	private void sendMailToAdministrative(RimborsoMissione rimborsoMissioneDB) {
+    private void gestioneMailResponsabileGruppo(Principal principal, RimborsoMissione rimborsoMissione) {
+    	if (rimborsoMissione.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null && ordineMissione.getPgProgetto() != null && 
+        			rimborsoMissione.getPgProgetto() != null && rimborsoMissione.getPgProgetto().compareTo(ordineMissione.getPgProgetto()) == 0 && 
+        			Utility.nvl(ordineMissione.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0 && rimborsoMissione.getTotaleRimborso().compareTo(ordineMissione.getImportoPresunto()) > 0){
+        		mailService.sendEmail(oggettoVariazioneImportoMissioneManager+" "+getNominativo(rimborsoMissione.getUid()), 
+        				getTestoMailAumentoMissioneResponsabileGruppo(rimborsoMissione, ordineMissione), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
+        	}
+    	}
+	}
+
+    private void sendMailToAdministrative(RimborsoMissione rimborsoMissioneDB) {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
 		String testoMail = getTextMailSendToAdministrative(rimborsoMissioneDB);
@@ -421,6 +437,10 @@ public class RimborsoMissioneService {
 				mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
 			}
 		}
+	}
+
+	private String getTestoMailAumentoMissioneResponsabileGruppo(RimborsoMissione rimborsoMissione, OrdineMissione ordine) {
+		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  ha un importo totale di euro "+ Utility.numberFormat(rimborsoMissione.getTotaleRimborso()) +" che è superiore all'importo presunto di euro "+Utility.numberFormat(ordine.getImportoPresunto())+" indicato sull'ordine di missione.";
 	}
 
 	private String getTextMailSendToAdministrative(RimborsoMissione rimborsoMissione) {
@@ -712,7 +732,9 @@ public class RimborsoMissioneService {
 					criterionList.add(Restrictions.eq("uid", principal.getName()));
 				}
 			}
-			criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
+			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S")){
+				criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
+			}
 
 			if (isServiceRest) {
 				if (isForValidateFlows){
