@@ -460,6 +460,10 @@ public class CMISOrdineMissioneService {
 		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
 		Document documentoAnticipo = null;
 		List<CMISFileAttachment> allegati = new ArrayList<>();
+		List<CMISFileAttachment> allegatiOrdineMissione = getAttachmentsOrdineMissione(ordineMissione, new Long(ordineMissione.getId().toString()));
+		if (allegatiOrdineMissione != null && !allegatiOrdineMissione.isEmpty()){
+			allegati.addAll(allegatiOrdineMissione);
+		}
 		if (anticipo != null){
 			anticipo.setOrdineMissione(ordineMissione);
 			documentoAnticipo = creaDocumentoAnticipo(username, anticipo);
@@ -468,6 +472,7 @@ public class CMISOrdineMissioneService {
 				allegati.addAll(allegatiAnticipo);
 			}
 		}
+
 		
 		Document documentoAutoPropria = null;
 		if (autoPropria != null){
@@ -496,6 +501,9 @@ public class CMISOrdineMissioneService {
 
 			aggiungiDocumento(documentoAutoPropria, nodeRefs);
 
+
+			
+			
 			jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
 			jGenerator.writeStringField("assoc_packageItems_removed" , "");
 
