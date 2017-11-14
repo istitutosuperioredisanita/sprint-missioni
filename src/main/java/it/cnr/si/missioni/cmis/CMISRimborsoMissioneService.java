@@ -594,6 +594,9 @@ public class CMISRimborsoMissioneService {
 			jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
 			jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
 			aggiungiDocumento(documento, nodeRefs);
+			
+			aggiungiAllegatiRimborsoMissione(rimborsoMissione, nodeRefs);
+			
 			aggiungiAllegatiDettagli(rimborsoMissione, nodeRefs);
 
 			jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
@@ -669,6 +672,18 @@ public class CMISRimborsoMissioneService {
 		}
 
 		avviaFlusso(rimborsoMissione, stringWriter, mapper);
+	}
+
+	private void aggiungiAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs) {
+		List<CMISFileAttachment> allegatiRimborsoMissione = getAttachmentsRimborsoMissione(rimborsoMissione, new Long(rimborsoMissione.getId().toString()));
+		if (allegatiRimborsoMissione != null && !allegatiRimborsoMissione.isEmpty()){
+			for (CMISFileAttachment cmisFileAttachment : allegatiRimborsoMissione){
+				if (nodeRefs.length() > 0){
+					 nodeRefs.append(",");
+				}
+				nodeRefs.append(cmisFileAttachment.getNodeRef());
+			}
+		 }
 	}
 
 	private void avviaFlusso(RimborsoMissione rimborsoMissione, StringWriter stringWriter, ObjectMapper mapper) {
