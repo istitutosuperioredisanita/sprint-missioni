@@ -37,6 +37,7 @@ public class Costanti {
 	public final static String APP_SIPER = "SIPER";
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
 	public final static String STATO_ANNULLATO = "ANN";
+	public final static String STATO_ANNULLATO_DOPO_APPROVAZIONE = "ANA";
 	public final static String STATO_INSERITO = "INS";
 	public final static String STATO_DEFINITIVO = "DEF";
 	public final static String STATO_NON_INVIATO_FLUSSO = "INS";

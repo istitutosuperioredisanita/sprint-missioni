@@ -1,6 +1,18 @@
 'use strict';
 
 missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, DirettoreUoService) {
+    var today = new Date();
+    var annoA = today.getFullYear();
+    var calcoloAnnoDa = function(){
+        annoDa = today.getFullYear();
+        meseAttuale = today.getMonth();
+        if (meseAttuale < 4){
+             annoDa = annoDa- 1;
+        }
+    }
+
+    var annoDa = calcoloAnnoDa();
+
     var recuperoUo = function(anno, cds, uoRich){
         var urlRestProxy = URL_REST.STANDARD;
         var uos = [];
@@ -90,7 +102,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var url = SIPER_REST.PERSONS_FOR_UO;
         var persons = [];
         var uoSiper = uo.replace('.','');
-        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: uoSiper, userinfo:true}});
+        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: uoSiper, userinfo:true, cessati:true}});
         var y = x.then(function (result) {
             if (result.data){
                 var listaPersons = result.data;
@@ -111,6 +123,16 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                         }
                     }
                     for (var k=0; k<listaPersons.length; k++) {
+
+                        recuperoDatiInquadramentoCf(listaPersons[k].codice_fiscale, annoDa, annoA).then(function(ret){
+                            if (ret && ret.data && ret.data.elements && ret.data.elements.length > 0){
+                                $scope.inquadramento = ret.data.elements;
+                            } else {
+                                ui.error("Inquadramento non trovato");
+                            }
+                        }
+
+
                         if ((soloDipendenti && listaPersons[k].matricola) || !soloDipendenti){
                             var person = null;
                             var cognome = null;
@@ -187,6 +209,24 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.INQUADRAMENTO;
         var objectPostInqClauses = [{condition: 'AND', fieldName: 'cd_anag', operator: "=", fieldValue:cdAnag}];
+        var objectPostInq = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostInqClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostInq, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                inq = data.elements;
+            }
+            return inq;
+        }).error(function (data) {
+        });
+    }
+
+    var recuperoDatiInquadramentoCf = function(cf, annoDa, annoA){
+        var urlRestProxy = URL_REST.STANDARD;
+        var inq = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.INQUADRAMENTO;
+        var objectPostInqClauses = [{condition: 'AND', fieldName: 'cf', operator: "=", fieldValue:cf},
+                                    {condition: 'AND', fieldName: 'annoDa', operator: "=", fieldValue:annoDa},
+                                    {condition: 'AND', fieldName: 'annoA', operator: "=", fieldValue:annoA}];
         var objectPostInq = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostInqClauses}
         return $http.post(urlRestProxy + app+'/', objectPostInq, {params: {proxyURL: url}}).success(function (data) {
             if (data){
@@ -381,7 +421,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getPersons: recuperoPersonsForUo,
              getPerson: recuperoDatiPerson ,
              getTerzo: recuperoDatiTerzoSigla ,
-             getInquadramento: recuperoDatiInquadramento ,
+             getInquadramento: recuperoDatiInquadramento,
+             getInquadramentoCf: recuperoDatiInquadramentoCf,
              getModalitaPagamento: recuperoModalitaPagamento,
              getTipiSpesa: recuperoTipoSpesa,
              getRimborsoKm: recuperoRimborsoKm,
