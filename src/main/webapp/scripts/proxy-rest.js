@@ -5,7 +5,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     var annoA = today.getFullYear();
     var calcoloAnnoDa = function(){
         annoDa = today.getFullYear();
-        meseAttuale = today.getMonth();
+        var meseAttuale = today.getMonth();
         if (meseAttuale < 4){
              annoDa = annoDa- 1;
         }
@@ -124,7 +124,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                     }
                     for (var k=0; k<listaPersons.length; k++) {
 
-                        recuperoDatiInquadramentoCf(listaPersons[k].codice_fiscale, annoDa, annoA).then(function(ret){
+/*                        recuperoDatiInquadramentoCf(listaPersons[k].codice_fiscale, annoDa, annoA).then(function(ret){
                             if (ret && ret.data && ret.data.elements && ret.data.elements.length > 0){
                                 $scope.inquadramento = ret.data.elements;
                             } else {
@@ -132,7 +132,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                             }
                         }
 
-
+*/
                         if ((soloDipendenti && listaPersons[k].matricola) || !soloDipendenti){
                             var person = null;
                             var cognome = null;
