@@ -254,12 +254,20 @@
                     "fieldValue": 2
                 }
             ],
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "fl_utilizzabile",
+                    "operator": "=",
+                    "fieldValue": true
+                }
+            ],
             "clauseToIterate": [
                 {
                     "type": "calculateValues",
                     "condition": "AND",
                     "fieldName": "esercizio",
-                    "fromValue": 2015,
+                    "fromValue": 2017,
                     "toSpecialValue": "ANNO_CORRENTE"
                 }
             ],

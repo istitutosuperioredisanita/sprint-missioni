@@ -485,7 +485,9 @@ public class OrdineMissioneService {
 					condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
 				}
 			}
-			criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
+			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S")){
+				criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
+			}
 
 			if (isServiceRest) {
 				if (isForValidateFlows){

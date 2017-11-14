@@ -477,6 +477,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 uo = COSTANTI.UO_STANDARD_SAC;
             }
             var varClauses = [{condition: 'AND', fieldName: 'livello', operator: "=", fieldValue:2},
+                              {condition: 'AND', fieldName: 'fl_utilizzabile', operator: "=", fieldValue:true},
                               {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'cd_unita_organizzativa', operator: "=", fieldValue:uo}];
             var postModuli = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
