@@ -133,8 +133,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
 
                     return $q.all(promises)
                         .then(function (items) {
-                            items.filter(function (item) {
-                                return item !== false;
+                            return items.filter(function (item) {
+                                return item != false;
                             });
                         });
 
@@ -151,24 +151,22 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     }
 
     var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind){
-                            if (data && data.data && data.data.elements && data.data.elements.length > 0){
-        var terziPerCompenso = data.data.elements;
-                                var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
-                                    for (var i=0; i<listaPersons.length; i++) {
-                                        var persona = listaPersons[i];
-                                        if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
-                                            if (terzoPerCompenso.ti_dipendente_altro == 'A'){
-                                                listaPersons[i].matricola = "-";
-                                                listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
-                                            }
-                                            return listaPersons[i];
-                                        }
-                                    }
-
-
-                                } else {
-                                    return false;
-                                }
+        if (data && data.data && data.data.elements && data.data.elements.length > 0){
+            var terziPerCompenso = data.data.elements;
+            var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
+            for (var i=0; i<listaPersons.length; i++) {
+                var persona = listaPersons[i];
+                if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
+                    if (terzoPerCompenso.ti_dipendente_altro == 'A'){
+                        listaPersons[i].matricola = "-";
+                        listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
+                    }
+                    return listaPersons[i];
+                }
+            }
+        } else {
+            return false;
+        }
         return false;
     }
 
