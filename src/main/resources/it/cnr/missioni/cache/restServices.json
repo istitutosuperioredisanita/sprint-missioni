@@ -291,6 +291,13 @@
             "skipLoadStartup": "S",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.InquadramentoJson",
             "classe": "it.cnr.si.missioni.util.proxy.json.object.Inquadramento"
+        },
+        {
+            "app": "SIGLA",
+            "url": "ConsTerzoPerCompensoAction.json",
+            "skipLoadStartup": "S",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompensoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompenso"
         }
     ]
 }
