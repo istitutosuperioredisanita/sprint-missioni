@@ -36,9 +36,9 @@ public class TerzoPerCompenso extends RestServiceBean  implements Serializable {
 	@JsonProperty("ds_tipo_rapporto")
 	private String dsTipoRapporto;
 	@JsonProperty("dt_ini_validita")
-	private Integer dtIniValidita;
+	private Object dtIniValidita;
 	@JsonProperty("dt_fin_validita")
-	private Integer dtFinValidita;
+	private Object dtFinValidita;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -93,22 +93,22 @@ public class TerzoPerCompenso extends RestServiceBean  implements Serializable {
 	}
 
 	@JsonProperty("dt_ini_validita")
-	public Integer getDtIniValidita() {
+	public Object getDtIniValidita() {
 	return dtIniValidita;
 	}
 
 	@JsonProperty("dt_ini_validita")
-	public void setDtIniValidita(Integer dtIniValidita) {
+	public void setDtIniValidita(Object dtIniValidita) {
 	this.dtIniValidita = dtIniValidita;
 	}
 
 	@JsonProperty("dt_fin_validita")
-	public Integer getDtFinValidita() {
+	public Object getDtFinValidita() {
 	return dtFinValidita;
 	}
 
 	@JsonProperty("dt_fin_validita")
-	public void setDtFinValidita(Integer dtFinValidita) {
+	public void setDtFinValidita(Object dtFinValidita) {
 	this.dtFinValidita = dtFinValidita;
 	}
 
