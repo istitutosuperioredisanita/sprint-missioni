@@ -1,6 +1,6 @@
 'use strict';
 
-missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, $filter, DirettoreUoService) {
+missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, $filter, DirettoreUoService, $q) {
     var today = new Date();
     var dataA = today;
     var calcoloDataDa = function(){
@@ -123,16 +123,44 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                             listaPersons.push(direttore);
                         }
                     }
-                    for (var k=0; k<listaPersons.length; k++) {
 
-                        recuperoDatiTerzoPerCompenso(listaPersons[k].codice_fiscale, dataDa, dataA).then(function(ret){
-                            if (ret && ret.data && ret.data.elements && ret.data.elements.length > 0){
-                                var terziPerCompenso = ret.data.elements;
+                    var promises = listaPersons.map(personaz => {
+                        return recuperoDatiTerzoPerCompenso(personaz.codice_fiscale, dataDa, dataA)
+                                .then(data => processXhr(data, personaz, soloDipendenti, listaPersons, ind));
+                    });
+
+                    $q.all(promises).then(items => {
+                        persons = items
+                            .filter(item => item !== false);
+                            return persons;
+                        }, function (err) {
+                        }
+                    );
+
+                });
+            } else {
+                return [];
+            }
+        });
+        x.error(function (data) {
+        });
+        return y;
+    }
+
+    var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind){
+                            if (data && data.data && data.data.elements && data.data.elements.length > 0){
+        var terziPerCompenso = data.data.elements;
                                 var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
-                                if (terzoPerCompenso.ti_dipendente_altro = "A"){
-                                    listaPersons[k].matricola = null;
+                                if (terzoPerCompenso.ti_dipendente_altro == 'A'){
+                                    for (var i=0; i<listaPersons.length; i++) {
+                                        var persona = listaPersons[i];
+                                        if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
+                                            listaPersons[i].matricola = null;
+                                            listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
+                                            break;
+                                        }
+                                    }
                                 }
-                                listaPersons[k].profilo = terzoPerCompenso.ds_tipo_rapporto;
 
                                 if ((soloDipendenti && listaPersons[k].matricola) || !soloDipendenti){
                                     var person = null;
@@ -155,22 +183,14 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                                         }
                                     }
                                     if (person != null){
-                                        ind ++;
-                                        persons[ind] = person;
+                                       return person;
                                     }
                                 }
-                            }
-                        });
-                    }
-                    return persons;
-                });
-            } else {
-                return [];
-            }
-        });
-        x.error(function (data) {
-        });
-        return y;
+
+                                } else {
+                                    return false;
+                                }
+        return false;
     }
 
     var createPerson = function(data){
