@@ -124,13 +124,19 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                         }
                     }
 
-                    var promises = listaPersons.map(personaz => {
+                    var promises = listaPersons.map(function (personaz) {
                         return recuperoDatiTerzoPerCompenso(personaz.codice_fiscale, dataDa, dataA)
-                                .then(data => processXhr(data, personaz, soloDipendenti, listaPersons, ind));
+                                .then(function (data) {
+                                    return processXhr(data, personaz, soloDipendenti, listaPersons, ind);
+                                });
                     });
 
                     return $q.all(promises)
-                        .then(items => items.filter(item => item !== false));
+                        .then(function (items) {
+                            items.filter(function (item) {
+                                return item !== false;
+                            });
+                        });
 
                 });
             } else {
