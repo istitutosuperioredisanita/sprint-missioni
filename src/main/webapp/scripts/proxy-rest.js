@@ -129,17 +129,14 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                                 .then(data => processXhr(data, personaz, soloDipendenti, listaPersons, ind));
                     });
 
-                    $q.all(promises).then(items => {
-                        persons = items
-                            .filter(item => item !== false);
-                            return persons;
-                        }, function (err) {
-                        }
-                    );
+                    return $q.all(promises)
+                        .then(items => items.filter(item => item !== false));
 
                 });
             } else {
-                return [];
+                var deferred = $q.defer();
+                deferred.resolve([]);
+                return deferred;
             }
         });
         x.error(function (data) {
