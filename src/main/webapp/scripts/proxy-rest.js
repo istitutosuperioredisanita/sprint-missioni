@@ -2,16 +2,18 @@
 
 missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, DirettoreUoService) {
     var today = new Date();
-    var annoA = today.getFullYear();
-    var calcoloAnnoDa = function(){
+    var dataA = today;
+    var calcoloDataDa = function(){
         annoDa = today.getFullYear();
         var meseAttuale = today.getMonth();
         if (meseAttuale < 4){
-             annoDa = annoDa- 1;
+             return new Date(today.getFullYear() - 1 , 6, 1);
+        } else {
+             return new Date(today.getFullYear(), 1, 1);
         }
     }
 
-    var annoDa = calcoloAnnoDa();
+    var dataDa = calcoloDataDa();
 
     var recuperoUo = function(anno, cds, uoRich){
         var urlRestProxy = URL_REST.STANDARD;
@@ -124,38 +126,42 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                     }
                     for (var k=0; k<listaPersons.length; k++) {
 
-/*                        recuperoDatiInquadramentoCf(listaPersons[k].codice_fiscale, annoDa, annoA).then(function(ret){
+                        recuperoDatiTerzoPerCompenso(listaPersons[k].codice_fiscale, dataDa, dataA).then(function(ret){
                             if (ret && ret.data && ret.data.elements && ret.data.elements.length > 0){
-                                $scope.inquadramento = ret.data.elements;
-                            } else {
-                                ui.error("Inquadramento non trovato");
-                            }
-                        }
+                                var terziPerCompenso = ret.data.elements;
+                                var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
+                                if (terzoPerCompenso.ti_dipendente_altro = "A"){
+                                    listaPersons[k].matricola = null;
+                                }
+                                listaPersons[k].profilo = terzoPerCompenso.ds_tipo_rapporto;
 
-*/
-                        if ((soloDipendenti && listaPersons[k].matricola) || !soloDipendenti){
-                            var person = null;
-                            var cognome = null;
-                            var cf = null;
-                            var nome = null;
-                            for (var i=0; i<listaPersons.length; i++) {
-                                if ((soloDipendenti && listaPersons[i].matricola) || !soloDipendenti){
-                                    if ((ind == -1 || !isPersonaGiaPresente(persons, listaPersons[i].codice_fiscale)) && (cognome == null || 
-                                        (listaPersons[i].cognome < cognome && 
-                                            (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                        (listaPersons[i].cognome == cognome && listaPersons[i].nome < nome && 
-                                            (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                        (listaPersons[i].cognome == cognome && listaPersons[i].nome == nome && listaPersons[i].codice_fiscale < cf ) ) ) {
-                                        person = listaPersons[i];
-                                        cognome = person.cognome;
-                                        nome = person.nome;
-                                        cf = person.codice_fiscale;
+                                if ((soloDipendenti && listaPersons[k].matricola) || !soloDipendenti){
+                                    var person = null;
+                                    var cognome = null;
+                                    var cf = null;
+                                    var nome = null;
+                                    for (var i=0; i<listaPersons.length; i++) {
+                                        if ((soloDipendenti && listaPersons[i].matricola) || !soloDipendenti){
+                                            if ((ind == -1 || !isPersonaGiaPresente(persons, listaPersons[i].codice_fiscale)) && (cognome == null || 
+                                                (listaPersons[i].cognome < cognome && 
+                                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
+                                                (listaPersons[i].cognome == cognome && listaPersons[i].nome < nome && 
+                                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
+                                                (listaPersons[i].cognome == cognome && listaPersons[i].nome == nome && listaPersons[i].codice_fiscale < cf ) ) ) {
+                                                person = listaPersons[i];
+                                                cognome = person.cognome;
+                                                nome = person.nome;
+                                                cf = person.codice_fiscale;
+                                            }
+                                        }
+                                    }
+                                    if (person != null){
+                                        ind ++;
+                                        persons[ind] = person;
                                     }
                                 }
-                            }
-                            if (person != null){
-                                ind ++;
-                                persons[ind] = person;
+                            } else {
+                                ui.error("Terzo non trovato in SIGLA per il codice fiscale "+listaPersons[k].codice_fiscale);
                             }
                         }
                     }
@@ -219,20 +225,21 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
-    var recuperoDatiInquadramentoCf = function(cf, annoDa, annoA){
+    var recuperoDatiTerzoPerCompenso = function(cf, dataDa, dataA){
         var urlRestProxy = URL_REST.STANDARD;
-        var inq = [];
+        var ter = [];
         var app = APP_FOR_REST.SIGLA;
-        var url = SIGLA_REST.INQUADRAMENTO;
-        var objectPostInqClauses = [{condition: 'AND', fieldName: 'cf', operator: "=", fieldValue:cf},
-                                    {condition: 'AND', fieldName: 'annoDa', operator: "=", fieldValue:annoDa},
-                                    {condition: 'AND', fieldName: 'annoA', operator: "=", fieldValue:annoA}];
-        var objectPostInq = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostInqClauses}
-        return $http.post(urlRestProxy + app+'/', objectPostInq, {params: {proxyURL: url}}).success(function (data) {
+        var url = SIGLA_REST.TERZO_PER_COMPENSO;
+        var objectPostTerOrderBy = [{name: 'dt_fin_validita', type: 'DESC'}];
+        var objectPostTerClauses = [{condition: 'AND', fieldName: 'codice_fiscale', operator: "=", fieldValue:cf},
+                                    {condition: 'AND', fieldName: 'dt_ini_validita', operator: "<=", fieldValue:dataDa},
+                                    {condition: 'AND', fieldName: 'dt_fin_validita', operator: ">=", fieldValue:dataA}];
+        var objectPostTer = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostTerOrderBy, clauses:objectPostTerClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostTer, {params: {proxyURL: url}}).success(function (data) {
             if (data){
-                inq = data.elements;
+                ter = data.elements;
             }
-            return inq;
+            return ter;
         }).error(function (data) {
         });
     }
@@ -422,7 +429,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getPerson: recuperoDatiPerson ,
              getTerzo: recuperoDatiTerzoSigla ,
              getInquadramento: recuperoDatiInquadramento,
-             getInquadramentoCf: recuperoDatiInquadramentoCf,
+             getTerzoPerCompenso: recuperoDatiTerzoPerCompenso,
              getModalitaPagamento: recuperoModalitaPagamento,
              getTipiSpesa: recuperoTipoSpesa,
              getRimborsoKm: recuperoRimborsoKm,
