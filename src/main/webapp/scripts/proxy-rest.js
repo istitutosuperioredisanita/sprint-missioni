@@ -6,9 +6,9 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     var calcoloDataDa = function(){
         var meseAttuale = today.getMonth();
         if (meseAttuale < 4){
-             return new Date(today.getFullYear() - 1 , 6, 1);
+             return new Date(today.getFullYear() - 1 , 5, 1);
         } else {
-             return new Date(today.getFullYear(), 1, 1);
+             return new Date(today.getFullYear(), 0, 1);
         }
     }
 
@@ -148,41 +148,17 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                             if (data && data.data && data.data.elements && data.data.elements.length > 0){
         var terziPerCompenso = data.data.elements;
                                 var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
-                                if (terzoPerCompenso.ti_dipendente_altro == 'A'){
                                     for (var i=0; i<listaPersons.length; i++) {
                                         var persona = listaPersons[i];
                                         if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
-                                            listaPersons[i].matricola = null;
-                                            listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if ((soloDipendenti && listaPersons[k].matricola) || !soloDipendenti){
-                                    var person = null;
-                                    var cognome = null;
-                                    var cf = null;
-                                    var nome = null;
-                                    for (var i=0; i<listaPersons.length; i++) {
-                                        if ((soloDipendenti && listaPersons[i].matricola) || !soloDipendenti){
-                                            if ((ind == -1 || !isPersonaGiaPresente(persons, listaPersons[i].codice_fiscale)) && (cognome == null || 
-                                                (listaPersons[i].cognome < cognome && 
-                                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                                (listaPersons[i].cognome == cognome && listaPersons[i].nome < nome && 
-                                                    (ind == -1 || cognome > persons[ind].cognome || (cognome == persons[ind].cognome && nome > persons[ind].nome) )) || 
-                                                (listaPersons[i].cognome == cognome && listaPersons[i].nome == nome && listaPersons[i].codice_fiscale < cf ) ) ) {
-                                                person = listaPersons[i];
-                                                cognome = person.cognome;
-                                                nome = person.nome;
-                                                cf = person.codice_fiscale;
+                                            if (terzoPerCompenso.ti_dipendente_altro == 'A'){
+                                                listaPersons[i].matricola = "-";
+                                                listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
                                             }
+                                            return listaPersons[i];
                                         }
                                     }
-                                    if (person != null){
-                                       return person;
-                                    }
-                                }
+
 
                                 } else {
                                     return false;
