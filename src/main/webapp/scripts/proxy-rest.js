@@ -1,10 +1,9 @@
 'use strict';
 
-missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, DirettoreUoService) {
+missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, $filter, DirettoreUoService) {
     var today = new Date();
     var dataA = today;
     var calcoloDataDa = function(){
-        annoDa = today.getFullYear();
         var meseAttuale = today.getMonth();
         if (meseAttuale < 4){
              return new Date(today.getFullYear() - 1 , 6, 1);
@@ -160,10 +159,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                                         persons[ind] = person;
                                     }
                                 }
-                            } else {
-                                ui.error("Terzo non trovato in SIGLA per il codice fiscale "+listaPersons[k].codice_fiscale);
                             }
-                        }
+                        });
                     }
                     return persons;
                 });
@@ -230,10 +227,13 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var ter = [];
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.TERZO_PER_COMPENSO;
+        var daDataFormatted = $filter('date')(dataDa, "dd/MM/yyyy");
+        var aDataFormatted = $filter('date')(dataA, "dd/MM/yyyy");
+
         var objectPostTerOrderBy = [{name: 'dt_fin_validita', type: 'DESC'}];
         var objectPostTerClauses = [{condition: 'AND', fieldName: 'codice_fiscale', operator: "=", fieldValue:cf},
-                                    {condition: 'AND', fieldName: 'dt_ini_validita', operator: "<=", fieldValue:dataDa},
-                                    {condition: 'AND', fieldName: 'dt_fin_validita', operator: ">=", fieldValue:dataA}];
+                                    {condition: 'AND', fieldName: 'daData', operator: "<=", fieldValue:daDataFormatted},
+                                    {condition: 'AND', fieldName: 'aData', operator: ">=", fieldValue:aDataFormatted}];
         var objectPostTer = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostTerOrderBy, clauses:objectPostTerClauses}
         return $http.post(urlRestProxy + app+'/', objectPostTer, {params: {proxyURL: url}}).success(function (data) {
             if (data){
