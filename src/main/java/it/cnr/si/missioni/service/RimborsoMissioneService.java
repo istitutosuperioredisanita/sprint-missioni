@@ -398,7 +398,7 @@ public class RimborsoMissioneService {
     	log.debug("Updated Information for Rimborso Missione: {}", rimborsoMissioneDB);
 
 	   if (confirm && rimborsoMissioneDB.isMissioneDaValidare()){
-			sendMailToAdministrative(rimborsoMissioneDB);
+			sendMailToAdministrative(basePath, rimborsoMissioneDB);
 	   }
     	if (isRitornoMissioneMittente){
     		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, rimborsoMissioneDB), false, true, getEmail(rimborsoMissioneDB.getUidInsert()));
@@ -418,10 +418,10 @@ public class RimborsoMissioneService {
     	}
 	}
 
-    private void sendMailToAdministrative(RimborsoMissione rimborsoMissioneDB) {
+    private void sendMailToAdministrative(String basePath, RimborsoMissione rimborsoMissioneDB) {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
-		String testoMail = getTextMailSendToAdministrative(rimborsoMissioneDB);
+		String testoMail = getTextMailSendToAdministrative(basePath, rimborsoMissioneDB);
 		if (dati != null && dati.getMailNotifiche() != null){
 			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
 		} else {
@@ -443,8 +443,9 @@ public class RimborsoMissioneService {
 		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  ha un importo totale di euro "+ Utility.numberFormat(rimborsoMissione.getTotaleRimborso()) +" che è superiore all'importo presunto di euro "+Utility.numberFormat(ordine.getImportoPresunto())+" indicato sull'ordine di missione.";
 	}
 
-	private String getTextMailSendToAdministrative(RimborsoMissione rimborsoMissione) {
-		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " della uo "+rimborsoMissione.getUoRich()+" "+rimborsoMissione.getDatoreLavoroRich()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  è stato inviato per la verifica/completamento dei dati finanziari.";
+	private String getTextMailSendToAdministrative(String basePath, RimborsoMissione rimborsoMissione) {
+		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " della uo "+rimborsoMissione.getUoRich()+" "+rimborsoMissione.getDatoreLavoroRich()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  è stato inviato per la verifica/completamento dei dati finanziari."
+				+ "Si prega di verificarlo attraverso il link "+basePath+"/#/rimborso-missione/"+rimborsoMissione.getId()+"/S";
 	}
 
 	private void aggiornaDatiRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Boolean confirm,
