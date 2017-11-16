@@ -460,8 +460,8 @@ public class OrdineMissioneService {
 				} else {
 					if (StringUtils.isEmpty(filter.getUoRich())){
 						criterionList.add(Restrictions.eq("uid", principal.getName()));
-					} else {
-						criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+//					} else {
+//						criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
 					}
 				}
 			} else {
