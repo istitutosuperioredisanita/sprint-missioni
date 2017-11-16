@@ -47,9 +47,9 @@ public class Costanti {
     public final static String STATO_INVIATO_RESPONSABILE = "INR";
 	public final static String MISSIONE_ITALIANA = "I";
 	public final static String MISSIONE_ESTERA = "E";
-	public final static String PRIORITA_CRITICA = "1";
+	public final static String PRIORITA_CRITICA = "5";
 	public final static String PRIORITA_IMPORTANTE = "3";
-	public final static String PRIORITA_MEDIA = "5";
+	public final static String PRIORITA_MEDIA = "1";
 	public final static String TAM = "T";
 	public final static String RIMBORSO_DOCUMENTATO = "R";
 	public final static String RESIDENZA_DOMICILIO = "R";

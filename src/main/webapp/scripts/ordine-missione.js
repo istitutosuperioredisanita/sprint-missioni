@@ -554,9 +554,9 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     };
 
     $scope.valoriPriorita = {
-        'Critica': '1',
+        'Critica': '5',
         'Importante': '3',
-        'Media': '5'
+        'Media': '1'
     };
 
     $scope.trattamenti = {
