@@ -95,13 +95,16 @@ public class CacheService implements EnvironmentAware{
 	}
 	
 	private void cacheRestService(RestService rest) {
+		Boolean eseguitaChiamata = false;
 		if (rest.getClauseToIterate() != null && !rest.getClauseToIterate().isEmpty()){
+			List<JSONClause> listaClause = new ArrayList<JSONClause>();
 			for (Iterator<ClauseToIterate> iteratorClauseToIterate = rest.getClauseToIterate().iterator(); iteratorClauseToIterate.hasNext();){
 				ClauseToIterate clauseToIterate = iteratorClauseToIterate.next();
 				if (clauseToIterate.getType() != null && clauseToIterate.getType().equals("callRestForGetValuesForFilter")){
-					Boolean eseguitaChiamata = executeCallForFilter(rest, clauseToIterate);
+					eseguitaChiamata = executeCallForFilter(rest, clauseToIterate, listaClause);
 					if (!eseguitaChiamata){
-						cacheRest(rest, null);
+						eseguitaChiamata = true;
+						cacheRest(rest, listaClause);
 					}
 				} else if (clauseToIterate.getType() != null && clauseToIterate.getType().equals("calculateValues")){
 					if (!StringUtils.isEmpty(clauseToIterate.getFromValue()) && clauseToIterate.containsToSpecialValue()){
@@ -109,12 +112,13 @@ public class CacheService implements EnvironmentAware{
 						Integer to = (int)clauseToIterate.getValueFromToSpecialValue();
 						for (int anno=from; anno<=to; anno++){
 							JSONClause clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), "=", anno);
-							cacheRest(rest, clause);
+							listaClause.add(clause);
 						}
-					} else {
-						cacheRest(rest, null);
-					}
+					} 
 				}
+			}
+			if (listaClause!= null && !listaClause.isEmpty() && !eseguitaChiamata){
+				cacheRest(rest, listaClause);
 			}
 		} else {
 			cacheRest(rest, null);
@@ -122,7 +126,7 @@ public class CacheService implements EnvironmentAware{
 	}
 
 	private Boolean executeCallForFilter(RestService rest,
-			ClauseToIterate clauseToIterate) {
+			ClauseToIterate clauseToIterate, List<JSONClause> listaClause) {
 		Boolean eseguitaChiamata = false;
 		if (clauseToIterate.getUrlInCache() != null ){
 			RestService restForFilter = getRestServiceForFilter(clauseToIterate.getUrlInCache());
@@ -140,9 +144,12 @@ public class CacheService implements EnvironmentAware{
 								Object value = Introspector.getPropertyValue(bean, clauseToIterate.getFieldGetForSpecialValue());
 								if (value != null){
 									String valueList = (String)value;
+									List<JSONClause> listaNewClause = new ArrayList<>();
+									listaNewClause.addAll(listaClause);
 									JSONClause clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), clauseToIterate.getOperator(), valueList);
+									listaNewClause.add(clause);
 									eseguitaChiamata = true;
-									cacheRest(rest, clause);
+									cacheRest(rest, listaNewClause);
 								}
 							}
 						}
@@ -153,15 +160,10 @@ public class CacheService implements EnvironmentAware{
 				}
 			}
 		}
-		return eseguitaChiamata;
+		return false;
 	}
 
-	public void cacheRest(RestService rest, JSONClause clause) {
-		List<JSONClause> listaClause = null;
-		if (clause != null){
-			listaClause = new ArrayList<JSONClause>();
-			listaClause.add(clause);
-		}
+	public void cacheRest(RestService rest, List<JSONClause> listaClause) {
 		CallCache callCache = prepareCallCache(rest, listaClause);
 		ResultProxy result = proxyService.process(callCache);
 		/* E' necessario chiamare il service non in cache e poi mettere a mano il risultato in cache perchè quando parte questo service allo startup dell'applicazione
@@ -208,7 +210,7 @@ public class CacheService implements EnvironmentAware{
 				JSONClause clause = getClause(clauseDefault);
 				listaClause.add(clause);
 			}
-			if (clauseToAdd != null){
+			if (clauseToAdd != null && !clauseToAdd.isEmpty()){
 				listaClause.addAll(clauseToAdd);
 			}
 			jBody.setClauses(listaClause);

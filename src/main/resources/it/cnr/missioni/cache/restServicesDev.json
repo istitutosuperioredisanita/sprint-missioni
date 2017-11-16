@@ -172,6 +172,57 @@
         },
         {
             "app": "SIGLA",
+            "url": "ConsProgettiAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.ProgettoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Progetto",
+            "clauseVariable": [
+                {
+                    "condition": "AND",
+                    "fieldName": "pg_progetto",
+                    "operator": "=",
+                    "fieldValue": ""
+                }
+            ],
+            "clauseFixed": [
+                {
+                    "condition": "AND",
+                    "fieldName": "livello",
+                    "operator": "=",
+                    "fieldValue": 2
+                },
+                {
+                    "condition": "AND",
+                    "fieldName": "fl_utilizzabile",
+                    "operator": "=",
+                    "fieldValue": true
+                }
+            ],
+            "clauseToIterate": [
+                {
+                    "type": "calculateValues",
+                    "condition": "AND",
+                    "fieldName": "esercizio",
+                    "fromValue": 2017,
+                    "toSpecialValue": "ANNO_CORRENTE"
+                },
+                {	
+                    "type": "callRestForGetValuesForFilter",
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "urlInCache": "ConsUnitaOrganizzativaAction.json",
+                    "fieldGetForSpecialValue": "cd_unita_organizzativa"
+                }
+            ],
+            "order": [
+                {
+                    "name": "cd_progetto",
+                    "type": "ASC"
+                }
+            ]
+        },
+        {
+            "app": "SIGLA",
             "url": "ConsTerzoAction.json",
             "skipLoadStartup": "S",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.TerzoJson",
