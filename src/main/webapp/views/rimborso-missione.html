@@ -450,6 +450,7 @@
             </div>
   </div>
 </div>
+     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{rimborsoMissioneModel.totaleRimborso() | currency : "€"}}     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli-non-anticipati' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoSenzaSpeseAnticipate() | currency : "€"}}
 <form class="form-inline col-md-12" role="form" id="missioni">
 <div class="panel panel-default" ng-if="rimborsoMissioneModel.id && (rimborsoMissioneModel.isFireSearchAttachments == true || rimborsoMissioneModel.isFireSearchAttachments == false )">
   <div class="panel-heading color-verde-chiaro text-center">
