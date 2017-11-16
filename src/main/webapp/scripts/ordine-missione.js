@@ -526,6 +526,20 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.reloadModulo = function(pgProgetto, cdr, uo) {
       $scope.annullaGae();
       $scope.restGae($scope.ordineMissioneModel.anno, pgProgetto, cdr, uo);
+
+      if ($scope.showResponsabile && pgProgetto && $scope.elencoResponsabiliGruppo){
+            for (var i=0; i<$scope.elencoModuli.length; i++) {
+                if (pgProgetto == $scope.elencoModuli[i].pg_progetto && $scope.elencoModuli[i].codice_fiscale_responsabile){
+                    for (var k=0; i<$scope.elencoResponsabiliGruppo.length; k++) {
+                        if ($scope.elencoResponsabiliGruppo[k].codice_fiscale == $scope.elencoModuli[i].codice_fiscale_responsabile){
+                            $scope.ordineMissioneModel.responsabileGruppo = $scope.elencoResponsabiliGruppo[k].uid;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     $scope.tipiMissione = {

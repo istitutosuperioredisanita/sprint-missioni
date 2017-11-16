@@ -84,6 +84,7 @@
               <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
               <th style="text-align: center">{{'missione.form.data' | translate}}</th>
               <th ng-hide="accountModel" style="text-align: left">{{'main.userid' | translate}}</th>
+              <th ng-hide="accountModel" style="text-align: left">{{'missione.form.uo' | translate}}</th>
               <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
               <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
               <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
@@ -98,6 +99,7 @@
                 <td style="text-align: right">{{rimborsoMissione.numero}}</td>
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
                 <td ng-hide="accountModel" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+                <td ng-hide="accountModel" style="text-align: left">{{rimborsoMissione.uoRich}}</td>
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
                 <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
                 <td class="col-md-4" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
