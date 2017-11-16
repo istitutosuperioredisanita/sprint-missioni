@@ -28,8 +28,8 @@ public class ProgettoService {
 			if (uo != null && uo.startsWith(Costanti.CDS_SAC)){
 				uo = Costanti.UO_SAC_PROGETTI;
 			}
-			List<JSONClause> clauses = prepareJSONClause(pgProgetto, anno, uo);
-			List<JSONClause> clausesFixedToAdd = prepareJSONClauseToAdd(anno);
+			List<JSONClause> clauses = prepareJSONClause(pgProgetto);
+			List<JSONClause> clausesFixedToAdd = prepareJSONClauseToAdd(anno, uo);
 			String app = Costanti.APP_SIGLA;
 			String url = Costanti.REST_MODULO;
 			String risposta = commonService.process(clauses, app, url, clausesFixedToAdd);
@@ -50,22 +50,10 @@ public class ProgettoService {
 		return null;
 	}
 
-	public List<JSONClause> prepareJSONClauseToAdd(Integer anno	) {
+	public List<JSONClause> prepareJSONClauseToAdd(Integer anno, String uo) {
 		JSONClause clause = new JSONClause();
 		clause.setFieldName("esercizio");
 		clause.setFieldValue(anno);
-		clause.setCondition("AND");
-		clause.setOperator("=");
-		List<JSONClause> clauses = new ArrayList<JSONClause>();
-		clauses.add(clause);
-		return clauses;
-	}
-
-	public List<JSONClause> prepareJSONClause(Long pgProgetto, Integer anno,
-			String uo) {
-		JSONClause clause = new JSONClause();
-		clause.setFieldName("pg_progetto");
-		clause.setFieldValue(pgProgetto);
 		clause.setCondition("AND");
 		clause.setOperator("=");
 		List<JSONClause> clauses = new ArrayList<JSONClause>();
@@ -78,6 +66,17 @@ public class ProgettoService {
 			clause.setOperator("=");
 			clauses.add(clause);
 		}
+		return clauses;
+	}
+
+	public List<JSONClause> prepareJSONClause(Long pgProgetto) {
+		JSONClause clause = new JSONClause();
+		clause.setFieldName("pg_progetto");
+		clause.setFieldValue(pgProgetto);
+		clause.setCondition("AND");
+		clause.setOperator("=");
+		List<JSONClause> clauses = new ArrayList<JSONClause>();
+		clauses.add(clause);
 		return clauses;
 	}
 
