@@ -364,10 +364,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     private List<RimborsoMissioneDettagli> rimborsoMissioneDettagli;
 
 	@Transient
-    private BigDecimal totaleRimborsoSenzaSpeseAnticipate;
+    private BigDecimal totaleRimborsoSenzaAnticipi;
 
 	@Transient
-    private BigDecimal totaleRimborso;
+    private BigDecimal totaleRimborsoComplessivo;
 
 	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
 			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich){
@@ -1326,5 +1326,21 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setNoteRespingi(String noteRespingi) {
 		this.noteRespingi = noteRespingi;
+	}
+
+	public BigDecimal getTotaleRimborsoSenzaAnticipi() {
+		return totaleRimborsoSenzaAnticipi;
+	}
+
+	public void setTotaleRimborsoSenzaAnticipi(BigDecimal totaleRimborsoSenzaAnticipi) {
+		this.totaleRimborsoSenzaAnticipi = totaleRimborsoSenzaAnticipi;
+	}
+
+	public BigDecimal getTotaleRimborsoComplessivo() {
+		return totaleRimborsoComplessivo;
+	}
+
+	public void setTotaleRimborsoComplessivo(BigDecimal totaleRimborsoComplessivo) {
+		this.totaleRimborsoComplessivo = totaleRimborsoComplessivo;
 	}
 }

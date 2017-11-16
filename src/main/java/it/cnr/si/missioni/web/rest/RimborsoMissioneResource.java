@@ -138,7 +138,10 @@ public class RimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
         	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true, true);
-            return JSONResponseEntity.ok(rimborsoMissione);
+        	rimborsoMissione.setTotaleRimborsoComplessivo(rimborsoMissione.getTotaleRimborso());
+        	rimborsoMissione.setTotaleRimborsoSenzaAnticipi(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate());
+        	rimborsoMissione.setRimborsoMissioneDettagli(null);
+        	return JSONResponseEntity.ok(rimborsoMissione);
         } catch (AwesomeException e) {
 			log.error("ERRORE getRimborsoMissione",e);
 			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
