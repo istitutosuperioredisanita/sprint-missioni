@@ -363,6 +363,12 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
     private List<RimborsoMissioneDettagli> rimborsoMissioneDettagli;
 
+	@Transient
+    private BigDecimal totaleRimborsoSenzaSpeseAnticipate;
+
+	@Transient
+    private BigDecimal totaleRimborso;
+
 	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
 			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich){
 		super();

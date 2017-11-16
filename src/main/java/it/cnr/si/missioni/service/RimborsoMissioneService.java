@@ -648,7 +648,10 @@ public class RimborsoMissioneService {
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
 			}
 			if (filter.getUoRich() != null){
-				criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+				Disjunction condizioneOr = Restrictions.disjunction();
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
+				criterionList.add(condizioneOr);
 			}
 			if (filter.getAnnoOrdine() != null){
 				criterionList.add(Restrictions.eq(aliasRimborsoMissione+".anno", filter.getAnnoOrdine()));

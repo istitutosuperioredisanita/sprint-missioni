@@ -137,7 +137,7 @@ public class RimborsoMissioneResource {
     		@RequestParam(value = "id") Long idMissione) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
-        	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, false, true);
+        	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true, true);
             return JSONResponseEntity.ok(rimborsoMissione);
         } catch (AwesomeException e) {
 			log.error("ERRORE getRimborsoMissione",e);

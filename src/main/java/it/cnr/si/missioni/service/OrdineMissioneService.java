@@ -34,6 +34,7 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
@@ -156,6 +157,10 @@ public class OrdineMissioneService {
 		if (listaOrdiniMissione != null && !listaOrdiniMissione.isEmpty()){
 			ordineMissione = listaOrdiniMissione.get(0);
 			if (retrieveDataFromFlows){
+				OrdineMissioneAutoPropria autoPropria = getAutoPropria(ordineMissione);
+				if (autoPropria != null){
+					ordineMissione.setUtilizzoAutoPropria("S");
+				}
 				OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissione);
 				if (anticipo != null){
 					ordineMissione.setRichiestaAnticipo("S");
@@ -407,7 +412,10 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
 			}
 			if (filter.getUoRich() != null){
-				criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+				Disjunction condizioneOr = Restrictions.disjunction();
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
+				criterionList.add(condizioneOr);
 			}
 			if (filter.getSoloMissioniNonGratuite()){
 				criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita")).add(Restrictions.eq("missioneGratuita", "N")));
