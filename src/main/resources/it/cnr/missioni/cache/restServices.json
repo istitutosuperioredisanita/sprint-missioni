@@ -235,12 +235,6 @@
             "clauseVariable": [
                 {
                     "condition": "AND",
-                    "fieldName": "cd_unita_organizzativa",
-                    "operator": "=",
-                    "fieldValue": ""
-                },
-                {
-                    "condition": "AND",
                     "fieldName": "pg_progetto",
                     "operator": "=",
                     "fieldValue": ""
@@ -252,9 +246,7 @@
                     "fieldName": "livello",
                     "operator": "=",
                     "fieldValue": 2
-                }
-            ],
-            "clauseFixed": [
+                },
                 {
                     "condition": "AND",
                     "fieldName": "fl_utilizzabile",
@@ -269,6 +261,14 @@
                     "fieldName": "esercizio",
                     "fromValue": 2017,
                     "toSpecialValue": "ANNO_CORRENTE"
+                },
+                {	
+                    "type": "callRestForGetValuesForFilter",
+                    "condition": "AND",
+                    "fieldName": "cd_unita_organizzativa",
+                    "operator": "=",
+                    "urlInCache": "ConsUnitaOrganizzativaAction.json",
+                    "fieldGetForSpecialValue": "cd_unita_organizzativa"
                 }
             ],
             "order": [
