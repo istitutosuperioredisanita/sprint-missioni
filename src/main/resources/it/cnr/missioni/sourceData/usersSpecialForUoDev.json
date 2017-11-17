@@ -203,6 +203,9 @@
                 }, {
                     "codice_uo" : "044000"
                 }, {
+                    "codice_uo" : "020000",
+                    "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "032000",
                     "ordine_da_validare" : "S"
                 }, {

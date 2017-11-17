@@ -151,6 +151,9 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     }
 
     var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind){
+        if (personaz.matricola != null){
+            return personaz;
+        }
         if (data && data.data && data.data.elements && data.data.elements.length > 0){
             var terziPerCompenso = data.data.elements;
             var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
