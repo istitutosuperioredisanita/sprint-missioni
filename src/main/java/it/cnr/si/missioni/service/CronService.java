@@ -113,7 +113,7 @@ public class CronService {
 				try {
 					LOGGER.info("Cron per Caricare la Cache");
 
-					cacheService.loadInCache();
+					cacheService.loadInCache(false);
 
 					LOGGER.info("Cron per Caricare la Cache terminato");
 				} finally {

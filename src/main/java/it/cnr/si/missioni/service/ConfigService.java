@@ -43,14 +43,17 @@ public class ConfigService {
 	}
 
 	public void reloadUsersSpecialForUo() {
+		loadFilesService.evictUsersSpecialForUo();
 		dataUsersSpecial = loadFilesService.loadUsersSpecialForUo();
 	}
 
 	public void reloadServicesForCache() {
+		loadFilesService.evictServicesForCache();
 		services = loadFilesService.loadServicesForCache();
 	}
 
 	public void reloadDatiUo() {
+		loadFilesService.evictDatiUo();
 		datiUo = loadFilesService.loadDatiUo();
 	}
 

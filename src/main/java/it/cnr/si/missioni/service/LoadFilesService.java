@@ -1,16 +1,20 @@
 package it.cnr.si.missioni.service;
 
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.core.ILock;
 
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -30,6 +34,16 @@ public class LoadFilesService {
 
 	private RelaxedPropertyResolver propertyResolver;	
 	
+	@CacheEvict(value = Costanti.NOME_CACHE_DATI_UO, allEntries = true)
+	public void evictDatiUo() {
+	}
+	@CacheEvict(value = Costanti.NOME_CACHE_SERVICES_SIGLA, allEntries = true)
+	public void evictServicesForCache() {
+	}
+	@CacheEvict(value = Costanti.NOME_CACHE_USER_SPECIAL, allEntries = true)
+	public void evictUsersSpecialForUo() {
+	}
+
     @Cacheable(value=Costanti.NOME_CACHE_DATI_UO)
 	public DatiUo loadDatiUo() {
 		InputStream is = getUo();
