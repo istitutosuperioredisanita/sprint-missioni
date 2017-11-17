@@ -66,17 +66,17 @@ public class CacheService implements EnvironmentAware{
 	public void init(){
 		taskExecutor.execute(() -> {
 			log.info("loading data from SIGLA rest");
-			loadInCache();
+			loadInCache(true);
 			log.info("loading data from SIGLA rest finished.");
 		});
 	}
 
-	public void loadInCache() {
+	public void loadInCache(Boolean fromInit) {
 		if (configService.getServices()!= null && configService.getServices().getRestService() != null ){
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();
 				if (!Utility.nvl(rest.getSkipLoadStartup(),"N").equals("S")){
-					cacheRestService(rest);
+					cacheRestService(rest, fromInit);
 				}
 			}
 		}
@@ -94,17 +94,17 @@ public class CacheService implements EnvironmentAware{
 		return null;
 	}
 	
-	private void cacheRestService(RestService rest) {
+	private void cacheRestService(RestService rest, Boolean fromInit) {
 		Boolean eseguitaChiamata = false;
 		if (rest.getClauseToIterate() != null && !rest.getClauseToIterate().isEmpty()){
 			List<JSONClause> listaClause = new ArrayList<JSONClause>();
 			for (Iterator<ClauseToIterate> iteratorClauseToIterate = rest.getClauseToIterate().iterator(); iteratorClauseToIterate.hasNext();){
 				ClauseToIterate clauseToIterate = iteratorClauseToIterate.next();
 				if (clauseToIterate.getType() != null && clauseToIterate.getType().equals("callRestForGetValuesForFilter")){
-					eseguitaChiamata = executeCallForFilter(rest, clauseToIterate, listaClause);
+					eseguitaChiamata = executeCallForFilter(rest, clauseToIterate, listaClause, fromInit);
 					if (!eseguitaChiamata){
 						eseguitaChiamata = true;
-						cacheRest(rest, listaClause);
+						cacheRest(rest, listaClause, fromInit);
 					}
 				} else if (clauseToIterate.getType() != null && clauseToIterate.getType().equals("calculateValues")){
 					if (!StringUtils.isEmpty(clauseToIterate.getFromValue()) && clauseToIterate.containsToSpecialValue()){
@@ -118,15 +118,15 @@ public class CacheService implements EnvironmentAware{
 				}
 			}
 			if (listaClause!= null && !listaClause.isEmpty() && !eseguitaChiamata){
-				cacheRest(rest, listaClause);
+				cacheRest(rest, listaClause, fromInit);
 			}
 		} else {
-			cacheRest(rest, null);
+			cacheRest(rest, null, fromInit);
 		}
 	}
 
 	private Boolean executeCallForFilter(RestService rest,
-			ClauseToIterate clauseToIterate, List<JSONClause> listaClause) {
+			ClauseToIterate clauseToIterate, List<JSONClause> listaClause, Boolean fromInit) {
 		Boolean eseguitaChiamata = false;
 		if (clauseToIterate.getUrlInCache() != null ){
 			RestService restForFilter = getRestServiceForFilter(clauseToIterate.getUrlInCache());
@@ -149,7 +149,7 @@ public class CacheService implements EnvironmentAware{
 									JSONClause clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), clauseToIterate.getOperator(), valueList);
 									listaNewClause.add(clause);
 									eseguitaChiamata = true;
-									cacheRest(rest, listaNewClause);
+									cacheRest(rest, listaNewClause, fromInit);
 								}
 							}
 						}
@@ -163,12 +163,16 @@ public class CacheService implements EnvironmentAware{
 		return false;
 	}
 
-	public void cacheRest(RestService rest, List<JSONClause> listaClause) {
+	public void cacheRest(RestService rest, List<JSONClause> listaClause, Boolean fromInit) {
 		CallCache callCache = prepareCallCache(rest, listaClause);
-		ResultProxy result = proxyService.process(callCache);
-		/* E' necessario chiamare il service non in cache e poi mettere a mano il risultato in cache perchè quando parte questo service allo startup dell'applicazione
-		 * i servizi di cache non sono stati ancora inizializzati. In questo modo i dati vengono messi in cache. */		
-		cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache, result);
+		if (fromInit){
+			ResultProxy result = proxyService.process(callCache);
+			/* E' necessario chiamare il service non in cache e poi mettere a mano il risultato in cache perchè quando parte questo service allo startup dell'applicazione
+			 * i servizi di cache non sono stati ancora inizializzati. In questo modo i dati vengono messi in cache. */		
+			cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache, result);
+		} else {
+			proxyService.processInCache(callCache);
+		}
 	}
 
 	private CallCache prepareCallForCache(RestService rest, JSONBody jBody) {
