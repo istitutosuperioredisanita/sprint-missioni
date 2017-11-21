@@ -972,7 +972,7 @@
 {"uid":"Antonella.Pieri", "uoForUsersSpecial":[{"codice_uo":"048000", "ordine_da_validare":"S"}]},
 {"uid":"noemi.terreni", "uoForUsersSpecial":[{"codice_uo":"048000", "ordine_da_validare":"S"}]},
 
-{"uid":"paola.focaccia", "uoForUsersSpecial":[{"codice_uo":"080000", "ordine_da_validare":"S"}]},
+{"uid":"paola.focaccia", "uoForUsersSpecial":[{"codice_uo":"080000", "ordine_da_validare":"S"}, {"codice_uo":"080002"}]},
 {"uid":"barbara.bittner", "uoForUsersSpecial":[{"codice_uo":"080000", "ordine_da_validare":"S"}]},
 {"uid":"barbara.baso", "uoForUsersSpecial":[{"codice_uo":"080000", "ordine_da_validare":"S"}]},
 {"uid":"francesca.zanon", "uoForUsersSpecial":[{"codice_uo":"080000", "ordine_da_validare":"S"}]},
