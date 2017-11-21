@@ -27,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
@@ -35,14 +37,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @Service
-public class CacheService implements EnvironmentAware{
+public class CacheService implements EnvironmentAware, ApplicationListener<ApplicationReadyEvent> {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
 
@@ -61,22 +62,14 @@ public class CacheService implements EnvironmentAware{
 	private RelaxedPropertyResolver propertyResolver;
 
 	private Environment environment;
-	
-	@PostConstruct
-	public void init(){
-		taskExecutor.execute(() -> {
-			log.info("loading data from SIGLA rest");
-			loadInCache(true);
-			log.info("loading data from SIGLA rest finished.");
-		});
-	}
 
-	public void loadInCache(Boolean fromInit) {
+
+	public void loadInCache() {
 		if (configService.getServices()!= null && configService.getServices().getRestService() != null ){
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();
 				if (!Utility.nvl(rest.getSkipLoadStartup(),"N").equals("S")){
-					cacheRestService(rest, fromInit);
+					cacheRestService(rest);
 				}
 			}
 		}
@@ -94,17 +87,17 @@ public class CacheService implements EnvironmentAware{
 		return null;
 	}
 	
-	private void cacheRestService(RestService rest, Boolean fromInit) {
+	private void cacheRestService(RestService rest) {
 		Boolean eseguitaChiamata = false;
 		if (rest.getClauseToIterate() != null && !rest.getClauseToIterate().isEmpty()){
 			List<JSONClause> listaClause = new ArrayList<JSONClause>();
 			for (Iterator<ClauseToIterate> iteratorClauseToIterate = rest.getClauseToIterate().iterator(); iteratorClauseToIterate.hasNext();){
 				ClauseToIterate clauseToIterate = iteratorClauseToIterate.next();
 				if (clauseToIterate.getType() != null && clauseToIterate.getType().equals("callRestForGetValuesForFilter")){
-					eseguitaChiamata = executeCallForFilter(rest, clauseToIterate, listaClause, fromInit);
+					eseguitaChiamata = executeCallForFilter(rest, clauseToIterate, listaClause);
 					if (!eseguitaChiamata){
 						eseguitaChiamata = true;
-						cacheRest(rest, listaClause, fromInit);
+						cacheRest(rest, listaClause);
 					}
 				} else if (clauseToIterate.getType() != null && clauseToIterate.getType().equals("calculateValues")){
 					if (!StringUtils.isEmpty(clauseToIterate.getFromValue()) && clauseToIterate.containsToSpecialValue()){
@@ -118,15 +111,15 @@ public class CacheService implements EnvironmentAware{
 				}
 			}
 			if (listaClause!= null && !listaClause.isEmpty() && !eseguitaChiamata){
-				cacheRest(rest, listaClause, fromInit);
+				cacheRest(rest, listaClause);
 			}
 		} else {
-			cacheRest(rest, null, fromInit);
+			cacheRest(rest, null);
 		}
 	}
 
 	private Boolean executeCallForFilter(RestService rest,
-			ClauseToIterate clauseToIterate, List<JSONClause> listaClause, Boolean fromInit) {
+			ClauseToIterate clauseToIterate, List<JSONClause> listaClause) {
 		Boolean eseguitaChiamata = false;
 		if (clauseToIterate.getUrlInCache() != null ){
 			RestService restForFilter = getRestServiceForFilter(clauseToIterate.getUrlInCache());
@@ -149,7 +142,7 @@ public class CacheService implements EnvironmentAware{
 									JSONClause clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), clauseToIterate.getOperator(), valueList);
 									listaNewClause.add(clause);
 									eseguitaChiamata = true;
-									cacheRest(rest, listaNewClause, fromInit);
+									cacheRest(rest, listaNewClause);
 								}
 							}
 						}
@@ -163,16 +156,9 @@ public class CacheService implements EnvironmentAware{
 		return false;
 	}
 
-	public void cacheRest(RestService rest, List<JSONClause> listaClause, Boolean fromInit) {
+	public void cacheRest(RestService rest, List<JSONClause> listaClause) {
 		CallCache callCache = prepareCallCache(rest, listaClause);
-		if (fromInit){
-			ResultProxy result = proxyService.process(callCache);
-			/* E' necessario chiamare il service non in cache e poi mettere a mano il risultato in cache perchè quando parte questo service allo startup dell'applicazione
-			 * i servizi di cache non sono stati ancora inizializzati. In questo modo i dati vengono messi in cache. */		
-			cacheManager.getCache(Costanti.NOME_CACHE_PROXY).put(callCache, result);
-		} else {
-			proxyService.processInCache(callCache);
-		}
+		proxyService.processInCache(callCache);
 	}
 
 	private CallCache prepareCallForCache(RestService rest, JSONBody jBody) {
@@ -616,5 +602,13 @@ public class CacheService implements EnvironmentAware{
 	public void setEnvironment(Environment environment) {
         this.environment = environment;
         this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.proxy.");
+	}
+
+
+	@Override
+	public void onApplicationEvent(ApplicationReadyEvent event) {
+		log.error("loading data from SIGLA rest after event: {}", event.getClass().getCanonicalName());
+		loadInCache();
+		log.info("loading data from SIGLA rest finished.");
 	}
 }

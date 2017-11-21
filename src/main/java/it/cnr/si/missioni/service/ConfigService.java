@@ -1,13 +1,12 @@
 package it.cnr.si.missioni.service;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.proxy.cache.json.Services;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 @Service
 public class ConfigService {
@@ -15,9 +14,6 @@ public class ConfigService {
 	@Autowired
     private LoadFilesService loadFilesService;
 	
-    @Autowired
-    private CronService cronService;
-    
 	Services services = null;
 	DatiUo datiUo = null;
 	DataUsersSpecial dataUsersSpecial = null;
@@ -27,10 +23,6 @@ public class ConfigService {
 		loadData();
 	}
 
-	public void refreshCache() {
-		cronService.evictCache();
-		cronService.loadCache();
-	}
 
 	public void reloadConfig() {
 		loadData();
