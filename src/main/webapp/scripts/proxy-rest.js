@@ -4,12 +4,13 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     var today = new Date();
     var dataA = today;
     var calcoloDataDa = function(){
-        var meseAttuale = today.getMonth();
+/*        var meseAttuale = today.getMonth();
         if (meseAttuale < 4){
              return new Date(today.getFullYear() - 1 , 5, 1);
         } else {
              return new Date(today.getFullYear(), 0, 1);
-        }
+        }*/
+        return today;
     }
 
     var dataDa = calcoloDataDa();
