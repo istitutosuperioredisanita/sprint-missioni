@@ -67,7 +67,7 @@ public class PrintRimborsoMissioneService {
     private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
-		Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), rimborsoMissione.getAnno(), null);
+		Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), rimborsoMissione.getAnno(), rimborsoMissione.getUoSpesa());
 		Voce voce = voceService.loadVoce(rimborsoMissione);
 		Gae gae = gaeService.loadGae(rimborsoMissione);
     	PrintRimborsoMissione printRimborsoMissione = new PrintRimborsoMissione();
