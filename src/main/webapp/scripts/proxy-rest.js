@@ -151,7 +151,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     }
 
     var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind, dataDa){
-        if (personaz.matricola != null && personaz.data_cessazione && personaz.data_cessazione >= dataDa){
+        if (personaz.matricola != null && ((personaz.data_cessazione && personaz.data_cessazione >= dataDa) || (!personaz.data_cessazione))){
             return personaz;
         }
         if (data && data.data && data.data.elements && data.data.elements.length > 0){
