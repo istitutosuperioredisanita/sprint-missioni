@@ -60,7 +60,7 @@ public class PrintOrdineMissioneService {
     private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(ordineMissione);
-		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), null);
+		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), ordineMissione.getUoSpesa());
 		Voce voce = voceService.loadVoce(ordineMissione);
 		Gae gae = gaeService.loadGae(ordineMissione);
     	PrintOrdineMissione printOrdineMissione = new PrintOrdineMissione();
