@@ -1,20 +1,7 @@
 package it.cnr.si.missioni.service;
 
-import java.security.Principal;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ILock;
-
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -24,6 +11,17 @@ import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.Principal;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -113,7 +111,7 @@ public class CronService {
 				try {
 					LOGGER.info("Cron per Caricare la Cache");
 
-					cacheService.loadInCache(false);
+					cacheService.loadInCache();
 
 					LOGGER.info("Cron per Caricare la Cache terminato");
 				} finally {
