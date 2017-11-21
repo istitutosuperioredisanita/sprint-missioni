@@ -193,8 +193,26 @@ public class AccountService {
 		return risposta;
 	}
 
-	public String getDirector(String uo) {
-		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, "titCa="+uo+"&userinfo=true&ruolo=resp", null, null);
+	public String getDirectorFromSede(String codiceSede) {
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_SEDE+codiceSede+"&userinfo=true&ruolo=dir", null, null);
+		ResultProxy result = proxyService.processInCache(callCache);
+		String risposta = result.getBody();
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			DatiDirettore [] lista = mapper.readValue(risposta, DatiDirettore[].class);
+			if (lista != null && lista.length > 0){
+				return lista[0].getUid();
+			} else if (lista == null || lista.length == 0){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato possibile recuperare il responsabile per la sede:" + codiceSede);
+			}
+		} catch (Exception ex) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i responsabili della sede ("+Utility.getMessageException(ex)+").");
+		}
+		return risposta;
+	}
+
+	public String getDirectorFromUo(String uo) {
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+uo+"&userinfo=true&ruolo=resp", null, null);
 		ResultProxy result = proxyService.processInCache(callCache);
 		String risposta = result.getBody();
 		try {
@@ -209,6 +227,10 @@ public class AccountService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i Direttori ("+Utility.getMessageException(ex)+").");
 		}
 		return risposta;
+	}
+
+	public String getDirector(String uo) {
+		return getDirectorFromUo(uo);
 	}
 
 	public Boolean isUserSpecialEnableToFinalizeOrder(String user, String uo){
