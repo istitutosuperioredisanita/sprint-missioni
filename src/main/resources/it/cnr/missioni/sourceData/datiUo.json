@@ -38,7 +38,7 @@
 {"codice_uo":"002003", "uid_direttore":"laura.giuliano"},
 {"codice_uo":"002004", "uid_direttore":"laura.giuliano"},
 {"codice_uo":"002005", "uid_direttore":"laura.giuliano"},
-{"codice_uo":"003000", "uid_direttore":"giovanni.rinaldi"},
+{"codice_uo":"003000", "uid_direttore":"giovanni.rinaldi", "ordine_da_validare":"S"},
 {"codice_uo":"004000", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
 {"codice_uo":"004001", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
 {"codice_uo":"004002", "uid_direttore":"roberto.natalini", "ordine_da_validare":"S"},
