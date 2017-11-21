@@ -6,10 +6,9 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +39,12 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
+import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.service.DatiIstitutoService;
+import it.cnr.si.missioni.service.DatiSedeService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAnticipoService;
@@ -79,7 +80,7 @@ public class CMISOrdineMissioneService {
 	public static final String PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
 
 	@Autowired
-	private DatiIstitutoService datiIstitutoService;
+	private DatiSedeService datiSedeService;
 
     @Autowired
     private Environment env;
@@ -129,6 +130,7 @@ public class CMISOrdineMissioneService {
 	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione) throws ComponentException{
 		if (ordineMissione != null){
 			CMISOrdineMissione cmisOrdineMissione = new CMISOrdineMissione();
+			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			caricaDatiDerivati(principal, ordineMissione);
 			OrdineMissioneAnticipo anticipo = null;
 			OrdineMissioneAutoPropria autoPropria = null;
@@ -149,7 +151,6 @@ public class CMISOrdineMissioneService {
 
 			String username = principal.getName();
 			
-			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), null);
 			Voce voce = voceService.loadVoce(ordineMissione);
 			Gae gae = gaeService.loadGae(ordineMissione);
@@ -179,7 +180,7 @@ public class CMISOrdineMissioneService {
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
-			userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, ordineMissione.getAnno());
+			userNameFirmatario = recuperoDirettore(ordineMissione, account, LocalDate.now());
 			
 			if (ordineMissione.isMissioneGratuita()){
 				userNameFirmatarioSpesa = userNameFirmatario;
@@ -265,12 +266,13 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Integer anno) {
+	private String recuperoDirettore(OrdineMissione ordineMissione, Account account, LocalDate data) {
 		String userNameFirmatario;
 		if (isDevProfile()){
-			userNameFirmatario = recuperoUidDirettoreUo(uo);
+			userNameFirmatario = recuperoUidDirettoreUo(ordineMissione.getUoRich());
 		} else {
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
+			if (account.getMatricola() != null )
+			DatiSede dati = datiSedeService.getDatiSede(Utility.getUoSigla(o), anno);
 			if (dati != null && dati.getResponsabile() != null){
 				if (!ordineMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloPerItalia(),"N").equals("N"))){
 					userNameFirmatario = dati.getResponsabile();
@@ -279,6 +281,21 @@ public class CMISOrdineMissioneService {
 				}
 			} else {
 				userNameFirmatario = accountService.getDirector(uo);		
+			}
+
+			DatiSede dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
+			if (dati != null && dati.getResponsabile() != null){
+				if (!ordineMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloItalia(),"N").equals("N"))){
+					userNameFirmatario = dati.getResponsabile();
+				} else {
+					if (StringUtils.isEmpty(dati.getSedeRespEstero())){
+						userNameFirmatario = accountService.getDirectorFromSede(dati.getCodiceSede());		
+					} else {
+						userNameFirmatario = accountService.getDirectorFromSede(dati.getSedeRespEstero());		
+					}
+				}
+			} else {
+				userNameFirmatario = accountService.getDirectorFromSede(account.getCodiceSede());		
 			}
 		}
 		if (StringUtils.isEmpty(userNameFirmatario)){
