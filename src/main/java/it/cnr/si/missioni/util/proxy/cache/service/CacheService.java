@@ -153,7 +153,7 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 				}
 			}
 		}
-		return false;
+		return eseguitaChiamata;
 	}
 
 	public void cacheRest(RestService rest, List<JSONClause> listaClause) {
