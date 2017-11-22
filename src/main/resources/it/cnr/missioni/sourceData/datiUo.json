@@ -149,8 +149,8 @@
 
 {"codice_uo":"047000", "uid_direttore":"antonio.lamarra"},
 {"codice_uo":"048000", "uid_direttore":"simonetta.montemagni", "ordine_da_validare":"S"},
-{"codice_uo":"049000", "uid_direttore":"eleonora.carletti", "ordine_da_validare":"S"},
-{"codice_uo":"049001", "uid_direttore":"eugenio.cavallo", "ordine_da_validare":"S"},
+{"codice_uo":"049000", "uid_direttore":"eleonora.carletti"},
+{"codice_uo":"049001", "uid_direttore":"eugenio.cavallo"},
 {"codice_uo":"050000", "uid_direttore":"annalisa.buffa", "ordine_da_validare":"S"},
 {"codice_uo":"050001", "uid_direttore":"antonio.pievatolo", "ordine_da_validare":"S"},
 {"codice_uo":"050002", "uid_direttore":"andrea.clematis", "ordine_da_validare":"S"},
