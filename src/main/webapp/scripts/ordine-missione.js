@@ -669,7 +669,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     $scope.inizializzaFormPerInserimento = function(account){
-        $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
+        $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'1', nominativo:account.lastName+" "+account.firstName, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
