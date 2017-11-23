@@ -1,9 +1,10 @@
 package it.cnr.si.missioni.service;
 
 import java.io.InputStream;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cache.annotation.CacheEvict;
@@ -12,9 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.ILock;
 
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -26,6 +25,7 @@ import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
 @Service
 public class LoadFilesService {
+    private final Logger log = LoggerFactory.getLogger(LoadFilesService.class);
 	@Autowired
     private MissioniCMISService missioniCMISService;
 
@@ -59,6 +59,7 @@ public class LoadFilesService {
 
     @Cacheable(value=Costanti.NOME_CACHE_USER_SPECIAL)
     public DataUsersSpecial loadUsersSpecialForUo() {
+    	log.info("loadUsersSpecialForUo");
 		InputStream is = getUsersSpecial();
 		if (is != null){
 			try {

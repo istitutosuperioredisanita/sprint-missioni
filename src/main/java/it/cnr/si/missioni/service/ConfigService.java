@@ -25,13 +25,18 @@ public class ConfigService {
 
 
 	public void reloadConfig() {
+		evictData();
 		loadData();
 	}
 
 	private void loadData() {
 		dataUsersSpecial = loadFilesService.loadUsersSpecialForUo();
 		datiUo = loadFilesService.loadDatiUo();
-		services = loadFilesService.loadServicesForCache();
+	}
+
+	private void evictData() {
+		loadFilesService.evictUsersSpecialForUo();
+		loadFilesService.evictDatiUo();
 	}
 
 	public void reloadUsersSpecialForUo() {
