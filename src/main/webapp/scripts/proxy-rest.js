@@ -98,13 +98,19 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return y;
     }
 
-    var recuperoPersonsForUo = function(uo, soloDipendenti){
+    var recuperoPersonsForCdsUo = function(cds, uo, soloDipendenti, dipendentiCessati){
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.SIPER;
         var url = SIPER_REST.PERSONS_FOR_UO;
         var persons = [];
+        var titCa = null;
         var uoSiper = uo.replace('.','');
-        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: uoSiper, userinfo:true, cessati:true}});
+        if (cds){
+            titCa = cds.replace('.','');
+        } else {
+            titCa = uo.replace('.','');
+        }
+        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: titCa, userinfo:true, cessati:dipendentiCessati}});
         var y = x.then(function (result) {
             if (result.data){
                 var listaPersons = result.data;
@@ -115,14 +121,18 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                     if (result && result.data){
                         var direttore = result.data;
                         var trovatoDirettore = false;
-                        for (var z=0; z<persons.length; z++) {
-                            if (persons[z].uid == direttore.uid){
+                        for (var z=0; z<listaPersons.length; z++) {
+                            if (listaPersons[z].uid == direttore.uid){
                                 trovatoDirettore = true;
                             }
                         }
                         if (!trovatoDirettore){
                             listaPersons.push(direttore);
                         }
+                    }
+
+                    if (soloDipendenti && !dipendentiCessati){
+                        return listaPersons;
                     }
 
                     var promises = listaPersons.map(function (personaz) {
@@ -151,6 +161,10 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return y;
     }
 
+    var recuperoPersonsForUo = function(uo, soloDipendenti){
+        return recuperoPersonsForCdsUo(null, uo, soloDipendenti, true);
+    }
+   
     var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind, dataDa){
         if (personaz.matricola != null && ((personaz.data_cessazione && personaz.data_cessazione >= dataDa) || (!personaz.data_cessazione))){
             return personaz;
@@ -427,6 +441,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
 
     return { getUos: recuperoUo,
              getPersons: recuperoPersonsForUo,
+             getPersonsForCds: recuperoPersonsForCdsUo,
              getPerson: recuperoDatiPerson ,
              getTerzo: recuperoDatiTerzoSigla ,
              getInquadramento: recuperoDatiInquadramento,
