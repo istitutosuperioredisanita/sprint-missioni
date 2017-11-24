@@ -768,6 +768,8 @@
 {"codice_uo":"084001"},
 {"codice_uo":"084002"},
 {"codice_uo":"084003"}]},
+{"uid":"irenedora.napoli", "uoForUsersSpecial":[
+{"codice_uo":"084001"}]},
 {"uid":"lucia.sollima", "uoForUsersSpecial":[
 {"codice_uo":"084003", "ordine_da_validare":"S"}]},
 {"uid":"brunellamaria.aresta", "uoForUsersSpecial":[{"codice_uo":"027000", "ordine_da_validare":"S"}, {"codice_uo":"027002", "ordine_da_validare":"S"}]},
