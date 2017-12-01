@@ -193,6 +193,11 @@
 {"codice_uo":"070000"},
 {"codice_uo":"042000"},
 {"codice_uo":"605000"}]},
+{"uid":"patrizia.villani", "uoForUsersSpecial":[
+{"codice_uo":"084000"},
+{"codice_uo":"084001"},
+{"codice_uo":"084002"},
+{"codice_uo":"084003"}]},
 {"uid":"fabiana.carinci", "uoForUsersSpecial":[
 {"codice_uo":"000401"},
 {"codice_uo":"000407", "ordine_da_validare":"S"},
