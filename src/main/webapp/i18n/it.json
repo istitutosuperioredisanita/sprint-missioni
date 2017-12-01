@@ -414,7 +414,8 @@
             "a-numero": "A Numero",
             "da-data": "Da Data Inserimento",
             "a-data": "A Data Inserimento",
-            "anno": "Anno"
+            "anno": "Anno",
+            "annullati": "Annullati"
         },
         "form": {
             "modulo": "Progetto",
@@ -434,10 +435,10 @@
             "data-fine-obbligatoria": "Data Fine*",
             "data-fine": "Data Fine",
             "data-fine.placeholder": "Data di Fine della Missione",
-            "data-inizio-frontiera": "Inizio Attr. Frontiera*",
-            "data-inizio-frontiera.placeholder": "Data di Inizio di attraversamento della Frontiera",
-            "data-fine-frontiera": "Fine Attr. Frontiera*",
-            "data-fine-frontiera.placeholder": "Data di Fine di attraversamento della Frontiera",
+            "data-inizio-frontiera": "Imbarco Partenza*",
+            "data-inizio-frontiera.placeholder": "Data di imbarco in partenza",
+            "data-fine-frontiera": "Sbarco Ritorno*",
+            "data-fine-frontiera.placeholder": "Data di sbarco del ritorno",
             "inquadramento": "Inquadramento",
             "modalita-pagamento": "Modalità di Pagamento*",
             "dati-modalita-pagamento": "Dati Modalità di Pagamento*",
@@ -452,7 +453,9 @@
             "rimborso-spese-terzi": "Rimborso o concorso spese da terzi",
             "rimborso-spese-terzi-importo": "Importo €",
             "stato-invio-sigla": "Stato Sigla",
-            "id-sigla": "Id. SIGLA"
+            "id-sigla": "Id. SIGLA",
+            "ordini-con-rimborsi-diversi": "Ordini già rimborsati",
+            "rimborso-importo-0": "Importo 0"
         },
         "button": {
             "print": "Stampa Rimborso",
@@ -473,7 +476,7 @@
                     "ds-spesa" : "Descrizione Spesa*",
                     "tipologia-pasto" : "Tipo Pasto*",
                     "importo": "Importo €*",
-                    "spesa-anticipata": "Spesa Anticipata",
+                    "spesa-anticipata": "Spesa Anticipata dall'ente",
                     "download-file": "Download File",
                     "remove-file": "Elimina File",
                     "km": "Km percorsi*",

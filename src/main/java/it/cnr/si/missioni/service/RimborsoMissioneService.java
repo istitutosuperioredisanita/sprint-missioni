@@ -148,8 +148,8 @@ public class RimborsoMissioneService {
     @Value("${spring.mail.messages.invioRimborsoPerValidazioneDatiFinanziari.oggetto}")
     private String subjectSendToAdministrative;
     
-    @Value("${spring.mail.messages.variazioneImportoMissionePerResponsabileGruppo.oggetto}")
-    private String oggettoVariazioneImportoMissioneManager;
+    @Value("${spring.mail.messages.importoMissionePerResponsabileGruppo.oggetto}")
+    private String oggettoImportoMissioneManager;
     
     @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
@@ -378,8 +378,11 @@ public class RimborsoMissioneService {
     	rimborsoMissioneDB.setToBeUpdated();
     	retrieveDetails(principal, rimborsoMissioneDB);
 		if (confirm){
-			if (assenzaDettagli(rimborsoMissioneDB)){
+			if (assenzaDettagli(rimborsoMissioneDB) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("N"))){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile confermare un rimborso missione senza aver indicato nessun dettaglio di spesa.");
+			}
+			if (!assenzaDettagli(rimborsoMissione) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("S"))){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile confermare un rimborso missione con dettagli e ad importo 0.");
 			}
 		}
 //		//effettuo controlli di validazione operazione CRUD
@@ -411,8 +414,8 @@ public class RimborsoMissioneService {
         	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
         	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null && ordineMissione.getPgProgetto() != null && 
         			rimborsoMissione.getPgProgetto() != null && rimborsoMissione.getPgProgetto().compareTo(ordineMissione.getPgProgetto()) == 0 && 
-        			Utility.nvl(ordineMissione.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0 && rimborsoMissione.getTotaleRimborso().compareTo(ordineMissione.getImportoPresunto()) > 0){
-        		mailService.sendEmail(oggettoVariazioneImportoMissioneManager+" "+getNominativo(rimborsoMissione.getUid()), 
+        			Utility.nvl(ordineMissione.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0){
+        		mailService.sendEmail(oggettoImportoMissioneManager+" "+getNominativo(rimborsoMissione.getUid()), 
         				getTestoMailAumentoMissioneResponsabileGruppo(rimborsoMissione, ordineMissione), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
         	}
     	}
@@ -440,7 +443,7 @@ public class RimborsoMissioneService {
 	}
 
 	private String getTestoMailAumentoMissioneResponsabileGruppo(RimborsoMissione rimborsoMissione, OrdineMissione ordine) {
-		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  ha un importo totale di euro "+ Utility.numberFormat(rimborsoMissione.getTotaleRimborso()) +" che è superiore all'importo presunto di euro "+Utility.numberFormat(ordine.getImportoPresunto())+" indicato sull'ordine di missione.";
+		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+"  ha un importo totale di euro "+ Utility.numberFormat(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate());
 	}
 
 	private String getTextMailSendToAdministrative(String basePath, RimborsoMissione rimborsoMissione) {
@@ -501,6 +504,7 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDB.setAltreSpeseAntImporto(rimborsoMissione.getAltreSpeseAntImporto());
 		rimborsoMissioneDB.setSpeseTerziImporto(rimborsoMissione.getSpeseTerziImporto());
 		rimborsoMissioneDB.setSpeseTerziRicevute(rimborsoMissione.getSpeseTerziRicevute());
+		rimborsoMissioneDB.setRimborso0(rimborsoMissione.getRimborso0());
 //			rimborsoMissioneDB.setOrdineMissione(rimborsoMissione.getOrdineMissione());
 		rimborsoMissioneDB.setInquadramento(rimborsoMissione.getInquadramento());
 		rimborsoMissioneDB.setCdCdsSigla(rimborsoMissione.getCdCdsSigla());
@@ -795,6 +799,10 @@ public class RimborsoMissioneService {
     		rimborsoMissione.setSpeseTerziRicevute("N");
     	}
     	
+    	if (StringUtils.isEmpty(rimborsoMissione.getRimborso0())){
+    		rimborsoMissione.setRimborso0("N");
+    	}
+    	
     	aggiornaValidazione(principal, rimborsoMissione);
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
@@ -863,6 +871,8 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Anticipo Ricevuto");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getSpeseTerziRicevute())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Altri anticipi ricevuti");
+			} else if (StringUtils.isEmpty(rimborsoMissione.getRimborso0())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Altri anticipi ricevuti");
 			} 
 			if (StringUtils.isEmpty(rimborsoMissione.getInquadramento())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per la data della missione indicata non è stato possibile recuperare l'inquadramento.");
@@ -874,18 +884,20 @@ public class RimborsoMissioneService {
 				if (StringUtils.isEmpty(rimborsoMissione.getTrattamento())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Trattamento");
 				} 
-				if (rimborsoMissione.getDataInizioEstero() == null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Inizio Attraversamento Frontiera");
-				}
-				if (rimborsoMissione.getDataFineEstero() == null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Fine Attraversamento Frontiera");
+				if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+					if (rimborsoMissione.getDataInizioEstero() == null){
+						throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Imbarco di Partenza");
+					}
+					if (rimborsoMissione.getDataFineEstero() == null){
+						throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Data Sbarco di Ritorno");
+					}
 				}
 			} else {
 				if (rimborsoMissione.getDataInizioEstero() != null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Inizio Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Imbarco di Partenza può essere valorizzata solo nel caso di missione estera con TAM");
 				}
 				if (rimborsoMissione.getDataFineEstero() != null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Fine Attraversamento Frontiera può essere valorizzata solo nel caso di missione estera");
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Sbarco di Ritorno può essere valorizzata solo nel caso di missione estera con TAM");
 				}
 			}
 			if (rimborsoMissione.isMissioneDipendente()){
@@ -1035,15 +1047,15 @@ public class RimborsoMissioneService {
 //			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S"))){
 //			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
 //		}
-		if (rimborsoMissione.isMissioneEstera()) {
+		if (rimborsoMissione.isMissioneEstera() && rimborsoMissione.isTrattamentoAlternativoMissione()) {
 			if (rimborsoMissione.getDataInizioEstero().isBefore(rimborsoMissione.getDataInizioMissione())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di inizio attraversamento frontiera non può essere precedente alla data di inizio missione");
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La Data Imbarco di Partenza non può essere precedente alla data di inizio missione");
 			}
 			if (rimborsoMissione.getDataFineMissione().isBefore(rimborsoMissione.getDataFineEstero())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine attraversamento frontiera non può essere successiva alla data di fine missione");
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La Data Sbarco di Ritorno non può essere successiva alla data di fine missione");
 			}
 			if (rimborsoMissione.getDataFineEstero().isBefore(rimborsoMissione.getDataInizioEstero())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine attraversamento frontiera non può essere precedente alla data di inizio attraversamento frontiera");
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La Data Sbarco di Ritorno non può essere precedente alla Data Imbarco di Partenza ");
 			}
 		}
 		if (StringUtils.isEmpty(rimborsoMissione.getIdFlusso()) &&  rimborsoMissione.isStatoInviatoAlFlusso()){
@@ -1132,8 +1144,11 @@ public class RimborsoMissioneService {
 		byte[] printRimborsoMissione;
 		String fileName;
 		retrieveDetails(principal, rimborsoMissione);
-		if (assenzaDettagli(rimborsoMissione)){
+		if (assenzaDettagli(rimborsoMissione) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("N"))){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile stampare un rimborso missione senza aver indicato nessun dettaglio di spesa.");
+		}
+		if (!assenzaDettagli(rimborsoMissione) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("S"))){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile stampare un rimborso missione con dettagli e ad importo 0.");
 		}
 		fileName = "RimborsoMissione"+rimborsoMissione.getId()+".pdf";
 		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, principal.getName());
@@ -1257,7 +1272,7 @@ public class RimborsoMissioneService {
 			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordine);
 			String autoPropriaOrdine = "N";
 			String autoPropriaRimborso = "N";
-			if (autoPropria != null){
+			if (autoPropria != null && Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(),"N").equals("S")){
 				autoPropriaOrdine = "S";
 			}
 			
@@ -1271,9 +1286,9 @@ public class RimborsoMissioneService {
 			
 			if (isDiverso(autoPropriaRimborso, autoPropriaOrdine)){
 				if (autoPropriaRimborso.equals("S")){
-					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Non autorizzato in fase d'ordine");
+					aggiungiDifferenza(buffer, "Rimborso KM: ", "Non autorizzato in fase d'ordine");
 				} else {
-					aggiungiDifferenza(buffer, "Utilizzo Auto Propria: ", "Autorizzato in fase d'ordine ma non utilizzato in fase di rimborso");
+					aggiungiDifferenza(buffer, "Rimborso KM: ", "Autorizzato in fase d'ordine ma non utilizzato in fase di rimborso");
 				}
 			}
 		} catch (ComponentException e) {

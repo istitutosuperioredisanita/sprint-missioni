@@ -120,6 +120,8 @@ public class Account {
 	private String cdTerzoSigla;
 	@JsonProperty("inquadramenti")
 	private List<Inquadramento> inquadramenti;
+	@JsonProperty("data_cessazione")
+	private String dataCessazione;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -791,6 +793,14 @@ public class Account {
 	@JsonProperty("inquadramenti")
 	public void setInquadramenti(List<Inquadramento> inquadramenti) {
 		this.inquadramenti = inquadramenti;
+	}
+
+	public String getDataCessazione() {
+		return dataCessazione;
+	}
+
+	public void setDataCessazione(String dataCessazione) {
+		this.dataCessazione = dataCessazione;
 	}
 }
 

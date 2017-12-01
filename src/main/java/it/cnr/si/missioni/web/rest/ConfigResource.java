@@ -1,10 +1,9 @@
 package it.cnr.si.missioni.web.rest;
 
-import javax.annotation.security.RolesAllowed;
-
+import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.missioni.service.ConfigService;
+import it.cnr.si.missioni.service.CronService;
 import it.cnr.si.security.AuthoritiesConstants;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.annotation.security.RolesAllowed;
 
 /**
  * REST controller for managing config.
@@ -24,6 +23,8 @@ public class ConfigResource {
 
 	private final Logger log = LoggerFactory.getLogger(ConfigResource.class);
 
+	@Autowired
+	private CronService cronService;
 
 	@Autowired
 	private ConfigService configService;
@@ -47,7 +48,8 @@ public class ConfigResource {
 	@Timed
 	public void refreshCache() {
 		log.debug("REST request per ricaricare la configurazione da Alfresco");
-		configService.refreshCache();
+		cronService.evictCache();
+		cronService.loadCache();
 	}
 
 	/**

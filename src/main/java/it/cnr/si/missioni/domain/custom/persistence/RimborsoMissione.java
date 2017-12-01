@@ -321,6 +321,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "NOTE_RESPINGI", length = 1000, nullable = true)
     public String noteRespingi;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "RIMBORSO_0", length = 1, nullable = true)
+    private String rimborso0;
+
 	@Transient
     private String daValidazione;
 	
@@ -1342,5 +1346,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setTotaleRimborsoComplessivo(BigDecimal totaleRimborsoComplessivo) {
 		this.totaleRimborsoComplessivo = totaleRimborsoComplessivo;
+	}
+
+	public String getRimborso0() {
+		return rimborso0;
+	}
+
+	public void setRimborso0(String rimborso0) {
+		this.rimborso0 = rimborso0;
 	}
 }

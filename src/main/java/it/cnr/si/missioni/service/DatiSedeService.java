@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class DatiSedeService {
     private DatiSedeRepository datiSedeRepository;
 
     @Transactional(readOnly = true)
-    public DatiSede getDatiSede(String sede, LocalDate data) {
+    public DatiSede getDatiSede(String sede, ZonedDateTime data) {
         return datiSedeRepository.getDatiSede(sede, data);
     }
 }

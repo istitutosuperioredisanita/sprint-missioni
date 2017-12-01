@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,6 +83,9 @@ public class CMISOrdineMissioneService {
 	@Autowired
 	private DatiSedeService datiSedeService;
 
+	@Autowired
+	private DatiIstitutoService datiIstitutoService;
+	
     @Autowired
     private Environment env;
 
@@ -151,7 +155,7 @@ public class CMISOrdineMissioneService {
 
 			String username = principal.getName();
 			
-			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), null);
+			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), ordineMissione.getUoSpesa());
 			Voce voce = voceService.loadVoce(ordineMissione);
 			Gae gae = gaeService.loadGae(ordineMissione);
 			UnitaOrganizzativa uoCompetenza = null;
@@ -180,19 +184,19 @@ public class CMISOrdineMissioneService {
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
-			userNameFirmatario = recuperoDirettore(ordineMissione, account, LocalDate.now());
+			userNameFirmatario = recuperoDirettore(ordineMissione, ordineMissione.getUoRich(), account);
 			
 			if (ordineMissione.isMissioneGratuita()){
 				userNameFirmatarioSpesa = userNameFirmatario;
 			} else {
 				if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 					if (uoCompetenzaPerFlusso != null){
-						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, ordineMissione.getAnno());
+						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account);
 					} else {
 						userNameFirmatarioSpesa = userNameFirmatario;
 					}
 				} else {
-					userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, ordineMissione.getAnno());
+					userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, account);
 				}
 			}
 			
@@ -266,44 +270,16 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private String recuperoDirettore(OrdineMissione ordineMissione, Account account, LocalDate data) {
+	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Account account) {
 		String userNameFirmatario;
 		if (isDevProfile()){
-			userNameFirmatario = recuperoUidDirettoreUo(ordineMissione.getUoRich());
+			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			if (account.getMatricola() != null )
-			DatiSede dati = datiSedeService.getDatiSede(Utility.getUoSigla(o), anno);
-			if (dati != null && dati.getResponsabile() != null){
-				if (!ordineMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloPerItalia(),"N").equals("N"))){
-					userNameFirmatario = dati.getResponsabile();
-				} else {
-					userNameFirmatario = accountService.getDirector(uo);		
-				}
-			} else {
-				userNameFirmatario = accountService.getDirector(uo);		
-			}
-
-			DatiSede dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
-			if (dati != null && dati.getResponsabile() != null){
-				if (!ordineMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloItalia(),"N").equals("N"))){
-					userNameFirmatario = dati.getResponsabile();
-				} else {
-					if (StringUtils.isEmpty(dati.getSedeRespEstero())){
-						userNameFirmatario = accountService.getDirectorFromSede(dati.getCodiceSede());		
-					} else {
-						userNameFirmatario = accountService.getDirectorFromSede(dati.getSedeRespEstero());		
-					}
-				}
-			} else {
-				userNameFirmatario = accountService.getDirectorFromSede(account.getCodiceSede());		
-			}
-		}
-		if (StringUtils.isEmpty(userNameFirmatario)){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la uo "+uo);
+			userNameFirmatario = accountService.recuperoDirettore(ordineMissione.getAnno(), uo, ordineMissione.isMissioneEstera(), account, ordineMissione.getDataInizioMissione());
 		}
 		return userNameFirmatario;
 	}
-	
+
 	private boolean isDevProfile(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return true;
