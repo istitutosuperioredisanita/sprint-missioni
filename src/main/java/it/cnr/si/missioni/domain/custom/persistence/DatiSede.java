@@ -44,6 +44,10 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
     @Column(name = "RESPONSABILE_SOLO_ITALIA", length = 1, nullable = true)
     private String responsabileSoloItalia;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "MAIL_DOPO_APPROVAZIONE", length = 1, nullable = true)
+    private String mailDopoApprovazione;
+
     @Size(min = 0, max = 30)
     @Column(name = "SEDE_RESP_ESTERO", length = 30, nullable = true)
     private String sedeRespEstero;
@@ -90,5 +94,11 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
 	}
 	public void setSedeRespEstero(String sedeRespEstero) {
 		this.sedeRespEstero = sedeRespEstero;
+	}
+	public String getMailDopoApprovazione() {
+		return mailDopoApprovazione;
+	}
+	public void setMailDopoApprovazione(String mailDopoApprovazione) {
+		this.mailDopoApprovazione = mailDopoApprovazione;
 	}
 }

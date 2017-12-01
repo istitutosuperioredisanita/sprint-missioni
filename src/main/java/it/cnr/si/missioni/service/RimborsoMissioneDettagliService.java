@@ -24,12 +24,17 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
+import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
 /**
@@ -45,6 +50,9 @@ public class RimborsoMissioneDettagliService {
 
 	@Autowired
 	private RimborsoMissioneService rimborsoMissioneService;
+
+	@Autowired
+	private OrdineMissioneService ordineMissioneService;
 
 	@Autowired
 	private MissioniCMISService missioniCMISService;
@@ -96,7 +104,19 @@ public class RimborsoMissioneDettagliService {
 		return null;
 	}
 
-	private void validaCRUD(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli) {
+	private void validaCRUD(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws ComponentException {
+		if (rimborsoMissioneDettagli.getKmPercorsi() != null){
+			RimborsoMissione rimborsoMissione = rimborsoMissioneDettagli.getRimborsoMissione();
+	    	if (rimborsoMissione.getOrdineMissione() != null){
+	        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+	        	if (ordineMissione != null){
+	    			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
+	    			if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi,"N").equals("S")){
+	    				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione, verifica e controlli.");
+	    			}
+	        	}
+	    	}
+		}
 		validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
 	}
 
@@ -128,7 +148,6 @@ public class RimborsoMissioneDettagliService {
 		validaCRUD(principal, rimborsoMissioneDettagli);
 		rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean.creaConBulk(principal,
 				rimborsoMissioneDettagli);
-		// autoPropriaRepository.save(autoPropria);
 		log.debug("Created Information for RimborsoMissioneDettagli: {}", rimborsoMissioneDettagli);
 		return rimborsoMissioneDettagli;
 	}

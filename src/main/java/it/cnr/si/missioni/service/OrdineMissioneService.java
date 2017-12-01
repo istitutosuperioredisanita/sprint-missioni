@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
+import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
@@ -34,11 +35,12 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.ResultFlows;
-import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
+import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -64,7 +66,10 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
+import net.bzdyl.ejb3.criteria.Criteria;
+import net.bzdyl.ejb3.criteria.CriteriaFactory;
 import net.bzdyl.ejb3.criteria.Order;
+import net.bzdyl.ejb3.criteria.projections.Projections;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
 
@@ -79,6 +84,9 @@ public class OrdineMissioneService {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private DatiSedeService datiSedeService;
 
     @Autowired
     private DatiIstitutoService datiIstitutoService;
@@ -146,6 +154,9 @@ public class OrdineMissioneService {
     
     @Value("${spring.mail.messages.approvazioneAnticipo.oggetto}")
     private String subjectAnticipo;
+    
+    @Value("${spring.mail.messages.approvazioneOrdineMissione.oggetto}")
+    private String approvazioneOrdineMissione;
     
     @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
@@ -317,6 +328,15 @@ public class OrdineMissioneService {
 	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		Account account = accountService.loadAccountFromRest(ordineMissioneDaAggiornare.getUid());
+		DatiSede datiSede = datiSedeService.getDatiSede(account.getCodiceSede(), ordineMissioneDaAggiornare.getDataInizioMissione());
+		Boolean mailDaInviare = false;
+		if (datiSede != null && Utility.nvl(datiSede.getMailDopoApprovazione(),"N").equals("S")){
+			List<UsersSpecial> lista = accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false);
+			if (lista != null && lista.size() > 0){
+	    		mailService.sendEmail(approvazioneOrdineMissione, getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare), false, true, mailService.prepareTo(lista));
+			}
+		}
 		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
 		if (anticipo != null){
 			anticipo.setStato(Costanti.STATO_DEFINITIVO);
@@ -330,7 +350,6 @@ public class OrdineMissioneService {
 		    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(lista));
 				}
 			}
-			
 		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 		popolaCoda(ordineMissioneDaAggiornare);
@@ -419,6 +438,9 @@ public class OrdineMissioneService {
 			}
 			if (filter.getSoloMissioniNonGratuite()){
 				criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita")).add(Restrictions.eq("missioneGratuita", "N")));
+			}
+			if (Utility.nvl(filter.getGiaRimborsato(),"N").equals("N")){
+				criterionList.add(Subqueries.notExists("select rimborso_missione.id from rimborso_missione where rimborso_missione.id_ordine_missione = ordine_missione.id"));
 			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
@@ -823,6 +845,10 @@ public class OrdineMissioneService {
 				+ "Si prega di confermarlo attraverso il link "+basePath+"/#/ordine-missione/"+ordineMissione.getId();
 	}
 
+	private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione) {
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" è stata approvata.";
+	}
+
 	private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
 		return "E'  stata approvata la richiesta di anticipo di € "+Utility.numberFormat(anticipo.getImporto()) + " relativa all'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto();
 	}
@@ -968,7 +994,7 @@ public class OrdineMissioneService {
 			}
 		}
 		if (Utility.nvl(ordineMissione.getMissioneGratuita()).equals("S") &&  ordineMissione.getImportoPresunto() != null && ordineMissione.getImportoPresunto().compareTo(BigDecimal.ZERO) != 0){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire una missione gratuita e l'importo presunto");
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire una missione con spese a carico di altro ente e l'importo presunto");
 		} 
 	}
 	

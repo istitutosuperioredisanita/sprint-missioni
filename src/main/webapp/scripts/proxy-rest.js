@@ -4,12 +4,13 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     var today = new Date();
     var dataA = today;
     var calcoloDataDa = function(){
-        var meseAttuale = today.getMonth();
+/*        var meseAttuale = today.getMonth();
         if (meseAttuale < 4){
              return new Date(today.getFullYear() - 1 , 5, 1);
         } else {
              return new Date(today.getFullYear(), 0, 1);
-        }
+        }*/
+        return today;
     }
 
     var dataDa = calcoloDataDa();
@@ -127,7 +128,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                     var promises = listaPersons.map(function (personaz) {
                         return recuperoDatiTerzoPerCompenso(personaz.codice_fiscale, dataDa, dataA)
                                 .then(function (data) {
-                                    return processXhr(data, personaz, soloDipendenti, listaPersons, ind);
+                                    return processXhr(data, personaz, soloDipendenti, listaPersons, ind, dataDa);
                                 });
                     });
 
@@ -150,8 +151,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return y;
     }
 
-    var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind){
-        if (personaz.matricola != null){
+    var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind, dataDa){
+        if (personaz.matricola != null && ((personaz.data_cessazione && personaz.data_cessazione >= dataDa) || (!personaz.data_cessazione))){
             return personaz;
         }
         if (data && data.data && data.data.elements && data.data.elements.length > 0){
@@ -161,7 +162,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 var persona = listaPersons[i];
                 if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
                     if (terzoPerCompenso.ti_dipendente_altro == 'A'){
-                        listaPersons[i].matricola = "-";
+                        listaPersons[i].matricola = "";
                         listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
                     }
                     return listaPersons[i];
@@ -233,7 +234,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var objectPostTerOrderBy = [{name: 'dt_fin_validita', type: 'DESC'}];
         var objectPostTerClauses = [{condition: 'AND', fieldName: 'codice_fiscale', operator: "=", fieldValue:cf},
                                     {condition: 'AND', fieldName: 'daData', operator: "<=", fieldValue:daDataFormatted},
-                                    {condition: 'AND', fieldName: 'aData', operator: ">=", fieldValue:aDataFormatted}];
+                                    {condition: 'AND', fieldName: 'aData', operator: ">=", fieldValue:daDataFormatted}];
         var objectPostTer = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostTerOrderBy, clauses:objectPostTerClauses}
         return $http.post(urlRestProxy + app+'/', objectPostTer, {params: {proxyURL: url}}).success(function (data) {
             if (data){

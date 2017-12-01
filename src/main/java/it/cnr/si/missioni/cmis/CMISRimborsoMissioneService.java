@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -42,13 +40,10 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.DatiIstitutoService;
-import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.service.UoService;
@@ -61,8 +56,6 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
-import it.cnr.si.missioni.util.proxy.json.object.Nazione;
-import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.Voce;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
@@ -208,16 +201,16 @@ public class CMISRimborsoMissioneService {
 		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 		String userNameFirmatario;
 		String userNameFirmatarioSpesa;
-		userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, rimborsoMissione.getAnno());
+		userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account);
 		
 		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 			if (uoCompetenzaPerFlusso != null){
-				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, rimborsoMissione.getAnno());
+				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, account);
 			} else {
 				userNameFirmatarioSpesa = userNameFirmatario;
 			}
 		} else {
-			userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, rimborsoMissione.getAnno());
+			userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
 		}
 		
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
@@ -280,25 +273,16 @@ public class CMISRimborsoMissioneService {
 		return cmisRimborsoMissione;
 	}
 
-	private String recuperoDirettore(RimborsoMissione rimborsoMissione, String uo, Integer anno) {
+	private String recuperoDirettore(RimborsoMissione rimborsoMissione, String uo, Account account) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
-			if (dati != null && dati.getResponsabile() != null){
-				if (!rimborsoMissione.isMissioneEstera() || (Utility.nvl(dati.getResponsabileSoloPerItalia(),"N").equals("N"))){
-					userNameFirmatario = dati.getResponsabile();
-				} else {
-					userNameFirmatario = accountService.getDirector(uo);		
-				}
-			} else {
-				userNameFirmatario = accountService.getDirector(uo);		
-			}
+			userNameFirmatario = accountService.recuperoDirettore(rimborsoMissione.getAnno(), uo, rimborsoMissione.isMissioneEstera(), account, rimborsoMissione.getDataInizioMissione());
 		}
 		return userNameFirmatario;
 	}
-	
+
 	private boolean isDevProfile(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return true;

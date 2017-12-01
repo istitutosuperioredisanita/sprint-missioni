@@ -342,7 +342,7 @@ public class ComunicaRimborsoSiglaService {
 		impostaNazioneRimborso(rimborsoApprovato, tappa);
 		ZonedDateTime dataInizio = null;
 		ZonedDateTime dataFine = null;
-		if (!rimborsoApprovato.isMissioneEstera()){
+		if (!rimborsoApprovato.isMissioneEstera() || !rimborsoApprovato.isTrattamentoAlternativoMissione()){
 			dataInizio = rimborsoApprovato.getDataInizioMissione();
 			dataFine = rimborsoApprovato.getDataFineMissione();
 		} else {

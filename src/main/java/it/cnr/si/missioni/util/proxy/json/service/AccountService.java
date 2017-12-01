@@ -1,5 +1,7 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,16 +11,23 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
+import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
+import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.ConfigService;
+import it.cnr.si.missioni.service.DatiIstitutoService;
+import it.cnr.si.missioni.service.DatiSedeService;
 import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
@@ -39,10 +48,10 @@ public class AccountService {
     private ConfigService configService;
 
 	@Autowired
-    private TerzoService terzoService;
+    private DatiSedeService datiSedeService;
 
 	@Autowired
-    private InquadramentoService inquadramentoService;
+    private DatiIstitutoService datiIstitutoService;
 
 	@Autowired
     private UoService uoService;
@@ -281,4 +290,48 @@ public class AccountService {
 		return utente.getEmailComunicazioni();
     }
 
+	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data) {
+		String userNameFirmatario;
+		if (account.getMatricola() == null || (account.getDataCessazione() != null && DateUtils.parseZonedDateTime(account.getDataCessazione(), "").compareTo(data) < 0)){
+			userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
+		} else {
+			DatiSede dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
+			if (dati != null && dati.getResponsabile() != null){
+				if (!isMissioneEstera || (Utility.nvl(dati.getResponsabileSoloItalia(),"N").equals("N"))){
+					userNameFirmatario = dati.getResponsabile();
+				} else {
+					if (StringUtils.isEmpty(dati.getSedeRespEstero())){
+						userNameFirmatario = getDirectorFromSede(dati.getCodiceSede());		
+					} else {
+						userNameFirmatario = getDirectorFromSede(dati.getSedeRespEstero());		
+					}
+				}
+			} else {
+				userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
+			}
+			if (StringUtils.isEmpty(userNameFirmatario)){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la sede "+dati.getCodiceSede());
+			}
+		}
+		return userNameFirmatario;
+	}
+
+	private String recuperoDirettoreDaUo(Integer anno, String uo, Boolean isMissioneEstera) {
+		String userNameFirmatario;
+		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
+		if (datiIstituto != null && datiIstituto.getResponsabile() != null){
+			if (!isMissioneEstera || (Utility.nvl(datiIstituto.getResponsabileSoloItalia(),"N").equals("N"))){
+				userNameFirmatario = datiIstituto.getResponsabile();
+			} else {
+				userNameFirmatario = getDirector(uo);
+			}
+		} else {
+			userNameFirmatario = getDirector(uo);
+		}
+		if (StringUtils.isEmpty(userNameFirmatario)){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la uo "+uo);
+		}
+		return userNameFirmatario;
+	}
+	
 }

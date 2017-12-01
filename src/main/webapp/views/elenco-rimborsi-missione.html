@@ -66,12 +66,20 @@
                 <input type="text" class="input-sm form-control" style="text-align:right" name="aNumeroOrdine" ng-model="aNumeroOrdine" />
             </p>
         </div>
-       <div class="col-md-7 float-right">
-        <button type="button" class="btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
-       </div>
-       <div class="col-md-12 text-center" ng-show="messageRimborsiNonEsistenti">
-        <h5 translate="elenco-rimborsi-missione.no-result">Nessun Risultato</h5>
-       </div>
+        <div class="col-md-2">
+            <span class="input-group">
+              <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
+                <label class="checkbox">
+                  <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N">
+                </label>
+            </span>
+        </div>
+        <div class="col-md-7 float-right">
+          <button type="button" class="btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
+        </div>
+        <div class="col-md-12 text-center" ng-show="messageRimborsiNonEsistenti">
+          <h5 translate="elenco-rimborsi-missione.no-result">Nessun Risultato</h5>
+        </div>
     </div>
     </div>
 

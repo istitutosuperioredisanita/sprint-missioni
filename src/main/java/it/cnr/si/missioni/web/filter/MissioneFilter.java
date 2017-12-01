@@ -10,6 +10,7 @@ public class MissioneFilter {
 	private String stato;
 	private String statoFlusso;
 	private String validato;
+	private String giaRimborsato;
 	private Integer anno;
 	private Long daId;
 	private Long aId;
@@ -136,5 +137,11 @@ public class MissioneFilter {
 	}
 	public void setIncludiMissioniAnnullate(String includiMissioniAnnullate) {
 		this.includiMissioniAnnullate = includiMissioniAnnullate;
+	}
+	public String getGiaRimborsato() {
+		return giaRimborsato;
+	}
+	public void setGiaRimborsato(String giaRimborsato) {
+		this.giaRimborsato = giaRimborsato;
 	}
 }
