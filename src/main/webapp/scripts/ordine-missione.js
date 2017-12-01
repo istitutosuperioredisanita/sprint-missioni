@@ -467,8 +467,8 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.impostaGestioneResponsabileGruppo = function(uo){
       DatiIstitutoService.get(uo, $scope.ordineMissioneModel.anno).then(function(data){
         if (data.gestioneRespModulo != null && data.gestioneRespModulo == 'S'){
+            $scope.getRestForResponsabileGruppo(uo);
             $scope.showResponsabile = true;
-            $scope.disableResponsabileGruppo = true;
         } else {
             $scope.showResponsabile = false;
             $scope.ordineMissioneModel.responsabileGruppo = null;
@@ -501,7 +501,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.getRestForResponsabileGruppo = function (uo){
         $scope.disableResponsabileGruppo = true;
         if (uo){
-            var persons = ProxyService.getPersons(uo, true).then(function(result){
+            var persons = ProxyService.getPersonsForCds($scope.ordineMissioneModel.cdsSpesa, uo, true, false).then(function(result){
                 if (result ){
                     $scope.elencoResponsabiliGruppo = result;
                     $scope.disableResponsabileGruppo = false;
@@ -512,7 +512,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.reloadUo = function(uo) {
       $scope.annullaCdr();  
-      $scope.getRestForResponsabileGruppo(uo);
       $scope.impostaGestioneResponsabileGruppo(uo);
       $scope.restCdr(uo, "N");
     }
@@ -670,7 +669,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     $scope.inizializzaFormPerInserimento = function(account){
-        $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'5', nominativo:account.lastName+" "+account.firstName, 
+        $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'1', nominativo:account.lastName+" "+account.firstName, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
                                         datoreLavoroRich:account.struttura_appartenenza, matricola:account.matricola,
@@ -1006,7 +1005,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.restCdr(model.uoSpesa, "S");
                 $scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
-                $scope.getRestForResponsabileGruppo(model.uoSpesa);
                 $scope.restCapitoli(model.anno);
                 $scope.ordineMissioneModel = model;
                 $scope.viewAttachments($scope.ordineMissioneModel.id);
