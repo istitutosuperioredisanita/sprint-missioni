@@ -71,8 +71,12 @@ spring:
                 oggetto: Rimborso Missione reinviato al mittente.
             approvazioneAnticipo:
                 oggetto: Anticipo su Ordine di Missione.
-            variazioneImportoMissionePerResponsabileGruppo:
-                oggetto: Aumento importo Missione di
+            importoMissionePerResponsabileGruppo:
+                oggetto: Comunicazione Importo Rimborso Missione di 
+            approvazioneOrdineMissione:
+                oggetto: Ordine di Missione approvato.
+            approvazioneRimborsoMissione:
+                oggetto: Rimborso Missione approvato.
 
 security:
     basic:

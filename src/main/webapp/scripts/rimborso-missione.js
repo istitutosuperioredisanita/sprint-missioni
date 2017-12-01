@@ -22,6 +22,7 @@ missioniApp.factory('RimborsoMissioneService', function ($resource, DateUtils) {
 missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, RimborsoMissioneService, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, AccessToken,
             ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session) {
 
+    $scope.giaRimborsato = "N";
     var urlRestProxy = URL_REST.STANDARD;
     $scope.today = function() {
         // Today + 1 day - needed if the current day must be included
@@ -110,6 +111,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 }
                 $scope.rimborsoMissioneModel.anticipoRicevuto = "N";
                 $scope.rimborsoMissioneModel.speseTerziRicevute = "N";
+                $scope.rimborsoMissioneModel.rimborso0 = "N";
                 inizializzaForm();
                 $scope.recuperoDatiDivisa();
                 break;
@@ -117,8 +119,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         }
     }
 
-    $scope.restOrdiniMissioneDaRimborsare = function(userWork){
-        ElencoOrdiniMissioneService.findMissioniDaRimborsare(userWork.login).then(function(data){
+    $scope.restOrdiniMissioneDaRimborsare = function(userWork, ordiniGiaRimborsati){
+        ElencoOrdiniMissioneService.findMissioniDaRimborsare(userWork.login, ordiniGiaRimborsati).then(function(data){
             $scope.elencoOrdiniMissione = data;
         });
     }
@@ -771,8 +773,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     var impostadisabilitaRimborsoMissione = function() {
-        if ($scope.esisteRimborsoMissione && ($scope.rimborsoMissioneModel.stato === 'DEF' || $scope.rimborsoMissioneModel.statoFlusso === 'APP' || ($scope.rimborsoMissioneModel.stato === 'CON' && 
-            ($scope.rimborsoMissioneModel.stateFlows === 'ANNULLATO' ||
+        if ($scope.esisteRimborsoMissione && ($scope.rimborsoMissioneModel.stato === 'DEF' || 
+            $scope.rimborsoMissioneModel.statoFlusso === 'APP' || $scope.rimborsoMissioneModel.stato === 'ANN' || 
+            ($scope.rimborsoMissioneModel.stato === 'CON' && 
+               ($scope.rimborsoMissioneModel.stateFlows === 'ANNULLATO' ||
                 $scope.rimborsoMissioneModel.stateFlows === 'FIRMA SPESA RIMBORSO' ||
                 $scope.rimborsoMissioneModel.stateFlows === 'FIRMA UO RIMBORSO' ||
                 $scope.rimborsoMissioneModel.stateFlows === 'FIRMATO')))) {
@@ -962,7 +966,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     var data = $scope.elencoPersone[i];
                     var userWork = ProxyService.buildPerson(data);
                     $scope.recuperoDatiTerzoSigla(userWork);
-                    $scope.restOrdiniMissioneDaRimborsare(userWork);
+                    $scope.restOrdiniMissioneDaRimborsare(userWork, $scope.giaRimborsato);
                     $scope.accountModel = userWork;
                     $sessionStorage.accountWork = userWork;
                 }
@@ -974,9 +978,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       if ($scope.rimborsoMissioneModel.id){
         var dataInizio = null;
         var dataFine = null;
-        if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
+        if ($scope.rimborsoMissioneModel.tipoMissione === 'E' && $scope.rimborsoMissioneModel.trattamento === 'T') {
             if (!$scope.rimborsoMissioneModel.dataInizioEstero || !$scope.rimborsoMissioneModel.dataFineEstero){
-                ui.error("Valorizzare le date inizio e fine attraversamento frontiera.");
+                ui.error("Valorizzare la data di imbarco in partenza e la data di sbarco del ritorno.");
             }
             dataInizio = $scope.rimborsoMissioneModel.dataInizioEstero;
             dataFine = $scope.rimborsoMissioneModel.dataFineEstero;
@@ -1043,6 +1047,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         x.error(function (data) {
             $rootScope.salvataggio = false;
         });
+    }
+
+    $scope.onChangeGiaRimborsato = function (giaRimborsato) {
+        $scope.restOrdiniMissioneDaRimborsare($sessionStorage.accountWork, giaRimborsato);
     }
 
     $scope.viewAttachments = function (idRimborsoMissione) {
@@ -1171,7 +1179,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         } else {
             $scope.accountModel = $sessionStorage.account;
             $sessionStorage.accountWork = $scope.accountModel;
-            $scope.restOrdiniMissioneDaRimborsare($sessionStorage.accountWork);
+            $scope.restOrdiniMissioneDaRimborsare($sessionStorage.accountWork, $scope.giaRimborsato);
             $scope.recuperoDatiTerzoSigla($scope.accountModel);
         }
     }

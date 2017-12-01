@@ -61,13 +61,13 @@ public class ProxyService implements EnvironmentAware{
     
     @Cacheable(value=Costanti.NOME_CACHE_PROXY)
     public ResultProxy processInCache(CallCache callCache)  throws AwesomeException{
-    	log.debug("Process in Cache 2: "+callCache.toString());
+    	log.info("Process in Cache 2: "+callCache.toString());
     	ResultProxy resultProxyForCache = process(callCache.getHttpMethod(), callCache.getBody(), callCache.getApp(), callCache.getUrl(), callCache.getQueryString(), callCache.getAuthorization());
 		return resultProxyForCache(callCache, resultProxyForCache);
     }
 
     public ResultProxy process(CallCache callCache)  throws AwesomeException{
-    	log.debug("Process in Cache 1: "+callCache.toString());
+    	log.info("Process in Cache 1: "+callCache.toString());
     	ResultProxy resultProxyForCache = process(callCache.getHttpMethod(), callCache.getBody(), callCache.getApp(), callCache.getUrl(), callCache.getQueryString(), callCache.getAuthorization());
 		return resultProxyForCache(callCache, resultProxyForCache);
     }

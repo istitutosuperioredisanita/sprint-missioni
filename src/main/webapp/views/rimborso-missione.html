@@ -53,6 +53,16 @@
 
 <div class="row">
   <div class="panel panel-success" ng-hide="rimborsoMissioneModel.id">
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-2">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.ordini-con-rimborsi-diversi">Più rimborsi</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="!modalitaPagamentos || !inquadramento" type="checkbox" ng-model="giaRimborsato" ng-true-value="S" ng-false-value="N" ng-change="onChangeGiaRimborsato(giaRimborsato)">
+                            </label>
+                        </span>
+                </p>
+            </form>
               <form class="form-inline" role="form" id="missioni">
                       <p class="col-md-12">
                           <span class="input-group">
@@ -232,7 +242,7 @@
 
 <div class="panel panel-danger">
   <div class="panel-heading color-rosso-mattone text-center">
-    <h3 class="panel-title color-rosso-mattone" translate="missione.form.box-dati-fin">Informazioni anagrafiche</h3>
+    <h3 class="panel-title color-rosso-mattone" translate="missione.form.box-dati-fin">Dati Finanziari</h3>
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni">
@@ -302,7 +312,7 @@
 
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                    <p class="col-md-2">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
                             <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
@@ -324,12 +334,22 @@
                     </p>
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                    <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
                             <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>
                         </span>
                     </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-2">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.rimborso-importo-0">Rimborso a 0</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.rimborso0" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
@@ -445,7 +465,7 @@
             <div class="col-md-12">
               <ul class="pager" ng-show="showEsisteRimborsoMissione">
                 <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
-                <li><a ng-click="goDettagliSpesa()" translate="rimborso-missione.button.dettagli"></a></li>
+                <li ng-show = "!rimborsoMissioneModel.rimborso0 || rimborsoMissioneModel.rimborso0 != 'S'"><a ng-click="goDettagliSpesa()" translate="rimborso-missione.button.dettagli"></a></li>
               </ul>
             </div>
   </div>
