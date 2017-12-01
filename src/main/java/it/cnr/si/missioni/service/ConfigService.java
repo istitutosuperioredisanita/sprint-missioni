@@ -20,18 +20,26 @@ public class ConfigService {
 	
 	@PostConstruct
 	public void init(){
-		loadData();
+		loadData(true);
 	}
 
 
 	public void reloadConfig() {
-		loadData();
+		evictData();
+		loadData(false);
 	}
 
-	private void loadData() {
+	private void loadData(Boolean fromInit) {
 		dataUsersSpecial = loadFilesService.loadUsersSpecialForUo();
 		datiUo = loadFilesService.loadDatiUo();
-		services = loadFilesService.loadServicesForCache();
+		if (fromInit){
+			services = loadFilesService.loadServicesForCache();
+		}
+	}
+
+	private void evictData() {
+		loadFilesService.evictUsersSpecialForUo();
+		loadFilesService.evictDatiUo();
 	}
 
 	public void reloadUsersSpecialForUo() {

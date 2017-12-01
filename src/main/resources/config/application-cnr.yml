@@ -80,8 +80,8 @@ logging.config: classpath:logback-local.xml
 cron:
     comunicaDati:
         name: comunicaDati
-        active: false
-        cronExpression: "0 */5 * * * MON-SAT"
+        active: true
+        cronExpression: "0 */10 * * * MON-SAT"
 
     evictCache:
         name: evictCache

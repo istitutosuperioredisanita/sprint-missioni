@@ -1,13 +1,32 @@
 package it.cnr.si.missioni.util.proxy.cache.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.util.Introspector;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.service.ConfigService;
-import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -23,29 +42,11 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.cache.CacheManager;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @Service
 public class CacheService implements EnvironmentAware, ApplicationListener<ApplicationReadyEvent> {
 
-    private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
+	private final Logger log = LoggerFactory.getLogger(CacheService.class);
 
 	@Autowired
 	private ProxyService proxyService;
@@ -66,12 +67,15 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 
 	public void loadInCache() {
 		if (configService.getServices()!= null && configService.getServices().getRestService() != null ){
+			log.info("loadInCache: Servizi trovati");
 			for (Iterator<RestService> iteratorRest = configService.getServices().getRestService().iterator(); iteratorRest.hasNext();){
 				RestService rest = iteratorRest.next();
 				if (!Utility.nvl(rest.getSkipLoadStartup(),"N").equals("S")){
 					cacheRestService(rest);
 				}
 			}
+		} else {
+			log.info("loadInCache: Servizi non trovati");
 		}
 	}
 
