@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,10 +15,8 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.DatiSedeService;
