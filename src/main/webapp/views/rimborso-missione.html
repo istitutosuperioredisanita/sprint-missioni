@@ -96,7 +96,7 @@
                 <p class="col-md-6">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" ng-model="rimborsoMissioneModel.trattamento" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
+                          <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" ng-model="rimborsoMissioneModel.trattamento" ng-change="onChangeTrattamento()" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
                         </span>
               </p>
             </form>
@@ -128,7 +128,7 @@
                 <p class="column-in-column col-md-5">
 <cnr-widget-datetime-range id-missione="1" disabilitato="validazione || disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioMissione" end-datetime="rimborsoMissioneModel.dataFineMissione" start-label="{{'rimborso-missione.form.data-inizio-obbligatoria' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'rimborso-missione.form.data-fine-obbligatoria' | translate}}"></cnr-widget-datetime-range>
                 </p>
-                <p class="column-in-column col-md-7" ng-show="missioneEstera">
+                <p class="column-in-column col-md-7" ng-show="missioneEsteraConTam">
 <cnr-widget-datetime-range id-missione="idMissione" disabilitato="validazione || disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioEstero" end-datetime="rimborsoMissioneModel.dataFineEstero" start-label="{{'rimborso-missione.form.data-inizio-frontiera' | translate}}" fn-change="onChangeDateInizioFineFrontiera" end-label="{{'rimborso-missione.form.data-fine-frontiera' | translate}}"></cnr-widget-datetime-range>
                 </p>
             </form>

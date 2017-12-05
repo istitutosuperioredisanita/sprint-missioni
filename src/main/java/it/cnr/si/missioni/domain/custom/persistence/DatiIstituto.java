@@ -54,6 +54,10 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     private String mailNotifiche;
 
     @Size(min = 0, max = 200)
+    @Column(name = "MAIL_NOTIFICHE_RIMBORSO", length = 200, nullable = true)
+    private String mailNotificheRimborso;
+
+    @Size(min = 0, max = 200)
     @Column(name = "RESPONSABILE", length = 200, nullable = true)
     private String responsabile;
 
@@ -175,6 +179,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setResponsabileSoloItalia(String responsabileSoloItalia) {
 		this.responsabileSoloItalia = responsabileSoloItalia;
+	}
+
+	public String getMailNotificheRimborso() {
+		return mailNotificheRimborso;
+	}
+
+	public void setMailNotificheRimborso(String mailNotificheRimborso) {
+		this.mailNotificheRimborso = mailNotificheRimborso;
 	}
 
 }

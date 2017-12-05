@@ -422,10 +422,10 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.le("numero", filter.getaNumero()));
 			}
 			if (filter.getDaData() != null){
-				criterionList.add(Restrictions.ge("dataInserimento", filter.getDaData()));
+				criterionList.add(Restrictions.ge("dataInserimento", DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getaData() != null){
-				criterionList.add(Restrictions.le("dataInserimento", filter.getaData()));
+				criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getCdsRich() != null){
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
@@ -439,8 +439,8 @@ public class OrdineMissioneService {
 			if (filter.getSoloMissioniNonGratuite()){
 				criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita")).add(Restrictions.eq("missioneGratuita", "N")));
 			}
-			if (Utility.nvl(filter.getGiaRimborsato(),"N").equals("N")){
-				criterionList.add(Subqueries.notExists("select rimborso_missione.id from rimborso_missione where rimborso_missione.id_ordine_missione = ordine_missione.id"));
+			if (Utility.nvl(filter.getGiaRimborsato(),"A").equals("N")){
+				criterionList.add(Subqueries.notExists("select rimborsoMissione.id from rimborsoMissione where rimborsoMissione.idOrdineMissione = ordineMissione.id"));
 			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
@@ -515,7 +515,7 @@ public class OrdineMissioneService {
 					condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
 				}
 			}
-			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S")){
+			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S") && (!(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0))){
 				criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
 			}
 

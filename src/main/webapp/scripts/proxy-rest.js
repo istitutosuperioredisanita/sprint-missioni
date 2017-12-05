@@ -1,6 +1,6 @@
 'use strict';
 
-missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, Session, $filter, DirettoreUoService, $q) {
+missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGLA_REST, SIPER_REST, URL_REST, ui, $filter, DirettoreUoService, $q) {
     var today = new Date();
     var dataA = today;
     var calcoloDataDa = function(){
@@ -177,6 +177,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
                     if (terzoPerCompenso.ti_dipendente_altro == 'A'){
                         listaPersons[i].matricola = "";
+                        listaPersons[i].comune_residenza = terzoPerCompenso.ds_comune_fiscale;
                         listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
                     }
                     return listaPersons[i];

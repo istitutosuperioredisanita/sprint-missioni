@@ -36,7 +36,11 @@
     <include file="classpath:config/liquibase/changelog/20171018151400_add_column_responsabile_solo_italia.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171018181400_add_column_altri_motivi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171110181300_add_column_note_respingi.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20171117190000_add_table_dati_sede.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171128090000_add_column_mail_approvazione.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20171201090000_add_column_rimborso0.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20171201190000_add_column_mail_notifiche_rimborso.xml" relativeToChangelogFile="false"/>
+    
 
     <!-- JHipster will add liquibase changelogs here -->
 

@@ -678,6 +678,9 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         if (account.comune_residenza && account.cap_residenza){
             $scope.ordineMissioneModel.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza;
         }
+        if (account.comune_residenza){
+            $scope.ordineMissioneModel.comuneResidenzaRich = account.comune_residenza;
+        }
         if (account.indirizzo_completo_residenza){
             $scope.ordineMissioneModel.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
         }

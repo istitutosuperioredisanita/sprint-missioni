@@ -425,8 +425,8 @@ public class RimborsoMissioneService {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
 		String testoMail = getTextMailSendToAdministrative(basePath, rimborsoMissioneDB);
-		if (dati != null && dati.getMailNotifiche() != null){
-			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
+		if (dati != null && dati.getMailNotificheRimborso() != null){
+			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotificheRimborso());
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
 			sendMailToAdministrative(lista, testoMail, subjectMail);
@@ -643,10 +643,10 @@ public class RimborsoMissioneService {
 				criterionList.add(Restrictions.le("numero", filter.getaNumero()));
 			}
 			if (filter.getDaData() != null){
-				criterionList.add(Restrictions.ge("dataInserimento", filter.getDaData()));
+				criterionList.add(Restrictions.ge("dataInserimento", DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getaData() != null){
-				criterionList.add(Restrictions.le("dataInserimento", filter.getaData()));
+				criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getCdsRich() != null){
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
@@ -740,7 +740,7 @@ public class RimborsoMissioneService {
 					criterionList.add(Restrictions.eq("uid", principal.getName()));
 				}
 			}
-			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S")){
+			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S") && (!(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0))){
 				criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
 			}
 
