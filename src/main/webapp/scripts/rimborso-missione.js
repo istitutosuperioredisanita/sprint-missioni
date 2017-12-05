@@ -210,6 +210,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.objUoSpesa = $scope.uoSpesaSelected;
             }
         }
+        if ($scope.rimborsoMissioneModel.trattamento=== 'R'){
+            $scope.rimborsoMissioneModel.dataInizioEstero = null;
+            $scope.rimborsoMissioneModel.dataFineEstero = null;
+        }
         return $scope.impostaInquadramento();
     }
 
@@ -727,12 +731,32 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
             if (!$scope.rimborsoMissioneModel.trattamento){
                 $scope.rimborsoMissioneModel.trattamento = "R";
+                $scope.missioneEsteraConTam = false;
             }
             $scope.missioneEstera = true;
         } else {
             $scope.rimborsoMissioneModel.trattamento = "R";
             $scope.missioneEstera = null;
+            $scope.missioneEsteraConTam = null;
             $scope.rimborsoMissioneModel.nazione = null;
+            $scope.rimborsoMissioneModel.dataInizioEstero = null;
+            $scope.rimborsoMissioneModel.dataFineEstero = null;
+        }
+    };
+
+    $scope.onChangeTrattamento = function() {
+        if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
+            if ($scope.rimborsoMissioneModel.trattamento=== 'T'){
+                $scope.missioneEsteraConTam = true;
+            } else {
+                $scope.missioneEsteraConTam = false;
+                $scope.rimborsoMissioneModel.dataInizioEstero = null;
+                $scope.rimborsoMissioneModel.dataFineEstero = null;
+            }
+        } else {
+            $scope.rimborsoMissioneModel.dataInizioEstero = null;
+            $scope.rimborsoMissioneModel.dataFineEstero = null;
+            $scope.missioneEsteraConTam = false;
         }
     };
 
@@ -808,7 +832,11 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     var inizializzaForm = function(){
         if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
-            $scope.missioneEstera = true;
+            if ($scope.rimborsoMissioneModel.trattamento === 'T'){
+                $scope.missioneEsteraConTam = true;
+            } else {
+                $scope.missioneEsteraConTam = false;
+            }
         } else {
             $scope.missioneEstera = null;
         }
@@ -832,10 +860,14 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         if (account.comune_residenza && account.cap_residenza){
             $scope.rimborsoMissioneModel.comuneResidenzaRich = account.comune_residenza+" - "+account.cap_residenza;
         }
+        if (account.comune_residenza){
+            $scope.rimborsoMissioneModel.comuneResidenzaRich = account.comune_residenza;
+        }
         if (account.indirizzo_completo_residenza){
             $scope.rimborsoMissioneModel.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
         }
 
+        $scope.missioneEsteraConTam = null;
         $scope.missioneEstera = null;
         $scope.rimborsoMissioneModel.uid = account.login;
         var today = $scope.today();

@@ -56,7 +56,8 @@
             "undo": "Annulla Modifiche",
             "simpleUndo": "Annulla",
             "validate": "Valida",
-            "close": "Chiudi"
+            "close": "Chiudi",
+            "print": "Stampa"
         },
         "messages": {
             "info": {
@@ -415,7 +416,7 @@
             "da-data": "Da Data Inserimento",
             "a-data": "A Data Inserimento",
             "anno": "Anno",
-            "annullati": "Annullati"
+            "annullati": "Includi Annullati"
         },
         "form": {
             "modulo": "Progetto",

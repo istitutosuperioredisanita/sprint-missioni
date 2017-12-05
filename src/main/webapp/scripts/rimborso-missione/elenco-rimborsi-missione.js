@@ -63,8 +63,17 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.rimborsiMissione = null;
+        var daDataFormatted = null;
+        var aDataFormatted = null;
+        if ($scope.daData){
+            daDataFormatted = $filter('date')($scope.daData, "dd/MM/yyyy");
+        }
+        if ($scope.aData){
+            aDataFormatted = $filter('date')($scope.aData, "dd/MM/yyyy");
+        }
+
         ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, 
-                $scope.aNumero, $scope.daData, $scope.aData, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine,
+                $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine,
                 $scope.annullati).then(function(data){
             if (data && data.length > 0){
                 $scope.rimborsiMissione = data;
@@ -95,6 +104,10 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
             }
         }
     }
+
+    $scope.stampa = function () {
+        window.print();
+    };
 
     $scope.reloadUoWork = function(uo){
         $scope.accountModel = null;
