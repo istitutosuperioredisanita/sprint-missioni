@@ -66,7 +66,15 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.ordiniMissione = null;
-        ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, $scope.daData, $scope.aData).then(function(data){
+        var daDataFormatted = null;
+        var aDataFormatted = null;
+        if ($scope.daData){
+            daDataFormatted = $filter('date')($scope.daData, "dd/MM/yyyy");
+        }
+        if ($scope.aData){
+            aDataFormatted = $filter('date')($scope.aData, "dd/MM/yyyy");
+        }
+        ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted).then(function(data){
             if (data && data.length > 0){
                 $scope.ordiniMissione = data;
                 $scope.messageOrdiniNonEsistenti = false;
@@ -80,6 +88,10 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
 
     $scope.doSelectOrdineMissione = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id);
+    };
+
+    $scope.stampa = function () {
+        window.print();
     };
 
     $scope.reloadUserWork = function(uid){
