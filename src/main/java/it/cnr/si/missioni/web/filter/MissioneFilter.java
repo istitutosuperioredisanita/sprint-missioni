@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.web.filter;
 
-import java.util.Date;
 import java.util.List;
 
 public class MissioneFilter {
@@ -17,8 +16,8 @@ public class MissioneFilter {
 	private String includiMissioniAnnullate;
 	private Long daNumero;
 	private Long aNumero;
-	private Date daData;
-	private Date aData;
+	private String daData;
+	private String aData;
 	private String cdsRich;
 	private String uoRich;
 	private String toFinal;
@@ -41,16 +40,16 @@ public class MissioneFilter {
 	public void setCdsRich(String cdsRich) {
 		this.cdsRich = cdsRich;
 	}
-	public Date getDaData() {
+	public String getDaData() {
 		return daData;
 	}
-	public void setDaData(Date daData) {
+	public void setDaData(String daData) {
 		this.daData = daData;
 	}
-	public Date getaData() {
+	public String getaData() {
 		return aData;
 	}
-	public void setaData(Date aData) {
+	public void setaData(String aData) {
 		this.aData = aData;
 	}
 	public Integer getAnno() {

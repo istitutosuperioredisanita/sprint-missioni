@@ -639,10 +639,10 @@ public class RimborsoMissioneService {
 				criterionList.add(Restrictions.le("numero", filter.getaNumero()));
 			}
 			if (filter.getDaData() != null){
-				criterionList.add(Restrictions.ge("dataInserimento", filter.getDaData()));
+				criterionList.add(Restrictions.ge("dataInserimento", DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getaData() != null){
-				criterionList.add(Restrictions.le("dataInserimento", filter.getaData()));
+				criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getCdsRich() != null){
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
