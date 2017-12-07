@@ -72,6 +72,15 @@ public class OrdineMissioneAnticipoService {
 				idMissione);
 
 		if (ordineMissione != null) {
+			return getAnticipo(ordineMissione, valorizzaOrdineMissione);
+		}
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	public OrdineMissioneAnticipo getAnticipo(OrdineMissione ordineMissione, Boolean valorizzaOrdineMissione)
+			throws ComponentException {
+		if (ordineMissione != null) {
 			OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoRepository.getAnticipo(ordineMissione);
 			if (anticipo != null && valorizzaOrdineMissione) {
 				anticipo.setOrdineMissione(ordineMissione);
