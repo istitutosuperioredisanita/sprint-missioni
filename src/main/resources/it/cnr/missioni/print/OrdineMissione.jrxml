@@ -148,6 +148,18 @@
 	<field name="personaleAlSeguito" class="java.lang.String">
 		<fieldDescription><![CDATA[personaleAlSeguito]]></fieldDescription>
 	</field>
+	<field name="missioneGratuita" class="java.lang.String">
+		<fieldDescription><![CDATA[missioneGratuita]]></fieldDescription>
+	</field>
+	<field name="richiestaAutoPropria" class="java.lang.String">
+		<fieldDescription><![CDATA[richiestaAutoPropria]]></fieldDescription>
+	</field>
+	<field name="richiestaAnticipo" class="java.lang.String">
+		<fieldDescription><![CDATA[richiestaAnticipo]]></fieldDescription>
+	</field>
+	<field name="partenzaDaAltro" class="java.lang.String">
+		<fieldDescription><![CDATA[partenzaDaAltro]]></fieldDescription>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -267,14 +279,14 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Missione  </style>"+$F{italiaEstero}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="12" y="64" width="350" height="20" uuid="530a5a12-f715-44d0-ba9b-f86e37bbbfbd"/>
+				<reportElement positionType="Float" x="12" y="64" width="167" height="20" uuid="530a5a12-f715-44d0-ba9b-f86e37bbbfbd"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Partenza Da  </style>"+ $F{partenzaDa}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="372" y="64" width="182" height="20" uuid="692f31c1-c2bd-42f8-ae3d-6a3d9b631a62"/>
+				<reportElement positionType="Float" x="439" y="64" width="115" height="20" uuid="692f31c1-c2bd-42f8-ae3d-6a3d9b631a62"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -313,14 +325,14 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Obbligo di Rientro Giornaliero  </style>"+ $F{obbligoRientro}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="179" y="143" width="165" height="20" uuid="cf3f3018-b718-4776-84df-d783ff0931fd"/>
+				<reportElement positionType="Float" x="125" y="143" width="141" height="20" uuid="cf3f3018-b718-4776-84df-d783ff0931fd"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Utilizzo Auto a Noleggio  </style>"+ $F{utilizzoAutoNoleggio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="13" y="143" width="162" height="20" uuid="aa3b245e-1763-41d6-99b4-84ae08388358"/>
+				<reportElement positionType="Float" x="13" y="143" width="112" height="20" uuid="aa3b245e-1763-41d6-99b4-84ae08388358"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -343,18 +355,41 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Motivazione per l'Utilizzo del Taxi/Auto a Noleggio-Servizio/Personale al Seguito  </style>"+ $F{noteUtilizzoTaxiNoleggio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="12" y="169" width="165" height="20" uuid="124adcfe-f50b-41e5-bce7-8c82fb65ec84"/>
+				<reportElement positionType="Float" x="268" y="143" width="143" height="20" uuid="124adcfe-f50b-41e5-bce7-8c82fb65ec84"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Utilizzo Auto di Servizio  </style>"+ $F{utilizzoAutoServizio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="179" y="169" width="162" height="20" uuid="8ebf9829-1ff1-4130-9bc7-8262fe4b35bc"/>
+				<reportElement positionType="Float" x="17" y="169" width="162" height="20" uuid="8ebf9829-1ff1-4130-9bc7-8262fe4b35bc"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Personale al Seguito  </style>"+ $F{personaleAlSeguito}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="179" y="64" width="260" height="20" uuid="35924cfc-bb30-49ef-9af8-1894f699bbb2">
+					<printWhenExpression><![CDATA[$F{partenzaDa}.equalsIgnoreCase( "A" )]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{partenzaDaAltro}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="411" y="143" width="143" height="20" uuid="1932129c-9861-4a1d-b6cf-0fc52a589637"/>
+				<textElement markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Richiesta Auto Propria  </style>"+ $F{richiestaAutoPropria}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="190" y="169" width="162" height="20" uuid="b3713269-9eca-416f-9965-07da936ff800"/>
+				<textElement markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Richiesta Anticipo </style>"+ $F{richiestaAnticipo}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>

@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissione;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -49,6 +52,9 @@ public class PrintOrdineMissioneService {
 
     @Autowired
     private GaeService gaeService;
+
+    @Autowired
+    private OrdineMissioneService ordineMissioneService;
 
     @Autowired
     private ProgettoService progettoService;
@@ -118,6 +124,7 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setCognomeRich(account.getCognome());
     	printOrdineMissione.setNomeRich(account.getNome());
     	printOrdineMissione.setNote(Utility.nvl(ordineMissione.getNote()));
+    	printOrdineMissione.setPartenzaDaAltro(Utility.nvl(ordineMissione.getPartenzaDaAltro()));
     	printOrdineMissione.setNumero(ordineMissione.getNumero());
     	if (ordineMissione.isMissioneConGiorniDivervi()){
         	printOrdineMissione.setObbligoRientro(ordineMissione.decodeObbligoRientro());
@@ -141,6 +148,21 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setUtilizzoAutoNoleggio(ordineMissione.decodeUtilizzoAutoNoleggio());
     	printOrdineMissione.setUtilizzoTaxi(ordineMissione.decodeUtilizzoTaxi());
     	printOrdineMissione.setUtilizzoAutoServizio(ordineMissione.decodeUtilizzoAutoServizio());
+    	printOrdineMissione.setMissioneGratuita(ordineMissione.decodeMissioneGratuita());
+    	
+		OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
+		if (autoPropria != null){
+			ordineMissione.setUtilizzoAutoPropria(Costanti.SI);
+		} else {
+			ordineMissione.setUtilizzoAutoPropria(Costanti.NO);
+		}
+		OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(ordineMissione);
+		if (anticipo != null){
+			printOrdineMissione.setRichiestaAnticipo(Costanti.SI);
+		} else {
+			printOrdineMissione.setRichiestaAnticipo(Costanti.NO);
+		}
+    	
     	printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
     	printOrdineMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(ordineMissione.getNoteUtilizzoTaxiNoleggio()));
     	printOrdineMissione.setCup(ordineMissione.getCup() == null ? "" : ordineMissione.getCup());

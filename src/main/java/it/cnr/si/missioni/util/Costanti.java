@@ -89,6 +89,8 @@ public class Costanti {
     public final static String TIPO_RIMBORSO_MISSIONE = "R";
     public final static String CODICE_DIVISA_DEFAULT_SIGLA = "EURO";
 	public final static Long NAZIONE_ITALIA_SIGLA = new Long ("1");
+	public final static String SI = "Si";
+	public final static String NO = "No";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
 	
 	public final static Map<String, String> PRIORITA;
@@ -139,8 +141,8 @@ public class Costanti {
     public final static Map<String, String> SI_NO;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
-        aMap.put("S", "Si");
-        aMap.put("N", "No");
+        aMap.put("S", SI);
+        aMap.put("N", NO);
         SI_NO = Collections.unmodifiableMap(aMap);
     }
 
