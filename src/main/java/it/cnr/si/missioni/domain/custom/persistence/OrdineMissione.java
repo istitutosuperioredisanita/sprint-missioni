@@ -944,6 +944,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     	return false;
     }
 
+	@Transient
+	public String decodeMissioneGratuita(){
+		if (!StringUtils.isEmpty(getMissioneGratuita())){
+			return Costanti.SI_NO.get(getMissioneGratuita());
+		}
+		return "";
+	}
+	
 	public String getNoteUtilizzoTaxiNoleggio() {
 		return noteUtilizzoTaxiNoleggio;
 	}

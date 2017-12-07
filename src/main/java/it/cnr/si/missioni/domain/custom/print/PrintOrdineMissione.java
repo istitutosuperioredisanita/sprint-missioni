@@ -15,7 +15,15 @@ public class PrintOrdineMissione extends PrintMissione{
 
     private String importoPresunto;
 
-	public String getObbligoRientro() {
+    public String missioneGratuita;
+
+    public String richiestaAutoPropria;
+
+    public String richiestaAnticipo;
+
+    public String partenzaDaAltro;
+
+    public String getObbligoRientro() {
 		return obbligoRientro;
 	}
 
@@ -61,6 +69,38 @@ public class PrintOrdineMissione extends PrintMissione{
 
 	public void setImportoPresunto(String importoPresunto) {
 		this.importoPresunto = importoPresunto;
+	}
+
+	public String getPartenzaDaAltro() {
+		return partenzaDaAltro;
+	}
+
+	public void setPartenzaDaAltro(String partenzaDaAltro) {
+		this.partenzaDaAltro = partenzaDaAltro;
+	}
+
+	public String getMissioneGratuita() {
+		return missioneGratuita;
+	}
+
+	public void setMissioneGratuita(String missioneGratuita) {
+		this.missioneGratuita = missioneGratuita;
+	}
+
+	public String getRichiestaAutoPropria() {
+		return richiestaAutoPropria;
+	}
+
+	public void setRichiestaAutoPropria(String richiestaAutoPropria) {
+		this.richiestaAutoPropria = richiestaAutoPropria;
+	}
+
+	public String getRichiestaAnticipo() {
+		return richiestaAnticipo;
+	}
+
+	public void setRichiestaAnticipo(String richiestaAnticipo) {
+		this.richiestaAnticipo = richiestaAnticipo;
 	}
 
 }

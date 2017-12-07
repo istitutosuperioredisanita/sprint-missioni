@@ -320,6 +320,11 @@ public class OrdineMissioneService {
 		return ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissioneDaAggiornare.getId().toString()));
 	}
 
+	public OrdineMissioneAnticipo getAnticipo(OrdineMissione ordineMissioneDaAggiornare)
+			throws ComponentException {
+		return ordineMissioneAnticipoService.getAnticipo(ordineMissioneDaAggiornare, false);
+	}
+
 	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
