@@ -19,6 +19,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.security.Principal;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -73,6 +74,9 @@ public class CronService {
 	@Autowired
 	private FlowsService flowsService;
 	
+    @Autowired
+    private DatiIstitutoService datiIstitutoService;
+
 	@Autowired
 	private CacheService cacheService;
 	
@@ -207,16 +211,18 @@ public class CronService {
 		}
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
-				try {
-					comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
-				} catch (Exception e) {
-					String error = Utility.getMessageException(e);
-					String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
-					LOGGER.error(testoErrore+" "+e);
+				if (rimborsoMissioneService.isMissioneComunicabileSigla(rimborsoMissione)){
 					try {
-						mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
-					} catch (Exception e1) {
-						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+						comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
+					} catch (Exception e) {
+						String error = Utility.getMessageException(e);
+						String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
+						LOGGER.error(testoErrore+" "+e);
+						try {
+							mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
+						} catch (Exception e1) {
+							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+						}
 					}
 				}
 			}

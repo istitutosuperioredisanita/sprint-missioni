@@ -2,6 +2,7 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ import org.springframework.util.StringUtils;
  */
 @Entity
 @Table(name = "DATI_ISTITUTO")
-public class DatiIstituto extends OggettoBulkXmlTransient implements Serializable {
+public class DatiIstituto extends OggettoBulkXmlTransient implements Serializable, Cloneable {
 
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
@@ -64,6 +65,12 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Size(min = 0, max = 1)
     @Column(name = "RESPONSABILE_SOLO_ITALIA", length = 1, nullable = true)
     private String responsabileSoloItalia;
+
+    @Column(name = "DATA_BLOCCO_RIMBORSI_TAM", nullable = true)
+    public LocalDate dataBloccoRimborsiTam;
+
+    @Column(name = "DATA_BLOCCO_RIMBORSI", nullable = true)
+    public LocalDate dataBloccoRimborsi;
 
 	public void setId(Long id) {
 		this.id = id;
@@ -189,4 +196,21 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 		this.mailNotificheRimborso = mailNotificheRimborso;
 	}
 
+	public LocalDate getDataBloccoRimborsiTam() {
+		return dataBloccoRimborsiTam;
+	}
+	public void setDataBloccoRimborsiTam(LocalDate dataBloccoRimborsiTam) {
+		this.dataBloccoRimborsiTam = dataBloccoRimborsiTam;
+	}
+	public LocalDate getDataBloccoRimborsi() {
+		return dataBloccoRimborsi;
+	}
+	public void setDataBloccoRimborsi(LocalDate dataBloccoRimborsi) {
+		this.dataBloccoRimborsi = dataBloccoRimborsi;
+	}
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+
+	    return super.clone();
+	}
 }
