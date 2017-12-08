@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
+import java.util.List;
 
 /**
  * Spring Data JPA repository for the AutoPropria entity.
@@ -19,4 +20,7 @@ public interface DatiIstitutoRepository extends
 
 	@Query("select a from DatiIstituto a where a.istituto = ?1 and a.anno = ?2")
 	DatiIstituto getDatiIstituto(String istituto, Integer anno);
+
+	@Query("select a from DatiIstituto a where a.anno = ?1")
+	List<DatiIstituto> getDatiIstituti(Integer anno);
 }
