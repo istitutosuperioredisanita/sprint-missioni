@@ -40,7 +40,7 @@
     <include file="classpath:config/liquibase/changelog/20171128090000_add_column_mail_approvazione.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171201090000_add_column_rimborso0.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171201190000_add_column_mail_notifiche_rimborso.xml" relativeToChangelogFile="false"/>
-    
+    <include file="classpath:config/liquibase/changelog/20171207190000_add_column_date_blocco_rimborso.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

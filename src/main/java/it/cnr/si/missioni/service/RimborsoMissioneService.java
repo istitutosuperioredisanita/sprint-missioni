@@ -773,9 +773,6 @@ public class RimborsoMissioneService {
     		RimborsoMissione rimborsoMissione) throws ComponentException{
     	rimborsoMissione.setUidInsert(principal.getName());
     	rimborsoMissione.setUser(principal.getName());
-    	Integer anno = recuperoAnno(rimborsoMissione);
-    	rimborsoMissione.setAnno(anno);
-    	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
     	if (StringUtils.isEmpty(rimborsoMissione.getTrattamento())){
     		rimborsoMissione.setTrattamento("R");
     	}
@@ -803,6 +800,13 @@ public class RimborsoMissioneService {
     		rimborsoMissione.setRimborso0("N");
     	}
     	
+    	Integer anno = recuperoAnno(rimborsoMissione);
+    	if (!isMissioneComunicabileSigla(rimborsoMissione)){
+    		anno = anno + 1;
+    	}
+    	rimborsoMissione.setAnno(anno);
+    	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
+
     	aggiornaValidazione(principal, rimborsoMissione);
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
@@ -1372,6 +1376,26 @@ public class RimborsoMissioneService {
 		}
 		buffer.append(label+Utility.nvl(value));
 		return buffer;
+	}
+	public Boolean isMissioneComunicabileSigla(RimborsoMissione rimborsoMissione){
+		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+			if (dati.getDataBloccoRimborsiTam() != null){
+				LocalDate data = LocalDate.now();
+				if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
+					return false;
+				}
+			}
+		} 
+		if (dati.getDataBloccoRimborsi() != null){
+			LocalDate data = LocalDate.now();
+			if (dati.getDataBloccoRimborsi().compareTo(data) < 0){
+				return false;
+			}
+			return true;
+		} else {
+			return true;
+		}
 	}
 }
 
