@@ -167,7 +167,7 @@ public class PrintRimborsoMissioneService {
         	printRimborsoMissione.setNumeroMandato("");
     	}
     	printRimborsoMissione.setSpeseTerzi(rimborsoMissione.getSpeseTerziRicevute());
-    	printRimborsoMissione.setRimborso0(rimborsoMissione.getRimborso0());
+    	printRimborsoMissione.setImporto0(rimborsoMissione.getRimborso0());
     	if (rimborsoMissione.getSpeseTerziImporto() != null){
         	printRimborsoMissione.setSpeseTerziImporto(Utility.numberFormat(rimborsoMissione.getSpeseTerziImporto()));
     	} else {
@@ -212,6 +212,7 @@ public class PrintRimborsoMissioneService {
     	printRimborsoMissione.setUtilizzoAutoServizio(rimborsoMissione.decodeUtilizzoAutoServizio());
     	printRimborsoMissione.setPersonaleAlSeguito(rimborsoMissione.decodePersonaleAlSeguito());
     	printRimborsoMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(rimborsoMissione.getNoteUtilizzoTaxiNoleggio()));
+    	printRimborsoMissione.setNote(Utility.nvl(rimborsoMissione.getNote()));
 		printRimborsoMissione.setTotMissione(Utility.numberFormat(totMissione));
     	printRimborsoMissione.setCup(rimborsoMissione.getCup() == null ? "" : rimborsoMissione.getCup());
 		return printRimborsoMissione; 
