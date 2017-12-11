@@ -13,7 +13,7 @@
     <scm>
         <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-missioni.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-missioni.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>sprint-missioni-3.0.69</tag>
     </scm>
     <properties>
         <assertj-core.version>3.5.2</assertj-core.version>
