@@ -300,7 +300,12 @@ public class AccountService {
 					if (StringUtils.isEmpty(dati.getSedeRespEstero())){
 						userNameFirmatario = getDirectorFromSede(dati.getCodiceSede());		
 					} else {
-						userNameFirmatario = getDirectorFromSede(dati.getSedeRespEstero());		
+						DatiSede datiAltraSede = datiSedeService.getDatiSede(dati.getSedeRespEstero(), data);
+						if (datiAltraSede != null && datiAltraSede.getResponsabile() != null){
+							userNameFirmatario = datiAltraSede.getResponsabile();
+						} else {
+							userNameFirmatario = getDirectorFromSede(dati.getSedeRespEstero());		
+						}
 					}
 				}
 			} else {

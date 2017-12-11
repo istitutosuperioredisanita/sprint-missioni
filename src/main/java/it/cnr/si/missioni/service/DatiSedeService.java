@@ -24,7 +24,12 @@ public class DatiSedeService {
     private DatiSedeRepository datiSedeRepository;
 
     @Transactional(readOnly = true)
-    public DatiSede getDatiSede(String sede, ZonedDateTime data) {
+    public DatiSede getDatiSede(String sede, LocalDate data) {
         return datiSedeRepository.getDatiSede(sede, data);
+    }
+
+    @Transactional(readOnly = true)
+    public DatiSede getDatiSede(String sede, ZonedDateTime data) {
+        return getDatiSede(sede, data.toLocalDate());
     }
 }

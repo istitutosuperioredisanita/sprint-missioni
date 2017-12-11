@@ -59,6 +59,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     private String mailNotificheRimborso;
 
     @Size(min = 0, max = 200)
+    @Column(name = "MAIL_DOPO_ORDINE", length = 200, nullable = true)
+    private String mailDopoOrdine;
+
+    @Size(min = 0, max = 200)
+    @Column(name = "MAIL_DOPO_RIMBORSO", length = 200, nullable = true)
+    private String mailDopoRimborso;
+
+    @Size(min = 0, max = 200)
     @Column(name = "RESPONSABILE", length = 200, nullable = true)
     private String responsabile;
 
@@ -71,6 +79,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
     @Column(name = "DATA_BLOCCO_RIMBORSI", nullable = true)
     public LocalDate dataBloccoRimborsi;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "TIPO_MAIL_DOPO_ORDINE", length = 1, nullable = true)
+    private String tipoMailDopoOrdine;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "TIPO_MAIL_DOPO_RIMBORSO", length = 1, nullable = true)
+    private String tipoMailDopoRimborso;
 
 	public void setId(Long id) {
 		this.id = id;
@@ -213,4 +229,37 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	    return super.clone();
 	}
+
+	public String getMailDopoOrdine() {
+		return mailDopoOrdine;
+	}
+
+	public void setMailDopoOrdine(String mailDopoOrdine) {
+		this.mailDopoOrdine = mailDopoOrdine;
+	}
+
+	public String getMailDopoRimborso() {
+		return mailDopoRimborso;
+	}
+
+	public void setMailDopoRimborso(String mailDopoRimborso) {
+		this.mailDopoRimborso = mailDopoRimborso;
+	}
+
+	public String getTipoMailDopoOrdine() {
+		return tipoMailDopoOrdine;
+	}
+
+	public void setTipoMailDopoOrdine(String tipoMailDopoOrdine) {
+		this.tipoMailDopoOrdine = tipoMailDopoOrdine;
+	}
+
+	public String getTipoMailDopoRimborso() {
+		return tipoMailDopoRimborso;
+	}
+
+	public void setTipoMailDopoRimborso(String tipoMailDopoRimborso) {
+		this.tipoMailDopoRimborso = tipoMailDopoRimborso;
+	}
+
 }

@@ -29,7 +29,7 @@ public class Costanti {
 	public final static String REST_ACCOUNT = "json/userinfo/";
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String REST_UO_TIT_CA = "titCa=";
-	public final static String REST_UO_SEDE = "sedeId";
+	public final static String REST_UO_SEDE = "sedeId=";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
@@ -89,7 +89,7 @@ public class Costanti {
     public final static String TIPO_RIMBORSO_MISSIONE = "R";
     public final static String CODICE_DIVISA_DEFAULT_SIGLA = "EURO";
 	public final static Long NAZIONE_ITALIA_SIGLA = new Long ("1");
-	public final static String SI = "Si";
+	public final static String SI = "Sì";
 	public final static String NO = "No";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
 	

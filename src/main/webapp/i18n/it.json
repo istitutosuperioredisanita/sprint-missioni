@@ -729,6 +729,7 @@
     "config": {
         "title": "Aggiorna i files di Configurazione",
         "refresh.button": "Aggiorna",
+        "ribalta-dati-istituti.button": "Ribalta Dati per UO",
         "refreshCache.button": "Aggiorna Cache Servizi REST"
     },
     "configuration": {

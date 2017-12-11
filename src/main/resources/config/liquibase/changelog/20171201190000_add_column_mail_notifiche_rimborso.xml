@@ -3,10 +3,19 @@
     <changeSet author="missioni" id="20171201190000">
     	<addColumn 
             tableName="DATI_ISTITUTO">
-            <column name="DATA_BLOCCO_RIMBORSI" type="date">
+            <column name="MAIL_NOTIFICHE_RIMBORSO" type="character varying(200)">
                 <constraints nullable="true"/>
             </column>
-            <column name="DATA_BLOCCO_RIMBORSI_TAM" type="date">
+            <column name="MAIL_DOPO_RIMBORSO" type="character varying(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="MAIL_DOPO_ORDINE" type="character varying(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TIPO_MAIL_DOPO_ORDINE" type="character varying(1)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TIPO_MAIL_DOPO_RIMBORSO" type="character varying(1)">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>

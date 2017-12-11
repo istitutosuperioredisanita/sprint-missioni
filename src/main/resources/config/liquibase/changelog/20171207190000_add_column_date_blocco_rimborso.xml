@@ -3,7 +3,10 @@
     <changeSet author="missioni" id="20171207190000">
     	<addColumn 
             tableName="DATI_ISTITUTO">
-            <column name="MAIL_NOTIFICHE_RIMBORSO" type="character varying(200)">
+            <column name="DATA_BLOCCO_RIMBORSI" type="date">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DATA_BLOCCO_RIMBORSI_TAM" type="date">
                 <constraints nullable="true"/>
             </column>
     	</addColumn>
