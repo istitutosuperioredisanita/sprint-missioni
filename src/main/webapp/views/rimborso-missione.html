@@ -2,7 +2,7 @@
 
   <h4 center translate="rimborso-missione.title">Rimborso missione</h4>
   <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.id" align="center">
-                <b>{{'missione.form.numero' | translate}}:</b> {{rimborsoMissioneModel.numero}}  --  
+                <b>{{'missione.form.numero' | translate}}:</b> {{rimborsoMissioneModel.anno+"/"+rimborsoMissioneModel.numero}}  --  
                 <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  --  
                 <b>  {{'missione.form.stato' | translate}}: </b>{{rimborsoMissioneModel.decodeStato}}  --  
                 <span ng-show="rimborsoMissioneModel.statoFlusso && rimborsoMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}  --  
@@ -53,7 +53,7 @@
 
 <div class="row">
   <div class="panel panel-success" ng-hide="rimborsoMissioneModel.id">
-            <form class="form-inline" role="form" id="missioni">
+<!--            <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-2">
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.ordini-con-rimborsi-diversi">Più rimborsi</span>
@@ -62,7 +62,7 @@
                             </label>
                         </span>
                 </p>
-            </form>
+            </form> -->
               <form class="form-inline" role="form" id="missioni">
                       <p class="col-md-12">
                           <span class="input-group">
@@ -312,7 +312,7 @@
 
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-2">
+                    <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
                             <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
@@ -334,7 +334,7 @@
                     </p>
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                    <p class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
                             <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>

@@ -11,4 +11,9 @@
             $scope.successRefresh = true;
         });
      }
+     $scope.ribaltaDatiIstituti = function() {
+        $http.get('api/rest/datiIstituto/ribalta').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
  });

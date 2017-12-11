@@ -82,6 +82,6 @@ public class ConfigResource {
 	@Timed
 	public void reloadConfigRestServicesForCache() {
 		log.debug("REST request per ricaricare la configurazione di dei Servizi Rest in Cache da Alfresco");
-		configService.reloadServicesForCache();;
+		configService.reloadServicesForCache();
 	}
 }

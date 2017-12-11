@@ -152,9 +152,9 @@ public class PrintOrdineMissioneService {
     	
 		OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
 		if (autoPropria != null){
-			ordineMissione.setUtilizzoAutoPropria(Costanti.SI);
+			printOrdineMissione.setRichiestaAutoPropria(Costanti.SI);
 		} else {
-			ordineMissione.setUtilizzoAutoPropria(Costanti.NO);
+			printOrdineMissione.setRichiestaAutoPropria(Costanti.NO);
 		}
 		OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(ordineMissione);
 		if (anticipo != null){

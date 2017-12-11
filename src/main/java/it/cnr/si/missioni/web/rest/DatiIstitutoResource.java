@@ -122,4 +122,13 @@ public class DatiIstitutoResource {
 		}
 	}
 
+	@RequestMapping(value = "/rest/datiIstituto/ribalta",
+			method = RequestMethod.GET)
+	@Timed
+	public void ribalta() {
+		log.debug("REST request per ribaltare i dati istituto");
+		datiIstitutoService.ribaltaDatiIstituti((Principal) SecurityUtils.getCurrentUser());
+		log.debug("END REST request per ribaltare i dati istituto");
+	}
+
 }

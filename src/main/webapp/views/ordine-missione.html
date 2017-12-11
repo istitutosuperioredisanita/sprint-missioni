@@ -2,7 +2,7 @@
 
   <h4 center translate="ordine-missione.title">Ordine di missione</b></h4>
   <div  class="my-panel-body panel panel-success" ng-show="ordineMissioneModel.id" align="center">
-                <b>{{'missione.form.numero' | translate}}:</b> {{ordineMissioneModel.numero}}  -  
+                <b>{{'missione.form.numero' | translate}}:</b> {{ordineMissioneModel.anno+"/"+ordineMissioneModel.numero}}  -  
                 <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{ordineMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  -  
                 <b>  {{'missione.form.stato' | translate}}: </b>{{ordineMissioneModel.decodeStato}}  -  
                 <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{ordineMissioneModel.decodeStatoFlusso}}
