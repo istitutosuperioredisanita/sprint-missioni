@@ -3,6 +3,7 @@ package it.cnr.si.missioni.service;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
@@ -105,8 +107,8 @@ public class RimborsoMissioneDettagliService {
 	}
 
 	private void validaCRUD(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws ComponentException {
+		RimborsoMissione rimborsoMissione = rimborsoMissioneDettagli.getRimborsoMissione();
 		if (rimborsoMissioneDettagli.getKmPercorsi() != null){
-			RimborsoMissione rimborsoMissione = rimborsoMissioneDettagli.getRimborsoMissione();
 	    	if (rimborsoMissione.getOrdineMissione() != null){
 	        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
 	        	if (ordineMissione != null){
@@ -116,6 +118,19 @@ public class RimborsoMissioneDettagliService {
 	    			}
 	        	}
 	    	}
+		} else {
+//			if (rimborsoMissioneDettagli.isDettaglioPasto()){
+//				GregorianCalendar calFrom = DateUtils.getDate(rimborsoMissione.getDataInizioMissione());
+//				GregorianCalendar calTo = DateUtils.getDate(rimborsoMissione.getDataFineMissione());
+//				if (!((calFrom.get(GregorianCalendar.YEAR) < calTo.get(GregorianCalendar.YEAR)) || 
+//					(calFrom.get(GregorianCalendar.MONTH) < calTo.get(GregorianCalendar.MONTH))||
+//					(calFrom.get(GregorianCalendar.DAY_OF_MONTH) < calTo.get(GregorianCalendar.DAY_OF_MONTH))||
+//					(calTo.get(GregorianCalendar.HOUR_OF_DAY) - calFrom.get(GregorianCalendar.HOUR_OF_DAY) > 8) || 
+//					(calTo.get(GregorianCalendar.HOUR_OF_DAY) - calFrom.get(GregorianCalendar.HOUR_OF_DAY) == 7 &&
+//					calTo.get(GregorianCalendar.MINUTE) - calFrom.get(GregorianCalendar.MINUTE) >= 0))){
+//					return true;
+//				}
+//			}
 		}
 		validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
 	}
@@ -215,7 +230,13 @@ public class RimborsoMissioneDettagliService {
 				.findById(principal, RimborsoMissioneDettagli.class, rimborsoMissioneDettagli.getId());
 		if (rimborsoMissioneDettagliDB == null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Rimborso Missione da aggiornare inesistente.");
-		rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissioneDettagli.getRimborsoMissione());
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
+				RimborsoMissione.class, rimborsoMissioneDettagli.getRimborsoMissione().getId());
+		if (rimborsoMissione != null) {
+			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissione);
+		}
+		rimborsoMissioneDettagli.setRimborsoMissione(rimborsoMissione);
+
 		controlloDatiObbligatoriDaGui(rimborsoMissioneDettagli);
 
 		rimborsoMissioneDettagliDB.setCdTiPasto(rimborsoMissioneDettagli.getCdTiPasto());
