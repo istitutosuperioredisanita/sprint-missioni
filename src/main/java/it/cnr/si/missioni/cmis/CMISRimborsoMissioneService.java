@@ -660,14 +660,39 @@ public class CMISRimborsoMissioneService {
 
 	private void aggiungiAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs) {
 		List<CMISFileAttachment> allegatiRimborsoMissione = getAttachmentsRimborsoMissione(rimborsoMissione, new Long(rimborsoMissione.getId().toString()));
+		List<String> list = new ArrayList<>();
+		List<String> listName = new ArrayList<>();
 		if (allegatiRimborsoMissione != null && !allegatiRimborsoMissione.isEmpty()){
 			for (CMISFileAttachment cmisFileAttachment : allegatiRimborsoMissione){
 				if (nodeRefs.length() > 0){
 					 nodeRefs.append(",");
 				}
+				list.add(cmisFileAttachment.getNodeRef());
+				listName.add(cmisFileAttachment.getNomeFile());
 				nodeRefs.append(cmisFileAttachment.getNodeRef());
 			}
-		 }
+		}
+		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
+			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
+				ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
+				if (children != null){
+					for (CmisObject object : children){
+				    	Document doc = (Document)object;
+				    	String nodeRef = (String)doc.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF);
+				    	String nodeName = (String)doc.getPropertyValue(PropertyIds.NAME);
+				    	if (!list.contains(nodeRef) && !listName.contains(nodeName)){
+							aggiungiDocumento(nodeRef, nodeRefs);
+							list.add(nodeRef);
+							listName.add(nodeName);
+				    	}
+				    }
+				} else {
+					if (dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())){
+						throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
+					}
+				}
+			}
+		}
 	}
 
 	private void avviaFlusso(RimborsoMissione rimborsoMissione, StringWriter stringWriter, ObjectMapper mapper) {
