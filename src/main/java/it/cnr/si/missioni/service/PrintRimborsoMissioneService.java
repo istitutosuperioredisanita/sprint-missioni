@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,7 +68,9 @@ public class PrintRimborsoMissioneService {
     private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
-		Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), rimborsoMissione.getAnno(), rimborsoMissione.getUoSpesa());
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+		Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), anno, rimborsoMissione.getUoSpesa());
 		Voce voce = voceService.loadVoce(rimborsoMissione);
 		Gae gae = gaeService.loadGae(rimborsoMissione);
     	PrintRimborsoMissione printRimborsoMissione = new PrintRimborsoMissione();

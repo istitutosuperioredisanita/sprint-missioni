@@ -11,6 +11,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.GaeJson;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,11 @@ public class GaeService {
     private CommonService commonService;
 
 	public Gae loadGae(RimborsoMissione rimborsoMissione) throws AwesomeException {
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+
 		if (rimborsoMissione.getGae() != null){
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getGae(), rimborsoMissione.getAnno(), rimborsoMissione.getCdrSpesa());
+			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getGae(), anno, rimborsoMissione.getCdrSpesa());
 			List<JSONClause> clausesAdd = prepareJSONClauseToAdd(rimborsoMissione.getCdsSpesa());
 			return loadGae(clauses, clausesAdd);
 		}

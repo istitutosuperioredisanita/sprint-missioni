@@ -977,7 +977,10 @@ public class RimborsoMissioneService {
 	}
 
 	private void controlloDatiFinanziari(Principal principal, RimborsoMissione rimborsoMissione) {
-    	UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno());
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+
+    	UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getCdsSpesa(), anno);
     	if (uo == null){
     		throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La UO "+ rimborsoMissione.getUoSpesa() + " non è corretta rispetto al CDS "+rimborsoMissione.getCdsSpesa());
     	}
@@ -988,7 +991,7 @@ public class RimborsoMissioneService {
 			}
 		}
 		if (!StringUtils.isEmpty(rimborsoMissione.getPgProgetto())){
-			Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), rimborsoMissione.getAnno(), rimborsoMissione.getUoSpesa());
+			Progetto progetto = progettoService.loadModulo(rimborsoMissione.getPgProgetto(), anno, rimborsoMissione.getUoSpesa());
 			if (progetto == null){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Il modulo indicato non è corretto rispetto alla UO "+rimborsoMissione.getUoSpesa());
 			}
@@ -1349,6 +1352,9 @@ public class RimborsoMissioneService {
 
 	private void aggiungiDifferenzaOrdineRimborsoDatiFin(RimborsoMissione rimborso, StringBuilder buffer,
 			OrdineMissione ordine) {
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+
 		if (isDiverso(rimborso.getUoSpesa(), ordine.getUoSpesa())){
 			aggiungiDifferenza(buffer, "UO Spesa. ", null);
 		}
@@ -1362,7 +1368,7 @@ public class RimborsoMissioneService {
 			aggiungiDifferenza(buffer, "GAE. ", null);
 		}
 		if (isDiverso(rimborso.getPgProgetto(), ordine.getPgProgetto())){
-			Progetto progetto = progettoService.loadModulo(rimborso.getPgProgetto(), rimborso.getAnno(), rimborso.getUoSpesa());
+			Progetto progetto = progettoService.loadModulo(rimborso.getPgProgetto(), anno, rimborso.getUoSpesa());
 			if (progetto != null){
 				aggiungiDifferenza(buffer, "Progetto. ", null);
 			}
@@ -1424,23 +1430,26 @@ public class RimborsoMissioneService {
 		return buffer;
 	}
 	public Boolean isMissioneComunicabileSigla(RimborsoMissione rimborsoMissione){
-		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
-		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
-			if (dati.getDataBloccoRimborsiTam() != null){
-				LocalDate data = LocalDate.now();
-				if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
+		LocalDate data = LocalDate.now();
+		if (data.getYear() == rimborsoMissione.getAnno()){
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+				if (dati.getDataBloccoRimborsiTam() != null){
+					if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
+						return false;
+					}
+				}
+			} 
+			if (dati.getDataBloccoRimborsi() != null){
+				if (dati.getDataBloccoRimborsi().compareTo(data) < 0){
 					return false;
 				}
+				return true;
+			} else {
+				return true;
 			}
-		} 
-		if (dati.getDataBloccoRimborsi() != null){
-			LocalDate data = LocalDate.now();
-			if (dati.getDataBloccoRimborsi().compareTo(data) < 0){
-				return false;
-			}
-			return true;
 		} else {
-			return true;
+			return false;
 		}
 	}
 	private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
