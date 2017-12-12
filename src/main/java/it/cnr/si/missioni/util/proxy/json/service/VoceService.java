@@ -10,6 +10,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.Voce;
 import it.cnr.si.missioni.util.proxy.json.object.VoceJson;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +77,10 @@ public class VoceService {
 	}
 
 	public List<JSONClause> prepareJSONClause(RimborsoMissione rimborsoMissione) {
-		return prepareJSONClause(rimborsoMissione.getAnno(), rimborsoMissione.getVoce());
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+
+		return prepareJSONClause(anno, rimborsoMissione.getVoce());
 	}
 
 	public List<JSONClause> prepareJSONClause(Integer anno, String cdVoce) {

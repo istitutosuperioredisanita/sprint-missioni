@@ -10,6 +10,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGaeJson;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,10 @@ public class ImpegnoGaeService {
 
 	public ImpegnoGae loadImpegno(RimborsoMissione rimborsoMissione) throws AwesomeException {
 		if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getAnno(), rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione(), rimborsoMissione.getGae());
+			LocalDate data = LocalDate.now();
+			int anno = data.getYear();
+
+			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getCdsSpesa(), anno, rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione(), rimborsoMissione.getGae());
 			return loadImpegno(clauses);
 		}
 		return null;

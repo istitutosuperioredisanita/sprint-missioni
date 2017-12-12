@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -347,6 +348,7 @@ public class CMISOrdineMissioneService {
 		aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);
 		aspectsToAdd.add(CMISMissioniAspect.ORDINE_MISSIONE_ASPECT.value());
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName);
+				
 		return cmisPath;
 	}
 	
