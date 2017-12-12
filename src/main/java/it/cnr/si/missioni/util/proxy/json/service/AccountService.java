@@ -218,7 +218,7 @@ public class AccountService {
 	}
 
 	public String getDirectorFromUo(String uo) {
-		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+uo+"&userinfo=true&ruolo=resp", null, null);
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+Utility.replace(uo, ".", "")+"&userinfo=true&ruolo=resp", null, null);
 		ResultProxy result = proxyService.processInCache(callCache);
 		String risposta = result.getBody();
 		try {
