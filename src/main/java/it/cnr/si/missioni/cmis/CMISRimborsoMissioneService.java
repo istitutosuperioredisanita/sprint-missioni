@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -176,11 +177,14 @@ public class CMISRimborsoMissioneService {
 		Voce voce = voceService.loadVoce(rimborsoMissione);
 		Gae gae = gaeService.loadGae(rimborsoMissione);
 		UnitaOrganizzativa uoCompetenza = null;
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+
 		if (rimborsoMissione.getUoCompetenza() != null){
-			uoCompetenza = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoCompetenza(), null, rimborsoMissione.getAnno());
+			uoCompetenza = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoCompetenza(), null, anno);
 		}
-		UnitaOrganizzativa uoSpesa = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoSpesa(), null, rimborsoMissione.getAnno());
-		UnitaOrganizzativa uoRich = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoRich(), null, rimborsoMissione.getAnno());
+		UnitaOrganizzativa uoSpesa = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoSpesa(), null, anno);
+		UnitaOrganizzativa uoRich = unitaOrganizzativaService.loadUo(rimborsoMissione.getUoRich(), null, anno);
 		String descrImpegno = ""; 
 		BigDecimal dispImpegno = null;
 		if (rimborsoMissione.getPgObbligazione() != null){
