@@ -579,23 +579,24 @@ public class CMISOrdineMissioneService {
 			try {
 				if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
 					ordineMissioneService.popolaCoda(ordineMissione);
-				}
-				Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
-				TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-				HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
-				String idFlusso = null;
+				} else {
+					Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
+					TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+					HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
+					String idFlusso = null;
 
-				String text = mapRichiedente.get("persistedObject").toString();
-				String patternString1 = "id=(activiti\\$[0-9]+)";
+					String text = mapRichiedente.get("persistedObject").toString();
+					String patternString1 = "id=(activiti\\$[0-9]+)";
 
-				Pattern pattern = Pattern.compile(patternString1);
-				Matcher matcher = pattern.matcher(text);
-				if (matcher.find())
-					idFlusso = matcher.group(1);
-				ordineMissione.setIdFlusso(idFlusso);
-				ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-				if (anticipo != null){
-					anticipo.setIdFlusso(idFlusso);
+					Pattern pattern = Pattern.compile(patternString1);
+					Matcher matcher = pattern.matcher(text);
+					if (matcher.find())
+						idFlusso = matcher.group(1);
+					ordineMissione.setIdFlusso(idFlusso);
+					ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+					if (anticipo != null){
+						anticipo.setIdFlusso(idFlusso);
+					}
 				}
 			} catch (AwesomeException e) {
 				throw e;
