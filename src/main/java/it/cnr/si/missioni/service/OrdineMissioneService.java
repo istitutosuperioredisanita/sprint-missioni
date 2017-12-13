@@ -390,7 +390,7 @@ public class OrdineMissioneService {
 		popolaCoda(ordineMissioneDaAggiornare);
 	}
 
-	private void popolaCoda(OrdineMissione ordineMissione) {
+	public void popolaCoda(OrdineMissione ordineMissione) {
 		if (ordineMissione.getMatricola() != null){
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			String idSede = null;

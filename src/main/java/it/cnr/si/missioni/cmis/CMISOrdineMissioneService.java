@@ -49,6 +49,7 @@ import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.DatiSedeService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
+import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneService;
@@ -92,6 +93,9 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private PrintOrdineMissioneService printOrdineMissioneService;
+
+	@Autowired
+	private OrdineMissioneService ordineMissioneService;
 
 	@Autowired
 	private UnitaOrganizzativaService unitaOrganizzativaService;
@@ -573,6 +577,9 @@ public class CMISOrdineMissioneService {
 
 		if (ordineMissione.isStatoNonInviatoAlFlusso()){
 			try {
+				if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
+					ordineMissioneService.popolaCoda(ordineMissione);
+				}
 				Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
 				TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
 				HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 

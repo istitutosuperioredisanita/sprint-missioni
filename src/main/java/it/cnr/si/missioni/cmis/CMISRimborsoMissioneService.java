@@ -701,7 +701,11 @@ public class CMISRimborsoMissioneService {
 
 	private void avviaFlusso(RimborsoMissione rimborsoMissione, StringWriter stringWriter, ObjectMapper mapper) {
 		if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
-			startFlow(rimborsoMissione, stringWriter, mapper);
+			if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()).getTipoMailDopoRimborso(),"N").equals("C")){
+				rimborsoMissioneService.popolaCoda(rimborsoMissione);
+			} else {
+				startFlow(rimborsoMissione, stringWriter, mapper);
+			}
 		} else {
 			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
 				restartFlow(rimborsoMissione, stringWriter);

@@ -317,7 +317,7 @@ public class RimborsoMissioneService {
 		return rimborso;
 	}
 
-	private void popolaCoda(RimborsoMissione rimborsoMissione) {
+	public void popolaCoda(RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissione.getMatricola() != null){
 			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 			String idSede = null;
