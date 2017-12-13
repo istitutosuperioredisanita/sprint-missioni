@@ -451,22 +451,22 @@ public class DateUtils {
 		return ZoneId.of(ZONE_ID_DEFAULT);
 	}
 	
-//	public static void main(String[] args) {
-//		ZonedDateTime data = ZonedDateTime.now();
-//		String d = getDateAsString(data, PATTERN_DATE);
-//		String c = getDateAsString(data, PATTERN_DATETIME);
-//		String a = getDateAsString(data, PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
-//		String b = getDateAsString(data, PATTERN_DATETIME_WITH_TIMEZONE);
-//		
-//		System.out.println(ZoneId.getAvailableZoneIds());
-//		System.out.println(data);
-//		System.out.println(a);
-//		System.out.println(b);
-//		System.out.println(c);
-//		System.out.println(d);
-//		
-//	}
-//	
+	public static void main(String[] args) {
+		ZonedDateTime data = ZonedDateTime.now();
+		String d = getDateAsString(data, PATTERN_DATE);
+		String c = getDateAsString(data, PATTERN_DATETIME);
+		String a = getDateAsString(data, PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
+		String b = getDateAsString(data, PATTERN_DATETIME_WITH_TIMEZONE);
+		
+		System.out.println(ZoneId.getAvailableZoneIds());
+		System.out.println(data);
+		System.out.println(a);
+		System.out.println(b);
+		System.out.println(c);
+		System.out.println(d);
+		
+	}
+	
 	public static GregorianCalendar getDate(ZonedDateTime data){
 		return GregorianCalendar.from(data);
 	}

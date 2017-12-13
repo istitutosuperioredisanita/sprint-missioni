@@ -189,7 +189,7 @@ public class CMISOrdineMissioneService {
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
-			userNameFirmatario = recuperoDirettore(ordineMissione, ordineMissione.getUoRich(), account);
+			userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account);
 			
 			if (ordineMissione.isMissioneGratuita()){
 				userNameFirmatarioSpesa = userNameFirmatario;
