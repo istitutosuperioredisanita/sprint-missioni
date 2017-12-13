@@ -289,7 +289,7 @@ public class AccountService {
 
 	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data) {
 		String userNameFirmatario;
-		if (account.getMatricola() == null || (account.getDataCessazione() != null && DateUtils.parseZonedDateTime(account.getDataCessazione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE).compareTo(data) < 0)){
+		if (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0)){
 			userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
 		} else {
 			DatiSede dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
