@@ -85,7 +85,7 @@
 {"codice_uo":"021000", "uid_direttore":"sergio.riva"},
 {"codice_uo":"021001", "uid_direttore":"sergio.riva"},
 {"codice_uo":"024000", "uid_direttore":"pietro.ferraro", "ordine_da_validare":"S"},
-{"codice_uo":"024001", "uid_direttore":"cosimo.distante"},
+{"codice_uo":"024001", "uid_direttore":"cosimo.distante", "ordine_da_validare":"S"},
 {"codice_uo":"024002", "uid_direttore":"giovanni.pioggia"},
 {"codice_uo":"026000", "uid_direttore":"mariaperla.colombini"},
 {"codice_uo":"026001", "uid_direttore":"mariaperla.colombini"},
