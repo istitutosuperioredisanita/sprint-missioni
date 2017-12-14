@@ -1455,6 +1455,8 @@
 {"uid" : "MANUELA.FERRANTE","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 {"uid" : "daniela.mulas","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 
+{"uid" : "app.intranet-ifac","uoForUsersSpecial" : [{"codice_uo" : "032000"}]},
+
 {"uid":"sara.mannocchi", "uoForUsersSpecial":[
 {"codice_uo":"088000", "ordine_da_validare":"S"}]},
 {"uid":"roberto.storchi", "uoForUsersSpecial":[
