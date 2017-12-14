@@ -88,12 +88,29 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var x = $http.get('api/proxy/SIPER?proxyURL=json/userinfo/'+ username);
         var y = x.then(function (result) {
             if (result.data){
-                return createPerson(result.data);
+                var persona = result.data;
+                if (persona.matricola != null && ((persona.data_cessazione && persona.data_cessazione >= dataDa) || (!persona.data_cessazione))){
+                    return createPerson(persona);
+                } else {
+                    var promise = recuperoDatiTerzoPerCompenso(persona.codice_fiscale, dataDa, dataA);
+                    return promise.then(function (terzo) {
+                        if (terzo && terzo.data && terzo.data.elements && terzo.data.elements.length > 0){
+                            var terziPerCompenso = terzo.data.elements;
+                            var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
+                            if (terzoPerCompenso.ti_dipendente_altro == 'A'){
+                                persona.matricola = "";
+                                persona.profilo = terzoPerCompenso.ds_tipo_rapporto;
+                                persona.comune_residenza = terzoPerCompenso.ds_comune_fiscale;
+                            }
+                        }
+                        return createPerson(persona);
+                    });
+                }
             } else {
                 return [];
             }
         });
-        x.error(function (data) {
+        x.error(function (result) {
         });
         return y;
     }

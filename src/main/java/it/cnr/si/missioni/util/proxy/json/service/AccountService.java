@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -334,6 +335,29 @@ public class AccountService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la uo "+uo);
 		}
 		return userNameFirmatario;
+	}
+
+	public Boolean isUserEnableToWorkUo(Principal principal, String uo){
+		UsersSpecial userSpecial = getUoForUsersSpecial(principal.getName());
+		boolean uoAbilitata = false;
+		if (userSpecial != null){
+			if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){
+				if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()){
+			    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
+			    		if (uoService.getUoSigla(uoUser).equals(uo)){
+			    			uoAbilitata = true;
+			    		}
+			    	} 
+				} else {
+	    			uoAbilitata = false;
+				}
+			} else {
+    			uoAbilitata = true;
+			}
+		} else {
+			uoAbilitata = false;
+		}
+		return uoAbilitata;
 	}
 	
 }
