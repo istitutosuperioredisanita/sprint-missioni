@@ -2,6 +2,8 @@ package it.cnr.si.missioni.web.filter;
 
 import java.util.List;
 
+import it.cnr.si.missioni.util.Utility;
+
 public class MissioneFilter {
 	private List<String> listaStatiMissione;
 	private List<String> listaStatiFlussoMissione;
@@ -142,5 +144,8 @@ public class MissioneFilter {
 	}
 	public void setGiaRimborsato(String giaRimborsato) {
 		this.giaRimborsato = giaRimborsato;
+	}
+	public Boolean isDaCron(){
+		return Utility.nvl(getDaCron(), "N").equals("S");
 	}
 }
