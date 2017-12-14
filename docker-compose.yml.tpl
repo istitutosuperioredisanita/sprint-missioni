@@ -25,7 +25,7 @@ services:
       traefik.port: "15672"
     read_only: true
     volumes:
-    - ./rabbitmq/etc/:/etc/rabbitmq/
+    - /etc/rabbitmq/
     - ./rabbitmq/lib/:/var/lib/rabbitmq/
     ports:
     - "15672:15672"
