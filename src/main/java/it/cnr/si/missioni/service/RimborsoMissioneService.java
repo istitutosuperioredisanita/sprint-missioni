@@ -698,10 +698,14 @@ public class RimborsoMissioneService {
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
 			}
 			if (filter.getUoRich() != null){
-				Disjunction condizioneOr = Restrictions.disjunction();
-				condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
-				condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
-				criterionList.add(condizioneOr);
+				if (accountService.isUserEnableToWorkUo(principal, filter.getUoRich()) && !filter.isDaCron()){
+					Disjunction condizioneOr = Restrictions.disjunction();
+					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
+					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
+					criterionList.add(condizioneOr);
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente "+principal.getName()+"  non è abilitato a vedere i dati della uo "+filter.getUoRich());
+				}
 			}
 			if (filter.getAnnoOrdine() != null){
 				criterionList.add(Restrictions.eq(aliasRimborsoMissione+".anno", filter.getAnnoOrdine()));
