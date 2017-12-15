@@ -21,6 +21,9 @@ public class CronConfigurationMissioni {
     @Value("${cron.loadCache.active}")
     private boolean cronLoadCacheActive;
 
+    @Value("${cron.verifyStep.active}")
+    private boolean cronVerifyStepActive;
+
     @Autowired
     private CronService cronService;
     
@@ -28,6 +31,12 @@ public class CronConfigurationMissioni {
     public void cronComunicaDati() throws Exception {
     	if (cronComunicaDatiActive)
     		cronService.verificaFlussoEComunicaDatiRimborsoSigla(new GenericPrincipal("cronMissioni"));
+    }
+
+	@Scheduled(cron = "${cron.verifyStep.cronExpression}")
+    public void cronVerifyStep() throws Exception {
+    	if (cronVerifyStepActive)
+    		cronService.verifyStep(new GenericPrincipal("cronMissioni"));
     }
 
 	@Scheduled(cron = "${cron.evictCache.cronExpression}")
