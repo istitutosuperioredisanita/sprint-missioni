@@ -424,10 +424,12 @@ public class RimborsoMissioneService {
     	rimborsoMissioneDB.setToBeUpdated();
     	retrieveDetails(principal, rimborsoMissioneDB);
 		if (confirm){
-			if (assenzaDettagli(rimborsoMissioneDB) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("N"))){
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
+			Boolean controlloEsistenzaAllegati = Utility.nvl(dati.getObbligoAllegatiValidazione(),"S").equals("S") || !rimborsoMissioneDB.isMissioneDaValidare();
+			if (assenzaDettagli(rimborsoMissioneDB, controlloEsistenzaAllegati) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("N"))){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile confermare un rimborso missione senza aver indicato nessun dettaglio di spesa.");
 			}
-			if (!assenzaDettagli(rimborsoMissione) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("S"))){
+			if (!assenzaDettagli(rimborsoMissione, controlloEsistenzaAllegati) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("S"))){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile confermare un rimborso missione con dettagli e ad importo 0.");
 			}
 		}
@@ -597,12 +599,14 @@ public class RimborsoMissioneService {
 		}
 	}
 
-	private Boolean assenzaDettagli(RimborsoMissione rimborsoMissione) throws ComponentException {
+	private Boolean assenzaDettagli(RimborsoMissione rimborsoMissione, Boolean controlloEsistenzaAllegati) throws ComponentException {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() == null || rimborsoMissione.getRimborsoMissioneDettagli().isEmpty() && 
 				!rimborsoMissione.isTrattamentoAlternativoMissione()){
 			return true;
 		} else {
-			cmisRimborsoMissioneService.controlloEsitenzaGiustificativoDettaglio(rimborsoMissione);
+			if (controlloEsistenzaAllegati){
+				cmisRimborsoMissioneService.controlloEsitenzaGiustificativoDettaglio(rimborsoMissione);
+			}
 		}
 		return false;
 	}
@@ -1201,10 +1205,10 @@ public class RimborsoMissioneService {
 		byte[] printRimborsoMissione;
 		String fileName;
 		retrieveDetails(principal, rimborsoMissione);
-		if (assenzaDettagli(rimborsoMissione) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("N"))){
+		if (assenzaDettagli(rimborsoMissione, false) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("N"))){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile stampare un rimborso missione senza aver indicato nessun dettaglio di spesa.");
 		}
-		if (!assenzaDettagli(rimborsoMissione) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("S"))){
+		if (!assenzaDettagli(rimborsoMissione, false) && (Utility.nvl(rimborsoMissione.getRimborso0(),"N").equals("S"))){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile stampare un rimborso missione con dettagli e ad importo 0.");
 		}
 		fileName = "RimborsoMissione"+rimborsoMissione.getId()+".pdf";

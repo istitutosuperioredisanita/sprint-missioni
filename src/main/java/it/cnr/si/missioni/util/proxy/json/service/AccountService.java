@@ -316,6 +316,10 @@ public class AccountService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la sede "+dati.getCodiceSede());
 			}
 		}
+		if (userNameFirmatario != null && userNameFirmatario.equalsIgnoreCase(account.getUid())){
+			
+		}
+			
 		return userNameFirmatario;
 	}
 

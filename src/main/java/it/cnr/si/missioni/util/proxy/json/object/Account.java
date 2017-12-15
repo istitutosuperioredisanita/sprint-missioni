@@ -122,6 +122,7 @@ public class Account {
 	private List<Inquadramento> inquadramenti;
 	@JsonProperty("data_cessazione")
 	private String dataCessazione;
+	private String uid;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -801,6 +802,14 @@ public class Account {
 
 	public void setDataCessazione(String dataCessazione) {
 		this.dataCessazione = dataCessazione;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 }
 

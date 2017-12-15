@@ -88,6 +88,10 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "TIPO_MAIL_DOPO_RIMBORSO", length = 1, nullable = true)
     private String tipoMailDopoRimborso;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "OBBLIGO_ALLEGATI_VALIDAZIONE", length = 1, nullable = true)
+    private String obbligoAllegatiValidazione;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -260,6 +264,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setTipoMailDopoRimborso(String tipoMailDopoRimborso) {
 		this.tipoMailDopoRimborso = tipoMailDopoRimborso;
+	}
+
+	public String getObbligoAllegatiValidazione() {
+		return obbligoAllegatiValidazione;
+	}
+
+	public void setObbligoAllegatiValidazione(String obbligoAllegatiValidazione) {
+		this.obbligoAllegatiValidazione = obbligoAllegatiValidazione;
 	}
 
 }

@@ -93,6 +93,11 @@ cron:
         active: false
         cronExpression: "0 0 3 * * MON-SAT"
 
+    verifyStep:
+        name: evictCache
+        active: false
+        cronExpression: "0 0 2 * * MON-SAT"
+
 jhipster:
     mail:
         from: missioni@cnr.it

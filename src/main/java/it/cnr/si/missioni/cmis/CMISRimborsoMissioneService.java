@@ -174,6 +174,7 @@ public class CMISRimborsoMissioneService {
 		String username = principal.getName();
 		
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+		account.setUid(rimborsoMissione.getUid());
 		Voce voce = voceService.loadVoce(rimborsoMissione);
 		Gae gae = gaeService.loadGae(rimborsoMissione);
 		UnitaOrganizzativa uoCompetenza = null;

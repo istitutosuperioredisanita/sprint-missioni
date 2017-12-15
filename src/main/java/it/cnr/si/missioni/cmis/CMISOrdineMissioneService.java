@@ -140,6 +140,7 @@ public class CMISOrdineMissioneService {
 		if (ordineMissione != null){
 			CMISOrdineMissione cmisOrdineMissione = new CMISOrdineMissione();
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+			account.setUid(ordineMissione.getUid());
 			caricaDatiDerivati(principal, ordineMissione);
 			OrdineMissioneAnticipo anticipo = null;
 			OrdineMissioneAutoPropria autoPropria = null;

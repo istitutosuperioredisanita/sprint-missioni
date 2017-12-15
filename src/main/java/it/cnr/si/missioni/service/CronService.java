@@ -275,4 +275,32 @@ public class CronService {
 	private String getTextErrorComunicaRimborso(RimborsoMissione rimborsoMissione, String error) {
 		return textErrorComunicazioneRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
 	}
+
+	@Transactional
+	public void verifyStep(Principal principal) throws ComponentException {
+		ILock lock = hazelcastInstance.getLock(lockKeyLoadCache);
+		LOGGER.info("requested lock: " + lock.getPartitionKey());
+
+		try {
+			if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
+
+				LOGGER.info("got lock {}", lockKeyLoadCache);
+
+				try {
+					LOGGER.info("Cron per Verificare gli step da eseguire");
+
+					LOGGER.info("Cron per Verificare gli step da eseguire terminato");
+				} finally {
+					LOGGER.info("unlocking {}", lockKeyLoadCache);
+					lock.unlock();
+				}
+
+			} else {
+				LOGGER.warn("unable to get lock {}", lockKeyLoadCache);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Errore", e);
+			throw new ComponentException(e);
+		}
+	}
 }
