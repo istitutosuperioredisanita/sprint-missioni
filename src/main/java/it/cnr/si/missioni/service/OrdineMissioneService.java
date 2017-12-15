@@ -478,9 +478,9 @@ public class OrdineMissioneService {
 			if (filter.getSoloMissioniNonGratuite()){
 				criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita")).add(Restrictions.eq("missioneGratuita", "N")));
 			}
-//			if (Utility.nvl(filter.getGiaRimborsato(),"A").equals("N")){
-//				criterionList.add(Subqueries.notExists("select rimborsoMissione.id from rimborsoMissione where rimborsoMissione.idOrdineMissione = ordineMissione.id"));
-//			}
+			if (Utility.nvl(filter.getGiaRimborsato(),"A").equals("N")){
+				criterionList.add(Subqueries.notExists("select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' "));
+			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
 			return crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("numero"));
