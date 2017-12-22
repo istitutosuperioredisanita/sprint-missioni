@@ -105,7 +105,7 @@
 {"codice_uo":"031001", "uid_direttore":"marialuigia.muolo", "ordine_da_validare":"S"},
 {"codice_uo":"031002", "uid_direttore":"maurizio.maldini", "ordine_da_validare":"S"},
 {"codice_uo":"031004", "uid_direttore":"francesca.passaretti", "ordine_da_validare":"S"},
-{"codice_uo":"032000", "uid_direttore":"roberto.pini"},
+{"codice_uo":"032000", "uid_direttore":"roberto.pini", "ordine_da_validare":"S"},
 {"codice_uo":"033000", "uid_direttore":"maurizio.lontano", "ordine_da_validare":"S"},
 {"codice_uo":"035000", "uid_direttore":"giorgio.iervasi", "ordine_da_validare":"S"},
 {"codice_uo":"035001", "uid_direttore":"giorgio.iervasi", "ordine_da_validare":"S"},
