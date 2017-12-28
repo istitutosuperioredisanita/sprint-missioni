@@ -6,6 +6,8 @@ import it.cnr.si.missioni.cmis.acl.ACLType;
 import it.cnr.si.missioni.cmis.acl.Permission;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
+import it.cnr.si.missioni.util.proxy.json.object.GruppoSAC;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,6 +58,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 @Component
 public class MissioniCMISService {
 	private transient static final Log logger = LogFactory.getLog(MissioniCMISService.class);
@@ -510,8 +513,17 @@ public class MissioniCMISService {
 		return startFlow(stringWriter, simpleUrl);
 	}
 
+	public Response startFlowAnnullamentoOrdineMissione(StringWriter stringWriter) throws ComponentException{
+		String simpleUrl = getUrlAnnullamentoOrdineMissione();
+		return startFlow(stringWriter, simpleUrl);
+	}
+
 	private String getUrlOrdineMissione() {
 		return "service/api/workflow/activiti$flussoMissioniOrdine/formprocessor";
+	}
+	
+	private String getUrlAnnullamentoOrdineMissione() {
+		return "service/api/workflow/activiti$flussoMissioniRevoca/formprocessor";
 	}
 	
 	private String getUrlRimborsoMissione() {
@@ -591,6 +603,46 @@ public class MissioniCMISService {
         	return cmisFileContent;
         }
 
+		return null;
+	}
+
+	public DatiGruppoSAC getDatiGruppoSAC(String uo) {
+
+		JsonFactory jsonFactory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
+		try {
+			String url = getRepositoryURL()+"service/api/groups/"+org.apache.commons.lang.StringUtils.rightPad(uo, 26, '0')+"/parents?";
+			logger.info("url for GET Dati Gruppo SAC: "+url);
+			Response responseGet = invokeGET(new UrlBuilder(url));
+			if (responseGet.getResponseCode()!=200) 
+				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di GET Dati Gruppo SAC. Errore: "+ responseGet.getErrorContent()+".");
+			Class<GruppoSAC> grpSAC = GruppoSAC.class;
+			GruppoSAC gruppoSac = (GruppoSAC)mapper.readValue(responseGet.getStream(), grpSAC);
+			if (gruppoSac != null && gruppoSac.getData() != null && gruppoSac.getData().size() > 0){
+				return gruppoSac.getData().get(0);
+			} else {
+				return null;
+			}
+		} catch (CMISException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+		}
+	}
+	public QueryResult recupeorFlusso(String idFlusso) {
+		StringBuilder query = new StringBuilder("select parametriFlusso.*, flussoMissioni.* from cmis:document as t ");
+		query.append( "inner join wfcnr:parametriFlusso as parametriFlusso on t.cmis:objectId = parametriFlusso.cmis:objectId ");
+		query.append(" inner join cnrmissioni:parametriFlussoMissioni as flussoMissioni on t.cmis:objectId = flussoMissioni.cmis:objectId ");
+		query.append(" where parametriFlusso.wfcnr:wfInstanceId = '").append(idFlusso).append("'");
+
+		ItemIterable<QueryResult> resultsFolder = search(query);
+		if (resultsFolder.getTotalNumItems() == 0){
+			return null;
+		} else {
+			for (QueryResult queryResult : resultsFolder) {
+				return queryResult;
+			}
+		}
 		return null;
 	}
 }

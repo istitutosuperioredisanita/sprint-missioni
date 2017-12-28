@@ -23,6 +23,10 @@ public class PrintOrdineMissione extends PrintMissione{
 
     public String partenzaDaAltro;
 
+    public String tipo;
+
+    public String motivoAnnullamento;
+
     public String getObbligoRientro() {
 		return obbligoRientro;
 	}
@@ -101,6 +105,22 @@ public class PrintOrdineMissione extends PrintMissione{
 
 	public void setRichiestaAnticipo(String richiestaAnticipo) {
 		this.richiestaAnticipo = richiestaAnticipo;
+	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
+	public String getMotivoAnnullamento() {
+		return motivoAnnullamento;
+	}
+
+	public void setMotivoAnnullamento(String motivoAnnullamento) {
+		this.motivoAnnullamento = motivoAnnullamento;
 	}
 
 }

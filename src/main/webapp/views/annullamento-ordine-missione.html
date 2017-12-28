@@ -1,0 +1,378 @@
+<div class="container-fluid">
+
+  <h4 center translate="annullamento-ordine-missione.title">Annullamento Ordine di missione</h4>
+  <div  class="my-panel-body panel panel-success" ng-show="annullamentoModel.id" align="center">
+                <b>{{'annullamento-ordine-missione.form.numero' | translate}}:</b> {{annullamentoModel.anno+"/"+annullamentoModel.numero}}  --  
+                <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{annullamentoModel.dataInserimento | date:'dd/MM/yyyy'}}  --  
+                <b>  {{'missione.form.stato' | translate}}: </b>{{annullamentoModel.decodeStato}}  --  
+                <span ng-show="annullamentoModel.statoFlusso && annullamentoModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{annullamentoModel.decodeStatoFlusso}}
+  </div>
+        <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
+                      <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{annullamentoModel.commentFlows}}
+        </div>
+            <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
+                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
+                    <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
+                        </span>
+                    </p>
+            </form>
+<div class="row" ng-show="accountModel">
+        <div class="col-md-12">
+
+<div class="row">
+  <div class="panel panel-primary">
+    <div class="panel-heading color-celeste-avion text-center">
+      <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
+    </div>
+            <div class="panel-body my-panel-body">
+              <info-account account="accountModel"></info-account>
+
+              <div class="col-md-12">
+                          <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.domicilio-fiscale">Domicilio</span>
+                              <input ng-disabled="disabilitaAnnullamento" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="annullamentoModel.domicilioFiscaleRich"/>
+                          </span>
+              </div>
+            </div>
+  </div>
+
+</div>
+
+
+<div class="row">
+  <div class="panel panel-success" ng-hide="annullamentoModel.id">
+              <form class="form-inline" role="form" id="missioni">
+                      <p class="col-md-12">
+                          <span class="input-group">
+                            <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
+                      <select ng-disabled="!elencoOrdiniMissione || annullamentoModel.id" ng-change="reloadOrdineMissione(annullamentoModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="annullamentoModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
+                          </span>
+                      </p>
+              </form>
+  </div>
+</div>
+
+<div>
+<div class="panel panel-success" ng-hide="!annullamentoModel.idOrdineMissione || !annullamentoModel.id" >
+  <div class="panel-heading color-verde-scuro text-center">
+    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
+  </div>
+     <div class="panel-body my-panel-body">
+  <div class="my-panel-body panel panel-success" ng-show="annullamentoModel.id" align="center">
+                          <b>{{'ordine-missione.title' | translate}} - {{'missione.form.numero' | translate}}:</b>
+                          {{annullamentoModel.ordineMissione.anno}}/{{annullamentoModel.ordineMissione.numero}} --
+                          <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{annullamentoModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}
+  </div>
+            <form class="form-inline" role="form" id ="missioni">
+                <p class="col-md-6">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="missione.form.tipo-missione">Tipo Missione</span>
+                          <select ng-disabled="annullamentoModel.idOrdineMissione" class="form-control" name="tipoMissione" ng-model="annullamentoModel.ordineMissione.tipoMissione" ng-options="value as tipoMissione for (tipoMissione,value) in tipiMissione" ng-change="onChangeTipoMissione()"></select>
+                        </span>
+                </p>
+                <p class="col-md-6">
+                        <span class="input-group" ng-show="missioneEstera">
+                          <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
+                          <select ng-disabled="annullamentoModel.idOrdineMissione"  class="form-control" ng-model="annullamentoModel.ordineMissione.trattamento" ng-change="onChangeTrattamento()" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
+                        </span>
+              </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <div class="col-md-5">
+                        <span class="input-group" ng-show="missioneEstera">
+                          <span class="input-group-addon" translate="missione.form.nazione">nazione</span>
+                          <select ng-disabled="annullamentoModel.idOrdineMissione"  class="form-control" ng-model="annullamentoModel.ordineMissione.nazione" ng-options="nazione.pg_nazione as nazione.ds_nazione for nazione in nazioni"></select>
+                        </span>
+              </div>
+                <p class="col-md-7">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="missione.form.destinazione-obbligatoria">Tipo Missione</span>
+                            <input  ng-disabled="annullamentoModel.idOrdineMissione" type="text" class="input-sm form-control" name="destinazione" placeholder="{{'missione.form.destinazione.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.destinazione"/>
+                        </span>
+              </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.oggetto-obbligatorio">oggetto</span>
+                            <textarea ng-disabled="annullamentoModel.idOrdineMissione"  class="input-sm form-control" name="oggetto" placeholder="{{'missione.form.oggetto.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.oggetto" rows = "2">
+                            </textarea>
+                        </span>
+                </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="column-in-column col-md-5" >
+<cnr-widget-datetime-range id-missione="1" disabilitato="annullamentoModel.idOrdineMissione" start-datetime="annullamentoModel.ordineMissione.dataInizioMissione" end-datetime="annullamentoModel.ordineMissione.dataFineMissione" start-label="{{'rimborso-missione.form.data-inizio-obbligatoria' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'rimborso-missione.form.data-fine-obbligatoria' | translate}}"></cnr-widget-datetime-range>
+                </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <div class="col-md-4">
+                        <p class="input-group" ng-show="showObbligoRientro">
+                          <span class="input-group-addon" translate="ordine-missione.form.obbligo-rientro">obbligo</span>
+                          <select  ng-disabled="annullamentoModel.idOrdineMissione" class="form-control" ng-model="annullamentoModel.ordineMissione.obbligoRientro" ng-options="value as obbligoRientro for (obbligoRientro,value) in obblighiRientro"></select>
+                        </p>
+                    </div>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.note">note</span>
+                            <textarea  ng-disabled="annullamentoModel.idOrdineMissione" class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="annullamentoModel.ordineMissione.note" rows = "2">
+                            </textarea>
+                        </span>
+                </p>
+            </form>
+  </div>
+</div>
+
+
+
+<div class="panel panel-danger" ng-hide="!annullamentoModel.idOrdineMissione" ng-disabled="annullamentoModel.idOrdineMissione" >
+  <div class="panel-heading color-rosso-mattone text-center">
+    <h3 class="panel-title color-rosso-mattone" translate="missione.form.box-dati-fin">Dati Finanziari</h3>
+  </div>
+     <div class="panel-body my-panel-body">
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-11">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-spesa">cds</span>
+                    <selectize ng-disabled="annullamentoModel.idOrdineMissione" options='elencoCds' config="{maxItems: 1}" ng-change="reloadCds(annullamentoModel.ordineMissione.cdsSpesa)" ng-model="annullamentoModel.ordineMissione.cdsSpesa"></selectize>
+                        </span>
+                    </p>
+            </form>
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-spesa">uo</span>
+                    <select ng-disabled="annullamentoModel.idOrdineMissione" ng-change="reloadUo(annullamentoModel.ordineMissione.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.uo-spesa.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cdr-spesa">cdr</span>
+                    <select ng-disabled="annullamentoModel.idOrdineMissione" ng-change="reloadCdr(annullamentoModel.ordineMissione.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.cdr-spesa.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
+                    <select ng-disabled="annullamentoModel.idOrdineMissione" ng-change="reloadModulo(annullamentoModel.ordineMissione.pgProgetto, annullamentoModel.ordineMissione.cdrSpesa, annullamentoModel.ordineMissione.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-11">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
+                    <select ng-disabled="annullamentoModel.idOrdineMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+                        </span>
+                    </p>
+                    <p class="col-md-1">
+                    <i ng-show="workingRestGae" class="fa fa-spinner fa-spin" style="font-size:16px"></i>
+                    <i ng-show="!workingRestGae" style="font-size:16px" class="fa">&#xf110;</i>
+                    </p>
+            </form>
+
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-11">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
+                    <selectize ng-disabled="annullamentoModel.idOrdineMissione" options='elencoVoci' config="{maxItems: 1}" ng-model="annullamentoModel.ordineMissione.voce"></selectize>
+                        </span>
+                    </p>
+            </form>
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-3">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
+                            <input ng-disabled="annullamentoModel.idOrdineMissione" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="annullamentoModel.ordineMissione.esercizioOriginaleObbligazione"/>
+                        </span>
+                    </p>
+            </form>
+
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-4">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
+                            <input ng-disabled="annullamentoModel.idOrdineMissione" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="annullamentoModel.ordineMissione.pgObbligazione"/>
+                        </span>
+                    </p>
+            </form>
+
+                    <p class="col-md-1">
+            <cnr-modal-info-impegno anno="annullamentoModel.ordineMissione.anno" cds="annullamentoModel.ordineMissione.cdsSpesa" gae="annullamentoModel.ordineMissione.gae" anno-impegno="annullamentoModel.ordineMissione.esercizioOriginaleObbligazione" numero="annullamentoModel.ordineMissione.pgObbligazione"> </cnr-modal-info-impegno>
+                    </p>
+
+            <form class="form-inline" role="form" id="missioni">
+                  <p class="col-md-3">
+                           <span class="input-group">
+                              <span class="input-group-addon" translate="ordine-missione.form.missione-gratuita">Missione Gratuita</span>
+                              <label class="checkbox">
+                                      <input ng-disabled="annullamentoModel.idOrdineMissione" ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.missioneGratuita" ng-true-value="S" ng-false-value="N">
+                              </label>
+                          </span>
+                  </p>
+                    <p class="col-md-4">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="missione.form.cup">cup</span>
+                            <input ng-disabled="annullamentoModel.idOrdineMissione" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="annullamentoModel.ordineMissione.cup"/>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="isUserOfUoSac">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
+                    <select ng-disabled="annullamentoModel.idOrdineMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(annullamentoModel.ordineMissione.cdsCompetenza)" placeholder="{{'missione.form.cds-competenza.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
+                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
+                    <select ng-disabled="annullamentoModel.idOrdineMissione" class="form-control" id="missioni" placeholder="{{'missione.form.uo-competenza.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
+                        </span>
+                    </p>
+            </form>
+  </div>
+</div>
+
+<div class="panel panel-info" ng-hide="!annullamentoModel.idOrdineMissione">
+  <div class="panel-heading color-verde-giada text-center">
+    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
+  </div>
+     <div class="panel-body my-panel-body">
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-taxi">Taxi</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.utilizzoTaxi" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+                <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </div>
+                <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </div>
+                <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">persona seguito</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </div>
+            </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
+                            <textarea ng-disabled="annullamentoModel.idOrdineMissione" class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="annullamentoModel.ordineMissione.noteUtilizzoTaxiNoleggio" rows = "2">
+                            </textarea>
+                        </span>
+                </p>
+            </form>
+
+  </div>
+</div>
+<form class="form-inline col-md-12" role="form" id="missioni">
+<div class="panel panel-default" ng-hide="!annullamentoModel.idOrdineMissione" ng-disabled="annullamentoModel.idOrdineMissione" ng-if="annullamentoModel.ordineMissione.id && (annullamentoModel.isFireSearchAttachments == true || annullamentoModel.isFireSearchAttachments == false )">
+  <div class="panel-heading color-verde-chiaro text-center">
+    <h1 class="panel-title">Allegati</h1>
+  </div>
+  <div class="panel-body my-panel-body">
+          <div>
+            <ul class="list-unstyled annullamentoModel.attachments" ng-show="annullamentoModel.attachmentsExists=true">
+              <li ng-repeat="attachment in annullamentoModel.attachments">
+                <span class="glyphicon glyphicon-download-alt"></span>
+                <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                <button ng-show="!disabilitaRimborsoMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              </li>
+            </ul>
+            <h4 >
+              <div class="row fileupload-buttonbar">
+                <span ng-hide="annullamentoModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="annullamentoModel.isFireSearchAttachments" url="api/rest/public/rimborsoMissione/uploadAllegati?idRimborso={{annullamentoModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="annullamentoModel" size-limit="500000"></ng-upload-form>
+              </div>
+            </h4>
+          </div> 
+  </div>
+</div>
+</form>
+<div ng-hide="!annullamentoModel.idOrdineMissione">
+            <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-12">
+                        <span class="input-group"">
+                            <span class="input-group-addon" translate="annullamento-ordine-missione.form.motivo-annullamento">Note Segreteria</span>
+                            <textarea 
+                              class="input-sm form-control" placeholder="{{'annullamento-ordine-missione.form.motivo-annullamento' | translate}}" name="motivoAnnullamento" ng-model="annullamentoModel.motivoAnnullamento" rows = "2">
+                            </textarea> 
+                        </span>
+                    </p>
+            </form>
+            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione">
+                            <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="confirm()">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaRimborsoMissione">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S'">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="confirm()">
+                    <div class="col-xs-3" ng-show="showEsisteAnnullamento">
+
+                    <div class="col-xs-3" ng-show="showEsisteAnnullamento">
+                      <a target="_blank" href="api/rest/public/printAnnullamentoMissione?idMissione={{annullamentoModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                    </div>
+
+                    </div>
+            </form>
+            <form name="form-inline" role="form" ng-submit="confirmDelete()">
+                    <div class="col-xs-1" ng-show="showEsisteAnnullamento && !validazione && !disabilitaRimborsoMissione">
+                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
+                    </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+</div>
