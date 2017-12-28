@@ -175,6 +175,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/annullamento-ordine-missione/:idMissione?/:validazione?', {
+                    templateUrl: 'views/annullamento-ordine-missione.html',
+                    controller: 'AnnullamentoOrdineMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/ordini-missione-da-rendere-definitivi', {
                     templateUrl: 'views/ordini-missione-da-rendere-definitivi.html',
                     controller: 'OrdiniMissioneDaRendereDefinitiviController',

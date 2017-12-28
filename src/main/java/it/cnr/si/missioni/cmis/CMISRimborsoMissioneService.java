@@ -874,20 +874,7 @@ public class CMISRimborsoMissioneService {
     }
 
 	public QueryResult recuperoFlusso(String idFlusso)throws AwesomeException{
-		StringBuilder query = new StringBuilder("select parametriFlusso.*, flussoMissioni.* from cmis:document as t ");
-		query.append( "inner join wfcnr:parametriFlusso as parametriFlusso on t.cmis:objectId = parametriFlusso.cmis:objectId ");
-		query.append(" inner join cnrmissioni:parametriFlussoMissioni as flussoMissioni on t.cmis:objectId = flussoMissioni.cmis:objectId ");
-		query.append(" where parametriFlusso.wfcnr:wfInstanceId = '").append(idFlusso).append("'");
-
-		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-		if (resultsFolder.getTotalNumItems() == 0){
-			return null;
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return queryResult;
-			}
-		}
-		return null;
+		return missioniCMISService.recupeorFlusso(idFlusso);
 	}
 
 	private StringWriter createJsonForAbortFlowOrdineMissione() {

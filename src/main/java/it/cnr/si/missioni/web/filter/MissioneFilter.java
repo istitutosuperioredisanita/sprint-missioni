@@ -12,6 +12,7 @@ public class MissioneFilter {
 	private String statoFlusso;
 	private String validato;
 	private String giaRimborsato;
+	private String daAnnullare;
 	private Integer anno;
 	private Long daId;
 	private Long aId;
@@ -147,5 +148,11 @@ public class MissioneFilter {
 	}
 	public Boolean isDaCron(){
 		return Utility.nvl(getDaCron(), "N").equals("S");
+	}
+	public String getDaAnnullare() {
+		return daAnnullare;
+	}
+	public void setDaAnnullare(String daAnnullare) {
+		this.daAnnullare = daAnnullare;
 	}
 }

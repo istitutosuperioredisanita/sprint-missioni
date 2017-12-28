@@ -2,6 +2,12 @@
 
 missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtils) {
         return {
+            findMissioniDaAnnullare: function(user) {
+                var promise = $http.get('api/rest/ordiniMissione/listDaAnnullare', {params: {user:user}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
             findMissioniDaRimborsare: function(user,giaRimborsato) {
                 var promise = $http.get('api/rest/ordiniMissione/listDaRimborsare', {params: {user:user, giaRimborsato:giaRimborsato}}).then(function (response) {
                     return response.data;
@@ -22,6 +28,12 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
             },
             findById: function(id) {
                 var promise = $http.get('api/rest/ordineMissione/getById', {params: {id: id}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
+            findAnnullamentoById: function(id) {
+                var promise = $http.get('api/rest/annullamentoOrdineMissione/getById', {params: {id: id}}).then(function (response) {
                     return response.data;
                 });
                 return promise;

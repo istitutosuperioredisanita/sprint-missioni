@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.service.ConfigService;
@@ -34,6 +35,7 @@ import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
+import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
 
 @Service
 public class AccountService {
@@ -47,6 +49,9 @@ public class AccountService {
 
 	@Autowired
     private DatiSedeService datiSedeService;
+
+	@Autowired
+    private MissioniCMISService missioniCMISService;
 
 	@Autowired
     private DatiIstitutoService datiIstitutoService;
@@ -219,7 +224,7 @@ public class AccountService {
 	}
 
 	public String getDirectorFromUo(String uo) {
-		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+Utility.replace(uo, ".", "")+"&userinfo=true&ruolo=resp", null, null);
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+Utility.getUoSiper(uo)+"&userinfo=true&ruolo=resp", null, null);
 		ResultProxy result = proxyService.processInCache(callCache);
 		String risposta = result.getBody();
 		try {
@@ -289,6 +294,9 @@ public class AccountService {
     }
 
 	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data) {
+		return recuperoDirettore(anno, uo, isMissioneEstera, account, data, false);
+	}
+	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean fromDatiSAC) {
 		String userNameFirmatario;
 		if (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0)){
 			userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
@@ -316,21 +324,34 @@ public class AccountService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la sede "+dati.getCodiceSede());
 			}
 		}
-		if (userNameFirmatario != null && userNameFirmatario.equalsIgnoreCase(account.getUid())){
-			
+		if (userNameFirmatario != null && userNameFirmatario.equalsIgnoreCase(account.getUid()) && uo.startsWith(Costanti.CDS_SAC) && isMissioneEstera && !fromDatiSAC){
+			DatiGruppoSAC datiSAC = missioniCMISService.getDatiGruppoSAC(Utility.getUoSiper(uo));
+			if (datiSAC != null){
+				if (datiSAC.getShortName() != null && datiSAC.getShortName().startsWith(Costanti.CDS_SAC)){
+					String uoPadre = datiSAC.getShortName().substring(0, 6);
+					userNameFirmatario = recuperoDirettore(anno, uoPadre, isMissioneEstera, account, data, true);
+				}
+			}
 		}
 			
 		return userNameFirmatario;
 	}
 
 	private String recuperoDirettoreDaUo(Integer anno, String uo, Boolean isMissioneEstera) {
+		return recuperoDirettoreDaUo(anno, uo, isMissioneEstera,false);
+	}
+	private String recuperoDirettoreDaUo(Integer anno, String uo, Boolean isMissioneEstera, Boolean isDaUoRespEstero) {
 		String userNameFirmatario;
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
 		if (datiIstituto != null && datiIstituto.getResponsabile() != null){
 			if (!isMissioneEstera || (Utility.nvl(datiIstituto.getResponsabileSoloItalia(),"N").equals("N"))){
 				userNameFirmatario = datiIstituto.getResponsabile();
 			} else {
-				userNameFirmatario = getDirector(uo);
+				if (!StringUtils.isEmpty(datiIstituto.getUoRespEstero()) && !isDaUoRespEstero){
+					userNameFirmatario = recuperoDirettoreDaUo(anno, datiIstituto.getUoRespEstero(), isMissioneEstera, true);
+				} else {
+					userNameFirmatario = getDirector(uo);
+				}
 			}
 		} else {
 			userNameFirmatario = getDirector(uo);

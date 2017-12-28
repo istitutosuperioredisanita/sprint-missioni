@@ -63,7 +63,7 @@ siper:
   password: ${spring.proxy.SIPER.password}
 
 cmis:
-    alfresco: http://as3dock.si.cnr.it:8080/alfresco/
+    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
     url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
     username: app.missioni
     password: bubbazza
@@ -94,9 +94,9 @@ cron:
         cronExpression: "0 0 3 * * MON-SAT"
 
     verifyStep:
-        name: evictCache
+        name: verifyStep
         active: false
-        cronExpression: "0 0 2 * * MON-SAT"
+        cronExpression: "0 0 4 * * MON-SAT"
 
 jhipster:
     mail:
