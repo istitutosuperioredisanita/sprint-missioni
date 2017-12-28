@@ -92,6 +92,10 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "OBBLIGO_ALLEGATI_VALIDAZIONE", length = 1, nullable = true)
     private String obbligoAllegatiValidazione;
 
+    @Size(min = 0, max = 20)
+    @Column(name = "UO_RESP_ESTERO", length = 20, nullable = true)
+    private String uoRespEstero;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -272,6 +276,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setObbligoAllegatiValidazione(String obbligoAllegatiValidazione) {
 		this.obbligoAllegatiValidazione = obbligoAllegatiValidazione;
+	}
+
+	public String getUoRespEstero() {
+		return uoRespEstero;
+	}
+
+	public void setUoRespEstero(String uoRespEstero) {
+		this.uoRespEstero = uoRespEstero;
 	}
 
 }

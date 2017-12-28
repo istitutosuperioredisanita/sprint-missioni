@@ -40,16 +40,19 @@ import org.springframework.util.StringUtils;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
+import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.DatiSedeService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.OrdineMissioneService;
+import it.cnr.si.missioni.service.PrintAnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneService;
@@ -95,7 +98,13 @@ public class CMISOrdineMissioneService {
 	private PrintOrdineMissioneService printOrdineMissioneService;
 
 	@Autowired
+	private PrintAnnullamentoOrdineMissioneService printAnnullamentoOrdineMissioneService;
+
+	@Autowired
 	private OrdineMissioneService ordineMissioneService;
+
+	@Autowired
+	private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
 	@Autowired
 	private UnitaOrganizzativaService unitaOrganizzativaService;
@@ -381,6 +390,28 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
+	public Document salvaStampaAnnullamentoOrdineMissioneSuCMIS(Principal principal,
+			byte[] stampa, AnnullamentoOrdineMissione annullamento) {
+		InputStream streamStampa = new ByteArrayInputStream(stampa);
+		CmisPath cmisPath = createFolderOrdineMissione(annullamento.getOrdineMissione());
+		Map<String, Object> metadataProperties = createMetadataForFileAnnullamentoOrdineMissione(principal.getName(), annullamento);
+		try{
+			Document node = missioniCMISService.restoreSimpleDocument(
+					metadataProperties,
+					streamStampa,
+					MimeTypes.PDF.mimetype(),
+					annullamento.getFileName(), 
+					cmisPath);
+			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+			missioniCMISService.makeVersionable(node);
+			return node;
+		} catch (Exception e) {
+			if (e.getCause() instanceof CmisConstraintException)
+				throw new ComponentException("CMIS - File ["+annullamento.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+		}
+	}
+
 	private String recuperoUidDirettoreUo(String codiceUo){
 		Uo uo = uoService.recuperoUo(codiceUo);
 		return recuperoUidDirettoreUo(codiceUo, uo);
@@ -450,6 +481,143 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA, cmisOrdineMissione.getValidazioneSpesa().equals("true"));
 		return metadataProperties;
 	}
+
+	public void avviaFlusso(Principal principal, AnnullamentoOrdineMissione annullamento) {
+		String username = principal.getName();
+		byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
+		CMISOrdineMissione cmisOrdineMissione = create(principal, annullamento.getOrdineMissione());
+		Document documento = salvaStampaAnnullamentoOrdineMissioneSuCMIS(principal, stampa, annullamento);
+
+		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
+
+		StringWriter stringWriter = new StringWriter();
+		JsonFactory jsonFactory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
+		try {
+			JsonGenerator jGenerator = jsonFactory.createJsonGenerator(stringWriter);
+			jGenerator.writeStartObject();
+			jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
+			jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
+			StringBuilder nodeRefs = new StringBuilder();
+			if (annullamento.isStatoNonInviatoAlFlusso()){
+				aggiungiDocumento(documento, nodeRefs);
+				jGenerator.writeStringField("prop_bpm_comment" , "");
+				jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
+			}
+
+			jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
+			jGenerator.writeStringField("assoc_packageItems_removed" , "");
+
+
+			jGenerator.writeStringField("prop_cnrmissioni_noteAutorizzazioniAggiuntive" , cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
+			jGenerator.writeStringField("prop_cnrmissioni_missioneGratuita" , cmisOrdineMissione.getMissioneGratuita());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
+			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
+			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisOrdineMissione.getNoteSegreteria());
+			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
+			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
+			jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");
+			jGenerator.writeStringField("prop_wfcnr_groupName" , "GENERICO");
+			jGenerator.writeStringField("prop_wfcnr_wfCounterIndex" , "");
+			jGenerator.writeStringField("prop_wfcnr_wfCounterId" , "");
+			jGenerator.writeStringField("prop_wfcnr_wfCounterAnno" , "");
+			jGenerator.writeStringField("prop_bpm_workflowPriority" , cmisOrdineMissione.getPriorita());
+			jGenerator.writeStringField("prop_cnrmissioni_validazioneSpesaFlag" , cmisOrdineMissione.getValidazioneSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_missioneConAnticipoFlag" , cmisOrdineMissione.getAnticipo());
+			jGenerator.writeStringField("prop_cnrmissioni_validazioneModuloFlag" , StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "false": "true");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameUtenteOrdineMissione" , cmisOrdineMissione.getUsernameUtenteOrdine());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameRichiedente" , cmisOrdineMissione.getUsernameRichiedente());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameResponsabileModulo" , cmisOrdineMissione.getUserNameResponsabileModulo());
+			jGenerator.writeStringField("prop_cnrmissioni_userNamePrimoFirmatario" , cmisOrdineMissione.getUserNamePrimoFirmatario());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameFirmatarioSpesa" , cmisOrdineMissione.getUserNameFirmatarioSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo1" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo2" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_userNameAmministrativo3" , "");
+			jGenerator.writeStringField("prop_cnrmissioni_uoOrdine" , cmisOrdineMissione.getUoOrdine());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoOrdine" , cmisOrdineMissione.getDescrizioneUoOrdine());
+			jGenerator.writeStringField("prop_cnrmissioni_uoSpesa" , cmisOrdineMissione.getUoSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoSpesa" , cmisOrdineMissione.getDescrizioneUoSpesa());
+			jGenerator.writeStringField("prop_cnrmissioni_uoCompetenza" , cmisOrdineMissione.getUoCompetenza());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneUoCompetenza" , cmisOrdineMissione.getDescrizioneUoCompetenza());
+			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaFlag" , cmisOrdineMissione.getAutoPropriaFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_noleggioFlag" , cmisOrdineMissione.getNoleggioFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_taxiFlag" , cmisOrdineMissione.getTaxiFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_servizioFlagOk" , cmisOrdineMissione.getAutoServizioFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_personaSeguitoFlagOk" , cmisOrdineMissione.getPersonaSeguitoFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_capitolo" , cmisOrdineMissione.getCapitolo());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneCapitolo" , cmisOrdineMissione.getDescrizioneCapitolo());
+			jGenerator.writeStringField("prop_cnrmissioni_modulo" , cmisOrdineMissione.getModulo());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneModulo" , cmisOrdineMissione.getDescrizioneModulo());
+			jGenerator.writeStringField("prop_cnrmissioni_gae" , cmisOrdineMissione.getGae());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneGae" , cmisOrdineMissione.getDescrizioneGae());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoResiduo" , cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoAnnoCompetenza" , cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_impegnoNumeroOk" , cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_descrizioneImpegno" , cmisOrdineMissione.getDescrizioneImpegno());
+			jGenerator.writeStringField("prop_cnrmissioni_importoMissione" , cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_disponibilita" , cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
+			jGenerator.writeStringField("prop_cnrmissioni_missioneEsteraFlag" , cmisOrdineMissione.getMissioneEsteraFlag());
+			jGenerator.writeStringField("prop_cnrmissioni_destinazione" , cmisOrdineMissione.getDestinazione());
+			jGenerator.writeStringField("prop_cnrmissioni_dataInizioMissione" , cmisOrdineMissione.getDataInizioMissione());
+			jGenerator.writeStringField("prop_cnrmissioni_dataFineMissione" , cmisOrdineMissione.getDataFineMissione());
+			jGenerator.writeStringField("prop_cnrmissioni_trattamento" , cmisOrdineMissione.getTrattamento());
+			jGenerator.writeStringField("prop_cnrmissioni_competenzaResiduo" , cmisOrdineMissione.getFondi());
+			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaAltriMotivi" , cmisOrdineMissione.getAltriMotiviAutoPropria());
+			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaPrimoMotivo" , cmisOrdineMissione.getPrimoMotivoAutoPropria());
+			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaSecondoMotivo" , cmisOrdineMissione.getSecondoMotivoAutoPropria());
+			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaTerzoMotivo" , cmisOrdineMissione.getTerzoMotivoAutoPropria());
+			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
+				jGenerator.writeStringField("prop_bpm_comment" , "AVANZAMENTO");
+				jGenerator.writeStringField("prop_wfcnr_reviewOutcome" , FlowResubmitType.RESTART_FLOW.operation());
+				jGenerator.writeStringField("prop_transitions" , "Next");
+			}
+			jGenerator.writeEndObject();
+			jGenerator.close();
+		} catch (IOException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: "+e);
+		}
+
+		if (annullamento.isStatoNonInviatoAlFlusso()){
+			try {
+				OrdineMissione ordineMissione = annullamento.getOrdineMissione();
+				if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
+					annullamentoOrdineMissioneService.popolaCoda(annullamento);
+				} else {
+					Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
+					TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+					HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
+					String idFlusso = null;
+
+					String text = mapRichiedente.get("persistedObject").toString();
+					String patternString1 = "id=(activiti\\$[0-9]+)";
+
+					Pattern pattern = Pattern.compile(patternString1);
+					Matcher matcher = pattern.matcher(text);
+					if (matcher.find())
+						idFlusso = matcher.group(1);
+					ordineMissione.setIdFlusso(idFlusso);
+					ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+				}
+			} catch (AwesomeException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			}
+		} else {
+			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
+				ResultFlows result = getFlowsOrdineMissione(annullamento.getIdFlusso());
+				if (!StringUtils.isEmpty(result.getTaskId())){
+					missioniCMISService.restartFlow(stringWriter, result);
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
+				}
+			} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
+			}
+		}
+	}
+
+	
 	
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
@@ -647,6 +815,14 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 	
+	public ContentStream getContentStreamAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
+		String id = getNodeRefOrdineMissione(annullamento.getOrdineMissione());
+		if (id != null){
+			return missioniCMISService.recuperoContentFileFromObjectID(id);
+		}
+		return null;
+	}
+	
 	public ContentStream getContentStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException{
 		String id = getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
 		if (id != null){
@@ -664,6 +840,30 @@ public class CMISOrdineMissioneService {
 	}
 	
 	public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
+		Folder node = recuperoFolderOrdineMissione(ordineMissione);
+		if (node == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		}
+		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
+		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
+		query.append(" join missioni_ordine_attachment:annullamento_ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
+		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
+		ItemIterable<QueryResult> results = missioniCMISService.search(query);
+		if (results.getTotalNumItems() == 0)
+			return null;
+		else if (results.getTotalNumItems() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		} else {
+			for (QueryResult nodeFile : results) {
+				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
+				return file;
+			}
+		}
+		return null;
+	}
+	
+	public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
+		OrdineMissione ordineMissione = annullamento.getOrdineMissione();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
 		if (node == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
@@ -787,20 +987,7 @@ public class CMISOrdineMissioneService {
     }
 
 	public QueryResult recuperoFlusso(String idFlusso){
-		StringBuilder query = new StringBuilder("select parametriFlusso.*, flussoMissioni.* from cmis:document as t ");
-		query.append( "inner join wfcnr:parametriFlusso as parametriFlusso on t.cmis:objectId = parametriFlusso.cmis:objectId ");
-		query.append(" inner join cnrmissioni:parametriFlussoMissioni as flussoMissioni on t.cmis:objectId = flussoMissioni.cmis:objectId ");
-		query.append(" where parametriFlusso.wfcnr:wfInstanceId = '").append(idFlusso).append("'");
-
-		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-		if (resultsFolder.getTotalNumItems() == 0){
-			return null;
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return queryResult;
-			}
-		}
-		return null;
+		return missioniCMISService.recupeorFlusso(idFlusso);
 	}
 
 	private StringWriter createJsonForAbortFlowOrdineMissione(StringWriter stringWriter) {
@@ -838,6 +1025,18 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissioneAutoPropria.CMIS_PROPERTY_NAME_DOC_AUTO_PROPRIA);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissioneAutoPropria.CMIS_PROPERTY_NAME_TIPODOC_AUTO_PROPRIA);
 		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissioneAutoPropria.CMIS_PROPERTY_NAME_TIPODOC_AUTO_PROPRIA);
+		return metadataProperties;
+	}
+	
+	public Map<String, Object> createMetadataForFileAnnullamentoOrdineMissione(String currentLogin, AnnullamentoOrdineMissione annullamento){
+		Map<String, Object> metadataProperties = new HashMap<String, Object>();
+		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
+		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Annullamento dell'Ordine Missione - anno "+annullamento.getOrdineMissione().getAnno()+" numero "+annullamento.getOrdineMissione().getNumero()));
+		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Annullamento dell'Ordine di Missione"));
+		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, AnnullamentoOrdineMissione.CMIS_PROPERTY_NAME_DOC_ANNULLAMENTO);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, AnnullamentoOrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ANNULLAMENTO);
+		metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, AnnullamentoOrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ANNULLAMENTO);
 		return metadataProperties;
 	}
 	

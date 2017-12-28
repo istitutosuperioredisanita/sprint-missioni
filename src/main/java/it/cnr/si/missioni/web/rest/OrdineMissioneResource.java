@@ -116,6 +116,34 @@ public class OrdineMissioneResource {
     /**
      * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
      */
+    @RequestMapping(value = "/rest/ordiniMissione/listDaAnnullare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getOrdiniMissioneDaAnnullare(HttpServletRequest request,
+    		MissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare" );
+        filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+        filter.setGiaRimborsato("N");
+        filter.setValidato("S");
+        filter.setDaAnnullare("S");
+        List<String> listaStati = new ArrayList<>();
+        listaStati.add(Costanti.STATO_DEFINITIVO);
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        filter.setListaStatiMissione(listaStati);
+        List<OrdineMissione> ordiniMissione;
+		try {
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
+		} catch (ComponentException e) {
+			log.error("ERRORE getOrdiniMissioneDaRimborsare",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		}
+        return JSONResponseEntity.ok(ordiniMissione);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
     @RequestMapping(value = "/rest/ordiniMissione/listToFinal",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

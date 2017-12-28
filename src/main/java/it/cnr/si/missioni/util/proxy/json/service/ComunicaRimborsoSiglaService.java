@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.cache.impl.TCKMBeanServerBuilder.RIMBeanServerDelegate;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
@@ -77,16 +76,15 @@ public class ComunicaRimborsoSiglaService {
 			impostaUserContext(principal, rimborsoApprovato, missioneSigla);
 			MissioneBulk oggettoBulk = new MissioneBulk();
 			oggettoBulk.setCdCds(rimborsoApprovato.getCdsSpesa());
-			
+			oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
 			impostaBanca(rimborsoApprovato, oggettoBulk);
-			
+
 			if (rimborsoApprovato.getCdTerzoSigla() != null){
-			    oggettoBulk.setCdTerzo(rimborsoApprovato.getCdTerzoSigla().intValue());
+				oggettoBulk.setCdTerzo(rimborsoApprovato.getCdTerzoSigla().intValue());
 			}
 			oggettoBulk.setCdUnitaOrganizzativa(rimborsoApprovato.getUoSpesa());
 			oggettoBulk.setDtFineMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
 			oggettoBulk.setDtInizioMissione(DateUtils.getDateAsString(rimborsoApprovato.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE));
-	/*GGGG TODO...VERIFICARE QUALE ESERCIZIO PASSARE*/                                oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
 			oggettoBulk.setPgMissioneFromGeMis(rimborsoApprovato.getNumero());
 			oggettoBulk.setFlAssociatoCompenso(false);
 			if (rimborsoApprovato.isMissioneEstera()){
@@ -166,7 +164,7 @@ public class ComunicaRimborsoSiglaService {
 				}
 			}
 			impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
-			
+
 			impostaInquadramento(rimborsoApprovato, oggettoBulk);
 			impostaTappe(rimborsoApprovato, oggettoBulk);
 
@@ -183,7 +181,7 @@ public class ComunicaRimborsoSiglaService {
 
 			if (rimborsoApprovato.getRimborsoMissioneDettagli() != null && !rimborsoApprovato.getRimborsoMissioneDettagli().isEmpty()){
 				List<SpeseMissioneColl> speseMissioneColl = new ArrayList<SpeseMissioneColl>();
-				
+
 				for (RimborsoMissioneDettagli dettaglio : rimborsoApprovato.getRimborsoMissioneDettagli()){
 					SpeseMissioneColl spesaMissione = new SpeseMissioneColl();
 					spesaMissione.setCdTiSpesa(dettaglio.getCdTiSpesa());
@@ -195,7 +193,7 @@ public class ComunicaRimborsoSiglaService {
 					} else {
 						throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+"  non esiste una tappa utile. Possibile incongruenza con le date di inizio e di fine missione.");
 					}
-					
+
 					spesaMissione.setFlDiariaManuale(false);
 					spesaMissione.setFlSpesaAnticipata(dettaglio.getFlSpesaAnticipata().equals("S") ? true : false);
 					spesaMissione.setImBaseMaggiorazione(BigDecimal.ZERO);
@@ -222,7 +220,7 @@ public class ComunicaRimborsoSiglaService {
 					} else {
 						if (dettaglio.isGiustificativoObbligatorio()){
 							if (dettaglio.getDsNoGiustificativo() != null){
-				    			spesaMissione.setDsNoGiustificativo(dettaglio.getDsNoGiustificativo());
+								spesaMissione.setDsNoGiustificativo(dettaglio.getDsNoGiustificativo());
 							} else {
 								throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+" è obbligatorio allegare almeno un giustificativo.");
 							}

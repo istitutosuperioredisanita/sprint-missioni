@@ -185,4 +185,8 @@ public class Utility {
 		return uo.substring(0,3)+"."+uo.substring(3,6);
 	}
 
+	public static String getUoSiper(String uo) {
+		return Utility.replace(uo, ".", "");
+	}
+
 }

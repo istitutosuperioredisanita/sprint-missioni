@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrdineMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AnnullamentoOrdineMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="459"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -10,9 +10,6 @@
 	</style>
 	<style name="bold" fontName="Times New Roman" fontSize="10" isBold="true" pdfFontName="Times-Bold"/>
 	<parameter name="DIR_IMAGE" class="java.io.InputStream">
-		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
-	</parameter>
-	<parameter name="ANN_IMAGE" class="java.io.InputStream">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<queryString language="json">
@@ -166,21 +163,8 @@
 	<field name="importo0" class="java.lang.String">
 		<fieldDescription><![CDATA[importo0]]></fieldDescription>
 	</field>
-	<field name="tipo" class="java.lang.String">
-		<fieldDescription><![CDATA[tipo]]></fieldDescription>
-	</field>
-	<field name="motivoAnnullamento" class="java.lang.String">
-		<fieldDescription><![CDATA[Motivo Annullamento]]></fieldDescription>
-	</field>
 	<background>
-		<band height="669" splitType="Stretch">
-			<image hAlign="Center">
-				<reportElement x="14" y="0" width="581" height="500" uuid="ce8c9109-119d-41e8-8fb5-ec4636774748">
-					<printWhenExpression><![CDATA[$F{tipo}.compareTo( "A" )==0]]></printWhenExpression>
-				</reportElement>
-				<imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
-			</image>
-		</band>
+		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="71" splitType="Stretch">
@@ -196,7 +180,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="12" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["ORDINE DI MISSIONE N. " + $F{numero} + "  DEL "+$F{dataInserimento}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["ANNULLAMENTO ORDINE DI MISSIONE N. " + $F{numero} + "  DEL "+$F{dataInserimento}]]></textFieldExpression>
 			</textField>
 			<image hAlign="Left" isUsingCache="true">
 				<reportElement x="177" y="0" width="202" height="38" uuid="31f592d2-33e1-4e62-88ef-8840a03001b5"/>
@@ -206,16 +190,12 @@
 	</title>
 	<pageHeader>
 		<band height="130" splitType="Stretch">
-			<frame>
-				<reportElement x="0" y="1" width="554" height="129" uuid="528baac3-d03a-41a3-8d38-faf875d05417"/>
-				<box>
-					<pen lineWidth="0.75"/>
-					<topPen lineWidth="0.75"/>
-					<leftPen lineWidth="0.75"/>
-					<bottomPen lineWidth="0.75"/>
-					<rightPen lineWidth="0.75"/>
-				</box>
-			</frame>
+			<rectangle>
+				<reportElement x="0" y="1" width="554" height="129" uuid="36243807-5214-4328-91de-1684de820b5d"/>
+				<graphicElement>
+					<pen lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
 			<textField isBlankWhenNull="false">
 				<reportElement x="12" y="5" width="427" height="20" uuid="e8951b51-1e9e-4770-a242-d48813a2f6a1"/>
 				<textElement markup="styled">
@@ -276,16 +256,9 @@
 	</pageHeader>
 	<columnHeader>
 		<band height="342" splitType="Stretch">
-			<frame>
-				<reportElement x="0" y="6" width="555" height="334" uuid="6b2457cb-201b-4240-9a68-c7981ab6922a"/>
-				<box>
-					<pen lineWidth="0.75"/>
-					<topPen lineWidth="0.75"/>
-					<leftPen lineWidth="0.75"/>
-					<bottomPen lineWidth="0.75"/>
-					<rightPen lineWidth="0.75"/>
-				</box>
-			</frame>
+			<rectangle>
+				<reportElement x="0" y="6" width="555" height="334" uuid="e5584a27-bedc-4ba1-87ae-9b7c6cf73a51"/>
+			</rectangle>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
 				<reportElement x="12" y="12" width="543" height="20" uuid="ab6edefc-339a-4161-989a-1b243a126789"/>
 				<textElement textAlignment="Justified" markup="styled">
@@ -323,9 +296,7 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Distanza in Km.  </style>"+ $F{distanzaDallaSede}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="13" y="259" width="542" height="20" uuid="38c47c71-b600-4496-ba44-5e6d1372a73c">
-					<printWhenExpression><![CDATA[$F{tipo}.compareTo( "A" )!=0]]></printWhenExpression>
-				</reportElement>
+				<reportElement x="13" y="259" width="542" height="20" uuid="38c47c71-b600-4496-ba44-5e6d1372a73c"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -422,15 +393,6 @@
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Richiesta Anticipo  </style>"+ $F{richiestaAnticipo}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement x="13" y="259" width="542" height="20" uuid="fb736664-6c3e-4eb9-948d-825a20ad550f">
-					<printWhenExpression><![CDATA[$F{tipo}.compareTo( "A" )==0]]></printWhenExpression>
-				</reportElement>
-				<textElement markup="styled">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Motivo Annullamento   </style>"+ $F{motivoAnnullamento}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>

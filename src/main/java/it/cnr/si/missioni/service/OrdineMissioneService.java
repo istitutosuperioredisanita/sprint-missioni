@@ -481,6 +481,9 @@ public class OrdineMissioneService {
 			if (Utility.nvl(filter.getGiaRimborsato(),"A").equals("N")){
 				criterionList.add(Subqueries.notExists("select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' "));
 			}
+			if (Utility.nvl(filter.getDaAnnullare(),"N").equals("S")){
+				criterionList.add(Subqueries.notExists("select ann.id from AnnullamentoOrdineMissione AS ann where ann.ordineMissione.id = this.id and ann.stato != 'ANN' "));
+			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
 			return crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("numero"));

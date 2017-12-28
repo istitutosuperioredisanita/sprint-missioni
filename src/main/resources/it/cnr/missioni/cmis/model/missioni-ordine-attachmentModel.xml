@@ -48,5 +48,9 @@
 			<title>Ordine di Missione</title>
 			<description>Ordine di Missione</description>
 		</aspect>
+		<aspect name="missioni_ordine_attachment:annullamento_ordine">
+			<title>Annullamento Ordine di Missione</title>
+			<description>Annullamento Ordine di Missione</description>
+		</aspect>
 	</aspects>
 </model>

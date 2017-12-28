@@ -71,6 +71,7 @@ public class PrintService{
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
 			parameters.put("DIR_IMAGE", this.getClass().getResourceAsStream("/it/cnr/missioni/print/LogoCNR.png"));
+			parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream("/it/cnr/missioni/print/Annullato.gif"));
 //			parameters.put(JRParameter.REPORT_VIRTUALIZER, vir);
 
 			LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());

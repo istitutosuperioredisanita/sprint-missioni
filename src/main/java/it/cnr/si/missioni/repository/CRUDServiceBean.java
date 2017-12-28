@@ -22,7 +22,8 @@
  ******************************************************************************/
 package it.cnr.si.missioni.repository;
 
-import it.cnr.jada.bulk.OggettoBulk;
+import java.security.Principal;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,6 +31,12 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import it.cnr.jada.bulk.OggettoBulk;
+import net.bzdyl.ejb3.criteria.Criteria;
+import net.bzdyl.ejb3.criteria.Criterion;
+import net.bzdyl.ejb3.criteria.Order;
+import net.bzdyl.ejb3.criteria.Projection;
 
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
@@ -39,5 +46,12 @@ public class CRUDServiceBean<T extends OggettoBulk> extends AbstractCRUDServiceB
 
 	public EntityManager getManager() {
 		return em;
+	}
+	public List eseguiQuery(Criteria criteria){
+		return criteria.prepareQuery(getManager()).getResultList();
+	}
+	public Criteria preparaCriteria(Principal principal, Class<T> bulkClass,
+			Criterion criterionList, Projection projection, Order... order){
+		return select(principal, bulkClass, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
 	}
 }

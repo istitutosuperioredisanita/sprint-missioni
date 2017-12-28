@@ -30,6 +30,7 @@
                 "ordine-missione": "Nuovo Ordine di Missione",
                 "elenco-ordini-missione": "Elenco Ordini di Missione",
                 "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi",
+                "annullamento-ordine-approvato": "Annullamento Ordine di Missione Approvato",
                 "rimborso-missione": "Nuovo Rimborso Missione",
                 "elenco-rimborsi-missione": "Elenco Rimborsi Missione"
             },
@@ -425,6 +426,18 @@
     },
     "ordini-missione-da-rendere-definitivi": {
         "title": "ORDINI DI MISSIONE DA RENDERE DEFINITIVI"
+    },
+    "annullamento-ordine-missione": {
+        "title": "ANNULLAMENTO ORDINE DI MISSIONE APPROVATO",
+        "form": {
+            "numero": "Progressivo di Annullamento",
+            "motivo-annullamento.placeholder": "Indicare il Motivo di Annuullamento dell'ordine di missione approvato",
+            "motivo-annullamento": "Motivo di Annuullamento"
+        },
+        "button": {
+            "print": "Stampa Annullamento",
+            "confirm": "Conferma l'Annullamento dell'Ordine di Missione"
+        }
     },
     "rimborso-missione": {
         "title": "RIMBORSO MISSIONE ",

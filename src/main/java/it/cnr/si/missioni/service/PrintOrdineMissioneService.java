@@ -63,13 +63,14 @@ public class PrintOrdineMissioneService {
     private VoceService voceService;
     
 //    private PrintOrdineMissione getPrintOrdineMissione(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
-    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
+    public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(ordineMissione);
 		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), ordineMissione.getUoSpesa());
 		Voce voce = voceService.loadVoce(ordineMissione);
 		Gae gae = gaeService.loadGae(ordineMissione);
     	PrintOrdineMissione printOrdineMissione = new PrintOrdineMissione();
+    	printOrdineMissione.setTipo("O");
     	printOrdineMissione.setAnno(ordineMissione.getAnno());
     	printOrdineMissione.setCdrRich(caricaCdr(ordineMissione.getCdrRich()));
     	printOrdineMissione.setCdrSpesa(caricaCdr(ordineMissione.getCdrSpesa()));
