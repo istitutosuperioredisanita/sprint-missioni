@@ -1,16 +1,9 @@
 package it.cnr.si.missioni.service;
 
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ILock;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
-import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
-import it.cnr.si.missioni.web.filter.MissioneFilter;
-import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import java.security.Principal;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +12,19 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.security.Principal;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.ILock;
+
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
+import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
+import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
 @Service
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -37,6 +39,12 @@ public class CronService {
     
     @Value("${cron.loadCache.name}")
     private String lockKeyLoadCache;
+    
+    @Value("${spring.mail.messages.erroreLetturaFlussoAnnullamento.oggetto}")
+    private String subjectErrorFlowsAnnullamento;
+    
+    @Value("${spring.mail.messages.erroreLetturaFlussoAnnullamento.testo}")
+    private String textErrorFlowsAnnullamento;
     
     @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
     private String subjectErrorFlowsOrdine;
@@ -70,6 +78,9 @@ public class CronService {
 	
 	@Autowired
 	private OrdineMissioneService ordineMissioneService;
+
+	@Autowired
+	private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
 	@Autowired
 	private FlowsService flowsService;
@@ -182,7 +193,7 @@ public class CronService {
 					String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
 					LOGGER.error(testoErrore+" "+e);
 					try {
-						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+						mailService.sendEmailError(subjectErrorFlowsRimborso, testoErrore, false, true);
 					} catch (Exception e1) {
 						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 					}
@@ -230,10 +241,15 @@ public class CronService {
 	}
 
 	private void aggiornaOrdiniMissioneFlows(Principal principal) {
-		MissioneFilter filtro = new MissioneFilter();
+		RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
 		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 		filtro.setValidato("S");
 		filtro.setDaCron("S");
+		aggiornaOrdini(principal, filtro);
+		aggiornaAnnullamentoOrdini(principal, filtro);
+	}
+
+	private void aggiornaOrdini(Principal principal, MissioneFilter filtro) {
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
 			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
@@ -262,6 +278,41 @@ public class CronService {
 				}
 			}
 		}
+	}
+
+	private void aggiornaAnnullamentoOrdini(Principal principal, RimborsoMissioneFilter filtro) {
+		List<AnnullamentoOrdineMissione> listaAnnullamenti = null;
+		try {
+			listaAnnullamenti = annullamentoOrdineMissioneService.getAnnullamenti(principal, filtro, false, true);
+		} catch (ComponentException e2) {
+			String error = Utility.getMessageException(e2);
+			LOGGER.error(error + " "+e2);
+			try {
+				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
+			} catch (Exception e1) {
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+			}
+		}
+		if (listaAnnullamenti != null){
+			for (AnnullamentoOrdineMissione annullamento : listaAnnullamenti){
+				try {
+					flowsService.aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(principal,annullamento.getId());
+				} catch (Exception e) {
+					String error = Utility.getMessageException(e);
+					String testoErrore = getTextErrorAnnullamento(annullamento, error);
+					LOGGER.error(testoErrore + " "+e);
+					try {
+						mailService.sendEmailError(subjectErrorFlowsAnnullamento, testoErrore, false, true);
+					} catch (Exception e1) {
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+					}
+				}
+			}
+		}
+	}
+
+	private String getTextErrorAnnullamento(AnnullamentoOrdineMissione annullamentoOrdineMissione, String error) {
+		return textErrorFlowsAnnullamento+" con id "+annullamentoOrdineMissione.getId()+" è andata in errore per il seguente motivo: " + error;
 	}
 
 	private String getTextErrorOrdine(OrdineMissione ordineMissione, String error) {

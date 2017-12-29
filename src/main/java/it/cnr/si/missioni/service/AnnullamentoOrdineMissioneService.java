@@ -181,11 +181,13 @@ public class AnnullamentoOrdineMissioneService {
 		updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
 	}
 
-	public AnnullamentoOrdineMissione aggiornaAnnullamentoMissioneApprovato(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare)
+	public AnnullamentoOrdineMissione aggiornaAnnullamentoMissioneApprovato(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare, OrdineMissione ordineMissione)
 			throws ComponentException {
 		annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		annullamentoDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		AnnullamentoOrdineMissione annullamento = updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
+		ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
+		ordineMissione = ordineMissioneService.updateOrdineMissione(principal, ordineMissione, true, false);
 		popolaCoda(annullamento);
 		return annullamento;
 	}
