@@ -303,4 +303,38 @@ public class CronService {
 			throw new ComponentException(e);
 		}
 	}
+	private void verifyStepRespGruppo(Principal principal) {
+		MissioneFilter filtro = new MissioneFilter();
+		filtro.setStato(Costanti.STATO_INVIATO_RESPONSABILE);
+		filtro.setDaCron("S");
+		List<OrdineMissione> listaOrdiniMissione = null;
+		try {
+			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+		} catch (ComponentException e2) {
+			String error = Utility.getMessageException(e2);
+			LOGGER.error(error + " "+e2);
+			try {
+				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
+			} catch (Exception e1) {
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+			}
+		}
+		if (listaOrdiniMissione != null){
+			for (OrdineMissione ordineMissione : listaOrdiniMissione){
+				try {
+					flowsService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione.getId());
+				} catch (Exception e) {
+					String error = Utility.getMessageException(e);
+					String testoErrore = getTextErrorOrdine(ordineMissione, error);
+					LOGGER.error(testoErrore + " "+e);
+					try {
+						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+					} catch (Exception e1) {
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+					}
+				}
+			}
+		}
+	}
+
 }
