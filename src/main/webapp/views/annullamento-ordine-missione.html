@@ -40,7 +40,7 @@
               <div class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.domicilio-fiscale">Domicilio</span>
-                              <input ng-disabled="disabilitaAnnullamento" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="annullamentoModel.domicilioFiscaleRich"/>
+                              <input ng-disabled="!elencoOrdiniMissione || annullamentoModel.id" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="annullamentoModel.domicilioFiscaleRich"/>
                           </span>
               </div>
             </div>
@@ -343,13 +343,13 @@
                     </p>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento">
                             <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaRimborsoMissione">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
@@ -367,7 +367,7 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-xs-1" ng-show="showEsisteAnnullamento && !validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-1" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
                     </div>
             </form>

@@ -38,6 +38,12 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
                 });
                 return promise;
             },
+            findListAnnullamentiToValidate: function() {
+                var promise = $http.get('api/rest/annullamentoOrdineMissione/listToValidate').then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
             findListToValidate: function() {
                 var promise = $http.get('api/rest/ordiniMissione/listToValidate').success(function (response) {
                     return response.data;

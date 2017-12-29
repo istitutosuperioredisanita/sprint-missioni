@@ -15,6 +15,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.ResultFlows;
+import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -32,6 +33,9 @@ public class FlowsService {
 	OrdineMissioneService ordineMissioneService;
 	
     @Autowired
+	AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
+	
+    @Autowired
 	RimborsoMissioneService rimborsoMissioneService;
 	
     @Autowired
@@ -46,6 +50,11 @@ public class FlowsService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResultFlows aggiornaOrdineMissioneFlowsNewTransaction(Principal principal, Serializable idOrdineMissione) throws Exception {
     	return aggiornaOrdineMissioneFlows(principal, idOrdineMissione);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public ResultFlows aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(Principal principal, Serializable idAnnullamentoMissione) throws Exception {
+    	return aggiornaAnnullamentoOrdineMissioneFlows(principal, idAnnullamentoMissione);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -73,6 +82,36 @@ public class FlowsService {
 				} else if (result.isStateReject()){
 	    			log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 					ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
+			    	return result;
+				}
+			}
+		}
+		return null;
+	}
+
+	public ResultFlows aggiornaAnnullamentoOrdineMissioneFlows(Principal principal, Serializable idAnnullamento)
+			throws ComponentException, Exception {
+		if (idAnnullamento != null){
+			AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById(principal, AnnullamentoOrdineMissione.class, idAnnullamento);
+			if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneDaValidare()){
+				ResultFlows result = retrieveDataFromFlows(annullamento);
+				if (result == null){
+					return null;
+				}
+				if (result.isApprovato()){
+					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
+					log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+					annullamentoOrdineMissioneService.aggiornaAnnullamentoMissioneApprovato(principal, annullamento, ordineMissione);
+					return result;
+				} else if (result.isAnnullato()){
+					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
+	    			log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} annullato.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+	    			annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneAnnullato(principal, annullamento);
+					return result;
+				} else if (result.isStateReject()){
+					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
+	    			log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+	    			annullamentoOrdineMissioneService.aggiornaAnnullamentoRespinto(principal, result, annullamento);
 			    	return result;
 				}
 			}
@@ -117,6 +156,12 @@ public class FlowsService {
 	private ResultFlows retrieveDataFromFlows(OrdineMissione ordineMissione)
 			throws ComponentException {
 		ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
+		return result;
+	}
+
+	private ResultFlows retrieveDataFromFlows(AnnullamentoOrdineMissione annullamento)
+			throws ComponentException {
+		ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(annullamento.getIdFlusso());
 		return result;
 	}
 
