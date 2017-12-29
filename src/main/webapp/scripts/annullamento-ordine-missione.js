@@ -617,7 +617,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
     }
 
     $scope.confirm = function () {
-        ui.confirmCRUD("Si sta per confermare l'Annullamento dell'Ordine di Missione Numero: "+$scope.ordineMissione.ordineMissione.numero+" del "+$filter('date')($scope.ordineMissione.ordine.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e la richiesta di annullamento non sarà più modificabile. Si desidera Continuare?", confirmAnnullamentoOrdineMissione);
+        ui.confirmCRUD("Si sta per confermare l'Annullamento dell'Ordine di Missione Numero: "+$scope.annullamentoModel.ordineMissione.numero+" del "+$filter('date')($scope.annullamentoModel.ordineMissione.dataInserimento, COSTANTI.FORMATO_DATA)+". L'operazione avvierà il processo di autorizzazione e la richiesta di annullamento non sarà più modificabile. Si desidera Continuare?", confirmAnnullamentoOrdineMissione);
     }
 
     var confirmAnnullamentoOrdineMissione = function () {
