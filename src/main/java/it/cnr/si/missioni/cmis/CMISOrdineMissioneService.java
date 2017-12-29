@@ -583,7 +583,7 @@ public class CMISOrdineMissioneService {
 				if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
 					annullamentoOrdineMissioneService.popolaCoda(annullamento);
 				} else {
-					Response responsePost = missioniCMISService.startFlowOrdineMissione(stringWriter);
+					Response responsePost = missioniCMISService.startFlowAnnullamentoOrdineMissione(stringWriter);
 					TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
 					HashMap<String,Object> mapRichiedente = mapper.readValue(responsePost.getStream(), typeRef); 
 					String idFlusso = null;
@@ -595,8 +595,8 @@ public class CMISOrdineMissioneService {
 					Matcher matcher = pattern.matcher(text);
 					if (matcher.find())
 						idFlusso = matcher.group(1);
-					ordineMissione.setIdFlusso(idFlusso);
-					ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+					annullamento.setIdFlusso(idFlusso);
+					annullamento.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 				}
 			} catch (AwesomeException e) {
 				throw e;

@@ -53,6 +53,9 @@ spring:
             erroreLetturaFlussoOrdine:
                 oggetto: Missioni. Errore durante l'aggiornamento dell'Ordine da Scrivania Digitale.
                 testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per l'ordine di missione
+            erroreLetturaFlussoAnnullamento:
+                oggetto: Missioni. Errore durante l'aggiornamento dell'Annullamento Ordine da Scrivania Digitale.
+                testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per l'annullamento dell'ordine di missione
             erroreLetturaFlussoRimborso:
                 oggetto: Missioni. Errore durante l'aggiornamento del Rimborso da Scrivania Digitale.
                 testo: Si segnala che il recupero delle informazioni dalla scrivania digitale per il rimborso missione
