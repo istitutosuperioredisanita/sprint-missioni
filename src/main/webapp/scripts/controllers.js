@@ -6,6 +6,7 @@ missioniApp.controller('MainController', function ($scope, $sessionStorage, $loc
 });
 
 missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService) {
+    $scope.endSearchCmisAnnullamenti = false;
     $scope.endSearchCmisOrdine = false;
     $scope.endSearchCmisRimborso = false;
     if (!$sessionStorage.account || !$sessionStorage.account.login) {
@@ -19,6 +20,34 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
             $scope.userSpecial = false;
         }    
 
+
+        ElencoOrdiniMissioneService.findListAnnullamentiToValidate().then(function(response){
+            $scope.listAnnullamentiOrdiniMissioniToValidate = response;
+            $scope.esistonoAnnullamentiDaApprovare = false;
+            $scope.esistonoAnnullamentiApprovati = false;
+            $scope.esistonoAnnullamentiRespinti = false;
+            $scope.esistonoAnnullamentiDaConfermare = false;
+            $scope.esistonoAnnullamentiDaValidare = false;
+            if ($scope.listAnnullamentiOrdiniMissioniToValidate){
+                for (var i=0; i< $scope.listAnnullamentiOrdiniMissioniToValidate.length; i++) {
+                    if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
+                        $scope.esistonoAnnullamentiDaApprovare = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'R'){
+                        $scope.esistonoAnnullamentiRespinti = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'C'){
+                        $scope.esistonoAnnullamentiDaConfermare = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'A'){
+                        $scope.esistonoAnnullamentiApprovati = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoAnnullamentiDaValidare = true;
+                    }
+                }
+            }
+            $scope.endSearchCmisAnnullamenti = true;
+        },
+        function(error){
+            $scope.endSearchCmisAnnullamenti = true;
+        });        
 
         ElencoOrdiniMissioneService.findListToValidate().then(function(response){
             $scope.listOrdiniMissioniToValidate = response.data;
@@ -101,6 +130,12 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     $scope.doSelectOrdineMissioneToFinalize = function (ordineMissione) {
         $location.path('/ordine-missione/'+ordineMissione.id+'/'+"D");
     };
+    $scope.doSelectAnnullamentoOrdineMissione = function (annullamento) {
+        $location.path('/annullamento-ordine-missione/'+annullamento.id);
+    };
+    $scope.doSelectAnnullamentoOrdineMissioneValidazione = function (annullamento) {
+        $location.path('/annullamento-ordine-missione/'+annullamento.id+'/'+"S");
+    };
 });
 
 missioniApp.controller('AdminController', function ($scope) {
@@ -159,6 +194,40 @@ missioniApp.controller('SettingsController', function ($scope, Account) {
                     }
                 });
         };
+    });
+
+missioniApp.controller('RegisterController', function ($scope, $translate, Register) {
+        $scope.success = null;
+        $scope.error = null;
+        $scope.doNotMatch = null;
+        $scope.errorUserExists = null;
+        $scope.register = function () {
+            if ($scope.registerAccount.password != $scope.confirmPassword) {
+                $scope.doNotMatch = "ERROR";
+            } else {
+                $scope.registerAccount.langKey = $translate.use();
+                $scope.doNotMatch = null;
+                $scope.success = null;
+                $scope.error = null;
+                $scope.errorUserExists = null;
+                $scope.errorEmailExists = null;
+                Register.save($scope.registerAccount,
+                    function (value, responseHeaders) {
+                        $scope.success = 'OK';
+                    },
+                    function (httpResponse) {
+                        if (httpResponse.status === 400 && httpResponse.data === "login already in use") {
+                            $scope.error = null;
+                            $scope.errorUserExists = "ERROR";
+                        } else if (httpResponse.status === 400 && httpResponse.data === "e-mail address already in use") {
+                            $scope.error = null;
+                            $scope.errorEmailExists = "ERROR";
+                        } else {
+                            $scope.error = "ERROR";
+                        }
+                    });
+            }
+        }
     });
 
 missioniApp.controller('RegisterController', function ($scope, $translate, Register) {

@@ -627,7 +627,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     var impostaDisabilitaOrdineMissione = function() {
         if ($scope.esisteOrdineMissione && 
             (($scope.ordineMissioneModel.stato === 'INR' && $scope.ordineMissioneModel.responsabileGruppo != $sessionStorage.account.login) || 
-              $scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || $scope.ordineMissioneModel.stato === 'ANN'||
+              $scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || $scope.ordineMissioneModel.stato === 'ANA'||$scope.ordineMissioneModel.stato === 'ANN'||
               ($scope.ordineMissioneModel.stato === 'CON' && 
                 ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
                  $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||

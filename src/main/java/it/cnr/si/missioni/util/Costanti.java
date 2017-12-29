@@ -124,6 +124,7 @@ public class Costanti {
     static {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(STATO_ANNULLATO, "Annullato");
+        aMap.put(STATO_ANNULLATO_DOPO_APPROVAZIONE, "Annullato dopo l'approvazione");
         aMap.put(STATO_CONFERMATO, "Confermato");
         aMap.put(STATO_INVIATO_RESPONSABILE, "Inviato");
         aMap.put(STATO_INSERITO, "Inserito");
