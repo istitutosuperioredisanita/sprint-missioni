@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -602,6 +604,12 @@ public class OrdineMissioneService {
     	return ordineMissione;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void verifyStepRespGruppo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
+		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+		long minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
+//		if (istituto.getMinutiMinimiResp())
+    }
 
     private void inizializzaCampiPerInserimento(Principal principal,
     		OrdineMissione ordineMissione) throws ComponentException {
