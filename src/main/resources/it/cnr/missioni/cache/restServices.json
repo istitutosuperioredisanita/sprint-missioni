@@ -229,6 +229,13 @@
         },
         {
             "app": "SIGLA",
+            "url": "ConsProgettiAction.json",
+            "classeJson": "it.cnr.si.missioni.util.proxy.json.object.ProgettoJson",
+            "classe": "it.cnr.si.missioni.util.proxy.json.object.Progetto",
+            "skipLoadStartup": "S",
+        },
+        {
+            "app": "SIGLA",
             "url": "ConsTerzoAction.json",
             "skipLoadStartup": "S",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.TerzoJson",
