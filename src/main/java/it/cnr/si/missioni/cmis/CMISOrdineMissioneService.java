@@ -169,8 +169,10 @@ public class CMISOrdineMissioneService {
 			}
 
 			String username = principal.getName();
+			LocalDate data = LocalDate.now();
+			int anno = data.getYear();
 			
-			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), ordineMissione.getUoSpesa());
+			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), anno, ordineMissione.getUoSpesa());
 			Voce voce = voceService.loadVoce(ordineMissione);
 			Gae gae = gaeService.loadGae(ordineMissione);
 			UnitaOrganizzativa uoCompetenza = null;

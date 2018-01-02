@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.service;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -66,7 +67,9 @@ public class PrintOrdineMissioneService {
     public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(ordineMissione);
-		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), ordineMissione.getUoSpesa());
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
+		Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), anno, ordineMissione.getUoSpesa());
 		Voce voce = voceService.loadVoce(ordineMissione);
 		Gae gae = gaeService.loadGae(ordineMissione);
     	PrintOrdineMissione printOrdineMissione = new PrintOrdineMissione();
