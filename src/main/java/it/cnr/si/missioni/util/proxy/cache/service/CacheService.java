@@ -107,10 +107,10 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 					if (!StringUtils.isEmpty(clauseToIterate.getFromValue()) && clauseToIterate.containsToSpecialValue()){
 						Integer from = new Integer(clauseToIterate.getFromValue()); 
 						Integer to = (int)clauseToIterate.getValueFromToSpecialValue();
-						for (int anno=from; anno<=to; anno++){
-							JSONClause clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), "=", anno);
-							listaClause.add(clause);
-						}
+						JSONClause clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), ">=", from);
+						listaClause.add(clause);
+						clause = new JSONClause(clauseToIterate.getCondition(), clauseToIterate.getFieldName(), "<=", to);
+						listaClause.add(clause);
 					} 
 				}
 			}

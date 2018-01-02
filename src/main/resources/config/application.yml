@@ -67,7 +67,7 @@ spring:
             invioOrdinePerValidazioneDatiFinanziari:
                 oggetto: Verifica Ordine di Missione di
             invioAnnullamentoOrdineMissione:
-                oggetto: Verifica Annullamento Ordine di Missione di
+                oggetto: Richiesta Annullamento Ordine di Missione di
             invioRimborsoPerValidazioneDatiFinanziari:
                 oggetto: Verifica Rimborso Missione di
             ritornoOrdineMissioneMittente:
