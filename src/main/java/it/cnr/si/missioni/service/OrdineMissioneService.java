@@ -1060,8 +1060,10 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Il CDR "+ ordineMissione.getCdrSpesa() + " non è corretto rispetto alla UO "+ordineMissione.getUoSpesa());
 			}
 		}
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
 		if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())){
-			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(), ordineMissione.getUoSpesa());
+			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), anno, ordineMissione.getUoSpesa());
 			if (progetto == null){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Il modulo indicato non è corretto rispetto alla UO "+ordineMissione.getUoSpesa());
 			}
