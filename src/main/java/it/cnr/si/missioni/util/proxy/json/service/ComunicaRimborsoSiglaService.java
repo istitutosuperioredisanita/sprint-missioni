@@ -275,7 +275,7 @@ public class ComunicaRimborsoSiglaService {
 				if (descrizioneMissione.length() > 300){
 					descrizioneMissione = rimborsoApprovato.getOggetto();
 					if (descrizioneMissione.length() > 300){
-						descrizioneMissione.substring(0, 299);
+						descrizioneMissione = descrizioneMissione.substring(0, 300);
 					}
 				}
 			}
