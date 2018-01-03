@@ -546,7 +546,7 @@
       </thead>
 
       <tbody id ="missioni">
-        <tr ng-repeat="annullamento in listAnnullamentiOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'D'}" ng-click="doSelectAnnullamentiOrdineMissione(annullamento)" data-method="get">
+        <tr ng-repeat="annullamento in listAnnullamentiOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'D'}" ng-click="doSelectAnnullamentoOrdineMissione(annullamento)" data-method="get">
               <td style="text-align: center" >{{annullamento.ordineMissione.anno}}</td>
               <td style="text-align: right">{{annullamento.ordineMissione.numero}}</td>
               <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>

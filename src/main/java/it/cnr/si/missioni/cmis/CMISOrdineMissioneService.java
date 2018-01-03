@@ -14,9 +14,11 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -568,6 +570,8 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaPrimoMotivo" , cmisOrdineMissione.getPrimoMotivoAutoPropria());
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaSecondoMotivo" , cmisOrdineMissione.getSecondoMotivoAutoPropria());
 			jGenerator.writeStringField("prop_cnrmissioni_autoPropriaTerzoMotivo" , cmisOrdineMissione.getTerzoMotivoAutoPropria());
+			jGenerator.writeStringField("prop_cnrmissioni_wfOrdineDaRevoca" , annullamento.getOrdineMissione().getIdFlusso());
+			
 			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
 				jGenerator.writeStringField("prop_bpm_comment" , "AVANZAMENTO");
 				jGenerator.writeStringField("prop_wfcnr_reviewOutcome" , FlowResubmitType.RESTART_FLOW.operation());
@@ -848,7 +852,7 @@ public class CMISOrdineMissioneService {
 		}
 		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
 		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:annullamento_ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
+		query.append(" join missioni_ordine_attachment:ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
 		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
 		ItemIterable<QueryResult> results = missioniCMISService.search(query);
 		if (results.getTotalNumItems() == 0)
@@ -872,7 +876,7 @@ public class CMISOrdineMissioneService {
 		}
 		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
 		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
+		query.append(" join missioni_ordine_attachment:annullamento_ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
 		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
 		ItemIterable<QueryResult> results = missioniCMISService.search(query);
 		if (results.getTotalNumItems() == 0)
@@ -914,9 +918,22 @@ public class CMISOrdineMissioneService {
 	public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) {
 		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
+//		Optional.ofNullable(node) 
+//			.map(folder -> folder.getChildren())
+//			.map(cmisObjects -> {
+//                List<CmisObject> list = new ArrayList<CmisObject>();
+//                cmisObjects.forEach(cmisObject ->
+//                        list.add(cmisObject));
+//                return list;
+//            })
+//			.map(lista -> lista.stream()
+//			.filter(cmisObj -> cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)
+//                    .equals("P:missioni_ordine_attachment:uso_auto_propria")));
+//
 		if (node == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti di richiesta anticipo collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		}
+		
 		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
 		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
 		query.append(" join missioni_ordine_attachment:richiesta_anticipo anticipo on doc.cmis:objectId = anticipo.cmis:objectId ");

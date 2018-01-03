@@ -63,6 +63,10 @@ public class Costanti {
 	public final static String STATO_ANNULLATO_FROM_CMIS = "ANNULLATO";
 	public final static String STATO_RESPINTO_UO_FROM_CMIS = "RESPINTO UO";
 	public final static String STATO_RESPINTO_SPESA_FROM_CMIS = "RESPINTO SPESA";
+	public final static String STATO_RESPINTO_UO_REVOCA_FROM_CMIS = "RESPINTO UO REVOCA";
+	public final static String STATO_RESPINTO_SPESA_REVOCA_FROM_CMIS = "RESPINTO SPESA REVOCA";
+	public final static String STATO_FIRMA_UO_REVOCA_FROM_CMIS = "FIRMA UO REVOCA";
+	public final static String STATO_FIRMA_SPESA_REVOCA_FROM_CMIS = "FIRMA SPESA REVOCA";
 	public final static String STATO_FIRMA_UO_FROM_CMIS = "FIRMA UO";
 	public final static String STATO_FIRMA_SPESA_FROM_CMIS = "FIRMA SPESA";
 	public final static String STATO_RESPINTO_UO_RIMBORSO_FROM_CMIS = "RESPINTO UO RIMBORSO";
