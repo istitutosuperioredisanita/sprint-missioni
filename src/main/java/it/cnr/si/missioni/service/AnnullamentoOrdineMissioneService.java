@@ -224,7 +224,26 @@ public class AnnullamentoOrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Annullamento Ordine Missione da aggiornare inesistente.");
 		}
 		
-		aggiornaDatiAnnullamentoOrdineMissione(principal, annullamento, confirm, annullamentoDB);
+		if (Utility.nvl(annullamento.getDaValidazione(), "N").equals("S")){
+			if (!annullamentoDB.getStato().equals(Costanti.STATO_CONFERMATO)){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione non confermato.");
+			}
+			if (!annullamentoDB.isMissioneDaValidare()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
+			}
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), annullamento.getOrdineMissione().getUoSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+annullamento.getOrdineMissione().getUoSpesa()+".");
+			}
+			
+			if (!confirm){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un annullamento ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
+			}
+
+			aggiornaDatiAnnullamentoOrdineMissione(principal, annullamento, confirm, annullamentoDB);
+			annullamentoDB.setValidato("S");
+		} else {
+			aggiornaDatiAnnullamentoOrdineMissione(principal, annullamento, confirm, annullamentoDB);
+		}
 
 		if (confirm){
 			annullamentoDB.setStato(Costanti.STATO_CONFERMATO);
@@ -274,6 +293,9 @@ public class AnnullamentoOrdineMissioneService {
 		annullamentoDB.setStato(annullamento.getStato());
 		annullamentoDB.setStatoFlusso(annullamento.getStatoFlusso());
 		annullamentoDB.setMotivoAnnullamento(annullamento.getMotivoAnnullamento());
+		if (confirm){
+			aggiornaValidazione(principal, annullamentoDB);
+		}
 	}
 
     private String getEmail(String user){
@@ -546,7 +568,11 @@ public class AnnullamentoOrdineMissioneService {
     }
 
     private void aggiornaValidazione(Principal principal, AnnullamentoOrdineMissione annullamento) {
-    	annullamento.setValidato("S");
+		if (accountService.isUserSpecialEnableToValidateOrder(principal.getName(), annullamento.getOrdineMissione().getUoSpesa())){
+			annullamento.setValidato("S");
+		} else {
+			annullamento.setValidato("N");
+		}
     }
 
 	private void validaCRUD(Principal principal, AnnullamentoOrdineMissione annullamento) {
