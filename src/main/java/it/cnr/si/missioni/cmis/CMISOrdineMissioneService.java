@@ -169,8 +169,11 @@ public class CMISOrdineMissioneService {
 					ordineMissione.setUtilizzoAutoPropria("N");
 				}
 			}
-
-			String username = principal.getName();
+			String username = "";
+			if (ordineMissione.getDatiIstituto() != null && StringUtils.isEmpty(ordineMissione.getDatiIstituto().getTipoMailDopoOrdine())){
+				username = principal.getName();
+			}
+			
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
 			
@@ -256,7 +259,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setUserNameResponsabileModulo("");
 			cmisOrdineMissione.setUsernameResponsabileGruppo("");
 			cmisOrdineMissione.setNoteAutorizzazioniAggiuntive(ordineMissione.getNoteUtilizzoTaxiNoleggio() == null ? "": ordineMissione.getNoteUtilizzoTaxiNoleggio());
-			cmisOrdineMissione.setUsernameRichiedente(username);
+			cmisOrdineMissione.setUsernameRichiedente(Utility.nvl(username,""));
 			cmisOrdineMissione.setUsernameUtenteOrdine(ordineMissione.getUid());
 			cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "false" : "true");
 			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "true" : "false");
