@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -921,18 +922,8 @@ public class CMISOrdineMissioneService {
 	public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) {
 		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
-//		Optional.ofNullable(node) 
-//			.map(folder -> folder.getChildren())
-//			.map(cmisObjects -> {
-//                List<CmisObject> list = new ArrayList<CmisObject>();
-//                cmisObjects.forEach(cmisObject ->
-//                        list.add(cmisObject));
-//                return list;
-//            })
-//			.map(lista -> lista.stream()
-//			.filter(cmisObj -> cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)
-//                    .equals("P:missioni_ordine_attachment:uso_auto_propria")));
-//
+//		List<CmisObject> autoPropria = recuperoDocumento(node, "P:missioni_ordine_attachment:uso_auto_propria");
+
 		if (node == null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti di richiesta anticipo collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		}
@@ -953,6 +944,20 @@ public class CMISOrdineMissioneService {
 			}
 		}
 		return null;
+	}
+
+	private List<CmisObject> recuperoDocumento(Folder node, String tipoDocumento) {
+		return Optional.ofNullable(node) 
+			.map(folder -> folder.getChildren())
+			.map(cmisObjects -> {
+                List<CmisObject> list = new ArrayList<CmisObject>();
+                cmisObjects.forEach(cmisObject ->
+                        list.add(cmisObject));
+                return list;
+            })
+			.map(lista -> lista.stream()
+			.filter(cmisObj -> cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)
+                    .equals(tipoDocumento)).collect(Collectors.toList())).orElse(new ArrayList<CmisObject>());
 	}
 	
 	public Folder recuperoFolderOrdineMissione(OrdineMissione ordineMissione){
