@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="missioni" id="20171228191400">
+    	<addColumn 
+            tableName="ORDINE_MISSIONE">
+            <column name="DATA_INVIO_RESP_GRUPPO" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DATA_INVIO_AMMINISTRATIVO" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DATA_INVIO_FIRMA" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+	        	<column name="BYPASS_RESP_GRUPPO" type="character varying(1)" >
+            		<constraints nullable="true"/>
+						</column>
+	        	<column name="BYPASS_AMMINISTRATIVO" type="character varying(1)" >
+            		<constraints nullable="true"/>
+						</column>
+    	</addColumn>
+    </changeSet>
+</databaseChangeLog>
