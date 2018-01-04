@@ -19,8 +19,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -645,4 +647,20 @@ public class MissioniCMISService {
 		}
 		return null;
 	}
+	protected List<CmisObject> recuperoDocumento(Folder node, String tipoDocumento) {
+		return Optional.ofNullable(node) 
+			.map(folder -> folder.getChildren())
+			.map(cmisObjects -> {
+                List<CmisObject> list = new ArrayList<CmisObject>();
+                cmisObjects.forEach(cmisObject ->
+                        list.add(cmisObject));
+                return list;
+            })
+			.map(lista -> lista.stream()
+			.filter(cmisObj -> {
+				Boolean str = ((ArrayList<String>)cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(tipoDocumento);
+				return str;
+			}).collect(Collectors.toList())).orElse(new ArrayList<CmisObject>());
+	}
+	
 }
