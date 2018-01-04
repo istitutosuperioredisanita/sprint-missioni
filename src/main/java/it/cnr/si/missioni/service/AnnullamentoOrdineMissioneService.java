@@ -257,6 +257,9 @@ public class AnnullamentoOrdineMissioneService {
     	}
     	annullamentoDB = (AnnullamentoOrdineMissione)crudServiceBean.modificaConBulk(principal, annullamentoDB);
     	
+    	if (confirm && annullamentoDB.isMissioneDaValidare()){
+    		sendMailToAdministrative(basePath, annullamentoDB);
+    	}
     	log.debug("Updated Information for Annullamento Ordine Missione: {}", annullamentoDB);
 
     	return annullamentoDB;
@@ -266,8 +269,8 @@ public class AnnullamentoOrdineMissioneService {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(annullamento.getOrdineMissione().getUoSpesa(), annullamento.getOrdineMissione().getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(annullamento.getUid());
 		String testoMail = getTextMailSendToAdministrative(basePath, annullamento);
-		if (dati != null && dati.getMailNotificheRimborso() != null){
-			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotificheRimborso());
+		if (dati != null && dati.getMailNotifiche() != null){
+			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(annullamento.getOrdineMissione().getUoSpesa());
 			sendMailToAdministrative(lista, testoMail, subjectMail);
