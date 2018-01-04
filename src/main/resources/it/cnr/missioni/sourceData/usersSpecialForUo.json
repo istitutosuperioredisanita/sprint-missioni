@@ -1735,7 +1735,7 @@
 {"uid":"martina.deangelis", "uoForUsersSpecial":[{"codice_uo":"042000", "ordine_da_validare":"S"}]},
 {"uid":"francesca.argiolas", "uoForUsersSpecial":[{"codice_uo":"042000", "ordine_da_validare":"S"}]},
 {"uid":"augusto.bortolussi", "uoForUsersSpecial":[{"codice_uo":"042002", "ordine_da_validare":"S"}]},
-{"uid":"lucia.satta", "uoForUsersSpecial":[{"codice_uo":"042000", "ordine_da_validare":"S"}]},
+{"uid":"lucia.satta", "uoForUsersSpecial":[{"codice_uo":"042002", "ordine_da_validare":"S"}]},
 
 {"uid":"massimogiordano.depellegrin", "uoForUsersSpecial":[{"codice_uo":"085001", "ordine_da_validare":"S"}]},
 {"uid":"leonardo.picaciamarra", "uoForUsersSpecial":[{"codice_uo":"085000", "ordine_da_validare":"S"}]},
