@@ -82,7 +82,7 @@ import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 
 @Service
 public class CMISOrdineMissioneService {
-	private static final Log logger = LogFactory.getLog(MissioniCMISService.class);
+	private static final Log logger = LogFactory.getLog(CMISOrdineMissioneService.class);
 
 	public static final String PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC";
 	public static final String PROPERTY_TIPOLOGIA_DOC_SPECIFICA = "wfcnr:tipologiaDocSpecifica";
@@ -851,115 +851,68 @@ public class CMISOrdineMissioneService {
 	
 	public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
-		if (node == null){
+		List<CmisObject> ordine = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
+		if (ordine.size() == 0)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
-		}
-		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
-		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
-		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-		ItemIterable<QueryResult> results = missioniCMISService.search(query);
-		if (results.getTotalNumItems() == 0)
-			return null;
-		else if (results.getTotalNumItems() > 1){
+		else if (ordine.size() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		} else {
-			for (QueryResult nodeFile : results) {
-				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
-				return file;
-			}
+				CmisObject nodeFile = ordine.get(0); 
+				return nodeFile.getId();
 		}
-		return null;
 	}
 	
 	public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
 		OrdineMissione ordineMissione = annullamento.getOrdineMissione();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
-		if (node == null){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		List<CmisObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+
+		if (objs.size() == 0){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di annullamento dell'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		}
-		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
-		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:annullamento_ordine ordine on doc.cmis:objectId = ordine.cmis:objectId ");
-		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-		ItemIterable<QueryResult> results = missioniCMISService.search(query);
-		if (results.getTotalNumItems() == 0)
-			return null;
-		else if (results.getTotalNumItems() > 1){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		else if (objs.size() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files di annullamento dell'ordine di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		} else {
-			for (QueryResult nodeFile : results) {
-				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
-				return file;
-			}
+			CmisObject nodeFile = objs.get(0);
+			String file = nodeFile.getId();
+			return file;
 		}
-		return null;
 	}
 	
 	public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException{
 		OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
-		if (node != null){
-			String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
-			StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-			query.append(" join missioni_ordine_attachment:uso_auto_propria auto_propria on doc.cmis:objectId = auto_propria.cmis:objectId ");
-			query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-			ItemIterable<QueryResult> results = missioniCMISService.search(query);
-			if (results.getTotalNumItems() == 0)
-				return null;
-			else if (results.getTotalNumItems() > 1){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di auto propria per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
-			} else {
-				for (QueryResult nodeFile : results) {
-					String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
-					return file;
-				}
-			}
+		List<CmisObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
+
+		if (objs.size() == 0){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta di auto propria per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		}
-		return null;
+		else if (objs.size() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di auto propria per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
+		} else {
+			CmisObject nodeFile = objs.get(0);
+			String file = nodeFile.getId();
+			return file;
+		}
 	}
 	
 	public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) {
 		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
-//		List<CmisObject> autoPropria = recuperoDocumento(node, "P:missioni_ordine_attachment:uso_auto_propria");
+		List<CmisObject> anticipi = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
 
-		if (node == null){
+		if (anticipi.size() == 0){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti di richiesta anticipo collegati all'Ordine di Missione. ID Ordine di Missione:"+ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		}
-		
-		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
-		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_ordine_attachment:richiesta_anticipo anticipo on doc.cmis:objectId = anticipo.cmis:objectId ");
-		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-		ItemIterable<QueryResult> results = missioniCMISService.search(query);
-		if (results.getTotalNumItems() == 0)
-			return null;
-		else if (results.getTotalNumItems() > 1){
+		else if (anticipi.size() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta anticipo per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		} else {
-			for (QueryResult nodeFile : results) {
-				String file = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
-				return file;
-			}
+			CmisObject nodeFile = anticipi.get(0);
+			String file = nodeFile.getId();
+			return file;
 		}
-		return null;
 	}
 
-	private List<CmisObject> recuperoDocumento(Folder node, String tipoDocumento) {
-		return Optional.ofNullable(node) 
-			.map(folder -> folder.getChildren())
-			.map(cmisObjects -> {
-                List<CmisObject> list = new ArrayList<CmisObject>();
-                cmisObjects.forEach(cmisObject ->
-                        list.add(cmisObject));
-                return list;
-            })
-			.map(lista -> lista.stream()
-			.filter(cmisObj -> cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)
-                    .equals(tipoDocumento)).collect(Collectors.toList())).orElse(new ArrayList<CmisObject>());
-	}
-	
 	public Folder recuperoFolderOrdineMissione(OrdineMissione ordineMissione){
 		StringBuilder query = new StringBuilder("select miss.cmis:objectId from missioni:main as miss "
 				+ " join missioni_commons_aspect:ordine_missione ordine on miss.cmis:objectId = ordine.cmis:objectId");
@@ -1134,15 +1087,19 @@ public class CMISOrdineMissioneService {
 	}
 
 	public List<CMISFileAttachment> getAttachmentsAnticipo(OrdineMissione ordineMissione, Long idAnticipo) {
-		ItemIterable<QueryResult> documents = getAttachmentsAnticipo(ordineMissione);
+		List<CmisObject> documents = getAttachmentsAnticipo(ordineMissione);
+		return creaCMISFileAttachment(idAnticipo, documents);
+	}
+
+	private List<CMISFileAttachment> creaCMISFileAttachment(Long id, List<CmisObject> documents) {
 		if (documents != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
-	        for (QueryResult object : documents){
+	        for (CmisObject object : documents){
 	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
-	        	cmisFileAttachment.setNomeFile(object.getPropertyValueById(PropertyIds.NAME));
-	        	cmisFileAttachment.setId(object.getPropertyValueById(PropertyIds.OBJECT_ID));
-	        	cmisFileAttachment.setNodeRef(object.getPropertyValueById(MissioniCMISService.ALFCMIS_NODEREF));
-	        	cmisFileAttachment.setIdMissione(idAnticipo);
+	        	cmisFileAttachment.setNomeFile(object.getName());
+	        	cmisFileAttachment.setId(object.getId());
+	        	cmisFileAttachment.setNodeRef(object.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
+	        	cmisFileAttachment.setIdMissione(id);
 	        	lista.add(cmisFileAttachment);
 	        }
 	        return lista;
@@ -1151,46 +1108,20 @@ public class CMISOrdineMissioneService {
 	}
 		
 	public List<CMISFileAttachment> getAttachmentsOrdineMissione(OrdineMissione ordineMissione, Long idOrdineMissione) {
-		ItemIterable<QueryResult> documents = getDocumentsOrdineMissione(ordineMissione);
-		if (documents != null){
-	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
-	        for (QueryResult object : documents){
-	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
-	        	cmisFileAttachment.setNomeFile(object.getPropertyValueById(PropertyIds.NAME));
-	        	cmisFileAttachment.setId(object.getPropertyValueById(PropertyIds.OBJECT_ID));
-	        	cmisFileAttachment.setNodeRef(object.getPropertyValueById(MissioniCMISService.ALFCMIS_NODEREF));
-	        	cmisFileAttachment.setIdMissione(idOrdineMissione);
-	        	lista.add(cmisFileAttachment);
-	        }
-	        return lista;
-		}
-		return Collections.<CMISFileAttachment>emptyList();
+		List<CmisObject> documents = getDocumentsOrdineMissione(ordineMissione);
+		return creaCMISFileAttachment(idOrdineMissione, documents);
 	}
 		
-	public ItemIterable<QueryResult> getAttachmentsAnticipo(OrdineMissione ordineMissione) {
-		Folder folder = recuperoFolderOrdineMissione(ordineMissione);
-		if (folder != null){
-			return getDocuments(folder, OrdineMissione.ATTACHMENT_ALLEGATO_ANTICIPO);
-		}
-		return null;
+	public List<CmisObject> getAttachmentsAnticipo(OrdineMissione ordineMissione) {
+		Folder node = recuperoFolderOrdineMissione(ordineMissione);
+		return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
 	}
 
-	public ItemIterable<QueryResult> getDocumentsOrdineMissione(OrdineMissione ordineMissione) {
-		Folder folder = recuperoFolderOrdineMissione(ordineMissione);
-		if (folder != null){
-			return getDocuments(folder, OrdineMissione.ATTACHMENT_ALLEGATO_ORDINE_MISSIONE);
-		}
-		return null;
-	}
+	public List<CmisObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione) {
+		Folder node = recuperoFolderOrdineMissione(ordineMissione);
+		List<CmisObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value());
 
-	public ItemIterable<QueryResult> getDocuments(Folder node, String tipoFile){
-		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID);
-		StringBuilder query = new StringBuilder("select doc.cmis:objectId, doc.alfcmis:nodeRef, doc.cmis:name from cmis:document doc ");
-		query.append(" join "+OrdineMissione.ORDINE_MISSIONE_ATTACHMENT_QUERY_CMIS+ tipoFile
-		+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
-		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-		ItemIterable<QueryResult> results = missioniCMISService.search(query);
-		return results;
+		return objs;
 	}
 
 	public CMISFileAttachment uploadAttachmentAnticipo(Principal principal, OrdineMissione ordineMissione, Long idAnticipo, InputStream inputStream, String name, MimeTypes mimeTypes){

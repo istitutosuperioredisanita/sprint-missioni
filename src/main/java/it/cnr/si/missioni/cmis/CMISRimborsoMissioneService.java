@@ -807,25 +807,15 @@ public class CMISRimborsoMissioneService {
 
 	public String getNodeRefRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException{
 		Folder node = recuperoFolderRimborsoMissione(rimborsoMissione);
-		if (node == null){
+		List<CmisObject> rimborso = missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
+		if (rimborso.size() == 0)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati al Rimborso di Missione. ID Rimborso di Missione:"+rimborsoMissione.getId()+", Anno:"+rimborsoMissione.getAnno()+", Numero:"+rimborsoMissione.getNumero());
-		}
-		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID); 
-		StringBuilder query = new StringBuilder("select doc.cmis:objectId from cmis:document doc ");
-		query.append(" join missioni_rimborso_attachment:rimborso rimborso on doc.cmis:objectId = rimborso.cmis:objectId ");
-		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-		ItemIterable<QueryResult> results = missioniCMISService.search(query);
-		if (results.getTotalNumItems() == 0)
-			return null;
-		else if (results.getTotalNumItems() > 1){
+		else if (rimborso.size() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files di rimborso di missione aventi l'ID :"+ rimborsoMissione.getId()+", Anno:"+rimborsoMissione.getAnno()+", Numero:"+rimborsoMissione.getNumero());
 		} else {
-			for (QueryResult nodeFile : results) {
-				String nodeRef = nodeFile.getPropertyValueById(PropertyIds.OBJECT_ID);
-				return nodeRef;
-			}
+				CmisObject nodeFile = rimborso.get(0); 
+				return nodeFile.getId();
 		}
-		return null;
 	}
 	
 	public Folder recuperoFolderRimborsoMissione(RimborsoMissione rimborsoMissione)throws ComponentException{
@@ -950,14 +940,14 @@ public class CMISRimborsoMissioneService {
 	}
 
 	public List<CMISFileAttachment> getAttachmentsRimborsoMissione(RimborsoMissione rimborsoMissione, Long idRimborsoMissione) {
-		ItemIterable<QueryResult> documents = getDocumentsRimborsoMissione(rimborsoMissione);
+		List<CmisObject> documents = getDocumentsAllegatiRimborsoMissione(rimborsoMissione);
 		if (documents != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
-	        for (QueryResult object : documents){
+	        for (CmisObject object : documents){
 	        	CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
-	        	cmisFileAttachment.setNomeFile(object.getPropertyValueById(PropertyIds.NAME));
-	        	cmisFileAttachment.setId(object.getPropertyValueById(PropertyIds.OBJECT_ID));
-	        	cmisFileAttachment.setNodeRef(object.getPropertyValueById(MissioniCMISService.ALFCMIS_NODEREF));
+	        	cmisFileAttachment.setNomeFile(object.getName());
+	        	cmisFileAttachment.setId(object.getId());
+	        	cmisFileAttachment.setNodeRef(object.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
 	        	cmisFileAttachment.setIdMissione(idRimborsoMissione);
 	        	lista.add(cmisFileAttachment);
 	        }
@@ -966,20 +956,8 @@ public class CMISRimborsoMissioneService {
 		return Collections.<CMISFileAttachment>emptyList();
 	}
 
-	public ItemIterable<QueryResult> getDocumentsRimborsoMissione(RimborsoMissione rimborsoMissione) {
-		Folder folder = recuperoFolderRimborsoMissione(rimborsoMissione);
-		if (folder != null){
-			return getDocuments(folder, OrdineMissione.ATTACHMENT_ALLEGATO_ORDINE_MISSIONE);
-		}
-		return null;
-	}
-	public ItemIterable<QueryResult> getDocuments(Folder node, String tipoFile){
-		String folder = (String) node.getPropertyValue(PropertyIds.OBJECT_ID);
-		StringBuilder query = new StringBuilder("select doc.cmis:objectId, doc.alfcmis:nodeRef, doc.cmis:name from cmis:document doc ");
-		query.append(" join "+RimborsoMissione.RIMBORSO_MISSIONE_ATTACHMENT_QUERY_CMIS+ tipoFile
-		+" tipoFile on doc.cmis:objectId = tipoFile.cmis:objectId");
-		query.append(" where IN_FOLDER(doc, '").append(folder).append("')");
-		ItemIterable<QueryResult> results = missioniCMISService.search(query);
-		return results;
+	public List<CmisObject> getDocumentsAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione) {
+		Folder node = recuperoFolderRimborsoMissione(rimborsoMissione);
+		return missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI.value());
 	}
 }
