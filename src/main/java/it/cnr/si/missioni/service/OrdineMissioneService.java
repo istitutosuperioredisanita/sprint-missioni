@@ -608,8 +608,48 @@ public class OrdineMissioneService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void verifyStepRespGruppo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
 		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-		long minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
-//		if (istituto.getMinutiMinimiResp())
+		ZonedDateTime oggi = ZonedDateTime.now();
+		long minutiDifferenza = 0;
+		long minutiDifferenzaDaInizioMissione = 0;
+		if (oggi.isAfter(ordineMissione.getDataInizioMissione())){
+			minutiDifferenzaDaInizioMissione = -1;
+		} else {
+			minutiDifferenza = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
+		}
+		minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioRespGruppo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
+		if (istituto.getMinutiMinimiResp() == null || (minutiDifferenza > istituto.getMinutiMinimiResp())){
+			if (istituto.getMinutiPrimaInizioResp() == null || (minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioResp())){
+				if (istituto.getMinutiPassatiResp() == null || (minutiDifferenza > istituto.getMinutiPassatiResp())){
+					ordineMissione.setBypassRespGruppo("S");
+					ordineMissione.setToBeUpdated();
+					updateOrdineMissione(principal, ordineMissione);
+				}
+			}
+		}
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void verifyStepAmministrativo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
+		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+		ZonedDateTime oggi = ZonedDateTime.now();
+		long minutiDifferenza = 0;
+		long minutiDifferenzaDaInizioMissione = 0;
+		if (oggi.isAfter(ordineMissione.getDataInizioMissione())){
+			minutiDifferenzaDaInizioMissione = -1;
+		} else {
+			minutiDifferenza = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
+		}
+		minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioAmministrativo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
+		if (istituto.getMinutiMinimiAmm() == null || (minutiDifferenza > istituto.getMinutiMinimiAmm())){
+			if (istituto.getMinutiPrimaInizioAmm() == null || (minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioAmm())){
+				if (istituto.getMinutiPassatiAmm() == null || (minutiDifferenza > istituto.getMinutiPassatiAmm())){
+					ordineMissione.setBypassRespAmministrativo("S");
+					ordineMissione.setDaValidazione("S");
+					ordineMissione.setToBeUpdated();
+					updateOrdineMissione(principal, ordineMissione, false, true);
+				}
+			}
+		}
     }
 
     private void inizializzaCampiPerInserimento(Principal principal,
@@ -672,7 +712,7 @@ public class OrdineMissioneService {
     }
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm, String basePath)  {
-
+    	ZonedDateTime oggi = ZonedDateTime.now();
     	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
     	boolean isCambioResponsabileGruppo = false;
        	boolean isRitornoMissioneMittente = false;
@@ -743,6 +783,7 @@ public class OrdineMissioneService {
 				if (ordineMissioneDB.isMissioneInserita()) {
 					ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
 					ordineMissioneDB.setStato(Costanti.STATO_INVIATO_RESPONSABILE);
+					ordineMissioneDB.setDataInvioRespGruppo(oggi);
 					ordineMissioneDB.setNoteRespingi(null);
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inviare al responsabile una missione in stato diverso da 'Inserito'.");
@@ -783,8 +824,15 @@ public class OrdineMissioneService {
     	}
 
     	if (confirm && !ordineMissioneDB.isMissioneDaValidare()){
+    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+    		if (Utility.nvl(istituto.getCreaImpegnoAut(),"N").equals("S") ){
+    			
+    		}
     		cmisOrdineMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneDB);
         	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
+        	ordineMissioneDB.setDataInvioFirma(oggi);
+    	}else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
+    		ordineMissioneDB.setDataInvioAmministrativo(oggi);
     	}
 		ordineMissioneDB = (OrdineMissione)crudServiceBean.modificaConBulk(principal, ordineMissioneDB);
     	
@@ -850,6 +898,11 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setFondi(ordineMissione.getFondi());
 		ordineMissioneDB.setCup(ordineMissione.getCup());
 		ordineMissioneDB.setMissioneGratuita(ordineMissione.getMissioneGratuita());
+		ordineMissioneDB.setBypassRespAmministrativo(ordineMissione.getBypassRespAmministrativo());
+		ordineMissioneDB.setBypassRespGruppo(ordineMissione.getBypassRespGruppo());
+		ordineMissioneDB.setDataInvioAmministrativo(ordineMissione.getDataInvioAmministrativo());
+		ordineMissioneDB.setDataInvioRespGruppo(ordineMissione.getDataInvioRespGruppo());
+		ordineMissioneDB.setDataInvioFirma(ordineMissione.getDataInvioFirma());
 	}
 
 	private void sendMailToAdministrative(String basePath, OrdineMissione ordineMissioneDB) {
