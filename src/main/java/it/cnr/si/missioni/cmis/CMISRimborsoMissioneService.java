@@ -172,9 +172,9 @@ public class CMISRimborsoMissioneService {
 		}
 
 		String username = "";
-		if (rimborsoMissione.getDatiIstituto() != null && StringUtils.isEmpty(rimborsoMissione.getDatiIstituto().getTipoMailDopoOrdine())){
+//		if (rimborsoMissione.getDatiIstituto() != null && StringUtils.isEmpty(rimborsoMissione.getDatiIstituto().getTipoMailDopoOrdine())){
 			username = principal.getName();
-		}
+//		}
 		
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 		account.setUid(rimborsoMissione.getUid());
