@@ -386,7 +386,7 @@ public class OrdineMissioneService {
 				}
 			}
 		}
-//		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 		popolaCoda(ordineMissioneDaAggiornare);
 	}
 
@@ -770,7 +770,7 @@ public class OrdineMissioneService {
     	ordineMissioneDB.setToBeUpdated();
 
 //		//effettuo controlli di validazione operazione CRUD
-    	if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
+    	if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R") && !fromFlows){
         	validaCRUD(principal, ordineMissioneDB);
     	}
 
