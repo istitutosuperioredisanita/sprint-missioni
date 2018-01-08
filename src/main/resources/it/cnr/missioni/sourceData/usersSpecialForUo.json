@@ -1651,6 +1651,7 @@
 {"uid":"roberta.populin", "uoForUsersSpecial":[{"codice_uo":"117000"}]},
 {"uid":"manuela.turco", "uoForUsersSpecial":[{"codice_uo":"117000"}]},
 
+{"uid":"marta.zanini", "uoForUsersSpecial":[{"codice_uo":"008001"}]},
 {"uid":"simona.garaventa", "uoForUsersSpecial":[{"codice_uo":"008001", "ordine_da_validare":"S"}]},
 {"uid":"tatiana.marescalchi", "uoForUsersSpecial":[{"codice_uo":"008001", "ordine_da_validare":"S"}]},
 {"uid":"fulvia.ivaldi", "uoForUsersSpecial":[{"codice_uo":"008001", "ordine_da_validare":"S"}]},
@@ -1862,6 +1863,7 @@
 {"uid" : "cesarino.nicoletti","uoForUsersSpecial" : [{"codice_uo" : "010000","ordine_da_validare" : "S"},{"codice_uo" : "010001","ordine_da_validare" : "S"},{"codice_uo" : "010002","ordine_da_validare" : "S"},{"codice_uo" : "010003","ordine_da_validare" : "S"}]}, 
 {"uid" : "marcella.vignanelli","uoForUsersSpecial" : [{"codice_uo" : "010000","ordine_da_validare" : "S"},{"codice_uo" : "010001","ordine_da_validare" : "S"},{"codice_uo" : "010002","ordine_da_validare" : "S"},{"codice_uo" : "010003","ordine_da_validare" : "S"}]}, 
 
+{"uid" : "daniela.riccobono","uoForUsersSpecial" : [{"codice_uo" : "014000"}]}, 
 {"uid" : "francesca.cavoli","uoForUsersSpecial" : [{"codice_uo" : "014000","ordine_da_validare" : "S"}]}, 
 {"uid" : "pietrina.parisi","uoForUsersSpecial" : [{"codice_uo" : "014000","ordine_da_validare" : "S"}]}, 
 {"uid" : "liana.pecorella","uoForUsersSpecial" : [{"codice_uo" : "014000","ordine_da_validare" : "S"}]}, 
@@ -1981,14 +1983,13 @@
 {"uid" : "marialuisa.sorce","uoForUsersSpecial" : [{"codice_uo" : "000413","ordine_da_validare" : "S"}]}, 
 
 {"uid" : "virginia.codanunziante","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S"}]}, 
-{"uid" : "maria.gerunda","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S"}]}, 
 {"uid" : "cecilia.lalle","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S"}]}, 
 {"uid" : "antonella.briuglia","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S"}]}, 
 {"uid" : "rita.carbonetti","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S"}]}, 
 {"uid" : "antonella.porretti","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S"}]}, 
 
-{"uid" : "anna.nucita","uoForUsersSpecial" : [{"codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
-{"uid" : "carla.roscioli","uoForUsersSpecial" : [{"codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
+{"uid" : "anna.nucita","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S", "codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
+{"uid" : "carla.roscioli","uoForUsersSpecial" : [{"codice_uo" : "000301","ordine_da_validare" : "S", "codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
 {"uid" : "linda.iavarone","uoForUsersSpecial" : [{"codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
 {"uid" : "caterina.russo","uoForUsersSpecial" : [{"codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
 {"uid" : "annarita.appetito","uoForUsersSpecial" : [{"codice_uo" : "000304","ordine_da_validare" : "S"}]}, 
