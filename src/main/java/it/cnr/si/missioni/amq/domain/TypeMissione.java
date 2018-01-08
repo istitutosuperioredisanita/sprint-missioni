@@ -2,6 +2,7 @@ package it.cnr.si.missioni.amq.domain;
 
 public enum TypeMissione {
 	ORDINE("Ordine"),
+	ANNULLAMENTO("Annullamento"),
 	RIMBORSO("Rimborso");
 	
 	private final String value;

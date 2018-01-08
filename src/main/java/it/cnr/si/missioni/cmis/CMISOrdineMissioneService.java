@@ -171,9 +171,9 @@ public class CMISOrdineMissioneService {
 				}
 			}
 			String username = "";
-			if (ordineMissione.getDatiIstituto() != null && StringUtils.isEmpty(ordineMissione.getDatiIstituto().getTipoMailDopoOrdine())){
+//			if (ordineMissione.getDatiIstituto() != null && StringUtils.isEmpty(ordineMissione.getDatiIstituto().getTipoMailDopoOrdine())){
 				username = principal.getName();
-			}
+//			}
 			
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
