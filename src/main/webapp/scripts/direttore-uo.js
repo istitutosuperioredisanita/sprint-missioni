@@ -17,6 +17,7 @@ missioniApp.factory('DirettoreUoService', function($http) {
                 return direttore;
             }
         }).error(function (data) {
+            return "";
         });
     }
     return { getDirettore: recuperoDirettore};
