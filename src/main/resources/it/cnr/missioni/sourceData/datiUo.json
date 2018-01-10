@@ -201,7 +201,7 @@
 {"codice_uo":"070000", "uid_direttore":"riccardo.chirone", "ordine_da_validare":"S"},
 {"codice_uo":"071000", "uid_direttore":"alfonso.morvillo", "ordine_da_validare":"S"},
 {"codice_uo":"072000", "uid_direttore":"riccardo.lanari", "ordine_da_validare":"S"},
-{"codice_uo":"072001", "uid_direttore":"riccardo.lanari"},
+{"codice_uo":"072001", "uid_direttore":"riccardo.lanari", "ordine_da_validare":"S"},
 
 {"codice_uo":"074000", "uid_direttore":"claudio.montani", "ordine_da_validare":"S"},
 {"codice_uo":"075000", "uid_direttore":"cristina.sabbioni", "ordine_da_validare":"S"},
