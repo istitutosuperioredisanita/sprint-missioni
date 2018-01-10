@@ -612,7 +612,7 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		log.error("loading data from SIGLA rest after event: {}", event.getClass().getCanonicalName());
-		loadInCache();
+//		loadInCache();
 		log.info("loading data from SIGLA rest finished.");
 	}
 }
