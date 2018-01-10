@@ -26,6 +26,7 @@ import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -54,6 +55,9 @@ public class RimborsoMissioneDettagliService {
 	private RimborsoMissioneService rimborsoMissioneService;
 
 	@Autowired
+	private DatiIstitutoService datiIstitutoService;
+
+	@Autowired
 	private OrdineMissioneService ordineMissioneService;
 
 	@Autowired
@@ -74,7 +78,11 @@ public class RimborsoMissioneDettagliService {
 		RimborsoMissioneDettagli dettaglio = (RimborsoMissioneDettagli) crudServiceBean.findById(principal,
 				RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
 		if (dettaglio != null) {
-			rimborsoMissioneService.controlloOperazioniCRUDDaGui(dettaglio.getRimborsoMissione());
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(dettaglio.getRimborsoMissione().getUoSpesa(), dettaglio.getRimborsoMissione().getAnno());
+			Boolean controlloEsistenzaAllegati = Utility.nvl(dati.getObbligoAllegatiValidazione(),"S").equals("S") || !dettaglio.getRimborsoMissione().isMissioneDaValidare();
+			if (controlloEsistenzaAllegati){
+				rimborsoMissioneService.controlloOperazioniCRUDDaGui(dettaglio.getRimborsoMissione());
+			}
 			CMISFileAttachment attachment = cmisRimborsoMissioneService.uploadAttachmentDetail(principal, dettaglio,
 					inputStream, name, mimeTypes);
 			return attachment;
