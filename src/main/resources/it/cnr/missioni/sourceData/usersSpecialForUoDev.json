@@ -186,8 +186,7 @@
                 }, {
                     "codice_uo" : "000410"
                 }, {
-                    "codice_uo" : "000411",
-                    "ordine_da_validare" : "S"
+                    "codice_uo" : "000411"
                 }, {
                     "codice_uo" : "000412"
                 }, {
@@ -564,6 +563,12 @@
                     "ordine_da_validare" : "S"
                 }
             ]
+        }, {
+            "uid" : "cronMissioni",
+            "all" : "S"
+        }, {
+            "uid" : "app.missioni",
+            "all" : "S"
         }, {
             "uid" : "serena.paoletti",
             "uoForUsersSpecial" : [{

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="missioni" id="20180111122400">
+    	<addColumn 
+            tableName="DATI_ISTITUTO">
+            <column name="CREA_IMPEGNO_AUT" type="character varying(1)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TERZO_IMP_DEFAULT" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="GAE_IMP_DEFAULT" type="character varying(28)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="PROGETTO_IMP_DEFAULT" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+    	</addColumn>
+    </changeSet>
+</databaseChangeLog>

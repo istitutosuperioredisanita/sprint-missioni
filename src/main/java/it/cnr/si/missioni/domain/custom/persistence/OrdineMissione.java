@@ -214,8 +214,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public String bypassRespGruppo;
 
     @Size(min = 0, max = 1)
-    @Column(name = "BYPASS_RESP_AMMINISTRATIVO", length = 1, nullable = true)
-    public String bypassRespAmministrativo;
+    @Column(name = "BYPASS_AMMINISTRATIVO", length = 1, nullable = true)
+    public String bypassAmministrativo;
 
     @Size(min = 0, max = 1)
     @Column(name = "VALIDATO", length = 1, nullable = false)
@@ -1258,11 +1258,11 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		this.bypassRespGruppo = bypassRespGruppo;
 	}
 
-	public String getBypassRespAmministrativo() {
-		return bypassRespAmministrativo;
+	public String getBypassAmministrativo() {
+		return bypassAmministrativo;
 	}
 
-	public void setBypassRespAmministrativo(String bypassRespAmministrativo) {
-		this.bypassRespAmministrativo = bypassRespAmministrativo;
+	public void setBypassAmministrativo(String bypassAmministrativo) {
+		this.bypassAmministrativo = bypassAmministrativo;
 	}
 }
