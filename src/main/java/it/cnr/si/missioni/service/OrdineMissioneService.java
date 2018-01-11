@@ -609,48 +609,61 @@ public class OrdineMissioneService {
     public void verifyStepRespGruppo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
 		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 		ZonedDateTime oggi = ZonedDateTime.now();
-		long minutiDifferenza = 0;
+		long minutiDifferenza = 10000;
 		long minutiDifferenzaDaInizioMissione = 0;
-		if (oggi.isAfter(ordineMissione.getDataInizioMissione())){
-			minutiDifferenzaDaInizioMissione = -1;
-		} else {
-			minutiDifferenza = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
+		if (oggi.isBefore(ordineMissione.getDataInizioMissione())){
+			minutiDifferenzaDaInizioMissione = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
 		}
-		minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioRespGruppo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
-		if (istituto.getMinutiMinimiResp() == null || (minutiDifferenza > istituto.getMinutiMinimiResp())){
-			if (istituto.getMinutiPrimaInizioResp() == null || (minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioResp())){
-				if (istituto.getMinutiPassatiResp() == null || (minutiDifferenza > istituto.getMinutiPassatiResp())){
-					ordineMissione.setBypassRespGruppo("S");
-					ordineMissione.setToBeUpdated();
-					updateOrdineMissione(principal, ordineMissione);
-				}
+		if (ordineMissione.getDataInvioRespGruppo() != null){
+			minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioRespGruppo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
+		}
+		if (istituto.getMinutiPrimaInizioResp() != null && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioResp()){
+			if (istituto.getMinutiMinimiResp() != null && minutiDifferenza > istituto.getMinutiMinimiResp()){
+				bypassRespGruppo(principal, ordineMissione);
 			}
 		}
+		if (istituto.getMinutiPassatiResp() != null && minutiDifferenza > istituto.getMinutiPassatiResp()){
+			bypassRespGruppo(principal, ordineMissione);
+		}
+
     }
+
+	private void bypassRespGruppo(Principal principal, OrdineMissione ordineMissione) {
+		ordineMissione.setBypassRespGruppo("S");
+		ordineMissione.setToBeUpdated();
+		updateOrdineMissione(principal, ordineMissione);
+	}
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void verifyStepAmministrativo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
 		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 		ZonedDateTime oggi = ZonedDateTime.now();
-		long minutiDifferenza = 0;
+		long minutiDifferenza = 10000;
 		long minutiDifferenzaDaInizioMissione = 0;
-		if (oggi.isAfter(ordineMissione.getDataInizioMissione())){
-			minutiDifferenzaDaInizioMissione = -1;
-		} else {
-			minutiDifferenza = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
+		if (oggi.isBefore(ordineMissione.getDataInizioMissione())){
+			minutiDifferenzaDaInizioMissione = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
 		}
-		minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioAmministrativo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
-		if (istituto.getMinutiMinimiAmm() == null || (minutiDifferenza > istituto.getMinutiMinimiAmm())){
-			if (istituto.getMinutiPrimaInizioAmm() == null || (minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioAmm())){
-				if (istituto.getMinutiPassatiAmm() == null || (minutiDifferenza > istituto.getMinutiPassatiAmm())){
-					ordineMissione.setBypassRespAmministrativo("S");
-					ordineMissione.setDaValidazione("S");
-					ordineMissione.setToBeUpdated();
-					updateOrdineMissione(principal, ordineMissione, false, true);
-				}
+		if (ordineMissione.getDataInvioAmministrativo() != null){
+			minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioAmministrativo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
+		}
+
+		if (istituto.getMinutiPrimaInizioAmm() != null && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioAmm()){
+			if (istituto.getMinutiMinimiAmm() != null && minutiDifferenza > istituto.getMinutiMinimiAmm()){
+				bypassVerificaAmministrativo(principal, ordineMissione);
 			}
 		}
+		if (istituto.getMinutiPassatiAmm() != null && minutiDifferenza > istituto.getMinutiPassatiAmm()){
+			bypassVerificaAmministrativo(principal, ordineMissione);
+		}
+
     }
+
+	private void bypassVerificaAmministrativo(Principal principal, OrdineMissione ordineMissione) {
+		ordineMissione.setBypassRespAmministrativo("S");
+		ordineMissione.setDaValidazione("S");
+		ordineMissione.setToBeUpdated();
+		updateOrdineMissione(principal, ordineMissione, false, true);
+	}
 
     private void inizializzaCampiPerInserimento(Principal principal,
     		OrdineMissione ordineMissione) throws ComponentException {

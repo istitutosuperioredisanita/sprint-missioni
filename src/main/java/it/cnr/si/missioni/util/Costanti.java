@@ -35,6 +35,8 @@ public class Costanti {
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
 	public final static String NOME_CACHE_SERVICES_SIGLA = "cacheServicesSigla";
 	public final static String APP_AA = "AA";
+	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
+	
 	public final static String APP_SIGLA = "SIGLA";
 	public final static String APP_SIPER = "SIPER";
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";

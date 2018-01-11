@@ -182,6 +182,9 @@ public class Utility {
 	}
 	
 	public static String getUoSigla(String uo) {
+		if (uo.contains(".")){
+			return uo;
+		}
 		return uo.substring(0,3)+"."+uo.substring(3,6);
 	}
 
