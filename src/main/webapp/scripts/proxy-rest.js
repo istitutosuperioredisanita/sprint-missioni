@@ -4,12 +4,12 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     var today = new Date();
     var dataA = today;
     var calcoloDataDa = function(){
-/*        var meseAttuale = today.getMonth();
-        if (meseAttuale < 4){
-             return new Date(today.getFullYear() - 1 , 5, 1);
+        var meseAttuale = today.getMonth();
+        if (meseAttuale = 0){
+             return new Date(today.getFullYear() - 1 , 11, 1);
         } else {
-             return new Date(today.getFullYear(), 0, 1);
-        }*/
+             return new Date(today.getFullYear(), meseAttuale - 1, 1);
+        }
         return today;
     }
 
@@ -265,8 +265,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
 
         var objectPostTerOrderBy = [{name: 'dt_fin_validita', type: 'DESC'}];
         var objectPostTerClauses = [{condition: 'AND', fieldName: 'codice_fiscale', operator: "=", fieldValue:cf},
-                                    {condition: 'AND', fieldName: 'daData', operator: "<=", fieldValue:daDataFormatted},
-                                    {condition: 'AND', fieldName: 'aData', operator: ">=", fieldValue:daDataFormatted}];
+                                    {condition: 'AND', fieldName: 'a_data', operator: ">=", fieldValue:daDataFormatted},
+                                    {condition: 'AND', fieldName: 'da_data', operator: "<=", fieldValue:aDataFormatted}];
         var objectPostTer = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostTerOrderBy, clauses:objectPostTerClauses}
         return $http.post(urlRestProxy + app+'/', objectPostTer, {params: {proxyURL: url}}).success(function (data) {
             if (data){

@@ -238,6 +238,9 @@
                     "codice_uo" : "094000",
                     "ordine_da_validare" : "S"
                 }, {
+                    "codice_uo" : "111003",
+                    "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "503000",
                     "ordine_da_validare" : "S"
                 }, {
