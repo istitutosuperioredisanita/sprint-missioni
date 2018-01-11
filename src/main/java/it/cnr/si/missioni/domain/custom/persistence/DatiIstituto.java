@@ -96,6 +96,40 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "UO_RESP_ESTERO", length = 20, nullable = true)
     private String uoRespEstero;
 
+    @Column(name = "MINUTI_MINIMI_RESP", length = 20, nullable = true)
+    private Long minutiMinimiResp;
+
+    @Column(name = "MINUTI_PRIMA_INIZIO_RESP", length = 20, nullable = true)
+    private Long minutiPrimaInizioResp;
+
+    @Column(name = "MINUTI_PASSATI_RESP", length = 20, nullable = true)
+    private Long minutiPassatiResp;
+
+    @Column(name = "MINUTI_MINIMI_AMM", length = 20, nullable = true)
+    private Long minutiMinimiAmm;
+
+    @Column(name = "MINUTI_PRIMA_INIZIO_AMM", length = 20, nullable = true)
+    private Long minutiPrimaInizioAmm;
+
+    @Column(name = "MINUTI_PASSATI_AMM", length = 20, nullable = true)
+    private Long minutiPassatiAmm;
+
+    @Column(name = "CREA_IMPEGNO_AUT", length = 1, nullable = true)
+    private String creaImpegnoAut;
+
+    @Column(name = "TERZO_IMP_DEFAULT", length = 8, nullable = true)
+    private Long terzoImpDefault;
+
+    @Column(name = "GAE_IMP_DEFAULT", length = 28, nullable = true)
+    public String gaeImpDefault;
+
+    @Column(name = "PROGETTO_IMP_DEFAULT", length = 20, nullable = true)
+    public Long progettoImpDefault;
+
+    @Size(min = 0, max = 20)
+    @Column(name = "UO_RESP_RESPONSABILI", length = 20, nullable = true)
+    private String uoRespResponsabili;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -286,4 +320,91 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 		this.uoRespEstero = uoRespEstero;
 	}
 
+	public Long getMinutiMinimiResp() {
+		return minutiMinimiResp;
+	}
+
+	public void setMinutiMinimiResp(Long minutiMinimiResp) {
+		this.minutiMinimiResp = minutiMinimiResp;
+	}
+
+	public Long getMinutiPrimaInizioResp() {
+		return minutiPrimaInizioResp;
+	}
+
+	public void setMinutiPrimaInizioResp(Long minutiPrimaInizioResp) {
+		this.minutiPrimaInizioResp = minutiPrimaInizioResp;
+	}
+
+	public Long getMinutiPassatiResp() {
+		return minutiPassatiResp;
+	}
+
+	public void setMinutiPassatiResp(Long minutiPassatiResp) {
+		this.minutiPassatiResp = minutiPassatiResp;
+	}
+
+	public Long getMinutiMinimiAmm() {
+		return minutiMinimiAmm;
+	}
+
+	public void setMinutiMinimiAmm(Long minutiMinimiAmm) {
+		this.minutiMinimiAmm = minutiMinimiAmm;
+	}
+
+	public Long getMinutiPrimaInizioAmm() {
+		return minutiPrimaInizioAmm;
+	}
+
+	public void setMinutiPrimaInizioAmm(Long minutiPrimaInizioAmm) {
+		this.minutiPrimaInizioAmm = minutiPrimaInizioAmm;
+	}
+
+	public Long getMinutiPassatiAmm() {
+		return minutiPassatiAmm;
+	}
+
+	public void setMinutiPassatiAmm(Long minutiPassatiAmm) {
+		this.minutiPassatiAmm = minutiPassatiAmm;
+	}
+
+	public String getCreaImpegnoAut() {
+		return creaImpegnoAut;
+	}
+
+	public void setCreaImpegnoAut(String creaImpegnoAut) {
+		this.creaImpegnoAut = creaImpegnoAut;
+	}
+
+	public Long getTerzoImpDefault() {
+		return terzoImpDefault;
+	}
+
+	public void setTerzoImpDefault(Long terzoImpDefault) {
+		this.terzoImpDefault = terzoImpDefault;
+	}
+
+	public String getGaeImpDefault() {
+		return gaeImpDefault;
+	}
+
+	public void setGaeImpDefault(String gaeImpDefault) {
+		this.gaeImpDefault = gaeImpDefault;
+	}
+
+	public Long getProgettoImpDefault() {
+		return progettoImpDefault;
+	}
+
+	public void setProgettoImpDefault(Long progettoImpDefault) {
+		this.progettoImpDefault = progettoImpDefault;
+	}
+
+	public String getUoRespResponsabili() {
+		return uoRespResponsabili;
+	}
+
+	public void setUoRespResponsabili(String uoRespResponsabili) {
+		this.uoRespResponsabili = uoRespResponsabili;
+	}
 }

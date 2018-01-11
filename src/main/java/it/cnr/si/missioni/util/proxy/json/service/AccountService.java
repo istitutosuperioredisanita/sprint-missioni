@@ -324,15 +324,22 @@ public class AccountService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la sede "+dati.getCodiceSede());
 			}
 		}
-		if (userNameFirmatario != null && userNameFirmatario.equalsIgnoreCase(account.getUid()) && uo.startsWith(Costanti.CDS_SAC) && isMissioneEstera && !fromDatiSAC){
-			DatiGruppoSAC datiSAC = missioniCMISService.getDatiGruppoSAC(Utility.getUoSiper(uo));
-			if (datiSAC != null){
-				if (datiSAC.getShortName() != null && datiSAC.getShortName().startsWith(Costanti.CDS_SAC)){
-					String uoPadre = datiSAC.getShortName().substring(0, 6);
-					userNameFirmatario = recuperoDirettore(anno, uoPadre, isMissioneEstera, account, data, true);
+		if (userNameFirmatario != null && userNameFirmatario.equalsIgnoreCase(account.getUid())){
+			if (uo.startsWith(Costanti.CDS_SAC) && isMissioneEstera && !fromDatiSAC){
+				DatiGruppoSAC datiSAC = missioniCMISService.getDatiGruppoSAC(Utility.getUoSiper(uo));
+				if (datiSAC != null){
+					if (datiSAC.getShortName() != null && datiSAC.getShortName().startsWith(Costanti.CDS_SAC)){
+						String uoPadre = datiSAC.getShortName().substring(0, 6);
+						userNameFirmatario = recuperoDirettore(anno, uoPadre, isMissioneEstera, account, data, true);
+					}
+				}
+			} else {
+				DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
+				if (datiIstituto != null && !StringUtils.isEmpty(datiIstituto.getUoRespResponsabili())){
+					userNameFirmatario = recuperoDirettore(anno, datiIstituto.getUoRespResponsabili(), isMissioneEstera, account, data, fromDatiSAC);
 				}
 			}
-		}
+		} 
 			
 		return userNameFirmatario;
 	}
