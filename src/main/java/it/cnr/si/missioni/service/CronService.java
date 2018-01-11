@@ -339,7 +339,8 @@ public class CronService {
 
 				try {
 					LOGGER.info("Cron per Verificare gli step da eseguire");
-
+					verifyStepRespGruppo(principal);
+					verifyStepAmministrativo(principal);
 					LOGGER.info("Cron per Verificare gli step da eseguire terminato");
 				} finally {
 					LOGGER.info("unlocking {}", lockKeyLoadCache);
@@ -373,7 +374,41 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				try {
-					flowsService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione.getId());
+					ordineMissioneService.verifyStepRespGruppo(principal, ordineMissione);
+				} catch (Exception e) {
+					String error = Utility.getMessageException(e);
+					String testoErrore = getTextErrorOrdine(ordineMissione, error);
+					LOGGER.error(testoErrore + " "+e);
+					try {
+						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+					} catch (Exception e1) {
+						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+					}
+				}
+			}
+		}
+	}
+	private void verifyStepAmministrativo(Principal principal) {
+		MissioneFilter filtro = new MissioneFilter();
+		filtro.setStato(Costanti.STATO_CONFERMATO);
+		filtro.setValidato("N");
+		filtro.setDaCron("S");
+		List<OrdineMissione> listaOrdiniMissione = null;
+		try {
+			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+		} catch (ComponentException e2) {
+			String error = Utility.getMessageException(e2);
+			LOGGER.error(error + " "+e2);
+			try {
+				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
+			} catch (Exception e1) {
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+			}
+		}
+		if (listaOrdiniMissione != null){
+			for (OrdineMissione ordineMissione : listaOrdiniMissione){
+				try {
+					ordineMissioneService.verifyStepAmministrativo(principal, ordineMissione);
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorOrdine(ordineMissione, error);

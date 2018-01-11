@@ -95,8 +95,8 @@ cron:
 
     verifyStep:
         name: verifyStep
-        active: false
-        cronExpression: "0 0 4 * * MON-SAT"
+        active: true
+        cronExpression: "0 */1 * * * MON-SAT"
 
 jhipster:
     mail:

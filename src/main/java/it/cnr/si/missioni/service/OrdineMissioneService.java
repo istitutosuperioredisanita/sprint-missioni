@@ -309,6 +309,11 @@ public class OrdineMissioneService {
 		ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
 		ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+		ordineMissioneDaAggiornare.setDataInvioAmministrativo(null);
+		ordineMissioneDaAggiornare.setDataInvioFirma(null);
+		ordineMissioneDaAggiornare.setDataInvioRespGruppo(null);
+		ordineMissioneDaAggiornare.setBypassAmministrativo(null);
+		ordineMissioneDaAggiornare.setBypassRespGruppo(null);
 		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
 		if (anticipo != null){
 			anticipo.setStato(Costanti.STATO_INSERITO);
@@ -629,9 +634,9 @@ public class OrdineMissioneService {
     }
 
 	private void bypassRespGruppo(Principal principal, OrdineMissione ordineMissione) {
+		ZonedDateTime oggi = ZonedDateTime.now();
 		ordineMissione.setBypassRespGruppo("S");
-		ordineMissione.setToBeUpdated();
-		updateOrdineMissione(principal, ordineMissione);
+		updateOrdineMissione(principal, ordineMissione, false, true, null);
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -659,7 +664,7 @@ public class OrdineMissioneService {
     }
 
 	private void bypassVerificaAmministrativo(Principal principal, OrdineMissione ordineMissione) {
-		ordineMissione.setBypassRespAmministrativo("S");
+		ordineMissione.setBypassAmministrativo("S");
 		ordineMissione.setDaValidazione("S");
 		ordineMissione.setToBeUpdated();
 		updateOrdineMissione(principal, ordineMissione, false, true);
@@ -785,6 +790,9 @@ public class OrdineMissioneService {
 				if (StringUtils.isEmpty(ordineMissione.getNoteRespingi())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un ordine di missione senza indicarne il motivo.");
 				}
+				ordineMissioneDB.setDataInvioAmministrativo(null);
+				ordineMissioneDB.setDataInvioRespGruppo(null);
+				ordineMissioneDB.setBypassRespGruppo(null);
 				ordineMissioneDB.setStato(Costanti.STATO_INSERITO);
 				ordineMissioneDB.setNoteRespingi(ordineMissione.getNoteRespingi());
 				isRitornoMissioneMittente = true;
@@ -841,10 +849,24 @@ public class OrdineMissioneService {
     		if (Utility.nvl(istituto.getCreaImpegnoAut(),"N").equals("S") ){
     			
     		}
-    		cmisOrdineMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneDB);
+    		cmisOrdineMissioneService.avviaFlusso(principal, ordineMissioneDB);
         	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
         	ordineMissioneDB.setDataInvioFirma(oggi);
+        	if (istituto.isAttivaGestioneResponsabileModulo()){
+        		if (ordineMissioneDB.getDataInvioRespGruppo() == null){
+        			ordineMissioneDB.setDataInvioRespGruppo(oggi);
+        		}
+        	}
+    		if (ordineMissioneDB.getDataInvioAmministrativo() == null){
+    			ordineMissioneDB.setDataInvioAmministrativo(oggi);
+    		}
     	}else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
+    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+        	if (istituto.isAttivaGestioneResponsabileModulo()){
+        		if (ordineMissioneDB.getDataInvioRespGruppo() == null){
+        			ordineMissioneDB.setDataInvioRespGruppo(oggi);
+        		}
+        	}
     		ordineMissioneDB.setDataInvioAmministrativo(oggi);
     	}
 		ordineMissioneDB = (OrdineMissione)crudServiceBean.modificaConBulk(principal, ordineMissioneDB);
@@ -911,7 +933,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setFondi(ordineMissione.getFondi());
 		ordineMissioneDB.setCup(ordineMissione.getCup());
 		ordineMissioneDB.setMissioneGratuita(ordineMissione.getMissioneGratuita());
-		ordineMissioneDB.setBypassRespAmministrativo(ordineMissione.getBypassRespAmministrativo());
+		ordineMissioneDB.setBypassAmministrativo(ordineMissione.getBypassAmministrativo());
 		ordineMissioneDB.setBypassRespGruppo(ordineMissione.getBypassRespGruppo());
 		ordineMissioneDB.setDataInvioAmministrativo(ordineMissione.getDataInvioAmministrativo());
 		ordineMissioneDB.setDataInvioRespGruppo(ordineMissione.getDataInvioRespGruppo());

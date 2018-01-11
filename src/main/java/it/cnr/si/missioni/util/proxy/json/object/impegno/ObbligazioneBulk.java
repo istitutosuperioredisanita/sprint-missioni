@@ -57,7 +57,7 @@ public class ObbligazioneBulk {
 	@JsonProperty("ti_gestione")
 	private String tiGestione;
 
---daFare get e set e da continuare.	
+//--daFare get e set e da continuare.	
 	@JsonProperty("ds_obbligazione")
 	private String dsObbligazione;
 	@JsonProperty("note_obbligazione")
