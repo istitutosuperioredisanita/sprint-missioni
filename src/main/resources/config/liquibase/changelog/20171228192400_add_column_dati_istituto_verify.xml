@@ -21,6 +21,9 @@
             <column name="MINUTI_PASSATI_AMM" type="bigint">
                 <constraints nullable="true"/>
             </column>
+            <column name="UO_RESP_RESPONSABILI" type="character varying(20)">
+                <constraints nullable="true"/>
+            </column>
     	</addColumn>
     </changeSet>
 </databaseChangeLog>

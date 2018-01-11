@@ -200,6 +200,23 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "DATA_FINE_MISSIONE", nullable = false)
     public ZonedDateTime dataFineMissione;
 
+    @Column(name = "DATA_INVIO_RESP_GRUPPO", nullable = true)
+    public ZonedDateTime dataInvioRespGruppo;
+
+    @Column(name = "DATA_INVIO_AMMINISTRATIVO", nullable = true)
+    public ZonedDateTime dataInvioAmministrativo;
+
+    @Column(name = "DATA_INVIO_FIRMA", nullable = true)
+    public ZonedDateTime dataInvioFirma;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "BYPASS_RESP_GRUPPO", length = 1, nullable = true)
+    public String bypassRespGruppo;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "BYPASS_RESP_AMMINISTRATIVO", length = 1, nullable = true)
+    public String bypassRespAmministrativo;
+
     @Size(min = 0, max = 1)
     @Column(name = "VALIDATO", length = 1, nullable = false)
     public String validato;
@@ -1207,5 +1224,45 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setNoteRespingi(String noteRespingi) {
 		this.noteRespingi = noteRespingi;
+	}
+
+	public ZonedDateTime getDataInvioRespGruppo() {
+		return dataInvioRespGruppo;
+	}
+
+	public void setDataInvioRespGruppo(ZonedDateTime dataInvioRespGruppo) {
+		this.dataInvioRespGruppo = dataInvioRespGruppo;
+	}
+
+	public ZonedDateTime getDataInvioAmministrativo() {
+		return dataInvioAmministrativo;
+	}
+
+	public void setDataInvioAmministrativo(ZonedDateTime dataInvioAmministrativo) {
+		this.dataInvioAmministrativo = dataInvioAmministrativo;
+	}
+
+	public ZonedDateTime getDataInvioFirma() {
+		return dataInvioFirma;
+	}
+
+	public void setDataInvioFirma(ZonedDateTime dataInvioFirma) {
+		this.dataInvioFirma = dataInvioFirma;
+	}
+
+	public String getBypassRespGruppo() {
+		return bypassRespGruppo;
+	}
+
+	public void setBypassRespGruppo(String bypassRespGruppo) {
+		this.bypassRespGruppo = bypassRespGruppo;
+	}
+
+	public String getBypassRespAmministrativo() {
+		return bypassRespAmministrativo;
+	}
+
+	public void setBypassRespAmministrativo(String bypassRespAmministrativo) {
+		this.bypassRespAmministrativo = bypassRespAmministrativo;
 	}
 }
