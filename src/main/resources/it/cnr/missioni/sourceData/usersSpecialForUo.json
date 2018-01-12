@@ -296,6 +296,7 @@
 {"codice_uo":"000203"},
 {"codice_uo":"314000"},
 {"codice_uo":"514000"},
+{"codice_uo":"317000"},
 {"codice_uo":"074000"}]},
 {"uid":"patrizia.villani", "uoForUsersSpecial":[
 {"codice_uo":"000411"},
@@ -600,6 +601,7 @@
 {"codice_uo":"000203"},
 {"codice_uo":"314000"},
 {"codice_uo":"514000"},
+{"codice_uo":"317000"},
 {"codice_uo":"605000"}]},
 {"uid":"massimo.fraticelli", "uoForUsersSpecial":[
 {"codice_uo":"000401"},
@@ -898,6 +900,7 @@
 {"codice_uo":"000203"},
 {"codice_uo":"314000"},
 {"codice_uo":"514000"},
+{"codice_uo":"317000"},
 {"codice_uo":"605000"}]},
 {"uid":"francesco.uliana", "uoForUsersSpecial":[
 {"codice_uo":"000401"},
@@ -1196,6 +1199,7 @@
 {"codice_uo":"000203"},
 {"codice_uo":"314000"},
 {"codice_uo":"514000"},
+{"codice_uo":"317000"},
 {"codice_uo":"605000"}]},
 {"uid":"claudio.romano", "uoForUsersSpecial":[
 {"codice_uo":"084000", "ordine_da_validare":"S"},
