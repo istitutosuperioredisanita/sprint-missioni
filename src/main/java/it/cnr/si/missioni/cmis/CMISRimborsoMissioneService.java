@@ -326,7 +326,7 @@ public class CMISRimborsoMissioneService {
 	
 	public CmisPath createFolderRimborsoMissione(RimborsoMissione rimborsoMissione){
 		CmisPath cmisPath = missioniCMISService.getBasePath();
-		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoRich());
+		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoSpesa());
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Rimborso Missione");
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Anno "+rimborsoMissione.getAnno());
 		cmisPath = createLastFolderIfNotPresent(cmisPath, rimborsoMissione);
