@@ -194,12 +194,16 @@ public class CMISRimborsoMissioneService {
 		if (rimborsoMissione.getPgObbligazione() != null){
 			if (gae != null){
 				ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoMissione);
-				descrImpegno = impegnoGae.getDsObbligazione();
-				dispImpegno = impegnoGae.getDisponibilitaImpegno();
+				if (impegnoGae != null){
+					descrImpegno = impegnoGae.getDsObbligazione();
+					dispImpegno = impegnoGae.getDisponibilitaImpegno();
+				}
 			} else {
 				Impegno impegno = impegnoService.loadImpegno(rimborsoMissione);
-				descrImpegno = impegno.getDsObbligazione();
-				dispImpegno = impegno.getDisponibilitaImpegno();
+				if (impegno != null){
+					descrImpegno = impegno.getDsObbligazione();
+					dispImpegno = impegno.getDisponibilitaImpegno();
+				}
 			}
 		}
 

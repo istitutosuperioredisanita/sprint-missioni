@@ -192,12 +192,16 @@ public class CMISOrdineMissioneService {
 			if (ordineMissione.getPgObbligazione() != null){
 				if (gae != null){
 					ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(ordineMissione);
-					descrImpegno = impegnoGae.getDsObbligazione();
-					dispImpegno = impegnoGae.getDisponibilitaImpegno();
+					if (impegnoGae != null){
+						descrImpegno = impegnoGae.getDsObbligazione();
+						dispImpegno = impegnoGae.getDisponibilitaImpegno();
+					}
 				} else {
 					Impegno impegno = impegnoService.loadImpegno(ordineMissione);
-					descrImpegno = impegno.getDsObbligazione();
-					dispImpegno = impegno.getDisponibilitaImpegno();
+					if (impegno != null){
+						descrImpegno = impegno.getDsObbligazione();
+						dispImpegno = impegno.getDisponibilitaImpegno();
+					}
 				}
 			}
 
