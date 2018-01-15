@@ -329,6 +329,10 @@ public class CMISRimborsoMissioneService {
 	}
 	
 	public CmisPath createFolderRimborsoMissione(RimborsoMissione rimborsoMissione){
+		Folder node = recuperoFolderRimborsoMissione(rimborsoMissione);
+		if (node != null){
+			return CmisPath.construct(node.getPath());
+		}
 		CmisPath cmisPath = missioniCMISService.getBasePath();
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoSpesa());
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Rimborso Missione");
