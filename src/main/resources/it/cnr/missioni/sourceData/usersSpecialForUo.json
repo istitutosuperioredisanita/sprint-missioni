@@ -2094,6 +2094,10 @@
 {"uid":"patrizia.amato", "uoForUsersSpecial":[{"codice_uo":"317000", "ordine_da_validare":"S"}]},
 {"uid":"stefania.zangara", "uoForUsersSpecial":[{"codice_uo":"317000", "ordine_da_validare":"S"}]},
 
+{"uid":"letizia.balestrieri", "uoForUsersSpecial":[{"codice_uo":"000405", "ordine_da_validare":"S"}]},
+{"uid":"martina.diciommo", "uoForUsersSpecial":[{"codice_uo":"000405", "ordine_da_validare":"S"}]},
+{"uid":"fabio.fiorentino", "uoForUsersSpecial":[{"codice_uo":"000405", "ordine_da_validare":"S"}]},
+
 {"uid":"sara.mannocchi", "uoForUsersSpecial":[
 {"codice_uo":"088000", "ordine_da_validare":"S"}]},
 {"uid":"roberto.storchi", "uoForUsersSpecial":[
