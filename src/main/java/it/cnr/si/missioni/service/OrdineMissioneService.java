@@ -933,6 +933,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setFondi(ordineMissione.getFondi());
 		ordineMissioneDB.setCup(ordineMissione.getCup());
 		ordineMissioneDB.setMissioneGratuita(ordineMissione.getMissioneGratuita());
+		ordineMissioneDB.setCug(ordineMissione.getCug());
 		ordineMissioneDB.setBypassAmministrativo(ordineMissione.getBypassAmministrativo());
 		ordineMissioneDB.setBypassRespGruppo(ordineMissione.getBypassRespGruppo());
 		ordineMissioneDB.setDataInvioAmministrativo(ordineMissione.getDataInvioAmministrativo());
