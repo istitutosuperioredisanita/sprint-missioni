@@ -41,10 +41,12 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.DatiIstitutoService;
+import it.cnr.si.missioni.service.ParametriService;
 import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.service.UoService;
@@ -88,7 +90,10 @@ public class CMISRimborsoMissioneService {
 
 	@Autowired
 	private ProgettoService progettoService;
-
+	
+	@Autowired
+	private ParametriService parametriService;
+	
 	@Autowired
 	private ImpegnoService impegnoService;
 
@@ -211,13 +216,24 @@ public class CMISRimborsoMissioneService {
 		String uoSpesaPerFlusso = Utility.replace(rimborsoMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(rimborsoMissione.getUoRich(), ".", "");
 		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
+		Uo uoDatiCompetenza = null;
+		if (uoCompetenzaPerFlusso != null){
+			uoDatiCompetenza = uoService.recuperoUo(uoCompetenzaPerFlusso);
+		}
 		String userNameFirmatario;
 		String userNameFirmatarioSpesa;
 		userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account);
 		
-		if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
+		Parametri parametri = parametriService.getParametri();
+		if (!StringUtils.isEmpty(rimborsoMissione.getCug()) && parametri != null && parametri.getResponsabileCug() != null){
+			userNameFirmatarioSpesa = parametri.getResponsabileCug();
+		} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 			if (uoCompetenzaPerFlusso != null){
-				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, account);
+				if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
+					userNameFirmatarioSpesa = userNameFirmatario;
+				} else {
+					userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, account);
+				}
 			} else {
 				userNameFirmatarioSpesa = userNameFirmatario;
 			}
