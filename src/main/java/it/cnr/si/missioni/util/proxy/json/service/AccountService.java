@@ -77,7 +77,7 @@ public class AccountService {
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
 				UsersSpecial user = iteratorUsers.next();
 				logger.info("Ricerca amministrativi per mail. Utente: "+user.getUid());
-				if (isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo, isPerValidazione)){
+				if (Utility.nvl(user.getAll(),"N").equals("N") && isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo, isPerValidazione)){
 					logger.info("User special to be able: "+user.getUid());
 					listaUtenti.add(user);
 				}

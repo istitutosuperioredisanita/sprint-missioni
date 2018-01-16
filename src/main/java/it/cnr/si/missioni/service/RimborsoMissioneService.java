@@ -563,6 +563,7 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDB.setCdTipoRapporto(rimborsoMissione.getCdTipoRapporto());
 		rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
 		rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
+		rimborsoMissioneDB.setCug(rimborsoMissione.getCug());
 		rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 	}
