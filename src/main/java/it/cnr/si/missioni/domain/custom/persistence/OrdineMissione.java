@@ -340,6 +340,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "MISSIONE_GRATUITA", length = 1, nullable = true)
     public String missioneGratuita;
 
+    @Column(name = "CUG", length = 1, nullable = true)
+    public String cug;
+
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE_RESPINGI", length = 1000, nullable = true)
     public String noteRespingi;
@@ -1264,5 +1267,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setBypassAmministrativo(String bypassAmministrativo) {
 		this.bypassAmministrativo = bypassAmministrativo;
+	}
+
+	public String getCug() {
+		return cug;
+	}
+
+	public void setCug(String cug) {
+		this.cug = cug;
 	}
 }

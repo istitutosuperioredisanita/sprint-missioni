@@ -404,7 +404,8 @@
             "info-disponibilita": "Informazioni sulla Disponibilità",
             "cup": "Codice CUP",
             "motivo-respingi-mittente": "Motivo Respingi al mittente",
-            "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente"
+            "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
+            "cug": "Missione CUG"
         },
         "button": {
             "sendToSign": "Invia alla Firma",

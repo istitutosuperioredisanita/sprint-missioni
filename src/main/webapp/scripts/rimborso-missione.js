@@ -93,6 +93,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
                 $scope.rimborsoMissioneModel.importoPresunto = ordineMissioneSelected.importoPresunto;
                 $scope.rimborsoMissioneModel.cup = ordineMissioneSelected.cup;
+                $scope.rimborsoMissioneModel.cug = ordineMissioneSelected.cug;
                 $scope.rimborsoMissioneModel.totaleRimborsoComplessivo = 0;
                 $scope.rimborsoMissioneModel.totaleRimborsoSenzaAnticipi = 0;
                 if ($scope.rimborsoMissioneModel.uoSpesa){

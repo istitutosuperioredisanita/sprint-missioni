@@ -186,7 +186,8 @@
                 }, {
                     "codice_uo" : "000410"
                 }, {
-                    "codice_uo" : "000411"
+                    "codice_uo" : "000411",
+                    "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "000412"
                 }, {
@@ -233,6 +234,9 @@
                     "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "075000",
+                    "ordine_da_validare" : "S"
+                }, {
+                    "codice_uo" : "067002",
                     "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "094000",

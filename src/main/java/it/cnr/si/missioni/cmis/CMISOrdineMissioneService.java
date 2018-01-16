@@ -7,17 +7,13 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -45,16 +41,17 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
-import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.DatiSedeService;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
 import it.cnr.si.missioni.service.OrdineMissioneService;
+import it.cnr.si.missioni.service.ParametriService;
 import it.cnr.si.missioni.service.PrintAnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAnticipoService;
 import it.cnr.si.missioni.service.PrintOrdineMissioneAutoPropriaService;
@@ -105,6 +102,9 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private OrdineMissioneService ordineMissioneService;
+
+	@Autowired
+	private ParametriService parametriService;
 
 	@Autowired
 	private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
@@ -205,6 +205,10 @@ public class CMISOrdineMissioneService {
 			String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 			String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
 			Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
+			Uo uoDatiCompetenza = null;
+			if (uoCompetenzaPerFlusso != null){
+				uoDatiCompetenza = uoService.recuperoUo(uoCompetenzaPerFlusso);
+			}
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
 			userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account);
@@ -212,9 +216,16 @@ public class CMISOrdineMissioneService {
 			if (ordineMissione.isMissioneGratuita()){
 				userNameFirmatarioSpesa = userNameFirmatario;
 			} else {
-				if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
+				Parametri parametri = parametriService.getParametri();
+				if (!StringUtils.isEmpty(ordineMissione.getCug()) && parametri != null && parametri.getResponsabileCug() != null){
+					userNameFirmatarioSpesa = parametri.getResponsabileCug();
+				} else if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 					if (uoCompetenzaPerFlusso != null){
-						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account);
+						if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
+							userNameFirmatarioSpesa = userNameFirmatario;
+						} else {
+							userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account);
+						}
 					} else {
 						userNameFirmatarioSpesa = userNameFirmatario;
 					}

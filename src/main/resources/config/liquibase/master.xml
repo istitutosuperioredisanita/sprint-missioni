@@ -47,6 +47,8 @@
     <include file="classpath:config/liquibase/changelog/20171228191400_add_column_ordine_verify.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171228192400_add_column_dati_istituto_verify.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180111122400_add_column_dati_istituto_crea_imp.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180115110000_add_table_parametri.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180115113000_add_column_cug.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 
