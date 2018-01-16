@@ -93,6 +93,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                 $scope.annullamentoModel.ordineMissione.obblighiRientro = ordineMissioneSelected.obblighiRientro;
                 $scope.annullamentoModel.ordineMissione.missioneGratuita = ordineMissioneSelected.missioneGratuita;
                 $scope.annullamentoModel.ordineMissione.cup = ordineMissioneSelected.cup;
+                $scope.annullamentoModel.ordineMissione.cug = ordineMissioneSelected.cug;
                 if ($scope.annullamentoModel.ordineMissione.uoSpesa){
                     $scope.restUo($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.cdsSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
                     $scope.restModuli($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);
@@ -233,7 +234,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                     $scope.elencoUoCompetenza = result.data.elements;
                     if ($scope.elencoUoCompetenza){
                         if ($scope.elencoUoCompetenza.length === 1){
-                            $scope.annullamentoModel.ordineMissione.uoCompetenza = $scope.elencoUoCompetenza[0];
+                            $scope.annullamentoModel.ordineMissione.uoCompetenza = $scope.elencoUoCompetenza[0].cd_unita_organizzativa;
                         }
                     }
                 } else {
