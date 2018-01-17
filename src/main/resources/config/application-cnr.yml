@@ -5,6 +5,10 @@ spring:
         name: missioni
         username: missioni
         password: missionipw
+#        url: jdbc:postgresql://jspringdb.src.cnr.it:5432/missioni
+#        name: missioni
+#        username: missioni
+#        password: missioniPW
 
     jpa:
         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
@@ -14,6 +18,7 @@ spring:
         SIGLA:
             url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
         #    url: http://localhost:8080/SIGLA/
+        #    url: http://contab.cnr.it:90/SIGLA/
             username: MISSIONI
             password: M15510N1
             context:
@@ -63,6 +68,7 @@ siper:
   password: ${spring.proxy.SIPER.password}
 
 cmis:
+#    alfresco: http://gestdoc.cnr.it:90/alfresco/
     alfresco: http://as1dock.si.cnr.it:8080/alfresco/
     url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
     username: app.missioni
@@ -80,7 +86,7 @@ logging.config: classpath:logback-local.xml
 cron:
     comunicaDati:
         name: comunicaDati
-        active: true
+        active: false
         cronExpression: "0 */1 * * * MON-SAT"
 
     evictCache:
@@ -95,7 +101,7 @@ cron:
 
     verifyStep:
         name: verifyStep
-        active: true
+        active: false
         cronExpression: "0 */1 * * * MON-SAT"
 
 jhipster:
