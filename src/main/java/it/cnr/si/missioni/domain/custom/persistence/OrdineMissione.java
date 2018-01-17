@@ -1062,10 +1062,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 
 	public Boolean isStatoNonInviatoAlFlusso(){
-		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INSERITO)){
-			return true;
-		}
-		return false;
+		return !isStatoInviatoAlFlusso();
 	}
 
 	public Boolean isStatoFlussoApprovato(){
