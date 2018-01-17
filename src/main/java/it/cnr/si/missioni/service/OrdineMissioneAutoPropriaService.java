@@ -304,7 +304,7 @@ public class OrdineMissioneAutoPropriaService {
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
     	byte[] printOrdineMissione = null;
     	String fileName = null;
-    	if (!ordineMissioneAutoPropria.getOrdineMissione().isStatoNonInviatoAlFlusso()){
+    	if (!ordineMissioneAutoPropria.getOrdineMissione().isStatoNonInviatoAlFlusso()  && !ordineMissioneAutoPropria.getOrdineMissione().isMissioneInserita()){
     		ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);

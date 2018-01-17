@@ -205,7 +205,7 @@ public class OrdineMissioneService {
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
     	byte[] printOrdineMissione = null;
     	String fileName = null;
-    	if (!ordineMissione.isStatoNonInviatoAlFlusso()){
+    	if (ordineMissione.isStatoInviatoAlFlusso()  && !ordineMissione.isMissioneInserita()){
     		ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissione(ordineMissione);
