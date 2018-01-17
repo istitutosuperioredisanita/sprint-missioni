@@ -265,8 +265,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
 
         var objectPostTerOrderBy = [{name: 'dt_fin_validita', type: 'DESC'}];
         var objectPostTerClauses = [{condition: 'AND', fieldName: 'codice_fiscale', operator: "=", fieldValue:cf},
-                                    {condition: 'AND', fieldName: 'a_data', operator: ">=", fieldValue:daDataFormatted},
-                                    {condition: 'AND', fieldName: 'da_data', operator: "<=", fieldValue:aDataFormatted}];
+                                    {condition: 'AND', fieldName: 'aData', operator: ">=", fieldValue:daDataFormatted},
+                                    {condition: 'AND', fieldName: 'daData', operator: "<=", fieldValue:aDataFormatted}];
         var objectPostTer = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostTerOrderBy, clauses:objectPostTerClauses}
         return $http.post(urlRestProxy + app+'/', objectPostTer, {params: {proxyURL: url}}).success(function (data) {
             if (data){
