@@ -209,7 +209,7 @@ public class OrdineMissioneAnticipoService {
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
 		byte[] printOrdineMissione = null;
 		String fileName = null;
-		if (!ordineMissioneAnticipo.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
+		if (!ordineMissioneAnticipo.getOrdineMissione().isStatoNonInviatoAlFlusso() && !ordineMissioneAnticipo.getOrdineMissione().isMissioneInserita()) {
 			ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAnticipo(ordineMissioneAnticipo);
