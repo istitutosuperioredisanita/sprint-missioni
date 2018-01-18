@@ -37,7 +37,7 @@ public class ImpegnoGaeService {
 	
 	public ImpegnoGae loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
 		if (ordineMissione.getPgObbligazione() != null && ordineMissione.getEsercizioOriginaleObbligazione() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getCdsSpesa(), ordineMissione.getEsercizioObbligazione(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione(), ordineMissione.getGae());
+			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getCdsSpesa(), ordineMissione.getAnno(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione(), ordineMissione.getGae());
 			return loadImpegno(clauses);
 		}
 		return null;

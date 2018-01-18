@@ -127,13 +127,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.recuperoDatiTerzoSigla = function(userWork){
-        ProxyService.getTerzo(userWork.codice_fiscale).then(function(ret){
-            if (ret && ret.data && ret.data.elements){
-                $scope.terzoSigla = ret.data.elements[0];
-                $scope.recuperoDatiInquadramento(userWork, $scope.terzoSigla);
-                $scope.recuperoDatiModalitaPagamento(userWork, $scope.terzoSigla);
-            }
-        });
+        if (userWork.codice_fiscale){
+            ProxyService.getTerzo(userWork.codice_fiscale).then(function(ret){
+                if (ret && ret.data && ret.data.elements){
+                    $scope.terzoSigla = ret.data.elements[0];
+                    $scope.recuperoDatiInquadramento(userWork, $scope.terzoSigla);
+                    $scope.recuperoDatiModalitaPagamento(userWork, $scope.terzoSigla);
+                }
+            });
+        } else {
+            ui.error("Codice Fiscale non presente.");
+        }
     }
 
     $scope.recuperoDatiDivisa = function(){

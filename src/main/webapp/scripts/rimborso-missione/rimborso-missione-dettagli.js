@@ -218,7 +218,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         } else {
                             $scope.newDettaglioSpesa.tiCdTiSpesa = "N";
                         }
-                        if ($scope.pasto){
+                        if ($scope.pasto &&  && $scope.newDettaglioSpesa.dataSpesa){
                             var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
                             var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
                                 if (result && result.data){
@@ -261,7 +261,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                 dettaglioSpesa.trasporto = tipo_spesa.fl_trasporto;
                                 dettaglioSpesa.alloggio = tipo_spesa.fl_alloggio;
                                 dettaglioSpesa.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;
-                                if (dettaglioSpesa.pasto){
+                                if (dettaglioSpesa.pasto && dettaglioSpesa.dataSpesa){
                                     var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
                                     var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
                                         if (result && result.data){
