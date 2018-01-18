@@ -440,7 +440,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     $scope.elencoUoCompetenza = result.data.elements;
                     if ($scope.elencoUoCompetenza){
                         if ($scope.elencoUoCompetenza.length === 1){
-                            $scope.rimborsoMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0];
+                            $scope.rimborsoMissioneModel.uoCompetenza = $scope.elencoUoCompetenza[0].cd_unita_organizzativa;
                         }
                     }
                 } else {
