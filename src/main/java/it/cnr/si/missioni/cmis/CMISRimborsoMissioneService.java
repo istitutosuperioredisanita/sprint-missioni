@@ -225,7 +225,7 @@ public class CMISRimborsoMissioneService {
 		userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account);
 		
 		Parametri parametri = parametriService.getParametri();
-		if (!StringUtils.isEmpty(rimborsoMissione.getCug()) && parametri != null && parametri.getResponsabileCug() != null){
+		if (!Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
 			userNameFirmatarioSpesa = parametri.getResponsabileCug();
 		} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 			if (uoCompetenzaPerFlusso != null){

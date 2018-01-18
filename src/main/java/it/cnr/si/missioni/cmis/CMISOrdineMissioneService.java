@@ -221,7 +221,7 @@ public class CMISOrdineMissioneService {
 				userNameFirmatarioSpesa = userNameFirmatario;
 			} else {
 				Parametri parametri = parametriService.getParametri();
-				if (!StringUtils.isEmpty(ordineMissione.getCug()) && parametri != null && parametri.getResponsabileCug() != null){
+				if (!Utility.nvl(ordineMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
 					userNameFirmatarioSpesa = parametri.getResponsabileCug();
 				} else if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 					if (uoCompetenzaPerFlusso != null){
