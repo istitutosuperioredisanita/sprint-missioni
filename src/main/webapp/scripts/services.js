@@ -219,7 +219,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                 var y = x.then(function (result) {
                     if (result && result.data && result.data.elements && result.data.elements.length > 0){
                         var terziPerCompenso = result.data.elements;
-                        var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
+                        var terzoPerCompenso = terziPerCompenso[0];
                         return terzoPerCompenso.ds_comune_fiscale;
                     }
                     return null;
