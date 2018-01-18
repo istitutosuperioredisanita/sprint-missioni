@@ -188,7 +188,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         }
         if (data && data.data && data.data.elements && data.data.elements.length > 0){
             var terziPerCompenso = data.data.elements;
-            var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
+            var terzoPerCompenso = terziPerCompenso[0];
             for (var i=0; i<listaPersons.length; i++) {
                 var persona = listaPersons[i];
                 if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
