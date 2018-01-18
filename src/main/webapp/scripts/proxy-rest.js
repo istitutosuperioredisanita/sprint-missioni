@@ -96,7 +96,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                     return promise.then(function (terzo) {
                         if (terzo && terzo.data && terzo.data.elements && terzo.data.elements.length > 0){
                             var terziPerCompenso = terzo.data.elements;
-                            var terzoPerCompenso = terziPerCompenso[terziPerCompenso.length-1];
+                            var terzoPerCompenso = terziPerCompenso[0];
                             if (terzoPerCompenso.ti_dipendente_altro == 'A'){
                                 persona.matricola = "";
                                 persona.profilo = terzoPerCompenso.ds_tipo_rapporto;
