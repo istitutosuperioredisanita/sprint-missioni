@@ -218,7 +218,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         } else {
                             $scope.newDettaglioSpesa.tiCdTiSpesa = "N";
                         }
-                        if ($scope.pasto &&  && $scope.newDettaglioSpesa.dataSpesa){
+                        if ($scope.pasto && $scope.newDettaglioSpesa.dataSpesa){
                             var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
                             var tipi = ProxyService.getTipiPasto($scope.rimborsoMissione.inquadramento, dataFormatted, $scope.rimborsoMissione.nazione).then(function(result){
                                 if (result && result.data){
