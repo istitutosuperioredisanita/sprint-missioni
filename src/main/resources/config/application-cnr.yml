@@ -1,14 +1,14 @@
 spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-#        url: jdbc:postgresql://as4dock.si.cnr.it:54321/missioni
-#        name: missioni
-#        username: missioni
-#        password: missionipw
-        url: jdbc:postgresql://jspringdb.src.cnr.it:5432/missioni
+        url: jdbc:postgresql://as4dock.si.cnr.it:54321/missioni
         name: missioni
         username: missioni
-        password: missioniPW
+        password: missionipw
+#        url: jdbc:postgresql://jspringdb.src.cnr.it:5432/missioni
+#        name: missioni
+#        username: missioni
+#        password: missioniPW
 
     jpa:
         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
