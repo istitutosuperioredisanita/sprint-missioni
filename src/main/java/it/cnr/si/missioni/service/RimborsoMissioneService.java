@@ -1168,7 +1168,7 @@ public class RimborsoMissioneService {
     	RimborsoMissione rimborsoMissione = getRimborsoMissione(principal, idMissione, true);
     	byte[] printRimborsoMissione = null;
     	String fileName = null;
-    	if (!rimborsoMissione.isStatoNonInviatoAlFlusso()){
+    	if ((rimborsoMissione.isStatoInviatoAlFlusso()  && (!rimborsoMissione.isMissioneInserita() || !rimborsoMissione.isMissioneDaValidare())) || (rimborsoMissione.isStatoFlussoApprovato())){
     		ContentStream content = null;
 			try {
 				content = cmisRimborsoMissioneService.getContentStreamRimborsoMissione(rimborsoMissione);
