@@ -16,6 +16,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import it.cnr.jada.ejb.session.ComponentException;
@@ -62,7 +63,7 @@ public class MailService {
 		for (int i = 0; i < lista.size(); i++){
 			UsersSpecial user = lista.get(i);
 			String mail = accountService.getEmail(user.getUid());
-			if (mail != null){
+			if (!StringUtils.isEmpty(mail)){
 				elencoMail[i] = mail;
 			}
 		}
