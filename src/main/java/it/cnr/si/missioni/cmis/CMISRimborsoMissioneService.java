@@ -220,27 +220,55 @@ public class CMISRimborsoMissioneService {
 		if (uoCompetenzaPerFlusso != null){
 			uoDatiCompetenza = uoService.recuperoUo(uoCompetenzaPerFlusso);
 		}
-		String userNameFirmatario;
-		String userNameFirmatarioSpesa;
-		userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account);
-		
-		Parametri parametri = parametriService.getParametri();
-		if (Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
-			userNameFirmatarioSpesa = parametri.getResponsabileCug();
-		} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-			if (uoCompetenzaPerFlusso != null){
-				if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
-					userNameFirmatarioSpesa = userNameFirmatario;
+		String userNameFirmatario = null;
+		String userNameFirmatarioSpesa = null;
+		Boolean usernameImpostati = false;
+		if (!Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && !Costanti.CDS_SAC.equals(rimborsoMissione.getCdsRich())){
+			String uoSiglaRich = rimborsoMissione.getUoRich();
+			String uoSiglaSpesa = null;
+			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
+				if (StringUtils.hasLength(rimborsoMissione.getUoCompetenza())){
+					uoSiglaSpesa = rimborsoMissione.getUoCompetenza();
 				} else {
-					userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, account);
+					uoSiglaSpesa = uoSiglaRich;
 				}
 			} else {
-				userNameFirmatarioSpesa = userNameFirmatario;
+				uoSiglaSpesa = rimborsoMissione.getUoSpesa();
 			}
-		} else {
-			userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
+			if (!uoSiglaRich.equals(uoSiglaSpesa) && uoSiglaRich.substring(0,3).equals(uoSiglaSpesa.substring(0,3))){
+				UnitaOrganizzativa uoSigla = unitaOrganizzativaService.loadUo(uoSiglaSpesa, null, rimborsoMissione.getAnno());
+				if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
+					DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaSpesa, rimborsoMissione.getAnno());
+					if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
+						userNameFirmatario = recuperoDirettore(rimborsoMissione, Utility.replace(uoSiglaSpesa, ".", ""), account);
+						userNameFirmatarioSpesa = userNameFirmatario;
+						usernameImpostati = true;
+					}
+				}
+			}
 		}
 		
+		if (!usernameImpostati){
+			userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account);
+			
+			Parametri parametri = parametriService.getParametri();
+			if (Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
+				userNameFirmatarioSpesa = parametri.getResponsabileCug();
+			} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
+				if (uoCompetenzaPerFlusso != null){
+					if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
+						userNameFirmatarioSpesa = userNameFirmatario;
+					} else {
+						userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, account);
+					}
+				} else {
+					userNameFirmatarioSpesa = userNameFirmatario;
+				}
+			} else {
+				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
+			}
+			
+		}
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
 		dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
 		dataScadenzaFlusso.add(Calendar.DAY_OF_MONTH, 7);

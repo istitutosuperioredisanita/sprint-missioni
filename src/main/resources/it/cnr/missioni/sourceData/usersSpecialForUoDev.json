@@ -114,7 +114,11 @@
                     "ordine_da_validare" : "S"
                 }
             ]
-        }, {
+        }, 
+{"uid":"martina.roncolini", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
+{"uid":"cinzia.gherarducci", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
+{"uid":"dario.tagliaferri", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
+        {
             "uid" : "francesco.uliana",
             "uoForUsersSpecial" : [{
                     "codice_uo" : "000001"

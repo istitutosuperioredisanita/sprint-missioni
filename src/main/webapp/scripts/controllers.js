@@ -5,15 +5,25 @@
 missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
 });
 
-missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService) {
+missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService) {
+    var recuperoMessaggio = function(){
+                var x = ConfigService.getMessage();
+                var y = x.then(function (result) {
+                    if (result){
+                        $scope.message = result;
+                    }
+                });
+    }
+
     $scope.endSearchCmisAnnullamenti = false;
     $scope.endSearchCmisOrdine = false;
     $scope.endSearchCmisRimborso = false;
     if (!$sessionStorage.account || !$sessionStorage.account.login) {
       $location.path('/login');
     } else {
-        var accountLog = $sessionStorage.account;
-        var uoForUsersSpecial = accountLog.uoForUsersSpecial;
+        $scope.account = $sessionStorage.account;
+        recuperoMessaggio();
+        var uoForUsersSpecial = $scope.account.uoForUsersSpecial;
         if (uoForUsersSpecial){
             $scope.userSpecial = true;
         }  else {

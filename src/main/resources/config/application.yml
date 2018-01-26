@@ -82,6 +82,8 @@ spring:
                 oggetto: Ordine di Missione approvato.
             approvazioneRimborsoMissione:
                 oggetto: Rimborso Missione approvato.
+            approvazioneAnnullamentoOrdineMissione:
+                oggetto: Annullamento Ordine di Missione.
 
 security:
     basic:

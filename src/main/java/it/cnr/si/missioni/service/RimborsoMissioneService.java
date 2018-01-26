@@ -402,6 +402,9 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 			rimborsoMissioneDB.setNoteRespingi(null);
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+rimborsoMissione.getUoSpesa()+".");
+			}
 			if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isMissioneDaValidare()) {
 				if (StringUtils.isEmpty(rimborsoMissione.getNoteRespingi())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione senza indicarne il motivo.");

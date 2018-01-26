@@ -1,17 +1,26 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.CronService;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * REST controller for managing config.
@@ -29,6 +38,29 @@ public class ConfigResource {
 	@Autowired
 	private ConfigService configService;
 
+	@RolesAllowed({AuthoritiesConstants.USER})
+    @RequestMapping(value = "/rest/config/message",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getMessage(HttpServletRequest request,
+                                             HttpServletResponse response) {
+    	String message = configService.getMessage();
+    	return JSONResponseEntity.ok(message);
+    }
+
+    @RequestMapping(value = "/rest/config/message",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> sendMessage(@RequestBody  String message, HttpServletRequest request,
+                                             HttpServletResponse response) {
+
+    	configService.updateMessage(message);
+    	configService.evictMessage();
+    	return JSONResponseEntity.ok("");
+    }
+	/**
 	/**
 	 * GET  /rest/config/refresh -> rechargeConfig
 	 */

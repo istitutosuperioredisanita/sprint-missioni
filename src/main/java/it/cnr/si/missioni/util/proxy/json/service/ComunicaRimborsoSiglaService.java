@@ -169,11 +169,10 @@ public class ComunicaRimborsoSiglaService {
 			impostaTappe(rimborsoApprovato, oggettoBulk);
 
 			TipoRapporto tipoRapporto = new TipoRapporto();
-			if (StringUtils.hasLength(rimborsoApprovato.getMatricola())){
-				tipoRapporto.setCdTipoRapporto("DIP");
+			tipoRapporto.setCdTipoRapporto(rimborsoApprovato.getCdTipoRapporto());
+			if (rimborsoApprovato.getCdTipoRapporto().equals("DIP")){
 				oggettoBulk.setTiAnagrafico("D");
 			} else {
-				tipoRapporto.setCdTipoRapporto(rimborsoApprovato.getCdTipoRapporto());
 				oggettoBulk.setTiAnagrafico("A");
 			}
 

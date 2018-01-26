@@ -30,6 +30,7 @@ public class Costanti {
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String REST_UO_TIT_CA = "titCa=";
 	public final static String REST_UO_SEDE = "sedeId=";
+	public final static String NOME_CACHE_MESSAGGIO = "cacheMessaggio";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";

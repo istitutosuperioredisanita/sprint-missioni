@@ -189,6 +189,7 @@ public class AnnullamentoOrdineMissioneService {
 		ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
 		ordineMissione = ordineMissioneService.updateOrdineMissione(principal, ordineMissione, true, false);
 		popolaCoda(annullamento);
+		ordineMissioneService.gestioneEmailDopoApprovazione(ordineMissione, true);
 		return annullamento;
 	}
 

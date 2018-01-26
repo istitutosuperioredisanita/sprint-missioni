@@ -160,6 +160,9 @@ public class OrdineMissioneService {
     @Value("${spring.mail.messages.approvazioneOrdineMissione.oggetto}")
     private String approvazioneOrdineMissione;
     
+    @Value("${spring.mail.messages.approvazioneAnnullamentoOrdineMissione.oggetto}")
+    private String approvazioneAnnullamentoOrdineMissione;
+    
     @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
     	MissioneFilter filter = new MissioneFilter();
@@ -340,6 +343,29 @@ public class OrdineMissioneService {
 	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare){
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
+		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
+		if (anticipo != null){
+			anticipo.setStato(Costanti.STATO_DEFINITIVO);
+			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(), ordineMissioneDaAggiornare.getAnno());
+			if (dati != null && dati.getMailNotifiche() != null){
+	    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, dati.getMailNotifiche());
+			} else {
+				List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
+				if (lista != null && lista.size() > 0){
+		    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(lista));
+				}
+			}
+		}
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+		popolaCoda(ordineMissioneDaAggiornare);
+	}
+
+	public void gestioneEmailDopoApprovazione(OrdineMissione ordineMissioneDaAggiornare) {
+		gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare, false);
+	}
+	public void gestioneEmailDopoApprovazione(OrdineMissione ordineMissioneDaAggiornare, Boolean isAnnullamento) {
 		List<UsersSpecial> listaUtenti = new ArrayList<>();
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoRich(), ordineMissioneDaAggiornare.getAnno());
 		DatiIstituto datiIstitutoSpesa = null;
@@ -362,39 +388,25 @@ public class OrdineMissioneService {
 				listaUtenti.addAll(listaUtentiSpesa);
 			}
 		}
+		String oggetto = isAnnullamento ? approvazioneAnnullamentoOrdineMissione : approvazioneOrdineMissione;
+		String testo = isAnnullamento ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare) : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare);
 		if (listaUtenti.size() > 0){
-			mailService.sendEmail(approvazioneOrdineMissione, getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
+			mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(),"N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotifiche())){
-			mailService.sendEmail(approvazioneOrdineMissione, getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare), false, true, datiIstituto.getMailNotifiche());
+			mailService.sendEmail(oggetto, testo, false, true, datiIstituto.getMailNotifiche());
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(),"N").equals("A") && !StringUtils.isEmpty(datiIstituto.getMailDopoOrdine())){
-			mailService.sendEmail(approvazioneOrdineMissione, getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare), false, true, datiIstituto.getMailDopoOrdine());
+			mailService.sendEmail(oggetto, testo, false, true, datiIstituto.getMailDopoOrdine());
 		}
 		if (datiIstitutoSpesa != null){
 			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(),"N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotifiche())){
-				mailService.sendEmail(approvazioneOrdineMissione, getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailNotifiche());
+				mailService.sendEmail(oggetto, testo, false, true, datiIstitutoSpesa.getMailNotifiche());
 			}
 			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(),"N").equals("A") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoOrdine())){
-				mailService.sendEmail(approvazioneOrdineMissione, getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailDopoOrdine());
+				mailService.sendEmail(oggetto, testo, false, true, datiIstitutoSpesa.getMailDopoOrdine());
 			}
 		}
-		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
-		if (anticipo != null){
-			anticipo.setStato(Costanti.STATO_DEFINITIVO);
-			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(), ordineMissioneDaAggiornare.getAnno());
-			if (dati != null && dati.getMailNotifiche() != null){
-	    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, dati.getMailNotifiche());
-			} else {
-				List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
-				if (lista != null && lista.size() > 0){
-		    		mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false, true, mailService.prepareTo(lista));
-				}
-			}
-		}
-		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
-		popolaCoda(ordineMissioneDaAggiornare);
 	}
 
 	public void popolaCoda(OrdineMissione ordineMissione) {
@@ -786,6 +798,9 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setNoteRespingi(null);
 			ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissione.getUoSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+ordineMissione.getUoSpesa()+".");
+			}
 			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
 				if (StringUtils.isEmpty(ordineMissione.getNoteRespingi())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un ordine di missione senza indicarne il motivo.");
@@ -987,6 +1002,10 @@ public class OrdineMissioneService {
 
 	private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione) {
 		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" è stata approvata.";
+	}
+
+	private String getTextMailApprovazioneAnnullamentoOrdine(OrdineMissione ordineMissione) {
+		return "L'ordine di missione "+ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+getNominativo(ordineMissione.getUid())+" per la missione a "+ordineMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione())+ " avente per oggetto "+ordineMissione.getOggetto()+" è stata annullato.";
 	}
 
 	private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {

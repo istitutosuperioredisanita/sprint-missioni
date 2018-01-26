@@ -1,6 +1,7 @@
 {
     "global": {
         "title": "Missioni",
+        "home-message": "Messaggio da Mettere in Home",
         "working": "Operazione in corso",
         "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
         "menu": {
@@ -122,8 +123,9 @@
         "subtitle_resp_gruppo": "Ordini di Missione da Approvare dal Responsabile del gruppo",
         "comment": "Motivazione",
         "userid": "Utente",
+        "message": "{{message}}",
         "logged": {
-            "message": "You are logged in as user \"{{username}}\"."
+            "message": "Sei registrato come utente \"{{username}}\"."
         },
         "question": "If you have any question on JHipster:",
         "link": {
@@ -748,7 +750,8 @@
         "title": "Aggiorna i files di Configurazione",
         "refresh.button": "Aggiorna",
         "ribalta-dati-istituti.button": "Ribalta Dati per UO",
-        "refreshCache.button": "Aggiorna Cache Servizi REST"
+        "refreshCache.button": "Aggiorna Cache Servizi REST",
+        "sendMessage.button": "Invia Messaggio"
     },
     "configuration": {
         "title": "Configuration",
