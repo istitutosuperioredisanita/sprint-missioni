@@ -130,6 +130,9 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "UO_RESP_RESPONSABILI", length = 20, nullable = true)
     private String uoRespResponsabili;
 
+    @Column(name = "SALTA_FIRMA_UOS_UO_CDS", length = 1, nullable = true)
+    public String saltaFirmaUosUoCds;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -406,5 +409,13 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setUoRespResponsabili(String uoRespResponsabili) {
 		this.uoRespResponsabili = uoRespResponsabili;
+	}
+
+	public String getSaltaFirmaUosUoCds() {
+		return saltaFirmaUosUoCds;
+	}
+
+	public void setSaltaFirmaUosUoCds(String saltaFirmaUosUoCds) {
+		this.saltaFirmaUosUoCds = saltaFirmaUosUoCds;
 	}
 }
