@@ -59,36 +59,42 @@ public class MailService {
     }
     
 	public String[] prepareTo(List<UsersSpecial> lista) {
-		String[] elencoMail = new String[lista.size()];
+		List<String> listaEmail = new ArrayList<>();
 		for (int i = 0; i < lista.size(); i++){
 			UsersSpecial user = lista.get(i);
 			String mail = accountService.getEmail(user.getUid());
 			if (!StringUtils.isEmpty(mail)){
-				elencoMail[i] = mail;
+				listaEmail.add(mail);
 			}
 		}
-		return elencoMail;
+		if (!listaEmail.isEmpty()){
+			String[] elencoMail = new String[listaEmail.size()];
+			elencoMail = listaEmail.toArray(elencoMail); 
+			return elencoMail;
+		}
+		return null;
 	}
 
     private void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isMultipart, boolean isHtml, String... to) {
         log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}', content={}",
                 isMultipart, isHtml, to, subject, content);
-
-        // Prepare message using a Spring helper
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        try {
-            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
-            message.setTo(to);
-            message.setFrom(from);
-            message.setSubject(subject);
-            message.setText(content, isHtml);
-            if (multipartFile!=null && !multipartFile.isEmpty())
-            	message.addAttachment(multipartFile.getOriginalFilename(), new ByteArrayResource(multipartFile.getBytes()), multipartFile.getContentType());
-            javaMailSender.send(mimeMessage);
-            log.debug("Sent e-mail to User '{}'", to);
-        } catch (Exception e) {
-            log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
-            throw new ComponentException("Errore nell'invio dell'e-mail: "+Utility.getMessageException(e),e);
+        if (to != null){
+            // Prepare message using a Spring helper
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            try {
+                MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+                message.setTo(to);
+                message.setFrom(from);
+                message.setSubject(subject);
+                message.setText(content, isHtml);
+                if (multipartFile!=null && !multipartFile.isEmpty())
+                	message.addAttachment(multipartFile.getOriginalFilename(), new ByteArrayResource(multipartFile.getBytes()), multipartFile.getContentType());
+                javaMailSender.send(mimeMessage);
+                log.debug("Sent e-mail to User '{}'", to);
+            } catch (Exception e) {
+                log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
+                throw new ComponentException("Errore nell'invio dell'e-mail: "+Utility.getMessageException(e),e);
+            }
         }
     }
 
