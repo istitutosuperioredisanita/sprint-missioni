@@ -282,7 +282,7 @@ public class AnnullamentoOrdineMissioneService {
 	private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
 		if (lista != null && lista.size() > 0){
 			String[] elencoMail = mailService.prepareTo(lista);
-			if (elencoMail.length > 0){
+			if (elencoMail != null && elencoMail.length > 0){
 				mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
 			}
 		}
