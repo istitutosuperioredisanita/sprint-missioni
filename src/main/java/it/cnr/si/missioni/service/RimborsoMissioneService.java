@@ -1123,6 +1123,12 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La Data Sbarco di Ritorno non può essere precedente alla Data Imbarco di Partenza ");
 			}
 		}
+		if ((!StringUtils.isEmpty(rimborsoMissione.getAnticipoImporto()) ||  Utility.nvl(rimborsoMissione.getAnticipoRicevuto()).equals("S") ||
+				!StringUtils.isEmpty(rimborsoMissione.getAnticipoAnnoMandato()) ||  !StringUtils.isEmpty(rimborsoMissione.getAnticipoNumeroMandato())) &&
+				(StringUtils.isEmpty(rimborsoMissione.getAnticipoImporto()) ||  Utility.nvl(rimborsoMissione.getAnticipoRicevuto(),"N").equals("N") ||
+						StringUtils.isEmpty(rimborsoMissione.getAnticipoAnnoMandato()) ||  StringUtils.isEmpty(rimborsoMissione.getAnticipoNumeroMandato())) ){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare tutti i campi dell'anticipo ricevuto e del mandato, oppure nessuno.");
+		} 
 		if (StringUtils.isEmpty(rimborsoMissione.getIdFlusso()) &&  rimborsoMissione.isStatoInviatoAlFlusso()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
 		} 
