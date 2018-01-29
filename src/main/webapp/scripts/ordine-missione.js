@@ -501,7 +501,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.getRestForResponsabileGruppo = function (uo){
         $scope.disableResponsabileGruppo = true;
         if (uo){
-            var persons = ProxyService.getPersonsForCds($scope.ordineMissioneModel.cdsSpesa, uo, false, false).then(function(result){
+            var persons = ProxyService.getPersonsForCds($scope.ordineMissioneModel.cdsSpesa, uo, false, true).then(function(result){
                 if (result ){
                     $scope.elencoResponsabiliGruppo = result;
                     $scope.disableResponsabileGruppo = false;
