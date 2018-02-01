@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.cmis;
 
 public class CMISOrdineMissione extends CMISMissione {
+	private String usernameFirmatarioAggiunto;
+	private String usernameFirmatarioSpesaAggiunto;
 	private String usernameResponsabileGruppo;
 	private String fondi;
 	private String altriMotiviAutoPropria;
@@ -80,5 +82,17 @@ public class CMISOrdineMissione extends CMISMissione {
 	}
 	public void setAltriMotiviAutoPropria(String altriMotiviAutoPropria) {
 		this.altriMotiviAutoPropria = altriMotiviAutoPropria;
+	}
+	public String getUsernameFirmatarioAggiunto() {
+		return usernameFirmatarioAggiunto;
+	}
+	public void setUsernameFirmatarioAggiunto(String usernameFirmatarioAggiunto) {
+		this.usernameFirmatarioAggiunto = usernameFirmatarioAggiunto;
+	}
+	public String getUsernameFirmatarioSpesaAggiunto() {
+		return usernameFirmatarioSpesaAggiunto;
+	}
+	public void setUsernameFirmatarioSpesaAggiunto(String usernameFirmatarioSpesaAggiunto) {
+		this.usernameFirmatarioSpesaAggiunto = usernameFirmatarioSpesaAggiunto;
 	}
 }
