@@ -205,6 +205,9 @@ public class CMISOrdineMissioneService {
 				}
 			}
 
+			DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(ordineMissione.getUoRich(), ordineMissione.getAnno());
+			List<String> listaUtentiPrimaFirmaDaAggiungere = new ArrayList<>();
+			List<String> listaUtentiSecondaFirmaDaAggiungere = new ArrayList<>();
 			String uoCompetenzaPerFlusso = Utility.replace(ordineMissione.getUoCompetenza(), ".", "");
 			String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 			String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
@@ -242,9 +245,13 @@ public class CMISOrdineMissioneService {
 				}
 			}
 			
+			String userNameAggiunto = null;
+			String userNameSpesaAggiunto = null;
 			if (!usernameImpostati){
 				userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account);
-				
+				if (StringUtils.hasLength(datiIstitutoUoRich.getUoFirmaAggiunta())){
+					userNameAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoRich.getUoFirmaAggiunta(),".",""), account);
+				}
 				if (ordineMissione.isMissioneGratuita()){
 					userNameFirmatarioSpesa = userNameFirmatario;
 				} else {
@@ -256,6 +263,10 @@ public class CMISOrdineMissioneService {
 							if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
 								userNameFirmatarioSpesa = userNameFirmatario;
 							} else {
+								DatiIstituto datiIstitutoUoComp = datiIstitutoService.getDatiIstituto(ordineMissione.getUoCompetenza(), ordineMissione.getAnno());
+								if (StringUtils.hasLength(datiIstitutoUoComp.getUoFirmaAggiunta())){
+									userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoComp.getUoFirmaAggiunta(),".",""), account);
+								}
 								userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account);
 							}
 						} else {
@@ -263,11 +274,20 @@ public class CMISOrdineMissioneService {
 						}
 					} else {
 						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, account);
+						DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+						if (StringUtils.hasLength(datiIstitutoUoSpesa.getUoFirmaAggiunta())){
+							userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoSpesa.getUoFirmaAggiunta(),".",""), account);
+						}
 					}
 				}
 			}
 			
-
+			if ((userNameSpesaAggiunto != null && (userNameFirmatario.equals(userNameSpesaAggiunto) || (userNameAggiunto != null && userNameAggiunto.equals(userNameSpesaAggiunto))))|| 
+					(userNameAggiunto != null && userNameAggiunto.equals(userNameFirmatarioSpesa))){
+				userNameFirmatario = userNameAggiunto;
+			}
+			cmisOrdineMissione.setUsernameFirmatarioAggiunto(userNameAggiunto);
+			cmisOrdineMissione.setUsernameFirmatarioSpesaAggiunto(userNameSpesaAggiunto);
 			cmisOrdineMissione.setAnno(ordineMissione.getAnno().toString());
 			cmisOrdineMissione.setNumero(ordineMissione.getNumero().toString());
 			cmisOrdineMissione.setAnticipo(ordineMissione.getRichiestaAnticipo().equals("S") ? "true" : "false");
@@ -542,6 +562,16 @@ public class CMISOrdineMissioneService {
 
 		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
 
+		
+		String nodeRefFirmatarioAggiunto = null;
+		String nodeRefFirmatarioSpesaAggiunto = null;
+		if (cmisOrdineMissione.getUsernameFirmatarioAggiunto() != null){
+			nodeRefFirmatarioAggiunto = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUsernameFirmatarioAggiunto());
+		}
+		if (cmisOrdineMissione.getUsernameFirmatarioSpesaAggiunto() != null){
+			nodeRefFirmatarioSpesaAggiunto = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUsernameFirmatarioSpesaAggiunto());
+		}
+
 		StringWriter stringWriter = new StringWriter();
 		JsonFactory jsonFactory = new JsonFactory();
 		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
@@ -723,6 +753,18 @@ public class CMISOrdineMissioneService {
 
 			aggiungiDocumento(documentoAutoPropria, nodeRefs);
 
+			StringBuilder nodeRefsPrimoFirmatario = new StringBuilder();
+			aggiungiFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario(), nodeRefsPrimoFirmatario);
+			String nodeRefFirmatarioAggiunto = null;
+			String nodeRefFirmatarioSpesaAggiunto = null;
+			if (cmisOrdineMissione.getUsernameFirmatarioAggiunto() != null){
+				nodeRefFirmatarioAggiunto = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUsernameFirmatarioAggiunto());
+			}
+			aggiungiFirmatario(cmisOrdineMissione.getUsernameFirmatarioAggiunto(), nodeRefsPrimoFirmatario);
+			StringBuilder nodeRefsFirmatarioSpesa = new StringBuilder();
+			aggiungiFirmatario(cmisOrdineMissione.getUserNameFirmatarioSpesa(), nodeRefsFirmatarioSpesa);
+			aggiungiFirmatario(cmisOrdineMissione.getUsernameFirmatarioSpesaAggiunto(), nodeRefsFirmatarioSpesa);
+
 
 			
 			
@@ -846,6 +888,16 @@ public class CMISOrdineMissioneService {
 				 nodeRefs.append(",");
 			}
 			nodeRefs.append((String)documentoAnticipo.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF));
+		 }
+	}
+
+	private void aggiungiFirmatario(String newFirmatario,
+			StringBuilder nodeRefs) {
+		if (newFirmatario != null){
+			if (nodeRefs.length() > 0){
+				 nodeRefs.append(",");
+			}
+			nodeRefs.append(newFirmatario);
 		 }
 	}
 
