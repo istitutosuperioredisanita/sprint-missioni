@@ -347,7 +347,7 @@ public class ComunicaRimborsoSiglaService {
 			dataFine = rimborsoApprovato.getDataFineEstero();
 			
 		} 
-		tappeMissioneColl = impostaTappeDaDate(dataInizio, dataFine, tappa, tappeMissioneColl);
+		tappeMissioneColl = impostaTappeDaDate(dataInizio, dataFine, tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
 //			if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0 && 
 //					DateUtils.truncate(rimborsoApprovato.getDataFineMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataFineEstero())) == 0){
 //				impostaNazioneRimborso(rimborsoApprovato, tappa);
@@ -411,31 +411,30 @@ public class ComunicaRimborsoSiglaService {
 			impostaDateTappa(data, dataFine, newDayTappa);
 			tappeMissioneColl.add(newDayTappa);
 		}
-//		if (dataFineMissione != null && !DateUtils.truncate(aData).equals(DateUtils.truncate(dataFineMissione))){
-//			ultimaDataInizioUsata = ultimaDataInizioUsata.plusDays(1);
-//			impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
-//			for (ZonedDateTime data = ultimaDataInizioUsata; DateUtils.truncate(data).isBefore(DateUtils.truncate(dataFineMissione)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(dataFineMissione)); data = data.plusDays(1))
-//			{
-//				ZonedDateTime dataInizio = data;
-//				if (dataInizio.isAfter(dataFineMissione)){
-//					dataInizio = dataFineMissione;
-//				}
-//				TappeMissioneColl newDayTappa;
-//				try {
-//					newDayTappa = (TappeMissioneColl)tappa.clone();
-//				} catch (CloneNotSupportedException e) {
-//					log.error("Errore",e);
-//					throw new ComponentException("Errore nel clone.",e);
-//				}
-//				ZonedDateTime dataFine = dataInizio.plusDays(1);
-//				if (dataFine.isAfter(dataFineMissione)){
-//					dataFine = dataFineMissione;
-//				}
-//				impostaDateTappa(dataInizio, dataFine, newDayTappa);
-//				tappeMissioneColl.add(newDayTappa);
-//			}
-//		}
-
+		if (dataFineMissione != null && !DateUtils.truncate(aData).equals(DateUtils.truncate(dataFineMissione))){
+			ultimaDataInizioUsata = ultimaDataInizioUsata.plusDays(1);
+			impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
+			for (ZonedDateTime data = ultimaDataInizioUsata; DateUtils.truncate(data).isBefore(DateUtils.truncate(dataFineMissione)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(dataFineMissione)); data = data.plusDays(1))
+			{
+				ZonedDateTime dataInizio = data;
+				if (dataInizio.isAfter(dataFineMissione)){
+					dataInizio = dataFineMissione;
+				}
+				TappeMissioneColl newDayTappa;
+				try {
+					newDayTappa = (TappeMissioneColl)tappa.clone();
+				} catch (CloneNotSupportedException e) {
+					log.error("Errore",e);
+					throw new ComponentException("Errore nel clone.",e);
+				}
+				ZonedDateTime dataFine = dataInizio.plusDays(1);
+				if (dataFine.isAfter(dataFineMissione)){
+					dataFine = dataFineMissione;
+				}
+				impostaDateTappa(dataInizio, dataFine, newDayTappa);
+				tappeMissioneColl.add(newDayTappa);
+			}
+		}
 		
 		return tappeMissioneColl;
 	}

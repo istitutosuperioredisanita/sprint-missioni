@@ -225,10 +225,11 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.impostaInquadramento = function(){
         if ($scope.terzoSigla && $scope.inquadramento){
             var trovatoInquadramento = false;
+            var dataFineTroncata = new Date(new Date($scope.rimborsoMissioneModel.dataFineMissione).setHours(0,0,0,0));
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
                 if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
-                    new Date(inquadramento.dt_fin_validita) >= new Date($scope.rimborsoMissioneModel.dataFineMissione)){
+                    new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
                     $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
                     $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                     trovatoInquadramento = true;

@@ -261,8 +261,8 @@ public class RimborsoMissioneService {
 
 	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws ComponentException {
+		retrieveDetails(principal, rimborsoMissioneDaAggiornare);
 		if (!rimborsoMissioneDaAggiornare.isTrattamentoAlternativoMissione()){
-			retrieveDetails(principal, rimborsoMissioneDaAggiornare);
 			if (rimborsoMissioneDaAggiornare.getTotaleRimborso().compareTo(BigDecimal.ZERO) == 0){
 				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_DA_NON_COMUNICARE);
 			} else {
@@ -271,6 +271,7 @@ public class RimborsoMissioneService {
 		} else {
 			rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
 		}
+		gestioneMailResponsabileGruppo(principal, rimborsoMissioneDaAggiornare);
 		List<UsersSpecial> listaUtenti = new ArrayList<>();
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoRich(), rimborsoMissioneDaAggiornare.getAnno());
 		DatiIstituto datiIstitutoSpesa = null;
@@ -359,6 +360,7 @@ public class RimborsoMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
 		}
 		
+    	retrieveDetails(principal, rimborsoMissioneDB);
 		if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			rimborsoMissioneDB.setNoteRespingi(null);
 			if (rimborsoMissioneDB.isStatoFlussoApprovato()){
@@ -386,7 +388,6 @@ public class RimborsoMissioneService {
 			aggiornaDatiRimborsoMissione(principal, rimborsoMissione, confirm, rimborsoMissioneDB);
 			rimborsoMissioneDB.setValidato("S");
 			rimborsoMissioneDB.setNoteRespingi(null);
-			gestioneMailResponsabileGruppo(principal, rimborsoMissioneDB);
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			if (rimborsoMissione.getEsercizioOriginaleObbligazione() == null || rimborsoMissione.getPgObbligazione() == null ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo il rimborso della missione è necessario valorizzare l'impegno.");
@@ -425,7 +426,6 @@ public class RimborsoMissioneService {
     	} 
 
     	rimborsoMissioneDB.setToBeUpdated();
-    	retrieveDetails(principal, rimborsoMissioneDB);
 		if (confirm){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
 			Boolean controlloEsistenzaAllegati = Utility.nvl(dati.getObbligoAllegatiValidazione(),"S").equals("S") || !rimborsoMissioneDB.isMissioneDaValidare();
