@@ -136,7 +136,7 @@
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.note">note</span>
-                            <textarea ng-disabled="validazione || disabilitaRimborsoMissione"
+                            <textarea ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" 
                               class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.note" rows = "2">
                             </textarea>
                         </span>
