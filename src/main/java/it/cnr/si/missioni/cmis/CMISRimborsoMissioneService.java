@@ -641,8 +641,6 @@ public class CMISRimborsoMissioneService {
 			
 			aggiungiAllegatiRimborsoMissione(rimborsoMissione, nodeRefs);
 			
-			aggiungiAllegatiDettagli(rimborsoMissione, nodeRefs);
-
 			jGenerator.writeStringField("assoc_packageItems_added" , nodeRefs.toString());
 			jGenerator.writeStringField("assoc_packageItems_removed" , "");
 			if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
@@ -803,32 +801,6 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
-	public void aggiungiAllegatiDettagli(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs)
-			throws ComponentException {
-		List<String> list = new ArrayList<>();
-		List<String> listName = new ArrayList<>();
-		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
-			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
-				if (children != null){
-					for (CmisObject object : children){
-				    	Document doc = (Document)object;
-				    	String nodeRef = (String)doc.getPropertyValue(MissioniCMISService.ALFCMIS_NODEREF);
-				    	String nodeName = (String)doc.getPropertyValue(PropertyIds.NAME);
-				    	if (!list.contains(nodeRef) && !listName.contains(nodeName)){
-							aggiungiDocumento(nodeRef, nodeRefs);
-							list.add(nodeRef);
-							listName.add(nodeName);
-				    	}
-				    }
-				} else {
-					if (dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())){
-						throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
-					}
-				}
-			}
-		}
-	}
 	public void controlloEsitenzaGiustificativoDettaglio(RimborsoMissione rimborsoMissione)
 			throws ComponentException {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){

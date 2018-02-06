@@ -49,6 +49,18 @@ public class CronService {
     @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
     private String subjectErrorFlowsOrdine;
     
+    @Value("${spring.mail.messages.erroreBypassStepRespGruppo.oggetto}")
+    private String subjectErrorBypassResp;
+    
+    @Value("${spring.mail.messages.erroreBypassStepRespGruppo.testo}")
+    private String textErrorBypassResp;
+    
+    @Value("${spring.mail.messages.erroreBypassStepAmm.oggetto}")
+    private String subjectErrorBypassAmm;
+    
+    @Value("${spring.mail.messages.erroreBypassStepAmm.testo}")
+    private String textErrorBypassAmm;
+    
     @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.testo}")
     private String textErrorFlowsOrdine;
     
@@ -315,8 +327,19 @@ public class CronService {
 		return textErrorFlowsAnnullamento+" con id "+annullamentoOrdineMissione.getId()+" è andata in errore per il seguente motivo: " + error;
 	}
 
+	private String getTextErrorOrdineMissione(OrdineMissione ordineMissione, String error){
+		return " con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+	}
 	private String getTextErrorOrdine(OrdineMissione ordineMissione, String error) {
-		return textErrorFlowsOrdine+" con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
+		return textErrorFlowsOrdine+getTextErrorOrdineMissione(ordineMissione, error);
+	}
+
+	private String getTextErrorBypassResp(OrdineMissione ordineMissione, String error) {
+		return textErrorBypassResp+getTextErrorOrdineMissione(ordineMissione, error);
+	}
+
+	private String getTextErrorBypassAmm(OrdineMissione ordineMissione, String error) {
+		return textErrorBypassAmm+getTextErrorOrdineMissione(ordineMissione, error);
 	}
 
 	private String getTextErrorRimborso(RimborsoMissione rimborsoMissione, String error) {
@@ -377,10 +400,10 @@ public class CronService {
 					ordineMissioneService.verifyStepRespGruppo(principal, ordineMissione);
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
-					String testoErrore = getTextErrorOrdine(ordineMissione, error);
+					String testoErrore = getTextErrorBypassResp(ordineMissione, error);
 					LOGGER.error(testoErrore + " "+e);
 					try {
-						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+						mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
 					} catch (Exception e1) {
 						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 					}
@@ -411,10 +434,10 @@ public class CronService {
 					ordineMissioneService.verifyStepAmministrativo(principal, ordineMissione);
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
-					String testoErrore = getTextErrorOrdine(ordineMissione, error);
+					String testoErrore = getTextErrorBypassAmm(ordineMissione, error);
 					LOGGER.error(testoErrore + " "+e);
 					try {
-						mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+						mailService.sendEmailError(subjectErrorBypassAmm, testoErrore, false, true);
 					} catch (Exception e1) {
 						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 					}

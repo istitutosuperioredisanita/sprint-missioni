@@ -62,6 +62,12 @@ spring:
             erroreComunicazioneRimborsoSigla:
                 oggetto: Missioni. Errore durante la comunicazione a SIGLA del Rimborso Missione.
                 testo: Si segnala che la comunicazione a SIGLA del rimborso missione 
+            erroreBypassStepRespGruppo:
+                oggetto: Missioni. Errore durante l'aggiornamento dell'Ordine per il bypass del responsabile del gruppo.
+                testo: Si segnala che l'aggiornamento per il bypass del responsabile del gruppo dell'ordine di missione
+            erroreBypassStepAmm:
+                oggetto: Missioni. Errore durante l'aggiornamento dell'Ordine per il bypass degli amministrativi.
+                testo: Si segnala che l'aggiornamento per il bypass degli amministrativi dell'ordine di missione
             invioResponsabileGruppo:
                 oggetto: Autorizzazione Ordine di Missione di
             invioOrdinePerValidazioneDatiFinanziari:
