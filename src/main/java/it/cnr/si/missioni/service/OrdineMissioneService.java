@@ -798,7 +798,7 @@ public class OrdineMissioneService {
 			ordineMissioneDB.setNoteRespingi(null);
 			ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 		} else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")){
-			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissione.getUoSpesa())){
+			if (!ordineMissione.isMissioneInviataResponsabile() && !accountService.isUserSpecialEnableToValidateOrder(principal.getName(), ordineMissione.getUoSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+ordineMissione.getUoSpesa()+".");
 			}
 			if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
