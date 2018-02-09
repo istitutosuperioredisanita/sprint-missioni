@@ -75,8 +75,7 @@ public class RimborsoMissioneDettagliService {
 	@Transactional(readOnly = true)
 	public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissioneDettagli,
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
-		RimborsoMissioneDettagli dettaglio = (RimborsoMissioneDettagli) crudServiceBean.findById(principal,
-				RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
+		RimborsoMissioneDettagli dettaglio = getRimborsoMissioneDettaglio(principal, idRimborsoMissioneDettagli);
 		if (dettaglio != null) {
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(dettaglio.getRimborsoMissione().getUoSpesa(), dettaglio.getRimborsoMissione().getAnno());
 			Boolean controlloEsistenzaAllegati = Utility.nvl(dati.getObbligoAllegatiValidazione(),"S").equals("S") || !dettaglio.getRimborsoMissione().isMissioneDaValidare();
@@ -94,7 +93,7 @@ public class RimborsoMissioneDettagliService {
 	public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissioneDettagli)
 			throws ComponentException {
 		if (idRimborsoMissioneDettagli != null) {
-			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(idRimborsoMissioneDettagli);
+			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(principal, idRimborsoMissioneDettagli);
 			return lista;
 		}
 		return null;
@@ -203,14 +202,20 @@ public class RimborsoMissioneDettagliService {
 	public void deleteRimborsoMissioneDettagli(Principal principal, Long idRimborsoMissioneDettagli)
 			throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException,
 			BusyResourceException {
-		RimborsoMissioneDettagli rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean
-				.findById(principal, RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
+		RimborsoMissioneDettagli rimborsoMissioneDettagli = getRimborsoMissioneDettaglio(principal,
+				idRimborsoMissioneDettagli);
 
 		// effettuo controlli di validazione operazione CRUD
 		if (rimborsoMissioneDettagli != null) {
 			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissioneDettagli.getRimborsoMissione());
 			cancellaRimborsoMissioneDettagli(principal, rimborsoMissioneDettagli, true);
 		}
+	}
+
+	public RimborsoMissioneDettagli getRimborsoMissioneDettaglio(Principal principal, Long idRimborsoMissioneDettagli) {
+		RimborsoMissioneDettagli rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean
+				.findById(principal, RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
+		return rimborsoMissioneDettagli;
 	}
 
 	private void cancellaRimborsoMissioneDettagli(Principal principal,
