@@ -48,6 +48,7 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.ParametriService;
 import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
+import it.cnr.si.missioni.service.RimborsoMissioneDettagliService;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -122,10 +123,14 @@ public class CMISRimborsoMissioneService {
 	private RimborsoMissioneService rimborsoMissioneService;
 
 	@Autowired
+	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
+
+	@Autowired
 	NazioneService nazioneService;
 	
-	public List<CMISFileAttachment> getAttachmentsDetail(Long idDettagliorimborso) throws ComponentException{
-		ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(idDettagliorimborso);
+	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
+		RimborsoMissioneDettagli dettaglio = rimborsoMissioneDettagliService.getRimborsoMissioneDettaglio(principal, idDettagliorimborso);
+		ItemIterable<CmisObject> children = getChildrenDettaglio(dettaglio);
 		if (children != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
 	        for (CmisObject object : children){
@@ -140,18 +145,29 @@ public class CMISRimborsoMissioneService {
 		}
 		return Collections.<CMISFileAttachment>emptyList();
 	}
+
+	public ItemIterable<CmisObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio) {
+		Folder folderDettaglio = getFolderDettaglioRimborso(dettaglio);
 		
-	public ItemIterable<CmisObject> getAttachmentsDetailRimborso(Long idDettagliorimborso) throws ComponentException{
-		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
-		if (folder != null){
-	        ItemIterable<CmisObject> children = ((Folder) folder).getChildren();
+		if (folderDettaglio != null){
+	        ItemIterable<CmisObject> children = ((Folder) folderDettaglio).getChildren();
 	        return children;
 		}
 		return null;
 	}
 		
+	public Folder getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws ComponentException{
+		Folder folderRimborso = recuperoFolderRimborsoMissione(dettaglio.getRimborsoMissione());
+		if (folderRimborso != null){
+			String path = folderRimborso.getPath();
+			Folder folderDettaglio = (Folder) missioniCMISService.getNodeByPath(path+"/"+dettaglio.constructCMISNomeFile());
+			return folderDettaglio;
+		}
+		return null;
+	}
+		
 	public void deleteFolderRimborsoMissioneDettaglio(RimborsoMissioneDettagli dettaglio) throws ComponentException{
-		Folder folder = getFolderDettaglioRimborso(new Long (dettaglio.getId().toString()));
+		Folder folder = getFolderDettaglioRimborso(dettaglio);
 		if (folder != null){
         	missioniCMISService.deleteNode(folder);
 		}
@@ -476,24 +492,24 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 	
-	private Folder getFolderDettaglioRimborso(Long idDettagliorimborso){
-		StringBuilder query = new StringBuilder("select cmis:objectId from missioni_rimborso_dettaglio:main ");
-		query.append(" where missioni_rimborso_dettaglio:id = ").append(idDettagliorimborso);
-		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-		if (resultsFolder.getTotalNumItems() == 0)
-			return null;
-		else if (resultsFolder.getTotalNumItems() > 1){
-			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' cartelle per lo stesso dettaglio di rimborso missione.  Id:"+ idDettagliorimborso);
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
-			}
-		}
-		return null;
-	}
-	
-	public String getNodeRefFolderDettaglioRimborso(Long idDettagliorimborso){
-		Folder folder = getFolderDettaglioRimborso(idDettagliorimborso);
+//	private Folder getFolderDettaglioRimborso(Long idDettagliorimborso){
+//		StringBuilder query = new StringBuilder("select cmis:objectId from missioni_rimborso_dettaglio:main ");
+//		query.append(" where missioni_rimborso_dettaglio:id = ").append(idDettagliorimborso);
+//		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
+//		if (resultsFolder.getTotalNumItems() == 0)
+//			return null;
+//		else if (resultsFolder.getTotalNumItems() > 1){
+//			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' cartelle per lo stesso dettaglio di rimborso missione.  Id:"+ idDettagliorimborso);
+//		} else {
+//			for (QueryResult queryResult : resultsFolder) {
+//				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
+//			}
+//		}
+//		return null;
+//	}
+//	
+	public String getNodeRefFolderDettaglioRimborso(RimborsoMissioneDettagli dettagliorimborso){
+		Folder folder = getFolderDettaglioRimborso(dettagliorimborso);
 		if (folder != null){
 			return 	folder.getId();
 		}
@@ -732,7 +748,7 @@ public class CMISRimborsoMissioneService {
 		}
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
+				ItemIterable<CmisObject> children = getChildrenDettaglio(dettaglio);
 				if (children != null){
 					for (CmisObject object : children){
 				    	Document doc = (Document)object;
@@ -805,7 +821,7 @@ public class CMISRimborsoMissioneService {
 			throws ComponentException {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				ItemIterable<CmisObject> children = getAttachmentsDetailRimborso(new Long (dettaglio.getId().toString()));
+				ItemIterable<CmisObject> children = getChildrenDettaglio(dettaglio);
 				if (children == null && dettaglio.isGiustificativoObbligatorio() && StringUtils.isEmpty(dettaglio.getDsNoGiustificativo())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
 				}

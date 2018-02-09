@@ -301,10 +301,11 @@ public class OrdineMissioneAutoPropriaService {
     	String username = SecurityUtils.getCurrentUserLogin();
     	Principal principal = (Principal)auth;
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = getAutoPropria(principal, idMissione, true);
+		OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
     	byte[] printOrdineMissione = null;
     	String fileName = null;
-    	if (!ordineMissioneAutoPropria.getOrdineMissione().isStatoNonInviatoAlFlusso()  && !ordineMissioneAutoPropria.getOrdineMissione().isMissioneInserita()){
+    	if ((ordineMissione.isStatoInviatoAlFlusso()  && (!ordineMissione.isMissioneInserita() || !ordineMissione.isMissioneDaValidare())) || (ordineMissione.isStatoFlussoApprovato())){
     		ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);

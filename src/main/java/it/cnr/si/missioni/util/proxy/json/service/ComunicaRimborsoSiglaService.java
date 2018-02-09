@@ -211,7 +211,7 @@ public class ComunicaRimborsoSiglaService {
 					spesaMissione.setCdDivisaSpesa(Costanti.CODICE_DIVISA_DEFAULT_SIGLA);
 					spesaMissione.setCambioSpesa(BigDecimal.ONE);
 					spesaMissione.setPgRiga(dettaglio.getRiga().intValue());
-					String idFolderDettaglio = cmisRimborsoMissioneService.getNodeRefFolderDettaglioRimborso(new Long (dettaglio.getId().toString()));
+					String idFolderDettaglio = cmisRimborsoMissioneService.getNodeRefFolderDettaglioRimborso(dettaglio);
 					if (idFolderDettaglio != null){
 						spesaMissione.setIdFolderDettagliGemis(idFolderDettaglio);
 						spesaMissione.setDsGiustificativo("DETTAGLIO DA GESTIONE AUTOMATICA MISSIONI");
@@ -376,7 +376,7 @@ public class ComunicaRimborsoSiglaService {
 					log.error("Errore",e);
 					throw new ComponentException("Errore nel clone.",e);
 				}
-				impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, newDayTappa);
+				impostaNazioneItalia(newDayTappa);
 				ZonedDateTime dataFine = data.plusDays(1);
 				if (dataFine.isAfter(dataFineMissione)){
 					dataFine = dataFineMissione;
@@ -413,7 +413,7 @@ public class ComunicaRimborsoSiglaService {
 		}
 		if (dataFineMissione != null && !DateUtils.truncate(aData).equals(DateUtils.truncate(dataFineMissione))){
 			ultimaDataInizioUsata = ultimaDataInizioUsata.plusDays(1);
-			impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
+			impostaNazioneItalia(tappa);
 			for (ZonedDateTime data = ultimaDataInizioUsata; DateUtils.truncate(data).isBefore(DateUtils.truncate(dataFineMissione)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(dataFineMissione)); data = data.plusDays(1))
 			{
 				ZonedDateTime dataInizio = data;
@@ -452,6 +452,12 @@ public class ComunicaRimborsoSiglaService {
 		Nazione nazione = new Nazione();
 		nazione.setPgNazione(idNazione.intValue());
 		tappa.setNazione(nazione);
+	}
+
+	private void impostaNazioneItalia(TappeMissioneColl tappa) {
+		impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, tappa);
+		tappa.setFlComuneEstero(false);
+		tappa.setFlRimborso(false);
 	}
 
 	private void impostaDivisaTappa(TappeMissioneColl tappa) {
