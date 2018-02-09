@@ -206,10 +206,11 @@ public class OrdineMissioneAnticipoService {
 		String username = SecurityUtils.getCurrentUserLogin();
 		Principal principal = (Principal) auth;
 		OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(principal, idMissione, true);
+		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
 		byte[] printOrdineMissione = null;
 		String fileName = null;
-		if (!ordineMissioneAnticipo.getOrdineMissione().isStatoNonInviatoAlFlusso() && !ordineMissioneAnticipo.getOrdineMissione().isMissioneInserita()) {
+    	if ((ordineMissione.isStatoInviatoAlFlusso()  && (!ordineMissione.isMissioneInserita() || !ordineMissione.isMissioneDaValidare())) || (ordineMissione.isStatoFlussoApprovato())){
 			ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAnticipo(ordineMissioneAnticipo);
