@@ -130,7 +130,7 @@ public class CMISRimborsoMissioneService {
 	
 	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
 		RimborsoMissioneDettagli dettaglio = rimborsoMissioneDettagliService.getRimborsoMissioneDettaglio(principal, idDettagliorimborso);
-		ItemIterable<CmisObject> children = getChildrenDettaglio(dettaglio);
+		List<CmisObject> children = getChildrenDettaglio(dettaglio);
 		if (children != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
 	        for (CmisObject object : children){
@@ -146,11 +146,11 @@ public class CMISRimborsoMissioneService {
 		return Collections.<CMISFileAttachment>emptyList();
 	}
 
-	public ItemIterable<CmisObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio) {
+	public List<CmisObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio) {
 		Folder folderDettaglio = getFolderDettaglioRimborso(dettaglio);
 		
 		if (folderDettaglio != null){
-	        ItemIterable<CmisObject> children = ((Folder) folderDettaglio).getChildren();
+	        List<CmisObject> children = missioniCMISService.recuperoDocumento(folderDettaglio, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_SCONTRINI.value());
 	        return children;
 		}
 		return null;
@@ -748,7 +748,7 @@ public class CMISRimborsoMissioneService {
 		}
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				ItemIterable<CmisObject> children = getChildrenDettaglio(dettaglio);
+				List<CmisObject> children = getChildrenDettaglio(dettaglio);
 				if (children != null){
 					for (CmisObject object : children){
 				    	Document doc = (Document)object;
@@ -821,7 +821,7 @@ public class CMISRimborsoMissioneService {
 			throws ComponentException {
 		if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
 			for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-				ItemIterable<CmisObject> children = getChildrenDettaglio(dettaglio);
+				List<CmisObject> children = getChildrenDettaglio(dettaglio);
 				if (children == null && dettaglio.isGiustificativoObbligatorio() && StringUtils.isEmpty(dettaglio.getDsNoGiustificativo())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " è obbligatorio allegare almeno un giustificativo.");
 				}

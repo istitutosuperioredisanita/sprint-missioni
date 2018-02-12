@@ -35,6 +35,10 @@
 				</property>
 			</properties>
 		</aspect>
+		<aspect name="missioni_commons_aspect:file_eliminato">
+			<title>File eliminato</title>
+			<description>File eliminato</description>
+		</aspect>
 		<aspect name="missioni_commons_aspect:ordine_missione">
 			<title>Ordine di Missione</title>
 			<description>Ordine di Missione</description>

@@ -883,13 +883,13 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
       }
     }
 
-    $scope.confirmDeleteAttachment = function (attachment) {
+    $scope.confirmDeleteAttachment = function (attachment, idOrdineMissione) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/ordine/deleteAttachment/' + attachment.id+'/' + attachment.idMissione);
         var y = x.then(function (result) {
             var attachments = $scope.ordineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){

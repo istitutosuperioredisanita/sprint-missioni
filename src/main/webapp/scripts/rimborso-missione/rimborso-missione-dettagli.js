@@ -67,7 +67,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/deleteAttachment/' + attachment.id+'/'+$routeParams.idRimborsoMissione);
         var y = x.then(function (result) {
             if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                 for (var i=0; i<$scope.dettagliSpese.length; i++) {
@@ -243,7 +243,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             }
         }
     }
-
     $scope.reloadFromTipoSpesa = function (dettaglioSpesa) {
         if (dettaglioSpesa.cdTiSpesa){
             $scope.tipi_spesa = [];

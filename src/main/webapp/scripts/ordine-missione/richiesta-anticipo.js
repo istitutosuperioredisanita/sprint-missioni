@@ -100,13 +100,13 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
       parent.history.back();
     }
 
-    $scope.confirmDeleteAttachment = function (attachment) {
+    $scope.confirmDeleteAttachment = function (attachment, idOrdineMissione) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/ordine/deleteAttachment/' + attachment.id+'/' + $routeParams.idOrdineMissione);
         var y = x.then(function (result) {
             var attachments = $scope.anticipoOrdineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){

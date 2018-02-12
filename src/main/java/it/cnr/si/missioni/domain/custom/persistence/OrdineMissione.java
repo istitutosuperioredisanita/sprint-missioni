@@ -102,6 +102,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public static final String ORDINE_MISSIONE_ATTACHMENT_QUERY_CMIS = "missioni_ordine_attachment";                      
 	public static final String ATTACHMENT_ALLEGATO_ANTICIPO = ":allegati_anticipo";
 	public static final String ATTACHMENT_ALLEGATO_ORDINE_MISSIONE = ":allegati";
+	public static final String CMIS_PROPERTY_ORDINE_ATTACHMENT_ELIMINATO = "missioni_ordine_attachment:eliminato";
 
 	@Size(min = 0, max = 1)
     @Column(name = "OBBLIGO_RIENTRO", length = 1, nullable = false)

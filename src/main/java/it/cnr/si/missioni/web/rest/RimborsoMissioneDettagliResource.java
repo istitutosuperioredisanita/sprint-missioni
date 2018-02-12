@@ -39,6 +39,7 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.service.RimborsoMissioneDettagliService;
+import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
@@ -54,6 +55,9 @@ public class RimborsoMissioneDettagliResource {
 
     @Autowired
     private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
+
+    @Autowired
+    private RimborsoMissioneService rimborsoMissioneService;
 
     @Autowired
     private MissioniCMISService missioniCMISService;
@@ -243,16 +247,16 @@ public class RimborsoMissioneDettagliResource {
         }
     }
 
-    @RequestMapping(value = "/rest/deleteAttachment/{id}",
+    @RequestMapping(value = "/rest/deleteAttachment/{id}/{idRimborso}",
             method = RequestMethod.GET)
     @Timed
     public ResponseEntity<?> deleteAttachment(HttpServletRequest request,
-    		@PathVariable String id) {
+    		@PathVariable String id, @PathVariable Long idRimborso) {
         log.debug("REST request per il downlaod degli allegati " );
         
         if (!StringUtils.isEmpty(id)){
             try {
-                    missioniCMISService.deleteNode(id);
+            		rimborsoMissioneService.gestioneCancellazioneAllegati((Principal) SecurityUtils.getCurrentUser(), id, idRimborso);
                     return JSONResponseEntity.ok();
             } catch (AwesomeException e) {
             	log.error("deleteAttachment", e);

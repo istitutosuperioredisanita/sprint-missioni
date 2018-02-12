@@ -66,6 +66,9 @@ missioniApp
       },
       confirmCRUD: function (message, callback, objectToCRUD) {
         modalFn('<span class="red glyphicon glyphicon-remove-sign"></span> Richiesta', message, callback, objectToCRUD);
+      },
+      confirmCRUD: function (message, callback, objectToCRUD, param2) {
+        modalFn('<span class="red glyphicon glyphicon-remove-sign"></span> Richiesta', message, callback, objectToCRUD, param2);
       }
     };
   })

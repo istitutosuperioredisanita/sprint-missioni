@@ -4,6 +4,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.config.AlfrescoConfiguration;
 import it.cnr.si.missioni.cmis.acl.ACLType;
 import it.cnr.si.missioni.cmis.acl.Permission;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -658,9 +660,22 @@ public class MissioniCMISService {
             })
 			.map(lista -> lista.stream()
 			.filter(cmisObj -> {
-				Boolean str = ((ArrayList<String>)cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(tipoDocumento);
+				Boolean str = ((ArrayList<String>)cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(tipoDocumento) && 
+						!((ArrayList<String>)cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
 				return str;
 			}).collect(Collectors.toList())).orElse(new ArrayList<CmisObject>());
 	}
 	
+	public void eliminaFilePresenteNelFlusso(Principal principal, String idNodo) {
+		Document node = (Document)getNodeByNodeRef(idNodo);
+		String nomeFile = node.getName();
+		nomeFile = sanitizeFilename(nomeFile+".eliminato");
+		Map<String, Object> metadataProperties = new HashMap<String, Object>();
+		metadataProperties.put(PropertyIds.NAME, nomeFile);
+		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, nomeFile);
+		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, nomeFile);
+		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, principal.getName());
+		updateProperties(metadataProperties, node);
+		addAspect(node, CMISMissioniAspect.FILE_ELIMINATO.value());
+	}
 }
