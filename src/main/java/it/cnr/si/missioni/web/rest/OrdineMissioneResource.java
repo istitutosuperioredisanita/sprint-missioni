@@ -419,4 +419,25 @@ public class OrdineMissioneResource {
             return JSONResponseEntity.badRequest(error);
     	}
     }
+    @RequestMapping(value = "/rest/ordine/deleteAttachment/{id}/{idOrdine}",
+            method = RequestMethod.GET)
+    @Timed
+    public ResponseEntity<?> deleteAttachment(HttpServletRequest request,
+    		@PathVariable String id, @PathVariable Long idOrdine) {
+        log.debug("REST request per il downlaod degli allegati " );
+        
+        if (!StringUtils.isEmpty(id)){
+            try {
+            		ordineMissioneService.gestioneCancellazioneAllegati((Principal) SecurityUtils.getCurrentUser(), id, idOrdine);
+                    return JSONResponseEntity.ok();
+            } catch (AwesomeException e) {
+            	log.error("deleteAttachment", e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+            } 
+        } else {
+        	String error = "Id Allegato non valorizzato";
+        	log.error("deleteAttachment", error);
+            return JSONResponseEntity.badRequest(error);
+        }
+    }
 }

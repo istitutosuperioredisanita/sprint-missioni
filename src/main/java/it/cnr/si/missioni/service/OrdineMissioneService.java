@@ -36,6 +36,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
@@ -144,6 +145,9 @@ public class OrdineMissioneService {
 	@Autowired
 	private AccountService accountService;
 	
+    @Autowired
+    private MissioniCMISService missioniCMISService;
+
     @Value("${spring.mail.messages.invioResponsabileGruppo.oggetto}")
     private String subjectSendToManagerOrdine;
 
@@ -1313,5 +1317,15 @@ public class OrdineMissioneService {
 					inputStream, name, mimeTypes);
 		}
 		return null;
+	}
+	public void gestioneCancellazioneAllegati(Principal principal, String idNodo, Long idOrdineMissione){
+		if (idOrdineMissione != null) {
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
+			if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso())){
+				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo);
+			} else {
+        		missioniCMISService.deleteNode(idNodo);
+			}
+		}
 	}
 }

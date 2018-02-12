@@ -2,6 +2,7 @@ package it.cnr.si.missioni.cmis;
 
 public enum CMISMissioniAspect {
 	ORDINE_MISSIONE_ASPECT("P:missioni_commons_aspect:ordine_missione"),
+	FILE_ELIMINATO("P:missioni_commons_aspect:file_eliminato"),
 	RIMBORSO_MISSIONE_ASPECT("P:missioni_commons_aspect:rimborso_missione");
 	
 	
