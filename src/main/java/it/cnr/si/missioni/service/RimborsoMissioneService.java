@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -32,8 +34,11 @@ import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
+import it.cnr.si.missioni.cmis.CMISMissioniAspect;
+import it.cnr.si.missioni.cmis.CMISOrdineMissioneAspect;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
@@ -158,6 +163,9 @@ public class RimborsoMissioneService {
     @Value("${spring.mail.messages.approvazioneRimborsoMissione.oggetto}")
     private String approvazioneRimborsoMissione;
     
+    @Autowired
+    private MissioniCMISService missioniCMISService;
+
     @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -1475,6 +1483,16 @@ public class RimborsoMissioneService {
 	}
 	private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
 		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" è stata approvata.";
+	}
+	public void gestioneCancellazioneAllegati(Principal principal, String idNodo, Long idRimborsoMissione){
+		if (idRimborsoMissione != null) {
+			RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
+			if (rimborsoMissione != null && StringUtils.hasLength(rimborsoMissione.getIdFlusso())){
+				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo);
+			} else {
+        		missioniCMISService.deleteNode(idNodo);
+			}
+		}
 	}
 
 }

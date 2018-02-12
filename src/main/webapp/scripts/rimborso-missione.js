@@ -1061,13 +1061,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       parent.history.back();
     }
 
-    $scope.confirmDeleteAttachment = function (attachment) {
+    $scope.confirmDeleteAttachment = function (attachment, idRimborsoMissione) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
 
-    var deleteAttachment = function (attachment) {
+    var deleteAttachment = function (attachment, idRimborsoMissione) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
+        var x = $http.get('api/rest/deleteAttachment/' + attachment.id+'/'+attachment.idMissione);
         var y = x.then(function (result) {
             var attachments = $scope.rimborsoMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
