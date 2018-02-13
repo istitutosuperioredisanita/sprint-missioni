@@ -24,26 +24,26 @@ import it.cnr.si.security.AuthoritiesConstants;
 public class HelpdeskResource {
 	private final Logger log = LoggerFactory.getLogger(HelpdeskResource.class);
 
-	@RequestMapping(value = "/sendWithAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)	
-	public ResponseEntity sendWithAttachment(HttpServletRequest req, @RequestParam("file") MultipartFile uploadedMultipartFile) {
-		log.debug("HelpdeskResource:send");
-		Helpdesk hd = new Helpdesk();
-		hd.setSubject(req.getParameter("subject"));
-		hd.setMessage(req.getParameter("message"));
-		hd.setCategory(req.getParameter("category"));
-		hd.setDescCategory(req.getParameter("desc-category"));
-		hd.setIp(req.getRemoteAddr());
-		hd.setAllegato(uploadedMultipartFile);
-		
-		helpdeskService.sendMessage(hdDataModel);
-		return JSONResponseEntity.ok();
-	}
-
-	@RequestMapping(value = "/sendWithoutAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)	
-	public ResponseEntity sendWithoutAttachment(HttpServletRequest req, @RequestBody Helpdesk hdDataModel) {
-		log.debug("HelpdeskResource:send");
-		hdDataModel.setIp(req.getRemoteAddr());
-		helpdeskService.sendMessage(hdDataModel);
-		return JSONResponseEntity.ok();	
-	}
+//	@RequestMapping(value = "/sendWithAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)	
+//	public ResponseEntity sendWithAttachment(HttpServletRequest req, @RequestParam("file") MultipartFile uploadedMultipartFile) {
+//		log.debug("HelpdeskResource:send");
+//		Helpdesk hd = new Helpdesk();
+//		hd.setSubject(req.getParameter("subject"));
+//		hd.setMessage(req.getParameter("message"));
+//		hd.setCategory(req.getParameter("category"));
+//		hd.setDescCategory(req.getParameter("desc-category"));
+//		hd.setIp(req.getRemoteAddr());
+//		hd.setAllegato(uploadedMultipartFile);
+//		
+//		helpdeskService.sendMessage(hdDataModel);
+//		return JSONResponseEntity.ok();
+//	}
+//
+//	@RequestMapping(value = "/sendWithoutAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)	
+//	public ResponseEntity sendWithoutAttachment(HttpServletRequest req, @RequestBody Helpdesk hdDataModel) {
+//		log.debug("HelpdeskResource:send");
+//		hdDataModel.setIp(req.getRemoteAddr());
+//		helpdeskService.sendMessage(hdDataModel);
+//		return JSONResponseEntity.ok();	
+//	}
 }
