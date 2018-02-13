@@ -26,6 +26,7 @@ import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -159,8 +160,13 @@ public class CMISRimborsoMissioneService {
 	public Folder getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws ComponentException{
 		Folder folderRimborso = recuperoFolderRimborsoMissione(dettaglio.getRimborsoMissione());
 		if (folderRimborso != null){
+			Folder folderDettaglio = null;
 			String path = folderRimborso.getPath();
-			Folder folderDettaglio = (Folder) missioniCMISService.getNodeByPath(path+"/"+dettaglio.constructCMISNomeFile());
+			try {	
+				folderDettaglio = (Folder) missioniCMISService.getNodeByPath(path+"/"+dettaglio.constructCMISNomeFile());
+			} catch (CmisObjectNotFoundException e){
+				return null;
+			}
 			return folderDettaglio;
 		}
 		return null;
