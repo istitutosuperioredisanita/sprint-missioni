@@ -105,7 +105,7 @@ public class MissioniCMISService {
 	
 	public String sanitizeFilename(String name) {
 		name = name.trim();
-		Pattern pattern = Pattern.compile("([\\/:@()&€<>?\"])");
+		Pattern pattern = Pattern.compile("([\\/:@()&\u20AC<>?\"])");
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
 			return matcher.replaceAll("_"); 
@@ -116,7 +116,7 @@ public class MissioniCMISService {
 	
 	public String sanitizeFolderName(String name) {
 		name = name.trim();
-		Pattern pattern = Pattern.compile("([\\/:@()&€<>?\"])");
+		Pattern pattern = Pattern.compile("([\\/:@()&\u20AC<>?\"])");
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
 			return matcher.replaceAll("'"); 
