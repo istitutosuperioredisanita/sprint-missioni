@@ -222,7 +222,7 @@ public class RimborsoMissioneDettagliResource {
                     if (cmisFileContent != null){
                         String fileName = cmisFileContent.getFileName();
                         res.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment;filename=".concat(fileName));
+                            "attachment;filename=\"".concat(fileName).concat("\""));
                         res.setContentType(cmisFileContent.getMimeType());
 
                         try {
