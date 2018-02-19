@@ -38,6 +38,7 @@ public class Costanti {
 	public final static String APP_AA = "AA";
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 	
+	public final static String APP_HELPDESK = "OIL";
 	public final static String APP_SIGLA = "SIGLA";
 	public final static String APP_SIPER = "SIPER";
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
