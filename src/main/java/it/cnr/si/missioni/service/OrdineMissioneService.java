@@ -7,7 +7,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +38,9 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
-import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -69,10 +66,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
-import net.bzdyl.ejb3.criteria.Criteria;
-import net.bzdyl.ejb3.criteria.CriteriaFactory;
 import net.bzdyl.ejb3.criteria.Order;
-import net.bzdyl.ejb3.criteria.projections.Projections;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
 
@@ -509,7 +503,7 @@ public class OrdineMissioneService {
 			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
-			return crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("numero"));
+			return crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 		} else if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
 			if (StringUtils.isEmpty(filter.getUoRich())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
@@ -537,7 +531,7 @@ public class OrdineMissioneService {
 			criterionList.add(Restrictions.eq("statoFlusso", Costanti.STATO_APPROVATO_FLUSSO));
 			criterionList.add(Restrictions.eq("stato", Costanti.STATO_CONFERMATO));
 			criterionList.add(Restrictions.eq("validato", "S"));
-			ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"), Order.asc("numero"));
+			ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			return ordineMissioneList;
 			
 		} else {
@@ -546,9 +540,11 @@ public class OrdineMissioneService {
 					criterionList.add(Restrictions.eq("uid", filter.getUser()));
 				} else {
 					if (StringUtils.isEmpty(filter.getUoRich())){
-						criterionList.add(Restrictions.eq("uid", principal.getName()));
-//					} else {
-//						criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
+						if (Utility.nvl(filter.getRespGruppo(), "N").equals("S")){
+							criterionList.add(Restrictions.eq("responsabileGruppo", principal.getName()));
+						} else {
+							criterionList.add(Restrictions.eq("uid", principal.getName()));
+						}
 					}
 				}
 			} else {
@@ -592,9 +588,9 @@ public class OrdineMissioneService {
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
-				ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"), Order.asc("numero"));
+				ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			} else
-				ordineMissioneList = crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("numero"));
+				ordineMissioneList = crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			return ordineMissioneList;
 		}
     }
@@ -851,6 +847,9 @@ public class OrdineMissioneService {
     			if (ordineMissioneDB.isMissioneInserita() && !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())){
     				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma l'ordine di missione non è stato inviato alla sua approvazione.");
     			}
+    		}
+    		if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("N") && ordineMissione.isMissioneConfermata() && ordineMissione.isMissioneDaValidare()){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già confermato.");
     		}
         	ordineMissioneDB.setStato(Costanti.STATO_CONFERMATO);
 			ordineMissioneDB.setNoteRespingi(null);

@@ -30,6 +30,11 @@ spring:
             url: https://siper.cnr.it/siper/
             username: app.selezioni
             password: pentagono
+        OIL:
+            username: app.missioni
+            password: bubbazza
+            url: helpdesk.oil
+            newProblem: pest
     ldap:
         userSearchBase: o=cnr, c=it
         userSearchFilter: uid={0}

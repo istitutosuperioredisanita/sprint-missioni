@@ -3,7 +3,6 @@ package it.cnr.si.missioni.service;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,18 +24,14 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
-import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
@@ -77,11 +72,7 @@ public class RimborsoMissioneDettagliService {
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
 		RimborsoMissioneDettagli dettaglio = getRimborsoMissioneDettaglio(principal, idRimborsoMissioneDettagli);
 		if (dettaglio != null) {
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(dettaglio.getRimborsoMissione().getUoSpesa(), dettaglio.getRimborsoMissione().getAnno());
-			Boolean controlloEsistenzaAllegati = Utility.nvl(dati.getObbligoAllegatiValidazione(),"S").equals("S") || !dettaglio.getRimborsoMissione().isMissioneDaValidare();
-			if (controlloEsistenzaAllegati){
-				rimborsoMissioneService.controlloOperazioniCRUDDaGui(dettaglio.getRimborsoMissione());
-			}
+			rimborsoMissioneService.controlloAllegatoDettaglioModificabile(dettaglio.getRimborsoMissione());
 			CMISFileAttachment attachment = cmisRimborsoMissioneService.uploadAttachmentDetail(principal, dettaglio,
 					inputStream, name, mimeTypes);
 			return attachment;
