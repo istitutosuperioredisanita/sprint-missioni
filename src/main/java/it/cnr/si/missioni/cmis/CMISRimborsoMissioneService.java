@@ -299,7 +299,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setNumero(rimborsoMissione.getNumero().toString());
 		cmisRimborsoMissione.setCapitolo(voce == null ? "" : rimborsoMissione.getVoce());
 		cmisRimborsoMissione.setDescrizioneCapitolo(voce == null ? "" : voce.getDs_elemento_voce());
-		cmisRimborsoMissione.setDescrizioneGae(gae == null ? "" : gae.getDs_linea_attivita());
+		cmisRimborsoMissione.setDescrizioneGae(gae == null ? "" : Utility.nvl(gae.getDs_linea_attivita(),""));
 		cmisRimborsoMissione.setDescrizioneImpegno(descrImpegno);
 		cmisRimborsoMissione.setDescrizioneUoOrdine(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
 		cmisRimborsoMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
