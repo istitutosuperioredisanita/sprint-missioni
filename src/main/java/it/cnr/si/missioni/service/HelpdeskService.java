@@ -25,38 +25,39 @@ import org.apache.http.util.EntityUtils;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.Helpdesk;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.proxy.ResultProxy;
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
 
 public class HelpdeskService {
     private final Logger log = LoggerFactory.getLogger(HelpdeskService.class);
 
-//    @Value("${helpdesk.username}")
-//    private static String helpdeskUsername;
-//
-//    @Value("${helpdesk.password}")
-//    private static String helpdeskPassword;
-//
-//    @Value("${helpdesk.url}")
-//    private static String helpdeskUrl;
-//
-//	public static long newProblem(Helpdesk hd, String instance) throws ServiceException {
-//		CloseableHttpClient client = null;
-//		CloseableHttpResponse response = null;
-//		long id = -1L;
-//		try {
-//			CredentialsProvider provider = new BasicCredentialsProvider();
-//			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(helpdeskUsername, helpdeskPassword);
-//			provider.setCredentials(AuthScope.ANY, credentials);
-//			client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-//			HttpPut request = new HttpPut(helpdeskUrl+instance);
-//			request.addHeader(new BasicScheme().authenticate(credentials, request, null));
-//
-//			StringEntity entity = new StringEntity(new Gso().toJson(hd), ContentType.APPLICATION_JSON);
-//			request.setEntity(entity);		
-//			response = client.execute(request);
+    @Autowired
+    ProxyService proxyService;
+    
+    @Value("${proxy.OIL.newProblem}")
+    private static String helpdeskUrl;
+
+	public Long newProblem(Helpdesk hd, String instance) throws ServiceException {
+
+			JSONBody jBody = new JSONBody();
+			jBody.setHelpdesk(hd);
+			
+//			, String app, String url, Boolean value, ) {
+			String risposta = null;
+			ResultProxy result = proxyService.process(HttpMethod.PUT, jBody, Costanti.APP_HELPDESK, helpdeskUrl, null, null, false);
+			if (HttpStatus.SC_CREATED != result.getStatus().value()){
+				
+			risposta = result.getBody();
+			return new Long(risposta);
+		}
+		
 //			if (HttpStatus.SC_CREATED!=response.getStatusLine().getStatusCode())
 //				throw new ServiceException(response.getStatusLine().getStatusCode()+" - "+response.getStatusLine().getReasonPhrase());
 //			HttpEntity resEntity = response.getEntity();
@@ -83,9 +84,10 @@ public class HelpdeskService {
 //			}
 //		}
 //		return id;
-//	}
-//	
-//	public static void addAttachments(long id, List<File> files, String instance) throws ServiceException {
+			return null;
+	}
+	
+	public static void addAttachments(long id, List<File> files, String instance) throws ServiceException {
 //		CloseableHttpClient client = null;
 //		CloseableHttpResponse response = null;
 //		try {
@@ -121,6 +123,6 @@ public class HelpdeskService {
 //				e.printStackTrace();
 //			}
 //		}
-//	}
-//
+	}
+
 }

@@ -60,6 +60,14 @@
                 </label>
             </span>
         </div>
+        <div class="col-md-2">
+            <span class="input-group" ng-show="uoForUsersSpecial">
+              <span class="input-group-addon" translate="ordine-missione.form.responsabile-gruppo">Responsabile del Gruppo</span>
+                <label class="checkbox">
+                  <input type="checkbox" ng-model="respGruppo" ng-true-value="S" ng-false-value="N">
+                </label>
+            </span>
+        </div>
        <div class="col-md-7 float-right">
         <button type="button" class="btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
        </div>

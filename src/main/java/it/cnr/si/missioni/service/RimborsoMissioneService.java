@@ -737,7 +737,7 @@ public class RimborsoMissioneService {
 			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
-			return crudServiceBean.findByCriterion(principal, RimborsoMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
+			return crudServiceBean.findByCriterion(principal, RimborsoMissione.class, criterionList, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 		} else if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
 			if (StringUtils.isEmpty(filter.getUoRich())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stata selezionata la uo per rendere definitivo il rimborso della missione.");
@@ -764,7 +764,7 @@ public class RimborsoMissioneService {
 			criterionList.add(Restrictions.eq("statoFlusso", Costanti.STATO_APPROVATO_FLUSSO));
 			criterionList.add(Restrictions.eq("stato", Costanti.STATO_CONFERMATO));
 			criterionList.add(Restrictions.eq("validato", "S"));
-			rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
+			rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			return rimborsoMissioneList;
 			
 		} else {
@@ -817,9 +817,9 @@ public class RimborsoMissioneService {
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
-				rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
+				rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			} else
-				rimborsoMissioneList = crudServiceBean.findByCriterion(principal, RimborsoMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
+				rimborsoMissioneList = crudServiceBean.findByCriterion(principal, RimborsoMissione.class, criterionList, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			return rimborsoMissioneList;
 		}
     }
@@ -1487,6 +1487,7 @@ public class RimborsoMissioneService {
 	public void gestioneCancellazioneAllegati(Principal principal, String idNodo, Long idRimborsoMissione){
 		if (idRimborsoMissione != null) {
 			RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
+			controlloAllegatoDettaglioModificabile(rimborsoMissione);
 			if (rimborsoMissione != null && StringUtils.hasLength(rimborsoMissione.getIdFlusso())){
 				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo);
 			} else {
@@ -1494,6 +1495,15 @@ public class RimborsoMissioneService {
 			}
 		}
 	}
+	
+	public void controlloAllegatoDettaglioModificabile(RimborsoMissione rimborso) {
+		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborso.getUoSpesa(), rimborso.getAnno());
+		Boolean controlloEsistenzaAllegati = Utility.nvl(dati.getObbligoAllegatiValidazione(),"S").equals("S") || !rimborso.isMissioneDaValidare();
+		if (controlloEsistenzaAllegati){
+			controlloOperazioniCRUDDaGui(rimborso);
+		}
+	}
+
 
 }
 
