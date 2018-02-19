@@ -315,6 +315,7 @@
             "auto-propria-si": "Richiesta Utilizzo Auto Propria: Sì",
             "auto-propria-no": "Richiesta Utilizzo Auto Propria: No",
             "sendToManager": "Invia al Responsabile del gruppo",
+            "sendToManagerShort": "Invia al Responsabile",
             "anticipo-si": "Richiesta Anticipo: Sì",
             "anticipo-no": "Richiesta Anticipo: No"
         },
@@ -411,7 +412,8 @@
         },
         "button": {
             "sendToSign": "Invia alla Firma",
-            "returnToSender": "Respingi al Mittente"
+            "returnToSender": "Respingi al Mittente",
+            "returnToSenderShort": "Respingi"
         }
     },
     "elenco-ordini-missione": {

@@ -18,6 +18,7 @@ public class MissioneFilter {
 	private Long aId;
 	private Boolean soloMissioniNonGratuite = false;
 	private String includiMissioniAnnullate;
+	private String respGruppo;
 	private Long daNumero;
 	private Long aNumero;
 	private String daData;
@@ -154,5 +155,11 @@ public class MissioneFilter {
 	}
 	public void setDaAnnullare(String daAnnullare) {
 		this.daAnnullare = daAnnullare;
+	}
+	public String getRespGruppo() {
+		return respGruppo;
+	}
+	public void setRespGruppo(String respGruppo) {
+		this.respGruppo = respGruppo;
 	}
 }
