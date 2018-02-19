@@ -948,7 +948,7 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per la data della missione indicata non è stato possibile recuperare l'inquadramento.");
 			} 
 			if (rimborsoMissione.isMissioneEstera()){
-				if (StringUtils.isEmpty(rimborsoMissione.getNazione())){
+				if (StringUtils.isEmpty(rimborsoMissione.getNazione()) || Costanti.NAZIONE_ITALIA_SIGLA.compareTo(rimborsoMissione.getNazione()) == 0){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Nazione");
 				} 
 				if (StringUtils.isEmpty(rimborsoMissione.getTrattamento())){

@@ -36,7 +36,8 @@
                 "elenco-rimborsi-missione": "Elenco Rimborsi Missione"
             },
             "admin": "Administration",
-            "language": "Lingua"
+            "language": "Lingua",
+            "helpdesk": "HelpDesk"
         },
         "form": {
             "username": "Login",
@@ -528,6 +529,17 @@
             "name": "Nome",
             "date": "Data Ultima Modifica",
             "version": "Versione"
+        }
+    },
+    "helpdesk": {
+        "title": "HelpDesk",
+        "form": {
+            "avviso": "Compilare tutti i dati per inviare una segnalazione helpdesk. Sarà inviata una mail di conferma in cui ci sarà un link da attivare per sottoporre la segnalazione all'esperto di turno. Non è necessario allegare files. La mancata conferma non consentirà la lettura della Sua segnalazione da parte degli esperti.",
+            "oggetto": "Oggetto",
+            "messaggio": "Messaggio",
+            "categoria": "Categoria",
+            "categoria.placeholder": "Selezionare una Categoria",
+            "invia": "Invia Segnalazione"
         }
     },
     "activate": {
