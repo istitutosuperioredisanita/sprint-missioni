@@ -102,6 +102,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/helpdesk', {
+                    templateUrl: 'views/helpdesk.html',
+                    controller: 'HelpdeskController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/register', {
                     templateUrl: 'views/register.html',
                     controller: 'RegisterController',

@@ -105,7 +105,7 @@ public class MissioniCMISService {
 	
 	public String sanitizeFilename(String name) {
 		name = name.trim();
-		Pattern pattern = Pattern.compile("([\\/:@()&<>?\"])");
+		Pattern pattern = Pattern.compile("([\\/:@()&€<>?\"])");
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
 			return matcher.replaceAll("_"); 
@@ -116,7 +116,7 @@ public class MissioniCMISService {
 	
 	public String sanitizeFolderName(String name) {
 		name = name.trim();
-		Pattern pattern = Pattern.compile("([\\/:@()&<>?\"])");
+		Pattern pattern = Pattern.compile("([\\/:@()&€<>?\"])");
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
 			return matcher.replaceAll("'"); 
@@ -634,7 +634,7 @@ public class MissioniCMISService {
 		}
 	}
 	public QueryResult recupeorFlusso(String idFlusso) {
-		StringBuilder query = new StringBuilder("select parametriFlusso.*, flussoMissioni.* from cmis:document as t ");
+		StringBuilder query = new StringBuilder("select parametriFlusso.wfcnr:statoFlusso, parametriFlusso.wfcnr:taskId, flussoMissioni.cnrmissioni:commento from cmis:document as t ");
 		query.append( "inner join wfcnr:parametriFlusso as parametriFlusso on t.cmis:objectId = parametriFlusso.cmis:objectId ");
 		query.append(" inner join cnrmissioni:parametriFlussoMissioni as flussoMissioni on t.cmis:objectId = flussoMissioni.cmis:objectId ");
 		query.append(" where parametriFlusso.wfcnr:wfInstanceId = '").append(idFlusso).append("'");

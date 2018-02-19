@@ -1079,7 +1079,7 @@ public class OrdineMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Tipo Missione");
 			} 
 			if (ordineMissione.isMissioneEstera()){
-				if (StringUtils.isEmpty(ordineMissione.getNazione())){
+				if (StringUtils.isEmpty(ordineMissione.getNazione()) || Costanti.NAZIONE_ITALIA_SIGLA.compareTo(ordineMissione.getNazione()) == 0){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Nazione");
 				} 
 				if (StringUtils.isEmpty(ordineMissione.getTrattamento())){
