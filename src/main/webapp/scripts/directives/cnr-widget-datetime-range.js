@@ -58,6 +58,10 @@ angular.module('missioniApp')
               scope.endDatetime = new Date(scope.endDatetime);
 
               startTime.datetimepicker({
+                widgetPositioning: {
+                  horizontal: 'right',
+                  vertical: 'auto'
+                },
                 useCurrent: false,
                 defaultDate: scope.startDatetime,
                 sideBySide: true,
