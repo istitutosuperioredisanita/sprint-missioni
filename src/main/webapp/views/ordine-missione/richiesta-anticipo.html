@@ -79,7 +79,7 @@
 
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
                     <div class="col-xs-4">
-                            <button type="submit" ng-show="validazione == 'N' && !isOrdineMissioneConfermato" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span></button>
+                            <button type="submit" ng-show="validazione == 'N' && !isOrdineMissioneConfermato" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
 <!--
@@ -89,11 +89,11 @@
                     </div>
             </form>-->
              <div class="col-xs-3" ng-show="anticipoOrdineMissioneModel.id">
-                 <a target="_blank" href="api/rest/public/printOrdineMissioneAnticipo?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-anticipo.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                 <a target="_blank" href="api/rest/public/printOrdineMissioneAnticipo?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-anticipo.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
              </div>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-xs-1" ng-show="anticipoOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
-                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
+                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>
 
