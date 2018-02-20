@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <property name="syslog.port" value="1514" />
+    <property name="syslog.port" value="2524" />
     <property name="LOG_FILE" value="${LOG_FILE:-logs/missioni.log}" />
     <include resource="logging/properties/prod.xml" />
 
