@@ -937,6 +937,8 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Modalità di Pagamento");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getPgBanca())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Dati Banca");
+			} else if (Costanti.TIPO_PAGAMENTO_BONIFICO.equals(rimborsoMissione.getModpag()) && !StringUtils.hasLength(rimborsoMissione.getIban())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Codice IBAN");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getAnticipoRicevuto())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Anticipo Ricevuto");
 			} else if (StringUtils.isEmpty(rimborsoMissione.getSpeseTerziRicevute())){

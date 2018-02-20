@@ -267,6 +267,15 @@ public class CMISRimborsoMissioneService {
 						usernameImpostati = true;
 					}
 				}
+				uoSigla = unitaOrganizzativaService.loadUo(uoSiglaRich, null, rimborsoMissione.getAnno());
+				if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
+					DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, rimborsoMissione.getAnno());
+					if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
+						userNameFirmatario = recuperoDirettore(rimborsoMissione, Utility.replace(uoSiglaRich, ".", ""), account);
+						userNameFirmatarioSpesa = userNameFirmatario;
+						usernameImpostati = true;
+					}
+				}
 			}
 		}
 		
