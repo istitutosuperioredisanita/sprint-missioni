@@ -60,8 +60,8 @@
                 </label>
             </span>
         </div>
-        <div class="col-md-2">
-            <span class="input-group" ng-show="uoForUsersSpecial">
+        <div class="col-md-2" ng-show="!uoForUsersSpecial">
+            <span class="input-group">
               <span class="input-group-addon" translate="ordine-missione.form.responsabile-gruppo">Responsabile del Gruppo</span>
                 <label class="checkbox">
                   <input type="checkbox" ng-model="respGruppo" ng-true-value="S" ng-false-value="N">

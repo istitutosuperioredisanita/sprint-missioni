@@ -242,6 +242,15 @@ public class CMISOrdineMissioneService {
 							usernameImpostati = true;
 						}
 					}
+					uoSigla = unitaOrganizzativaService.loadUo(uoSiglaRich, null, ordineMissione.getAnno());
+					if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
+						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, ordineMissione.getAnno());
+						if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
+							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaRich, ".", ""), account);
+							userNameFirmatarioSpesa = userNameFirmatario;
+							usernameImpostati = true;
+						}
+					}
 				}
 			}
 			
@@ -743,10 +752,10 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("assoc_bpm_assignee_added" , nodeRefFirmatario);
 			jGenerator.writeStringField("assoc_bpm_assignee_removed" , "");
 			StringBuilder nodeRefs = new StringBuilder();
+			aggiungiDocumento(documento, nodeRefs);
+			aggiungiDocumento(documentoAnticipo, nodeRefs);
+			aggiungiAllegati(allegati, nodeRefs);
 			if (ordineMissione.isStatoNonInviatoAlFlusso()){
-				aggiungiDocumento(documento, nodeRefs);
-				aggiungiDocumento(documentoAnticipo, nodeRefs);
-				aggiungiAllegati(allegati, nodeRefs);
 				jGenerator.writeStringField("prop_bpm_comment" , "");
 				jGenerator.writeStringField("prop_bpm_percentComplete" , "0");
 			}

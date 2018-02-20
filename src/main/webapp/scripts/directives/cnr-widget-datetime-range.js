@@ -70,6 +70,10 @@ angular.module('missioniApp')
               });
 
               endTime.datetimepicker({
+                widgetPositioning: {
+                  horizontal: 'right',
+                  vertical: 'auto'
+                },
                 useCurrent: false,
                 defaultDate: scope.endDatetime,
                 sideBySide: true,
@@ -84,12 +88,20 @@ angular.module('missioniApp')
           var startTime = $(inputs[0]);
           var endTime = $(inputs[1]);
           startTime.datetimepicker({
+                widgetPositioning: {
+                  horizontal: 'right',
+                  vertical: 'auto'
+                },
                 useCurrent: false,
                 sideBySide: true,
                 locale:'it'
           });
 
           endTime.datetimepicker({
+                widgetPositioning: {
+                  horizontal: 'right',
+                  vertical: 'auto'
+                },
                 useCurrent: false,
                 sideBySide: true,
                 locale:'it'
