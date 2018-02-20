@@ -1086,6 +1086,10 @@ public class OrdineMissioneService {
 				} 
 			}
 
+			if (StringUtils.isEmpty(ordineMissione.getPartenzaDa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Partenza Da");
+			}
+
 			if (Utility.nvl(ordineMissione.getPartenzaDa(),"N").equals("A")){
 				if (StringUtils.isEmpty(ordineMissione.getPartenzaDaAltro())){
 					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO+": Specificare il luogo di partenza");

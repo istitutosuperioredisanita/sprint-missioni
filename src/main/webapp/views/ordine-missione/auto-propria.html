@@ -124,7 +124,7 @@
             </form>
           </div>
            <div class="col-md-1"> 
-                <button ng-show="validazione == 'N'" class="btn btn-sm" ng-disabled="saveButtonDisable(rigaAutoPropria)" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;{{'global.button.save' | translate}}</button>
+                <button ng-show="validazione == 'N'" class="btn btn-sm" ng-disabled="saveButtonDisable(rigaAutoPropria)" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
           </div>
            <div class="col-md-1"> 
                 <button ng-show="validazione == 'N'" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
@@ -254,11 +254,11 @@
     </ul>
   </div>
              <div class="col-xs-3" ng-show="autoPropriaOrdineMissioneModel.id">
-                 <a target="_blank" href="api/rest/public/printOrdineMissioneAutoPropria?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-auto-propria.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                 <a target="_blank" href="api/rest/public/printOrdineMissioneAutoPropria?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-auto-propria.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
              </div>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-xs-1" ng-show="autoPropriaOrdineMissioneModel.id">
-                            <button ng-show="validazione == 'N'" type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span></button>
+                            <button ng-show="validazione == 'N'" type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>
         </div>
