@@ -109,6 +109,21 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
         $location.path('/ordine-missione/'+ordineMissione.id);
     };
 
+    $scope.doOrderMissioni = function (item) {
+            if ($scope.predicate !== item)
+                delete $scope.reverse;
+
+            $scope.predicate = item;
+
+            if ($scope.reverse===undefined)
+                $scope.reverse=false;
+            else if ($scope.reverse) {
+                delete $scope.predicate;
+                delete $scope.reverse;
+            } else
+                $scope.reverse = true;
+    };
+
     $scope.stampa = function () {
         window.print();
     };
@@ -144,6 +159,10 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
             });
         }
     }
+
+    $scope.rowsPerPage = 30;
+    $scope.predicate = 'ordineMissione.dataInserimento';
+    $scope.reverse = true;
 
     var accountLog = $sessionStorage.account;
     var uoForUsersSpecial = accountLog.uoForUsersSpecial;
