@@ -950,10 +950,14 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         controlliPrimaDelSalvataggio();
         if ($scope.esisteOrdineMissione()){
             $rootScope.salvataggio = true;
+            var autoPropria = $scope.ordineMissioneModel.utilizzoAutoPropria;
+            var anticipo = $scope.ordineMissioneModel.richiestaAnticipo;
             OrdineMissioneService.modify($scope.ordineMissioneModel,
                     function (value, responseHeaders) {
                         $rootScope.salvataggio = false;
                         $scope.ordineMissioneModel = value;
+                        $scope.ordineMissioneModel.utilizzoAutoPropria = autoPropria;
+                        $scope.ordineMissioneModel.richiestaAnticipo = anticipo;
                         $scope.viewAttachments($scope.ordineMissioneModel.id);
                     },
                     function (httpResponse) {
