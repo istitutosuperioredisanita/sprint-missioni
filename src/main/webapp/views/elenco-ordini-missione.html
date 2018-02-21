@@ -81,6 +81,126 @@
       <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
         <thead>
           <tr>
+<!--              <th style="text-align: center">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.anno')">
+                  <h6>
+                    <b>{{'missione.form.anno' | translate}}
+                      <span ng-show="predicate=='ordineMissione.anno'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: right">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.numero')">
+                  <h6>
+                    <b>{{'missione.form.numero' | translate}}
+                      <span ng-show="predicate=='ordineMissione.numero'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: center">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.dataInserimento')">
+                  <h6>
+                    <b>{{'missione.form.data' | translate}}
+                      <span ng-show="predicate=='ordineMissione.dataInserimento'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th ng-hide="accountModel" style="text-align: left">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.uid')">
+                  <h6>
+                    <b>{{'main.userid' | translate}}
+                      <span ng-show="predicate=='ordineMissione.uid'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th ng-hide="accountModel" style="text-align: left">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.uoRich')">
+                  <h6>
+                    <b>{{'missione.form.uo' | translate}}
+                      <span ng-show="predicate=='ordineMissione.uoRich'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: center">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.decodeStato')">
+                  <h6>
+                    <b>{{'missione.form.stato' | translate}}
+                      <span ng-show="predicate=='ordineMissione.decodeStato'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: center">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.decodeStato')">
+                  <h6>
+                    <b>{{'missione.form.destinazione' | translate}}
+                      <span ng-show="predicate=='ordineMissione.destinazione'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: left">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.oggetto')">
+                  <h6>
+                    <b>{{'missione.form.oggetto' | translate}}
+                      <span ng-show="predicate=='ordineMissione.oggetto'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: left">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.dataInizioMissione')">
+                  <h6>
+                    <b>{{'ordine-missione.form.data-inizio' | translate}}
+                      <span ng-show="predicate=='ordineMissione.dataInizioMissione'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th>
+              <th style="text-align: left">
+                <a href="" ng-click="doOrderMissioni('ordineMissione.dataFineMissione')">
+                  <h6>
+                    <b>{{'ordine-missione.form.data-fine' | translate}}
+                      <span ng-show="predicate=='ordineMissione.dataFineMissione'">
+                        <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                        <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                      </span>
+                    </b>
+                  </h6>
+                </a>
+              </th> -->
               <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
               <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
               <th style="text-align: center">{{'missione.form.data' | translate}}</th>
@@ -109,6 +229,18 @@
           </tr>
         </tbody>  
       </table>
+<!--   <div style="text-align: center" ng-show="ordiniMissione.length>10">
+        Righe: 
+        <select id="rows-per-page" ng-model="rowsPerPage" class="input-xlarge">
+          <option>10</option>
+          <option>30</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+      </div>  
+      <div style="text-align: center">
+        <paginator uid='0'></paginator>
+      </div>-->
       <div class="col-xs-3" ng-show="ordiniMissione">
         <button type="button" ng-click="stampa()" class="btn btn-default" data-toggle="tooltip" title="{{'global.button.print' | translate}}"><span class="glyphicon glyphicon-print"></span></button>
       </div>

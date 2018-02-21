@@ -141,7 +141,7 @@ public class Utility {
 	
 	public static String getMessageException(Exception e){
 		String obj = e.getLocalizedMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getLocalizedMessage();
-		log.error("Errore", e);
+		log.debug("Errore", e);
 
 		ErrorRestSigla errorRest = null;
 		try {
