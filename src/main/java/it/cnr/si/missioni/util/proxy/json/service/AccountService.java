@@ -73,10 +73,11 @@ public class AccountService {
 	
 	public List<UsersSpecial> getUserSpecialForUo(String uo, Boolean isPerValidazione){
 		List<UsersSpecial> listaUtenti = new ArrayList<UsersSpecial>();
+		logger.info("Ricerca amministrativi per mail della uo: "+uo);
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
 			for (Iterator<UsersSpecial> iteratorUsers = configService.getDataUsersSpecial().getUsersSpecials().iterator(); iteratorUsers.hasNext();){
 				UsersSpecial user = iteratorUsers.next();
-				logger.info("Ricerca amministrativi per mail. Utente: "+user.getUid());
+				logger.debug("Ricerca amministrativi per mail. Utente: "+user.getUid());
 				if (Utility.nvl(user.getAll(),"N").equals("N") && isUtenteAbilitatoUo(user.getUoForUsersSpecials(),uo, isPerValidazione)){
 					logger.info("User special to be able: "+user.getUid());
 					listaUtenti.add(user);
@@ -119,7 +120,6 @@ public class AccountService {
 		for (Iterator<UoForUsersSpecial> iteratorUo = listUo.iterator(); iteratorUo.hasNext();){
 			UoForUsersSpecial uoForUsersSpecial = iteratorUo.next();
 			if (uoForUsersSpecial.getCodice_uo() != null && getUoSigla(uoForUsersSpecial).equals(uo)){
-				logger.info("Trovato amministrativi per mail della uo: "+uo);
 				if (isPerValidazione){
 					if (Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S")){
 						return true;
