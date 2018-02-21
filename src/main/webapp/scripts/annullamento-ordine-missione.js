@@ -10,6 +10,13 @@ missioniApp.factory('AnnullamentoOrdineMissioneService', function ($resource, Da
                     return angular.toJson(copy);
                 }
             },
+            'return_sender':  { method: 'PUT', params:{confirm:false, daValidazione:"R"}, 
+                transformRequest: function (data) {
+                    var copy = angular.copy(data);
+                    copy.dataInserimento = DateUtils.convertLocalDateToServer(copy.dataInserimento);
+                    return angular.toJson(copy);
+                }
+            },
             'modify':  { method: 'PUT'},
             'delete':  { method: 'DELETE'},
             'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}}
@@ -756,6 +763,23 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
         x.error(function (data) {
             $rootScope.salvataggio = false;
         });
+    }
+
+    $scope.ritornaMittenteAnnullamento = function () {
+            $rootScope.salvataggio = true;
+            AnnullamentoOrdineMissioneService.return_sender($scope.annullamentoModel,
+                    function (responseHeaders) {
+                        $rootScope.salvataggio = false;
+                        ui.ok_message("Annullamento Ordine di Missione respinto al mittente.");
+                        AnnullamentoOrdineMissioneService.get($scope.annullamentoModel.id).then(function(data){
+                            $scope.annullamentoModel = data;
+                            $scope.inizializzaFormPerModifica();
+                        });
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                    }
+            );
     }
 
     $scope.save = function () {
