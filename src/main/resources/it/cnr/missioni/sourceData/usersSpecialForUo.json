@@ -1706,7 +1706,7 @@
 {"uid":"italo.duffizi", "uoForUsersSpecial":[{"codice_uo":"000407", "ordine_da_validare":"S"}]},
 {"uid":"manuelito.rinaldi", "uoForUsersSpecial":[{"codice_uo":"000407", "ordine_da_validare":"S"},{"codice_uo":"000301"}]},
 {"uid":"app.missioni", "uoForUsersSpecial":[{"codice_uo":"000407", "ordine_da_validare":"S"}]},
-{"uid":"marilena.dicintio ", "uoForUsersSpecial":[{"codice_uo":"000407", "ordine_da_validare":"S"}]},
+{"uid":"marilena.dicintio", "uoForUsersSpecial":[{"codice_uo":"000407", "ordine_da_validare":"S"}]},
 
 {"uid":"silvia.rossi", "uoForUsersSpecial":[{"codice_uo":"000411", "ordine_da_validare":"S"}]},
 
@@ -2217,6 +2217,7 @@
 {"uid" : "MANUELA.FERRANTE","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 {"uid" : "daniela.mulas","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 
+{"uid" : "app.intranet-ivalsa","uoForUsersSpecial" : [{"codice_uo" : "106000"}]},
 {"uid" : "app.intranet-ifac","uoForUsersSpecial" : [{"codice_uo" : "032000"}]},
 
 {"uid" : "domenicangelo.freri","uoForUsersSpecial" : [{"codice_uo" : "021000","ordine_da_validare" : "S"}]}, 
@@ -2373,6 +2374,7 @@
 {"uid" : "fabio.ferrara","uoForUsersSpecial" : [{"codice_uo" : "009000","ordine_da_validare" : "S"},{"codice_uo" : "009002","ordine_da_validare" : "S"}]}, 
 {"uid" : "lorena.bonaldi","uoForUsersSpecial" : [{"codice_uo" : "009000","ordine_da_validare" : "S"},{"codice_uo" : "009002","ordine_da_validare" : "S"}]}, 
 {"uid" : "maria.aiello","uoForUsersSpecial" : [{"codice_uo" : "009000","ordine_da_validare" : "S"},{"codice_uo" : "009002","ordine_da_validare" : "S"}]}, 
+{"uid" : "domenico.apuzzo","uoForUsersSpecial" : [{"codice_uo" : "009002"}]}, 
 
 
 
