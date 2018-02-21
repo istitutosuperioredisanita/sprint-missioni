@@ -7,7 +7,19 @@
     <!-- spring boot logback configuration files -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
-    <include resource="logging/appender/syslog.xml" />
+
+    <appender name="SYSLOG APPENDER" class="ch.qos.logback.classic.net.SyslogAppender">
+        <syslogHost>${syslog.host}</syslogHost>
+        <port>${syslog.port}</port>
+        <facility>LOCAL1</facility>
+        <suffixPattern>${syslog.url} | %d | %-5p | %c:%L | %t | %m%n</suffixPattern>
+    </appender>
+    <appender name="ASYNC_SYSLOG_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SYSLOG APPENDER" />
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
 
     <!-- logger CNR -->
     <logger name="it.cnr" level="INFO"/>
