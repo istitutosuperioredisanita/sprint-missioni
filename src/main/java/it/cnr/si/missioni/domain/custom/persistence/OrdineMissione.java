@@ -892,7 +892,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 	
 	@Transient
-	public String decodeTrattamentoShort(){
+	public String getDecodeTrattamentoShort(){
 		if (!StringUtils.isEmpty(getTrattamento())){
 			return Costanti.TRATTAMENTO_SHORT.get(getTrattamento());
 		}

@@ -481,7 +481,21 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
       $scope.restUoCompetenza($scope.ordineMissioneModel.anno, cds, null);
     }
 
+    $scope.gestioneUtenteAbilitatoValidare = function (uo){
+        $scope.utenteAbilitatoValidareUo = 'N';
+        var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
+        var uoSiper = uo.replace('.','');
+        for (var k=0; k<uoForUsersSpecial.length; k++) {
+            var uoForUserSpecial = uoForUsersSpecial[k];
+            if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
+            $scope.utenteAbilitatoValidareUo = 'S';
+            }
+        }
+    }
+
     $scope.reloadUoWork = function(uo){
+        $scope.gestioneUtenteAbilitatoValidare(uo);
+
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
@@ -1019,6 +1033,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.ordineMissioneModel = model;
                 $scope.viewAttachments($scope.ordineMissioneModel.id);
                 $scope.inizializzaFormPerModifica();
+                $scope.gestioneUtenteAbilitatoValidare($scope.ordineMissioneModel.uoSpesa);
             }
         });
     } else {

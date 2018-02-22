@@ -541,7 +541,8 @@ public class OrdineMissioneService {
 				} else {
 					if (StringUtils.isEmpty(filter.getUoRich())){
 						if (Utility.nvl(filter.getRespGruppo(), "N").equals("S")){
-							criterionList.add(Restrictions.eq("responsabileGruppo", principal.getName()));
+
+							criterionList.add(Restrictions.disjunction().add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.not(Restrictions.eq("stato", "INR")))));
 						} else {
 							criterionList.add(Restrictions.eq("uid", principal.getName()));
 						}
@@ -591,7 +592,7 @@ public class OrdineMissioneService {
 				ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 				if (isServiceRest && !isForValidateFlows){
 					for (OrdineMissione ordineMissione : ordineMissioneList){
-						OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(ordineMissione, false);
+						OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(new Long(ordineMissione.getId().toString()));
 						if (anticipo != null){
 							ordineMissione.setRichiestaAnticipo(Costanti.SI_NO.get("S"));
 						} else {

@@ -378,7 +378,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     private BigDecimal totaleRimborsoComplessivo;
 
 	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich){
+			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich, String trattamento){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -394,6 +394,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.setDataFineMissione(dataFineMissione);
 		this.setValidato(validato);
 		this.setUoRich(uoRich);
+		this.setTrattamento(trattamento);
 	}
 
 	public RimborsoMissione(){
@@ -414,7 +415,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			add(Projections.property("dataInizioMissione")).
 			add(Projections.property("dataFineMissione")).
 			add(Projections.property("validato")).
-			add(Projections.property("uoRich"));
+			add(Projections.property("uoRich")).
+			add(Projections.property("trattamento"));
 
 	public void setStato(String stato) {
 		this.stato = stato;
@@ -485,6 +487,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			if (!StringUtils.isEmpty(getStatoFlusso())){
 				return Costanti.STATO_FLUSSO.get(getStatoFlusso());
 			}
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getDecodeTrattamentoShort(){
+		if (!StringUtils.isEmpty(getTrattamento())){
+			return Costanti.TRATTAMENTO_SHORT.get(getTrattamento());
 		}
 		return "";
 	}

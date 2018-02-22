@@ -15,4 +15,7 @@ public interface OrdineMissioneAnticipoRepository extends
 	@Query("select a from OrdineMissioneAnticipo a where a.ordineMissione = ?1 and a.stato != 'ANN'")
     OrdineMissioneAnticipo getAnticipo(OrdineMissione ordineMissione);
     
+	@Query("select a from OrdineMissioneAnticipo a where a.ordineMissione.id = ?1 and a.stato != 'ANN'")
+    OrdineMissioneAnticipo getAnticipo(Long idOrdineMissione);
+    
 }
