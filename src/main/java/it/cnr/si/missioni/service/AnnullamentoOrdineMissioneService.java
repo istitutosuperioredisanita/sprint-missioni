@@ -98,6 +98,9 @@ public class AnnullamentoOrdineMissioneService {
     @Value("${spring.mail.messages.invioAnnullamentoOrdineMissione.oggetto}")
     private String subjectSendToAdministrative;
     
+    @Value("${spring.mail.messages.ritornoAnnullamentoOrdineMittente.oggetto}")
+    private String subjectReturnToSender;
+    
     @Transactional(readOnly = true)
     public AnnullamentoOrdineMissione getAnnullamentoOrdineMissione(Principal principal, Long idAnnullamento, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -226,6 +229,12 @@ public class AnnullamentoOrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Annullamento Ordine Missione da aggiornare inesistente.");
 		}
 		
+    	if (annullamentoDB.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamentoDB.getOrdineMissione().getId());
+        	if (ordineMissione != null){
+        		annullamento.setOrdineMissione(ordineMissione);
+        	}
+    	}
 		if (Utility.nvl(annullamento.getDaValidazione(), "N").equals("S")){
 			if (!annullamentoDB.getStato().equals(Costanti.STATO_CONFERMATO)){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione non confermato.");
@@ -243,6 +252,16 @@ public class AnnullamentoOrdineMissioneService {
 
 			aggiornaDatiAnnullamentoOrdineMissione(principal, annullamento, confirm, annullamentoDB);
 			annullamentoDB.setValidato("S");
+		} else if (Utility.nvl(annullamento.getDaValidazione(), "N").equals("R")){
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), annullamentoDB.getOrdineMissione().getUoSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+annullamentoDB.getOrdineMissione().getUoSpesa()+".");
+			}
+			if (annullamentoDB.isStatoNonInviatoAlFlusso() || annullamentoDB.isMissioneDaValidare()) {
+				annullamentoDB.setStato(Costanti.STATO_INSERITO);
+				isRitornoMissioneMittente = true;
+			} else {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
+			}
 		} else {
 			aggiornaDatiAnnullamentoOrdineMissione(principal, annullamento, confirm, annullamentoDB);
 		}
@@ -262,10 +281,17 @@ public class AnnullamentoOrdineMissioneService {
     	if (confirm && annullamentoDB.isMissioneDaValidare()){
     		sendMailToAdministrative(basePath, annullamentoDB);
     	}
+    	if (isRitornoMissioneMittente){
+    		mailService.sendEmail(subjectReturnToSender, getTextMailReturnToSender(principal, basePath, annullamentoDB), false, true, accountService.getEmail(annullamentoDB.getUidInsert()));
+    	}
     	log.debug("Updated Information for Annullamento Ordine Missione: {}", annullamentoDB);
 
     	return annullamentoDB;
     }
+
+	private String getTextMailReturnToSender(Principal principal, String basePath, AnnullamentoOrdineMissione annullamento) {
+		return "L'annullamento ordine di missione "+annullamento.getAnno()+"-"+annullamento.getNumero()+ " di "+getNominativo(annullamento.getUid())+" per la missione a "+annullamento.getOrdineMissione().getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione())+ " avente per oggetto "+annullamento.getOrdineMissione().getOggetto()+" le è stata respinto da "+getNominativo(principal.getName());
+	}
 
     private void sendMailToAdministrative(String basePath, AnnullamentoOrdineMissione annullamento) {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(annullamento.getOrdineMissione().getUoSpesa(), annullamento.getOrdineMissione().getAnno());

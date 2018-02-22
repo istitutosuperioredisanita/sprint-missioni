@@ -589,6 +589,16 @@ public class OrdineMissioneService {
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
 				ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
+				if (isServiceRest && !isForValidateFlows){
+					for (OrdineMissione ordineMissione : ordineMissioneList){
+						OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(ordineMissione, false);
+						if (anticipo != null){
+							ordineMissione.setRichiestaAnticipo(Costanti.SI_NO.get("S"));
+						} else {
+							ordineMissione.setRichiestaAnticipo(Costanti.SI_NO.get("N"));
+						}
+					}
+				}
 			} else
 				ordineMissioneList = crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
 			return ordineMissioneList;
