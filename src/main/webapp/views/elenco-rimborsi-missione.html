@@ -96,6 +96,7 @@
               <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
               <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
               <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+              <th style="text-align: center">{{'missione.form.trattamentoShort' | translate}}</th>
               <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
               <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
           </tr>
@@ -111,6 +112,7 @@
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
                 <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
                 <td class="col-md-4" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
           </tr>

@@ -436,7 +436,7 @@
                 </p>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaOrdineMissione">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaOrdineMissione && ((ordineMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo) || (ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione) || ordineMissioneModel.stato === 'INS')">
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
@@ -446,27 +446,27 @@
               </div>
             </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (ordineMissioneModel.stato === 'INS'||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && !showResponsabile)||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.missioneGratuita != 'S' && ordineMissioneModel.stato === 'INS'">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.missioneGratuita != 'S' && ordineMissioneModel.stato === 'INS' && validazione != 'S'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToManager' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'ordine-missione.button.sendToManagerShort' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateOrdineMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'S'">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'S' && ordineMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'S'">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'S' && ordineMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSenderShort' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="finalizeOrdineMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'D'">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'D' && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
@@ -481,11 +481,11 @@
 -->
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato = 'INS' && !disabilitaOrdineMissione">
+                    <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato == 'INS' && !disabilitaOrdineMissione && validazione != 'S'">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>
-            <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
+            <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()"> 
                     <div class="col-xs-1" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSenderShort' | translate}}</button>
                     </div>
