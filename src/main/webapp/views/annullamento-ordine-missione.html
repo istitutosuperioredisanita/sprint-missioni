@@ -343,28 +343,26 @@
                     </p>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento && annullamentoModel.stato == 'INS'">
                             <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento&& annullamentoModel.stato == 'INS' ">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
                     </div>
             </form>
-            <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S'">
+            <form name="form-inline" role="form" ng-submit="validateAnnullamentoOrdineMissione()">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S' && !disabilitaAnnullamento">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                     </div>
             </form>
-<!--            <form name="form-inline" role="form" ng-submit="ritornaMittenteAnnullamento()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S'">
+            <form name="form-inline" role="form" ng-submit="ritornaMittenteAnnullamento()">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S' && !disabilitaAnnullamento">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSenderShort' | translate}}</button>
                     </div>
-            </form>-->
+            </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-3" ng-show="showEsisteAnnullamento">
-
                     <div class="col-xs-3" ng-show="showEsisteAnnullamento">
                       <a target="_blank" href="api/rest/public/printAnnullamentoMissione?idMissione={{annullamentoModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
@@ -372,7 +370,7 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-xs-1" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento">
+                    <div class="col-xs-1" ng-show="showEsisteAnnullamento  && validazione != 'S' && annullamentoModel.stato == 'INS' && !disabilitaAnnullamento">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>

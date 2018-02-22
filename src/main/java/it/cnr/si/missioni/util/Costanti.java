@@ -143,7 +143,7 @@ public class Costanti {
         aMap.put(STATO_ANNULLATO, "Annullato");
         aMap.put(STATO_ANNULLATO_DOPO_APPROVAZIONE, "Annullato dopo l'approvazione");
         aMap.put(STATO_CONFERMATO, "Confermato");
-        aMap.put(STATO_INVIATO_RESPONSABILE, "Inviato");
+        aMap.put(STATO_INVIATO_RESPONSABILE, "Inviato al responsabile");
         aMap.put(STATO_INSERITO, "Inserito");
         aMap.put(STATO_DEFINITIVO, "Definitivo");
         STATO = Collections.unmodifiableMap(aMap);

@@ -19,7 +19,8 @@ missioniApp.factory('AnnullamentoOrdineMissioneService', function ($resource, Da
             },
             'modify':  { method: 'PUT'},
             'delete':  { method: 'DELETE'},
-            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}}
+            'confirm':  { method: 'PUT', params:{confirm:true, daValidazione:"N"}},
+            'confirm_validate':  { method: 'PUT', params:{confirm:true, daValidazione:"S"}}
         });
     });
 
@@ -541,7 +542,8 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
         if ($scope.esisteAnnullamento && ($scope.annullamentoModel.stato === 'DEF' || 
             $scope.annullamentoModel.statoFlusso === 'APP' || $scope.annullamentoModel.stato === 'ANN' || 
             ($scope.annullamentoModel.stato === 'CON' && 
-               ($scope.annullamentoModel.stateFlows === 'ANNULLATO' ||
+               ($scope.annullamentoModel.statoFlusso === 'INV' ||
+                $scope.annullamentoModel.stateFlows === 'ANNULLATO' ||
                 $scope.annullamentoModel.stateFlows === 'FIRMA SPESA RIMBORSO' ||
                 $scope.annullamentoModel.stateFlows === 'FIRMA UO RIMBORSO' ||
                 $scope.annullamentoModel.stateFlows === 'FIRMATO')))) {
@@ -817,6 +819,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
 
 
     $scope.idMissione = $routeParams.idMissione;
+    $scope.validazione = $routeParams.validazione;
     $scope.accessToken = AccessToken.get();
     $sessionStorage.accountWork = null;
 

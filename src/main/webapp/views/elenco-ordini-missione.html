@@ -209,8 +209,8 @@
               <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
               <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
               <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
-              <th style="text-align: left">{{'missione.form.trattamentoShort' | translate}}</th>
-              <th style="text-align: left">{{'elenco-ordini-missione.form.anticipo' | translate}}</th>
+              <th style="text-align: center">{{'missione.form.trattamentoShort' | translate}}</th>
+              <th style="text-align: center">{{'elenco-ordini-missione.form.anticipo' | translate}}</th>
               <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
               <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
           </tr>
@@ -226,8 +226,8 @@
                 <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeStato}}</td>
                 <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
                 <td class="col-md-4" style="text-align: left">{{ordineMissione.oggetto}}</td>
-                <td class="col-md-4" style="text-align: left">{{ordineMissione.decodeTrattamentoShort}}</td>
-                <td class="col-md-4" style="text-align: left">{{ordineMissione.anticipo}}</td>
+                <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeTrattamentoShort}}</td>
+                <td class="col-md-1" style="text-align: center">{{ordineMissione.richiestaAnticipo}}</td>
                 <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
           </tr>

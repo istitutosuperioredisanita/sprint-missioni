@@ -90,6 +90,13 @@ public class OrdineMissioneAnticipoService {
 		return null;
 	}
 
+	@Transactional(readOnly = true)
+	public OrdineMissioneAnticipo getAnticipo(Long idOrdineMissione)
+			throws ComponentException {
+		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoRepository.getAnticipo(idOrdineMissione);
+		return anticipo;
+	}
+
 	@Transactional(propagation = Propagation.REQUIRED)
 	public OrdineMissioneAnticipo createAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws AwesomeException, ComponentException, OptimisticLockException, OptimisticLockException,
