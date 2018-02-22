@@ -656,6 +656,9 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
         if ($scope.ordineMissioneModel.uoSpesa){
             $scope.impostaGestioneResponsabileGruppo($scope.ordineMissioneModel.uoSpesa);
+            if ($scope.ordineMissioneModel.responsabileGruppo && $sessionStorage.account.login == $scope.ordineMissioneModel.responsabileGruppo){
+                $scope.isResponsabileGruppoMissione = true;
+            }
         }
         $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
         dateInizioFineDiverse();

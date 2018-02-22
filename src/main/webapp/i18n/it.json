@@ -379,6 +379,7 @@
             "tipo-missione": "Tipo Missione*",
             "nazione": "Nazione*",
             "trattamento": "Trattamento*",
+            "trattamentoShort": "Tratt.",
             "note": "Note",
             "note.placeholder": "Annotazioni. Altre Disposizioni.",
             "voce": "Voce di Bilancio",
@@ -430,6 +431,7 @@
             "annullati": "Includi Annullati"
         },
         "form": {
+            "anticipo": "Anticipo",
             "modulo": "Progetto",
             "modulo.placeholder": "Progetto"
         }

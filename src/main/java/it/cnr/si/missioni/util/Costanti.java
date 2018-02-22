@@ -120,6 +120,14 @@ public class Costanti {
         TRATTAMENTO = Collections.unmodifiableMap(aMap);
     }
 
+    public final static Map<String, String> TRATTAMENTO_SHORT;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(TAM, "TAM");
+        aMap.put(RIMBORSO_DOCUMENTATO, "Rimborso");
+        TRATTAMENTO_SHORT = Collections.unmodifiableMap(aMap);
+    }
+
     public final static Map<String, String> PARTENZA_DA;
     static {
         Map<String, String> aMap = new HashMap<String, String>();

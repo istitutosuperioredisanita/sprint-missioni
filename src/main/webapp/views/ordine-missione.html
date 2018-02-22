@@ -446,7 +446,7 @@
               </div>
             </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (!showResponsabile||ordineMissioneModel.missioneGratuita === 'S'||ordineMissioneModel.stato === 'INR')  && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (ordineMissioneModel.stato === 'INS'||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
                     </div>
             </form>
@@ -481,12 +481,12 @@
 -->
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato != 'INR' && !validazione && !disabilitaOrdineMissione">
+                    <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato = 'INS' && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
-                    <div class="col-xs-1" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && ordineMissioneModel.stato === 'INR'">
+                    <div class="col-xs-1" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSenderShort' | translate}}</button>
                     </div>
             </form>
