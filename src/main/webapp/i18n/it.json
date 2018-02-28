@@ -502,6 +502,7 @@
                     "ds-spesa" : "Descrizione Spesa*",
                     "tipologia-pasto" : "Tipo Pasto*",
                     "importo": "Importo €*",
+                    "importoSenzaSimbolo": "Importo",
                     "spesa-anticipata": "Spesa Anticipata dall'ente",
                     "download-file": "Download File",
                     "remove-file": "Elimina File",
