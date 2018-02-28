@@ -228,7 +228,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             var dataFineTroncata = new Date(new Date($scope.rimborsoMissioneModel.dataFineMissione).setHours(0,0,0,0));
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
-                if (cd_tipo_rapporto = "DIP"){
+                if (inquadramento.cd_tipo_rapporto = "DIP"){
                     if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
                         new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
                         $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
@@ -693,7 +693,20 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       $scope.restUoCompetenza($scope.rimborsoMissioneModel.anno, cds, null);
     }
 
+    $scope.gestioneUtenteAbilitatoValidare = function (uo){
+        $scope.utenteAbilitatoValidareUo = 'N';
+        var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
+        var uoSiper = uo.replace('.','');
+        for (var k=0; k<uoForUsersSpecial.length; k++) {
+            var uoForUserSpecial = uoForUsersSpecial[k];
+            if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
+            $scope.utenteAbilitatoValidareUo = 'S';
+            }
+        }
+    }
     $scope.reloadUoWork = function(uo){
+        $scope.gestioneUtenteAbilitatoValidare(uo);
+
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
@@ -1200,7 +1213,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restCapitoli(model.anno);
                 $scope.rimborsoMissioneModel = model;
                 $scope.viewAttachments($scope.rimborsoMissioneModel.id);
-               $scope.inizializzaFormPerModifica();
+                $scope.inizializzaFormPerModifica();
+                $scope.gestioneUtenteAbilitatoValidare($scope.rimborsoMissioneModel.uoSpesa);
             }
         });
     } else {

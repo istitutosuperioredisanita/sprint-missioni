@@ -38,13 +38,15 @@ angular.module('missioniApp')
         endDatetime: '=',
         fnChange: '=',
         idMissione: '=',
+        isInModifica: '=',
+        isAttiva: '=',
         disabilitato: '='
       },
       templateUrl: 'views/datetimepicker-range.html',
       link: function(scope, element, attrs) {
         scope.startLabel = attrs.startLabel;
         scope.endLabel = attrs.endLabel;
-        if (scope.idMissione){
+        if (scope.idMissione && (!scope.isInModifica || (scope.isInModifica && scope.isAttiva && !scope.startDatetime))){
           var init = true;
           scope.$watch('startDatetime', function (startValue) {
             if (startValue && init) {

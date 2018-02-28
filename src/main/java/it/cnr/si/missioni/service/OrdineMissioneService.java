@@ -541,8 +541,7 @@ public class OrdineMissioneService {
 				} else {
 					if (StringUtils.isEmpty(filter.getUoRich())){
 						if (Utility.nvl(filter.getRespGruppo(), "N").equals("S")){
-
-							criterionList.add(Restrictions.disjunction().add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.not(Restrictions.eq("stato", "INR")))));
+							criterionList.add(Restrictions.disjunction().add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.not(Restrictions.eq("stato", "INS")))));
 						} else {
 							criterionList.add(Restrictions.eq("uid", principal.getName()));
 						}
@@ -1125,7 +1124,7 @@ public class OrdineMissioneService {
 		if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La data di fine missione non può essere precedente alla data di inizio missione");
 		}
-		if (DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE).equals(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_WITH_TIMEZONE))){
+		if (DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC).equals(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC))){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Le date di inizio e fine missione non possono essere uguali");
 		}
 		
