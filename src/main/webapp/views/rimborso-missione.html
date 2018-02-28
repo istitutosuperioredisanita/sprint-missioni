@@ -129,7 +129,7 @@
 <cnr-widget-datetime-range id-missione="1" disabilitato="validazione || disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioMissione" end-datetime="rimborsoMissioneModel.dataFineMissione" start-label="{{'rimborso-missione.form.data-inizio-obbligatoria' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'rimborso-missione.form.data-fine-obbligatoria' | translate}}"></cnr-widget-datetime-range>
                 </p>
                 <p class="column-in-column col-md-7" ng-show="missioneEsteraConTam">
-<cnr-widget-datetime-range id-missione="idMissione" disabilitato="validazione || disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioEstero" end-datetime="rimborsoMissioneModel.dataFineEstero" start-label="{{'rimborso-missione.form.data-inizio-frontiera' | translate}}" fn-change="onChangeDateInizioFineFrontiera" end-label="{{'rimborso-missione.form.data-fine-frontiera' | translate}}"></cnr-widget-datetime-range>
+<cnr-widget-datetime-range id-missione="idMissione" is-in-modifica="true" is-attiva="missioneEsteraConTam" disabilitato="validazione || disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioEstero" end-datetime="rimborsoMissioneModel.dataFineEstero" start-label="{{'rimborso-missione.form.data-inizio-frontiera' | translate}}" fn-change="onChangeDateInizioFineFrontiera" end-label="{{'rimborso-missione.form.data-fine-frontiera' | translate}}"></cnr-widget-datetime-range>
                 </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
@@ -514,22 +514,22 @@
                 </p>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione && ((rimborsoMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo) || rimborsoMissioneModel.stato === 'INS'||!showEsisteRimborsoMissione)">
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="!validazione && showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'INS'   && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S'">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
                     </div>
             </form>
@@ -540,18 +540,15 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-3" ng-show="showEsisteRimborsoMissione">
-
-                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione">
                       <a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
 
 <!--
                       <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(rimborsoMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
 -->
-                    </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-xs-1" ng-show="showEsisteRimborsoMissione && !validazione && !disabilitaRimborsoMissione">
+                    <div class="col-xs-1" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato == 'INS' && !disabilitaRimborsoMissione && validazione != 'S'">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>

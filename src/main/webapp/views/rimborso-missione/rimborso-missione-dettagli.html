@@ -39,7 +39,7 @@
                             <span ng-show="dettaglioSpesa.dsNoGiustificativo"><b>{{'rimborso-missione-dettagli.form.dettaglio-spese.mancanza-giustificativo' | translate}}:</b>  {{dettaglioSpesa.dsNoGiustificativo}}</span>
 -->                            
                             <br>
-                            <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importo' | translate}}:</b> {{dettaglioSpesa.importoEuro}}
+                            <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.localita-spostamento' | translate}}:</b>{{dettaglioSpesa.localitaSpostamento}}</span>
                             <div ng-show="dettaglioSpesa.viewAttachment">
