@@ -446,7 +446,7 @@
               </div>
             </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && !showResponsabile)||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
+                    <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && !showResponsabile)||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
                     </div>
             </form>
