@@ -343,7 +343,7 @@
                     </p>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento && annullamentoModel.stato == 'INS'">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento && (annullamentoModel.stato == 'INS'|| !showEsisteAnnullamento)">
                             <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
@@ -353,7 +353,7 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateAnnullamentoOrdineMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S' && !disabilitaAnnullamento">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S' && !disabilitaAnnullamento && utenteAbilitatoValidareUo == 'S'">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                     </div>
             </form>

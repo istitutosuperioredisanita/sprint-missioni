@@ -452,6 +452,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
     }
 
     $scope.reloadUoWork = function(uo){
+        $scope.gestioneUtenteAbilitatoValidare(uo);
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
@@ -569,6 +570,18 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
         }
 
         inizializzaForm();
+    }
+
+    $scope.gestioneUtenteAbilitatoValidare = function (uo){
+        $scope.utenteAbilitatoValidareUo = 'N';
+        var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
+        var uoSiper = uo.replace('.','');
+        for (var k=0; k<uoForUsersSpecial.length; k++) {
+            var uoForUserSpecial = uoForUsersSpecial[k];
+            if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
+            $scope.utenteAbilitatoValidareUo = 'S';
+            }
+        }
     }
 
     var inizializzaForm = function(){
@@ -848,7 +861,8 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                                 $scope.restGae(model.anno, model.ordineMissione.pgProgetto, model.ordineMissione.cdrSpesa, model.ordineMissione.uoSpesa);
                                 $scope.restCapitoli(model.anno);
                                 $scope.annullamentoModel = model;
-                               $scope.inizializzaFormPerModifica();
+                                $scope.inizializzaFormPerModifica();
+                                $scope.gestioneUtenteAbilitatoValidare(model.ordineMissione.uoSpesa);
                             }
             });
     } else {
