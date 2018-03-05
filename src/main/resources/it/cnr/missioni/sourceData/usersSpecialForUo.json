@@ -2214,6 +2214,7 @@
 {"uid":"vincenza.cocchieri", "uoForUsersSpecial":[{"codice_uo":"101000", "ordine_da_validare":"S"}]},
 
 {"uid":"anna.nigri", "uoForUsersSpecial":[{"codice_uo":"097000", "ordine_da_validare":"S"},{"codice_uo":"097001", "ordine_da_validare":"S"}]},
+{"uid":"lidietta.giorno", "uoForUsersSpecial":[{"codice_uo":"097000"},{"codice_uo":"097001"}]},
 {"uid":"giovanni.chiappetta", "uoForUsersSpecial":[{"codice_uo":"097000"}]},
 {"uid":"lisa.bissacco", "uoForUsersSpecial":[{"codice_uo":"097001"},{"codice_uo":"019003", "ordine_da_validare":"S"}]},
 
