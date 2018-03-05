@@ -228,7 +228,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             var dataFineTroncata = new Date(new Date($scope.rimborsoMissioneModel.dataFineMissione).setHours(0,0,0,0));
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
-                if (inquadramento.cd_tipo_rapporto = "DIP"){
+                if (inquadramento.cd_tipo_rapporto == "DIP"){
                     if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
                         new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
                         $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
