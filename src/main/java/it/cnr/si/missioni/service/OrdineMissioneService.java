@@ -566,14 +566,14 @@ public class OrdineMissioneService {
 						    		}
 					    		}
 					    	}
-					    	condizioneResponsabileGruppo(principal, condizioneOr);
+					    	condizioneResponsabileGruppo(principal, condizioneOr, filter);
 					    	criterionList.add(condizioneOr);
 						} else {
-							condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
+							condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList, filter);
 						}
 					}
 				} else {
-					condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList);
+					condizioneOrdineDellUtenteConResponsabileGruppo(principal, criterionList, filter);
 				}
 			}
 			if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S") && (!(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0))){
@@ -605,15 +605,19 @@ public class OrdineMissioneService {
 		}
     }
 
-	private void condizioneOrdineDellUtenteConResponsabileGruppo(Principal principal, CriterionList criterionList) {
+	private void condizioneOrdineDellUtenteConResponsabileGruppo(Principal principal, CriterionList criterionList, MissioneFilter filter) {
 		Disjunction condizioneOr = Restrictions.disjunction();
-		condizioneResponsabileGruppo(principal, condizioneOr);
+		condizioneResponsabileGruppo(principal, condizioneOr, filter);
 		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uid", principal.getName())));
 		criterionList.add(condizioneOr);
 	}
 
-	private void condizioneResponsabileGruppo(Principal principal, Disjunction condizioneOr) {
-		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.eq("stato", "INR")));
+	private void condizioneResponsabileGruppo(Principal principal, Disjunction condizioneOr, MissioneFilter filter) {
+		if (filter.getaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId())== 0){
+			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.not(Restrictions.eq("stato", "INS"))));
+		} else {
+			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", principal.getName())).add(Restrictions.eq("stato", "INR")));
+		} 
 	}
 
     @Transactional(readOnly = true)
