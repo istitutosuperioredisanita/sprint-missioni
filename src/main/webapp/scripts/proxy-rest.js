@@ -98,7 +98,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                             var terziPerCompenso = terzo.data.elements;
                             var terzoPerCompenso = terziPerCompenso[0];
                             if (terzoPerCompenso.ti_dipendente_altro == 'A'){
-                                persona.matricola = "";
+                                persona.matricola = null;
                                 persona.profilo = terzoPerCompenso.ds_tipo_rapporto;
                                 persona.comune_residenza = terzoPerCompenso.ds_comune_fiscale;
                             }
@@ -193,7 +193,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 var persona = listaPersons[i];
                 if (persona.codice_fiscale == terzoPerCompenso.codice_fiscale){
                     if (terzoPerCompenso.ti_dipendente_altro == 'A'){
-                        listaPersons[i].matricola = "";
+                        listaPersons[i].matricola = null;
                         listaPersons[i].comune_residenza = terzoPerCompenso.ds_comune_fiscale;
                         listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
                     }
