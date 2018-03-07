@@ -202,7 +202,6 @@ public class OrdineMissioneService {
 		return getOrdineMissione(principal, idMissione, false);
     }
 
-    @Transactional(readOnly = true)
    	public Map<String, byte[]> printOrdineMissione(Authentication auth, Long idMissione) throws ComponentException {
     	String username = SecurityUtils.getCurrentUserLogin();
     	Principal principal = (Principal)auth;
@@ -436,12 +435,10 @@ public class OrdineMissioneService {
 		return result.getState();
 	}
 
-    @Transactional(readOnly = true)
     public List<OrdineMissione> getOrdiniMissione(Principal principal, MissioneFilter filter, Boolean isServiceRest) throws ComponentException {
 		return getOrdiniMissione(principal, filter, isServiceRest, false);
     }
 
-    @Transactional(readOnly = true)
     public List<OrdineMissione> getOrdiniMissione(Principal principal, MissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
 		CriterionList criterionList = new CriterionList();
 		List<OrdineMissione> ordineMissioneList=null;

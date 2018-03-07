@@ -371,11 +371,11 @@ public class RimborsoMissioneService {
 		if (rimborsoMissioneDB==null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
 		}
-		try {
-			crudServiceBean.lockBulk(principal, rimborsoMissioneDB);
-		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione.");
-		}
+//		try {
+//			crudServiceBean.lockBulk(principal, rimborsoMissioneDB);
+//		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
+//			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione.");
+//		}
     	retrieveDetails(principal, rimborsoMissioneDB);
 		if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			rimborsoMissioneDB.setNoteRespingi(null);
@@ -662,23 +662,19 @@ public class RimborsoMissioneService {
 		return result;
 	}
 
-    @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail) throws ComponentException {
 		return getRimborsoMissione(principal, idMissione, retrieveDetail, false);
     }
 
-    @Transactional(readOnly = true)
     public List<RimborsoMissione> getRimborsoMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
 		return getRimborsiMissione(principal, filter, isServiceRest, false);
     }
 
-    @Transactional(readOnly = true)
     public List<RimborsoMissione> getRimborsiMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
 		return getRimborsiMissione(principal, filter, isServiceRest, false);
     }
 
 
-    @Transactional(readOnly = true)
     public List<RimborsoMissione> getRimborsiMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
 		CriterionList criterionList = new CriterionList();
 		List<RimborsoMissione> rimborsoMissioneList=null;
