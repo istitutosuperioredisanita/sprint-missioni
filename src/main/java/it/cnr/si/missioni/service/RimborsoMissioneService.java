@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.OptimisticLockException;
+
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -28,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
+import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
@@ -367,7 +371,11 @@ public class RimborsoMissioneService {
 		if (rimborsoMissioneDB==null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
 		}
-		
+		try {
+			crudServiceBean.lockBulk(principal, rimborsoMissioneDB);
+		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione.");
+		}
     	retrieveDetails(principal, rimborsoMissioneDB);
 		if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			rimborsoMissioneDB.setNoteRespingi(null);
@@ -1153,6 +1161,9 @@ public class RimborsoMissioneService {
 			if (oreDifferenza < 24 ){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
 			}
+		}
+		if (!StringUtils.hasLength(rimborsoMissione.getMatricola())){
+			rimborsoMissione.setMatricola(null);
 		}
 	}
 	
