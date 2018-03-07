@@ -225,7 +225,7 @@
 {"codice_uo":"082001", "uid_direttore":"roberto.zamboni"},
 {"codice_uo":"083000", "uid_direttore":"andrea.scaloni"},
 {"codice_uo":"083001", "uid_direttore":"andrea.scaloni"},
-{"codice_uo":"084000", "uid_direttore":"riccardo.dandria"},
+{"codice_uo":"084000", "uid_direttore":"riccardo.dandria", "ordine_da_validare":"S"},
 {"codice_uo":"084001", "uid_direttore":"riccardo.dandria"},
 {"codice_uo":"084002", "uid_direttore":"riccardo.dandria"},
 {"codice_uo":"084003", "uid_direttore":"riccardo.dandria"},
