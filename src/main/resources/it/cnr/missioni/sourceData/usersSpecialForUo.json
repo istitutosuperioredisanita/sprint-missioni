@@ -2250,7 +2250,7 @@
 {"uid" : "mario.montanino","uoForUsersSpecial" : [{"codice_uo" : "119003","ordine_da_validare" : "S"}]}, 
 {"uid" : "giovanni.nasti","uoForUsersSpecial" : [{"codice_uo" : "119003","ordine_da_validare" : "S"}]}, 
 
-{"uid" : "clementina.falco","uoForUsersSpecial" : [{"codice_uo" : "106000","ordine_da_validare" : "S"}]}, 
+{"uid" : "clementina.falco","uoForUsersSpecial" : [{"codice_uo" : "106000","ordine_da_validare" : "S"},{"codice_uo":"106001"},{"codice_uo":"106002"}]}, 
 {"uid" : "ilaria.bizzarri","uoForUsersSpecial" : [{"codice_uo" : "106000","ordine_da_validare" : "S"},{"codice_uo":"318000", "ordine_da_validare":"S"}]}, 
 {"uid" : "marianovella.manciani","uoForUsersSpecial" : [{"codice_uo" : "106001","ordine_da_validare" : "S"}]}, 
 {"uid" : "maria.litrenta","uoForUsersSpecial" : [{"codice_uo" : "106001","ordine_da_validare" : "S"}]}, 

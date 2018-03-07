@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.OptimisticLockException;
+
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -27,7 +29,9 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.criterion.Subqueries;
+import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
@@ -764,6 +768,11 @@ public class OrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
 		}
 		
+		try {
+			crudServiceBean.lockBulk(principal, ordineMissioneDB);
+		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione in modifica. Ripetere l'operazione.");
+		}
 		if (ordineMissione.getResponsabileGruppo() != null && ordineMissioneDB.getResponsabileGruppo() != null && 
 				!ordineMissione.getResponsabileGruppo().equals(ordineMissioneDB.getResponsabileGruppo())){
 			isCambioResponsabileGruppo = true;
@@ -1180,6 +1189,9 @@ public class OrdineMissioneService {
 		if (Utility.nvl(ordineMissione.getMissioneGratuita()).equals("S") &&  ordineMissione.getImportoPresunto() != null && ordineMissione.getImportoPresunto().compareTo(BigDecimal.ZERO) != 0){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire una missione con spese a carico di altro ente e l'importo presunto");
 		} 
+		if (!StringUtils.hasLength(ordineMissione.getMatricola())){
+			ordineMissione.setMatricola(null);
+		}
 	}
 	
 	private void controlloDatiFinanziari(Principal principal, OrdineMissione ordineMissione) {
