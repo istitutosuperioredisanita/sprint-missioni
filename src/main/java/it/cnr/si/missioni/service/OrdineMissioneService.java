@@ -761,11 +761,11 @@ public class OrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
 		}
 		
-		try {
-			crudServiceBean.lockBulk(principal, ordineMissioneDB);
-		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione in modifica. Ripetere l'operazione.");
-		}
+//		try {
+//			crudServiceBean.lockBulk(principal, ordineMissioneDB);
+//		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
+//			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione in modifica. Ripetere l'operazione.");
+//		}
 		if (ordineMissione.getResponsabileGruppo() != null && ordineMissioneDB.getResponsabileGruppo() != null && 
 				!ordineMissione.getResponsabileGruppo().equals(ordineMissioneDB.getResponsabileGruppo())){
 			isCambioResponsabileGruppo = true;
