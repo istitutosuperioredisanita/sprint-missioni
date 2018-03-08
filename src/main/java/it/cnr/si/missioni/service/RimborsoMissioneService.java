@@ -170,7 +170,6 @@ public class RimborsoMissioneService {
     @Autowired
     private MissioniCMISService missioniCMISService;
 
-    @Transactional(readOnly = true)
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
     	filter.setDaId(idMissione);
@@ -1191,7 +1190,6 @@ public class RimborsoMissioneService {
 		}
 	}
 
-	@Transactional(readOnly = true)
    	public Map<String, byte[]> printRimborsoMissione(Authentication auth, Long idMissione) throws ComponentException {
     	Principal principal = (Principal)auth;
     	RimborsoMissione rimborsoMissione = getRimborsoMissione(principal, idMissione, true);
@@ -1251,7 +1249,6 @@ public class RimborsoMissioneService {
 		return map;
 	}
 
-	@Transactional(readOnly = true)
 	public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissione)
 			throws ComponentException {
 		if (idRimborsoMissione != null) {
@@ -1264,7 +1261,6 @@ public class RimborsoMissioneService {
 		return null;
 	}
 
-	@Transactional(readOnly = true)
 	public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissione,
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
 		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);

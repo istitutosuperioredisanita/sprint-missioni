@@ -165,7 +165,6 @@ public class OrdineMissioneService {
     @Value("${spring.mail.messages.approvazioneAnnullamentoOrdineMissione.oggetto}")
     private String approvazioneAnnullamentoOrdineMissione;
     
-    @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows) throws ComponentException {
     	MissioneFilter filter = new MissioneFilter();
     	filter.setDaId(idMissione);
@@ -197,7 +196,6 @@ public class OrdineMissioneService {
 		return ordineMissione;
     }
 
-    @Transactional(readOnly = true)
     public OrdineMissione getOrdineMissione(Principal principal, Long idMissione) throws ComponentException {
 		return getOrdineMissione(principal, idMissione, false);
     }
@@ -253,7 +251,6 @@ public class OrdineMissioneService {
    		return false;
 	}
 
-	@Transactional(readOnly = true)
 	public String jsonForPrintOrdineMissione(Principal principal, Long idMissione) throws ComponentException {
     	OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
     	return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, principal.getName());
@@ -621,7 +618,6 @@ public class OrdineMissioneService {
 		} 
 	}
 
-    @Transactional(readOnly = true)
     public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione ordineMissione) {
         return OrdineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
     }
@@ -1321,7 +1317,6 @@ public class OrdineMissioneService {
 		}
 	}
 
-	@Transactional(readOnly = true)
 	public List<CMISFileAttachment> getAttachments(Principal principal, Long idOrdineMissione)
 			throws ComponentException {
 		if (idOrdineMissione != null) {
@@ -1334,7 +1329,6 @@ public class OrdineMissioneService {
 		return null;
 	}
 
-	@Transactional(readOnly = true)
 	public CMISFileAttachment uploadAllegato(Principal principal, Long idOrdineMissione,
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
 		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);

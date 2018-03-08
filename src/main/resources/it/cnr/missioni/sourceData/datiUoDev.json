@@ -306,7 +306,7 @@
 {"codice_uo":"314000", "uid_direttore":"enrico.brugnoli"},
 {"codice_uo":"501000", "uid_direttore":"enrico.brugnoli"},
 {"codice_uo":"503000", "uid_direttore":"francesco.loreto"},
-{"codice_uo":"506000", "uid_direttore":"luigi.ambrosio"},
+{"codice_uo":"506000", "uid_direttore":"luigi.ambrosio", "ordine_da_validare":"S"},
 {"codice_uo":"507000", "uid_direttore":"rosariocorrado.spinella"},
 {"codice_uo":"512000", "uid_direttore":"tullio.pozzan"},
 {"codice_uo":"513000", "uid_direttore":"paola.giugni", "ordine_da_validare":"S"},
