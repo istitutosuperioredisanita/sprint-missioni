@@ -124,6 +124,9 @@
                 }, {
                     "codice_uo" : "314000",
                     "ordine_da_validare" : "S"
+                }, {
+                    "codice_uo" : "506000",
+                    "ordine_da_validare" : "S"
                 }
             ]
         }, 
