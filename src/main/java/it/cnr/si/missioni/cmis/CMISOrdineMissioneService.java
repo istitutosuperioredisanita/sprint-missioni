@@ -149,6 +149,9 @@ public class CMISOrdineMissioneService {
 	private AccountService accountService;
 
 	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione) throws ComponentException{
+		return create(principal, ordineMissione,ordineMissione.getAnno());
+	}
+	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione, Integer annoGestione) throws ComponentException{
 		if (ordineMissione != null){
 			CMISOrdineMissione cmisOrdineMissione = new CMISOrdineMissione();
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
@@ -205,7 +208,7 @@ public class CMISOrdineMissioneService {
 				}
 			}
 
-			DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(ordineMissione.getUoRich(), ordineMissione.getAnno());
+			DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(ordineMissione.getUoRich(), annoGestione);
 			List<String> listaUtentiPrimaFirmaDaAggiungere = new ArrayList<>();
 			List<String> listaUtentiSecondaFirmaDaAggiungere = new ArrayList<>();
 			String uoCompetenzaPerFlusso = Utility.replace(ordineMissione.getUoCompetenza(), ".", "");
@@ -235,18 +238,18 @@ public class CMISOrdineMissioneService {
 				if (!uoSiglaRich.equals(uoSiglaSpesa) && uoSiglaRich.substring(0,3).equals(uoSiglaSpesa.substring(0,3))){
 					UnitaOrganizzativa uoSigla = unitaOrganizzativaService.loadUo(uoSiglaSpesa, null, ordineMissione.getAnno());
 					if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
-						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaSpesa, ordineMissione.getAnno());
+						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaSpesa, annoGestione);
 						if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaSpesa, ".", ""), account);
+							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaSpesa, ".", ""), account, annoGestione);
 							userNameFirmatarioSpesa = userNameFirmatario;
 							usernameImpostati = true;
 						}
 					}
 					uoSigla = unitaOrganizzativaService.loadUo(uoSiglaRich, null, ordineMissione.getAnno());
 					if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
-						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, ordineMissione.getAnno());
+						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, annoGestione);
 						if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaRich, ".", ""), account);
+							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaRich, ".", ""), account, annoGestione);
 							userNameFirmatarioSpesa = userNameFirmatario;
 							usernameImpostati = true;
 						}
@@ -257,9 +260,9 @@ public class CMISOrdineMissioneService {
 			String userNameAggiunto = null;
 			String userNameSpesaAggiunto = null;
 			if (!usernameImpostati){
-				userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account);
+				userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account, annoGestione);
 				if (StringUtils.hasLength(datiIstitutoUoRich.getUoFirmaAggiunta())){
-					userNameAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoRich.getUoFirmaAggiunta(),".",""), account);
+					userNameAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoRich.getUoFirmaAggiunta(),".",""), account, annoGestione);
 				}
 				if (ordineMissione.isMissioneGratuita()){
 					userNameFirmatarioSpesa = userNameFirmatario;
@@ -272,20 +275,20 @@ public class CMISOrdineMissioneService {
 							if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
 								userNameFirmatarioSpesa = userNameFirmatario;
 							} else {
-								DatiIstituto datiIstitutoUoComp = datiIstitutoService.getDatiIstituto(ordineMissione.getUoCompetenza(), ordineMissione.getAnno());
+								DatiIstituto datiIstitutoUoComp = datiIstitutoService.getDatiIstituto(ordineMissione.getUoCompetenza(), annoGestione);
 								if (StringUtils.hasLength(datiIstitutoUoComp.getUoFirmaAggiunta())){
-									userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoComp.getUoFirmaAggiunta(),".",""), account);
+									userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoComp.getUoFirmaAggiunta(),".",""), account, annoGestione);
 								}
-								userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account);
+								userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account, annoGestione);
 							}
 						} else {
 							userNameFirmatarioSpesa = userNameFirmatario;
 						}
 					} else {
-						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, account);
-						DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, account, annoGestione);
+						DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), annoGestione);
 						if (StringUtils.hasLength(datiIstitutoUoSpesa.getUoFirmaAggiunta())){
-							userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoSpesa.getUoFirmaAggiunta(),".",""), account);
+							userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoSpesa.getUoFirmaAggiunta(),".",""), account, annoGestione);
 						}
 					}
 				}
@@ -366,12 +369,12 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Account account) {
+	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Account account, Integer annoGestione) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			userNameFirmatario = accountService.recuperoDirettore(ordineMissione.getAnno(), uo, ordineMissione.isMissioneEstera(), account, ordineMissione.getDataInizioMissione());
+			userNameFirmatario = accountService.recuperoDirettore(annoGestione, uo, ordineMissione.isMissioneEstera(), account, ordineMissione.getDataInizioMissione());
 		}
 		return userNameFirmatario;
 	}
@@ -566,7 +569,7 @@ public class CMISOrdineMissioneService {
 	public void avviaFlusso(Principal principal, AnnullamentoOrdineMissione annullamento) {
 		String username = principal.getName();
 		byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
-		CMISOrdineMissione cmisOrdineMissione = create(principal, annullamento.getOrdineMissione());
+		CMISOrdineMissione cmisOrdineMissione = create(principal, annullamento.getOrdineMissione(), annullamento.getAnno());
 		Document documento = salvaStampaAnnullamentoOrdineMissioneSuCMIS(principal, stampa, annullamento);
 
 		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
