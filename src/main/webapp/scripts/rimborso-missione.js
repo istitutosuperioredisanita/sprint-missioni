@@ -54,8 +54,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.dataInserimento = today;
                 $scope.rimborsoMissioneModel.anno = today.getFullYear();
 
-                $scope.rimborsoMissioneModel.comuneResidenzaRich = ordineMissioneSelected.comuneResidenzaRich;
-                $scope.rimborsoMissioneModel.indirizzoResidenzaRich = ordineMissioneSelected.indirizzoResidenzaRich;
+                if (!$scope.rimborsoMissioneModel.comuneResidenzaRich){
+                    $scope.rimborsoMissioneModel.comuneResidenzaRich = ordineMissioneSelected.comuneResidenzaRich;
+                }
+                if (!$scope.rimborsoMissioneModel.indirizzoResidenzaRich){
+                    $scope.rimborsoMissioneModel.indirizzoResidenzaRich = ordineMissioneSelected.indirizzoResidenzaRich;
+                }
+
                 $scope.rimborsoMissioneModel.domicilioFiscaleRich = ordineMissioneSelected.domicilioFiscaleRich;
                 $scope.rimborsoMissioneModel.datoreLavoroRich = ordineMissioneSelected.datoreLavoroRich;
                 $scope.rimborsoMissioneModel.contrattoRich = ordineMissioneSelected.contrattoRich;
@@ -446,6 +451,19 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         });
     }
     
+    $scope.restUoRich = function(anno, cds, uoRich){
+        var uos = ProxyService.getUos(anno, cds, uoRich).then(function(result){
+            if (result && result.data){
+                if (result.data.elements){
+                    if (result.data.elements.length === 1){
+                        $scope.rimborsoMissioneModel.uoRich = result.data.elements[0].cd_unita_organizzativa;
+                        $scope.restCdrRich($scope.rimborsoMissioneModel.uoRich,"N");
+                    }
+                }
+            }
+        });
+    }
+    
     $scope.restUoCompetenza = function(anno, cds, uo){
         $scope.elencoUoCompetenza = [];
         if (cds){
@@ -491,6 +509,26 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             });
         } else {
             $scope.elencoCdr = [];
+        }
+    }
+    
+    $scope.restCdrRich = function(uo, daQuery){
+        if (uo){
+            var app = APP_FOR_REST.SIGLA;
+            var url = SIGLA_REST.CDR;
+            var objectPostCdrOrderBy = [{name: 'cd_centro_responsabilita', type: 'ASC'}];
+            var objectPostCdrClauses = [{condition: 'AND', fieldName: 'cd_unita_organizzativa', operator: "=", fieldValue:uo}];
+            var objectPostCdr = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostCdrOrderBy, clauses:objectPostCdrClauses}
+            $http.post(urlRestProxy + app+'/', objectPostCdr, {params: {proxyURL: url}}).success(function (data) {
+                if (data){
+                    if (data.elements){
+                        if (data.elements.length === 1){
+                            $scope.rimborsoMissioneModel.cdrRich = data.elements[0].cd_centro_responsabilita;
+                        }
+                    }
+                }
+            }).error(function (data) {
+            });
         }
     }
     
@@ -685,7 +723,11 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.reloadCds = function(cds) {
       $scope.annullaUo();  
-      $scope.restUo($scope.rimborsoMissioneModel.anno, cds, $scope.rimborsoMissioneModel.uoRich);
+      $scope.restUo($scope.rimborsoMissioneModel.anno, cds, $scope.rimborsoMissioneModel.uoSpesa);
+    }
+
+    $scope.reloadCdsRich = function(cds) {
+      $scope.restUoRich($scope.rimborsoMissioneModel.anno, cds, $scope.rimborsoMissioneModel.uoRich);
     }
 
     $scope.reloadCdsCompetenza = function(cds) {
@@ -1018,7 +1060,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var serviziRestInizialiInserimento = function(){
         $scope.restNazioni();
         $scope.restCds($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsRich);
-        $scope.reloadCds($scope.rimborsoMissioneModel.cdsRich);
+        $scope.reloadCdsRich($scope.rimborsoMissioneModel.cdsRich);
         $scope.restCapitoli($scope.rimborsoMissioneModel.anno);
         $scope.restCdsCompetenza($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsRich);
     }
