@@ -222,11 +222,11 @@ public class RimborsoMissioneService {
     					if (result.isStateReject()){
     						rimborsoMissione.setCommentFlows(result.getComment());
     						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
-    						aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissioneDaAggiornare);
+//    						aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
     						listaNew.add(rimborsoMissione);
     					} else if (result.isAnnullato()){
-    						aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissioneDaAggiornare);
+//    						aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
     						listaNew.add(rimborsoMissione);
 //        				} else if (isDevProfile() && result.isApprovato()){
@@ -370,11 +370,11 @@ public class RimborsoMissioneService {
 		if (rimborsoMissioneDB==null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
 		}
-//		try {
-//			crudServiceBean.lockBulk(principal, rimborsoMissioneDB);
-//		} catch (OptimisticLockException | PersistencyException | BusyResourceException e) {
-//			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione.");
-//		}
+    	try {
+			crudServiceBean.lockBulk(principal, rimborsoMissioneDB);
+		} catch (ComponentException | OptimisticLockException | PersistencyException | BusyResourceException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione. Id "+rimborsoMissioneDB.getId());
+		}
     	retrieveDetails(principal, rimborsoMissioneDB);
 		if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")){
 			rimborsoMissioneDB.setNoteRespingi(null);
