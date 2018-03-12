@@ -134,7 +134,7 @@ missioniApp.factory('AuditsService', function ($http) {
     });
 
 missioniApp.factory('Session', function (ProxyService) {
-        this.create = function (login, matricola, firstName, lastName, email, userRoles, comune_nascita, data_nascita, comune_residenza, indirizzo_residenza, num_civico_residenza, cap_residenza, provincia_residenza, codice_fiscale, profilo, struttura_appartenenza, codice_sede, codice_uo, livello, allUoForUsersSpecial, uoForUsersSpecial, isAccountLDAP) {
+        this.create = function (login, matricola, firstName, lastName, email, userRoles, allUoForUsersSpecial, uoForUsersSpecial, isAccountLDAP, comune_nascita, data_nascita, comune_residenza, indirizzo_residenza, num_civico_residenza, cap_residenza, provincia_residenza, codice_fiscale, profilo, struttura_appartenenza, codice_sede, codice_uo, livello) {
             this.login = login;
             this.matricola = matricola;
             this.firstName = firstName;
@@ -208,7 +208,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, Costanti) {
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
             return data.comune_residenza;
@@ -247,28 +247,32 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
-                        if (data.strutturaAppartenenza) {
+                        if (data.strutturaAppartenenza || data.login==Costanti.UTENTE_SPECIALE) {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username + ':' + param.password);
                             $http.get(
                                 'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username
                             ).success(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                                 var comune_residenza = null;
-                                if (data.comune_residenza){
-                                    comune_residenza = data.comune_residenza;
-                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
-                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
-                                } else {
-                                    recuperoResidenza(data).then(function (result){
-                                                comune_residenza = result;
-                                                Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
+                                if (data.strutturaAppartenenza ) {
+                                    if (data.comune_residenza){
+                                        comune_residenza = data.comune_residenza;
+                                        Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                     data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                     data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                    data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
-                                            });
-                                }    
+                                                    data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                    } else {
+                                        recuperoResidenza(data).then(function (result){
+                                                    comune_residenza = result;
+                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                        data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                });
+                                    }    
+                                } else {
+                                    Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                }
                                 $rootScope.account = Session;
                                 $sessionStorage.account = Session;
                                 authService.loginConfirmed(data);
@@ -308,7 +312,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             return;
                         }
                         AccountLDAP.get(function(data) {
-                            if (!data.strutturaAppartenenza) {
+                            if (!data.strutturaAppartenenza && data.login != Costanti.UTENTE_SPECIALE ) {
                                 Account.get(function(data) {
                                     Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
@@ -324,21 +328,25 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 AccountFromToken.get({token: token},
                                     function (data, responseHeaders) {
                                         var comune_residenza = null;
-                                        if (data.comune_residenza){
-                                            comune_residenza = data.comune_residenza;
-                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
-                                                            data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                            data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                            data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                        if (data.struttura_appartenenza){
+                                            if (data.comune_residenza){
+                                                comune_residenza = data.comune_residenza;
+                                                        Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
+                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                                data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                            } else {
+                                                recuperoResidenza(data).then(function (result){
+                                                            comune_residenza = result;
+                                                        Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
+                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                                data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                        });
+                                            }    
                                         } else {
-                                            recuperoResidenza(data).then(function (result){
-                                                        comune_residenza = result;
-                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'],
-                                                            data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                            data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                            data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
-                                                    });
-                                        }    
+                                            Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                        }
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
 

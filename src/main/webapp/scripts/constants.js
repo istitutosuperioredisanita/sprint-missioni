@@ -56,6 +56,7 @@ missioniApp.constant('SIGLA_REST', {
     });
 
 missioniApp.constant('COSTANTI', {
+        'UTENTE_SPECIALE': 'app.missioni',
         'FORMATO_DATA': 'dd/MM/yyyy',
         'CDS_SAC': '000',
         'ANNO_PARTENZA': 2017,

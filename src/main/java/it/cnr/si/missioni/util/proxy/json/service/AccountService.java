@@ -173,15 +173,6 @@ public class AccountService {
 			account.setAllUoForUsersSpecial(user.getAll());
 			account.setUoForUsersSpecial(user.getUoForUsersSpecials());
 		}
-// Da richiamare come servizio REST a parte per il rimborso
-//		if (account.getCodiceFiscale() != null){
-//			Terzo terzo = terzoService.loadTerzo(account.getCodiceFiscale(), null);
-//			if (terzo != null){
-//				account.setCdTerzoSigla(terzo.getCd_terzo().toString());
-//				account.setInquadramenti(inquadramentoService.loadInquadramento(terzo.getCd_anag()));
-//				
-//			}
-//		}
 		return getBodyAccount(account);
 	}
 
