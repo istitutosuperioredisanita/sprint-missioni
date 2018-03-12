@@ -142,11 +142,11 @@ public class AnnullamentoOrdineMissioneService {
     					if (result.isStateReject()){
     						annullamento.setCommentFlows(result.getComment());
     						annullamento.setStateFlows(retrieveStateFromFlows(result));
-    						aggiornaAnnullamentoRespinto(principal, result, annullamentoDaAggiornare);
+//    						aggiornaAnnullamentoRespinto(principal, result, annullamentoDaAggiornare);
     						annullamento.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
     						listaNew.add(annullamento);
     					} else if (result.isAnnullato()){
-    						aggiornaAnnullamentoOrdineMissioneAnnullato(principal, annullamentoDaAggiornare);
+//    						aggiornaAnnullamentoOrdineMissioneAnnullato(principal, annullamentoDaAggiornare);
     						annullamento.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
     						listaNew.add(annullamento);
             			} else {

@@ -268,11 +268,11 @@ public class OrdineMissioneService {
     			    	if (result.isStateReject()){
         					ordineMissione.setCommentFlows(result.getComment());
         					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
-        			    	aggiornaOrdineMissioneRespinto(principal, result, ordineMissioneDaAggiornare);
+//        			    	aggiornaOrdineMissioneRespinto(principal, result, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
         					listaNew.add(ordineMissione);
         				} else if (result.isAnnullato()){
-        					aggiornaOrdineMissioneAnnullato(principal, ordineMissioneDaAggiornare);
+//        					aggiornaOrdineMissioneAnnullato(principal, ordineMissioneDaAggiornare);
         					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
         					listaNew.add(ordineMissione);
 //        				} else if (isDevProfile() && result.isApprovato()){
@@ -755,6 +755,11 @@ public class OrdineMissioneService {
     public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm, String basePath)  {
     	ZonedDateTime oggi = ZonedDateTime.now();
     	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
+    	try {
+			crudServiceBean.lockBulk(principal, ordineMissioneDB);
+		} catch (ComponentException | OptimisticLockException | PersistencyException | BusyResourceException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine in modifica. Ripetere l'operazione. ID: "+ordineMissioneDB.getId());
+		}
     	boolean isCambioResponsabileGruppo = false;
        	boolean isRitornoMissioneMittente = false;
 		if (ordineMissioneDB==null){
