@@ -208,7 +208,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, Costanti) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage) {
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
             return data.comune_residenza;
@@ -247,7 +247,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
-                        if (data.strutturaAppartenenza || data.login==Costanti.UTENTE_SPECIALE) {
+                        if (data.strutturaAppartenenza || data.login=="app.missioni") {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username + ':' + param.password);
                             $http.get(
                                 'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username
@@ -312,7 +312,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             return;
                         }
                         AccountLDAP.get(function(data) {
-                            if (!data.strutturaAppartenenza && data.login != Costanti.UTENTE_SPECIALE ) {
+                            if (!data.strutturaAppartenenza && data.login != "app.missioni" ) {
                                 Account.get(function(data) {
                                     Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
