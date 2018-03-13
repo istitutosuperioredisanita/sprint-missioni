@@ -102,12 +102,12 @@
                 }
             ]
         }, {
-            "uid" : "gianfranco.gasparro",
+            "uid" : "gianfranco1.gasparro",
             "uoForUsersSpecial" : [{
                     "codice_uo" : "016001",
                     "ordine_da_validare" : "S"
                 }, {
-                    "codice_uo" : "063002",
+                    "codice_uo" : "028001",
                     "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "000411",
