@@ -175,7 +175,7 @@ public class CMISRimborsoMissioneService {
 	}
 	
 	public void deleteFolderRimborsoMissione(RimborsoMissione rimborso) throws ComponentException{
-		Folder folder = getFolderRimborso(rimborso);
+		Folder folder = recuperoFolderRimborsoMissione(rimborso);
 		if (folder != null){
         	missioniCMISService.deleteNode(folder);
 		}
@@ -491,38 +491,6 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
-	private Folder getFolderRimborso(RimborsoMissione rimborso){
-		StringBuilder query = new StringBuilder("select rim.cmis:objectId from missioni:main missioni join missioni_commons_aspect:rimborso_missione rim on missioni.cmis:objectId = rim.cmis:objectId ");
-		query.append(" where missioni.missioni:id = ").append(rimborso.getId());
-		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-		if (resultsFolder.getTotalNumItems() == 0)
-			return null;
-		else if (resultsFolder.getTotalNumItems() > 1){
-			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' cartelle per lo stesso rimborso missione.  Anno:"+ rimborso.getAnno()+ " cds:" +rimborso.getCdsRich() +" numero:"+rimborso.getNumero());
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
-			}
-		}
-		return null;
-	}
-	
-//	private Folder getFolderDettaglioRimborso(Long idDettagliorimborso){
-//		StringBuilder query = new StringBuilder("select cmis:objectId from missioni_rimborso_dettaglio:main ");
-//		query.append(" where missioni_rimborso_dettaglio:id = ").append(idDettagliorimborso);
-//		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-//		if (resultsFolder.getTotalNumItems() == 0)
-//			return null;
-//		else if (resultsFolder.getTotalNumItems() > 1){
-//			throw new AwesomeException("Errore di sistema, esistono sul documentale piu' cartelle per lo stesso dettaglio di rimborso missione.  Id:"+ idDettagliorimborso);
-//		} else {
-//			for (QueryResult queryResult : resultsFolder) {
-//				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
-//			}
-//		}
-//		return null;
-//	}
-//	
 	public String getNodeRefFolderDettaglioRimborso(RimborsoMissioneDettagli dettagliorimborso){
 		Folder folder = getFolderDettaglioRimborso(dettagliorimborso);
 		if (folder != null){
@@ -545,7 +513,7 @@ public class CMISRimborsoMissioneService {
 	private Document salvaAllegatoRimborsoMissioneDettaglioCMIS(Principal principal,
 			RimborsoMissioneDettagli dettaglio, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
-		Folder folder = (Folder) getFolderRimborso(dettaglio.getRimborsoMissione());
+		Folder folder = (Folder) recuperoFolderRimborsoMissione(dettaglio.getRimborsoMissione());
 		CmisPath cmisPath ;
 		if (folder == null){
 			cmisPath = createFolderRimborsoMissione(dettaglio.getRimborsoMissione());
