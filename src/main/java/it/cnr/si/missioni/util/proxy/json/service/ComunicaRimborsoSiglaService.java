@@ -400,13 +400,13 @@ public class ComunicaRimborsoSiglaService {
 			}
 			ZonedDateTime dataFine = data.plusDays(1);
 			if (dataFine.isAfter(aData)){
-				if (dataFineMissione == null){
+//				if (dataFineMissione == null){
 					dataFine = aData;
-				} else {
-					if (dataFine.isAfter(dataFineMissione)){
-						dataFine = dataFineMissione;
-					}
-				}
+//				} else {
+//					if (dataFine.isAfter(dataFineMissione)){
+//						dataFine = dataFineMissione;
+//					}
+//				}
 			}
 			impostaDateTappa(data, dataFine, newDayTappa);
 			tappeMissioneColl.add(newDayTappa);

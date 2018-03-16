@@ -403,6 +403,11 @@ public class CMISRimborsoMissioneService {
 		if (node != null){
 			return CmisPath.construct(node.getPath());
 		}
+		CmisPath cmisPath = createFolder(rimborsoMissione);
+		return cmisPath;
+	}
+
+	public CmisPath createFolder(RimborsoMissione rimborsoMissione) {
 		CmisPath cmisPath = missioniCMISService.getBasePath();
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoSpesa());
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Rimborso Missione");
@@ -882,10 +887,16 @@ public class CMISRimborsoMissioneService {
 		).stream().collect(
 				Collectors.joining("/")
 		);
-		return Optional.ofNullable(missioniCMISService.getNodeByPath(path))
-				.filter(Folder.class::isInstance)
-				.map(Folder.class::cast)
-				.orElse(null);
+		
+		try{
+			return Optional.ofNullable(missioniCMISService.getNodeByPath(path))
+					.filter(Folder.class::isInstance)
+					.map(Folder.class::cast)
+					.orElse(null);
+		} catch (CmisObjectNotFoundException e){
+			CmisPath cmisPath = createFolder(rimborsoMissione);
+			return (Folder)missioniCMISService.getNodeByPath(cmisPath.getPath());
+		}
 	}
 	
     public void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException {

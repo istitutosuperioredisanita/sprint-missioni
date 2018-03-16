@@ -390,6 +390,8 @@
 {"uid":"christiana.vescera", "uoForUsersSpecial":[{"codice_uo":"069000", "ordine_da_validare":"S"}]},
 {"uid":"cristina.frana", "uoForUsersSpecial":[{"codice_uo":"069001", "ordine_da_validare":"S"}]},
 {"uid":"vincenzo.piscitelli", "uoForUsersSpecial":[{"codice_uo":"069002", "ordine_da_validare":"S"}]},
+{"uid":"giuseppe.tullo", "uoForUsersSpecial":[{"codice_uo":"069002", "ordine_da_validare":"S"}]},
+{"uid":"giuseppe.leone", "uoForUsersSpecial":[{"codice_uo":"069002", "ordine_da_validare":"S"}]},
 
 {"uid":"tiziana.davanzo", "uoForUsersSpecial":[{"codice_uo":"046000", "ordine_da_validare":"S"}]},
 {"uid":"elisa.zappaterreno", "uoForUsersSpecial":[{"codice_uo":"046000", "ordine_da_validare":"S"}]},
@@ -1069,6 +1071,7 @@
 {"uid" : "monica.giustizieri","uoForUsersSpecial" : [{"codice_uo" : "104000","ordine_da_validare" : "S"}]}, 
 {"uid" : "annamaria.iozzo","uoForUsersSpecial" : [{"codice_uo" : "104000","ordine_da_validare" : "S"}]}, 
 {"uid" : "teresa.balsamo","uoForUsersSpecial" : [{"codice_uo" : "104000"}]}, 
+{"uid" : "sebastiano.faro","uoForUsersSpecial" : [{"codice_uo" : "104000"}]}, 
 {"uid" : "massimo.cristofaro","uoForUsersSpecial" : [{"codice_uo" : "104000"}]}, 
 
 {"uid" : "martina.centazzo","uoForUsersSpecial" : [{"codice_uo" : "114000","ordine_da_validare" : "S"}]}, 
@@ -1110,7 +1113,7 @@
 {"uid" : "mariangela.giglio","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}]}, 
 {"uid" : "susanna.titone","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}]}, 
 {"uid" : "giuseppe.pantaleo","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}]}, 
-{"uid" : "marilena.coppola","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}]}, 
+{"uid" : "marilena.coppola","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}, {"codice_uo" : "002000"}]}, 
 {"uid" : "francesca.cuguttu","uoForUsersSpecial" : [{"codice_uo" : "002005","ordine_da_validare" : "S"}]}, 
 {"uid" : "angela.basile","uoForUsersSpecial" : [{"codice_uo" : "002005","ordine_da_validare" : "S"}]}, 
 
