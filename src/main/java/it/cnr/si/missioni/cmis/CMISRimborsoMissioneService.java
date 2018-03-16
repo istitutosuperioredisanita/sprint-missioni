@@ -7,15 +7,10 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -874,21 +869,23 @@ public class CMISRimborsoMissioneService {
 	}
 	
 	public Folder recuperoFolderRimborsoMissione(RimborsoMissione rimborsoMissione)throws ComponentException{
-		StringBuilder query = new StringBuilder("select miss.cmis:objectId from missioni:main as miss "
-				+ " join missioni_commons_aspect:rimborso_missione rimborso on miss.cmis:objectId = rimborso.cmis:objectId");
-		query.append(" where miss.missioni:id = ").append(rimborsoMissione.getId());
-
-		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-		if (resultsFolder.getTotalNumItems() == 0)
-			return null;
-		else if (resultsFolder.getTotalNumItems() > 1){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' rimborsi di missione aventi l'ID :"+ rimborsoMissione.getId()+", Anno:"+rimborsoMissione.getAnno()+", Numero:"+rimborsoMissione.getNumero());
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
-			}
-		}
-		return null;
+		final String path = Arrays.asList(
+				missioniCMISService.getBasePath().getPath(),
+				Optional.ofNullable(rimborsoMissione)
+						.map(RimborsoMissione::getUoSpesa)
+						.orElse(""),
+				"Rimborso Missione",
+				Optional.ofNullable(rimborsoMissione)
+						.map(rimborso -> "Anno " + String.valueOf(rimborso.getAnno()))
+						.orElse("0"),
+				String.valueOf(missioniCMISService.sanitizeFilename(rimborsoMissione.constructCMISNomeFile()))
+		).stream().collect(
+				Collectors.joining("/")
+		);
+		return Optional.ofNullable(missioniCMISService.getNodeByPath(path))
+				.filter(Folder.class::isInstance)
+				.map(Folder.class::cast)
+				.orElse(null);
 	}
 	
     public void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException {
