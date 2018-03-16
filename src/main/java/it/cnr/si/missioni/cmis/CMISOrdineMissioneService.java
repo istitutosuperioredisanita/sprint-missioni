@@ -8,12 +8,15 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -24,6 +27,7 @@ import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
@@ -45,6 +49,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.Parametri;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.DatiSedeService;
@@ -1022,21 +1027,29 @@ public class CMISOrdineMissioneService {
 	}
 
 	public Folder recuperoFolderOrdineMissione(OrdineMissione ordineMissione){
-		StringBuilder query = new StringBuilder("select miss.cmis:objectId from missioni:main as miss "
-				+ " join missioni_commons_aspect:ordine_missione ordine on miss.cmis:objectId = ordine.cmis:objectId");
-		query.append(" where miss.missioni:id = ").append(ordineMissione.getId());
-
-		ItemIterable<QueryResult> resultsFolder = missioniCMISService.search(query);
-		if (resultsFolder.getTotalNumItems() == 0)
-			return null;
-		else if (resultsFolder.getTotalNumItems() > 1){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return (Folder) missioniCMISService.getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
-			}
+		final String path = Arrays.asList(
+				missioniCMISService.getBasePath().getPath(),
+				Optional.ofNullable(ordineMissione)
+						.map(OrdineMissione::getUoRich)
+						.orElse(""),
+				"Ordini di Missione",
+				Optional.ofNullable(ordineMissione)
+						.map(ordine -> "Anno " + String.valueOf(ordine.getAnno()))
+						.orElse("0"),
+				String.valueOf(missioniCMISService.sanitizeFilename(ordineMissione.constructCMISNomeFile()))
+		).stream().collect(
+				Collectors.joining("/")
+		);
+		
+		try{
+			return Optional.ofNullable(missioniCMISService.getNodeByPath(path))
+					.filter(Folder.class::isInstance)
+					.map(Folder.class::cast)
+					.orElse(null);
+		} catch (CmisObjectNotFoundException e){
+			CmisPath cmisPath = createFolderOrdineMissione(ordineMissione);
+			return (Folder)missioniCMISService.getNodeByPath(cmisPath.getPath());
 		}
-		return null;
 	}
 	
     public void annullaFlusso(OrdineMissione ordineMissione)  {
