@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="missioni" id="20180323132300">
+        <createSequence sequenceName="SEQ_PARAMETRI" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_ORDINE_AUTO_PROPRIA" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_ANTICIPO" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_ORDINE_MISSIONE" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_DATI_SEDE" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_DATI_PATENTE" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_DATI_ISTITUTO" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_AUTO_PROPRIA" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_ANNULLAMENTO" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_RIMBORSO_MISSIONE" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_RIMBORSO_DETTAGLI" startValue="30000000"/>
+        <createSequence sequenceName="SEQ_SPOSTAMENTI" startValue="30000000"/>
+    </changeSet>
+</databaseChangeLog>

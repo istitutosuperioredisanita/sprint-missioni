@@ -19,7 +19,8 @@ missioniApp.constant('TIPO_PAGAMENTO', {
 
 missioniApp.constant('APP_FOR_REST', {
         'SIGLA': 'SIGLA',
-        'SIPER': 'SIPER'
+        'SIPER': 'SIPER',
+        'OIL': 'OIL'
     });
 
 missioniApp.constant('URL_REST', {
@@ -29,6 +30,11 @@ missioniApp.constant('URL_REST', {
 missioniApp.constant('SIPER_REST', {
         'PERSONS_FOR_UO': 'json/sedi/',
         'GET_PERSON': 'json/userinfo/'
+    });
+
+missioniApp.constant('OIL_REST', {
+        'CATEGORIE': 'catg/',
+        'NEW_PROBLEM': 'pest/'
     });
 
 missioniApp.constant('SIGLA_REST', {
