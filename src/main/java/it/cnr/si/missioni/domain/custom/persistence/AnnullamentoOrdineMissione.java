@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
@@ -28,6 +29,7 @@ import net.bzdyl.ejb3.criteria.projections.Projections;
  */
 @Entity
 @Table(name = "ANNULLAMENTO_ORDINE_MISSIONE")
+@SequenceGenerator(name="SEQUENZA", sequenceName="SEQ_ANNULLAMENTO", allocationSize=0)
 public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 
 	public final static String CMIS_PROPERTY_NAME_DOC_ANNULLAMENTO = "Principale";
@@ -39,7 +41,7 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
 	@Size(min = 0, max = 256)

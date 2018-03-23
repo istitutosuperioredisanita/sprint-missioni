@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -18,12 +19,12 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "SPOSTAMENTI_AUTO_PROPRIA")
+@SequenceGenerator(name="SEQUENZA", sequenceName="SEQ_SPOSTAMENTI", allocationSize=0)
 public class SpostamentiAutoPropria extends OggettoBulkXmlTransient implements Serializable {
 
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
     @Size(min = 0, max = 256)

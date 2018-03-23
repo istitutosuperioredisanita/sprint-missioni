@@ -971,13 +971,13 @@
 {"uid":"martina.roncolini", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
 {"uid":"cinzia.gherarducci", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
 
-{"uid" : "PIERANGELA.CEMPINI","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]}, 
+{"uid" : "pierangela.cempini","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]}, 
 {"uid" : "serena.paoletti","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 {"uid" : "luca.mancini","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 {"uid" : "alessandra.pierotti","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 {"uid" : "marco.puntoni","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
-{"uid" : "GIOVANNI-RICCI","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
-{"uid" : "MANUELA.FERRANTE","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
+{"uid" : "giovanni-ricci","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
+{"uid" : "manuela.ferrante","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 {"uid" : "daniela.mulas","uoForUsersSpecial" : [{"codice_uo" : "074000","ordine_da_validare" : "S"}]},
 
 {"uid" : "app.intranet-ivalsa","uoForUsersSpecial" : [{"codice_uo" : "106000"}]},

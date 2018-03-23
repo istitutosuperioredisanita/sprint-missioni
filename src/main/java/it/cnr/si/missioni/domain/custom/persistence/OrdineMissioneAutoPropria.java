@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
@@ -26,6 +27,7 @@ import it.cnr.si.missioni.util.Costanti;
  */
 @Entity
 @Table(name = "ORDINE_MISSIONE_AUTO_PROPRIA")
+@SequenceGenerator(name="SEQUENZA", sequenceName="SEQ_ORDINE_AUTO_PROPRIA", allocationSize=0)
 public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implements Serializable {
 
 	public final static String CMIS_PROPERTY_NAME_DOC_AUTO_PROPRIA = "Allegato";
@@ -33,7 +35,7 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
 
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
     @Size(min = 0, max = 50)
