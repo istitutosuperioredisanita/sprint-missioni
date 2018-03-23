@@ -257,7 +257,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
 
         return {
             login: function (param) {
-                var data = "username=" + param.username + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
+                var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
                 $http.post('oauth/token', data, {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
@@ -269,9 +269,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
                         if (data.strutturaAppartenenza || data.login=="app.missioni") {
-                            httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username + ':' + param.password);
+                            httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username.toLowerCase() + ':' + param.password);
                             $http.get(
-                                'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username
+                                'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username.toLowerCase()
                             ).success(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                                 var comune_residenza = null;    

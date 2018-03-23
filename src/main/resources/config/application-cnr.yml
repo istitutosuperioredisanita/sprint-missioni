@@ -31,9 +31,11 @@ spring:
             username: app.selezioni
             password: pentagono
         OIL:
-            username: app.missioni
-            password: bubbazza
-            url: helpdesk.oil
+            username: esperto1
+            password: esperto.1
+            url: http://oil.test.si.cnr.it/rest/
+            instance: HDMissioni
+            categories: catg
             newProblem: pest
     ldap:
         userSearchBase: o=cnr, c=it

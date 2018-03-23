@@ -1,27 +1,9 @@
 package it.cnr.si.missioni.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthenticationException;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.Helpdesk;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
@@ -41,8 +22,17 @@ public class HelpdeskService {
     @Autowired
     ProxyService proxyService;
     
-    @Value("${proxy.OIL.newProblem}")
+    @Value("${proxy.OIL.url}")
     private static String helpdeskUrl;
+
+    @Value("${proxy.OIL.instance}")
+    private static String instance;
+
+    @Value("${proxy.OIL.categories}")
+    private static String categories;
+
+    @Value("${proxy.OIL.newProblem}")
+    private static String newProblem;
 
 	public Long newProblem(Helpdesk hd, String instance) throws ServiceException {
 
