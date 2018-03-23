@@ -31,9 +31,11 @@ spring:
             username: app.selezioni
             ***REMOVED***
         OIL:
-            username: app.missioni
+            username: esperto1
             ***REMOVED***
-            url: helpdesk.oil
+            url: http://oil.test.si.cnr.it/rest/
+            instance: HDMissioni
+            categories: catg
             newProblem: pest
     ldap:
         userSearchBase: o=cnr, c=it

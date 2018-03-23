@@ -1095,9 +1095,9 @@
                 }
             ]
         }, {
-            "uid" : "gianfranco1.gasparro",
+            "uid" : "gianfranco.gasparro",
             "uoForUsersSpecial" : [{
-                    "codice_uo" : "513000",
+                    "codice_uo" : "000106",
                     "ordine_da_validare" : "S"
                 }
             ]

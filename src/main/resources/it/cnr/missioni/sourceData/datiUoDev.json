@@ -5,7 +5,7 @@
 {"codice_uo":"000100", "uid_direttore":"paolo.annunziato"},
 {"codice_uo":"000101", "uid_direttore":"gianpietro.angelini"},
 {"codice_uo":"000105", "uid_direttore":"maurizio.vitale"},
-{"codice_uo":"000106", "uid_direttore":"alberto.silvani"},
+{"codice_uo":"000106", "uid_direttore":"alberto.silvani", "ordine_da_validare":"S"},
 {"codice_uo":"000107", "uid_direttore":"gianluca.fasano"},
 {"codice_uo":"000108", "uid_direttore":"paolo.annunziato"},
 {"codice_uo":"000200", "uid_direttore":"daniela.gregori"},
