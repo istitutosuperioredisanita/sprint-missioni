@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -16,12 +17,12 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "AUTO_PROPRIA")
+@SequenceGenerator(name="SEQUENZA", sequenceName="SEQ_AUTO_PROPRIA", allocationSize=0)
 public class AutoPropria extends OggettoBulkXmlTransient implements Serializable {
 
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
 //    @JsonIgnore

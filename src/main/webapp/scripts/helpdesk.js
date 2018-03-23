@@ -1,7 +1,19 @@
 'use strict';
 
-missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $location, $routeParams, $http, $filter, AccessToken, ui) {
+missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $location, $routeParams, $http, $filter, AccessToken, ui, URL_REST) {
     $scope.accessToken = AccessToken.get();
+
+    $scope.restCategorie = function(){
+        var urlRestProxy = URL_REST.STANDARD;
+        var app = APP_FOR_REST.OIL;
+        var url = OIL_REST.CATEGORIE;
+        $http.post(urlRestProxy + app+'/', objectPostNazione, {params: {proxyURL: url}}).success(function (data) {
+            if (data)
+                $scope.categorieHelpdesk = data.elements;
+        });
+    }        
+
+
 
     $scope.categorieHelpdesk = [
       {'id': '1',
@@ -77,10 +89,6 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
     .prop('disabled', !$.support.fileInput)
     .parent().addClass($.support.fileInput ? undefined : 'disabled');
  
-    $scope.formatResultSearchCategoria = function(item) {
-      return item.descrizione;
-    }
-
     $scope.sendMailButtonDisable = function (attestatoBuoniPasto) {
       return $scope.helpdeskModel==undefined || $scope.helpdeskModel.subject===undefined || 
              $scope.helpdeskModel.message===undefined || $scope.helpdeskModel.category===undefined;

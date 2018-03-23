@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -19,12 +20,12 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "DATI_PATENTE")
+@SequenceGenerator(name="SEQUENZA", sequenceName="SEQ_DATI_PATENTE", allocationSize=0)
 public class DatiPatente extends OggettoBulkXmlTransient implements Serializable {
 
 	@Id
 	@Column(name="ID", unique=true, nullable=false, length = 20)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-//	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQUENZA")
 	private Long id;
 
 //    @JsonIgnore
