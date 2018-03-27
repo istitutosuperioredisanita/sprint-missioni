@@ -33,7 +33,8 @@ missioniApp.constant('SIPER_REST', {
     });
 
 missioniApp.constant('OIL_REST', {
-        'CATEGORIE': 'catg/',
+        'ISTANZA': 'HDMissioni',
+        'CATEGORIE': 'catg/HDMissioni',
         'NEW_PROBLEM': 'pest/'
     });
 
