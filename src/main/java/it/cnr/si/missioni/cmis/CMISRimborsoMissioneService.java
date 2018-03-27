@@ -266,7 +266,7 @@ public class CMISRimborsoMissioneService {
 				if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
 					DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, rimborsoMissione.getAnno());
 					if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-						userNameFirmatario = recuperoDirettore(rimborsoMissione, Utility.replace(uoSiglaRich, ".", ""), account);
+						userNameFirmatario = recuperoDirettore(rimborsoMissione, Utility.replace(uoSiglaRich, ".", ""), account, true);
 						userNameFirmatarioSpesa = userNameFirmatario;
 						usernameImpostati = true;
 					}
@@ -275,7 +275,7 @@ public class CMISRimborsoMissioneService {
 		}
 		
 		if (!usernameImpostati){
-			userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account);
+			userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account, true);
 			
 			Parametri parametri = parametriService.getParametri();
 			if (Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
@@ -355,14 +355,18 @@ public class CMISRimborsoMissioneService {
 		return cmisRimborsoMissione;
 	}
 
-	private String recuperoDirettore(RimborsoMissione rimborsoMissione, String uo, Account account) {
+	private String recuperoDirettore(RimborsoMissione rimborsoMissione, String uo, Account account, Boolean isUoRich) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			userNameFirmatario = accountService.recuperoDirettore(rimborsoMissione.getAnno(), uo, rimborsoMissione.isMissioneEstera(), account, rimborsoMissione.getDataInizioMissione());
+			userNameFirmatario = accountService.recuperoDirettore(rimborsoMissione.getAnno(), uo, rimborsoMissione.isMissioneEstera(), account, rimborsoMissione.getDataInizioMissione(), isUoRich);
 		}
 		return userNameFirmatario;
+	}
+
+	private String recuperoDirettore(RimborsoMissione rimborsoMissione, String uo, Account account) {
+		return recuperoDirettore(rimborsoMissione, uo, account, false);
 	}
 
 	private boolean isDevProfile(){

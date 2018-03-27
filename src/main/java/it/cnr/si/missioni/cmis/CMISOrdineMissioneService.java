@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -49,7 +48,6 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.Parametri;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.DatiSedeService;
@@ -254,7 +252,7 @@ public class CMISOrdineMissioneService {
 					if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
 						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, annoGestione);
 						if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaRich, ".", ""), account, annoGestione);
+							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaRich, ".", ""), account, annoGestione, true);
 							userNameFirmatarioSpesa = userNameFirmatario;
 							usernameImpostati = true;
 						}
@@ -265,7 +263,7 @@ public class CMISOrdineMissioneService {
 			String userNameAggiunto = null;
 			String userNameSpesaAggiunto = null;
 			if (!usernameImpostati){
-				userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account, annoGestione);
+				userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account, annoGestione, true);
 				if (StringUtils.hasLength(datiIstitutoUoRich.getUoFirmaAggiunta())){
 					userNameAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoRich.getUoFirmaAggiunta(),".",""), account, annoGestione);
 				}
@@ -374,14 +372,18 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Account account, Integer annoGestione) {
+	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Account account, Integer annoGestione, Boolean isUoRich) {
 		String userNameFirmatario;
 		if (isDevProfile()){
 			userNameFirmatario = recuperoUidDirettoreUo(uo);
 		} else {
-			userNameFirmatario = accountService.recuperoDirettore(annoGestione, uo, ordineMissione.isMissioneEstera(), account, ordineMissione.getDataInizioMissione());
+			userNameFirmatario = accountService.recuperoDirettore(annoGestione, uo, ordineMissione.isMissioneEstera(), account, ordineMissione.getDataInizioMissione(), isUoRich);
 		}
 		return userNameFirmatario;
+	}
+
+	private String recuperoDirettore(OrdineMissione ordineMissione, String uo, Account account, Integer annoGestione) {
+		return recuperoDirettore(ordineMissione, uo, account, annoGestione, false);
 	}
 
 	private boolean isDevProfile(){

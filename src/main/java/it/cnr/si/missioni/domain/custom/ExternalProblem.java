@@ -2,7 +2,9 @@ package it.cnr.si.missioni.domain.custom;
 
 import java.io.Serializable;
 
-public class Helpdesk  implements Serializable {
+import it.cnr.si.missioni.util.proxy.json.JSONBody;
+
+public class ExternalProblem extends JSONBody implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final int PRIORITY = 2;
     private String firstName;

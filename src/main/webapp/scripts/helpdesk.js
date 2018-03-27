@@ -1,42 +1,44 @@
 'use strict';
 
-missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $location, $routeParams, $http, $filter, AccessToken, ui, URL_REST) {
+missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $location, $routeParams, $http, $filter, AccessToken, ui, URL_REST, APP_FOR_REST, OIL_REST) {
     $scope.accessToken = AccessToken.get();
 
     $scope.restCategorie = function(){
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.OIL;
         var url = OIL_REST.CATEGORIE;
-        $http.post(urlRestProxy + app+'/', objectPostNazione, {params: {proxyURL: url}}).success(function (data) {
+        $http.get(urlRestProxy + app+'/'+'?proxyURL='+url).success(function (data) {
             if (data)
-                $scope.categorieHelpdesk = data.elements;
+                $scope.categorie = data.sottocategorie;
         });
     }        
 
-
-
-    $scope.categorieHelpdesk = [
-      {'id': '1',
-       'descrizione': 'Problemi informatici Ordine di Missione'
-      },
-      {'id': '2',
-       'descrizione': 'Problemi informatici Rimborso Missione'
-      },
-      {'id': '3',
-       'descrizione': 'Informazioni sulla compilazione delle missioni'
-      }
-    ];
+    $scope.send = function(){
+          HelpdeskService.add($scope.helpdeskModel,
+                    function (value, responseHeaders) {
+                        $rootScope.salvataggio = false;
+                    },
+                    function (httpResponse) {
+                        $rootScope.salvataggio = false;
+                    }
+            );
+    }        
 
     var initMapHelpDesk = function() {
+      $scope.restCategorie();
         delete $scope.helpdeskModel;
         $('#files').children().remove();
         $('button[name="sendMail"]').unbind( "click" );
         $('button[name="sendMail"]').click(function () {
           var hdDataModel = {};
-          hdDataModel.subject = $scope.helpdeskModel.subject;
-          hdDataModel.message = $scope.helpdeskModel.message;
-          hdDataModel.category = $scope.helpdeskModel.category.id;
-          hdDataModel.descCategory = $scope.helpdeskModel.category.descrizione;
+          hdDataModel.titolo = $scope.helpdeskModel.titolo;
+          hdDataModel.descrizione = $scope.helpdeskModel.descrizione;
+          hdDataModel.categoria = $scope.helpdeskModel.categoria;
+          for (var k=0; k<$scope.categorie.length; k++) {
+            if (hdDataModel.categoria == $scope.categorie[k].id){
+              hdDataModel.categoriaDescrizione = $scope.categorie[k].descrizione;
+            }
+          }
           $http.post('api/rest/helpdesk/sendWithoutAttachment', hdDataModel)
             .success(function (data) {
               initMapHelpDesk();
@@ -56,10 +58,14 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
             $('button[name="sendMail"]').unbind( "click" );
             $('button[name="sendMail"]').click(function () {
                 data.formData = new FormData();
-                data.formData.append("subject", $scope.helpdeskModel.subject);
-                data.formData.append("message", $scope.helpdeskModel.message);
-                data.formData.append("category", $scope.helpdeskModel.category.id);
-                data.formData.append("desc-category", $scope.helpdeskModel.category.descrizione);
+                data.formData.append("titolo", $scope.helpdeskModel.titolo);
+                data.formData.append("descrizione", $scope.helpdeskModel.descrizione);
+                data.formData.append("categoria", $scope.helpdeskModel.categoria);
+                for (var k=0; k<$scope.categorie.length; k++) {
+                  if ($scope.helpdeskModel.categoria == $scope.categorie[k].id){
+                    data.formData.append("categoriaDescrizione", $scope.categorie[k].descrizione);
+                  }
+                }
                 data.submit();
             });
             $('#files').children().remove();
@@ -90,8 +96,8 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
     .parent().addClass($.support.fileInput ? undefined : 'disabled');
  
     $scope.sendMailButtonDisable = function (attestatoBuoniPasto) {
-      return $scope.helpdeskModel==undefined || $scope.helpdeskModel.subject===undefined || 
-             $scope.helpdeskModel.message===undefined || $scope.helpdeskModel.category===undefined;
+      return $scope.helpdeskModel==undefined || $scope.helpdeskModel.titolo===undefined || 
+             $scope.helpdeskModel.descrizione===undefined || $scope.helpdeskModel.categoria===undefined;
     }
 
     $scope.trustAsHtml = function(html) {

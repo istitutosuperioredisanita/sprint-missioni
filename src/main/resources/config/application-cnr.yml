@@ -34,7 +34,8 @@ spring:
             username: esperto1
             password: esperto.1
             url: http://oil.test.si.cnr.it/rest/
-            instance: HDMissioni
+            newProblem: pest
+            instance: /HDMissioni
     ldap:
         userSearchBase: o=cnr, c=it
         userSearchFilter: uid={0}

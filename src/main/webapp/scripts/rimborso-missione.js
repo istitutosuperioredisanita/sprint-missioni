@@ -739,10 +739,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         $scope.utenteAbilitatoValidareUo = 'N';
         var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
         var uoSiper = uo.replace('.','');
-        for (var k=0; k<uoForUsersSpecial.length; k++) {
-            var uoForUserSpecial = uoForUsersSpecial[k];
-            if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
-            $scope.utenteAbilitatoValidareUo = 'S';
+        if (uoForUsersSpecial){
+            for (var k=0; k<uoForUsersSpecial.length; k++) {
+                var uoForUserSpecial = uoForUsersSpecial[k];
+                if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
+                $scope.utenteAbilitatoValidareUo = 'S';
+                }
             }
         }
     }

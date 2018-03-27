@@ -22,7 +22,7 @@
 {"codice_uo":"000402", "uid_direttore":"mariano.digiulio", "ordine_da_validare":"S"},
 {"codice_uo":"000403", "uid_direttore":"alessandro.preti", "ordine_da_validare":"S"},
 {"codice_uo":"000403", "uid_direttore":"pietro.piro"},
-{"codice_uo":"000404", "uid_direttore":"angelo.grisanti"},
+{"codice_uo":"000404", "uid_direttore":"angelo.grisanti", "ordine_da_validare":"S"},
 {"codice_uo":"000405", "uid_direttore":"pierpaolo.orrico", "ordine_da_validare":"S"},
 {"codice_uo":"000406", "uid_direttore":"pierpaolo.orrico", "ordine_da_validare":"S"},
 {"codice_uo":"000407", "uid_direttore":"angelo.grisanti", "ordine_da_validare":"S", "firma_spesa":"N"},
