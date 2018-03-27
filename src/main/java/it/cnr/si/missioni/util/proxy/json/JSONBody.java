@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.util.proxy.json;
 
-import it.cnr.si.missioni.domain.custom.Helpdesk;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 
@@ -25,7 +24,6 @@ public class JSONBody implements Cloneable, Serializable{
 	String km;
 	String importoSpesa;
 	MissioneBulk missioneBulk;
-	Helpdesk helpdesk;
 	
 	public JSONBody() {
 		super();
@@ -162,11 +160,5 @@ public class JSONBody implements Cloneable, Serializable{
 		return super.clone();
 	}
 
-	public Helpdesk getHelpdesk() {
-		return helpdesk;
-	}
 
-	public void setHelpdesk(Helpdesk helpdesk) {
-		this.helpdesk = helpdesk;
-	}
 }

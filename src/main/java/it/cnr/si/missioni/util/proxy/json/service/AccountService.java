@@ -284,12 +284,12 @@ public class AccountService {
 		return utente.getEmailComunicazioni();
     }
 
-	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data) {
-		return recuperoDirettore(anno, uo, isMissioneEstera, account, data, false);
+	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean isUoRich ) {
+		return recuperoDirettore(anno, uo, isMissioneEstera, account, data, isUoRich, false);
 	}
-	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean fromDatiSAC) {
+	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean isUoRich, Boolean fromDatiSAC) {
 		String userNameFirmatario;
-		if (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0)){
+		if (!isUoRich || (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0))){
 			userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
 		} else {
 			DatiSede dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
@@ -321,13 +321,13 @@ public class AccountService {
 				if (datiSAC != null){
 					if (datiSAC.getShortName() != null && datiSAC.getShortName().startsWith(Costanti.CDS_SAC)){
 						String uoPadre = datiSAC.getShortName().substring(0, 6);
-						userNameFirmatario = recuperoDirettore(anno, uoPadre, isMissioneEstera, account, data, true);
+						userNameFirmatario = recuperoDirettore(anno, uoPadre, isMissioneEstera, account, data, isUoRich, true);
 					}
 				}
 			} else {
 				DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
 				if (datiIstituto != null && !StringUtils.isEmpty(datiIstituto.getUoRespResponsabili())){
-					userNameFirmatario = recuperoDirettore(anno, datiIstituto.getUoRespResponsabili(), isMissioneEstera, account, data, fromDatiSAC);
+					userNameFirmatario = recuperoDirettore(anno, datiIstituto.getUoRespResponsabili(), isMissioneEstera, account, data, isUoRich, fromDatiSAC);
 				}
 			}
 		} 
