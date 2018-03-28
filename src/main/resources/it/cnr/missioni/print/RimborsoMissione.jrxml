@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RimborsoMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="1054"/>
+	<property name="ireport.x" value="211"/>
+	<property name="ireport.y" value="891"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -402,7 +402,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{dataInizioEstero}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dataFineEstero}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement style="bold" mode="Transparent" x="278" y="205" width="109" height="17" uuid="add8bbd9-6c44-4e76-979e-7f7ed9af5f0d"/>
@@ -486,7 +486,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{dataFineEstero}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dataInizioEstero}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
@@ -744,7 +744,7 @@
 			</textField>
 			<textField>
 				<reportElement positionType="Float" x="360" y="94" width="192" height="20" uuid="5ff3be92-f272-4e96-8a9f-32469dec1286">
-					<printWhenExpression><![CDATA[!$F{importo0}.equals("S")]]></printWhenExpression>
+					<printWhenExpression><![CDATA[!$F{importo0}.equals("S") && !$F{cup}.equals("")]]></printWhenExpression>
 				</reportElement>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
