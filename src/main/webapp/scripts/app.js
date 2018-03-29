@@ -102,7 +102,7 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
-                .when('/helpdesk', {
+                .when('/helpdesk/:idHelpdesk?', {
                     templateUrl: 'views/helpdesk.html',
                     controller: 'HelpdeskController',
                     access: {

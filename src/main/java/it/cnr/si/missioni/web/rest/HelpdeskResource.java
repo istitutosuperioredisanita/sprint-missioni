@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +35,10 @@ public class HelpdeskResource {
 		log.debug("HelpdeskResource:send");
 		ExternalProblem hd = new ExternalProblem();
 		hd.setTitolo(req.getParameter("titolo"));
+		if (StringUtils.hasLength(req.getParameter("idHelpdesk"))){
+			hd.setIdSegnalazione(new Long (req.getParameter("idHelpdesk")));
+			hd.setNota(req.getParameter("nota"));
+		}
 		hd.setDescrizione(req.getParameter("descrizione"));
 		hd.setCategoria(new Integer(req.getParameter("categoria")));
 		hd.setCategoriaDescrizione(req.getParameter("categoriaDescrizione"));
