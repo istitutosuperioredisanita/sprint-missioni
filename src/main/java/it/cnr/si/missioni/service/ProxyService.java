@@ -31,12 +31,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.ExternalProblem;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.FileMessageResource;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.CallCache;
@@ -151,15 +153,15 @@ public class ProxyService implements EnvironmentAware{
 	}
 
 	public ResultProxy processWithFile(HttpMethod httpMethod, String body, String app, String url, String queryString, String authorization, MultipartFile uploadedMultipartFile) throws IOException {
-		
 		MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-		bodyMap.add(ExternalProblem.ALLEGATO, new ByteArrayResource(uploadedMultipartFile.getBytes(), uploadedMultipartFile.getOriginalFilename()));
-
+		bodyMap.add(ExternalProblem.ALLEGATO , new FileMessageResource(uploadedMultipartFile.getBytes(),uploadedMultipartFile.getOriginalFilename()));
 		HttpHeaders headers = impostaAutenticazione(app, authorization);
+		
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
 		String proxyURL = impostaUrl(app, url, queryString);
+
 		log.info("Url: "+proxyURL);
 		log.info("Header: "+headers);
 		log.info("Body: "+body);
