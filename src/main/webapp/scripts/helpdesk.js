@@ -33,7 +33,9 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
           var hdDataModel = {};
           hdDataModel.titolo = $scope.helpdeskModel.titolo;
           hdDataModel.descrizione = $scope.helpdeskModel.descrizione;
+          hdDataModel.nota = $scope.helpdeskModel.nota;
           hdDataModel.categoria = $scope.helpdeskModel.categoria;
+          hdDataModel.idSegnalazione = $scope.idHelpdesk;
           for (var k=0; k<$scope.categorie.length; k++) {
             if (hdDataModel.categoria == $scope.categorie[k].id){
               hdDataModel.categoriaDescrizione = $scope.categorie[k].descrizione;
@@ -46,6 +48,8 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
           });
         });
     }
+
+    $scope.idHelpdesk = $routeParams.idHelpdesk;
 
     initMapHelpDesk();
 
@@ -60,6 +64,8 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
                 data.formData = new FormData();
                 data.formData.append("titolo", $scope.helpdeskModel.titolo);
                 data.formData.append("descrizione", $scope.helpdeskModel.descrizione);
+                data.formData.append("nota", $scope.helpdeskModel.nota);
+                data.formData.append("idSegnalazione", $scope.idHelpdesk);
                 data.formData.append("categoria", $scope.helpdeskModel.categoria);
                 for (var k=0; k<$scope.categorie.length; k++) {
                   if ($scope.helpdeskModel.categoria == $scope.categorie[k].id){
@@ -96,8 +102,9 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
     .parent().addClass($.support.fileInput ? undefined : 'disabled');
  
     $scope.sendMailButtonDisable = function (attestatoBuoniPasto) {
-      return $scope.helpdeskModel==undefined || $scope.helpdeskModel.titolo===undefined || 
-             $scope.helpdeskModel.descrizione===undefined || $scope.helpdeskModel.categoria===undefined;
+      return (($scope.helpdeskModel==undefined || $scope.helpdeskModel.titolo===undefined || 
+             $scope.helpdeskModel.descrizione===undefined || $scope.helpdeskModel.categoria===undefined) && !$scope.idHelpdesk) ||
+            (($scope.helpdeskModel==undefined || $scope.helpdeskModel.nota===undefined) && $scope.idHelpdesk);
     }
 
     $scope.trustAsHtml = function(html) {
