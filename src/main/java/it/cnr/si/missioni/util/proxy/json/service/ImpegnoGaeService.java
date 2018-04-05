@@ -7,6 +7,7 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
+import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGaeJson;
 
@@ -24,20 +25,22 @@ public class ImpegnoGaeService {
 	@Autowired
     private CommonService commonService;
 
+
+	public ImpegnoGae loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
+		return loadImpegno(ordineMissione.getCdsSpesa(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione(), ordineMissione.getGae());
+
+	}
+
 	public ImpegnoGae loadImpegno(RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
+		return loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione(), rimborsoMissione.getGae());
+	}
+
+	public ImpegnoGae loadImpegno(String cds, Integer esercizio, Long pgObbligazione, String gae) throws AwesomeException {
+		if (pgObbligazione != null && esercizio != null){
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
 
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getCdsSpesa(), anno, rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione(), rimborsoMissione.getGae());
-			return loadImpegno(clauses);
-		}
-		return null;
-	}
-	
-	public ImpegnoGae loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getPgObbligazione() != null && ordineMissione.getEsercizioOriginaleObbligazione() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getCdsSpesa(), ordineMissione.getAnno(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione(), ordineMissione.getGae());
+			List<JSONClause> clauses = prepareJSONClause(cds, anno, esercizio, pgObbligazione, gae);
 			return loadImpegno(clauses);
 		}
 		return null;

@@ -1,13 +1,9 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,8 +17,10 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
+
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
 
 /**
  * A user.
@@ -121,8 +119,32 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Column(name = "TI_CD_TI_SPESA", length = 1, nullable = true)
     private String tiCdTiSpesa;
 
+    @Size(min = 0, max = 30)
+    @Column(name = "CD_CDS_OBBLIGAZIONE", length = 30, nullable = false)
+    public String cdCdsObbligazione;
+
+    @Column(name = "ESERCIZIO_OBBLIGAZIONE", length = 4, nullable = false)
+    public Integer esercizioObbligazione;
+
+    @Column(name = "PG_OBBLIGAZIONE", length = 50, nullable = false)
+    public Long pgObbligazione;
+
+    @Column(name = "ESERCIZIO_ORIGINALE_OBBLIGAZIONE", length = 4, nullable = false)
+    public Integer esercizioOriginaleObbligazione;
+    
+    @Size(min = 0, max = 28)
+    @Column(name = "VOCE", length = 28, nullable = true)
+    public String voce;
+
+    @Size(min = 0, max = 500)
+    @Column(name = "DS_VOCE", length = 500, nullable = true)
+    public String dsVoce;
+
 	@Transient
     private String decodeSpesaAnticipata;
+	
+	@Column(name="ID_RIMBORSO_IMPEGNI", length = 20)
+    private Long idRimborsoImpegni;
 	
 	public void setId(Long id) {
 		this.id = id;
@@ -408,4 +430,123 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.tiCdTiSpesa = tiCdTiSpesa;
 	}
 
+	public String getCdCdsObbligazione() {
+		return cdCdsObbligazione;
+	}
+
+	public void setCdCdsObbligazione(String cdCdsObbligazione) {
+		this.cdCdsObbligazione = cdCdsObbligazione;
+	}
+
+	public Integer getEsercizioObbligazione() {
+		return esercizioObbligazione;
+	}
+
+	public void setEsercizioObbligazione(Integer esercizioObbligazione) {
+		this.esercizioObbligazione = esercizioObbligazione;
+	}
+
+	public Long getPgObbligazione() {
+		return pgObbligazione;
+	}
+
+	public void setPgObbligazione(Long pgObbligazione) {
+		this.pgObbligazione = pgObbligazione;
+	}
+
+	public Integer getEsercizioOriginaleObbligazione() {
+		return esercizioOriginaleObbligazione;
+	}
+
+	public void setEsercizioOriginaleObbligazione(Integer esercizioOriginaleObbligazione) {
+		this.esercizioOriginaleObbligazione = esercizioOriginaleObbligazione;
+	}
+
+	public String getVoce() {
+		return voce;
+	}
+
+	public void setVoce(String voce) {
+		this.voce = voce;
+	}
+
+	public String getDsVoce() {
+		return dsVoce;
+	}
+
+	public void setDsVoce(String dsVoce) {
+		this.dsVoce = dsVoce;
+	}
+
+	public Long getIdRimborsoImpegni() {
+		return idRimborsoImpegni;
+	}
+
+	public void setIdRimborsoImpegni(Long idRimborsoImpegni) {
+		this.idRimborsoImpegni = idRimborsoImpegni;
+	}
+	
+	public Boolean isModificaSoloDatiFinanziari(RimborsoMissioneDettagli other) {
+		if (cdTiPasto == null) {
+			if (other.cdTiPasto != null)
+				return false;
+		} else if (!cdTiPasto.equals(other.cdTiPasto))
+			return false;
+		if (cdTiSpesa == null) {
+			if (other.cdTiSpesa != null)
+				return false;
+		} else if (!cdTiSpesa.equals(other.cdTiSpesa))
+			return false;
+		if (dataSpesa == null) {
+			if (other.dataSpesa != null)
+				return false;
+		} else if (!dataSpesa.equals(other.dataSpesa))
+			return false;
+		if (dsSpesa == null) {
+			if (other.dsSpesa != null)
+				return false;
+		} else if (!dsSpesa.equals(other.dsSpesa))
+			return false;
+		if (dsTiSpesa == null) {
+			if (other.dsTiSpesa != null)
+				return false;
+		} else if (!dsTiSpesa.equals(other.dsTiSpesa))
+			return false;
+		if (flSpesaAnticipata == null) {
+			if (other.flSpesaAnticipata != null)
+				return false;
+		} else if (!flSpesaAnticipata.equals(other.flSpesaAnticipata))
+			return false;
+		if (importoEuro == null) {
+			if (other.importoEuro != null)
+				return false;
+		} else if (importoEuro.compareTo(other.importoEuro) != 0)
+			return false;
+		if (kmPercorsi == null) {
+			if (other.kmPercorsi != null)
+				return false;
+		} else if (!kmPercorsi.equals(other.kmPercorsi))
+			return false;
+		if (localitaSpostamento == null) {
+			if (other.localitaSpostamento != null)
+				return false;
+		} else if (!localitaSpostamento.equals(other.localitaSpostamento))
+			return false;
+		if (note == null) {
+			if (other.note != null)
+				return false;
+		} else if (!note.equals(other.note))
+			return false;
+		if (tiCdTiSpesa == null) {
+			if (other.tiCdTiSpesa != null)
+				return false;
+		} else if (!tiCdTiSpesa.equals(other.tiCdTiSpesa))
+			return false;
+		if (tiSpesaDiaria == null) {
+			if (other.tiSpesaDiaria != null)
+				return false;
+		} else if (!tiSpesaDiaria.equals(other.tiSpesaDiaria))
+			return false;
+		return true;
+	}
 }

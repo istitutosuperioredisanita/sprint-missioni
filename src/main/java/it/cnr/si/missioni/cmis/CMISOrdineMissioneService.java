@@ -720,8 +720,6 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
-	
-	
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
 		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);

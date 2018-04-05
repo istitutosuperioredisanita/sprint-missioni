@@ -14,7 +14,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
@@ -134,7 +132,9 @@ public class ProxyService implements EnvironmentAware{
             		exchange(proxyURL, httpMethod, requestEntity, String.class);
             ResultProxy resultProxy = new ResultProxy();
             resultProxy.setBody(result.getBody());
-            resultProxy.setType(result.getHeaders().getContentType().getType());
+            if (result.getHeaders() != null && result.getHeaders().getContentType() != null){
+                resultProxy.setType(result.getHeaders().getContentType().getType());
+            }
             resultProxy.setStatus(result.getStatusCode());
             log.debug("Response for url : " + proxyURL, resultProxy);
             return resultProxy;

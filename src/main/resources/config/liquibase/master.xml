@@ -52,6 +52,8 @@
     <include file="classpath:config/liquibase/changelog/20180126122400_add_column_dati_istituto_uos_cds.xml" relativeToChangelogFile="false"/>
 <!--    <include file="classpath:config/liquibase/changelog/20180201162400_add_column_dati_istituto_uo_firma.xml" relativeToChangelogFile="false"/>-->
     <include file="classpath:config/liquibase/changelog/20180323132300_add_sequences.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180330110000_add_table_rimborso_impegni" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180404121000_add_column_rimborso_missioni_dettagli.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

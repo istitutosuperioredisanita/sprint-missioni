@@ -28,6 +28,17 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     $scope.accessToken = AccessToken.get();
     $scope.accountModel = $sessionStorage.accountWork;
 
+    var recuperoImpegni = function(idRimborsoMissione){
+        $scope.impegni = [];
+        ElencoRimborsiMissioneService.findRimborsoImpegni($scope.idRimborsoMissione).then(function(result){
+            if (result.data && result.data.length > 0){
+                $scope.impegni = result.data;
+            }
+        });
+    }
+
+    recuperoImpegni($scope.idRimborsoMissione);
+
     $scope.aggiungiDettaglioSpesa = function () {
       $scope.addDettaglioSpesa = true;
       $scope.newDettaglioSpesa = {};
@@ -119,6 +130,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     var recuperoTipiSpesa = function(dataSpesa){
         recuperoTipiSpesa(dataSpesa, null);
     }
+
 
     var recuperoTipiSpesa = function(dataSpesa, cdTipoSpesa){
         $scope.tipi_spesa = [];
@@ -338,6 +350,10 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         $http.put('api/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
             $rootScope.salvataggio = false;
             dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglioSpesa.dataSpesa);
+            dettaglioSpesa.esercizioOriginaleObbligazione = data.esercizioOriginaleObbligazione;
+            dettaglioSpesa.pgObbligazione = data.pgObbligazione;
+            dettaglioSpesa.voce = data.voce;
+            dettaglioSpesa.dsVoce = data.dsVoce;
             undoEditingDettaglioSpesa(dettaglioSpesa);
         }).error(function (data) {
             $rootScope.salvataggio = false;

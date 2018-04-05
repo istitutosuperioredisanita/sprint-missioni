@@ -484,6 +484,7 @@
             "rimborso-importo-0": "Importo 0"
         },
         "button": {
+            "addImpegno": "Aggiungi impegno",
             "print": "Stampa Rimborso",
             "sendToFinal": "Rendi Definitivo il Rimborso Missione",
             "confirm": "Conferma il Rimborso Missione",
@@ -507,6 +508,7 @@
                     "download-file": "Download File",
                     "remove-file": "Elimina File",
                     "km": "Km percorsi*",
+                    "impegno": "Impegno",
                     "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
                     "localita-spostamento": "Località Spostamento*"
                 },

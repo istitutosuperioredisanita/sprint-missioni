@@ -101,37 +101,6 @@
                     "codice_uo" : "044000"
                 }
             ]
-        }, {
-            "uid" : "gianfranco1.gasparro",
-            "uoForUsersSpecial" : [{
-                    "codice_uo" : "016001",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "028001",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "000411",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "084000",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "000413",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "030000",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "044000",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "314000",
-                    "ordine_da_validare" : "S"
-                }, {
-                    "codice_uo" : "506000",
-                    "ordine_da_validare" : "S"
-                }
-            ]
         }, 
 {"uid":"martina.roncolini", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
 {"uid":"cinzia.gherarducci", "uoForUsersSpecial":[{"codice_uo":"044000", "ordine_da_validare":"S"}]},
@@ -1095,7 +1064,7 @@
                 }
             ]
         }, {
-            "uid" : "gianfranco.gasparro1",
+            "uid" : "app.missioni",
             "uoForUsersSpecial" : [{
                     "codice_uo" : "000001"
                 }, {
@@ -1171,7 +1140,8 @@
                 }, {
                     "codice_uo" : "000406"
                 }, {
-                    "codice_uo" : "000407"
+                    "codice_uo" : "000407",
+                    "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "000408"
                 }, {

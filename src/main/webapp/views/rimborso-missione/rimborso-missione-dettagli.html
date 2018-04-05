@@ -40,6 +40,9 @@
                             <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.localita-spostamento' | translate}}:</b>{{dettaglioSpesa.localitaSpostamento}}</span>
+                            <span ng-show="dettaglioSpesa.pgObbligazione"><br>
+                            <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.impegno' | translate}}:</b> {{dettaglioSpesa.esercizioObbligazione}} - {{dettaglioSpesa.pgObbligazione}}.   <b>{{'missione.form.voce' | translate}}:</b> {{dettaglioSpesa.voce}} - {{dettaglioSpesa.dsVoce}}</span>
+
                             <div ng-show="dettaglioSpesa.viewAttachment">
                               <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists=true">
                                 <li ng-repeat="attachment in dettaglioSpesa.attachments">
@@ -93,7 +96,7 @@
                                     <p class="col-md-12">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa">ds spesa</span>
-                                        <textarea class="input-sm form-control" ng-model="dettaglioSpesa.dsSpesa" rows = "1"></textarea>
+                                        <textarea ng-disabled="validazione == 'S'" class="input-sm form-control" ng-model="dettaglioSpesa.dsSpesa" rows = "1"></textarea>
                                         </span>
                                     </p>
                             </form>
@@ -111,14 +114,14 @@
                                          <span class="input-group">
                                             <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
                                             <label class="checkbox">
-                                                    <input type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
+                                                    <input ng-disabled="validazione == 'S'" type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
                                             </label>
                                         </span>
                                     </p>
                                     <p class="col-md-3">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
-                                            <input ng-disabled="dettaglioSpesa.rimborso" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
+                                            <input ng-disabled="dettaglioSpesa.rimborso || validazione == 'S'" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
                                         </span>
                                     </p>
                             </form>
@@ -136,13 +139,21 @@
                                         </span>
                                     </p>
                             </form>
+                            <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0">
+                                    <p class="col-md-12">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.impegno">impegno</span>
+                                            <select class="form-control" ng-model="dettaglioSpesa.idRimborsoImpegni" ng-options="impegno.id as impegno.esercizioOriginaleObbligazione +'-'+impegno.pgObbligazione+' ('+' Voce di Bilancio: '+impegno.voce+' - '+impegno.dsVoce+')' for impegno in impegni"></select>
+                                        </span>
+                                    </p>
+                            </form>
                           </div>
                         </div>
         <div class="col-md-1-button col-md-1 text-right" >
-           <button ng-show="!disabilita && validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+           <button ng-show="!disabilita && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
             <button ng-show="!disabilita && validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="confirmDeleteDettaglioSpesa($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
-            <button ng-show="!disabilita && validazione == 'N' && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(dettaglioSpesa)" ng-click="modifyDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
-            <button ng-show="!disabilita && validazione == 'N' && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-click="undoDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+            <button ng-show="!disabilita && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(dettaglioSpesa)" ng-click="modifyDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+            <button ng-show="!disabilita && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-click="undoDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
         </div>
                       </div>
                     </li>
@@ -225,6 +236,14 @@
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.localita-spostamento">localita</span>
                             <input class="form-control" ng-model="newDettaglioSpesa.localitaSpostamento" maxlength="200">
                         </span>
+                    </p>
+            </form>
+            <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0">
+                    <p class="col-md-12">
+                      <span class="input-group">
+                        <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.impegno">impegno</span>
+                        <select class="form-control" ng-model="newDettaglioSpesa.idRimborsoImpegni" ng-options="impegno.id as impegno.esercizioOriginaleObbligazione +'-'+impegno.pgObbligazione+' ('+' Voce di Bilancio: '+impegno.voce+' - '+impegno.dsVoce+')' for impegno in impegni"></select>
+                      </span>
                     </p>
             </form>
         </div>
