@@ -25,19 +25,20 @@ public class ImpegnoService {
     private CommonService commonService;
 
 	public Impegno loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getPgObbligazione() != null && ordineMissione.getEsercizioOriginaleObbligazione() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getCdsSpesa(), ordineMissione.getAnno(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione());
-			return loadImpegno(clauses);
-		}
-		return null;
+		return loadImpegno(ordineMissione.getCdsSpesa(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione());
+
 	}
 
 	public Impegno loadImpegno(RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
+		return loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione());
+	}
+
+	public Impegno loadImpegno(String cds, Integer esercizio, Long pgObbligazione) throws AwesomeException {
+		if (pgObbligazione != null && esercizio != null){
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
 
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getCdsSpesa(), anno, rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione());
+			List<JSONClause> clauses = prepareJSONClause(cds, anno, esercizio, pgObbligazione);
 			return loadImpegno(clauses);
 		}
 		return null;

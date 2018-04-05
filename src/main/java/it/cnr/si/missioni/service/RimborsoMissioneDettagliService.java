@@ -26,6 +26,7 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -64,6 +65,10 @@ public class RimborsoMissioneDettagliService {
 	@Autowired
 	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
 
+
+	@Autowired
+	private RimborsoImpegniService rimborsoImpegniService;
+	 
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
@@ -159,10 +164,26 @@ public class RimborsoMissioneDettagliService {
 		controlloDatiObbligatoriDaGui(rimborsoMissioneDettagli);
 		impostaImportoDivisa(rimborsoMissioneDettagli);
 		validaCRUD(principal, rimborsoMissioneDettagli);
+		aggiornaDatiImpegni(principal, rimborsoMissioneDettagli);
+
 		rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean.creaConBulk(principal,
 				rimborsoMissioneDettagli);
 		log.debug("Created Information for RimborsoMissioneDettagli: {}", rimborsoMissioneDettagli);
 		return rimborsoMissioneDettagli;
+	}
+
+	public void aggiornaDatiImpegni(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli) {
+		if (rimborsoMissioneDettagli.getIdRimborsoImpegni() != null) {
+			RimborsoImpegni rimborsoImpegni = (RimborsoImpegni)crudServiceBean.findById(principal, RimborsoImpegni.class, rimborsoMissioneDettagli.getIdRimborsoImpegni());
+			if (rimborsoMissioneDettagli.getIdRimborsoImpegni() != null) {
+				rimborsoMissioneDettagli.setCdCdsObbligazione(rimborsoImpegni.getCdCdsObbligazione());
+				rimborsoMissioneDettagli.setEsercizioObbligazione(rimborsoImpegni.getEsercizioObbligazione());
+				rimborsoMissioneDettagli.setEsercizioOriginaleObbligazione(rimborsoImpegni.getEsercizioOriginaleObbligazione());
+				rimborsoMissioneDettagli.setPgObbligazione(rimborsoImpegni.getPgObbligazione());
+				rimborsoMissioneDettagli.setVoce(rimborsoImpegni.getVoce());
+				rimborsoMissioneDettagli.setDsVoce(rimborsoImpegni.getDsVoce());
+			}
+		}
 	}
 
 	private void controlloDatiObbligatoriDaGui(RimborsoMissioneDettagli dettaglio) {
@@ -236,7 +257,7 @@ public class RimborsoMissioneDettagliService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Rimborso Missione da aggiornare inesistente.");
 		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
 				RimborsoMissione.class, rimborsoMissioneDettagli.getRimborsoMissione().getId());
-		if (rimborsoMissione != null) {
+		if (rimborsoMissione != null && !rimborsoMissioneDettagli.isModificaSoloDatiFinanziari(rimborsoMissioneDettagliDB)) {
 			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissione);
 		}
 		rimborsoMissioneDettagli.setRimborsoMissione(rimborsoMissione);
@@ -258,17 +279,20 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setImportoEuro(rimborsoMissioneDettagli.getImportoEuro());
 		rimborsoMissioneDettagliDB.setDsNoGiustificativo(rimborsoMissioneDettagli.getDsNoGiustificativo());
 		rimborsoMissioneDettagliDB.setLocalitaSpostamento(rimborsoMissioneDettagli.getLocalitaSpostamento());
+		rimborsoMissioneDettagliDB.setIdRimborsoImpegni(rimborsoMissioneDettagli.getIdRimborsoImpegni());
 		impostaImportoDivisa(rimborsoMissioneDettagliDB);
 
 		rimborsoMissioneDettagliDB.setToBeUpdated();
 
 		validaCRUD(principal, rimborsoMissioneDettagliDB);
 
+		aggiornaDatiImpegni(principal, rimborsoMissioneDettagliDB);
+
 		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli) crudServiceBean.modificaConBulk(principal,
 				rimborsoMissioneDettagliDB);
 
 		log.debug("Updated Information for Dettaglio Rimborso Missione: {}", rimborsoMissioneDettagliDB);
-		return rimborsoMissioneDettagli;
+		return rimborsoMissioneDettagliDB;
 	}
 
 }

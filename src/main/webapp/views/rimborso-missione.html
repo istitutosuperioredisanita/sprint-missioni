@@ -310,31 +310,85 @@
                     </p>
 
 
-
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
-                        <span class="input-group">
-                            <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
-                            <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
-                        </span>
+     <div class="panel-body my-panel-body" ng-show="showEsisteRimborsoMissione">
+      <p class="col-md-2">
+      <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.button.addImpegno' | translate}}" ng-click="aggiungiRigaImpegno()"><span class="glyphicon glyphicon-plus"></span>{{'rimborso-missione.button.addImpegno' | translate}}</button> 
                     </p>
-            </form>
+  <div class="col-md-5">
+          <table class="table table-condensed table-striped table-bordered table-responsive">
+          <tr>
+            <th class="col-xs-4">{{'missione.form.anno-impegno' | translate}}</th>
+            <th class="col-xs-6">{{'missione.form.numero-impegno' | translate}}</th>
+          </tr>
+          <tbody id ="missioni">
+            <tr ng-repeat="impegno in impegni">
+              <td ng-hide="impegno.editing" class="col-lg-4" style="text-align: center" type="number">{{impegno.esercizioOriginaleObbligazione}}</td>
+              <td ng-show="impegno.editing" ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="col-xs-4" style="text-align:center" type="number">
+                <input class="form-control" ng-model="impegno.esercizioOriginaleObbligazione" required maxlength="4">
+              </td>
+              <td ng-hide="impegno.editing" class="col-lg-6" style="text-align: right" type="number">{{impegno.pgObbligazione}}</td>
+              <td ng-show="impegno.editing" ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="col-xs-6" style="text-align: right" type="number">
+                <input class="form-control" ng-model="impegno.pgObbligazione" required maxlength="256">
+              </td>
+              <td ng-hide="impegno.editing">
+                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="editImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+              </td>
+              <td ng-hide="impegno.editing">
+                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))"  class="btn btn-sm btn-link" ng-click="confirmDeleteImpegno($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+              </td>
+              <td ng-show="impegno.editing">
+                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="modifyImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+              </td>
+              <td ng-show="impegno.editing">
+                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="undoImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+              </td>
+            </tr>
 
+
+          <tr ng-show="addImpegno" id="impegnoAdd">
+
+            <td  class="col-sm-5" style="text-align:left">
+              <input class="form-control" ng-model="newImpegno.esercizioOriginaleObbligazione" maxlength="256"</input>
+            </td>
+            <td  class="col-sm-7" style="text-align:left">
+              <input class="form-control" ng-model="newImpegno.pgObbligazione" maxlength="256"</input>
+            </td>
+            <td >
+                  <button class="btn btn-sm btn-link" ng-click="insertImpegno(newImpegno)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+            </td>
+            <td >
+                  <button class="btn btn-sm btn-link" ng-click="undoAddImpegno()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+            <div ng-hide="showEsisteRimborsoMissione">
+              <form class="form-inline" role="form" id="missioni">
+                      <p class="col-md-3">
+                          <span class="input-group">
+                              <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
+                              <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
+                          </span>
+                      </p>
+              </form>
+
+              <form class="form-inline" role="form" id="missioni">
+                      <p class="col-md-4">
+                          <span class="input-group">
+                              <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
+                              <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="rimborsoMissioneModel.pgObbligazione"/>
+                          </span>
+                      </p>
+              </form>
+
+                      <p class="col-md-1">
+              <cnr-modal-info-impegno anno="rimborsoMissioneModel.anno" cds="rimborsoMissioneModel.cdsSpesa" gae="rimborsoMissioneModel.gae" anno-impegno="rimborsoMissioneModel.esercizioOriginaleObbligazione" numero="rimborsoMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
+                      </p>
+            </div>
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
-                        <span class="input-group">
-                            <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
-                            <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="rimborsoMissioneModel.pgObbligazione"/>
-                        </span>
-                    </p>
-            </form>
-
-                    <p class="col-md-1">
-            <cnr-modal-info-impegno anno="rimborsoMissioneModel.anno" cds="rimborsoMissioneModel.cdsSpesa" gae="rimborsoMissioneModel.gae" anno-impegno="rimborsoMissioneModel.esercizioOriginaleObbligazione" numero="rimborsoMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
-                    </p>
-
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                    <p class="col-md-6">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
                             <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>

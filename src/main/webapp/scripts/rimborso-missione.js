@@ -748,6 +748,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             }
         }
     }
+
     $scope.reloadUoWork = function(uo){
         $scope.gestioneUtenteAbilitatoValidare(uo);
 
@@ -1131,6 +1132,76 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       parent.history.back();
     }
 
+    $scope.editImpegno= function (impegno) {
+      impegno.editing = true;
+    }
+
+    var undoEditingImpegno = function (impegno) {
+      delete impegno.editing;
+    }
+
+    $scope.undoImpegno = function (impegno) {
+      undoEditingImpegno(impegno);
+    }
+
+    $scope.confirmDeleteImpegno = function (index) {
+        var impegnoDaEliminare = $scope.impegni[index];
+        ui.confirmCRUD("Confermi l'eliminazione dell'impegno "+impegnoDaEliminare.esercizioOriginaleObbligazione+" - "+impegnoDaEliminare.pgObbligazione+"?", deleteImpegno, index);
+    }
+
+    var deleteImpegno  = function (index) {
+        var id = $scope.impegni[index].id;
+            $rootScope.salvataggio = true;
+            $http.delete('api/rest/rimborsoMissione/impegno/' + id).success(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                        $scope.impegni.splice(index,1);
+                    }).error(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                    }
+            );
+    }
+
+    var annullaDatiNuovaRigaImpegno = function () {
+      delete $scope.addImpegno;
+      delete $scope.newImpegno;
+    }
+
+    $scope.undoAddImpegno = function () {
+        annullaDatiNuovaRigaImpegno();
+    }
+
+    $scope.aggiungiRigaImpegno = function () {
+      $scope.addImpegno = true;
+      $scope.newImpegno = {};
+    }
+
+    $scope.insertImpegno = function (newRigaImpegno) {
+        newRigaImpegno.rimborsoMissione = $scope.rimborsoMissioneModel;
+            $rootScope.salvataggio = true;
+            $http.post('api/rest/rimborsoMissione/impegno/create', newRigaImpegno).success(function(data){
+                    $rootScope.salvataggio = false;
+                    if (!$scope.impegni){
+                        $scope.impegni = [];
+                    }
+                    $scope.impegni.push(data);
+                    $scope.undoAddImpegno();
+            }).error(function (data) {
+                $rootScope.salvataggio = false;
+            });
+    }
+
+    $scope.modifyImpegno = function (impegno) {
+        $rootScope.salvataggio = true;
+        $http.put('api/rest/rimborsoMissione/impegno/modify', impegno).success(function(data){
+            $rootScope.salvataggio = false;
+            undoEditingImpegno(impegno);
+        }).error(function (data) {
+            $rootScope.salvataggio = false;
+        });
+    }
+
     $scope.confirmDeleteAttachment = function (attachment, idRimborsoMissione) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
@@ -1259,6 +1330,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.viewAttachments($scope.rimborsoMissioneModel.id);
                 $scope.inizializzaFormPerModifica();
                 $scope.gestioneUtenteAbilitatoValidare($scope.rimborsoMissioneModel.uoSpesa);
+
+                ElencoRimborsiMissioneService.findRimborsoImpegni(model.id).then(function(result){
+                    if (result.data && result.data.length > 0){
+                        $scope.impegni = result.data;
+                    }
+                });
             }
         });
     } else {
