@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,9 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissione;
@@ -63,9 +66,12 @@ public class PrintRimborsoMissioneService {
     private ProgettoService progettoService;
 
     @Autowired
+    private RimborsoImpegniService rimborsoImpegniService;
+
+    @Autowired
     private VoceService voceService;
     
-    private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
+    private PrintRimborsoMissione getPrintRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
 		LocalDate data = LocalDate.now();
@@ -116,13 +122,28 @@ public class PrintRimborsoMissioneService {
     	}
     	printRimborsoMissione.setUoSpesa(caricaUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()));
     	printRimborsoMissione.setCdrSpesa(caricaCdr(rimborsoMissione.getCdrSpesa()));
-    	if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
-    		printRimborsoMissione.setPgObbligazione(rimborsoMissione.getPgObbligazione().toString());
-    		printRimborsoMissione.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione().toString());
+    	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(principal, new Long(rimborsoMissione.getId().toString()));
+		String impegni = "";
+    	if (lista != null && !lista.isEmpty()){
+        	if (lista.size() == 1){
+        		RimborsoImpegni rimborsoImpegno = lista.get(0);
+        		printRimborsoMissione.setPgObbligazione(rimborsoImpegno.getPgObbligazione().toString());
+        		printRimborsoMissione.setEsercizioOriginaleObbligazione(rimborsoImpegno.getEsercizioOriginaleObbligazione().toString());
+        	} else {
+        		for (RimborsoImpegni rimborsoImpegni : lista) {
+                	if (StringUtils.hasLength(impegni)){
+                		impegni += "  -  ";
+                	}
+
+        			impegni += rimborsoImpegni.getEsercizioOriginaleObbligazione()+"/"+rimborsoImpegni.getPgObbligazione();
+        		}
+        	}
+    		
     	} else {
     		printRimborsoMissione.setPgObbligazione("");
     		printRimborsoMissione.setEsercizioOriginaleObbligazione("");
     	}
+    	printRimborsoMissione.setImpegni(impegni);
     	if (rimborsoMissione.getAnticipoAnnoMandato() != null){
         	printRimborsoMissione.setAnnoMandato(rimborsoMissione.getAnticipoAnnoMandato().toString());
     	} else {
@@ -237,15 +258,15 @@ public class PrintRimborsoMissioneService {
    		return "";
 	}
 	
-	public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
-		String myJson = createJsonPrintRimborsoMissione(rimborsoMissione, currentLogin);
+	public byte[] printRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
+		String myJson = createJsonPrintRimborsoMissione(principal, rimborsoMissione, currentLogin);
 		Map<String, String> mapSubReport = new HashMap<String, String>();
 		mapSubReport.put("SUBREPORT_DETTAGLI","rimborso_missione_dettagli_sub.jasper");
 		return printService.print(myJson, "RimborsoMissione.jasper", mapSubReport);
 	}
 
-	public String createJsonPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws ComponentException {
-		PrintRimborsoMissione printRimborsoMissione = getPrintRimborsoMissione(rimborsoMissione, currentLogin);
+	public String createJsonPrintRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, String currentLogin) throws ComponentException {
+		PrintRimborsoMissione printRimborsoMissione = getPrintRimborsoMissione(principal,rimborsoMissione, currentLogin);
 		return printService.createJsonForPrint(printRimborsoMissione);
 	}
 

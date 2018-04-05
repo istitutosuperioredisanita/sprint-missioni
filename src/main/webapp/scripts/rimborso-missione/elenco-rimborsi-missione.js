@@ -28,6 +28,12 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
                     return response.data;
                 });
                 return promise;
+            },
+            findRimborsoImpegni: function(id) {
+                var promise = $http.get('api/rest/rimborsoMissione/impegno/getImpegni', {params: {idRimborsoMissione: id}}).success(function (response) {
+                    return response.data;
+                });
+                return promise;
             }
         }
     });

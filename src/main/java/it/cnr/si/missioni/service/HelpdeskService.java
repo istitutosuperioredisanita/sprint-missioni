@@ -42,18 +42,20 @@ public class HelpdeskService {
 	
 	public Long newProblem(ExternalProblem hd) throws ServiceException {
 
-		hd.setLogin(SecurityUtils.getCurrentUser().getName());
-		Account account = accountService.loadAccountFromRest(hd.getLogin());
-		hd.setFirstName(account.getNome());
-		hd.setFamilyName(account.getCognome());
-		hd.setEmail(account.getEmailComunicazioni());
 		String url = Costanti.REST_OIL_NEW_PROBLEM;
 
 		if (hd.getIdSegnalazione() != null){
-			hd.setStato(0);
+			
+			hd.setLogin("mail");
+			hd.setStato(2);
 			ResultProxy result = proxyService.process(HttpMethod.POST, hd, Costanti.APP_HELPDESK, url, null, null, false);
-
+			return hd.getIdSegnalazione();
 		} else {
+			hd.setLogin(SecurityUtils.getCurrentUser().getName());
+			Account account = accountService.loadAccountFromRest(hd.getLogin());
+			hd.setFirstName(account.getNome());
+			hd.setFamilyName(account.getCognome());
+			hd.setEmail(account.getEmailComunicazioni());
 			String descrizione = hd.getDescrizione() + System.getProperty("line.separator")+System.getProperty("line.separator")+hd.getFirstName()+
 					" "+hd.getFamilyName()+"  Email: "+hd.getEmail()+"  Data: "+DateUtils.getDateAsString(ZonedDateTime.now(), DateUtils.PATTERN_DATETIME);
 
@@ -64,7 +66,6 @@ public class HelpdeskService {
 			return new Long( result.getBody());
 			
 		}
-		return null;
 	}
 	
 	public void addAttachments(long id, MultipartFile uploadedMultipartFile) throws ServiceException {

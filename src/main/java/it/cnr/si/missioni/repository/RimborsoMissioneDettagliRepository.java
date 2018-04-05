@@ -17,6 +17,9 @@ public interface RimborsoMissioneDettagliRepository extends
 	@Query("select a from RimborsoMissioneDettagli a where a.rimborsoMissione = ?1 and stato != 'ANN' order by riga")
     List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(RimborsoMissione rimborsoMissione);
     
+	@Query("select a from RimborsoMissioneDettagli a where a.idRimborsoImpegni = ?1 and stato != 'ANN' order by riga")
+    List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Long idRimborsoImpegni);
+    
 	@Query("select max(riga) from RimborsoMissioneDettagli a where a.rimborsoMissione = ?1")
     Long getMaxRigaDettaglio(RimborsoMissione rimborsoMissione);
     
