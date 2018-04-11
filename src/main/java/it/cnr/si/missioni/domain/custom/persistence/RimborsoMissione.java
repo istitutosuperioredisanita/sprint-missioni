@@ -323,8 +323,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "CUP", length = 50, nullable = true)
     public String cup;
 
-    @Size(min = 0, max = 1000)
-    @Column(name = "NOTE_RESPINGI", length = 1000, nullable = true)
+    @Size(min = 0, max = 2000)
+    @Column(name = "NOTE_RESPINGI", length = 2000, nullable = true)
     public String noteRespingi;
 
     @Size(min = 0, max = 1)

@@ -508,7 +508,7 @@
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
                             <textarea ng-disabled="!validazione || disabilitaRimborsoMissione"
-                              class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="rimborsoMissioneModel.noteRespingi" rows = "2">
+                              class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="rimborsoMissioneModel.noteRespingi" maxlength="2000" rows = "2">
                             </textarea>
                         </span>
                 </p>
