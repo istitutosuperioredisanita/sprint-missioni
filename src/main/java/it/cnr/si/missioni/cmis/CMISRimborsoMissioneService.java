@@ -7,7 +7,15 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -15,7 +23,6 @@ import java.util.stream.Collectors;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -415,7 +422,7 @@ public class CMISRimborsoMissioneService {
 		CmisPath cmisPath = missioniCMISService.getBasePath();
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoSpesa());
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Rimborso Missione");
-		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Anno "+rimborsoMissione.getAnno());
+		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Anno "+rimborsoMissione.getAnnoIniziale());
 		cmisPath = createLastFolderIfNotPresent(cmisPath, rimborsoMissione);
 		return cmisPath;
 	}
@@ -626,7 +633,7 @@ public class CMISRimborsoMissioneService {
 	@Transactional(readOnly = true)
 	public void avviaFlusso(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
 		String username = principal.getName();
-		byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
+		byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(principal, rimborsoMissione, username);
 		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
 		Document documento = salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
 		StringBuilder nodeRefs = new StringBuilder();
@@ -853,7 +860,7 @@ public class CMISRimborsoMissioneService {
 						.orElse(""),
 				"Rimborso Missione",
 				Optional.ofNullable(rimborsoMissione)
-						.map(rimborso -> "Anno " + String.valueOf(rimborso.getAnno()))
+						.map(rimborso -> "Anno " + String.valueOf(rimborso.getAnnoIniziale()))
 						.orElse("0"),
 				String.valueOf(missioniCMISService.sanitizeFilename(rimborsoMissione.constructCMISNomeFile()))
 		).stream().collect(

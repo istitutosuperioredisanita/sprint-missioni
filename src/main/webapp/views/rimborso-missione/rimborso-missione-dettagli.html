@@ -114,7 +114,7 @@
                                          <span class="input-group">
                                             <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
                                             <label class="checkbox">
-                                                    <input ng-disabled="validazione == 'S'" type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
+                                                    <input ng-disabled="validazione == 'S'" type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N" ng-change="cambioSpesaAnticipata(dettaglioSpesa)">
                                             </label>
                                         </span>
                                     </p>
@@ -139,7 +139,7 @@
                                         </span>
                                     </p>
                             </form>
-                            <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0">
+                            <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0 && dettaglioSpesa.flSpesaAnticipata != 'S'">
                                     <p class="col-md-12">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.impegno">impegno</span>
@@ -213,7 +213,7 @@
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
                             <label class="checkbox">
-                                    <input type="checkbox" ng-model="newDettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
+                                    <input type="checkbox" ng-model="newDettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N" ng-change="cambioSpesaAnticipata(newDettaglioSpesa)">
                             </label>
                         </span>
                     </p>
@@ -238,7 +238,7 @@
                         </span>
                     </p>
             </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0">
+            <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0 && newDettaglioSpesa.flSpesaAnticipata != 'S'">
                     <p class="col-md-12">
                       <span class="input-group">
                         <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.impegno">impegno</span>

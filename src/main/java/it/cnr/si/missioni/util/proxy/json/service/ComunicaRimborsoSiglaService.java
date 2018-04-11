@@ -37,6 +37,7 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Banca;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.DivisaTappa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneRigaColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneSigla;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.ModalitaPagamento;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Nazione;
@@ -117,6 +118,9 @@ public class ComunicaRimborsoSiglaService {
 				oggettoBulk.setPgAnticipoGeMis(rimborsoApprovato.getAnticipoNumeroMandato());
 				oggettoBulk.setCdsAnticipoGeMis(rimborsoApprovato.getCdsSpesa());
 			}
+			if (rimborsoApprovato.getGae() != null){
+				oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
+			}
 			oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
 			oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
 			Account account = accountService.loadAccountFromRest(rimborsoApprovato.getUid());
@@ -138,29 +142,6 @@ public class ComunicaRimborsoSiglaService {
 					if (folderOrdine != null){
 						oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getPropertyValue(PropertyIds.OBJECT_ID));
 					}
-				}
-			}
-			if (!rimborsoApprovato.isTrattamentoAlternativoMissione()){
-				if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
-					oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
-				}
-				if (rimborsoApprovato.getEsercizioObbligazione() != null){
-					oggettoBulk.setEsercizioObblGeMis(rimborsoApprovato.getEsercizioObbligazione());
-				}
-				if (rimborsoApprovato.getEsercizioOriginaleObbligazione() != null){
-					oggettoBulk.setEsercizioOriObblGeMis(rimborsoApprovato.getEsercizioOriginaleObbligazione());
-				}
-				if (rimborsoApprovato.getPgObbligazione() != null){
-					oggettoBulk.setPgObblGeMis(rimborsoApprovato.getPgObbligazione());
-				}
-				if (rimborsoApprovato.getGae() != null){
-					oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
-				}
-				if (rimborsoApprovato.getCdrSpesa() != null){
-					oggettoBulk.setCdrGeMis(rimborsoApprovato.getCdrSpesa());
-				}
-				if (rimborsoApprovato.getVoce() != null){
-					oggettoBulk.setVoceGeMis(rimborsoApprovato.getVoce());
 				}
 			}
 			impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
@@ -244,6 +225,9 @@ public class ComunicaRimborsoSiglaService {
 					}
 					spesaMissione.setTiSpesaDiaria("S");
 					speseMissioneColl.add(spesaMissione);
+					
+					impostaDatiMissioneRiga(dettaglio, oggettoBulk);
+				
 				}
 				oggettoBulk.setSpeseMissioneColl(speseMissioneColl);
 			}
@@ -265,6 +249,33 @@ public class ComunicaRimborsoSiglaService {
 		}
 		return null;
 	}
+	
+	private void impostaDatiMissioneRiga(RimborsoMissioneDettagli dettaglio, MissioneBulk oggettoBulk) {
+			if (!dettaglio.isSpesaAnticipata() && !dettaglio.getRimborsoMissione().isTrattamentoAlternativoMissione() && StringUtils.hasLength(dettaglio.getCdCdsObbligazione())){
+				Boolean trovataRiga = false;
+				for (MissioneRigaColl riga : oggettoBulk.getMissioneRigaColl()){
+					if (riga.getCdCdsObbligazione().equals(dettaglio.getCdCdsObbligazione()) && 
+							riga.getEsercizioObbligazione().compareTo(dettaglio.getEsercizioObbligazione()) == 0 && 
+								riga.getEsercizioOriObbligazione().compareTo(dettaglio.getEsercizioOriginaleObbligazione()) == 0 && 
+									riga.getPgObbligazione().compareTo(dettaglio.getPgObbligazione()) == 0){
+						riga.setImTotaleRigaMissione(Utility.nvl(riga.getImTotaleRigaMissione()).add(Utility.nvl(dettaglio.getImportoEuro())));
+						trovataRiga = true;
+					}
+				}
+				if (!trovataRiga){
+					MissioneRigaColl riga = new MissioneRigaColl();
+					riga.setProgressivoRiga(oggettoBulk.getMissioneRigaColl().size() + 1);
+					riga.setCdCdsObbligazione(dettaglio.getCdCdsObbligazione());
+					riga.setEsercizioObbligazione(dettaglio.getEsercizioObbligazione());
+					riga.setEsercizioOriObbligazione(dettaglio.getEsercizioOriginaleObbligazione());
+					riga.setPgObbligazione(dettaglio.getPgObbligazione());
+					riga.setImTotaleRigaMissione(Utility.nvl(dettaglio.getImportoEuro()));
+					oggettoBulk.getMissioneRigaColl().add(riga);
+				}
+				
+			}
+	}
+	
 	private void impostaDescrizioneMissione(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk) {
 		String descrizioneMissione = "Missione a "+rimborsoApprovato.getDestinazione()+" del "+DateUtils.getDefaultDateAsString(rimborsoApprovato.getDataInizioMissione())+" di "+Utility.nvl(oggettoBulk.getCognome())+" "+ Utility.nvl(oggettoBulk.getNome())+" - "+rimborsoApprovato.getOggetto();
 		if (descrizioneMissione.length() > 300){
