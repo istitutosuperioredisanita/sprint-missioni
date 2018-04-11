@@ -36,6 +36,7 @@ public class Costanti {
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
 	public final static String NOME_CACHE_SERVICES_SIGLA = "cacheServicesSigla";
 	public final static String APP_AA = "AA";
+	public final static String TIPO_RAPPORTO_BORSISTA = "BORS";
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 	
 	

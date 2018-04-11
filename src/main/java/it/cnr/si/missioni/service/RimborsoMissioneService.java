@@ -14,8 +14,6 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -38,14 +36,11 @@ import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
-import it.cnr.si.missioni.cmis.CMISMissioniAspect;
-import it.cnr.si.missioni.cmis.CMISOrdineMissioneAspect;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
-import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
@@ -195,7 +190,6 @@ public class RimborsoMissioneService {
 				retrieveDetails(principal, rimborsoMissione);
 			}
 		}
-//		popolaCoda(rimborsoMissione);
 		return rimborsoMissione;
     }
 
@@ -212,9 +206,6 @@ public class RimborsoMissioneService {
 	}
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws ComponentException{
-//    	if (isDevProfile()){
-//        	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
-//    	}
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
     	if (lista != null){
     		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
@@ -226,17 +217,11 @@ public class RimborsoMissioneService {
     					if (result.isStateReject()){
     						rimborsoMissione.setCommentFlows(result.getComment());
     						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
-//    						aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
     						listaNew.add(rimborsoMissione);
     					} else if (result.isAnnullato()){
-//    						aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissioneDaAggiornare);
     						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
     						listaNew.add(rimborsoMissione);
-//        				} else if (isDevProfile() && result.isApprovato()){
-//        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
-//        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-//        					listaNew.add(rimborsoMissione);
             			} else if (result.isApprovato()){
             				
             			} else {
@@ -440,6 +425,10 @@ public class RimborsoMissioneService {
 		}
 		
     	if (confirm){
+        	if (Utility.nvl(rimborsoMissioneDB.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoMissioneDB.getAnticipoImporto())).compareTo(BigDecimal.ZERO) < 0){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo totale dei dettagli spesa non anticipati al netto dell'anticipo ricevuto è negativo.");
+        	}
+    		
     		rimborsoMissioneDB.setStato(Costanti.STATO_CONFERMATO);
 			rimborsoMissioneDB.setNoteRespingi(null);
     	} 
@@ -782,8 +771,6 @@ public class RimborsoMissioneService {
 				} else {
 					if (StringUtils.isEmpty(filter.getUoRich())){
 						criterionList.add(Restrictions.eq("uid", principal.getName()));
-//					} else {
-//						criterionList.add(Restrictions.eq("uoRich", filter.getUoRich()));
 					}
 				}
 			} else {
@@ -896,7 +883,8 @@ public class RimborsoMissioneService {
     	}
     	rimborsoMissione.setAnno(anno);
     	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
-
+    	rimborsoMissione.setAnnoIniziale(rimborsoMissione.getAnno());
+    	rimborsoMissione.setNumeroIniziale(rimborsoMissione.getNumero());
     	aggiornaValidazione(principal, rimborsoMissione);
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
@@ -1157,12 +1145,6 @@ public class RimborsoMissioneService {
 		if (DateUtils.getDateAsString(rimborsoMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC).equals(DateUtils.getDateAsString(rimborsoMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC))){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": Le date di inizio e fine missione non possono essere uguali");
 		}
-//        if (rimborsoMissione.getUtilizzoAutoNoleggio() != null && rimborsoMissione.getUtilizzoAutoNoleggio().equals("S") ){
-//                throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione prevede l'utilizo dell'auto propria. Non è possibile indicare l'utilizzo dell'auto a noleggio.");
-//        } 
-//        if (rimborsoMissione.getUtilizzoTaxi() != null && rimborsoMissione.getUtilizzoTaxi().equals("S") ){
-//        	throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile salvare una missione con la richiesta di utilizzo del taxi e dell'auto propria.");
-//        } 
 		if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
 			if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N") && rimborsoMissione.getUtilizzoAutoServizio().equals("N") && rimborsoMissione.getPersonaleAlSeguito().equals("N")){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio o del personale al seguito se non si è scelto il loro utilizzo");
@@ -1171,12 +1153,11 @@ public class RimborsoMissioneService {
 		if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") || Utility.nvl(rimborsoMissione.getPersonaleAlSeguito()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())){
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio o del personale al seguito se si è scelto il loro utilizzo");
 		}
-//		if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S")) || 
-//			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S")) || 
-//			(Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") && Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S"))){
-//			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo dell'auto ");
-//		}
 		if (rimborsoMissione.isMissioneEstera() && rimborsoMissione.isTrattamentoAlternativoMissione()) {
+			if (Utility.nvl(rimborsoMissione.getCdTipoRapporto()).equals(Costanti.TIPO_RAPPORTO_BORSISTA)){
+				throw new AwesomeException(CodiciErrore.ERRGEN,CodiciErrore.DATI_INCONGRUENTI+": Per il tipo di rapporto borsista non è previsto il trattamento alternativo di missione.");
+			}
+			
 			if (rimborsoMissione.getDataInizioEstero().isBefore(rimborsoMissione.getDataInizioMissione())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI+": La Data Imbarco di Partenza non può essere precedente alla data di inizio missione");
 			}

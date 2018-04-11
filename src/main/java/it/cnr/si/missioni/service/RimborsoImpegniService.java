@@ -106,6 +106,7 @@ public class RimborsoImpegniService {
 					} else {
 						rimborsoImpegni.setVoce(impegno.getCdElementoVoce());
 					}
+					rimborsoImpegni.setVoce(impegno.getCdElementoVoce());
 					rimborsoImpegni.setCdCdsObbligazione(impegno.getCdCds());
 					rimborsoImpegni.setEsercizioObbligazione(impegno.getEsercizio());
 					

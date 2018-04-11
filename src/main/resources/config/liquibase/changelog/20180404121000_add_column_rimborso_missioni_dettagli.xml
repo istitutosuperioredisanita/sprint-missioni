@@ -4,19 +4,19 @@
     	<addColumn 
             tableName="RIMBORSO_MISSIONE_DETTAGLI">
 							<column name="CD_CDS_OBBLIGAZIONE" type="varchar(30)">
-		              <constraints nullable="false"/>
+		              <constraints nullable="true"/>
 		          </column>
 		          <column name="ESERCIZIO_OBBLIGAZIONE" type="integer">
-		              <constraints nullable="false"/>
+		              <constraints nullable="true"/>
 		          </column>
 		          <column name="ESERCIZIO_ORIGINALE_OBBLIGAZIONE" type="integer">
-		              <constraints nullable="false"/>
+		              <constraints nullable="true"/>
 		          </column>
 		          <column name="PG_OBBLIGAZIONE" type="bigint">
-		              <constraints nullable="false"/>
+		              <constraints nullable="true"/>
 		          </column>
 		          <column name="ID_RIMBORSO_IMPEGNI" type="bigint">
-		              <constraints nullable="false"/>
+		              <constraints nullable="true"/>
 		          </column>
 							<column name="VOCE" type="varchar(28)">
 		              <constraints nullable="true"/>

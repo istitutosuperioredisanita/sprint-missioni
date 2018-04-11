@@ -42,15 +42,27 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     $scope.aggiungiDettaglioSpesa = function () {
       $scope.addDettaglioSpesa = true;
       $scope.newDettaglioSpesa = {};
-      inizializzaNuovaRiga();
+      inizializzaNuovaRiga($scope.newDettaglioSpesa);
     }
 
-    var inizializzaNuovaRiga = function(){
+    var caricaImpegnoSingolo = function (dettaglioSpesa){
+        if ($scope.impegni && $scope.impegni.length == 1){
+            var impegno = $scope.impegni[0];
+            dettaglioSpesa.esercizioOriginaleObbligazione = impegno.esercizioOriginaleObbligazione;
+            dettaglioSpesa.idRimborsoImpegni = impegno.id;
+            dettaglioSpesa.pgObbligazione = impegno.pgObbligazione;
+            dettaglioSpesa.voce = impegno.voce;
+            dettaglioSpesa.dsVoce = impegno.dsVoce;
+        }
+    }
+
+    var inizializzaNuovaRiga = function(dettaglioSpesa){
         $scope.newDettaglioSpesa.flSpesaAnticipata = "N";
         $scope.newDettaglioSpesa.cdDivisa = "EURO";
         $scope.newDettaglioSpesa.cambio = 1;
         $scope.tipi_pasto = [];
         $scope.rimborsoKm = null;
+        caricaImpegnoSingolo(dettaglioSpesa);
     }
 
     $scope.confirmDeleteDettaglioSpesa = function (index) {
@@ -343,6 +355,22 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                 $rootScope.salvataggio = false;
             });
     }
+
+    $scope.cambioSpesaAnticipata = function (dettaglioSpesa) {
+        if (dettaglioSpesa.flSpesaAnticipata == 'S'){
+            dettaglioSpesa.esercizioObbligazione = null;
+            dettaglioSpesa.esercizioOriginaleObbligazione = null;
+            dettaglioSpesa.cdCdsObbligazione = null;
+            dettaglioSpesa.idRimborsoImpegni = null;
+            dettaglioSpesa.pgObbligazione = null;
+            dettaglioSpesa.voce = null;
+            dettaglioSpesa.dsVoce = null;
+        } else {
+            caricaImpegnoSingolo(dettaglioSpesa);
+        }
+    }
+
+
 
     $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
         $rootScope.salvataggio = true;

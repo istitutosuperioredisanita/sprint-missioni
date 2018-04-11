@@ -183,6 +183,13 @@ public class RimborsoMissioneDettagliService {
 				rimborsoMissioneDettagli.setVoce(rimborsoImpegni.getVoce());
 				rimborsoMissioneDettagli.setDsVoce(rimborsoImpegni.getDsVoce());
 			}
+		} else {
+			rimborsoMissioneDettagli.setCdCdsObbligazione(null);
+			rimborsoMissioneDettagli.setEsercizioObbligazione(null);
+			rimborsoMissioneDettagli.setEsercizioOriginaleObbligazione(null);
+			rimborsoMissioneDettagli.setPgObbligazione(null);
+			rimborsoMissioneDettagli.setVoce(null);
+			rimborsoMissioneDettagli.setDsVoce(null);
 		}
 	}
 
