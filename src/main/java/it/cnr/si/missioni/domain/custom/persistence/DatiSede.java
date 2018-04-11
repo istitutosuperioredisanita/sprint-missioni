@@ -49,6 +49,10 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
     @Column(name = "SEDE_RESP_ESTERO", length = 30, nullable = true)
     private String sedeRespEstero;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "DELEGA_SPESA", length = 1, nullable = true)
+    private String delegaSpesa;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -91,5 +95,11 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
 	}
 	public void setSedeRespEstero(String sedeRespEstero) {
 		this.sedeRespEstero = sedeRespEstero;
+	}
+	public String getDelegaSpesa() {
+		return delegaSpesa;
+	}
+	public void setDelegaSpesa(String delegaSpesa) {
+		this.delegaSpesa = delegaSpesa;
 	}
 }
