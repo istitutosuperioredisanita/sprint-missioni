@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrdineMissioneAutoPropria" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
-	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.zoom" value="1.5026296018031553"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="804"/>
+	<property name="ireport.y" value="635"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -336,14 +336,14 @@
 				<text><![CDATA[Ai sensi di quanto disposto dall’art. 6 c. 12 del D.L. 78/2010, dalla circolare n. 36 del 22/10/2010 del Ministero dell’Economia e delle Finanze – Dipartimento della Ragioneria Generale dello Stato e della delibera della Corte dei Conti a Sezioni Riunite n. 8/CONTR/11 del 7 febbraio 2011, si allega alla  presente la copia dei tariffari forniti dagli esercenti dei trasporti pubblici per le tratte sopra indicate.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="3" y="73" width="552" height="34" uuid="10d39fca-e610-4c42-9d3b-a7fd0a82673c"/>
+				<reportElement positionType="Float" x="3" y="55" width="552" height="34" uuid="10d39fca-e610-4c42-9d3b-a7fd0a82673c"/>
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="9" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Nel rispetto delle disposizioni normative in materia (Art. 6 c. 12 del D.L. 78/2010, Circ. 36 del 22/10/2010 del M.E.F. – Dip.tp della Ragioneria Generale dello Stato e delibera della Corte dei Conti a Sezioni riunite n. 8/CONTR/11 del 7 febbraio 2011)  e trattandosi di una circostanza eccezionale e non ricorrente, si autorizza l’uso del mezzo proprio per le seguenti motivazioni:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="false">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="110" width="549" height="14" isRemoveLineWhenBlank="true" uuid="00504e92-6afa-477f-8143-cd4b40e37c2b">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="98" width="549" height="14" isRemoveLineWhenBlank="true" uuid="00504e92-6afa-477f-8143-cd4b40e37c2b">
 					<printWhenExpression><![CDATA[$F{motiviIspettivi}.equals( "S" )]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle" markup="styled">
@@ -352,7 +352,7 @@
 				<textFieldExpression><![CDATA[" - Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="125" width="549" height="17" isRemoveLineWhenBlank="true" uuid="33d90e21-a453-4b31-a291-09df3f29ed2f">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="113" width="549" height="17" isRemoveLineWhenBlank="true" uuid="33d90e21-a453-4b31-a291-09df3f29ed2f">
 					<printWhenExpression><![CDATA[$F{motiviUrgenza}.equals( "S" )]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle" markup="styled">
@@ -361,7 +361,7 @@
 				<textFieldExpression><![CDATA[" - Per Attività caratterizzata da emergenza, urgenza, indifferibilità"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="143" width="549" height="17" isRemoveLineWhenBlank="true" uuid="99c34b20-86a5-49f1-a21a-30c81021fc6b">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="131" width="549" height="17" isRemoveLineWhenBlank="true" uuid="99c34b20-86a5-49f1-a21a-30c81021fc6b">
 					<printWhenExpression><![CDATA[$F{motiviTrasporto}.equals( "S" )]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle" markup="styled">
@@ -369,8 +369,8 @@
 				</textElement>
 				<textFieldExpression><![CDATA[" - Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione"]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="false">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="161" width="549" height="17" isRemoveLineWhenBlank="true" uuid="27e4463e-e73f-4839-a33d-a826e34a1452"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement x="3" y="149" width="549" height="17" isRemoveLineWhenBlank="true" uuid="27e4463e-e73f-4839-a33d-a826e34a1452"/>
 				<textElement verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman" isBold="false"/>
 				</textElement>
@@ -396,12 +396,12 @@
 				<text><![CDATA[DATI ORDINE DI MISSIONE]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="9" y="62" width="543" height="16" uuid="ab6edefc-339a-4161-989a-1b243a126789"/>
+				<reportElement x="114" y="62" width="438" height="16" uuid="ab6edefc-339a-4161-989a-1b243a126789"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" isUnderline="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Oggetto della Missione   </style>"+ $F{oggetto}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{oggetto}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="21" y="29" width="521" height="16" uuid="6688f5cd-6cd4-4b71-8a77-95aa536fb7b8"/>
@@ -410,6 +410,10 @@
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Inizio Missione  </style>"+ $F{dataInizioMissione} + "       <style pdfFontName='Times-Bold' isBold='true'>Fine Missione  </style>"+  $F{dataFineMissione}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement style="bold" x="9" y="62" width="105" height="16" uuid="d2cccd12-9a16-4946-ba4e-1e1364e0608d"/>
+				<text><![CDATA[Oggetto della Missione:]]></text>
+			</staticText>
 		</band>
 	</pageFooter>
 	<summary>
