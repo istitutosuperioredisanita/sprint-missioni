@@ -316,7 +316,7 @@ public class OrdineMissioneResource {
                     		String headerValue = "attachment";
                     		for (String key : map.keySet()) {
                     			System.out.println(map.get(key).length);
-                    			log.error("Lunghezza "+map.get(key).length);
+                    			log.debug("Lunghezza "+map.get(key).length);
                        			headerValue += "; filename=\"" + key + "\"";
                         		OutputStream outputStream = res.getOutputStream();
                         		res.setHeader("Content-Disposition", headerValue);

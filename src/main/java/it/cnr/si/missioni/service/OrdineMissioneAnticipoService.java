@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
@@ -195,12 +198,19 @@ public class OrdineMissioneAnticipoService {
 			ordineMissioneAnticipo.setToBeUpdated();
 			ordineMissioneAnticipo.setStato(Costanti.STATO_ANNULLATO);
 			crudServiceBean.modificaConBulk(principal, ordineMissioneAnticipo);
-			List<CMISFileAttachment> allegati = getAttachments(principal, new Long(ordineMissioneAnticipo.getId().toString()));
-			if (allegati != null){
-		        for (CMISFileAttachment allegato : allegati){
-		        	missioniCMISService.deleteNode(allegato.getId());
-		        }
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, ordineMissioneAnticipo.getOrdineMissione().getId());
+
+			List<CmisObject> listaAllegati = cmisOrdineMissioneService.getAttachmentsAnticipo(ordineMissione);
+			if (listaAllegati != null){
+				for (CmisObject object : listaAllegati){
+					if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso())){
+						missioniCMISService.eliminaFilePresenteNelFlusso(principal, object.getId());
+					} else {
+		        		missioniCMISService.deleteNode(object.getId());
+					}
+				}
 			}
+
 		} else {
 			throw new AwesomeException(CodiciErrore.ERRGEN,
 					"Non è possibile cancellare l'anticipo. E' già stato inviato al flusso per l'approvazione.");
