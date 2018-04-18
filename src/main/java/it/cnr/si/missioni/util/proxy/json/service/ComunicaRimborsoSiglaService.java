@@ -255,9 +255,9 @@ public class ComunicaRimborsoSiglaService {
 				Boolean trovataRiga = false;
 				for (MissioneRigaColl riga : oggettoBulk.getMissioneRigaColl()){
 					if (riga.getCdCdsObbligazione().equals(dettaglio.getCdCdsObbligazione()) && 
-							riga.getEsercizioObbligazione().compareTo(dettaglio.getEsercizioObbligazione()) == 0 && 
-								riga.getEsercizioOriObbligazione().compareTo(dettaglio.getEsercizioOriginaleObbligazione()) == 0 && 
-									riga.getPgObbligazione().compareTo(dettaglio.getPgObbligazione()) == 0){
+							riga.getEsercizioObbligazione().equals(dettaglio.getEsercizioObbligazione().toString()) && 
+								riga.getEsercizioOriObbligazione().equals(dettaglio.getEsercizioOriginaleObbligazione().toString()) && 
+									riga.getPgObbligazione().equals(dettaglio.getPgObbligazione().toString())){
 						riga.setImTotaleRigaMissione(Utility.nvl(riga.getImTotaleRigaMissione()).add(Utility.nvl(dettaglio.getImportoEuro())));
 						trovataRiga = true;
 					}
@@ -266,9 +266,9 @@ public class ComunicaRimborsoSiglaService {
 					MissioneRigaColl riga = new MissioneRigaColl();
 					riga.setProgressivoRiga(oggettoBulk.getMissioneRigaColl().size() + 1);
 					riga.setCdCdsObbligazione(dettaglio.getCdCdsObbligazione());
-					riga.setEsercizioObbligazione(dettaglio.getEsercizioObbligazione());
-					riga.setEsercizioOriObbligazione(dettaglio.getEsercizioOriginaleObbligazione());
-					riga.setPgObbligazione(dettaglio.getPgObbligazione());
+					riga.setEsercizioObbligazione(dettaglio.getEsercizioObbligazione().toString());
+					riga.setEsercizioOriObbligazione(dettaglio.getEsercizioOriginaleObbligazione().toString());
+					riga.setPgObbligazione(dettaglio.getPgObbligazione().toString());
 					riga.setImTotaleRigaMissione(Utility.nvl(dettaglio.getImportoEuro()));
 					oggettoBulk.getMissioneRigaColl().add(riga);
 				}
