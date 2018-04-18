@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class MissioneRigaColl implements Serializable {
     @JsonProperty("pg_obbligazione")
     private String pgObbligazione;
     @JsonProperty("im_totale_riga_missione")
-    private Boolean imTotaleRigaMissione;
+    private BigDecimal imTotaleRigaMissione;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     
@@ -66,10 +67,10 @@ public class MissioneRigaColl implements Serializable {
 		this.pgObbligazione = pgObbligazione;
 	}
 
-	public Boolean getImTotaleRigaMissione() {
+	public BigDecimal getImTotaleRigaMissione() {
 		return imTotaleRigaMissione;
 	}
-	public void setImTotaleRigaMissione(Boolean imTotaleRigaMissione) {
+	public void setImTotaleRigaMissione(BigDecimal imTotaleRigaMissione) {
 		this.imTotaleRigaMissione = imTotaleRigaMissione;
 	}
 	public Map<String, Object> getAdditionalProperties() {
