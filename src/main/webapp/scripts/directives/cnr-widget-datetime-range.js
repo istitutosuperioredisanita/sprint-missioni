@@ -58,9 +58,13 @@ angular.module('missioniApp')
               var inputs = $(element).find('input');
               var startTime = $(inputs[0]);
               var endTime = $(inputs[1]);
-              scope.startDatetime = startValue ? new Date(startValue) : new Date(scope.startOtherDatetime);
-              scope.endDatetime = scope.endDatetime ? new Date(scope.endDatetime) : new Date(scope.endOtherDatetime);
-
+              if (startValue){
+               scope.startDatetime = new Date(startValue);
+              }
+              if (scope.endDatetime){
+                scope.endDatetime = new Date(scope.endDatetime);
+              } 
+              
               startTime.datetimepicker({
                 widgetPositioning: {
                   horizontal: 'right',
