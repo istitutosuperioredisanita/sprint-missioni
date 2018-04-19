@@ -969,10 +969,10 @@ public class RimborsoMissioneService {
 				}
 			} else {
 				if (rimborsoMissione.getDataInizioEstero() != null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Imbarco di Partenza può essere valorizzata solo nel caso di missione estera con TAM");
+					rimborsoMissione.setDataInizioEstero(null);
 				}
 				if (rimborsoMissione.getDataFineEstero() != null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Sbarco di Ritorno può essere valorizzata solo nel caso di missione estera con TAM");
+					rimborsoMissione.setDataFineEstero(null);
 				}
 			}
 			if (rimborsoMissione.isMissioneDipendente()){
