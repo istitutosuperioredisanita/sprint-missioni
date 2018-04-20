@@ -790,7 +790,7 @@
 {"uid":"vittorio.galler", "uoForUsersSpecial":[{"codice_uo":"066002"}]},
 
 {"uid":"monia.dechecchi", "uoForUsersSpecial":[{"codice_uo":"066003", "ordine_da_validare":"S"}]},
-{"uid":"roberta.zuin", "uoForUsersSpecial":[{"codice_uo":"066003", "ordine_da_validare":"S"}]},
+{"uid":"roberta.zuin", "uoForUsersSpecial":[{"codice_uo":"066003", "ordine_da_validare":"S"},{"codice_uo":"312000", "ordine_da_validare":"S"}]},
 {"uid":"antonella.barizza", "uoForUsersSpecial":[{"codice_uo":"066003"}]},
 
 {"uid":"caterina.tantaro", "uoForUsersSpecial":[{"codice_uo":"066004", "ordine_da_validare":"S"}]},
