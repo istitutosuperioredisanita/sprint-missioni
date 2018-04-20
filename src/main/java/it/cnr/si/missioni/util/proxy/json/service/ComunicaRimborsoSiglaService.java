@@ -391,6 +391,9 @@ public class ComunicaRimborsoSiglaService {
 		for (ZonedDateTime data = daData; DateUtils.truncate(data).isBefore(DateUtils.truncate(aData)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(aData)); data = data.plusDays(1))
 		{
 			ultimaDataInizioUsata = data;
+			if (data.isAfter(aData)){
+				data = aData;
+			}
 			TappeMissioneColl newDayTappa;
 			try {
 				newDayTappa = (TappeMissioneColl)tappa.clone();
@@ -400,13 +403,7 @@ public class ComunicaRimborsoSiglaService {
 			}
 			ZonedDateTime dataFine = data.plusDays(1);
 			if (dataFine.isAfter(aData)){
-//				if (dataFineMissione == null){
-					dataFine = aData;
-//				} else {
-//					if (dataFine.isAfter(dataFineMissione)){
-//						dataFine = dataFineMissione;
-//					}
-//				}
+				dataFine = aData;
 			}
 			impostaDateTappa(data, dataFine, newDayTappa);
 			tappeMissioneColl.add(newDayTappa);
