@@ -80,7 +80,7 @@ public class RimborsoImpegniService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati degli impegni incompleti.");
     	}
 			if (!StringUtils.isEmpty(rimborsoImpegni.getRimborsoMissione().getGae())){
-				ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoImpegni.getRimborsoMissione().getCdsSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione(), rimborsoImpegni.getRimborsoMissione().getGae());
+				ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoImpegni.getRimborsoMissione().getCdsSpesa(), rimborsoImpegni.getRimborsoMissione().getUoSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione(), rimborsoImpegni.getRimborsoMissione().getGae());
 				if (impegnoGae == null){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoImpegni.getRimborsoMissione().getGae()+" indicata oppure non esiste");
 				} else {
@@ -95,7 +95,7 @@ public class RimborsoImpegniService {
 					
 				}
 			} else {
-				Impegno impegno = impegnoService.loadImpegno(rimborsoImpegni.getRimborsoMissione().getCdsSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione());
+				Impegno impegno = impegnoService.loadImpegno(rimborsoImpegni.getRimborsoMissione().getCdsSpesa(), rimborsoImpegni.getRimborsoMissione().getUoSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione());
 				if (impegno == null){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non esiste");
 				} else {
