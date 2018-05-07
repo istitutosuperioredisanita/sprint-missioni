@@ -287,6 +287,7 @@ angular.module('missioniApp')
         fondi: '=',
         anno: '=',
         cds: '=',
+        uo: '=',
         gae: '=',
         annoImpegno: '=',
         numero: '='
@@ -309,6 +310,7 @@ angular.module('missioniApp')
               if (scope.gae){
                   url = SIGLA_REST.IMPEGNO_GAE;
                   varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:scope.anno},
+                                {condition: 'AND', fieldName: 'cdUnitaOrganizzativa', operator: "=", fieldValue:scope.uo},
                                 {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:scope.cds},
                                 {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:scope.annoImpegno},
                                 {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:scope.numero},
@@ -317,6 +319,7 @@ angular.module('missioniApp')
                   url = SIGLA_REST.IMPEGNO;
                   varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:scope.anno},
                                 {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:scope.cds},
+                                {condition: 'AND', fieldName: 'cdUnitaOrganizzativa', operator: "=", fieldValue:scope.uo},
                                 {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:scope.annoImpegno},
                                 {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:scope.numero}];
               }

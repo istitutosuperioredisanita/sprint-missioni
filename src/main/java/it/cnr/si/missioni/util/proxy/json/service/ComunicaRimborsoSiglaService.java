@@ -201,8 +201,8 @@ public class ComunicaRimborsoSiglaService {
 						if (dettaglio.isGiustificativoObbligatorio()){
 							if (dettaglio.getDsNoGiustificativo() != null){
 								spesaMissione.setDsNoGiustificativo(dettaglio.getDsNoGiustificativo());
-							} else {
-								throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+" è obbligatorio allegare almeno un giustificativo.");
+//							} else {
+//								throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+" è obbligatorio allegare almeno un giustificativo.");
 							}
 						}
 					}
@@ -356,7 +356,6 @@ public class ComunicaRimborsoSiglaService {
 		} else {
 			dataInizio = rimborsoApprovato.getDataInizioEstero();
 			dataFine = rimborsoApprovato.getDataFineEstero();
-			
 		} 
 		tappeMissioneColl = impostaTappeDaDate(dataInizio, dataFine, tappa, tappeMissioneColl, rimborsoApprovato.getDataInizioMissione(), rimborsoApprovato.getDataFineMissione());
 //			if (DateUtils.truncate(rimborsoApprovato.getDataInizioMissione()).compareTo(DateUtils.truncate(rimborsoApprovato.getDataInizioEstero())) == 0 && 
@@ -401,6 +400,9 @@ public class ComunicaRimborsoSiglaService {
 		}
 		for (ZonedDateTime data = daData; DateUtils.truncate(data).isBefore(DateUtils.truncate(aData)) || DateUtils.truncate(data).isEqual(DateUtils.truncate(aData)); data = data.plusDays(1))
 		{
+			if (data.isAfter(aData)){
+				data = aData;
+			}
 			ultimaDataInizioUsata = data;
 			TappeMissioneColl newDayTappa;
 			try {
@@ -411,13 +413,7 @@ public class ComunicaRimborsoSiglaService {
 			}
 			ZonedDateTime dataFine = data.plusDays(1);
 			if (dataFine.isAfter(aData)){
-//				if (dataFineMissione == null){
-					dataFine = aData;
-//				} else {
-//					if (dataFine.isAfter(dataFineMissione)){
-//						dataFine = dataFineMissione;
-//					}
-//				}
+				dataFine = aData;
 			}
 			impostaDateTappa(data, dataFine, newDayTappa);
 			tappeMissioneColl.add(newDayTappa);
