@@ -136,6 +136,12 @@
                 }, {
                     "codice_uo" : "506000",
                     "ordine_da_validare" : "S"
+                }, {
+                    "codice_uo" : "017000",
+                    "ordine_da_validare" : "S"
+                }, {
+                    "codice_uo" : "017002",
+                    "ordine_da_validare" : "S"
                 }
             ]
         }, 
