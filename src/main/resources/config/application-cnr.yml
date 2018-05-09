@@ -1,14 +1,14 @@
 spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-#        url: jdbc:postgresql://as4dock.si.cnr.it:54321/missioni
-#        name: missioni
-#        username: missioni
-#        password: missionipw
-        url: jdbc:postgresql://jspringdb.src.cnr.it:5432/missioni
+        url: jdbc:postgresql://as4dock.si.cnr.it:54321/missioni
         name: missioni
         username: missioni
-        password: missioniPW
+        password: missionipw
+#        url: jdbc:postgresql://jspringdb.src.cnr.it:5432/missioni
+#        name: missioni
+#        username: missioni
+#        password: missioniPW
 
     jpa:
         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
@@ -75,8 +75,8 @@ siper:
   password: ${spring.proxy.SIPER.password}
 
 cmis:
-    alfresco: http://gestdoc.cnr.it:90/alfresco/
-#    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
+#    alfresco: http://gestdoc.cnr.it:90/alfresco/
+    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
     url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
     username: app.missioni
     password: bubbazza
@@ -108,7 +108,7 @@ cron:
 
     verifyStep:
         name: verifyStep
-        active: true
+        active: false
         cronExpression: "0 */1 * * * MON-SAT"
 
 jhipster:
