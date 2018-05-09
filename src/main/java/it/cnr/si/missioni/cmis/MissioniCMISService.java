@@ -293,11 +293,15 @@ public class MissioniCMISService {
 		}
 		node = updateContent(node.getObjectOfLatestVersion(false).getId(), inputStream, contentType);
 		if (existsDocument){
-			addAspect(node, ASPECT_FLUSSO);
-			addAspect(node, ASPECT_FLUSSO_MISSIONI);
-			updateProperties(metadataProperties, node);
+			addPropertyForExistingDocument(metadataProperties, node);
 		}
 		return node;
+	}
+
+	public void addPropertyForExistingDocument(Map<String, Object> metadataProperties, Document node) {
+		addAspect(node, ASPECT_FLUSSO);
+		addAspect(node, ASPECT_FLUSSO_MISSIONI);
+		updateProperties(metadataProperties, node);
 	}
 
     @Transactional(readOnly = true)
@@ -317,8 +321,12 @@ public class MissioniCMISService {
 
 	public Document updateContent(String nodeRef, InputStream inputStream, String contentType){
 		Document document = (Document) getNodeByNodeRef(nodeRef);
+		return updateContent(document, inputStream, contentType, document.getName());
+	}
+
+	public Document updateContent(Document document, InputStream inputStream, String contentType, String name){
 		ContentStream contentStream = new ContentStreamImpl(
-				document.getName(),
+				name,
 				BigInteger.ZERO,
 				contentType,
 				inputStream);
