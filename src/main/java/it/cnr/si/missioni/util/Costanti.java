@@ -39,7 +39,7 @@ public class Costanti {
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 	
 	
-	public final static String REST_OIL_NEW_PROBLEM =  "pest/HDMissioni";
+	public final static String REST_OIL_NEW_PROBLEM =  "pest/HDSiper";
 	public final static String APP_HELPDESK = "OIL";
 	public final static String APP_SIGLA = "SIGLA";
 	public final static String APP_SIPER = "SIPER";
