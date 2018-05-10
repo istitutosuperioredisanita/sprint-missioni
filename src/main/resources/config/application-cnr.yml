@@ -31,11 +31,11 @@ spring:
             username: app.selezioni
             ***REMOVED***
         OIL:
-            username: esperto1
+            username: missioni1
             ***REMOVED***
             url: http://oil.test.si.cnr.it/rest/
             newProblem: pest
-            instance: /HDMissioni
+            instance: /HDSiper
     ldap:
         userSearchBase: o=cnr, c=it
         userSearchFilter: uid={0}
