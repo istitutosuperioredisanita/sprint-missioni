@@ -410,7 +410,7 @@
             "cup": "Codice CUP",
             "motivo-respingi-mittente": "Motivo Respingi al mittente",
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
-            "cug": "Missione CUG"
+            "cug": "Comitato Unico Garanzia"
         },
         "button": {
             "sendToSign": "Invia alla Firma",

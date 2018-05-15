@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RimborsoMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="48"/>
+	<property name="ireport.y" value="1098"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -103,6 +103,9 @@
 	</field>
 	<field name="gae" class="java.lang.String">
 		<fieldDescription><![CDATA[gae]]></fieldDescription>
+	</field>
+	<field name="impegni" class="java.lang.String">
+		<fieldDescription><![CDATA[impegni]]></fieldDescription>
 	</field>
 	<field name="cdrSpesa" class="java.lang.String">
 		<fieldDescription><![CDATA[cdrSpesa]]></fieldDescription>
@@ -215,11 +218,6 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<staticText>
-					<reportElement style="bold" x="12" y="130" width="105" height="20" uuid="7fb18725-5712-4cb6-a4e5-8a0ff222d7a4"/>
-					<textElement verticalAlignment="Middle"/>
-					<text><![CDATA[Oggetto della Missione:]]></text>
-				</staticText>
 			</frame>
 			<textField isBlankWhenNull="false">
 				<reportElement x="12" y="5" width="310" height="20" uuid="e8951b51-1e9e-4770-a242-d48813a2f6a1"/>
@@ -285,12 +283,12 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Qualifica    </style>"+$F{qualificaRich} + "     <style pdfFontName='Times-Bold' isBold='true'>Livello   </style>"+$F{livelloRich}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="117" y="130" width="438" height="20" uuid="0322eadf-5829-48d7-882d-c7d4aab2fcb2"/>
+				<reportElement x="12" y="130" width="543" height="20" uuid="0322eadf-5829-48d7-882d-c7d4aab2fcb2"/>
 				<textElement textAlignment="Justified" verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman" isUnderline="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{oggetto}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Oggetto della Missione   </style>"+ $F{oggetto}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement positionType="Float" x="12" y="152" width="427" height="20" uuid="58e62936-d5a8-4781-84c2-723a6231930c"/>
@@ -382,7 +380,7 @@
 				<text><![CDATA[  Sbarco Estero]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="127" y="222" width="151" height="25" uuid="cf1f599d-01f3-4a66-89ef-e940e28ffbaa"/>
+				<reportElement positionType="Float" x="127" y="222" width="151" height="25" uuid="cf1f599d-01f3-4a66-89ef-e940e28ffbaa"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -396,7 +394,7 @@
 				<textFieldExpression><![CDATA[$F{dataInizioMissione}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="127" y="247" width="151" height="25" uuid="1ce17d49-eda6-43b4-abac-8998ae398bca"/>
+				<reportElement positionType="Float" x="127" y="247" width="151" height="25" uuid="1ce17d49-eda6-43b4-abac-8998ae398bca"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -466,7 +464,7 @@
 				<text><![CDATA[  Imbarco Estero]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="387" y="247" width="152" height="25" uuid="c5a776ad-5e74-4724-9903-b7b89fce1596"/>
+				<reportElement positionType="Float" x="387" y="247" width="152" height="25" uuid="c5a776ad-5e74-4724-9903-b7b89fce1596"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -480,7 +478,7 @@
 				<textFieldExpression><![CDATA[$F{dataFineMissione}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="387" y="222" width="152" height="25" uuid="2306432c-6a92-41e7-8d4e-d54a87867692"/>
+				<reportElement positionType="Float" x="387" y="222" width="152" height="25" uuid="2306432c-6a92-41e7-8d4e-d54a87867692"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -684,7 +682,7 @@
 	<summary>
 		<band height="329" splitType="Stretch">
 			<rectangle radius="10">
-				<reportElement x="1" y="3" width="554" height="146" uuid="4b431bd0-bd9a-477a-a9ed-128b398a4c8f"/>
+				<reportElement x="1" y="3" width="554" height="157" uuid="4b431bd0-bd9a-477a-a9ed-128b398a4c8f"/>
 			</rectangle>
 			<staticText>
 				<reportElement style="bold" x="203" y="6" width="160" height="19" uuid="563e5ced-acfb-4ec1-9d65-120a00897a1b">
@@ -704,7 +702,7 @@
 			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement x="11" y="46" width="542" height="20" uuid="49f97cce-3020-487a-a07b-e4b24d8a17e6">
-					<printWhenExpression><![CDATA[!$F{importo0}.equals("S")]]></printWhenExpression>
+					<printWhenExpression><![CDATA[!$F{importo0}.equals("S") && $F{impegni}.isEmpty()]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Left" markup="styled">
 					<font fontName="Times New Roman"/>
@@ -739,8 +737,8 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>C.D.R.  </style>"+$F{cdrSpesa}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="360" y="72" width="192" height="20" uuid="5a62fe9c-15fd-4f25-9318-9971699fc72a">
-					<printWhenExpression><![CDATA[!$F{importo0}.equals("S")]]></printWhenExpression>
+				<reportElement positionType="Float" x="12" y="134" width="538" height="20" uuid="5a62fe9c-15fd-4f25-9318-9971699fc72a">
+					<printWhenExpression><![CDATA[!$F{importo0}.equals("S") && $F{impegni}.isEmpty()]]></printWhenExpression>
 				</reportElement>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
@@ -757,37 +755,37 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>CUP  </style>"+$F{cup}]]></textFieldExpression>
 			</textField>
 			<rectangle radius="10">
-				<reportElement x="1" y="160" width="554" height="102" uuid="4a29cbaf-53a2-482a-84b6-171601d26a2a"/>
+				<reportElement x="1" y="179" width="554" height="102" uuid="4a29cbaf-53a2-482a-84b6-171601d26a2a"/>
 			</rectangle>
 			<staticText>
-				<reportElement style="bold" x="190" y="160" width="182" height="19" uuid="5800db1e-3827-47c4-ae91-4d3a745d76ad"/>
+				<reportElement style="bold" x="190" y="179" width="182" height="19" uuid="5800db1e-3827-47c4-ae91-4d3a745d76ad"/>
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[AUTORIZZAZIONI AGGIUNTIVE:]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="10" y="209" width="165" height="20" uuid="3be7c957-86d3-4984-88db-da5cf9ac2dec"/>
+				<reportElement positionType="Float" x="10" y="228" width="165" height="20" uuid="3be7c957-86d3-4984-88db-da5cf9ac2dec"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Utilizzo Auto di Servizio  </style>"+ $F{utilizzoAutoServizio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="177" y="209" width="162" height="20" uuid="58c0ad94-d0e2-455a-80a5-9f2f003ca3f0"/>
+				<reportElement positionType="Float" x="177" y="228" width="162" height="20" uuid="58c0ad94-d0e2-455a-80a5-9f2f003ca3f0"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Personale al Seguito  </style>"+ $F{personaleAlSeguito}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="177" y="183" width="165" height="20" uuid="ca799b33-2a47-4474-b93a-f0109c9882e4"/>
+				<reportElement positionType="Float" x="177" y="202" width="165" height="20" uuid="ca799b33-2a47-4474-b93a-f0109c9882e4"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Utilizzo Auto a Noleggio  </style>"+ $F{utilizzoAutoNoleggio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="11" y="236" width="542" height="20" uuid="7cf49600-7f74-43b3-90bb-2301891e7790">
-					<printWhenExpression><![CDATA[$F{utilizzoTaxi}.equalsIgnoreCase( "Si" ) || $F{utilizzoAutoNoleggio}.equalsIgnoreCase( "Si" )|| $F{personaleAlSeguito}.equalsIgnoreCase( "Si" )|| $F{utilizzoAutoServizio}.equalsIgnoreCase( "Si" )]]></printWhenExpression>
+				<reportElement positionType="Float" x="11" y="255" width="542" height="20" uuid="7cf49600-7f74-43b3-90bb-2301891e7790">
+					<printWhenExpression><![CDATA[$F{utilizzoTaxi}.equalsIgnoreCase( "Sì" ) || $F{utilizzoAutoNoleggio}.equalsIgnoreCase( "Sì" )|| $F{personaleAlSeguito}.equalsIgnoreCase( "Sì" )|| $F{utilizzoAutoServizio}.equalsIgnoreCase( "Sì" )]]></printWhenExpression>
 				</reportElement>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
@@ -795,17 +793,17 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Motivazione per l'Utilizzo del Taxi/Auto a Noleggio-Servizio/Personale al Seguito  </style>"+ $F{noteUtilizzoTaxiNoleggio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="11" y="183" width="162" height="20" uuid="e6c6ee2c-5a7a-40e2-9806-277628e64a16"/>
+				<reportElement positionType="Float" x="11" y="202" width="162" height="20" uuid="e6c6ee2c-5a7a-40e2-9806-277628e64a16"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Utilizzo Taxi  </style>"+ $F{utilizzoTaxi}]]></textFieldExpression>
 			</textField>
 			<rectangle radius="10">
-				<reportElement x="1" y="270" width="554" height="40" uuid="96df4d3b-e12a-43b2-8d38-006f75ffd939"/>
+				<reportElement x="1" y="289" width="554" height="40" uuid="96df4d3b-e12a-43b2-8d38-006f75ffd939"/>
 			</rectangle>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="12" y="274" width="542" height="18" uuid="5778a61d-420c-45de-b910-6c73a92103e8"/>
+				<reportElement positionType="Float" x="12" y="293" width="542" height="18" uuid="5778a61d-420c-45de-b910-6c73a92103e8"/>
 				<textElement markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -818,6 +816,15 @@
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[MISSIONE A IMPORTO 0]]></text>
 			</staticText>
+			<textField>
+				<reportElement positionType="Float" x="12" y="134" width="538" height="20" uuid="8d537fa9-bab0-4310-b599-2261e21b0d24">
+					<printWhenExpression><![CDATA[!$F{importo0}.equals("S") && !$F{impegni}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Impegni  </style>"+$F{impegni}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>
