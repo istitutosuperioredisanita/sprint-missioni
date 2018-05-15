@@ -479,12 +479,20 @@ public class CMISRimborsoMissioneService {
 		CmisPath cmisPath = createFolderRimborsoMissione(rimborsoMissione);
 		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissione(principal.getName(), cmisRimborsoMissione);
 		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
-					metadataProperties,
-					streamStampa,
-					MimeTypes.PDF.mimetype(),
-					rimborsoMissione.getFileName(), 
-					cmisPath);
+			Document node = null;
+			if (!rimborsoMissione.isStatoInviatoAlFlusso()){
+				node = missioniCMISService.restoreSimpleDocument(
+						metadataProperties,
+						streamStampa,
+						MimeTypes.PDF.mimetype(),
+						rimborsoMissione.getFileName(), 
+						cmisPath);
+				
+			}else{
+				node = (Document)getObjectRimborsoMissione(rimborsoMissione);
+				node = missioniCMISService.updateContent(node.getObjectOfLatestVersion(false), streamStampa, MimeTypes.PDF.mimetype(),rimborsoMissione.getFileName());
+				missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+			}
 			missioniCMISService.addAspect(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
 			missioniCMISService.makeVersionable(node);
 			return node;
@@ -495,6 +503,18 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
+	public CmisObject getObjectRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException{
+		Folder node = recuperoFolderRimborsoMissione(rimborsoMissione);
+		List<CmisObject> ordine = missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
+		if (ordine.size() == 0)
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati al Rimborso di Missione. ID Rimborso Missione:"+rimborsoMissione.getId()+", Anno:"+rimborsoMissione.getAnno()+", Numero:"+rimborsoMissione.getNumero());
+		else if (ordine.size() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files rimborso missione aventi l'ID :"+ rimborsoMissione.getId()+", Anno:"+rimborsoMissione.getAnno()+", Numero:"+rimborsoMissione.getNumero());
+		} else {
+				CmisObject nodeFile = ordine.get(0); 
+				return nodeFile;
+		}
+	}
 	public String getNodeRefFolderDettaglioRimborso(RimborsoMissioneDettagli dettagliorimborso){
 		Folder folder = getFolderDettaglioRimborso(dettagliorimborso);
 		if (folder != null){
