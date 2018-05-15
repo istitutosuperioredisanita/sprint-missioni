@@ -79,9 +79,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>it.cnr.si.sprint</groupId>
-            <artifactId>sprint-alfresco</artifactId>
-            <version>${sprint.version}</version>
+            <groupId>org.apache.chemistry.opencmis</groupId>
+            <artifactId>chemistry-opencmis-client-impl</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
