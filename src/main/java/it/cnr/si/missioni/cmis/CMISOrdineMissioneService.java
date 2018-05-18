@@ -494,20 +494,29 @@ public class CMISOrdineMissioneService {
 		InputStream streamStampa = new ByteArrayInputStream(stampa);
 		CmisPath cmisPath = createFolderOrdineMissione(annullamento.getOrdineMissione());
 		Map<String, Object> metadataProperties = createMetadataForFileAnnullamentoOrdineMissione(principal.getName(), annullamento);
-		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
-					metadataProperties,
-					streamStampa,
-					MimeTypes.PDF.mimetype(),
-					annullamento.getFileName(), 
-					cmisPath);
-			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+		
+		try {
+			Document node = null;
+			if (!annullamento.isStatoInviatoAlFlusso()){
+				node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
+						MimeTypes.PDF.mimetype(), annullamento.getFileName(), cmisPath);
+
+			}else{
+				node = (Document)getObjectAnnullamentoOrdineMissione(annullamento);
+				node = missioniCMISService.updateContent(node.getObjectOfLatestVersion(false), streamStampa, MimeTypes.PDF.mimetype(),annullamento.getFileName());
+				missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+			}
+
+			missioniCMISService.addAspect(node,
+					CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
 			missioniCMISService.makeVersionable(node);
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof CmisConstraintException)
-				throw new ComponentException("CMIS - File ["+annullamento.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("CMIS - File [" + annullamento.getFileName()
+						+ "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale ("
+					+ Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -728,8 +737,6 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
-	
-	
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
 		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
@@ -985,6 +992,19 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
+	public CmisObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
+		Folder node = recuperoFolderOrdineMissione(annullamento.getOrdineMissione());
+		List<CmisObject> ordine = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+		if (ordine.size() == 0)
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Annullamento Ordine di Missione. ID Ordine di Missione:"+annullamento.getId()+", Anno:"+annullamento.getAnno()+", Numero:"+annullamento.getNumero());
+		else if (ordine.size() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files Annullamento ordini di missione aventi l'ID :"+ annullamento.getId()+", Anno:"+annullamento.getAnno()+", Numero:"+annullamento.getNumero());
+		} else {
+				CmisObject nodeFile = ordine.get(0); 
+				return nodeFile;
+		}
+	}
+
 	public CmisObject getObjectAnticipoOrdineMissione(OrdineMissioneAnticipo anticipo) throws ComponentException{
 		Folder node = recuperoFolderOrdineMissione(anticipo.getOrdineMissione());
 		List<CmisObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
@@ -997,7 +1017,6 @@ public class CMISOrdineMissioneService {
 				return nodeFile;
 		}
 	}
-
 	public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
 		return getObjectOrdineMissione(ordineMissione).getId();
 	}
