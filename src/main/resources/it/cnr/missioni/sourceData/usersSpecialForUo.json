@@ -877,7 +877,7 @@
 {"uid":"cinzia.bagnesi", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
 {"uid":"lisa.moretti", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
 {"uid":"franca.martini", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
-{"uid":"paola.fruzzetti", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
+{"uid":"paola.fruzzetti", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"},{"codice_uo":"314000", "ordine_da_validare":"S"}]},
 {"uid":"ilaria.citti", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
 {"uid":"emanuela.campani", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
 {"uid":"alessandra.cardinali", "uoForUsersSpecial":[{"codice_uo":"035000", "ordine_da_validare":"S"},{"codice_uo":"035002", "ordine_da_validare":"S"},{"codice_uo":"035003", "ordine_da_validare":"S"},{"codice_uo":"035005", "ordine_da_validare":"S"}]},
@@ -1252,6 +1252,8 @@
 
 {"uid":"patrizia.amato", "uoForUsersSpecial":[{"codice_uo":"317000", "ordine_da_validare":"S"}, {"codice_uo":"008002"}]},
 {"uid":"stefania.zangara", "uoForUsersSpecial":[{"codice_uo":"317000", "ordine_da_validare":"S"}, {"codice_uo":"008002"}]},
+{"uid":"valentina.scatassa", "uoForUsersSpecial":[{"codice_uo":"008002", "ordine_da_validare":"S"}]},
+
 
 {"uid":"letizia.balestrieri", "uoForUsersSpecial":[{"codice_uo":"000405", "ordine_da_validare":"S"}]},
 {"uid":"martina.diciommo", "uoForUsersSpecial":[{"codice_uo":"000405", "ordine_da_validare":"S"}]},
