@@ -32,6 +32,7 @@ public class Costanti {
 	public final static String REST_UO_SEDE = "sedeId=";
 	public final static String NOME_CACHE_MESSAGGIO = "cacheMessaggio";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
+	public final static String NOME_CACHE_TICKET_ALFRESCO = "cacheTicketAlfresco";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
 	public final static String NOME_CACHE_SERVICES_SIGLA = "cacheServicesSigla";
