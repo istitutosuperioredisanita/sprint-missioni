@@ -478,9 +478,7 @@ public class RimborsoMissioneService {
     private void gestioneMailResponsabileGruppo(Principal principal, RimborsoMissione rimborsoMissione) {
     	if (rimborsoMissione.getOrdineMissione() != null){
         	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
-        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null && ordineMissione.getPgProgetto() != null && 
-        			rimborsoMissione.getPgProgetto() != null && rimborsoMissione.getPgProgetto().compareTo(ordineMissione.getPgProgetto()) == 0 && 
-        			Utility.nvl(ordineMissione.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0){
+        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null){
         		mailService.sendEmail(oggettoImportoMissioneManager+" "+getNominativo(rimborsoMissione.getUid()), 
         				getTestoMailAumentoMissioneResponsabileGruppo(rimborsoMissione, ordineMissione), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
         	}
