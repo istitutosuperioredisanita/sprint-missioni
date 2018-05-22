@@ -471,9 +471,7 @@ public class RimborsoMissioneService {
     private void gestioneMailResponsabileGruppo(Principal principal, RimborsoMissione rimborsoMissione) {
     	if (rimborsoMissione.getOrdineMissione() != null){
         	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
-        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null && ordineMissione.getPgProgetto() != null && 
-        			rimborsoMissione.getPgProgetto() != null && rimborsoMissione.getPgProgetto().compareTo(ordineMissione.getPgProgetto()) == 0 && 
-        			Utility.nvl(ordineMissione.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0){
+        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null){
         		mailService.sendEmail(oggettoImportoMissioneManager+" "+getNominativo(rimborsoMissione.getUid()), 
         				getTestoMailAumentoMissioneResponsabileGruppo(rimborsoMissione, ordineMissione), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
         	}
@@ -1511,6 +1509,9 @@ public class RimborsoMissioneService {
 		LocalDate data = LocalDate.now();
 		if (data.getYear() == rimborsoMissione.getAnno()){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+			if (dati == null){
+				throw new ComponentException("Dati uo non presenti per il codice: "+rimborsoMissione.getUoSpesa()); 
+			}
 			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
 				if (dati.getDataBloccoRimborsiTam() != null){
 					if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
