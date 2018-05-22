@@ -99,7 +99,6 @@ public class OrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare" );
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         filter.setValidato("S");
-        filter.setSoloMissioniNonGratuite(true);
         filter.setDaAnnullare("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);

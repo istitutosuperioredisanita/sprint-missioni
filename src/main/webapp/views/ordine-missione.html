@@ -54,19 +54,19 @@
                 <div class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="ordine-missione.form.priorita">Priorita</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissionepriorita" ng-model="ordineMissioneModel.priorita" ng-options="value as priorita for (priorita,value) in valoriPriorita"></select>
+                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissionepriorita" ng-model="ordineMissioneModel.priorita" placeholder="{{'ordine-missione.form.priorita' | translate}}" ng-options="value as priorita for (priorita,value) in valoriPriorita"></select>
                         </span>
                 </div>
                 <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="missione.form.tipo-missione">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissione" ng-model="ordineMissioneModel.tipoMissione" ng-options="value as tipoMissione for (tipoMissione,value) in tipiMissione" ng-change="onChangeTipoMissione()"></select>
+                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissione" ng-model="ordineMissioneModel.tipoMissione" placeholder="{{'missione.form.tipo-missione' | translate}}" ng-options="value as tipoMissione for (tipoMissione,value) in tipiMissione" ng-change="onChangeTipoMissione()"></select>
                         </span>
                 </p>
                 <p class="col-md-6">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.trattamento" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
+                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.trattamento" placeholder="{{'missione.form.trattamento' | translate}}" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
                         </span>
               </p>
             </form>
