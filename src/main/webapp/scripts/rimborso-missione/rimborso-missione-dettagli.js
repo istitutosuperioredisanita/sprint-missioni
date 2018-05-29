@@ -19,7 +19,7 @@ missioniApp.factory('RimborsoMissioneDettagliService', function (DateUtils, $htt
         }
     });
 
-missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils) {
+missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils, DateService) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.inizioMissione = $routeParams.inizioMissione;
@@ -445,13 +445,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     inizializzaDati();
 
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-
-            $scope.ordineMissioneModel.dataInserimento = $filter('date')(today, "dd-MM-yyyy");
-    };
 
     $scope.previousPage = function () {
       parent.history.back();
