@@ -17,40 +17,39 @@ missioniApp.factory('DatiPatenteServiceUser', function ($resource) {
     }
     });
 
-missioniApp.controller('DatiPatenteController', function ($scope, DatiPatenteService, DatiPatenteServiceUser, ProxyService, $sessionStorage) {
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-            return today;
-    };
+missioniApp.controller('DatiPatenteController', function ($scope, DatiPatenteService, DatiPatenteServiceUser, ProxyService, $sessionStorage, DateService) {
 
     $scope.userSpecialBuild = function(accountLog, uoForUsersSpecial){
-      var anno = $scope.today().getFullYear();
-      var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog));
-      var res = elenco.then(function(result){
-          $scope.uoForUsersSpecial = [];
-          if (result && result.data){
-              var uos = result.data.elements;
-              var ind = -1;
-              for (var i=0; i<uos.length; i++) {
-                 for (var k=0; k<uoForUsersSpecial.length; k++) {
-                    if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
-                        ind ++;
-                        $scope.uoForUsersSpecial[ind] = uos[i];
-                     }
-                  }
-              }
-              if ($scope.uoForUsersSpecial.length === 1){
-                  $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
-              }
-              return uos;
-          } else {
-              $scope.accountModel = accountLog;
-              return uos;
-          }
-      });
-      return res;
+        var lista = DateService.today().then(function(result){
+            if (result){
+                var anno = result.getFullYear();
+                var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog));
+                var res = elenco.then(function(result){
+                    $scope.uoForUsersSpecial = [];
+                    if (result && result.data){
+                        var uos = result.data.elements;
+                        var ind = -1;
+                        for (var i=0; i<uos.length; i++) {
+                           for (var k=0; k<uoForUsersSpecial.length; k++) {
+                              if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                  ind ++;
+                                  $scope.uoForUsersSpecial[ind] = uos[i];
+                               }
+                            }
+                        }
+                        if ($scope.uoForUsersSpecial.length === 1){
+                            $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                        }
+                        return uos;
+                    } else {
+                        $scope.accountModel = accountLog;
+                        return uos;
+                    }
+                });
+                return res;
+            }
+        });
+        return lista;
     }
 
         var accountLog = $sessionStorage.account;

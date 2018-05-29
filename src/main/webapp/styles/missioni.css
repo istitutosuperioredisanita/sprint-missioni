@@ -2,6 +2,10 @@
   border-width: 1px;
 }
 
+#missioni-ui-select span{
+  font-size: 12px;
+}
+
 #missioni td{
   font-size: 12px;
   vertical-align: middle;

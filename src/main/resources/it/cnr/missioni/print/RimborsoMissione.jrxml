@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RimborsoMissione" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="true" uuid="9c3b805b-ea54-4163-b6ac-3dbd635f86f5">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="1098"/>
+	<property name="ireport.y" value="92"/>
 	<style name="table" mode="Transparent" isBold="true">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -208,9 +208,9 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="273" splitType="Stretch">
+		<band height="295" splitType="Stretch">
 			<frame>
-				<reportElement positionType="Float" x="0" y="0" width="554" height="192" uuid="876a504c-3872-4c37-b85b-7ef67fe7a609"/>
+				<reportElement positionType="Float" x="0" y="0" width="554" height="211" uuid="876a504c-3872-4c37-b85b-7ef67fe7a609"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -218,6 +218,10 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
+				<staticText>
+					<reportElement style="bold" x="12" y="130" width="105" height="19" uuid="a91521ea-634d-4adf-ad8f-178d0c52cb68"/>
+					<text><![CDATA[Oggetto della Missione:]]></text>
+				</staticText>
 			</frame>
 			<textField isBlankWhenNull="false">
 				<reportElement x="12" y="5" width="310" height="20" uuid="e8951b51-1e9e-4770-a242-d48813a2f6a1"/>
@@ -283,29 +287,29 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Qualifica    </style>"+$F{qualificaRich} + "     <style pdfFontName='Times-Bold' isBold='true'>Livello   </style>"+$F{livelloRich}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement x="12" y="130" width="543" height="20" uuid="0322eadf-5829-48d7-882d-c7d4aab2fcb2"/>
+				<reportElement x="117" y="130" width="438" height="19" uuid="0322eadf-5829-48d7-882d-c7d4aab2fcb2"/>
 				<textElement textAlignment="Justified" verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman" isUnderline="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Oggetto della Missione   </style>"+ $F{oggetto}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{oggetto}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="12" y="152" width="427" height="20" uuid="58e62936-d5a8-4781-84c2-723a6231930c"/>
+				<reportElement positionType="Float" x="12" y="170" width="427" height="20" uuid="58e62936-d5a8-4781-84c2-723a6231930c"/>
 				<textElement verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Località   </style>"+ $F{destinazione} + "  " + $F{nazione}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement positionType="Float" x="439" y="152" width="115" height="20" uuid="7a104199-acf8-4c16-b7c8-f53b05eecb48"/>
+				<reportElement positionType="Float" x="439" y="170" width="115" height="20" uuid="7a104199-acf8-4c16-b7c8-f53b05eecb48"/>
 				<textElement verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Missione  </style>"+$F{italiaEstero}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="12" y="172" width="542" height="20" uuid="9a458775-ff21-464f-99c2-3a22ebd72fed">
+				<reportElement positionType="Float" x="12" y="190" width="542" height="20" uuid="9a458775-ff21-464f-99c2-3a22ebd72fed">
 					<printWhenExpression><![CDATA[$F{tipoMissione}.equalsIgnoreCase( "ESTERO" )]]></printWhenExpression>
 				</reportElement>
 				<textElement verticalAlignment="Middle" markup="styled">
@@ -314,7 +318,7 @@
 				<textFieldExpression><![CDATA["<style pdfFontName='Times-Bold' isBold='true'>Trattamento Richiesto  </style>"+ $F{trattamento}]]></textFieldExpression>
 			</textField>
 			<frame>
-				<reportElement x="14" y="205" width="525" height="67" uuid="28826837-4920-47cb-af85-8bcb33c0ebed"/>
+				<reportElement x="14" y="221" width="525" height="67" uuid="28826837-4920-47cb-af85-8bcb33c0ebed"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -324,7 +328,7 @@
 				</box>
 			</frame>
 			<staticText>
-				<reportElement style="bold" mode="Transparent" x="14" y="205" width="113" height="17" uuid="cd4d45ff-809b-4a24-9b3c-033e1fbf5acb"/>
+				<reportElement style="bold" mode="Transparent" x="14" y="221" width="113" height="17" uuid="cd4d45ff-809b-4a24-9b3c-033e1fbf5acb"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -338,7 +342,7 @@
 				<text><![CDATA[Andata]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="bold" mode="Transparent" x="127" y="205" width="151" height="17" uuid="66714210-bf32-4e32-9325-ad296cefbd96"/>
+				<reportElement style="bold" mode="Transparent" x="127" y="221" width="151" height="17" uuid="66714210-bf32-4e32-9325-ad296cefbd96"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -352,7 +356,7 @@
 				<text><![CDATA[Data e Ora]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="bold" mode="Transparent" x="14" y="222" width="113" height="25" uuid="b9239062-64bd-4f19-b160-4f68ed977258"/>
+				<reportElement style="bold" mode="Transparent" x="14" y="238" width="113" height="25" uuid="b9239062-64bd-4f19-b160-4f68ed977258"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -366,91 +370,7 @@
 				<text><![CDATA[  Inizio Missione]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="bold" mode="Transparent" x="14" y="247" width="113" height="25" uuid="e9b9500d-b481-40ae-a2ab-939ca1d30e33"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[  Sbarco Estero]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement positionType="Float" x="127" y="222" width="151" height="25" uuid="cf1f599d-01f3-4a66-89ef-e940e28ffbaa"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{dataInizioMissione}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement positionType="Float" x="127" y="247" width="151" height="25" uuid="1ce17d49-eda6-43b4-abac-8998ae398bca"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{dataFineEstero}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="bold" mode="Transparent" x="278" y="205" width="109" height="17" uuid="add8bbd9-6c44-4e76-979e-7f7ed9af5f0d"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Ritorno]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="bold" mode="Transparent" x="387" y="205" width="152" height="17" uuid="f6a5b4ce-57c9-42ba-aaa6-2a651a2aedc4"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Data e Ora]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="bold" mode="Transparent" x="278" y="247" width="109" height="25" uuid="3dc414b3-fe95-44e6-a9d2-f64abc30c631"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[  Fine Missione]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="bold" mode="Transparent" x="278" y="222" width="109" height="25" uuid="eedda5a9-4db1-4c7c-a80a-8f2f1bab8950"/>
+				<reportElement style="bold" mode="Transparent" x="14" y="263" width="113" height="25" uuid="e9b9500d-b481-40ae-a2ab-939ca1d30e33"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -464,7 +384,91 @@
 				<text><![CDATA[  Imbarco Estero]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement positionType="Float" x="387" y="247" width="152" height="25" uuid="c5a776ad-5e74-4724-9903-b7b89fce1596"/>
+				<reportElement positionType="Float" x="127" y="238" width="151" height="25" uuid="cf1f599d-01f3-4a66-89ef-e940e28ffbaa"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataInizioMissione}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement positionType="Float" x="127" y="263" width="151" height="25" uuid="1ce17d49-eda6-43b4-abac-8998ae398bca"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataInizioEstero}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="bold" mode="Transparent" x="278" y="221" width="109" height="17" uuid="add8bbd9-6c44-4e76-979e-7f7ed9af5f0d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Ritorno]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="bold" mode="Transparent" x="387" y="221" width="152" height="17" uuid="f6a5b4ce-57c9-42ba-aaa6-2a651a2aedc4"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Data e Ora]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="bold" mode="Transparent" x="278" y="263" width="109" height="25" uuid="3dc414b3-fe95-44e6-a9d2-f64abc30c631"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[  Fine Missione]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="bold" mode="Transparent" x="278" y="238" width="109" height="25" uuid="eedda5a9-4db1-4c7c-a80a-8f2f1bab8950"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[  Sbarco Estero]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement positionType="Float" x="387" y="263" width="152" height="25" uuid="c5a776ad-5e74-4724-9903-b7b89fce1596"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -478,7 +482,7 @@
 				<textFieldExpression><![CDATA[$F{dataFineMissione}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement positionType="Float" x="387" y="222" width="152" height="25" uuid="2306432c-6a92-41e7-8d4e-d54a87867692"/>
+				<reportElement positionType="Float" x="387" y="238" width="152" height="25" uuid="2306432c-6a92-41e7-8d4e-d54a87867692"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -489,7 +493,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{dataInizioEstero}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dataFineEstero}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

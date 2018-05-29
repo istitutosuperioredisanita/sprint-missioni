@@ -17,7 +17,7 @@ missioniApp.factory('AutoPropriaOrdineMissioneService', function ($http) {
         }
     });
 
-missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, AutoProprieService, DatiPatenteServiceUser, AutoPropriaOrdineMissioneService, ElencoOrdiniMissioneService, ui, COSTANTI) {
+missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, AutoProprieService, DatiPatenteServiceUser, AutoPropriaOrdineMissioneService, ElencoOrdiniMissioneService, ui, COSTANTI, DateService) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.idOrdineMissione = $routeParams.idOrdineMissione;
@@ -104,16 +104,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function ($scope, 
         }
     });
 
-
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-
-            $scope.ordineMissioneModel.dataInserimento = $filter('date')(today, "dd-MM-yyyy");
-    };
-
-    $scope.save = function () {
+   $scope.save = function () {
             $rootScope.salvataggio = true;
             if ($scope.autoPropriaOrdineMissioneModel.id){
                 $http.put('api/rest/ordineMissione/autoPropria/modify', $scope.autoPropriaOrdineMissioneModel).success(function(data){
