@@ -541,7 +541,7 @@
     "helpdesk": {
         "title": "HelpDesk",
         "form": {
-            "avviso": "Compilare tutti i dati per inviare una segnalazione helpdesk. Non è necessario allegare files. Sarà inviata una mail di conferma in cui ci sarà un link da attivare per sottoporre la segnalazione all'esperto di turno. La mancata conferma non consentirà la lettura della Sua segnalazione da parte degli esperti.",
+            "avviso": "Compilare tutti i dati per inviare una segnalazione helpdesk. Non è necessario allegare files.",
             "oggetto": "Oggetto",
             "messaggio": "Messaggio",
             "nota": "Annotazione",

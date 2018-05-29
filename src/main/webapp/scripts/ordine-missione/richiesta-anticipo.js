@@ -6,7 +6,7 @@ missioniApp.factory('RichiestaAnticipoService', function ($resource) {
         });
     });
 
-missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, RichiestaAnticipoService, ElencoOrdiniMissioneService, ui, COSTANTI, AccessToken) {
+missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, RichiestaAnticipoService, ElencoOrdiniMissioneService, ui, COSTANTI, AccessToken, DateService) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.idOrdineMissione = $routeParams.idOrdineMissione;
@@ -38,13 +38,6 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
             }
         }
     });
-
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-            $scope.ordineMissioneModel.dataInserimento = $filter('date')(today, "dd-MM-yyyy");
-    };
 
     $scope.save = function () {
             $rootScope.salvataggio = true;

@@ -114,6 +114,20 @@ missioniApp.factory('LogsService', function ($resource) {
         });
     });
 
+missioniApp.factory('DateService', function ($http, DateUtils) {
+    return {
+        today: function() {
+                var promise = $http.get('api/rest/date/today');
+                var res = promise.then (function (result) {
+                    var data = result.data;
+                    data = data.replace(new RegExp('"', 'g'), '');
+                    return DateUtils.convertDateTimeFromServer(data);
+                });
+                return res;
+            }
+        };
+    });
+
 'use strict';
 
 missioniApp.factory('AuditsService', function ($http) {
