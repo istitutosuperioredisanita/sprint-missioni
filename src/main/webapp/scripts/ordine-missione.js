@@ -536,37 +536,37 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
-    $scope.tipiMissione = {
-        'Italia': 'I',
-        'Estera': 'E'
-    };
+    $scope.tipiMissione = [
+       {tipo:'Italia', value: 'I'},
+       {tipo:'Estera', value: 'E'}
+    ];
 
-    $scope.luoghiDiPartenza = {
-        'Sede di Lavoro': 'S',
-        'Residenza/Domicilio Fiscale': 'R',
-        'Altro': 'A'
-    };
+    $scope.luoghiDiPartenza = [
+       {partenza:'Sede di Lavoro', value: 'S'},
+       {partenza:'Residenza/Domicilio Fiscale', value: 'R'},
+       {partenza:'Altro', value: 'A'}
+    ];
 
-    $scope.valoriPriorita = {
-        'Critica': '5',
-        'Importante': '3',
-        'Media': '1'
-    };
+    $scope.valoriPriorita = [
+       {priorita:'Critica', value: '5'},
+       {priorita:'Importante', value: '3'},
+       {priorita:'Media', value: '1'}
+    ];
 
-    $scope.trattamenti = {
-        'Rimborso Documentato': 'R',
-        'Trattamento Alternativo di Missione': 'T'
-    };
+    $scope.trattamenti = [
+       {trattamento:'Rimborso Documentato', value: 'R'},
+       {trattamento:'Trattamento Alternativo di Missione', value: 'T'}
+    ];
 
     $scope.fondi = {
         'Competenza': 'C',
         'Residuo': 'R'
     };
 
-    $scope.obblighiRientro = {
-        'Sì': 'S',
-        'No': 'N'
-    };
+    $scope.obblighiRientro = [
+       {rientro:'Sì', value: 'S'},
+       {rientro:'No', value: 'N'}
+    ];
 
     $scope.onChangeTipoMissione = function() {
         if ($scope.ordineMissioneModel.tipoMissione === 'E') {

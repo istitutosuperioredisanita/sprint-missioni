@@ -71,19 +71,40 @@
                 <div class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="ordine-missione.form.priorita">Priorita</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissionepriorita" ng-model="ordineMissioneModel.priorita" placeholder="{{'ordine-missione.form.priorita' | translate}}" ng-options="value as priorita for (priorita,value) in valoriPriorita"></select>
+    <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.priorita"/>
+    <ui-select-match placeholder="{{'ordine-missione.form.priorita' | translate}}" >
+        <span ng-bind="$select.selected.priorita"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in valoriPriorita | filter: $select.search">
+        <span ng-bind="val.priorita"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                 </div>
                 <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="missione.form.tipo-missione">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="tipoMissione" ng-model="ordineMissioneModel.tipoMissione" placeholder="{{'missione.form.tipo-missione' | translate}}" ng-options="value as tipoMissione for (tipoMissione,value) in tipiMissione" ng-change="onChangeTipoMissione()"></select>
+    <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.tipoMissione" on-select="onChangeTipoMissione()"/>
+    <ui-select-match placeholder="{{'missione.form.tipo-missione' | translate}}" >
+        <span ng-bind="$select.selected.tipo"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in tipiMissione | filter: $select.search">
+        <span ng-bind="val.tipo"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                 </p>
                 <p class="col-md-6">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.trattamento" placeholder="{{'missione.form.trattamento' | translate}}" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
+   <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.trattamento"/>
+    <ui-select-match placeholder="{{'missione.form.trattamento' | translate}}" >
+        <span ng-bind="$select.selected.trattamento"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in trattamenti | filter: $select.search">
+        <span ng-bind="val.trattamento"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
               </p>
             </form>
@@ -91,7 +112,14 @@
                 <div class="col-md-5">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.nazione">nazione</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.nazione" ng-options="nazione.pg_nazione as nazione.ds_nazione for nazione in nazioni"></select>
+    <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.nazione"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.nazione' | translate}}" >
+        <span ng-bind="$select.selected.ds_nazione"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="naz.pg_nazione as naz in nazioni | filter: $select.search">
+        <span ng-bind="naz.ds_nazione"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
               </div>
                 <p class="col-md-7">
@@ -112,13 +140,20 @@
                 </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.partenza">partenza</span>
-                            <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" name="partenza" ng-model="ordineMissioneModel.partenzaDa" ng-options="value as partenzaDa for (partenzaDa,value) in luoghiDiPartenza" ng-change="onChangePartenzaDa()"></select>
+   <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.partenzaDa" on-select="onChangePartenzaDa()"/>
+    <ui-select-match placeholder="{{'ordine-missione.form.partenza' | translate}}" >
+        <span ng-bind="$select.selected.partenza"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in luoghiDiPartenza | filter: $select.search">
+        <span ng-bind="val.partenza"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </div>
-                    <p class="col-md-6" ng-show="ordineMissioneModel.partenzaDa === 'A'">
+                    <p class="col-md-5" ng-show="ordineMissioneModel.partenzaDa === 'A'">
                             <span class="input-group">
                               <span class="input-group-addon" translate="ordine-missione.form.partenza-da-altro">Partenza Da Altro</span>
                               <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" ng-model="ordineMissioneModel.partenzaDaAltro" ng-maxlength=100 maxlength="100"></input>
@@ -140,7 +175,14 @@
                     <div class="col-md-4">
                         <p class="input-group" ng-show="showObbligoRientro">
                           <span class="input-group-addon" translate="ordine-missione.form.obbligo-rientro">obbligo</span>
-                          <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" ng-model="ordineMissioneModel.obbligoRientro" ng-options="value as obbligoRientro for (obbligoRientro,value) in obblighiRientro"></select>
+   <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.obbligoRientro"/>
+    <ui-select-match placeholder="{{'ordine-missione.form.obbligo-rientro' | translate}}" >
+        <span ng-bind="$select.selected.rientro"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in obblighiRientro | filter: $select.search">
+        <span ng-bind="val.rientro"></span>
+    </ui-select-choices>
+    </ui-select>
                         </p>
                     </div>
             </form>
