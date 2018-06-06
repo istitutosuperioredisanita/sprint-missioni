@@ -34,6 +34,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
@@ -207,7 +208,7 @@ public class OrdineMissioneService {
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
     	byte[] printOrdineMissione = null;
     	String fileName = null;
-    	if ((ordineMissione.isStatoInviatoAlFlusso()  && (!ordineMissione.isMissioneInserita() || !ordineMissione.isMissioneDaValidare())) || (ordineMissione.isStatoFlussoApprovato())){
+    	if ((ordineMissione.isStatoInviatoAlFlusso()  && !ordineMissione.isMissioneInserita() && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())){
     		ContentStream content = null;
 			try {
 				content = cmisOrdineMissioneService.getContentStreamOrdineMissione(ordineMissione);
@@ -415,7 +416,7 @@ public class OrdineMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.ORDINE, new Long(ordineMissione.getId().toString()), idSede, 
-					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null);
+					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null, ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
 			rabbitMQService.send(missione);
 		}
 	}
@@ -973,6 +974,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setCup(ordineMissione.getCup());
 		ordineMissioneDB.setMissioneGratuita(ordineMissione.getMissioneGratuita());
 		ordineMissioneDB.setCug(ordineMissione.getCug());
+		ordineMissioneDB.setPresidente(ordineMissione.getPresidente());
 		ordineMissioneDB.setBypassAmministrativo(ordineMissione.getBypassAmministrativo());
 		ordineMissioneDB.setBypassRespGruppo(ordineMissione.getBypassRespGruppo());
 		ordineMissioneDB.setDataInvioAmministrativo(ordineMissione.getDataInvioAmministrativo());

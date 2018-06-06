@@ -10,6 +10,7 @@ import it.cnr.si.missioni.util.DateUtils;
  */
 public class Missione {
 
+    private TypeTipoMissione dest_missione;
     private TypeMissione tipo_missione;
     private String codice_sede;
     private Long id;
@@ -18,7 +19,7 @@ public class Missione {
     private ZonedDateTime data_fine;
     private Long id_ordine;
 
-    public Missione(TypeMissione tipoMissione, Long id, String codiceSede, String matricola, ZonedDateTime data_inizio, ZonedDateTime data_fine, Long idOrdine) {
+    public Missione(TypeMissione tipoMissione, Long id, String codiceSede, String matricola, ZonedDateTime data_inizio, ZonedDateTime data_fine, Long idOrdine, TypeTipoMissione dest_missione) {
         this.codice_sede = codiceSede;
         this.tipo_missione = tipoMissione;
         this.matricola = matricola;
@@ -26,6 +27,7 @@ public class Missione {
         this.data_fine = data_fine;
         this.id = id;
         this.id_ordine = idOrdine;
+        this.dest_missione = dest_missione;
     }
 
     public String getMatricola() {
@@ -71,6 +73,12 @@ public class Missione {
                 ", data_fine=" + data_fine +
                 ", id=" + id +
                 ", idOrdine=" + id_ordine +
+                ", dest_missione=" + dest_missione +
                 '}';
     }
+
+	public TypeTipoMissione getDest_missione() {
+		return dest_missione;
+	}
+
 }
