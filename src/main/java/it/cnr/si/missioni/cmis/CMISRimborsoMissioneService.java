@@ -240,7 +240,7 @@ public class CMISRimborsoMissioneService {
 		String userNameFirmatario = null;
 		String userNameFirmatarioSpesa = null;
 		Boolean usernameImpostati = false;
-		if (!Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && !Costanti.CDS_SAC.equals(rimborsoMissione.getCdsRich())){
+		if (!Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && !Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S") && !Costanti.CDS_SAC.equals(rimborsoMissione.getCdsRich())){
 			String uoSiglaRich = rimborsoMissione.getUoRich();
 			String uoSiglaSpesa = null;
 			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
@@ -280,6 +280,8 @@ public class CMISRimborsoMissioneService {
 			Parametri parametri = parametriService.getParametri();
 			if (Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
 				userNameFirmatarioSpesa = parametri.getResponsabileCug();
+			} else  if (Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
+				userNameFirmatarioSpesa = parametri.getPresidente();
 			} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 				if (uoCompetenzaPerFlusso != null){
 					if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){

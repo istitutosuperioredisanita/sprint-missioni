@@ -226,7 +226,7 @@ public class CMISOrdineMissioneService {
 			String userNameFirmatario = null;
 			String userNameFirmatarioSpesa = null;
 			Boolean usernameImpostati = false;
-			if (!Utility.nvl(ordineMissione.getCug(),"N").equals("S") && !Costanti.CDS_SAC.equals(ordineMissione.getCdsRich())){
+			if (!Utility.nvl(ordineMissione.getCug(),"N").equals("S") && !Utility.nvl(ordineMissione.getPresidente(),"N").equals("S") && !Costanti.CDS_SAC.equals(ordineMissione.getCdsRich())){
 				String uoSiglaRich = ordineMissione.getUoRich();
 				String uoSiglaSpesa = null;
 				if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
@@ -273,6 +273,8 @@ public class CMISOrdineMissioneService {
 					Parametri parametri = parametriService.getParametri();
 					if (Utility.nvl(ordineMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
 						userNameFirmatarioSpesa = parametri.getResponsabileCug();
+					} else 	if (Utility.nvl(ordineMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
+						userNameFirmatarioSpesa = parametri.getPresidente();
 					} else if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 						if (uoCompetenzaPerFlusso != null){
 							if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
