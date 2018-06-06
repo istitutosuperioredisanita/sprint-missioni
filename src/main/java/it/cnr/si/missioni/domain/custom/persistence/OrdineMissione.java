@@ -345,6 +345,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "CUG", length = 1, nullable = true)
     public String cug;
 
+    @Column(name = "PRESIDENTE", length = 1, nullable = true)
+    public String presidente;
+
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE_RESPINGI", length = 1000, nullable = true)
     public String noteRespingi;
@@ -1285,5 +1288,13 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
 	public void setCug(String cug) {
 		this.cug = cug;
+	}
+
+	public String getPresidente() {
+		return presidente;
+	}
+
+	public void setPresidente(String presidente) {
+		this.presidente = presidente;
 	}
 }

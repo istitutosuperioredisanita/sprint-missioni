@@ -35,6 +35,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
@@ -337,7 +338,7 @@ public class RimborsoMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
-					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()));
+					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
 			rabbitMQService.send(missione);
 		}
 	}
@@ -582,6 +583,7 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
 		rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
 		rimborsoMissioneDB.setCug(rimborsoMissione.getCug());
+		rimborsoMissioneDB.setPresidente(rimborsoMissione.getPresidente());
 		rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 	}
@@ -1195,7 +1197,7 @@ public class RimborsoMissioneService {
     	RimborsoMissione rimborsoMissione = getRimborsoMissione(principal, idMissione, true);
     	byte[] printRimborsoMissione = null;
     	String fileName = null;
-    	if ((rimborsoMissione.isStatoInviatoAlFlusso()  && (!rimborsoMissione.isMissioneInserita() || !rimborsoMissione.isMissioneDaValidare())) || (rimborsoMissione.isStatoFlussoApprovato())){
+    	if ((rimborsoMissione.isStatoInviatoAlFlusso()  && !rimborsoMissione.isMissioneInserita() && !rimborsoMissione.isMissioneDaValidare()) || (rimborsoMissione.isStatoFlussoApprovato())){
     		ContentStream content = null;
 			try {
 				content = cmisRimborsoMissioneService.getContentStreamRimborsoMissione(rimborsoMissione);
