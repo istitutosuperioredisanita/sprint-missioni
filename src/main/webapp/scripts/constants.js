@@ -34,7 +34,7 @@ missioniApp.constant('SIPER_REST', {
 
 missioniApp.constant('OIL_REST', {
         'ISTANZA': 'HDSiper',
-        'CATEGORIE': 'catg/HDSiper/51',
+        'CATEGORIE': 'catg/HDSiper/119',
         'NEW_PROBLEM': 'pest/'
     });
 

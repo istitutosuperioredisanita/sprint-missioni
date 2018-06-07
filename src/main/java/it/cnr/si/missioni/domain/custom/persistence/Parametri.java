@@ -33,6 +33,10 @@ public class Parametri extends OggettoBulkXmlTransient implements Serializable {
     @Column(name = "PRESIDENTE", length = 200, nullable = true)
     private String presidente;
 
+    @Size(min = 0, max = 200)
+    @Column(name = "DIPENDENTE_CDA", length = 200, nullable = true)
+    private String dipendenteCda;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -51,5 +55,11 @@ public class Parametri extends OggettoBulkXmlTransient implements Serializable {
 	}
 	public void setPresidente(String presidente) {
 		this.presidente = presidente;
+	}
+	public String getDipendenteCda() {
+		return dipendenteCda;
+	}
+	public void setDipendenteCda(String dipendenteCda) {
+		this.dipendenteCda = dipendenteCda;
 	}
 }

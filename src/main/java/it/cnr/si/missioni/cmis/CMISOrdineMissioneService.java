@@ -467,12 +467,20 @@ public class CMISOrdineMissioneService {
 		CmisPath cmisPath = createFolderOrdineMissione(ordineMissione);
 		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissione(principal.getName(), cmisOrdineMissione);
 		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
-					metadataProperties,
-					streamStampa,
-					MimeTypes.PDF.mimetype(),
-					ordineMissione.getFileName(), 
-					cmisPath);
+			Document node = null;
+			if (!ordineMissione.isStatoInviatoAlFlusso()){
+				node = missioniCMISService.restoreSimpleDocument(
+						metadataProperties,
+						streamStampa,
+						MimeTypes.PDF.mimetype(),
+						ordineMissione.getFileName(), 
+						cmisPath);
+				
+			}else{
+				node = (Document)getObjectOrdineMissione(ordineMissione);
+				node = missioniCMISService.updateContent(node.getObjectOfLatestVersion(false), streamStampa, MimeTypes.PDF.mimetype(),ordineMissione.getFileName());
+				missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+			}
 			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
 			missioniCMISService.makeVersionable(node);
 			return node;
@@ -488,20 +496,29 @@ public class CMISOrdineMissioneService {
 		InputStream streamStampa = new ByteArrayInputStream(stampa);
 		CmisPath cmisPath = createFolderOrdineMissione(annullamento.getOrdineMissione());
 		Map<String, Object> metadataProperties = createMetadataForFileAnnullamentoOrdineMissione(principal.getName(), annullamento);
-		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
-					metadataProperties,
-					streamStampa,
-					MimeTypes.PDF.mimetype(),
-					annullamento.getFileName(), 
-					cmisPath);
-			missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+		
+		try {
+			Document node = null;
+			if (!annullamento.isStatoInviatoAlFlusso()){
+				node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
+						MimeTypes.PDF.mimetype(), annullamento.getFileName(), cmisPath);
+
+			}else{
+				node = (Document)getObjectAnnullamentoOrdineMissione(annullamento);
+				node = missioniCMISService.updateContent(node.getObjectOfLatestVersion(false), streamStampa, MimeTypes.PDF.mimetype(),annullamento.getFileName());
+				missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+			}
+
+			missioniCMISService.addAspect(node,
+					CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
 			missioniCMISService.makeVersionable(node);
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof CmisConstraintException)
-				throw new ComponentException("CMIS - File ["+annullamento.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("CMIS - File [" + annullamento.getFileName()
+						+ "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale ("
+					+ Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -722,8 +739,6 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
-	
-	
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
 		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
@@ -966,7 +981,7 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 	
-	public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
+	public CmisObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
 		Folder node = recuperoFolderOrdineMissione(ordineMissione);
 		List<CmisObject> ordine = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
 		if (ordine.size() == 0)
@@ -975,8 +990,37 @@ public class CMISOrdineMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		} else {
 				CmisObject nodeFile = ordine.get(0); 
-				return nodeFile.getId();
+				return nodeFile;
 		}
+	}
+
+	public CmisObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
+		Folder node = recuperoFolderOrdineMissione(annullamento.getOrdineMissione());
+		List<CmisObject> ordine = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+		if (ordine.size() == 0)
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Annullamento Ordine di Missione. ID Ordine di Missione:"+annullamento.getId()+", Anno:"+annullamento.getAnno()+", Numero:"+annullamento.getNumero());
+		else if (ordine.size() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files Annullamento ordini di missione aventi l'ID :"+ annullamento.getId()+", Anno:"+annullamento.getAnno()+", Numero:"+annullamento.getNumero());
+		} else {
+				CmisObject nodeFile = ordine.get(0); 
+				return nodeFile;
+		}
+	}
+
+	public CmisObject getObjectAnticipoOrdineMissione(OrdineMissioneAnticipo anticipo) throws ComponentException{
+		Folder node = recuperoFolderOrdineMissione(anticipo.getOrdineMissione());
+		List<CmisObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
+		if (ant.size() == 0)
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono anticipi collegati all'Ordine di Missione. ID Anticipo:"+anticipo.getId());
+		else if (ant.size() > 1){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files anticipo di missione aventi l'ID :"+ anticipo.getId());
+		} else {
+				CmisObject nodeFile = ant.get(0); 
+				return nodeFile;
+		}
+	}
+	public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
+		return getObjectOrdineMissione(ordineMissione).getId();
 	}
 	
 	public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
@@ -1188,8 +1232,17 @@ public class CMISOrdineMissioneService {
 		CmisPath cmisPath = createFolderOrdineMissione(ordineMissioneAnticipo.getOrdineMissione());
 		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAnticipo(currentLogin, ordineMissioneAnticipo);
 		try {
-			Document node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
-					MimeTypes.PDF.mimetype(), ordineMissioneAnticipo.getFileName(), cmisPath);
+			Document node = null;
+			if (!ordineMissioneAnticipo.getOrdineMissione().isStatoInviatoAlFlusso()){
+				node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
+						MimeTypes.PDF.mimetype(), ordineMissioneAnticipo.getFileName(), cmisPath);
+
+			}else{
+				node = (Document)getObjectAnticipoOrdineMissione(ordineMissioneAnticipo);
+				node = missioniCMISService.updateContent(node.getObjectOfLatestVersion(false), streamStampa, MimeTypes.PDF.mimetype(),ordineMissioneAnticipo.getFileName());
+				missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+			}
+
 			missioniCMISService.addAspect(node,
 					CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
 			missioniCMISService.makeVersionable(node);
