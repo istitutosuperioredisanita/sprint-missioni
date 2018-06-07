@@ -86,6 +86,9 @@ public class CronService {
 	private ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
 	@Autowired
+	private StepService stepService;
+	
+	@Autowired
 	private MailService mailService;
 	
 	@Autowired
@@ -397,7 +400,7 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				try {
-					ordineMissioneService.verifyStepRespGruppo(principal, ordineMissione);
+					stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorBypassResp(ordineMissione, error);
@@ -431,7 +434,7 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				try {
-					ordineMissioneService.verifyStepAmministrativo(principal, ordineMissione);
+					stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorBypassAmm(ordineMissione, error);

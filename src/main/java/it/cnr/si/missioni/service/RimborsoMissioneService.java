@@ -50,6 +50,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -98,6 +99,9 @@ public class RimborsoMissioneService {
 
 	@Autowired
 	private UoService uoService;
+
+    @Autowired
+    private ParametriService parametriService;
 
     @Autowired
     private Environment env;
@@ -479,9 +483,7 @@ public class RimborsoMissioneService {
     private void gestioneMailResponsabileGruppo(Principal principal, RimborsoMissione rimborsoMissione) {
     	if (rimborsoMissione.getOrdineMissione() != null){
         	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
-        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null && ordineMissione.getPgProgetto() != null && 
-        			rimborsoMissione.getPgProgetto() != null && rimborsoMissione.getPgProgetto().compareTo(ordineMissione.getPgProgetto()) == 0 && 
-        			Utility.nvl(ordineMissione.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0){
+        	if (ordineMissione != null && ordineMissione.getResponsabileGruppo() != null){
         		mailService.sendEmail(oggettoImportoMissioneManager+" "+getNominativo(rimborsoMissione.getUid()), 
         				getTestoMailAumentoMissioneResponsabileGruppo(rimborsoMissione, ordineMissione), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
         	}
@@ -1161,6 +1163,15 @@ public class RimborsoMissioneService {
 		}
 		if (!StringUtils.hasLength(rimborsoMissione.getMatricola())){
 			rimborsoMissione.setMatricola(null);
+		}
+		OrdineMissione ordine = rimborsoMissione.getOrdineMissione();
+		if (ordine.getCdsRich() != null){
+			ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
+		}
+		if (Utility.nvl(ordine.getPresidente(),"N").equals("S")){
+			if (!Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S")){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione è per la presidenza, quindi anche il rimborso missione deve essere per la presidenza.");
+			}
 		}
 	}
 	
