@@ -189,6 +189,9 @@ public class PrintRimborsoMissioneService {
 	    		} else {
 	    			dsSpesa = dettagli.getDsTiSpesa();
 	    		}
+	    		if (Utility.nvl(dettagli.getTiCdTiSpesa()).equals("P") ){
+	    			dsSpesa = dsSpesa + " - "+dettagli.getCdTiPasto();
+	    		}
 	    		if (dettagli.isSpesaAnticipata()){
 	    			dsSpesa = dsSpesa + " - SPESA ANTICIPATA";
 	    		} else {
