@@ -1,0 +1,29 @@
+﻿{
+  "title": "faq",
+  "elencoFaq": [{
+      "tipo": "Ordine di Missione",
+      "anomalia": "Assegnista/Borsista/Associato: Non viene visualizzato correttamente l'istituto di appartenenza",
+      "risposta": "E' necessario comunicare all'amministrazione dell'istituto di appartenenza di aggiornare in Gestione Istituti, nella parte del personale non dipendente, la parte relativa alla verifica 'LDAP' che deve essere completa in ogni sua parte. Dal giorno successivo all'aver apportato queste modifiche l'istituto risulterà corretto."
+   },
+   {
+      "tipo": "Per Amministrativi - Ordine di Missione",
+      "anomalia": "In SIGLA non si visualizza automaticamente l'anticipo dopo che l'ordine di missione è in stato definitivo",
+      "risposta": "L'anticipo deve essere inserito manualmente in SIGLA, non esiste nessun automatismo."
+   },
+   {
+      "tipo": "Per Amministrativi - Ordine di Missione",
+      "anomalia": "Dipendente non visibile nell'elenco per la uo selezionata",
+      "risposta": "Se si tratta di un tempo determinato è possibile che la proroga non sia stata ancora acquisita. Occorre aspettare dopo il 23 del mese per vedere i dati aggiornati. Nel caso di un tempo indeterminato dovete contattare chi segue gli attestati di presenza e chiedere di aggiornare i dati all'ufficio del personale in sede centrale."
+   },
+   {
+      "tipo": "Per Amministrativi - Ordine di Missione",
+      "anomalia": "Assegnista/Borsista/Associato non visibile nell'elenco per la uo selezionata",
+      "risposta": "E' necessario che abbia una utenza SIPER. Inoltre è necessario fare queste 2 operazioni: 1) Nella intranet, in Gestione Istituti, nella parte del personale non dipendente deve esserci la parte relativa alla verifica 'LDAP' completa in ogni sua parte per ogni borsista/assegnista/associato; 2) In SIGLA il personale non dipendente deve avere un rapporto ed un inquadramento valido. Dal giorno successivo all'aver apportato queste modifiche il personale sarà visibile nel nuovo applicativo 'Missioni CNR'."
+   },
+   {
+      "tipo": "Rimborso Missione",
+      "anomalia": "Per la data della missione non esiste un inquadramento valido.",
+      "risposta": "Chiedere agli amministrativi dell'istituto di appartenenza di regolarizzare in Sigla i dati relativi al rapporto e all'inquadramento. Dopo che avranno inserito i dati in Sigla, dal giorno successivo, sarà possibile effettuare il rimborso."
+   }
+  ]
+}

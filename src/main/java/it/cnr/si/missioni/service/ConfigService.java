@@ -1,18 +1,17 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.data.DataUsersSpecial;
-import it.cnr.si.missioni.util.data.DatiUo;
-import it.cnr.si.missioni.util.proxy.ResultProxy;
-import it.cnr.si.missioni.util.proxy.cache.CallCache;
-import it.cnr.si.missioni.util.proxy.cache.json.Services;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.data.DataUsersSpecial;
+import it.cnr.si.missioni.util.data.DatiUo;
+import it.cnr.si.missioni.util.data.Faq;
+import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
 @Service
 public class ConfigService {
@@ -22,6 +21,7 @@ public class ConfigService {
 	
 	Services services = null;
 	DatiUo datiUo = null;
+	Faq faq = null;
 	DataUsersSpecial dataUsersSpecial = null;
 	String message = null;
 	
@@ -39,6 +39,7 @@ public class ConfigService {
 	private void loadData(Boolean fromInit) {
 		dataUsersSpecial = loadFilesService.loadUsersSpecialForUo();
 		datiUo = loadFilesService.loadDatiUo();
+		faq = loadFilesService.loadFaq();
 		if (fromInit){
 			services = loadFilesService.loadServicesForCache();
 		}
@@ -47,6 +48,7 @@ public class ConfigService {
 	private void evictData() {
 		loadFilesService.evictUsersSpecialForUo();
 		loadFilesService.evictDatiUo();
+		loadFilesService.evictFaq();
 	}
 
 	public void reloadUsersSpecialForUo() {
@@ -64,9 +66,18 @@ public class ConfigService {
 		datiUo = loadFilesService.loadDatiUo();
 	}
 
+	public void reloadFaq() {
+		loadFilesService.evictFaq();
+		faq = loadFilesService.loadFaq();
+	}
+
 	
 	public DataUsersSpecial getDataUsersSpecial() {
     	return dataUsersSpecial;
+	}
+
+	public Faq getFaq() {
+		return faq;
 	}
 
 	public DatiUo getDatiUo() {

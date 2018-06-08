@@ -5,6 +5,12 @@ missioniApp.factory('ConfigService', function ($http, ui) {
                     return response.data;
                 });
                 return promise;
+            },
+            getFaq: function() {
+                var promise = $http.get('api/rest/config/faq').then(function (response) {
+                    return response.data;
+                });
+                return promise;
             }
         }
     });
