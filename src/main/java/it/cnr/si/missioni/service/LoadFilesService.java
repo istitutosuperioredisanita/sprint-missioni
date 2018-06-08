@@ -21,6 +21,7 @@ import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
+import it.cnr.si.missioni.util.data.Faq;
 import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
 @Service
@@ -34,6 +35,9 @@ public class LoadFilesService {
 
 	private RelaxedPropertyResolver propertyResolver;	
 	
+	@CacheEvict(value = Costanti.NOME_CACHE_FAQ, allEntries = true)
+	public void evictFaq() {
+	}
 	@CacheEvict(value = Costanti.NOME_CACHE_DATI_UO, allEntries = true)
 	public void evictDatiUo() {
 	}
@@ -54,6 +58,19 @@ public class LoadFilesService {
 			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, DatiUo.class); 
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle uo." + Utility.getMessageException(e));
+		}
+	}
+
+    @Cacheable(value=Costanti.NOME_CACHE_FAQ)
+	public Faq loadFaq() {
+		InputStream is = getFaq();
+		if (is == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle faq non trovato.");
+		}
+		try {
+			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, Faq.class); 
+		} catch (Exception e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle faq." + Utility.getMessageException(e));
 		}
 	}
 
@@ -109,6 +126,22 @@ public class LoadFilesService {
 		return is;
 	}
 
+	private InputStream getFaq() {
+		InputStream is = null;
+		String fileName = getFileNameFromFaq();
+		Document node = (Document) missioniCMISService.getNodeByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
+		if (node == null || node.getContentStream() == null){
+			is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/"+fileName);
+		} else {
+			is = node.getContentStream().getStream();
+		}
+		return is;
+	}
+
+	private String getFileNameFromFaq(){
+   			return "faq.json";
+	}
+	
 	private String getFileNameFromDatiUo(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return "datiUoDev.json";
