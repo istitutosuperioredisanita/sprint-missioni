@@ -22,8 +22,13 @@
    },
    {
       "tipo": "Rimborso Missione",
-      "anomalia": "Per la data della missione non esiste un inquadramento valido.",
+      "anomalia": "Assegnista/Borsista/Associato riceve messaggio 'Per la data della missione non esiste un inquadramento valido.'",
       "risposta": "Chiedere agli amministrativi dell'istituto di appartenenza di regolarizzare in Sigla i dati relativi al rapporto e all'inquadramento. Dopo che avranno inserito i dati in Sigla, dal giorno successivo, sarà possibile effettuare il rimborso."
+   },
+   {
+      "tipo": "Rimborso Missione",
+      "anomalia": "Dipendente riceve messaggio 'Per la data della missione non esiste un inquadramento valido.'",
+      "risposta": "Per i dipendenti a tempo determinato che sono a scadenza, i rinnovi vengono aggiornati dal sistema informativo del personale dopo il 20 di ogni mese. Quindi purtroppo per poter operare è necessario aspettare questo aggiornamento."
    }
   ]
 }
