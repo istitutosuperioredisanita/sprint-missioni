@@ -49,10 +49,16 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
               hdDataModel.categoriaDescrizione = $scope.categorie[k].descrizione;
             }
           }
+
           $http.post('api/rest/helpdesk/sendWithoutAttachment', hdDataModel)
             .success(function (data) {
               initMapHelpDesk();
               ui.message("Segnalazione Inviata.");
+          })            
+            .error(function (data) {
+              if (data && data.message){
+                ui.error(data.message);
+              }
           });
         });
     }
