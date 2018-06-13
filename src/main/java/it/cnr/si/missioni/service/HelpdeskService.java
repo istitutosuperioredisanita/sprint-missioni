@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.ExternalProblem;
+import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
@@ -43,7 +44,11 @@ public class HelpdeskService {
 	public Long newProblem(ExternalProblem hd) throws ServiceException {
 
 		hd.setLogin(SecurityUtils.getCurrentUser().getName());
-		Account account = accountService.loadAccountFromRest(hd.getLogin());
+		Account account = accountService.loadAccountFromRest(hd.getLogin(), true);
+		if (account.getUoForUsersSpecials() == null || account.getUoForUsersSpecials().isEmpty()){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Helpdesk non autorizzato");
+		}
+		
 		hd.setFirstName(account.getNome());
 		hd.setFamilyName(account.getCognome());
 		hd.setEmail(account.getEmailComunicazioni());
