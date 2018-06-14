@@ -276,7 +276,7 @@
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
                               <label class="checkbox">
-                                      <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="checkbox" ng-model="ordineMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
+                                      <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="checkbox" ng-change="cambioPresidenza(ordineMissioneModel.presidente)" ng-model="ordineMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
                               </label>
                           </span>
                   </p>

@@ -104,6 +104,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         }
     }
 
+    $scope.cambioSpesaAnticipata = function (spesaAnticipata) {
+        if (spesaAnticipata == "S"){
+            ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta direttamente dall'Ente(tramite agenzia viaggi o altro), quindi non riguarda anticipi ricevuti per la missione. Per questo la spesa non verrà conteggiata nella missione.");
+        }
+    }
+
     var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
             recuperoTipiSpesa($scope.newDettaglioSpesa.dataSpesa);
