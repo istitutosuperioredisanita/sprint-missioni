@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
+import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.Terzo;
 
@@ -38,6 +40,9 @@ public class ValidaDettaglioRimborsoService {
 		clause.setDivisa(dettaglio.getCdDivisa());
 		clause.setImportoSpesa(dettaglio.getImportoEuro().toString());
 		clause.setCdTipoSpesa(dettaglio.getCdTiSpesa());
+		if (Utility.nvl(dettaglio.getTiCdTiSpesa()).equals("P") && dettaglio.getCdTiPasto() == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il tipo pasto.");
+		}
 		if (dettaglio.getCdTiPasto() != null){
 			clause.setCdTipoPasto(dettaglio.getCdTiPasto());
 		}
