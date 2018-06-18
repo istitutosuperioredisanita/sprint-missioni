@@ -55,9 +55,9 @@ public class CommonService {
 			}
 
 			CallCache callCache = cacheService.prepareCallCache(restInCache, clausesToAdd);
-	    	log.info("Common Cache : "+url);
+	    	log.debug("Start Common Cache : "+url);
 			ResultProxy result = proxyService.processInCache(callCache);
-	    	log.info("End Common Cache : "+url);
+	    	log.debug("End Common Cache : "+url);
 			CommonJsonRest<RestServiceBean> commonJsonRest = result.getCommonJsonResponse();
 			risposta = cacheService.manageResponse(restInCache, listaNewClauses, commonJsonRest);
 		} else {
