@@ -31,6 +31,7 @@ import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompenso;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompensoJson;
 
 /**
  * REST controller for managing the current user's account.
@@ -69,7 +70,7 @@ public class TerzoPerCompensoResource {
         		key += data.getTime();
     		}
     		
-        	List<TerzoPerCompenso> terzi = terzoPerCompensoService.getTerzi(key, body, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
+        	TerzoPerCompensoJson terzi = terzoPerCompensoService.getTerzi(key, body, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
             return JSONResponseEntity.ok(terzi);
 		} catch (AwesomeException e) {
 			log.error("ERRORE recuperoTerzoPerCompenso",e);

@@ -33,7 +33,7 @@ public class TerzoPerCompensoService {
     private CacheService cacheService;
     
     @Cacheable(value=Costanti.NOME_CACHE_PROXY, key="#key")
-    public List<TerzoPerCompenso> getTerzi(String key, JSONBody body, String url, String query, String auth) throws ComponentException{
+    public TerzoPerCompensoJson getTerzi(String key, JSONBody body, String url, String query, String auth) throws ComponentException{
 
     	String app = Costanti.APP_SIGLA;
     	cacheService.setContext(body, app);
@@ -45,7 +45,7 @@ public class TerzoPerCompensoService {
 			log.error("Errore", e);
 			throw new ComponentException(Utility.getMessageException(e),e);
 		}
-		return terzoJson.getElements();
+		return terzoJson;
     	
     }
 }
