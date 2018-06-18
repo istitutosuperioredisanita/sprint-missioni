@@ -71,7 +71,7 @@ public class ProxyService implements EnvironmentAware{
     public ResultProxy processInCache(CallCache callCache)  throws AwesomeException{
     	log.info("Process in Cache 2: "+callCache.toString());
     	ResultProxy resultProxyForCache = process(callCache.getHttpMethod(), callCache.getBody(), callCache.getApp(), callCache.getUrl(), callCache.getQueryString(), callCache.getAuthorization());
-    	log.info("Response Cache 2: "+resultProxyForCache.toString());
+    	log.debug("Response Cache 2: "+resultProxyForCache.toString());
     	return resultProxyForCache(callCache, resultProxyForCache);
     }
 
