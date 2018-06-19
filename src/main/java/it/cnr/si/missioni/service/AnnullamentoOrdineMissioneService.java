@@ -661,9 +661,10 @@ public class AnnullamentoOrdineMissioneService {
         		if (is != null){
             		try {
     					printAnnullamentoMissione = IOUtils.toByteArray(is);
+    					is.close();
     				} catch (IOException e) {
     					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
-    				}
+					}
         		}
     		} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale");

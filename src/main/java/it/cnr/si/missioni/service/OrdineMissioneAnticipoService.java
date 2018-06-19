@@ -249,6 +249,7 @@ public class OrdineMissioneAnticipoService {
 				if (is != null) {
 					try {
 						printOrdineMissione = IOUtils.toByteArray(is);
+						is.close();
 					} catch (IOException e) {
 						throw new ComponentException(
 								"Errore nella conversione dello stream in byte del file Anticipo ("

@@ -323,6 +323,7 @@ public class OrdineMissioneAutoPropriaService {
         		if (is != null){
             		try {
     					printOrdineMissione = IOUtils.toByteArray(is);
+						is.close();
     				} catch (IOException e) {
     					throw new ComponentException("Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")",e);
     				}
