@@ -1226,6 +1226,7 @@ public class RimborsoMissioneService {
         		if (is != null){
             		try {
     					printRimborsoMissione = IOUtils.toByteArray(is);
+						is.close();
     				} catch (IOException e) {
     					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
     				}
