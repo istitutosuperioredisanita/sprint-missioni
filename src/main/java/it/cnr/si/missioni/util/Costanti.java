@@ -30,8 +30,15 @@ public class Costanti {
 	public final static String REST_UO_DIRECTOR = "json/sedi";
 	public final static String REST_UO_TIT_CA = "titCa=";
 	public final static String REST_UO_SEDE = "sedeId=";
+	public final static String NOME_STAMPA_ORDINE = "ordine";
+	public final static String NOME_STAMPA_RIMBORSO = "rimborso";
+	public final static String NOME_STAMPA_AUTO_PROPRIA = "autoPropria";
+	public final static String NOME_STAMPA_ANTICIPO = "anticipo";
+	public final static String PARAMETER_DATA_SOURCE_FOR_PRINT = "REPORT_DATA_SOURCE";
+	
 	public final static String NOME_CACHE_MESSAGGIO = "cacheMessaggio";
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
+	public final static String NOME_CACHE_TERZO_COMPENSO_SERVICE = "cacheTerzoCompensoService";
 	public final static String NOME_CACHE_TICKET_ALFRESCO = "cacheTicketAlfresco";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_FAQ = "cacheFaq";

@@ -5,6 +5,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import it.cnr.jada.ejb.session.ComponentException;
@@ -12,6 +14,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAnticipo;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -20,6 +23,11 @@ import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 @Service
 public class PrintOrdineMissioneAnticipoService {
     private final Logger log = LoggerFactory.getLogger(PrintOrdineMissioneAnticipoService.class);
+
+	@Autowired	
+	private Environment env;
+
+	private RelaxedPropertyResolver propertyResolver;
 
     @Autowired
     private PrintService printService;
@@ -64,7 +72,14 @@ public class PrintOrdineMissioneAnticipoService {
 
 	public byte[] printOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintOrdineMissioneAnticipo(ordineMissioneAnticipo, currentLogin);
-		return printService.print(myJson, "OrdineMissioneAnticipo.jasper");
+    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
+    	String nomeStampa = "";
+    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_ANTICIPO) != null) {
+    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_ANTICIPO);
+    	} else {
+    		throw new ComponentException("Configurare il nome stampa dell'anticipo");
+    	}
+		return printService.print(myJson, nomeStampa);
 	}
 
 	public String createJsonPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws ComponentException {

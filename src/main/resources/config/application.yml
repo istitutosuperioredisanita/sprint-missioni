@@ -34,7 +34,10 @@ spring:
             naming:
                 strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
     print:
-        baseDir: /it/cnr/missioni/print/
+        rimborso: /missioni/RimborsoMissione.jrxml
+        ordine: /missioni/OrdineMissione.jrxml
+        anticipo: /missioni/OrdineMissioneAnticipo.jrxml
+        autoPropria: /missioni/OrdineMissioneAutoPropria.jrxml
     messages:
         basename: i18n/messages
     mvc:

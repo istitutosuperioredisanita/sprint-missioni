@@ -10,6 +10,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import it.cnr.jada.ejb.session.ComponentException;
@@ -19,6 +21,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.print.Spostamenti;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -27,6 +30,11 @@ import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 @Service
 public class PrintOrdineMissioneAutoPropriaService {
     private final Logger log = LoggerFactory.getLogger(PrintOrdineMissioneAutoPropriaService.class);
+
+	@Autowired	
+	private Environment env;
+
+	private RelaxedPropertyResolver propertyResolver;
 
     @Autowired
     private PrintService printService;
@@ -94,9 +102,14 @@ public class PrintOrdineMissioneAutoPropriaService {
 
 	public byte[] printOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintOrdineMissioneAutoPropria(ordineMissioneAutoPropria, currentLogin);
-		Map<String, String> mapSubReport = new HashMap<String, String>();
-		mapSubReport.put("SUBREPORT_SPOSTAMENTI","ordine_missione_spostamenti_sub.jasper");
-		return printService.print(myJson, "OrdineMissioneAutoPropria.jasper", mapSubReport);
+    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
+    	String nomeStampa = "";
+    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_AUTO_PROPRIA) != null) {
+    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_AUTO_PROPRIA);
+    	} else {
+    		throw new ComponentException("Configurare il nome stampa dell'auto propria");
+    	}
+		return printService.print(myJson, nomeStampa);
 	}
 
 	public String createJsonPrintOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, String currentLogin) throws ComponentException {
