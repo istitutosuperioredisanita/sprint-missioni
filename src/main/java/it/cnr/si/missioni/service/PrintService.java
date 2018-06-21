@@ -63,7 +63,7 @@ public class PrintService{
         try {
         	HttpHeaders headers = new HttpHeaders();
     		headers.add("Authorization", "");
-    		headers.setContentType(MediaType.APPLICATION_JSON);
+    		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
     		String body = createJsonForPrint(params);
             log.info("Body: " + body);
             log.info("Headers: " + headers);
