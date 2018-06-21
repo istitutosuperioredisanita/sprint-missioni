@@ -97,6 +97,17 @@ public class ConfigResource {
 	}
 
 	/**
+	 * GET  /rest/config/refreshCache -> refreshCache
+	 */
+	@RequestMapping(value = "/rest/config/refreshCacheTerzoCompenso",
+			method = RequestMethod.GET)
+	@Timed
+	public void refreshCacheTerzoCompenso() {
+		log.debug("REST request per svuotare la cache di terzo per compenso");
+		cronService.evictCacheTerzoCompenso();
+	}
+
+	/**
 	 * GET  /rest/config/specialUsers -> rechargeSpecialUser.
 	 */
 	@RequestMapping(value = "/rest/config/specialUsers",
