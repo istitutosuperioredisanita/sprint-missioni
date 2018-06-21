@@ -38,6 +38,11 @@ missioniApp.factory('ConfigService', function ($http, ui) {
             $scope.successRefresh = true;
         });
      }
+     $scope.refreshCacheTerzoCompenso = function() {
+        $http.get('api/rest/config/refreshCacheTerzoCompenso').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
      $scope.ribaltaDatiIstituti = function() {
         $http.get('api/rest/datiIstituto/ribalta').success(function(result){
             $scope.successRefresh = true;
