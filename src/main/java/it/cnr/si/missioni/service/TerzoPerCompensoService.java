@@ -1,7 +1,6 @@
 package it.cnr.si.missioni.service;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
-import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompenso;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompensoJson;
 
 @Service
@@ -32,7 +30,7 @@ public class TerzoPerCompensoService {
     @Autowired
     private CacheService cacheService;
     
-    @Cacheable(value=Costanti.NOME_CACHE_PROXY, key="#key")
+    @Cacheable(value=Costanti.NOME_CACHE_TERZO_COMPENSO_SERVICE, key="#key")
     public TerzoPerCompensoJson getTerzi(String key, JSONBody body, String url, String query, String auth) throws ComponentException{
 
     	String app = Costanti.APP_SIGLA;

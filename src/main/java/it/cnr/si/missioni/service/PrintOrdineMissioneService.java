@@ -6,6 +6,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import it.cnr.jada.ejb.session.ComponentException;
@@ -35,6 +37,11 @@ import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 @Service
 public class PrintOrdineMissioneService {
     private final Logger log = LoggerFactory.getLogger(PrintOrdineMissioneService.class);
+
+	@Autowired	
+	private Environment env;
+
+	private RelaxedPropertyResolver propertyResolver;
 
     @Autowired
     private PrintService printService;
@@ -191,7 +198,14 @@ public class PrintOrdineMissioneService {
 	
 	public byte[] printOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintOrdineMissione(ordineMissione, currentLogin);
-		return printService.print(myJson, "OrdineMissione.jasper");
+    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
+    	String nomeStampa = "";
+    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_ORDINE) != null) {
+    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_ORDINE);
+    	} else {
+    		throw new ComponentException("Configurare il nome stampa dell'ordine");
+    	}
+		return printService.print(myJson, nomeStampa);
 	}
 
 	public String createJsonPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws ComponentException {
