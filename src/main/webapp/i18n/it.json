@@ -778,6 +778,7 @@
         "refresh.button": "Aggiorna",
         "ribalta-dati-istituti.button": "Ribalta Dati per UO",
         "refreshCache.button": "Aggiorna Cache Servizi REST",
+        "refreshCacheTerzoCompenso.button": "Aggiorna Cache Terzo Compenso",
         "sendMessage.button": "Invia Messaggio"
     },
     "configuration": {

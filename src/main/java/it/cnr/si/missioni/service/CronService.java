@@ -119,6 +119,7 @@ public class CronService {
 
 				LOGGER.info("got lock {}", lockKeyEvictCache);
 				LOGGER.info("Cron per Svuotare la Cache");
+				evictCacheTerzoCompenso();
 			}
 
 
@@ -126,6 +127,11 @@ public class CronService {
 			LOGGER.error("Errore", e);
 			throw new ComponentException(e);
 		}
+	}
+
+	@CacheEvict(value = Costanti.NOME_CACHE_TERZO_COMPENSO_SERVICE, allEntries = true)
+	public void evictCacheTerzoCompenso() throws ComponentException {
+		LOGGER.info("Cron per Svuotare la Cache Terzo Compenso");
 	}
 
 	@Transactional
