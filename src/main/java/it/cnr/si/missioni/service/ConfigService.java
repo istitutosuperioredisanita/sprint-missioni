@@ -11,6 +11,7 @@ import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Faq;
+import it.cnr.si.missioni.util.data.UtentiPresidenteSpeciali;
 import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
 @Service
@@ -21,6 +22,7 @@ public class ConfigService {
 	
 	Services services = null;
 	DatiUo datiUo = null;
+	UtentiPresidenteSpeciali utentiPresidenteSpeciali = null;
 	Faq faq = null;
 	DataUsersSpecial dataUsersSpecial = null;
 	String message = null;
@@ -39,6 +41,8 @@ public class ConfigService {
 	private void loadData(Boolean fromInit) {
 		dataUsersSpecial = loadFilesService.loadUsersSpecialForUo();
 		datiUo = loadFilesService.loadDatiUo();
+		utentiPresidenteSpeciali = loadFilesService.loadDatiUtentiPresidenteSpeciali();
+		
 		faq = loadFilesService.loadFaq();
 		if (fromInit){
 			services = loadFilesService.loadServicesForCache();
@@ -48,6 +52,7 @@ public class ConfigService {
 	private void evictData() {
 		loadFilesService.evictUsersSpecialForUo();
 		loadFilesService.evictDatiUo();
+		loadFilesService.evictDatiUtentiPresidenteSpeciali();;
 		loadFilesService.evictFaq();
 	}
 
@@ -64,6 +69,11 @@ public class ConfigService {
 	public void reloadDatiUo() {
 		loadFilesService.evictDatiUo();
 		datiUo = loadFilesService.loadDatiUo();
+	}
+
+	public void reloadDatiUtentiPresidenteSpeciali() {
+		loadFilesService.evictDatiUtentiPresidenteSpeciali();
+		utentiPresidenteSpeciali = loadFilesService.loadDatiUtentiPresidenteSpeciali();
 	}
 
 	public void reloadFaq() {
@@ -100,5 +110,10 @@ public class ConfigService {
     public String getMessage() {
     	return message;
     }
+
+
+	public UtentiPresidenteSpeciali getUtentiPresidenteSpeciali() {
+		return utentiPresidenteSpeciali;
+	}
 
 }
