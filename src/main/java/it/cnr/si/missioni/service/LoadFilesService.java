@@ -22,6 +22,7 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Faq;
+import it.cnr.si.missioni.util.data.UtentiPresidenteSpeciali;
 import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
 @Service
@@ -46,6 +47,21 @@ public class LoadFilesService {
 	}
 	@CacheEvict(value = Costanti.NOME_CACHE_USER_SPECIAL, allEntries = true)
 	public void evictUsersSpecialForUo() {
+	}
+	@CacheEvict(value = Costanti.NOME_CACHE_DATI_UTENTI_PRESIDENTE_SPECIALI, allEntries = true)
+	public void evictDatiUtentiPresidenteSpeciali() {
+	}
+    @Cacheable(value=Costanti.NOME_CACHE_DATI_UTENTI_PRESIDENTE_SPECIALI)
+	public UtentiPresidenteSpeciali loadDatiUtentiPresidenteSpeciali() {
+		InputStream is = getUtentiPresidenteSpeciali();
+		if (is == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle uo non trovato.");
+		}
+		try {
+			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, UtentiPresidenteSpeciali.class); 
+		} catch (Exception e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON degli utenti presidente speciali." + Utility.getMessageException(e));
+		}
 	}
 
     @Cacheable(value=Costanti.NOME_CACHE_DATI_UO)
@@ -115,8 +131,16 @@ public class LoadFilesService {
 	}
 
 	private InputStream getUo() {
-		InputStream is = null;
 		String fileName = getFileNameFromDatiUo();
+		return recuperoFile(fileName);
+	}
+
+	private InputStream getUtentiPresidenteSpeciali() {
+		String fileName = getFileNameFromUtentiPresidenteSpeciali();
+		return recuperoFile(fileName);
+	}
+	protected InputStream recuperoFile(String fileName) {
+		InputStream is;
 		Document node = (Document) missioniCMISService.getNodeByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
 		if (node == null || node.getContentStream() == null){
 			is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/"+fileName);
@@ -127,15 +151,8 @@ public class LoadFilesService {
 	}
 
 	private InputStream getFaq() {
-		InputStream is = null;
 		String fileName = getFileNameFromFaq();
-		Document node = (Document) missioniCMISService.getNodeByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
-		if (node == null || node.getContentStream() == null){
-			is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/"+fileName);
-		} else {
-			is = node.getContentStream().getStream();
-		}
-		return is;
+		return recuperoFile(fileName);
 	}
 
 	private String getFileNameFromFaq(){
@@ -150,7 +167,10 @@ public class LoadFilesService {
    		}
 	}
 	
-	private String getFileNameFromRestServices(){
+	private String getFileNameFromUtentiPresidenteSpeciali(){
+		return "utentiPresidenteSpeciali.json";
+	}
+		private String getFileNameFromRestServices(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return "restServicesDev.json";
    		} else {
@@ -171,14 +191,8 @@ public class LoadFilesService {
 		
     	if (this.propertyResolver != null && Boolean.valueOf(this.propertyResolver.getProperty("init_cache")).equals(true)) {
     		String fileName = getFileNameFromRestServices();
-
-    		Document node = (Document) missioniCMISService.getNodeByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
-    		if (node == null || node.getContentStream() == null){
-    			is = this.getClass().getResourceAsStream("/it/cnr/missioni/cache/"+fileName);
-    		} else {
-    			is = node.getContentStream().getStream();
-    		}
-    	}
+    		is = recuperoFile(fileName);
+    	}	
 		return is;
 	}
 

@@ -47,11 +47,13 @@ import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
 import it.cnr.si.missioni.service.RimborsoMissioneDettagliService;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.service.UoService;
+import it.cnr.si.missioni.service.UtentiPresidenteSpecialiService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
+import it.cnr.si.missioni.util.data.UtentePresidenteSpeciale;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
@@ -117,6 +119,9 @@ public class CMISRimborsoMissioneService {
 
 	@Autowired
 	private RimborsoMissioneService rimborsoMissioneService;
+
+	@Autowired
+	private UtentiPresidenteSpecialiService utentiPresidenteSpecialeService;
 
 	@Autowired
 	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
@@ -284,6 +289,13 @@ public class CMISRimborsoMissioneService {
 				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
 				if (StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(rimborsoMissione.getUid(),"N").equals(parametri.getDipendenteCda())){
 					userNameFirmatario = userNameFirmatarioSpesa;
+				}else{
+					UtentePresidenteSpeciale utente = utentiPresidenteSpecialeService.esisteUtente(Utility.nvl(rimborsoMissione.getUid(),"N"));
+					if (utente != null){
+						String primo = userNameFirmatario;
+						userNameFirmatario = userNameFirmatarioSpesa;
+						userNameFirmatarioSpesa = primo;
+					}
 				}
 			} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 				if (uoCompetenzaPerFlusso != null){
