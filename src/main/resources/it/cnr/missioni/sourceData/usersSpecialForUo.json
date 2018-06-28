@@ -286,7 +286,7 @@
 {"codice_uo":"016000"},
 {"codice_uo":"016001"},
 {"codice_uo":"016002"},
-{"codice_uo":"092000"},
+{"codice_uo":"092000","ordine_da_validare" : "S"},
 {"codice_uo":"000600"},
 {"codice_uo":"000100"},
 {"codice_uo":"000105"},

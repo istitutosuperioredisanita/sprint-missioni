@@ -258,7 +258,7 @@ public class PrintRimborsoMissioneService {
     		throw new ComponentException("Configurare il nome stampa del rimborso");
     	}
 
-		return printService.print(myJson, nomeStampa);
+		return printService.print(myJson, nomeStampa, rimborsoMissione.getId());
 	}
 
 	public String createJsonPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws ComponentException {

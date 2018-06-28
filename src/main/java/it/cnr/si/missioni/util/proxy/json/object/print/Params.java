@@ -13,7 +13,11 @@ public class Params {
 	@JsonProperty("report")
 	private String report;
 	
-/**
+
+	@JsonProperty("pgStampa")
+	private Long pgStampa;
+
+	/**
 	*
 	* @return
 	* The params
@@ -47,6 +51,14 @@ public class Params {
 	*/
 	public void setReport(String report) {
 	this.report = report;
+	}
+
+	public Long getPgStampa() {
+		return pgStampa;
+	}
+
+	public void setPgStampa(Long pgStampa) {
+		this.pgStampa = pgStampa;
 	}
 
 }

@@ -109,7 +109,7 @@ public class PrintOrdineMissioneAutoPropriaService {
     	} else {
     		throw new ComponentException("Configurare il nome stampa dell'auto propria");
     	}
-		return printService.print(myJson, nomeStampa);
+		return printService.print(myJson, nomeStampa, ordineMissioneAutoPropria.getId());
 	}
 
 	public String createJsonPrintOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, String currentLogin) throws ComponentException {

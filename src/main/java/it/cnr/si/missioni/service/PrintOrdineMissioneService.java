@@ -205,7 +205,7 @@ public class PrintOrdineMissioneService {
     	} else {
     		throw new ComponentException("Configurare il nome stampa dell'ordine");
     	}
-		return printService.print(myJson, nomeStampa);
+		return printService.print(myJson, nomeStampa, ordineMissione.getId());
 	}
 
 	public String createJsonPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws ComponentException {

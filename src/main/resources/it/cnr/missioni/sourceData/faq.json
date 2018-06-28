@@ -28,7 +28,7 @@
    {
       "tipo": "Rimborso Missione",
       "anomalia": "Dipendente riceve messaggio 'Per la data della missione non esiste un inquadramento valido.'",
-      "risposta": "Per i dipendenti a tempo determinato che sono a scadenza, i rinnovi vengono aggiornati dal sistema informativo del personale dopo il 20 di ogni mese. Quindi purtroppo per poter operare è necessario aspettare questo aggiornamento."
+      "risposta": "Per i dipendenti a tempo determinato che sono a scadenza, i rinnovi vengono aggiornati dal sistema informativo del personale dopo il 22 di ogni mese. Quindi purtroppo per poter operare è necessario aspettare questo aggiornamento."
    }
   ]
 }
