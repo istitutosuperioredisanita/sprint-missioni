@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,9 +79,9 @@ public class PrintService{
     }
 
     
-    public byte[] print(String myJson, String printNameJasper) throws AwesomeException, ComponentException {
+    public byte[] print(String myJson, String printNameJasper, Serializable id) throws AwesomeException, ComponentException {
 		try {
-			Params params = createParamsForPrint(myJson, printNameJasper);
+			Params params = createParamsForPrint(myJson, printNameJasper, id);
 			ResponseEntity<byte[]> response = processForPrint(HttpMethod.POST, params);
 			log.debug("Stampa "+printNameJasper+" length: "+response.getHeaders().get("Content-Length").get( 0 ));
 			return response.getBody();
@@ -90,7 +91,7 @@ public class PrintService{
 		}
 	}
 
-	protected Params createParamsForPrint(String myJson, String printNameJasper) {
+	protected Params createParamsForPrint(String myJson, String printNameJasper, Serializable id) {
 		Key key = new Key();
 		key.setNomeParam(Costanti.PARAMETER_DATA_SOURCE_FOR_PRINT);
 		Param param = new Param();
@@ -102,6 +103,7 @@ public class PrintService{
 		lista.add(param);
 		params.setParams(lista);
 		params.setReport(printNameJasper);
+		params.setPgStampa(new Long(id.toString()));
 		return params;
 	}
 }

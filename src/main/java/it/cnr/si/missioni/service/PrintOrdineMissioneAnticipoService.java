@@ -79,7 +79,7 @@ public class PrintOrdineMissioneAnticipoService {
     	} else {
     		throw new ComponentException("Configurare il nome stampa dell'anticipo");
     	}
-		return printService.print(myJson, nomeStampa);
+		return printService.print(myJson, nomeStampa, ordineMissioneAnticipo.getId());
 	}
 
 	public String createJsonPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws ComponentException {
