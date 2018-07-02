@@ -3,6 +3,8 @@ package it.cnr.si.missioni.util.proxy.json.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class CommonService {
 	@Autowired
     private ProxyService proxyService;
 	
+    private final Logger log = LoggerFactory.getLogger(CommonService.class);
+
 	public String process(List<JSONClause> clauses, String app, String url) {
 		return process(clauses, app, url, null);
 	}
@@ -51,7 +55,9 @@ public class CommonService {
 			}
 
 			CallCache callCache = cacheService.prepareCallCache(restInCache, clausesToAdd);
+	    	log.debug("Start Common Cache : "+url);
 			ResultProxy result = proxyService.processInCache(callCache);
+	    	log.debug("End Common Cache : "+url);
 			CommonJsonRest<RestServiceBean> commonJsonRest = result.getCommonJsonResponse();
 			risposta = cacheService.manageResponse(restInCache, listaNewClauses, commonJsonRest);
 		} else {

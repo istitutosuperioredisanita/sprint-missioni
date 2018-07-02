@@ -12,6 +12,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import it.cnr.jada.ejb.session.ComponentException;
@@ -20,6 +22,7 @@ import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissioneDettagli;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -41,7 +44,12 @@ import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 public class PrintRimborsoMissioneService {
     private final Logger log = LoggerFactory.getLogger(PrintRimborsoMissioneService.class);
 
-    @Autowired
+	@Autowired	
+	private Environment env;
+
+	private RelaxedPropertyResolver propertyResolver;
+
+	@Autowired
     private PrintService printService;
 
     @Autowired
@@ -242,9 +250,15 @@ public class PrintRimborsoMissioneService {
 	
 	public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintRimborsoMissione(rimborsoMissione, currentLogin);
-		Map<String, String> mapSubReport = new HashMap<String, String>();
-		mapSubReport.put("SUBREPORT_DETTAGLI","rimborso_missione_dettagli_sub.jasper");
-		return printService.print(myJson, "RimborsoMissione.jasper", mapSubReport);
+    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
+    	String nomeStampa = "";
+    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_RIMBORSO) != null) {
+    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_RIMBORSO);
+    	} else {
+    		throw new ComponentException("Configurare il nome stampa del rimborso");
+    	}
+
+		return printService.print(myJson, nomeStampa, rimborsoMissione.getId());
 	}
 
 	public String createJsonPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws ComponentException {

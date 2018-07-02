@@ -33,6 +33,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
@@ -45,6 +46,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
+import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -93,6 +95,9 @@ public class RimborsoMissioneService {
 
 	@Autowired
 	private UoService uoService;
+
+    @Autowired
+    private ParametriService parametriService;
 
     @Autowired
     private Environment env;
@@ -326,7 +331,7 @@ public class RimborsoMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
-					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()));
+					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
 			rabbitMQService.send(missione);
 		}
 	}
@@ -573,6 +578,7 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
 		rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
 		rimborsoMissioneDB.setCug(rimborsoMissione.getCug());
+		rimborsoMissioneDB.setPresidente(rimborsoMissione.getPresidente());
 		rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
 	}
@@ -1187,6 +1193,15 @@ public class RimborsoMissioneService {
 		if (!StringUtils.hasLength(rimborsoMissione.getMatricola())){
 			rimborsoMissione.setMatricola(null);
 		}
+		OrdineMissione ordine = rimborsoMissione.getOrdineMissione();
+		if (ordine.getCdsRich() != null){
+			ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
+		}
+		if (Utility.nvl(ordine.getPresidente(),"N").equals("S")){
+			if (!Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S")){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione è per la presidenza, quindi anche il rimborso missione deve essere per la presidenza.");
+			}
+		}
 	}
 	
 	private void controlloCampiObbligatori(RimborsoMissione rimborsoMissione) {
@@ -1240,6 +1255,7 @@ public class RimborsoMissioneService {
         		if (is != null){
             		try {
     					printRimborsoMissione = IOUtils.toByteArray(is);
+						is.close();
     				} catch (IOException e) {
     					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
     				}
