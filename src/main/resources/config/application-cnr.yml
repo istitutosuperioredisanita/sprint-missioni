@@ -64,6 +64,9 @@ spring:
         consumer:
             name: loopback
 
+    print:
+        endpoint: http://sigla-print.test.si.cnr.it/api/v1/get/print
+
 ajp:
     port: 8009
     timeout: 120000

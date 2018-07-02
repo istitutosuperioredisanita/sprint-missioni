@@ -339,6 +339,14 @@
                               </label>
                           </span>
                   </p>
+                  <p class="col-md-2">
+                           <span class="input-group">
+                              <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
+                              <label class="checkbox">
+                                      <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="checkbox" ng-change="cambioPresidenza(ordineMissioneModel.presidente)" ng-model="ordineMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
+                              </label>
+                          </span>
+                  </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">

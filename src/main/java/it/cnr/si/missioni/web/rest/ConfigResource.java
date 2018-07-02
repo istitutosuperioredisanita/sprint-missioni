@@ -6,6 +6,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.CronService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.data.Faq;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,18 @@ public class ConfigResource {
     	return JSONResponseEntity.ok(message);
     }
 
-    @RequestMapping(value = "/rest/config/message",
+	@RolesAllowed({AuthoritiesConstants.USER})
+    @RequestMapping(value = "/rest/config/faq",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getFaq(HttpServletRequest request,
+                                             HttpServletResponse response) {
+    	Faq faq = configService.getFaq();
+    	return JSONResponseEntity.ok(faq.getElencoFaq());
+    }
+
+	@RequestMapping(value = "/rest/config/message",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -82,6 +94,17 @@ public class ConfigResource {
 		log.debug("REST request per ricaricare la configurazione da Alfresco");
 		cronService.evictCache();
 		cronService.loadCache();
+	}
+
+	/**
+	 * GET  /rest/config/refreshCache -> refreshCache
+	 */
+	@RequestMapping(value = "/rest/config/refreshCacheTerzoCompenso",
+			method = RequestMethod.GET)
+	@Timed
+	public void refreshCacheTerzoCompenso() {
+		log.debug("REST request per svuotare la cache di terzo per compenso");
+		cronService.evictCacheTerzoCompenso();
 	}
 
 	/**

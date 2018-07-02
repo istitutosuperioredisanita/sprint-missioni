@@ -1,0 +1,25 @@
+<div>
+    <h2 translate="faq.title">FAQ</h2>
+     <div class="panel-body my-panel-body">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <div>
+              <div class="text-left">
+                  <ul class="list-unstyled subscriptions">
+                   <li ng-repeat="q in faq" >
+                      <div class="row" style="text-align:justify">
+                            <b>{{q.tipo}}</b> 
+                            <br>
+                            <b>{{'faq.form.anomalia' | translate}}:</b>{{q.anomalia}}
+                            <br>
+                            <b>{{'faq.form.risposta' | translate}}:</b>{{q.risposta}}
+                            <br>
+                       </div>
+                    </li>
+                  </ul>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

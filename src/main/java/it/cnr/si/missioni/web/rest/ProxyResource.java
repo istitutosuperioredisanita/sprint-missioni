@@ -114,7 +114,9 @@ public class ProxyResource {
     		String existsClauseVariable = existsClauseVariable(resultCacheProxy);
     		if (isCacheable(resultCacheProxy)){
     			CallCache callCache = new CallCache(httpMethod, resultCacheProxy.getBody(), app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION), resultCacheProxy.getRestService().getClasseJson());
+    	    	log.debug("Start Cache :");
     			result = proxyService.processInCache(callCache);
+    	    	log.debug("End Cache :");
         	} else {
         		if (body != null && body.getContext() == null){
             		cacheService.setContext(body, app);

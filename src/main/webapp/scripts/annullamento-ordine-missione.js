@@ -107,6 +107,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                 $scope.annullamentoModel.ordineMissione.missioneGratuita = ordineMissioneSelected.missioneGratuita;
                 $scope.annullamentoModel.ordineMissione.cup = ordineMissioneSelected.cup;
                 $scope.annullamentoModel.ordineMissione.cug = ordineMissioneSelected.cug;
+                $scope.annullamentoModel.ordineMissione.presidente = ordineMissioneSelected.presidente;
                 if ($scope.annullamentoModel.ordineMissione.uoSpesa){
                     $scope.restUo($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.cdsSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
                     $scope.restModuli($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);

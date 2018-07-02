@@ -133,6 +133,9 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "CUG", length = 1, nullable = true)
     public String cug;
 
+    @Column(name = "PRESIDENTE", length = 1, nullable = true)
+    public String presidente;
+
     @Column(name = "ANNO", length = 4, nullable = false)
     public Integer anno;
 
@@ -1401,5 +1404,13 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setNumeroIniziale(Long numeroIniziale) {
 		this.numeroIniziale = numeroIniziale;
+	}
+
+	public String getPresidente() {
+		return presidente;
+	}
+
+	public void setPresidente(String presidente) {
+		this.presidente = presidente;
 	}
 }

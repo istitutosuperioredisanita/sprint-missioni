@@ -26,6 +26,7 @@ import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
@@ -205,7 +206,7 @@ public class AnnullamentoOrdineMissioneService {
 			}
 			Missione missione = new Missione(TypeMissione.ANNULLAMENTO, new Long(annullamento.getId().toString()), idSede, 
 					annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(), 
-					annullamento.getOrdineMissione().getDataFineMissione(), new Long(annullamento.getOrdineMissione().getId().toString()));
+					annullamento.getOrdineMissione().getDataFineMissione(), new Long(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
 			rabbitMQService.send(missione);
 		}
 	}
@@ -660,9 +661,10 @@ public class AnnullamentoOrdineMissioneService {
         		if (is != null){
             		try {
     					printAnnullamentoMissione = IOUtils.toByteArray(is);
+    					is.close();
     				} catch (IOException e) {
     					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
-    				}
+					}
         		}
     		} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale");

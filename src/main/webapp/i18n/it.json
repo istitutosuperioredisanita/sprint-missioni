@@ -7,6 +7,7 @@
         "menu": {
             "home": "Home",
             "manual": "Manuali",
+            "faq": "FAQ",
             "entities": {
                 "main": "Anagrafiche",
                 "autoPropria": "Auto Propria",
@@ -410,8 +411,9 @@
             "cup": "Codice CUP",
             "motivo-respingi-mittente": "Motivo Respingi al mittente",
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
-            "cug": "Comitato Unico Garanzia"
-        },
+            "cug": "Comitato Garanzia",
+            "presidenza": "Presidenza"        
+		},
         "button": {
             "sendToSign": "Invia alla Firma",
             "returnToSender": "Respingi al Mittente",
@@ -530,6 +532,14 @@
             "anno-ordine": "Anno Ordine"
         }
     },
+    "faq": {
+        "title": "FAQ",
+        "form": {
+            "categoria": "Categoria",
+            "anomalia": "Anomalia",
+            "risposta": "Risposta"
+        }
+    },
     "manual": {
         "title": "Manuali",
         "form": {
@@ -541,7 +551,7 @@
     "helpdesk": {
         "title": "HelpDesk",
         "form": {
-            "avviso": "Compilare tutti i dati per inviare una segnalazione helpdesk. Non è necessario allegare files.",
+            "avviso": "Prima di inviare una segnalazione di helpdesk controllare se l'anomalia è censita tra le FAQ, utilizzando l'apposita voce di menu. Compilare tutti i dati per inviare una segnalazione helpdesk. Non è necessario allegare files.",
             "oggetto": "Oggetto",
             "messaggio": "Messaggio",
             "nota": "Annotazione",
@@ -770,6 +780,7 @@
         "refresh.button": "Aggiorna",
         "ribalta-dati-istituti.button": "Ribalta Dati per UO",
         "refreshCache.button": "Aggiorna Cache Servizi REST",
+        "refreshCacheTerzoCompenso.button": "Aggiorna Cache Terzo Compenso",
         "sendMessage.button": "Invia Messaggio"
     },
     "configuration": {
