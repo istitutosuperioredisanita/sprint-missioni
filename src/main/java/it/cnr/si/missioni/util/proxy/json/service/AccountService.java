@@ -289,10 +289,17 @@ public class AccountService {
 	}
 	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean isUoRich, Boolean fromDatiSAC) {
 		String userNameFirmatario;
-		if (!isUoRich || (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0))){
+		DatiSede dati = null;
+		Boolean delegaSpesa = false;
+		if (account.getCodiceSede() != null){
+			dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
+			if (dati != null && dati.getResponsabile() != null && Utility.nvl(dati.getDelegaSpesa()).equals("S")){
+				delegaSpesa = true;
+			}
+		}
+		if ((!isUoRich && !delegaSpesa) || (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0))){
 			userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
 		} else {
-			DatiSede dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
 			if (dati != null && dati.getResponsabile() != null){
 				if (!isMissioneEstera || (Utility.nvl(dati.getResponsabileSoloItalia(),"N").equals("N"))){
 					userNameFirmatario = dati.getResponsabile();
