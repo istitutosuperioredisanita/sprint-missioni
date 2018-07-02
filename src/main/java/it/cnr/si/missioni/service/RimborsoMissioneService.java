@@ -780,15 +780,15 @@ public class RimborsoMissioneService {
 							Disjunction condizioneOr = Restrictions.disjunction();
 							List<String> listaUoUtente = new ArrayList<String>();
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
-					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
-					    		if (uo != null){
+//					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
+//					    		if (uo != null){
 					    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))));
-						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
-						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
+//						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
+//						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
 							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
-						    			}
-						    		}
-					    		}
+//						    			}
+//						    		}
+//					    		}
 					    	}
 					    	criterionList.add(condizioneOr);
 						} else {
@@ -976,10 +976,10 @@ public class RimborsoMissioneService {
 				}
 			} else {
 				if (rimborsoMissione.getDataInizioEstero() != null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Imbarco di Partenza può essere valorizzata solo nel caso di missione estera con TAM");
+					rimborsoMissione.setDataInizioEstero(null);
 				}
 				if (rimborsoMissione.getDataFineEstero() != null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La Data Sbarco di Ritorno può essere valorizzata solo nel caso di missione estera con TAM");
+					rimborsoMissione.setDataFineEstero(null);
 				}
 			}
 			if (rimborsoMissione.isMissioneDipendente()){

@@ -17,6 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.codec.Base64;
@@ -140,6 +141,12 @@ public class ProxyService implements EnvironmentAware{
             return resultProxy;
         } catch (HttpClientErrorException _ex) {
         	String errResponse = _ex.getResponseBodyAsString();
+    		if (_ex.getRawStatusCode() == 404 && proxyURL.contains(Costanti.REST_UO_TIT_CA) && app.equals(Costanti.APP_SIPER)){
+    			ResultProxy res = new ResultProxy();
+    			res.setStatus(HttpStatus.OK);
+    			res.setBody("");
+    			return res; 
+    		}
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
         	throw new ApplicationContextException(errResponse,_ex);
         } catch (HttpServerErrorException _ex) {

@@ -8,8 +8,16 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
         var app = APP_FOR_REST.OIL;
         var url = OIL_REST.CATEGORIE;
         $http.get(urlRestProxy + app+'/'+'?proxyURL='+url).success(function (data) {
-            if (data)
-                $scope.categorie = data.sottocategorie;
+            if (data){
+              for (var k=0; k<data.length; k++) {
+                if (data[k].sottocategorie && data[k].sottocategorie.length>0 ){
+                  $scope.categorie = data[k].sottocategorie;
+                  break;
+                }
+              }              
+
+            }
+                
         });
     }        
 

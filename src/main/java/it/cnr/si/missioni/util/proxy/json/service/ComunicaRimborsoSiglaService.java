@@ -404,6 +404,9 @@ public class ComunicaRimborsoSiglaService {
 				data = aData;
 			}
 			ultimaDataInizioUsata = data;
+			if (data.isAfter(aData)){
+				data = aData;
+			}
 			TappeMissioneColl newDayTappa;
 			try {
 				newDayTappa = (TappeMissioneColl)tappa.clone();

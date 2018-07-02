@@ -32,11 +32,11 @@ spring:
             username: app.selezioni
             password: pentagono
         OIL:
-            username: esperto1
-            password: esperto.1
+            username: missioni1
+            password: missioni.1
             url: http://oil.test.si.cnr.it/rest/
             newProblem: pest
-            instance: /HDMissioni
+            instance: /HDSiper
     ldap:
         userSearchBase: o=cnr, c=it
         userSearchFilter: uid={0}
