@@ -5,6 +5,12 @@ missioniApp.factory('ConfigService', function ($http, ui) {
                     return response.data;
                 });
                 return promise;
+            },
+            getFaq: function() {
+                var promise = $http.get('api/rest/config/faq').then(function (response) {
+                    return response.data;
+                });
+                return promise;
             }
         }
     });
@@ -29,6 +35,11 @@ missioniApp.factory('ConfigService', function ($http, ui) {
      }
      $scope.refreshCache = function() {
         $http.get('api/rest/config/refreshCache').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
+     $scope.refreshCacheTerzoCompenso = function() {
+        $http.get('api/rest/config/refreshCacheTerzoCompenso').success(function(result){
             $scope.successRefresh = true;
         });
      }

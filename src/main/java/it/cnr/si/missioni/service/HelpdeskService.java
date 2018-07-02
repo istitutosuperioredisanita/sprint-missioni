@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.ExternalProblem;
+import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
@@ -42,20 +43,21 @@ public class HelpdeskService {
 	
 	public Long newProblem(ExternalProblem hd) throws ServiceException {
 
+?		hd.setLogin(SecurityUtils.getCurrentUser().getName());
+		Account account = accountService.loadAccountFromRest(hd.getLogin(), true);
+		if (account.getUoForUsersSpecials() == null || account.getUoForUsersSpecials().isEmpty()){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Helpdesk non autorizzato");
+		}
+		
+		hd.setFirstName(account.getNome());
+		hd.setFamilyName(account.getCognome());
+		hd.setEmail(account.getEmailComunicazioni());
 		String url = Costanti.REST_OIL_NEW_PROBLEM;
 
 		if (hd.getIdSegnalazione() != null){
 			
-			hd.setLogin("mail");
-			hd.setStato(2);
 			ResultProxy result = proxyService.process(HttpMethod.POST, hd, Costanti.APP_HELPDESK, url, null, null, false);
-			return hd.getIdSegnalazione();
 		} else {
-			hd.setLogin(SecurityUtils.getCurrentUser().getName());
-			Account account = accountService.loadAccountFromRest(hd.getLogin());
-			hd.setFirstName(account.getNome());
-			hd.setFamilyName(account.getCognome());
-			hd.setEmail(account.getEmailComunicazioni());
 			String descrizione = hd.getDescrizione() + System.getProperty("line.separator")+System.getProperty("line.separator")+hd.getFirstName()+
 					" "+hd.getFamilyName()+"  Email: "+hd.getEmail()+"  Data: "+DateUtils.getDateAsString(ZonedDateTime.now(), DateUtils.PATTERN_DATETIME);
 

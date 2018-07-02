@@ -54,6 +54,8 @@
     <include file="classpath:config/liquibase/changelog/20180323132300_add_sequences.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180411113500_modify_column_note_respingi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180411115500_add_column_delega_spesa.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180530153000_add_column_presidente.xml" relativeToChangelogFile="false"/>
+
     <include file="classpath:config/liquibase/changelog/20180330110000_add_table_rimborso_impegni" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180404121000_add_column_rimborso_missioni_dettagli.xml" relativeToChangelogFile="false"/>
 

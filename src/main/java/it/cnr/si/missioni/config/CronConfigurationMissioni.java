@@ -41,8 +41,10 @@ public class CronConfigurationMissioni {
 
 	@Scheduled(cron = "${cron.evictCache.cronExpression}")
     public void evictCache() throws Exception {
-    	if (cronEvictCacheActive)
+    	if (cronEvictCacheActive){
     		cronService.evictCache();
+    		cronService.evictCacheTerzoCompenso();
+    	}
     }
 
 	@Scheduled(cron = "${cron.loadCache.cronExpression}")

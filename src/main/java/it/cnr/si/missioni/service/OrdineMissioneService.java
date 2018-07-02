@@ -34,6 +34,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
+import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
@@ -45,6 +46,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -103,6 +105,9 @@ public class OrdineMissioneService {
 
     @Autowired
     OrdineMissioneAutoPropriaRepository OrdineMissioneAutoPropriaRepository;
+
+    @Autowired
+    private ParametriService parametriService;
 
     @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
@@ -225,6 +230,7 @@ public class OrdineMissioneService {
         		if (is != null){
             		try {
     					printOrdineMissione = IOUtils.toByteArray(is);
+						is.close();
     				} catch (IOException e) {
     					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
     				}
@@ -415,7 +421,7 @@ public class OrdineMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.ORDINE, new Long(ordineMissione.getId().toString()), idSede, 
-					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null);
+					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null, ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
 			rabbitMQService.send(missione);
 		}
 	}
@@ -882,32 +888,41 @@ public class OrdineMissioneService {
     	if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R") && !fromFlows){
         	validaCRUD(principal, ordineMissioneDB);
     	}
-
-    	if (confirm && !ordineMissioneDB.isMissioneDaValidare()){
-    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-    		if (Utility.nvl(istituto.getCreaImpegnoAut(),"N").equals("S") ){
-    			
-    		}
-    		cmisOrdineMissioneService.avviaFlusso(principal, ordineMissioneDB);
-        	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
-        	ordineMissioneDB.setDataInvioFirma(oggi);
-        	if (istituto.isAttivaGestioneResponsabileModulo()){
-        		if (ordineMissioneDB.getDataInvioRespGruppo() == null){
-        			ordineMissioneDB.setDataInvioRespGruppo(oggi);
-        		}
-        	}
-    		if (ordineMissioneDB.getDataInvioAmministrativo() == null){
-    			ordineMissioneDB.setDataInvioAmministrativo(oggi);
-    		}
-    	}else if (confirm && ordineMissioneDB.isMissioneDaValidare()){
-    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-        	if (istituto.isAttivaGestioneResponsabileModulo()){
-        		if (ordineMissioneDB.getDataInvioRespGruppo() == null){
-        			ordineMissioneDB.setDataInvioRespGruppo(oggi);
-        		}
-        	}
-    		ordineMissioneDB.setDataInvioAmministrativo(oggi);
+    	if (confirm){
+			Parametri parametri = parametriService.getParametri();
+			if (parametri != null && StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(ordineMissione.getUid(),"N").equals(parametri.getDipendenteCda())){
+            	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMATO_FROM_CMIS));
+            	ordineMissioneDB.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+            	ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
+				
+			} else if (!ordineMissioneDB.isMissioneDaValidare()){
+	    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+	    		if (Utility.nvl(istituto.getCreaImpegnoAut(),"N").equals("S") ){
+	    			
+	    		}
+	    		cmisOrdineMissioneService.avviaFlusso(principal, ordineMissioneDB);
+	        	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
+	        	ordineMissioneDB.setDataInvioFirma(oggi);
+	        	if (istituto.isAttivaGestioneResponsabileModulo()){
+	        		if (ordineMissioneDB.getDataInvioRespGruppo() == null){
+	        			ordineMissioneDB.setDataInvioRespGruppo(oggi);
+	        		}
+	        	}
+	    		if (ordineMissioneDB.getDataInvioAmministrativo() == null){
+	    			ordineMissioneDB.setDataInvioAmministrativo(oggi);
+	    		}
+	    	}else if (ordineMissioneDB.isMissioneDaValidare()){
+	    		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+	        	if (istituto.isAttivaGestioneResponsabileModulo()){
+	        		if (ordineMissioneDB.getDataInvioRespGruppo() == null){
+	        			ordineMissioneDB.setDataInvioRespGruppo(oggi);
+	        		}
+	        	}
+	    		ordineMissioneDB.setDataInvioAmministrativo(oggi);
+	    	}
+    		
     	}
+    	
 		ordineMissioneDB = (OrdineMissione)crudServiceBean.modificaConBulk(principal, ordineMissioneDB);
     	
 //    	autoPropriaRepository.save(autoPropria);
@@ -973,6 +988,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setCup(ordineMissione.getCup());
 		ordineMissioneDB.setMissioneGratuita(ordineMissione.getMissioneGratuita());
 		ordineMissioneDB.setCug(ordineMissione.getCug());
+		ordineMissioneDB.setPresidente(ordineMissione.getPresidente());
 		ordineMissioneDB.setBypassAmministrativo(ordineMissione.getBypassAmministrativo());
 		ordineMissioneDB.setBypassRespGruppo(ordineMissione.getBypassRespGruppo());
 		ordineMissioneDB.setDataInvioAmministrativo(ordineMissione.getDataInvioAmministrativo());

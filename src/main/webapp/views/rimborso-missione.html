@@ -404,11 +404,19 @@
                             </label>
                         </span>
                 </p>
-                  <p class="col-md-2">
+                  <p class="col-md-3">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.cug">Missione CUG</span>
                               <label class="checkbox">
                                       <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.cug" ng-true-value="S" ng-false-value="N">
+                              </label>
+                          </span>
+                  </p>
+                  <p class="col-md-4">
+                           <span class="input-group">
+                              <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
+                              <label class="checkbox">
+                                      <input ng-disabled="rimborsoMissioneModel" type="checkbox" ng-model="rimborsoMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
                               </label>
                           </span>
                   </p>

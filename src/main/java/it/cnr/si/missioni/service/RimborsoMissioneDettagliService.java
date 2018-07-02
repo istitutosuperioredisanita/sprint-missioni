@@ -33,6 +33,7 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
@@ -243,7 +244,12 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagli.setStato(Costanti.STATO_ANNULLATO);
 		crudServiceBean.modificaConBulk(principal, rimborsoMissioneDettagli);
 		if (deleteDocument) {
-			cmisRimborsoMissioneService.deleteFolderRimborsoMissioneDettaglio(rimborsoMissioneDettagli);
+			List<CMISFileAttachment> lista = getAttachments(principal, new Long( rimborsoMissioneDettagli.getId().toString()));
+			if (lista != null && !lista.isEmpty()){
+				for (CMISFileAttachment attach : lista){
+					rimborsoMissioneService.gestioneCancellazioneAllegati(principal, attach.getId(), new Long(rimborsoMissioneDettagli.getRimborsoMissione().getId().toString()));
+				}
+			}
 		}
 	}
 

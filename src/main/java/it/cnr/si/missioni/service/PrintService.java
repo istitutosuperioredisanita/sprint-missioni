@@ -1,34 +1,35 @@
 package it.cnr.si.missioni.service;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Locale;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.SimpleClientHttpRequestWithGetBodyFactory;
 import it.cnr.si.missioni.util.Utility;
-import net.sf.jasperreports.engine.DefaultJasperReportsContext;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JsonDataSource;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
+import it.cnr.si.missioni.util.proxy.json.object.print.Key;
+import it.cnr.si.missioni.util.proxy.json.object.print.Param;
+import it.cnr.si.missioni.util.proxy.json.object.print.Params;
 
 @Service
 public class PrintService{
@@ -51,44 +52,58 @@ public class PrintService{
 		return myJson;
     }
     
-    public byte[] print(String myJson, String printNameJasper) throws AwesomeException, ComponentException {
-    	return print(myJson, printNameJasper, null);
+    public ResponseEntity<byte[]> processForPrint(HttpMethod httpMethod, Params params) throws ComponentException{
+    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
+    	String url = "";
+    	if (propertyResolver != null && propertyResolver.getProperty("endpoint") != null) {
+    		url = propertyResolver.getProperty("endpoint");
+    	} else {
+    		throw new ComponentException("Configurare l'EndPoint per le stampe");
+    	}
+    	log.info("Base Print Url is: " + url);  
+        try {
+        	HttpHeaders headers = new HttpHeaders();
+    		headers.add("Authorization", "");
+    		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+    		String body = createJsonForPrint(params);
+            log.info("Body: " + body);
+            log.info("Headers: " + headers);
+        	HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);  
+        	RestTemplate rest = new RestTemplate(new SimpleClientHttpRequestWithGetBodyFactory());
+        	rest.getMessageConverters().add(new ByteArrayHttpMessageConverter());
+        	return rest.exchange(url, httpMethod, requestEntity, byte[].class);
+        } catch (HttpClientErrorException _ex) {
+        	log.error(_ex.getMessage(), _ex);
+			throw new ComponentException("Errore nella registrazione degli allegati. "+_ex.getMessage());
+        }    	
     }
+
     
-    public byte[] print(String myJson, String printNameJasper, Map<String, String> parametersSubReport) throws AwesomeException, ComponentException {
+    public byte[] print(String myJson, String printNameJasper, Serializable id) throws AwesomeException, ComponentException {
 		try {
-	    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
-	    	String dir = "";
-	    	if (propertyResolver != null && propertyResolver.getProperty("baseDir") != null) {
-	    		dir = propertyResolver.getProperty("baseDir");
-	    	}
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(myJson.getBytes(Charset.forName("UTF-8"))));
-//			JRGzipVirtualizer vir = new JRGzipVirtualizer(100);
-			final ResourceBundle resourceBundle = ResourceBundle.getBundle(
-					"net.sf.jasperreports.view.viewer", Locale.ITALIAN);
-			parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
-			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
-			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
-			parameters.put("DIR_IMAGE", this.getClass().getResourceAsStream("/it/cnr/missioni/print/LogoCNR.png"));
-			parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream("/it/cnr/missioni/print/Annullato.gif"));
-//			parameters.put(JRParameter.REPORT_VIRTUALIZER, vir);
+			Params params = createParamsForPrint(myJson, printNameJasper, id);
+			ResponseEntity<byte[]> response = processForPrint(HttpMethod.POST, params);
+			log.debug("Stampa "+printNameJasper+" length: "+response.getHeaders().get("Content-Length").get( 0 ));
+			return response.getBody();
 
-			LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-			ctx.setClassLoader(ClassLoader.getSystemClassLoader());
- 
-			JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
-
-	    	if (parametersSubReport != null){
-		    	for (Map.Entry<String, String> entry : parametersSubReport.entrySet()){
-		    		parameters.put(entry.getKey(), (JasperReport)JRLoader.loadObject(this.getClass().getResourceAsStream(dir+entry.getValue())));
-		    	}
-	    	}
-	    	log.debug(myJson);
-			JasperPrint jasperPrint = fillmgr.fill(this.getClass().getResourceAsStream(dir+printNameJasper), parameters);
-			return JasperExportManager.exportReportToPdf(jasperPrint);
 		} catch (Exception e) {
 			throw new ComponentException("Error in JASPER ("+ e + ").",e);
 		}
+	}
+
+	protected Params createParamsForPrint(String myJson, String printNameJasper, Serializable id) {
+		Key key = new Key();
+		key.setNomeParam(Costanti.PARAMETER_DATA_SOURCE_FOR_PRINT);
+		Param param = new Param();
+		param.setKey(key);
+		param.setValoreParam(myJson);
+		param.setParamType(String.class.getCanonicalName());
+		Params params = new Params();
+		List<Param> lista = new ArrayList<Param>();
+		lista.add(param);
+		params.setParams(lista);
+		params.setReport(printNameJasper);
+		params.setPgStampa(new Long(id.toString()));
+		return params;
 	}
 }
