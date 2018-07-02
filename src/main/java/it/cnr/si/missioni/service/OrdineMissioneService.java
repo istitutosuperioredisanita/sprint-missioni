@@ -554,15 +554,15 @@ public class OrdineMissioneService {
 							Disjunction condizioneOr = Restrictions.disjunction();
 							List<String> listaUoUtente = new ArrayList<String>();
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
-					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
-					    		if (uo != null){
+//					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
+//					    		if (uo != null){
 					    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))));
-						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
-						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
+//						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
+//						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
 							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
-						    			}
-						    		}
-					    		}
+//						    			}
+//						    		}
+//					    		}
 					    	}
 					    	condizioneResponsabileGruppo(principal, condizioneOr, filter);
 					    	criterionList.add(condizioneOr);

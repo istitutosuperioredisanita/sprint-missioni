@@ -36,6 +36,8 @@ angular.module('missioniApp')
       scope: {
         startDatetime: '=',
         endDatetime: '=',
+        startOtherDatetime: '=',
+        endOtherDatetime: '=',
         fnChange: '=',
         idMissione: '=',
         isInModifica: '=',
@@ -49,16 +51,16 @@ angular.module('missioniApp')
         if (scope.idMissione && (!scope.isInModifica || (scope.isInModifica && scope.isAttiva && !scope.startDatetime))){
           var init = true;
           scope.$watch('startDatetime', function (startValue) {
-            if (startValue && init) {
+            if (startValue !== undefined && init) {
 
               init = false;
 
               var inputs = $(element).find('input');
               var startTime = $(inputs[0]);
               var endTime = $(inputs[1]);
-              scope.startDatetime = new Date(startValue);
-              scope.endDatetime = new Date(scope.endDatetime);
-
+              scope.startDatetime = startValue ? new Date(startValue) : new Date(scope.startOtherDatetime);
+              scope.endDatetime = scope.endDatetime ? new Date(scope.endDatetime) : new Date(scope.endOtherDatetime);
+              
               startTime.datetimepicker({
                 widgetPositioning: {
                   horizontal: 'right',
