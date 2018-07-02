@@ -1283,7 +1283,7 @@ public class RimborsoMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile stampare un rimborso missione con dettagli e ad importo 0.");
 		}
 		fileName = "RimborsoMissione"+rimborsoMissione.getId()+".pdf";
-		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(principal, rimborsoMissione, principal.getName());
+		printRimborsoMissione = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, principal.getName());
 		if (rimborsoMissione.isMissioneInserita()){
 			cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(principal, printRimborsoMissione, rimborsoMissione);
 		}
