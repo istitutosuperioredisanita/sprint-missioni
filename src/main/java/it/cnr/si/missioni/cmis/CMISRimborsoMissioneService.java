@@ -671,7 +671,7 @@ public class CMISRimborsoMissioneService {
 	@Transactional(readOnly = true)
 	public void avviaFlusso(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
 		String username = principal.getName();
-		byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(principal, rimborsoMissione, username);
+		byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
 		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
 		Document documento = salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
 		StringBuilder nodeRefs = new StringBuilder();
