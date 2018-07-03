@@ -444,7 +444,7 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-				if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
+				if ((istituto.getMinutiPrimaInizioAmm() != null && istituto.getMinutiMinimiAmm() != null) || (istituto.getMinutiPassatiAmm() != null)){
 					try {
 						stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
 					} catch (Exception e) {
