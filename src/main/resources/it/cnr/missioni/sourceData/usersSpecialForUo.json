@@ -1208,6 +1208,7 @@
 {"uid" : "anna.papa","uoForUsersSpecial" : [{"codice_uo" : "032000","ordine_da_validare" : "S"}]}, 
 {"uid" : "alessandro.agostini","uoForUsersSpecial" : [{"codice_uo" : "032000","ordine_da_validare" : "S"}]}, 
 {"uid" : "chiara.liseranivonberger","uoForUsersSpecial" : [{"codice_uo" : "032000","ordine_da_validare" : "S"}]}, 
+{"uid" : "angela.dalicandro","uoForUsersSpecial" : [{"codice_uo" : "032000","ordine_da_validare" : "S"}]}, 
 
 {"uid" : "alessandro.guercio","uoForUsersSpecial" : [{"codice_uo" : "016000","ordine_da_validare" : "S"},{"codice_uo" : "016001","ordine_da_validare" : "S"},{"codice_uo" : "016002","ordine_da_validare" : "S"},{"codice_uo":"503000"}]}, 
 
