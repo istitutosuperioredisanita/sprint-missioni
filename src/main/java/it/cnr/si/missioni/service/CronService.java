@@ -17,6 +17,7 @@ import com.hazelcast.core.ILock;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.Costanti;
@@ -405,16 +406,19 @@ public class CronService {
 		}
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
-				try {
-					stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());
-				} catch (Exception e) {
-					String error = Utility.getMessageException(e);
-					String testoErrore = getTextErrorBypassResp(ordineMissione, error);
-					LOGGER.error(testoErrore + " "+e);
+				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+				if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
 					try {
-						mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
-					} catch (Exception e1) {
-						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+						stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
+					} catch (Exception e) {
+						String error = Utility.getMessageException(e);
+						String testoErrore = getTextErrorBypassResp(ordineMissione, error);
+						LOGGER.error(testoErrore + " "+e);
+						try {
+							mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
+						} catch (Exception e1) {
+							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+						}
 					}
 				}
 			}
@@ -439,18 +443,22 @@ public class CronService {
 		}
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
-				try {
-					stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
-				} catch (Exception e) {
-					String error = Utility.getMessageException(e);
-					String testoErrore = getTextErrorBypassAmm(ordineMissione, error);
-					LOGGER.error(testoErrore + " "+e);
+				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+				if ((istituto.getMinutiPrimaInizioAmm() != null && istituto.getMinutiMinimiAmm() != null) || (istituto.getMinutiPassatiAmm() != null)){
 					try {
-						mailService.sendEmailError(subjectErrorBypassAmm, testoErrore, false, true);
-					} catch (Exception e1) {
-						LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+						stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
+					} catch (Exception e) {
+						String error = Utility.getMessageException(e);
+						String testoErrore = getTextErrorBypassAmm(ordineMissione, error);
+						LOGGER.error(testoErrore + " "+e);
+						try {
+							mailService.sendEmailError(subjectErrorBypassAmm, testoErrore, false, true);
+						} catch (Exception e1) {
+							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+						}
 					}
 				}
+				
 			}
 		}
 	}
