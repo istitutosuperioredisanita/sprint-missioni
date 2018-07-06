@@ -207,8 +207,8 @@
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
                         <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-spesa">cds</span>
-<!--                    <selectize ng-disabled="validazione || disabilitaOrdineMissione" options='elencoCds' config="{maxItems: 1}" ng-change="reloadCds(ordineMissioneModel.cdsSpesa)" ng-model="ordineMissioneModel.cdsSpesa"></selectize>-->
+                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-
+                            spesa">cds</span>
     <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" on-select="reloadCds(ordineMissioneModel.cdsSpesa)" ng-model="ordineMissioneModel.cdsSpesa"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cds-spesa' | translate}}" >
         <span ng-bind="$select.selected.cd_proprio_unita+' '+$select.selected.ds_unita_organizzativa"></span>
@@ -226,7 +226,15 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-spesa">uo</span>
-                    <select ng-disabled="!ordineMissioneModel.cdsSpesa || validazione || disabilitaOrdineMissione" ng-change="reloadUo(ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.uo-spesa.placeholder' | translate}}" ng-model="ordineMissioneModel.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
+    <ui-select id="missioni-ui-select" ng-disabled="!ordineMissioneModel.cdsSpesa || validazione || disabilitaOrdineMissione" on-select="reloadUo(ordineMissioneModel.uoSpesa)" ng-model="ordineMissioneModel.uoSpesa"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-spesa' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUo | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
+
                         </span>
                     </p>
             </form>
@@ -234,7 +242,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cdr-spesa">cdr</span>
-                    <select ng-disabled="!ordineMissioneModel.uoSpesa || disabilitaOrdineMissione" ng-change="reloadCdr(ordineMissioneModel.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.cdr-spesa.placeholder' | translate}}" ng-model="ordineMissioneModel.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
+    <ui-select id="missioni-ui-select" ng-disabled="!ordineMissioneModel.uoSpesa || disabilitaOrdineMissione" on-select="reloadCdr(ordineMissioneModel.cdrSpesa)" ng-model="ordineMissioneModel.cdrSpesa"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cdr-spesa' | translate}}" >
+        <span ng-bind="$select.selected.cd_centro_responsabilita+' '+$select.selected.ds_cdr"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="cdr.cd_centro_responsabilita as cdr in elencoCdr | filter: $select.search">
+        <span ng-bind="cdr.cd_centro_responsabilita+' '+cdr.ds_cdr"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -242,7 +257,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-                    <select ng-disabled="!elencoModuli || elencoModuli.length == 0 || !ordineMissioneModel.cdrSpesa || disabilitaOrdineMissione" ng-change="reloadModulo(ordineMissioneModel.pgProgetto, ordineMissioneModel.cdrSpesa, ordineMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" ng-disabled="!elencoModuli || elencoModuli.length == 0 || !ordineMissioneModel.cdrSpesa || disabilitaOrdineMissione" on-select="reloadModulo(ordineMissioneModel.pgProgetto, ordineMissioneModel.cdrSpesa, ordineMissioneModel.uoSpesa)" ng-model="ordineMissioneModel.pgProgetto"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.modulo' | translate}}" >
+        <span ng-bind="$select.selected.cd_progetto+' '+$select.selected.ds_progetto"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="modulo.pg- _progetto as modulo in elencoModuli | filter: $select.search">
+        <span ng-bind="modulo.cdz_progetto+' '+modulo.ds_progetto"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -251,7 +273,14 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                    <select ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 || !ordineMissioneModel.cdrSpesa || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="ordineMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 || !ordineMissioneModel.cdrSpesa || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" ng-model="ordineMissioneModel.gae"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.gae' | translate}}" >
+        <span ng-bind="$select.selected.cd_linea_attivita+' '+$select.selected.ds_linea_attivita"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="gae.cd_linea_attivita as gae in elencoGae | filter: $select.search">
+        <span ng-bind="gae.cd_linea_attivita+' '+gae.ds_linea_attivita"></span>
+    </ui-select-choices>
+    </ui-select>                
                         </span>
                     </p>
                     <p class="col-md-1">
@@ -282,7 +311,14 @@
                 <p class="col-md-2">
                         <span class="input-group">
                           <span class="input-group-addon" translate="ordine-missione.form.fondi">Fondi</span>
-                          <select ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="form-control" ng-model="ordineMissioneModel.fondi" ng-options="value as compRes for (compRes,value) in fondi"></select>
+    <ui-select id="missioni-ui-select" ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" ng-model="ordineMissioneModel.fondi" />
+    <ui-select-match placeholder="{{'ordine-missione.form.fondi' | translate}}" >
+        <span ng-bind="$select.selected.fondo"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in fondi | filter: $select.search">
+        <span ng-bind="val.fondo"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
               </p>
             </form>
@@ -352,7 +388,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
-                    <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(ordineMissioneModel.cdsCompetenza)" placeholder="{{'missione.form.cds-competenza.placeholder' | translate}}" ng-model="ordineMissioneModel.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" on-select="reloadCdsCompetenza(ordineMissioneModel.cdsCompetenza)" ng-model="ordineMissioneModel.cdsCompetenza"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cds-competenza' | translate}}" >
+        <span ng-bind="$select.selected.cd_proprio_unita+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="cds.cd_proprio_unita as cds in elencoCdsCompetenza | filter: $select.search">
+        <span ng-bind="cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -360,7 +403,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
-                    <select ng-disabled="validazione || disabilitaOrdineMissione" class="form-control" id="missioni" placeholder="{{'missione.form.uo-competenza.placeholder' | translate}}" ng-model="ordineMissioneModel.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.uoCompetenza"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-competenza' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUoCompetenza | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -386,7 +436,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.responsabile-gruppo">resp</span>
-                    <select ng-disabled="disableResponsabileGruppo || disabilitaOrdineMissione||validazione" class="form-control" id="missioni" ng-model="ordineMissioneModel.responsabileGruppo" ng-options="responsabile.uid as responsabile.cognome+' - '+responsabile.nome for responsabile in elencoResponsabiliGruppo"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" ng-disabled="disableResponsabileGruppo || disabilitaOrdineMissione||validazione" ng-model="ordineMissioneModel.responsabileGruppo"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cognome+' '+$select.selected.nome"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="resp.uid as resp in elencoResponsabiliGruppo | filter: $select.search">
+        <span ng-bind="resp.cognome+' '+resp.nome"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
