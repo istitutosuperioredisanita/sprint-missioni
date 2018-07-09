@@ -4,7 +4,6 @@
 
 #missioni-ui-select span{
   font-size: 12px;
-  height: 30px;
 }
 
 #missioni td{
@@ -188,6 +187,20 @@ input:-webkit-autofill {
 
 .select2-drop-mask {
   font-size: 12px;
+}
+
+.select2-choice {
+  height: 30px !important;
+}
+
+.select2-highlighted {
+  color: #000 !important;
+}
+ 
+
+.select2-container {
+  display: block;
+  height: 30px !important;
 }
 
 .row-empty-after {
