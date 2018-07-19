@@ -33,6 +33,7 @@ import org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
+import org.apache.chemistry.opencmis.client.util.OperationContextUtils;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -309,14 +310,21 @@ public class MissioniCMISService {
 
 		parameter.put(SessionParameter.PASSWORD, missioniCMISAccessService.getTicket(username, password));
 		parameter.put(SessionParameter.USER, "");
-
 		parameter.put(SessionParameter.ATOMPUB_URL, url);
 		parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 		parameter.put(SessionParameter.REPOSITORY_ID, "-default-");
 		parameter.put(SessionParameter.TYPE_DEFINITION_CACHE_CLASS, "it.cnr.si.missioni.cmis.MissioniTypeDefinitionCacheImpl");
 		parameter.put(SessionParameter.CACHE_SIZE_TYPES, "100");
+        parameter.put(SessionParameter.CACHE_PATH_OMIT, String.valueOf(Boolean.TRUE));
 
-		return factory.createSession(parameter);
+        Session session = factory.createSession(parameter);
+
+        OperationContext operationContext = OperationContextUtils.createOperationContext();
+        operationContext.setIncludeAllowableActions(false);
+        operationContext.setIncludePathSegments(false);
+        session.setDefaultContext(operationContext);
+
+        return session;
 	}
 
 	public void deleteNode(String nodeRef){
