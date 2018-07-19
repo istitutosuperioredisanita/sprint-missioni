@@ -36,6 +36,7 @@ import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
@@ -148,6 +149,8 @@ public class MissioniCMISService {
     
 	@Value("${cmis.alfresco}")
 	private String baseURL;
+
+    public static Map<String, TypeDefinition> CACHE_TYPES = new HashMap<String, TypeDefinition> ();
 
 	public void setBaseURL(String baseURL) {
 		this.baseURL = baseURL;
@@ -310,7 +313,7 @@ public class MissioniCMISService {
 		parameter.put(SessionParameter.ATOMPUB_URL, url);
 		parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 		parameter.put(SessionParameter.REPOSITORY_ID, "-default-");
-		parameter.put(SessionParameter.TYPE_DEFINITION_CACHE_CLASS, "org.apache.chemistry.opencmis.client.bindings.impl.TypeDefinitionCacheImpl");
+		parameter.put(SessionParameter.TYPE_DEFINITION_CACHE_CLASS, "it.cnr.si.missioni.cmis.MissioniTypeDefinitionCacheImpl");
 		parameter.put(SessionParameter.CACHE_SIZE_TYPES, "100");
 
 		return factory.createSession(parameter);
