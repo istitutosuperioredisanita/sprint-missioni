@@ -310,6 +310,8 @@ public class MissioniCMISService {
 		parameter.put(SessionParameter.ATOMPUB_URL, url);
 		parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 		parameter.put(SessionParameter.REPOSITORY_ID, "-default-");
+		parameter.put(SessionParameter.TYPE_DEFINITION_CACHE_CLASS, "org.apache.chemistry.opencmis.client.bindings.impl.TypeDefinitionCacheImpl");
+		parameter.put(SessionParameter.CACHE_SIZE_TYPES, "100");
 
 		return factory.createSession(parameter);
 	}
