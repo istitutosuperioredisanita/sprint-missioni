@@ -137,24 +137,8 @@ public class AnnullamentoOrdineMissioneService {
     		List<AnnullamentoOrdineMissione> listaNew = new ArrayList<AnnullamentoOrdineMissione>();
     		for (AnnullamentoOrdineMissione annullamento : lista){
     			if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneDaValidare()){
-    				ResultFlows result = retrieveDataFromFlows(annullamento);
-    				if (result != null){
-    					AnnullamentoOrdineMissione annullamentoDaAggiornare = (AnnullamentoOrdineMissione)crudServiceBean.findById(principal, AnnullamentoOrdineMissione.class, annullamento.getId());
-    					if (result.isStateReject()){
-    						annullamento.setCommentFlows(result.getComment());
-    						annullamento.setStateFlows(retrieveStateFromFlows(result));
-//    						aggiornaAnnullamentoRespinto(principal, result, annullamentoDaAggiornare);
-    						annullamento.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
-    						listaNew.add(annullamento);
-    					} else if (result.isAnnullato()){
-//    						aggiornaAnnullamentoOrdineMissioneAnnullato(principal, annullamentoDaAggiornare);
-    						annullamento.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
-    						listaNew.add(annullamento);
-            			} else {
-            				annullamento.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
-    						listaNew.add(annullamento);
-    					}
-    				}
+    				annullamento.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
+    				listaNew.add(annullamento);
     			} else {
     				if (annullamento.isMissioneDaValidare() && annullamento.isMissioneConfermata()){
     					annullamento.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
