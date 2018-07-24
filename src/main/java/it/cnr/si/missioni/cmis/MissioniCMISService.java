@@ -212,7 +212,7 @@ public class MissioniCMISService {
 		metadataProperties.put(PROPERTY_TITLE, folderName);
 		List<String> aspectsToAdd = new ArrayList<String>();
 		aspectsToAdd.add(ASPECT_TITLED);
-		cmisPath = createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName);
+		cmisPath = createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName, false);
 		return cmisPath;
 	}
 	
@@ -221,6 +221,10 @@ public class MissioniCMISService {
 	}
 	
 	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName) {
+		return createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName, true);
+	}
+	
+	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName, Boolean updateProperties) {
 		CmisObject cmisObject = getNodeByPath(cmisPath);
 		try{
 			metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspectsToAdd);
@@ -228,10 +232,12 @@ public class MissioniCMISService {
 			return CmisPath.construct(folder.getPath());
 		}catch(CmisContentAlreadyExistsException _ex){
 				Folder folder = (Folder) getNodeByPath(cmisPath.getPath()+(cmisPath.getPath().equals("/")?"":"/")+sanitizeFilename(folderName).toLowerCase());
-		        List<String> aspects = folder.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
-		        aspects.addAll(aspectsToAdd);
-		        metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-				folder.updateProperties(metadataProperties, true);
+				if (updateProperties){
+					List<String> aspects = folder.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
+			        aspects.addAll(aspectsToAdd);
+			        metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
+					folder.updateProperties(metadataProperties, true);
+				}
 				return CmisPath.construct(folder.getPath());
 		} catch (Exception e) {
 			logger.error("Errore nella creazione della folder.", e);
@@ -239,7 +245,6 @@ public class MissioniCMISService {
 		}
 	}
 	
-
 	public void deleteNode(CmisObject cmisObject){
 		if (cmisObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER))
 			((Folder)cmisObject).deleteTree(true, UnfileObject.DELETE, false);
