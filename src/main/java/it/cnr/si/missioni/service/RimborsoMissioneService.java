@@ -213,38 +213,13 @@ public class RimborsoMissioneService {
 	}
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws ComponentException{
-//    	if (isDevProfile()){
-//        	cronService.verificaFlussoEComunicaDatiRimborsoSigla(principal);
-//    	}
     	List<RimborsoMissione> lista = getRimborsiMissione(principal, filter, isServiceRest, true);
     	if (lista != null){
     		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
     		for (RimborsoMissione rimborsoMissione : lista){
     			if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
-    				ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
-    				if (result != null){
-    					RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
-    					if (result.isStateReject()){
-    						rimborsoMissione.setCommentFlows(result.getComment());
-    						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
-//    						aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissioneDaAggiornare);
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-    					} else if (result.isAnnullato()){
-//    						aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissioneDaAggiornare);
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-//        				} else if (isDevProfile() && result.isApprovato()){
-//        					aggiornaRimborsoMissioneApprovato(principal, rimborsoMissioneDaAggiornare);
-//        					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-//        					listaNew.add(rimborsoMissione);
-            			} else if (result.isApprovato()){
-            				
-            			} else {
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-    					}
-    				}
+    				rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
+    				listaNew.add(rimborsoMissione);
     			} else {
     				if (rimborsoMissione.isMissioneDaValidare() && rimborsoMissione.isMissioneConfermata()){
     					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);

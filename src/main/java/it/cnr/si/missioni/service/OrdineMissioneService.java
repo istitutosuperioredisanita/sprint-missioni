@@ -268,30 +268,8 @@ public class OrdineMissioneService {
         	List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
     		for (OrdineMissione ordineMissione : lista){
     			if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
-        			ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
-        			if (result != null){
-    			    	OrdineMissione ordineMissioneDaAggiornare = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
-    			    	if (result.isStateReject()){
-        					ordineMissione.setCommentFlows(result.getComment());
-        					ordineMissione.setStateFlows(retrieveStateFromFlows(result));
-//        			    	aggiornaOrdineMissioneRespinto(principal, result, ordineMissioneDaAggiornare);
-        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
-        					listaNew.add(ordineMissione);
-        				} else if (result.isAnnullato()){
-//        					aggiornaOrdineMissioneAnnullato(principal, ordineMissioneDaAggiornare);
-        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
-        					listaNew.add(ordineMissione);
-//        				} else if (isDevProfile() && result.isApprovato()){
-//        					aggiornaOrdineMissioneApprovato(principal, ordineMissioneDaAggiornare);
-//        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_APPROVATO_PER_HOME);
-//        					listaNew.add(ordineMissione);
-            			} else if (result.isApprovato()){
-            				
-        				} else {
-        					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
-        					listaNew.add(ordineMissione);
-        				}
-        			}
+    				ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
+    				listaNew.add(ordineMissione);
     			} else {
     				if (ordineMissione.isMissioneDaValidare() && ordineMissione.isMissioneConfermata()){
     					ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
