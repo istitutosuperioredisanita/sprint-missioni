@@ -71,6 +71,8 @@ ajp:
     port: 8009
     timeout: 120000
 
+audit: false
+
 siper:
   url: ${spring.proxy.SIPER.url}json/userinfo/
   urldett: ${spring.proxy.SIPER.url}json/userinfodett/

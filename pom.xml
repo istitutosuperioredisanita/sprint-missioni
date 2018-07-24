@@ -37,6 +37,7 @@
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <sprint.version>2.0.1</sprint.version>
+        <sprint-core.version>2.0.1.1</sprint-core.version>
         <start-class>it.cnr.si.SprintApp</start-class>
     </properties>
     <dependencies>
@@ -85,7 +86,7 @@
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-core</artifactId>
-            <version>${sprint.version}</version>
+            <version>${sprint-core.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
