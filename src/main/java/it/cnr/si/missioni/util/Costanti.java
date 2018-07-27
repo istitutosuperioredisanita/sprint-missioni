@@ -21,6 +21,7 @@ public class Costanti {
 	public final static String REST_VOCE =  "ConsCapitoloAction.json";
 	public final static String REST_TERZO =  "ConsTerzoAction.json";
 	public final static String REST_INQUADRAMENTI =  "ConsInquadramentoAction.json";
+	public final static String REST_TIPO_PASTO =  "ConsMissioneTipoPastoAction.json";
 	public final static String REST_IMPEGNO =  "ConsImpegnoAction.json";
 	public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
     public final static String REST_TIPI_SPESA =  "ConsTipiSpesaAction.json";

@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,8 +17,10 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissione;
@@ -54,6 +57,9 @@ public class PrintRimborsoMissioneService {
 
     @Autowired
     private AccountService accountService;
+    
+    @Autowired
+    RimborsoImpegniService rimborsoImpegniService;
     
     @Autowired
     private NazioneService nazioneService;
@@ -124,6 +130,20 @@ public class PrintRimborsoMissioneService {
     	}
     	printRimborsoMissione.setUoSpesa(caricaUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()));
     	printRimborsoMissione.setCdrSpesa(caricaCdr(rimborsoMissione.getCdrSpesa()));
+    	Principal principal = new GenericPrincipal(currentLogin);
+    	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(principal, new Long(rimborsoMissione.getId().toString()));
+    	if (lista != null && !lista.isEmpty()){
+    		String impegni = null;
+    		for (RimborsoImpegni rimborsoImpegni : lista){
+    			if (impegni != null){
+    				impegni+="   ";
+    			} else {
+    				impegni = "";
+    			}
+    			impegni += rimborsoImpegni.getEsercizioOriginaleObbligazione()+"-"+rimborsoImpegni.getPgObbligazione();
+    		}
+        	printRimborsoMissione.setImpegni(impegni);
+    	} 
     	if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
     		printRimborsoMissione.setPgObbligazione(rimborsoMissione.getPgObbligazione().toString());
     		printRimborsoMissione.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione().toString());
