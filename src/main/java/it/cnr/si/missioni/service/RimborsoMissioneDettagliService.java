@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,7 +35,6 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.TipoPasto;
 import it.cnr.si.missioni.util.proxy.json.service.TipoPastoService;
@@ -144,6 +142,9 @@ public class RimborsoMissioneDettagliService {
 	    			}
 	        	}
 	    	}
+		}
+		if (StringUtils.isEmpty(rimborsoMissioneDettagli.getDsSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare una descrizione per la spesa.");
 		}
 		validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
 	}
