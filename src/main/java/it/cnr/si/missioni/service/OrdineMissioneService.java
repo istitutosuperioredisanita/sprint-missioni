@@ -469,6 +469,7 @@ public class OrdineMissioneService {
 					Disjunction condizioneOr = Restrictions.disjunction();
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
+					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", filter.getUoRich())));
 					criterionList.add(condizioneOr);
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente "+principal.getName()+"  non è abilitato a vedere i dati della uo "+filter.getUoRich());
@@ -544,6 +545,7 @@ public class OrdineMissioneService {
 //						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 //						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
 							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
+							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", uoService.getUoSigla(uoUser))));
 //						    			}
 //						    		}
 //					    		}
