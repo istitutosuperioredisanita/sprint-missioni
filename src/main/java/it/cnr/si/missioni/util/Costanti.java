@@ -115,6 +115,7 @@ public class Costanti {
 	public final static String SI = "Sì";
 	public final static String NO = "No";
 	public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
+	public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
 	
 	public final static Map<String, String> PRIORITA;

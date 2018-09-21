@@ -5,7 +5,14 @@
                <p class="col-md-12">
                   <span class="input-group">
                   <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
-                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                    </span>
                </p>
             </form>
@@ -13,7 +20,14 @@
                 <p class="col-md-12">
                     <span class="input-group">
                     <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
-                       <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
+    <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
+        <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
+    </ui-select-choices>
+    </ui-select>
                     </span>
                 </p>
             </form>

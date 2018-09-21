@@ -801,8 +801,27 @@ public class MissioniCMISService {
 	
 	public void eliminaFilePresenteNelFlusso(Principal principal, String idNodo) {
 		Document node = (Document)getNodeByNodeRef(idNodo);
-		String nomeFile = node.getName();
-		nomeFile = sanitizeFilename(nomeFile+".eliminato");
+		String oldNomeFile = node.getName();
+		List<String> listaPath = node.getPaths();
+		Boolean nameAlreadyExists = true;
+		
+		String nomeFileEliminato = oldNomeFile;
+	    while( nameAlreadyExists ) {
+	    	nameAlreadyExists = false;
+			nomeFileEliminato = sanitizeFilename(nomeFileEliminato+".eliminato");
+			for (String path : listaPath){
+				String newPath = path.substring(0, path.length() - oldNomeFile.length());
+				try {
+					Document newNode = (Document) getNodeByPath(newPath+nomeFileEliminato);
+					nameAlreadyExists = true;
+					break;
+				} catch (CmisObjectNotFoundException e){
+				}
+			}
+	    }
+		String nomeFile = nomeFileEliminato;
+		
+		
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
 		metadataProperties.put(PropertyIds.NAME, nomeFile);
 		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, nomeFile);

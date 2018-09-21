@@ -65,6 +65,10 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return codice.substring(0,3)+'.'+codice.substring(3,6);
     }
 
+    var estraiUo = function(codice){
+        return codice.substring(0,3)+'.'+codice.substring(3,6);
+    }
+
     var estraiUoRichFromAccount = function(account){
         if (account.codice_uo){
             return estraiUo(account.codice_uo);
@@ -80,6 +84,38 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         }
         return false;
     }
+
+    var tipiMissione = [
+       {tipo:'Italia', value: 'I'},
+       {tipo:'Estera', value: 'E'}
+    ];
+
+    var luoghiDiPartenza = [
+       {partenza:'Sede di Lavoro', value: 'S'},
+       {partenza:'Residenza/Domicilio Fiscale', value: 'R'},
+       {partenza:'Altro', value: 'A'}
+    ];
+
+    var valoriPriorita = [
+       {priorita:'Critica', value: '5'},
+       {priorita:'Importante', value: '3'},
+       {priorita:'Media', value: '1'}
+    ];
+
+    var trattamenti = [
+       {trattamento:'Rimborso Documentato', value: 'R'},
+       {trattamento:'Trattamento Alternativo di Missione', value: 'T'}
+    ];
+
+    var fondi = [
+       {fondo:'Competenza', value: 'C'},
+       {fondo:'Residuo', value: 'R'}
+    ];
+
+    var obblighiRientro = [
+       {rientro:'Sì', value: 'S'},
+       {rientro:'No', value: 'N'}
+    ];
 
     var recuperoDatiPerson = function(username){
         var urlRestProxy = URL_REST.STANDARD;
@@ -475,6 +511,12 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getTerzoModalitaPagamento: recuperoTerzoModalitaPagamento,
              buildPerson: createPerson ,
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
-             buildUoSiglaFromUoSiper: estraiUo };
+             buildUoSiglaFromUoSiper: estraiUo,
+             valueTipiMissione: tipiMissione,
+             valueLuoghiDiPartenza: luoghiDiPartenza,
+             valuePriorita: valoriPriorita,
+             valueTrattamenti: trattamenti,
+             valueFondi: fondi,
+             valueObblighiRientro: obblighiRientro };
 });
 

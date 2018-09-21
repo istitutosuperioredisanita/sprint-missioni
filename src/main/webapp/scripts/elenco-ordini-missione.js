@@ -122,6 +122,9 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
     };
 
     $scope.reloadUserWork = function(uid){
+        if (uid){
+            $scope.userWork = uid;
+        }
         $scope.ordiniMissione = [];
         $scope.messageOrdiniNonEsistenti = false;
         if (uid){
@@ -137,6 +140,9 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
     }
 
     $scope.reloadUoWork = function(uo){
+        if (uo){
+            $scope.uoWorkForSpecialUser = uo;
+        }
         $scope.accountModel = null;
         $scope.elencoPersone = [];
         $scope.ordiniMissione = [];
