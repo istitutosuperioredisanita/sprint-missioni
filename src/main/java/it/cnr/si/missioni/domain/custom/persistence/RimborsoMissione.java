@@ -130,6 +130,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "UID", length = 256, nullable = false)
     public String uid;
 
+    @Size(min = 0, max = 1)
+    @Column(name = "AUTO_PROPRIA", length = 1, nullable = true)
+    public String autoPropria;
+
     @Column(name = "CUG", length = 1, nullable = true)
     public String cug;
 

@@ -107,6 +107,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.presidente = ordineMissioneSelected.presidente;
                 $scope.rimborsoMissioneModel.totaleRimborsoComplessivo = 0;
                 $scope.rimborsoMissioneModel.totaleRimborsoSenzaAnticipi = 0;
+                $scope.rimborsoMissioneModel.autoPropria = ordineMissioneSelected.utilizzoAutoPropria;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                     $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
@@ -318,24 +319,26 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var caricaCds = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
-                $scope.rimborsoMissioneModel.cdsRich = $scope.formatResultCds(listaCds[0]);
+                $scope.rimborsoMissioneModel.cdsRich = listaCds[0].cd_proprio_unita;
             } else {
                 if (cds){
                     $scope.elencoCds = [];
                     var ind = 0;
                     for (var i=0; i<listaCds.length; i++) {
                         if (listaCds[i].cd_proprio_unita === cds){
-                            $scope.elencoCds[0] = $scope.formatResultCds(listaCds[i]);
+                            $scope.elencoCds[0] = listaCds[i];
+                            $scope.elencoCds[0].testo = listaCds[i].cd_proprio_unita+" "+listaCds[i].ds_unita_organizzativa;
 //                            $scope.elencoCds[0].selected = true;
 //                            $scope.elencoCds[0] = listaCds[i];
                         } else {
                             ind ++;
-                            $scope.elencoCds[ind] = $scope.formatResultCds(listaCds[i]);
+                            $scope.elencoCds[ind] = listaCds[i];
+                            $scope.elencoCds[ind].testo = listaCds[i].cd_proprio_unita+" "+listaCds[i].ds_unita_organizzativa;
                         }
                     }
-//                    if ($scope.rimborsoMissioneModel){
-//                        $scope.rimborsoMissioneModel.cdsRich = cds;
-//                    }
+                    if ($scope.rimborsoMissioneModel){
+                        $scope.rimborsoMissioneModel.cdsRich = cds;
+                    }
                 }
             }
         } else {
@@ -428,7 +431,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         }
     }
 
-    $scope.onChangeModpag = function() {
+    $scope.onChangeModpag = function(modpag) {
         var modpag = $scope.rimborsoMissioneModel.modpag;
         if (modpag){
             for (var i=0; i<$scope.modalitaPagamentos.length; i++) {
@@ -436,6 +439,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (modalitaPagamento.cd_modalita_pag === modpag){
                     $scope.rimborsoMissioneModel.tipoPagamento = modalitaPagamento.ti_pagamento;
                     $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, modalitaPagamento.ti_pagamento);
+                    $scope.rimborsoMissioneModel.iban = null;
+                    $scope.rimborsoMissioneModel.pgBanca = null;
                 }
             }
         }
@@ -716,7 +721,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 	                    var ind = -1;
     	                for (var i=0; i<listaVoci.length; i++) {
         	                ind ++;
-            	            $scope.elencoVoci[ind] = $scope.formatResultVoce(listaVoci[i]);
+                            $scope.elencoVoci[ind] = listaVoci[i];
                 	    }
                     } else {
                         $scope.elencoVoci = [];
@@ -826,25 +831,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       $scope.restGae($scope.rimborsoMissioneModel.anno, pgProgetto, cdr, uo);
     }
 
-    $scope.tipiMissione = {
-        'Italia': 'I',
-        'Estera': 'E'
-    };
+    $scope.tipiMissione = ProxyService.valueTipiMissione;
 
-    $scope.luoghiDiPartenza = {
-        'Sede di Lavoro': 'S',
-        'Residenza/Domicilio Fiscale': 'R'
-    };
+    $scope.luoghiDiPartenza = ProxyService.valueLuoghiDiPartenza;
 
-    $scope.trattamenti = {
-        'Rimborso Documentato': 'R',
-        'Trattamento Alternativo di Missione': 'T'
-    };
+    $scope.valoriPriorita = ProxyService.valuePriorita;
 
-    $scope.obblighiRientro = {
-        'Sì': 'S',
-        'No': 'N'
-    };
+    $scope.trattamenti = ProxyService.valueTrattamenti;
 
     $scope.onChangeTipoMissione = function() {
         if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
