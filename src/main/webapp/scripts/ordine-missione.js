@@ -536,37 +536,17 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
-    $scope.tipiMissione = [
-       {tipo:'Italia', value: 'I'},
-       {tipo:'Estera', value: 'E'}
-    ];
+    $scope.tipiMissione = ProxyService.valueTipiMissione;
 
-    $scope.luoghiDiPartenza = [
-       {partenza:'Sede di Lavoro', value: 'S'},
-       {partenza:'Residenza/Domicilio Fiscale', value: 'R'},
-       {partenza:'Altro', value: 'A'}
-    ];
+    $scope.luoghiDiPartenza = ProxyService.valueLuoghiDiPartenza;
 
-    $scope.valoriPriorita = [
-       {priorita:'Critica', value: '5'},
-       {priorita:'Importante', value: '3'},
-       {priorita:'Media', value: '1'}
-    ];
+    $scope.valoriPriorita = ProxyService.valuePriorita;
 
-    $scope.trattamenti = [
-       {trattamento:'Rimborso Documentato', value: 'R'},
-       {trattamento:'Trattamento Alternativo di Missione', value: 'T'}
-    ];
+    $scope.trattamenti = ProxyService.valueTrattamenti;
 
-    $scope.fondi = [
-       {fondo:'Competenza', value: 'C'},
-       {fondo:'Residuo', value: 'R'}
-    ];
+    $scope.fondi = ProxyService.valueFondi;
 
-    $scope.obblighiRientro = [
-       {rientro:'Sì', value: 'S'},
-       {rientro:'No', value: 'N'}
-    ];
+    $scope.obblighiRientro = ProxyService.valueObblighiRientro;
 
     $scope.onChangeTipoMissione = function() {
         if ($scope.ordineMissioneModel.tipoMissione === 'E') {

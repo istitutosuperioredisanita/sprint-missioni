@@ -14,7 +14,6 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
-<!--                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>-->
     <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
     <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
         <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
@@ -30,7 +29,6 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
-<!--                    <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>-->
     <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
     <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
         <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
@@ -39,7 +37,6 @@
         <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
     </ui-select-choices>
     </ui-select>
-
                         </span>
                     </p>
             </form>
@@ -176,7 +173,7 @@
                         <p class="input-group" ng-show="showObbligoRientro">
                           <span class="input-group-addon" translate="ordine-missione.form.obbligo-rientro">obbligo</span>
    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.obbligoRientro"/>
-    <ui-select-match placeholder="{{'ordine-missione.form.obbligo-rientro' | translate}}" >
+    <ui-select-match placeholder="{{'ordine-missione.form.rientro' | translate}}" >
         <span ng-bind="$select.selected.rientro"></span>
     </ui-select-match>
     <ui-select-choices repeat="val.value as val in obblighiRientro | filter: $select.search">
@@ -260,8 +257,8 @@
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.modulo' | translate}}" >
         <span ng-bind="$select.selected.cd_progetto+' '+$select.selected.ds_progetto"></span>
     </ui-select-match>
-    <ui-select-choices repeat="modulo.pg- _progetto as modulo in elencoModuli | filter: $select.search">
-        <span ng-bind="modulo.cdz_progetto+' '+modulo.ds_progetto"></span>
+    <ui-select-choices repeat="modulo.pg_progetto as modulo in elencoModuli | filter: $select.search">
+        <span ng-bind="modulo.cd_progetto+' '+modulo.ds_progetto"></span>
     </ui-select-choices>
     </ui-select>
                         </span>
@@ -446,36 +443,6 @@
                         </span>
                     </p>
             </form>
-<!--<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoTaxi" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-taxi' | translate}}
-  </label>
- </p>
-</form>
-
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoNoleggio" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-auto-noleggio' | translate}}
-  </label>
- </p>
-</form>
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoServizio" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-auto-servizio' | translate}}
-  </label>
- </p>
-</form>
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.personaleAlSeguito" checked="v" autocomplete="off" > {{'ordine-missione.form.persona-seguito' | translate}}
-  </label>
- </p>
-</form> -->
-
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-3">
                          <span class="input-group">
@@ -571,11 +538,6 @@
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
-        <!--    <form name="form-inline" role="form" ng-submit="addAttach()">
-              <div class="col-md-3" ng-show="showEsisteOrdineMissione">
-                  <a target="_blank" href="app/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
-              </div>
-            </form> -->
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile||ordineMissioneModel.missioneGratuita == 'S'))||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
@@ -605,11 +567,6 @@
                     <div class="col-xs-3" ng-show="showEsisteOrdineMissione">
                       <a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
-
-<!--
-                      <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="
-                      intOrdineMissione(ordineMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
--->
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato == 'INS' && !disabilitaOrdineMissione && validazione != 'S'">
@@ -621,28 +578,6 @@
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSenderShort' | translate}}</button>
                     </div>
             </form>
-<!--  <div class="col-md-12">
-    <span class="btn btn-success fileinput-button" ng-hide="loading">
-      <i class="glyphicon glyphicon-plus"></i>
-      <span>Upload files...</span>
-      <input id="fileupload" type="file" name="file" multiple>
-    </span>
-    <br>
-    <br>
-    <div id="progress" class="progress">
-      <div class="progress-bar progress-bar-success"></div>
-    </div>
-    <div id="files" class="files"></div>
-  </div>
-
-  <div class="col-md-8 well highlight" id="message">
-    <h4><div id="messageTitle">{{messageTitle}}</div></h4>
-    <ul style="text-align:left">
-      <li ng-repeat="message in messages">
-        {{message}}
-      </li>
-    </ul>
-  </div> -->
         </div>
     </div>
 </div>

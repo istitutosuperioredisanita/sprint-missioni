@@ -100,6 +100,7 @@ public class OrdineMissioneResource {
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         filter.setValidato("S");
         filter.setDaAnnullare("S");
+        filter.setRecuperoAutoPropria("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_CONFERMATO);

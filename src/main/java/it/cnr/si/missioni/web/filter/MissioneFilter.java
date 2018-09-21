@@ -18,6 +18,7 @@ public class MissioneFilter {
 	private Long aId;
 	private Boolean soloMissioniNonGratuite = false;
 	private String includiMissioniAnnullate;
+	private String recuperoAutoPropria;
 	private String respGruppo;
 	private Long daNumero;
 	private Long aNumero;
@@ -161,5 +162,11 @@ public class MissioneFilter {
 	}
 	public void setRespGruppo(String respGruppo) {
 		this.respGruppo = respGruppo;
+	}
+	public String getRecuperoAutoPropria() {
+		return recuperoAutoPropria;
+	}
+	public void setRecuperoAutoPropria(String recuperoAutoPropria) {
+		this.recuperoAutoPropria = recuperoAutoPropria;
 	}
 }

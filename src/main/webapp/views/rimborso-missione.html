@@ -16,7 +16,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
-                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -24,7 +31,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
-                    <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
+    <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
+        <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -67,7 +81,14 @@
                       <p class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
-                      <select ng-disabled="!modalitaPagamentos || !inquadramento|| !elencoOrdiniMissione" ng-change="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
+    <ui-select ng-disabled="!modalitaPagamentos || !inquadramento|| !elencoOrdiniMissione" id="missioni-ui-select" theme="select2" on-select="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" ng-model="rimborsoMissioneModel.idOrdineMissione"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" >
+        <span ng-bind="$select.selected.anno+' / '+$select.selected.numero+' - Dal '+ ($select.selected.dataInizioMissione | dateMissioni) +' Al '+ ($select.selected.dataFineMissione | dateMissioni)+' - '+$select.selected.destinazione+' - '+$select.selected.oggetto"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="ordineMissione.id as ordineMissione in elencoOrdiniMissione | filter: $select.search">
+        <span ng-bind="ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto"></span>
+    </ui-select-choices>
+    </ui-select>
                           </span>
                       </p>
               </form>
@@ -90,13 +111,27 @@
                 <p class="col-md-6">
                         <span class="input-group">
                           <span class="input-group-addon" translate="missione.form.tipo-missione">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" name="tipoMissione" ng-model="rimborsoMissioneModel.tipoMissione" ng-options="value as tipoMissione for (tipoMissione,value) in tipiMissione" ng-change="onChangeTipoMissione()"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.tipoMissione" on-select="onChangeTipoMissione()"/>
+    <ui-select-match placeholder="{{'missione.form.tipo-missione' | translate}}" >
+        <span ng-bind="$select.selected.tipo"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in tipiMissione | filter: $select.search">
+        <span ng-bind="val.tipo"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                 </p>
                 <p class="col-md-6">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
-                          <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" ng-model="rimborsoMissioneModel.trattamento" ng-change="onChangeTrattamento()" ng-options="value as trattamento for (trattamento,value) in trattamenti"></select>
+   <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.trattamento" on-select="onChangeTrattamento()"/>
+    <ui-select-match placeholder="{{'missione.form.trattamento' | translate}}" >
+        <span ng-bind="$select.selected.trattamento"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in trattamenti | filter: $select.search">
+        <span ng-bind="val.trattamento"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
               </p>
             </form>
@@ -104,7 +139,14 @@
                 <div class="col-md-5">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.nazione">nazione</span>
-                          <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" ng-model="rimborsoMissioneModel.nazione" ng-options="nazione.pg_nazione as nazione.ds_nazione for nazione in nazioni"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.nazione"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.nazione' | translate}}" >
+        <span ng-bind="$select.selected.ds_nazione"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="naz.pg_nazione as naz in nazioni | filter: $select.search">
+        <span ng-bind="naz.ds_nazione"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
               </div>
                 <p class="col-md-7">
@@ -146,7 +188,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.modalita-pagamento">Modalita di Pagamento</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-model="rimborsoMissioneModel.modpag" ng-change="onChangeModpag()" ng-options="modalitaPagamento.cd_modalita_pag as modalitaPagamento.ds_modalita_pag for modalitaPagamento in modalitaPagamentos"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.modpag" on-select="onChangeModpag()"/>
+    <ui-select-match allow-clear="true" placeholder="{{'rimborso-missione.form.modalita-pagamento' | translate}}" >
+        <span ng-bind="$select.selected.ds_modalita_pag"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="modalitaPagamento.cd_modalita_pag as modalitaPagamento in modalitaPagamentos | filter: $select.search">
+        <span ng-bind="modalitaPagamento.ds_modalita_pag"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -155,7 +204,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-model="rimborsoMissioneModel.pgBanca" ng-change="onChangeTerzoModpag()" ng-options="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban for terzoModalitaPagamento in terzoModalitaPagamentos"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.pgBanca" on-select="onChangeTerzoModpag()"/>
+    <ui-select-match allow-clear="true" placeholder="{{'rimborso-missione.form.modalita-pagamento' | translate}}" >
+        <span ng-bind="$select.selected.ds_abicab + ' ' + $select.selected.numero_conto + ' ' + $select.selected.codice_iban"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento in terzoModalitaPagamentos | filter: $select.search">
+        <span ng-bind="terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -246,23 +302,34 @@
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-11">
+                    <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-spesa">cds</span>
-                    <selectize ng-disabled="validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" options='elencoCds' config="{maxItems: 1}" ng-change="reloadCds(rimborsoMissioneModel.cdsSpesa)" ng-model="rimborsoMissioneModel.cdsSpesa"></selectize>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" on-select="reloadCds(rimborsoMissioneModel.cdsSpesa)" ng-model="rimborsoMissioneModel.cdsSpesa"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cds-spesa' | translate}}" >
+        <span ng-bind="$select.selected.cd_proprio_unita+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="cds.cd_proprio_unita as cds in elencoCds | filter: $select.search">
+        <span ng-bind="cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
-                    <p class="col-md-1">
-            <button ng-disabled="validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" type="button" class="btn" ng-click="undoCds()">{{'global.button.simpleUndo' | translate}}</button>
-                    </p>
 
 
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-spesa">uo</span>
-                    <select ng-disabled="!rimborsoMissioneModel.cdsSpesa || validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" ng-change="reloadUo(rimborsoMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.uo-spesa.placeholder' | translate}}" ng-model="rimborsoMissioneModel.uoSpesa" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUo"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!rimborsoMissioneModel.cdsSpesa || validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" on-select="reloadUo(rimborsoMissioneModel.uoSpesa)" ng-model="rimborsoMissioneModel.uoSpesa"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-spesa' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUo | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -270,7 +337,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cdr-spesa">cdr</span>
-                    <select ng-disabled="!rimborsoMissioneModel.uoSpesa || disabilitaRimborsoMissione" ng-change="reloadCdr(rimborsoMissioneModel.cdrSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.cdr-spesa.placeholder' | translate}}" ng-model="rimborsoMissioneModel.cdrSpesa" ng-options="cdr.cd_centro_responsabilita as cdr.cd_centro_responsabilita+' '+cdr.ds_cdr for cdr in elencoCdr"></select>
+   <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!rimborsoMissioneModel.uoSpesa || disabilitaRimborsoMissione" on-select="reloadCdr(rimborsoMissioneModel.cdrSpesa)" ng-model="rimborsoMissioneModel.cdrSpesa"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cdr-spesa' | translate}}" >
+        <span ng-bind="$select.selected.cd_centro_responsabilita+' '+$select.selected.ds_cdr"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="cdr.cd_centro_responsabilita as cdr in elencoCdr | filter: $select.search">
+        <span ng-bind="cdr.cd_centro_responsabilita+' '+cdr.ds_cdr"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -278,7 +352,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-                    <select ng-disabled="!elencoModuli || elencoModuli.length == 0 || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" ng-change="reloadModulo(rimborsoMissioneModel.pgProgetto, rimborsoMissioneModel.cdrSpesa, rimborsoMissioneModel.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!elencoModuli || elencoModuli.length == 0 || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" on-select="reloadModulo(rimborsoMissioneModel.pgProgetto, rimborsoMissioneModel.cdrSpesa, rimborsoMissioneModel.uoSpesa)" ng-model="rimborsoMissioneModel.pgProgetto"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.modulo' | translate}}" >
+        <span ng-bind="$select.selected.cd_progetto+' '+$select.selected.ds_progetto"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="modulo.pg_progetto as modulo in elencoModuli | filter: $select.search">
+        <span ng-bind="modulo.cd_progetto+' '+modulo.ds_progetto"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -287,7 +368,14 @@
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                    <select ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'ordine-missione.form.modulo.placeholder' | translate}}" ng-model="rimborsoMissioneModel.gae" ng-options="elGae.cd_linea_attivita as elGae.cd_linea_attivita+' '+elGae.ds_linea_attivita for elGae in elencoGae"><option value=""></option></select>
+   <ui-select id="missioni-ui-select" theme="select2" ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.gae"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.gae' | translate}}" >
+        <span ng-bind="$select.selected.cd_linea_attivita+' '+$select.selected.ds_linea_attivita"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="gae.cd_linea_attivita as gae in elencoGae | filter: $select.search">
+        <span ng-bind="gae.cd_linea_attivita+' '+gae.ds_linea_attivita"></span>
+    </ui-select-choices>
+    </ui-select>                
                         </span>
                     </p>
                     <p class="col-md-1">
@@ -298,17 +386,20 @@
 
 
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-11">
+                    <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
-                    <selectize ng-disabled="disabilitaRimborsoMissione" options='elencoVoci' config="{maxItems: 1}" ng-model="rimborsoMissioneModel.voce"></selectize>
+   <ui-select id="missioni-ui-select" theme="select2" ng-model="rimborsoMissioneModel.voce" ng-disabled="disabilitaRimborsoMissione" />
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.voce' | translate}}" >
+        <span ng-bind="$select.selected.cd_elemento_voce+' '+$select.selected.ds_elemento_voce"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="voce.cd_elemento_voce as voce in elencoVoci | filter: $select.search">
+        <span ng-bind="voce.cd_elemento_voce+' '+voce.ds_elemento_voce"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
-                    <p class="col-md-1">
-            <button ng-disabled="validazione === 'S' || disabilitaRimborsoMissione" type="button" class="btn" ng-click="undoVoce()">{{'global.button.simpleUndo' | translate}}</button>
-                    </p>
-
 
      <div class="panel-body my-panel-body" ng-show="showEsisteRimborsoMissione">
       <p class="col-md-2">
@@ -388,7 +479,7 @@
                       </p>
             </div>
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-6">
+                    <p class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
                             <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>
@@ -412,7 +503,7 @@
                               </label>
                           </span>
                   </p>
-                  <p class="col-md-4">
+                  <p class="col-md-3">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
                               <label class="checkbox">
@@ -435,7 +526,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" ng-change="reloadCdsCompetenza(rimborsoMissioneModel.cdsCompetenza)" placeholder="{{'missione.form.cds-competenza.placeholder' | translate}}" ng-model="rimborsoMissioneModel.cdsCompetenza" ng-options="cds.cd_proprio_unita as cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa for cds in elencoCdsCompetenza"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" on-select="reloadCdsCompetenza(rimborsoMissioneModel.cdsCompetenza)" ng-model="rimborsoMissioneModel.cdsCompetenza"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cds-competenza' | translate}}" >
+        <span ng-bind="$select.selected.cd_proprio_unita+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="cds.cd_proprio_unita as cds in elencoCdsCompetenza | filter: $select.search">
+        <span ng-bind="cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -443,7 +541,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
-                    <select ng-disabled="validazione || disabilitaRimborsoMissione" class="form-control" id="missioni" placeholder="{{'missione.form.uo-competenza.placeholder' | translate}}" ng-model="rimborsoMissioneModel.uoCompetenza" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in elencoUoCompetenza"><option value=""></option></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.uoCompetenza"/>
+    <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-competenza' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUoCompetenza | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -455,38 +560,6 @@
     <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
   </div>
      <div class="panel-body my-panel-body">
-<!--
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoTaxi" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-taxi' | translate}}
-  </label>
- </p>
-</form>
-
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoNoleggio" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-auto-noleggio' | translate}}
-  </label>
- </p>
-</form>
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoServizio" checked="v" autocomplete="off" > {{'ordine-missione.form.utilizzo-auto-servizio' | translate}}
-  </label>
- </p>
-</form>
-<form class="form-inline" role="form" id="missioni">
-                <p class="col-xs-3">
-  <label class="btn" >
-    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.personaleAlSeguito" checked="v" autocomplete="off" > {{'ordine-missione.form.persona-seguito' | translate}}
-  </label>
- </p>
-</form>
--->
-
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-3">
                          <span class="input-group">
@@ -531,7 +604,16 @@
                         </span>
                 </p>
             </form>
-
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.uso-auto-propria">Auto Propria</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="1 == 1" type="checkbox" ng-model="rimborsoMissioneModel.autoPropria" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
             <div class="col-md-12">
               <ul class="pager" ng-show="showEsisteRimborsoMissione">
                 <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>

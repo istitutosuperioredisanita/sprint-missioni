@@ -286,6 +286,7 @@
         "form": {
             "priorita": "Priorità*",
             "obbligo-rientro": "Obbligo di Rientro Giornaliero*",
+            "rientro": "Rientro*",
             "partenza": "Partenza Da*",
             "partenza-da-altro": "Luogo di Partenza*",
             "distanza": "Km. di distanza dalla sede",
@@ -412,7 +413,8 @@
             "motivo-respingi-mittente": "Motivo Respingi al mittente",
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
             "cug": "Comitato Garanzia",
-            "presidenza": "Presidenza"        
+            "presidenza": "Presidenza",
+            "ordine-missione.placeholder": "Selezionare l'Ordine di Missione"
 		},
         "button": {
             "sendToSign": "Invia alla Firma",
@@ -483,6 +485,7 @@
             "stato-invio-sigla": "Stato Sigla",
             "id-sigla": "Id. SIGLA",
             "ordini-con-rimborsi-diversi": "Ordini già rimborsati",
+            "uso-auto-propria": "Richiesta Auto Propria su Ordine di Missione",
             "rimborso-importo-0": "Importo 0"
         },
         "button": {
