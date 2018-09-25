@@ -59,6 +59,35 @@
           </div>
 </div>
 
+<div class="row">
+  <div class="panel panel-success" ng-hide="ordineMissioneModel.id">
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.duplica-ordine">Duplica ordine</span>
+                            <label class="checkbox">
+                                    <input type="checkbox" ng-model="duplica" ng-true-value="S" ng-false-value="N" ng-change="onChangeDuplica(duplica)">
+                            </label>
+                        </span>
+                </p>
+            </form>
+              <form class="form-inline" role="form" id="missioni" ng-show="duplica=='S'">
+                      <p class="col-md-12">
+                          <span class="input-group">
+                            <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.form.duplica-ordine">Ordine di Missione</span>
+    <ui-select ng-disabled="!elencoOrdiniMissione || ordineMissioneModel.id" id="missioni-ui-select" theme="select2" on-select="reloadOrdineMissione(idOrdineMissioneDaDuplicare)" ng-model="idOrdineMissioneDaDuplicare"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" >
+        <span ng-bind="$select.selected.anno+' / '+$select.selected.numero+' - Dal '+ ($select.selected.dataInizioMissione | dateMissioni) +' Al '+ ($select.selected.dataFineMissione | dateMissioni)+' - '+$select.selected.destinazione+' - '+$select.selected.oggetto"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="ordineMissione.id as ordineMissione in elencoOrdiniMissione | filter: $select.search">
+        <span ng-bind="ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto"></span>
+    </ui-select-choices>
+    </ui-select>
+                          </span>
+                      </p>
+              </form>
+  </div>
+</div>
 <div class="panel panel-success">
   <div class="panel-heading color-verde-giada text-center">
     <h3 class="panel-title color-verde-giada" translate="missione.form.box-dati">Informazioni anagrafiche</h3>

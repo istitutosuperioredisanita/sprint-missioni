@@ -2,6 +2,12 @@
 
 missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtils) {
         return {
+            findMissioniDaDuplicare: function(user) {
+                var promise = $http.get('api/rest/ordiniMissione/listDaDuplicare', {params: {user:user}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
             findMissioniDaAnnullare: function(user) {
                 var promise = $http.get('api/rest/ordiniMissione/listDaAnnullare', {params: {user:user}}).then(function (response) {
                     return response.data;

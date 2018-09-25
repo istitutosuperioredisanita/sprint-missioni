@@ -244,7 +244,9 @@ public class CronService {
 		}
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
+				LOGGER.info("Comunica Missione: "+rimborsoMissione.getId());
 				if (rimborsoMissioneService.isMissioneComunicabileSigla(rimborsoMissione)){
+					LOGGER.info("Missione Comunicabile: "+rimborsoMissione.getId());
 					try {
 						comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
 					} catch (Exception e) {
