@@ -309,7 +309,8 @@
             "persona-seguito": "Personale al Seguito",
             "fondi": "Fondi",
             "missione-gratuita": "Spese non a carico Ente",
-            "responsabile-gruppo": "Responsabile del Gruppo*"
+            "responsabile-gruppo": "Responsabile del Gruppo*",
+            "duplica-ordine": "Duplica Ordine di Missione"
         },
         "button": {
             "sendToFinal": "Rendi Definitivo l'Ordine di Missione",

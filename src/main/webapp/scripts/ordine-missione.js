@@ -418,6 +418,82 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
     
 
+    $scope.onChangeDuplica = function (duplica) {
+        if (duplica == 'S'){
+            $scope.restOrdiniMissioneDaDuplicare($sessionStorage.accountWork);
+        }
+    }
+
+    $scope.reloadOrdineMissione = function(idOrdineMissione){
+
+        for (var i=0; i<$scope.elencoOrdiniMissione.length; i++) {
+            if ($scope.elencoOrdiniMissione[i].id === idOrdineMissione){
+                var ordineMissioneSelected = $scope.elencoOrdiniMissione[i];
+
+                var today = $scope.oggi;
+                $scope.ordineMissioneModel.dataInserimento = today;
+                $scope.ordineMissioneModel.anno = today.getFullYear();
+
+                $scope.ordineMissioneModel.priorita = ordineMissioneSelected.priorita;
+                $scope.ordineMissioneModel.oggetto = ordineMissioneSelected.oggetto;
+                $scope.ordineMissioneModel.destinazione = ordineMissioneSelected.destinazione;
+                $scope.ordineMissioneModel.nazione = ordineMissioneSelected.nazione;
+                $scope.ordineMissioneModel.tipoMissione = ordineMissioneSelected.tipoMissione;
+                $scope.ordineMissioneModel.trattamento = ordineMissioneSelected.trattamento;
+
+                if ($scope.ordineMissioneModel.tipoMissione === 'E') {
+                    $scope.missioneEstera = true;
+                } else {
+                    $scope.missioneEstera = null;
+                }
+
+                $scope.ordineMissioneModel.voce = ordineMissioneSelected.voce;
+                $scope.ordineMissioneModel.gae = ordineMissioneSelected.gae;
+                $scope.ordineMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
+                $scope.ordineMissioneModel.uoRich = ordineMissioneSelected.uoRich;
+                $scope.ordineMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
+                $scope.ordineMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
+                $scope.ordineMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
+                $scope.ordineMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
+                $scope.ordineMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
+                $scope.ordineMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
+                $scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
+                $scope.ordineMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
+                $scope.ordineMissioneModel.utilizzoAutoNoleggioServizio = ordineMissioneSelected.utilizzoAutoServizio;
+                $scope.ordineMissioneModel.personaleAlSeguito = ordineMissioneSelected.personaleAlSeguito;
+                $scope.ordineMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+                $scope.ordineMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
+                $scope.ordineMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
+                $scope.ordineMissioneModel.importoPresunto = ordineMissioneSelected.importoPresunto;
+                $scope.ordineMissioneModel.missioneGratuita = ordineMissioneSelected.missioneGratuita;
+                $scope.ordineMissioneModel.cup = ordineMissioneSelected.cup;
+                $scope.ordineMissioneModel.cug = ordineMissioneSelected.cug;
+                $scope.ordineMissioneModel.presidente = ordineMissioneSelected.presidente;
+                if ($scope.ordineMissioneModel.uoSpesa){
+                    $scope.restUo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsSpesa, $scope.ordineMissioneModel.uoSpesa);
+                    $scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
+                    $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                }
+                if ($scope.ordineMissioneModel.cdsCompetenza){
+                    $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsCompetenza);
+                }
+                if ($scope.ordineMissioneModel.uoCompetenza){
+                    $scope.restUoCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsCompetenza, $scope.ordineMissioneModel.uoCompetenza);
+                }
+                if ($scope.ordineMissioneModel.cdrSpesa){
+                    $scope.restCdr($scope.ordineMissioneModel.uoSpesa, "S");
+                }
+                break;
+            }
+        }
+    }
+
+    $scope.restOrdiniMissioneDaDuplicare = function(userWork){
+        ElencoOrdiniMissioneService.findMissioniDaDuplicare(userWork.login).then(function(data){
+            $scope.elencoOrdiniMissione = data;
+        });
+    }
+
     $scope.annullaGae = function(){
       $scope.ordineMissioneModel.gae = null;
       $scope.gaeSelected = null;
