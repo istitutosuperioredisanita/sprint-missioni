@@ -75,6 +75,7 @@ public class RimborsoImpegniService {
     }
 
     private void validaCRUD(Principal principal, RimborsoImpegni rimborsoImpegni) {
+		RimborsoMissione rimborsoMissione = rimborsoImpegni.getRimborsoMissione();
     	if (StringUtils.isEmpty(rimborsoImpegni.getEsercizioOriginaleObbligazione()) ||
     			StringUtils.isEmpty(rimborsoImpegni.pgObbligazione) ){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati degli impegni incompleti.");
@@ -82,11 +83,15 @@ public class RimborsoImpegniService {
 			if (!StringUtils.isEmpty(rimborsoImpegni.getRimborsoMissione().getGae())){
 				ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoImpegni.getRimborsoMissione().getCdsSpesa(), rimborsoImpegni.getRimborsoMissione().getUoSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione(), rimborsoImpegni.getRimborsoMissione().getGae());
 				if (impegnoGae == null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoImpegni.getRimborsoMissione().getGae()+" indicata oppure non esiste");
+					rimborsoMissione.setGae(null);
+					rimborsoMissione.setToBeUpdated();
+//					throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoImpegni.getRimborsoMissione().getGae()+" indicata oppure non esiste");
 				} else {
 					if (!StringUtils.isEmpty(rimborsoImpegni.getRimborsoMissione().getVoce())){
 						if (!impegnoGae.getCdElementoVoce().equals(rimborsoImpegni.getRimborsoMissione().getVoce())){
-							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoImpegni.getRimborsoMissione().getVoce());
+							rimborsoMissione.setVoce(null);
+							rimborsoMissione.setToBeUpdated();
+//							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoImpegni.getRimborsoMissione().getVoce());
 						}
 					}
 					rimborsoImpegni.setCdCdsObbligazione(impegnoGae.getCdCds());
@@ -101,7 +106,9 @@ public class RimborsoImpegniService {
 				} else {
 					if (!StringUtils.isEmpty(rimborsoImpegni.getRimborsoMissione().getVoce())){
 						if (!impegno.getCdElementoVoce().equals(rimborsoImpegni.getRimborsoMissione().getVoce())){
-							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoImpegni.getRimborsoMissione().getVoce());
+							rimborsoMissione.setVoce(null);
+							rimborsoMissione.setToBeUpdated();
+//							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoImpegni.getRimborsoMissione().getVoce());
 						}
 					} else {
 						rimborsoImpegni.setVoce(impegno.getCdElementoVoce());
@@ -131,6 +138,10 @@ public class RimborsoImpegniService {
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Impegno già esistente.");
 				}
+			}
+			if (rimborsoMissione.isToBeUpdated()){
+				rimborsoMissione = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissione);
+				rimborsoImpegni.setRimborsoMissione(rimborsoMissione);
 			}
     }
 

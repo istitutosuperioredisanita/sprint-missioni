@@ -1212,6 +1212,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       $scope.newImpegno = {};
     }
 
+    var aggiornaDatiFinanziari = function (rimborsoMissione) {
+        $scope.rimborsoMissioneModel.gae = rimborsoMissione.gae;
+        $scope.rimborsoMissioneModel.voce = rimborsoMissione.voce;
+    }
+
+
+
     $scope.insertImpegno = function (newRigaImpegno) {
         newRigaImpegno.rimborsoMissione = $scope.rimborsoMissioneModel;
             $rootScope.salvataggio = true;
@@ -1221,6 +1228,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                         $scope.impegni = [];
                     }
                     $scope.impegni.push(data);
+                    aggiornaDatiFinanziari(data.rimborsoMissione);
                     $scope.undoAddImpegno();
             }).error(function (data) {
                 $rootScope.salvataggio = false;
@@ -1231,6 +1239,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         $rootScope.salvataggio = true;
         $http.put('api/rest/rimborsoMissione/impegno/modify', impegno).success(function(data){
             $rootScope.salvataggio = false;
+            aggiornaDatiFinanziari(data.rimborsoMissione);
             undoEditingImpegno(impegno);
         }).error(function (data) {
             $rootScope.salvataggio = false;
