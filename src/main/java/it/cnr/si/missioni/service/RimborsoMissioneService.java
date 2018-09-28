@@ -430,9 +430,9 @@ public class RimborsoMissioneService {
 		}
 		
     	if (confirm){
-        	if (Utility.nvl(rimborsoMissioneDB.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoMissioneDB.getAnticipoImporto())).compareTo(BigDecimal.ZERO) < 0){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo totale dei dettagli spesa non anticipati al netto dell'anticipo ricevuto è negativo.");
-        	}
+//        	if (Utility.nvl(rimborsoMissioneDB.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoMissioneDB.getAnticipoImporto())).compareTo(BigDecimal.ZERO) < 0){
+//				throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo totale dei dettagli spesa non anticipati al netto dell'anticipo ricevuto è negativo.");
+//        	}
     		
     		rimborsoMissioneDB.setStato(Costanti.STATO_CONFERMATO);
 			rimborsoMissioneDB.setNoteRespingi(null);
