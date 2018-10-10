@@ -153,6 +153,9 @@ public class ProxyService implements EnvironmentAware{
         } catch (HttpServerErrorException _ex) {
         	String errResponse = _ex.getResponseBodyAsString();
         	log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
+        	if (_ex.getStatusCode().compareTo(HttpStatus.SERVICE_UNAVAILABLE) == 0){
+            	throw new ComponentException(app+" temporaneamente non disponibile");
+        	}
         	throw new ApplicationContextException(errResponse,_ex);
         } catch (Exception _ex) {
         	log.error(_ex.getMessage(), _ex.getLocalizedMessage());
