@@ -18,6 +18,7 @@ public class JSONBody implements Cloneable, Serializable{
 	String data;
 	Long nazione;
 	Long inquadramento;
+	Long idRimborsoMissione;
 	String cdTipoSpesa;
 	String cdTipoPasto;
 	String divisa;
@@ -33,7 +34,7 @@ public class JSONBody implements Cloneable, Serializable{
 			List<JSONOrderBy> orderBy, List<JSONClause> clauses,String data, Long nazione,
 			Long inquadramento, String cdTipoSpesa,
 			String cdTipoPasto, String divisa,
-			String km, String importoSpesa, MissioneBulk missioneBulk) {
+			String km, String importoSpesa, MissioneBulk missioneBulk, Long idRimborsoMissione) {
 		super();
 		this.activePage = activePage;
 		this.maxItemsPerPage = maxItemsPerPage;
@@ -48,6 +49,7 @@ public class JSONBody implements Cloneable, Serializable{
 		this.km = km;
 		this.importoSpesa = importoSpesa;
 		this.missioneBulk = missioneBulk;
+		this.idRimborsoMissione = idRimborsoMissione;
 	}
 
 	public Integer getActivePage() {
@@ -158,6 +160,14 @@ public class JSONBody implements Cloneable, Serializable{
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return super.clone();
+	}
+
+	public Long getIdRimborsoMissione() {
+		return idRimborsoMissione;
+	}
+
+	public void setIdRimborsoMissione(Long idRimborsoMissione) {
+		this.idRimborsoMissione = idRimborsoMissione;
 	}
 
 

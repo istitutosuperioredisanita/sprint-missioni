@@ -137,6 +137,12 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "UO_FIRMA_AGGIUNTA", length = 20, nullable = true)
     public String uoFirmaAggiunta;
 
+    @Column(name = "PROGRESSIVO_ANNULLAMENTO", length = 20, nullable = true)
+    private Long progressivoAnnullamento;
+
+    @Column(name = "PROGR_ANNULL_RIMBORSO", length = 20, nullable = true)
+    private Long progrAnnullRimborso;
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -430,4 +436,21 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 	public void setUoFirmaAggiunta(String uoFirmaAggiunta) {
 		this.uoFirmaAggiunta = uoFirmaAggiunta;
 	}
+
+	public Long getProgrAnnullRimborso() {
+		return progrAnnullRimborso;
+	}
+
+	public void setProgrAnnullRimborso(Long progrAnnullRimborso) {
+		this.progrAnnullRimborso = progrAnnullRimborso;
+	}
+
+	public Long getProgressivoAnnullamento() {
+		return progressivoAnnullamento;
+	}
+
+	public void setProgressivoAnnullamento(Long progressivoAnnullamento) {
+		this.progressivoAnnullamento = progressivoAnnullamento;
+	}
+
 }

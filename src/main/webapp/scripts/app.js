@@ -199,6 +199,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/annullamento-rimborso-missione/:idMissione?/:validazione?', {
+                    templateUrl: 'views/annullamento-rimborso-missione.html',
+                    controller: 'AnnullamentoRimborsoMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/ordini-missione-da-rendere-definitivi', {
                     templateUrl: 'views/ordini-missione-da-rendere-definitivi.html',
                     controller: 'OrdiniMissioneDaRendereDefinitiviController',

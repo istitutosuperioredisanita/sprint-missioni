@@ -51,6 +51,12 @@ public class DatiIstitutoService {
             if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
         		pgCorrente = new Long(datiIstituto.getProgressivoRimborso()+1);
         		datiIstituto.setProgressivoRimborso(pgCorrente);
+    		} else if (Costanti.TIPO_ANNULLAMENTO_ORDINE_MISSIONE.equals(tipo) ){
+                pgCorrente = new Long(datiIstituto.getProgressivoAnnullamento()+1);
+        		datiIstituto.setProgressivoAnnullamento(pgCorrente);
+    		} else if (Costanti.TIPO_ANNULLAMENTO_RIMBORSO_MISSIONE.equals(tipo) ){
+                pgCorrente = new Long(datiIstituto.getProgrAnnullRimborso()+1);
+        		datiIstituto.setProgrAnnullRimborso(pgCorrente);
     		} else{
                 pgCorrente = new Long(datiIstituto.getProgressivoOrdine()+1);
         		datiIstituto.setProgressivoOrdine(pgCorrente);
@@ -61,31 +67,18 @@ public class DatiIstitutoService {
     		log.debug("Updated Information for Dati Istituto: {}", datiIstituto);
     	} else {
     		throw new AwesomeException(CodiciErrore.ERRGEN, "Dati uo non presenti per il codice "+istituto+" nell'anno "+anno);
-//    		DatiIstituto datiIstitutoInsert = null;
-//    		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
-//        		datiIstitutoInsert = creaDatiIstitutoRimborso(principal, istituto, anno);
-//    		} else {
-//        		datiIstitutoInsert = creaDatiIstitutoOrdine(principal, istituto, anno);
-//    		}
-//    		datiIstituto = datiIstitutoInsert;
-//    		log.debug("Created Information for Dati Istituto: {}", datiIstitutoInsert);
     	}
 		if (Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ) {
 			return datiIstituto.getProgressivoRimborso();
+		} else if (Costanti.TIPO_ANNULLAMENTO_ORDINE_MISSIONE.equals(tipo) ){
+			return datiIstituto.getProgressivoAnnullamento();
+		} else if (Costanti.TIPO_ANNULLAMENTO_RIMBORSO_MISSIONE.equals(tipo) ){
+			return datiIstituto.getProgrAnnullRimborso();
 		} else {
 			return datiIstituto.getProgressivoOrdine();
 		}
 	}
 
-    @Transactional(propagation = Propagation.REQUIRED)
-	public DatiIstituto creaDatiIstitutoOrdine(Principal principal, String istituto, Integer anno) throws ComponentException {
-		return creaDatiIstituto(principal, istituto, anno, Costanti.TIPO_ORDINE_DI_MISSIONE);
-	}
-    @Transactional(propagation = Propagation.REQUIRED)
-    public DatiIstituto creaDatiIstitutoRimborso(Principal principal, String istituto, Integer anno ) throws ComponentException {
-		return creaDatiIstituto(principal, istituto, anno, Costanti.TIPO_RIMBORSO_MISSIONE);
-	}
-    
     @Transactional(propagation = Propagation.REQUIRED)
     public void ribaltaDatiIstituti(Principal principal) throws ComponentException {
     	List<DatiIstituto> lista = datiIstitutoRepository.getDatiIstituti(new Integer(DateUtils.getCurrentYear()));
@@ -98,6 +91,8 @@ public class DatiIstitutoService {
 	        		if (getDatiIstituto(datiIstitutoInsert.getIstituto(), anno) == null){
 	        			datiIstitutoInsert.setAnno(anno);        			
 	            		datiIstitutoInsert.setProgressivoOrdine(new Long(0));
+	            		datiIstitutoInsert.setProgrAnnullRimborso(new Long(0));
+	            		datiIstitutoInsert.setProgressivoAnnullamento(new Long(0));
 	            		datiIstitutoInsert.setProgressivoRimborso(new Long(0));
 	            		datiIstitutoInsert.setUser(principal.getName());
 	            		datiIstitutoInsert.setPg_ver_rec(new Long(1));
@@ -121,6 +116,8 @@ public class DatiIstitutoService {
 		datiIstitutoInsert.setIstituto(istituto);
 		datiIstitutoInsert.setProgressivoOrdine(Costanti.TIPO_ORDINE_DI_MISSIONE.equals(tipo) ? new Long(1) : new Long(0));
 		datiIstitutoInsert.setProgressivoRimborso(Costanti.TIPO_RIMBORSO_MISSIONE.equals(tipo) ? new Long(1) : new Long(0));
+		datiIstitutoInsert.setProgressivoAnnullamento(Costanti.TIPO_ANNULLAMENTO_ORDINE_MISSIONE.equals(tipo) ? new Long(1) : new Long(0));
+		datiIstitutoInsert.setProgrAnnullRimborso(Costanti.TIPO_ANNULLAMENTO_RIMBORSO_MISSIONE.equals(tipo) ? new Long(1) : new Long(0));
 		datiIstitutoInsert.setGestioneRespModulo("N");
 		datiIstitutoInsert.setUser(principal.getName());
 		datiIstitutoInsert.setToBeCreated();

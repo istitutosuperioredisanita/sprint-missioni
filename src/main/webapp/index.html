@@ -121,6 +121,8 @@
                                     &nbsp;<span translate="global.menu.account.rimborso-missione">Rimborso Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/elenco-rimborsi-missione"><span class="glyphicon glyphicon-list-alt"></span>
                                     &nbsp;<span translate="global.menu.account.elenco-rimborsi-missione">Elenco Rimborsi di Missione</span></a></li>
+                                <li ng-show="account.uoForUsersSpecial"><a href="#/annullamento-rimborso-missione"><span class="glyphicon glyphicon-remove"></span>
+                                    &nbsp;<span translate="global.menu.account.annullamento-rimborso-approvato">Annullamento Rimborso Missione Approvato</span></a></li>
                             </ul>
                         </li>
                         <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)" class="dropdown pointer" ng-controller="AdminController">
@@ -240,6 +242,7 @@
         <script src="scripts/ordine-missione.js"></script>
         <script src="scripts/rimborso-missione.js"></script>
         <script src="scripts/annullamento-ordine-missione.js"></script>
+        <script src="scripts/annullamento-rimborso-missione.js"></script>
         <script src="scripts/elenco-ordini-missione.js"></script>
         <script src="scripts/rimborso-missione/elenco-rimborsi-missione.js"></script>
         <script src="scripts/rimborso-missione/rimborso-missione-dettagli.js"></script>

@@ -910,7 +910,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     var impostadisabilitaRimborsoMissione = function() {
         if ($scope.esisteRimborsoMissione && ($scope.rimborsoMissioneModel.stato === 'DEF' || 
-            $scope.rimborsoMissioneModel.statoFlusso === 'APP' || $scope.rimborsoMissioneModel.stato === 'ANN' || 
+            $scope.rimborsoMissioneModel.statoFlusso === 'APP' || $scope.rimborsoMissioneModel.stato === 'ANN' || $scope.rimborsoMissioneModel.stato === 'ANA' || 
             ($scope.rimborsoMissioneModel.stato === 'CON' && 
                ($scope.rimborsoMissioneModel.stateFlows === 'ANNULLATO' ||
                 $scope.rimborsoMissioneModel.stateFlows === 'FIRMA SPESA RIMBORSO' ||
@@ -1293,7 +1293,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.attachments = {};
             });
         }
-//        $scope.anticipoOrdineMissioneModel.viewAttachment = true;
+    }
+
+    $scope.viewAttachmentsUndo = function () {
+        if ($scope.rimborsoMissioneModel.stato == 'ANA'){
+            $http.get('api/rest/annullamentoRimborsoMissione/viewAttachmentsFromRimborso/' + $scope.rimborsoMissioneModel.id).then(function (data) {
+                var attachments = data.data;
+                $scope.rimborsoMissioneModel.attachmentsUndo = attachments;
+            }, function () {
+                $scope.rimborsoMissioneModel.attachmentsUndo = {};
+            });
+        }
     }
 
     $scope.save = function () {
@@ -1372,6 +1382,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restCapitoli(model.anno);
                 $scope.rimborsoMissioneModel = model;
                 $scope.viewAttachments($scope.rimborsoMissioneModel.id);
+                if ($scope.rimborsoMissioneModel.stato == 'ANA'){
+                    $scope.viewAttachmentsUndo();
+                }
+
                 $scope.inizializzaFormPerModifica();
                 $scope.today();
                 $scope.gestioneUtenteAbilitatoValidare($scope.rimborsoMissioneModel.uoSpesa);

@@ -1038,7 +1038,6 @@ public class OrdineMissioneService {
 		if (lista != null && lista.size() > 0){
 			String[] elencoMail = mailService.prepareTo(lista);
 			if (elencoMail != null && elencoMail.length > 0){
-				log.info("Users Administrative to send Mail: "+elencoMail.toString());
 				mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
 			}
 		}

@@ -110,6 +110,7 @@ public class Costanti {
     public final static String TIPO_ORDINE_DI_MISSIONE = "O";
     public final static String TIPO_RIMBORSO_MISSIONE = "R";
     public final static String TIPO_ANNULLAMENTO_ORDINE_MISSIONE = "A";
+    public final static String TIPO_ANNULLAMENTO_RIMBORSO_MISSIONE = "C";
     public final static String CODICE_DIVISA_DEFAULT_SIGLA = "EURO";
 	public final static Long NAZIONE_ITALIA_SIGLA = new Long ("1");
 	public final static String SI = "Sì";
