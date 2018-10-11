@@ -108,6 +108,28 @@ public class RimborsoMissioneResource {
 
     /**
      * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/rimborsoMissione/listToBeDeleted",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getRimborsiMissioneDaCancellare(HttpServletRequest request,
+    		RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati dei Rimborsi di Missione da cancellare" );
+        List<RimborsoMissione> rimborsiMissione;
+        filter.setStatoFlusso("APP");
+        filter.setStato("DEF");
+		try {
+			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, false);
+		} catch (ComponentException e) {
+			log.error("ERRORE getRimborsoMissione",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		}
+        return JSONResponseEntity.ok(rimborsiMissione);
+    }
+
+    /**
+     * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
      * @throws Exception 
      */
     @RequestMapping(value = "/rest/rimborsoMissione/listToValidate",

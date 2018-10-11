@@ -114,7 +114,12 @@ public class OrdineMissioneAutoPropriaService {
     	ordineMissioneAutoPropria.setOrdineMissione(ordineMissione);
     	ordineMissioneAutoPropria.setStato(Costanti.STATO_INSERITO);
     	ordineMissioneAutoPropria.setToBeCreated();
-		validaCRUD(principal, ordineMissioneAutoPropria);
+    	OrdineMissioneAutoPropria otherAuto = ordineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
+    	if (otherAuto != null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Dati dell'auto propria già inseriti.");
+    	}
+
+    	validaCRUD(principal, ordineMissioneAutoPropria);
 		ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.creaConBulk(principal, ordineMissioneAutoPropria);
     	log.debug("Created Information for OrdineMissioneAutoPropria: {}", ordineMissioneAutoPropria);
     	return ordineMissioneAutoPropria;

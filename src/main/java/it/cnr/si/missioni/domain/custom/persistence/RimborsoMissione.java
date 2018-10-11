@@ -43,6 +43,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati";
 	public static final String CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione";
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO = "Allegati al Rimborso Missione";
+	public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANNULLAMENTO = "Allegati all'Annullamento del Rimborso Missione";
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo";
 	public static final String CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id";
 	public static final String CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione";
