@@ -696,6 +696,23 @@
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                     </div>
             </form>
+<form class="form-inline col-md-12" role="form" id="missioni" ng-show="rimborsoMissioneModel.stato == 'ANA'">
+<div class="panel panel-default" >
+  <div class="panel-heading color-verde-chiaro text-center">
+    <h1 class="panel-title" >Allegati dell'annullamento del rimborso missione</h1>
+  </div>
+  <div class="panel-body my-panel-body">
+          <div>
+            <ul class="list-unstyled rimborsoMissioneModel.attachmentsUndo" ng-show="rimborsoMissioneModel.stato == 'ANA'">
+              <li ng-repeat="attachment in rimborsoMissioneModel.attachmentsUndo">
+                <span class="glyphicon glyphicon-download-alt"></span>
+                <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+              </li>
+            </ul>
+          </div> 
+  </div>
+</div>
+</form>
         </div>
     </div>
 </div>

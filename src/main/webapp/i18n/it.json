@@ -33,6 +33,7 @@
                 "elenco-ordini-missione": "Elenco Ordini di Missione",
                 "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi",
                 "annullamento-ordine-approvato": "Annullamento Ordine di Missione Approvato",
+                "annullamento-rimborso-approvato": "Annullamento Rimborso Missione Approvato",
                 "rimborso-missione": "Nuovo Rimborso Missione",
                 "elenco-rimborsi-missione": "Elenco Rimborsi Missione"
             },
@@ -106,6 +107,7 @@
         "wait": "Controllo Flussi Missioni in corso",
         "subtitle_da_confermare": "Ordini di Missione da Confermare",
         "subtitle_da_confermare_annullamenti": "Annullamenti Ordini di Missione da Confermare",
+        "subtitle_da_confermare_annullamenti_rimborsi": "Annullamenti Rimborsi Missione da Confermare",
         "subtitle_da_confermare_rimborso": "Rimborsi Missione da Confermare",
         "subtitle_ko": "Flussi Respinti su Ordini di Missione",
         "subtitle_ko_rimborso": "Flussi Respinti Rimborso Missione",
@@ -415,7 +417,8 @@
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
             "cug": "Comitato Garanzia",
             "presidenza": "Presidenza",
-            "ordine-missione.placeholder": "Selezionare l'Ordine di Missione"
+            "ordine-missione.placeholder": "Selezionare l'Ordine di Missione",
+            "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
 		},
         "button": {
             "sendToSign": "Invia alla Firma",
@@ -448,12 +451,24 @@
         "title": "ANNULLAMENTO ORDINE DI MISSIONE APPROVATO",
         "form": {
             "numero": "Progressivo di Annullamento",
-            "motivo-annullamento.placeholder": "Indicare il Motivo di Annuullamento dell'ordine di missione approvato",
-            "motivo-annullamento": "Motivo di Annuullamento"
+            "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
+            "motivo-annullamento": "Motivo di Annullamento"
         },
         "button": {
             "print": "Stampa Annullamento",
             "confirm": "Conferma l'Annullamento dell'Ordine di Missione"
+        }
+    },
+    "annullamento-rimborso-missione": {
+        "title": "ANNULLAMENTO RIMBORSO MISSIONE APPROVATO",
+        "form": {
+            "numero": "Progressivo di Annullamento",
+            "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
+            "motivo-annullamento": "Motivo di Annullamento"
+        },
+        "button": {
+            "print": "Stampa Annullamento",
+            "confirm": "Conferma l'Annullamento del Rimborso Missione"
         }
     },
     "rimborso-missione": {
