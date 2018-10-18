@@ -231,6 +231,10 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.impostaInquadramento = function(){
         if ($scope.terzoSigla && $scope.inquadramento){
             var trovatoInquadramento = false;
+            var inqMisto = null;
+            var rappMisto = null;
+            var trovatoInquadramentoMistoInizio = false;
+            var trovatoInquadramentoMistoFine = false;
             var dataFineTroncata = new Date(new Date($scope.rimborsoMissioneModel.dataFineMissione).setHours(0,0,0,0));
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
@@ -240,6 +244,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                         $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
                         $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                         trovatoInquadramento = true;
+                    } else {
+                        if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
+                            new Date(inquadramento.dt_fin_validita) >= new Date($scope.rimborsoMissioneModel.dataInizioMissione)){
+                            inqMisto = inquadramento.pg_rif_inquadramento;
+                            rappMisto = inquadramento.cd_tipo_rapporto;
+                            trovatoInquadramentoMistoInizio = true;
+                        }
+                        if (new Date(inquadramento.dt_ini_validita) <= dataFineTroncata && 
+                            new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
+                            trovatoInquadramentoMistoFine = true;
+                        }
                     }
                 }
             }
@@ -251,12 +266,33 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                         $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
                         $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                         trovatoInquadramento = true;
+                    } else {
+                        if (!trovatoInquadramentoMistoInizio || !trovatoInquadramentoMistoFine){
+                            if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
+                                new Date(inquadramento.dt_fin_validita) >= new Date($scope.rimborsoMissioneModel.dataInizioMissione)){
+                                inqMisto = inquadramento.pg_rif_inquadramento;
+                                rappMisto = inquadramento.cd_tipo_rapporto;
+                                trovatoInquadramentoMistoInizio = true;
+                            }
+                            if (new Date(inquadramento.dt_ini_validita) <= dataFineTroncata && 
+                                new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
+                                trovatoInquadramentoMistoFine = true;
+                            }
+                        }
                     }
                 }
             }
+
             if (!trovatoInquadramento){
-                ui.error("Per la data della missione non esiste un inquadramento valido.");
-                return false;
+                if (trovatoInquadramentoMistoInizio && !trovatoInquadramentoMistoFine){
+                    $scope.rimborsoMissioneModel.inquadramento = inqMisto;
+                    $scope.rimborsoMissioneModel.cdTipoRapporto = rappMisto;
+                    return true;
+                } else {
+                    ui.error("Per la data della missione non esiste un inquadramento valido.");
+                    return false;
+                }
+
             }
         }
         return true;
