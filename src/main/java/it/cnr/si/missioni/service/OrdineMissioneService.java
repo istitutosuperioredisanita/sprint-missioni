@@ -469,6 +469,7 @@ public class OrdineMissioneService {
 					Disjunction condizioneOr = Restrictions.disjunction();
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
+					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", filter.getUoRich())));
 					criterionList.add(condizioneOr);
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente "+principal.getName()+"  non è abilitato a vedere i dati della uo "+filter.getUoRich());
@@ -544,6 +545,7 @@ public class OrdineMissioneService {
 //						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 //						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
 							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
+							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", uoService.getUoSigla(uoUser))));
 //						    			}
 //						    		}
 //					    		}
@@ -878,7 +880,7 @@ public class OrdineMissioneService {
     	}
     	if (confirm){
 			Parametri parametri = parametriService.getParametri();
-			if (parametri != null && StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(ordineMissione.getUid(),"N").equals(parametri.getDipendenteCda())){
+			if (parametri != null && StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(ordineMissione.getUid(),"N").equals(parametri.getDipendenteCda()) && Utility.nvl(ordineMissione.getPresidente(),"N").equals("S")){
             	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMATO_FROM_CMIS));
             	ordineMissioneDB.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
             	ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
