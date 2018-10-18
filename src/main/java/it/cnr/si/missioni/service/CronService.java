@@ -409,21 +409,21 @@ public class CronService {
 		}
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
-				LOGGER.info("Ordine Resp gruppo");
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-				LOGGER.info("Dati Ist Resp gruppo");
-				if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
-					try {
-						LOGGER.info("Start verify Resp gruppo");
-						stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
-					} catch (Exception e) {
-						String error = Utility.getMessageException(e);
-						String testoErrore = getTextErrorBypassResp(ordineMissione, error);
-						LOGGER.error(testoErrore + " "+e);
+				if (istituto != null){
+					if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
 						try {
-							mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
-						} catch (Exception e1) {
-							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+							LOGGER.info("Start verify Resp gruppo");
+							stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
+						} catch (Exception e) {
+							String error = Utility.getMessageException(e);
+							String testoErrore = getTextErrorBypassResp(ordineMissione, error);
+							LOGGER.error(testoErrore + " "+e);
+							try {
+								mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
+							} catch (Exception e1) {
+								LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+							}
 						}
 					}
 				}
@@ -452,22 +452,23 @@ public class CronService {
 				LOGGER.info("Ordine Amm");
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 				LOGGER.info("Dati Ist Amm");
-				if ((istituto.getMinutiPrimaInizioAmm() != null && istituto.getMinutiMinimiAmm() != null) || (istituto.getMinutiPassatiAmm() != null)){
-					try {
-						LOGGER.info("Start verify Amm");
-						stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
-					} catch (Exception e) {
-						String error = Utility.getMessageException(e);
-						String testoErrore = getTextErrorBypassAmm(ordineMissione, error);
-						LOGGER.error(testoErrore + " "+e);
+				if (istituto != null){
+					if ((istituto.getMinutiPrimaInizioAmm() != null && istituto.getMinutiMinimiAmm() != null) || (istituto.getMinutiPassatiAmm() != null)){
 						try {
-							mailService.sendEmailError(subjectErrorBypassAmm, testoErrore, false, true);
-						} catch (Exception e1) {
-							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+							LOGGER.info("Start verify Amm");
+							stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
+						} catch (Exception e) {
+							String error = Utility.getMessageException(e);
+							String testoErrore = getTextErrorBypassAmm(ordineMissione, error);
+							LOGGER.error(testoErrore + " "+e);
+							try {
+								mailService.sendEmailError(subjectErrorBypassAmm, testoErrore, false, true);
+							} catch (Exception e1) {
+								LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+							}
 						}
 					}
 				}
-				
 			}
 		}
 	}
