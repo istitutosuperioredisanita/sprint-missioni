@@ -373,6 +373,7 @@ public class CronService {
 				try {
 					LOGGER.info("Cron per Verificare gli step da eseguire");
 					verifyStepRespGruppo(principal);
+					LOGGER.info("Fine Cron Resp Gruppo");
 					verifyStepAmministrativo(principal);
 					LOGGER.info("Cron per Verificare gli step da eseguire terminato");
 				} finally {
@@ -395,7 +396,7 @@ public class CronService {
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
 			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
-		} catch (ComponentException e2) {
+		} catch (Exception e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error + " "+e2);
 			try {
@@ -406,9 +407,12 @@ public class CronService {
 		}
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
+				LOGGER.info("Ordine Resp gruppo");
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+				LOGGER.info("Dati Ist Resp gruppo");
 				if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
 					try {
+						LOGGER.info("Start verify Resp gruppo");
 						stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
 					} catch (Exception e) {
 						String error = Utility.getMessageException(e);
@@ -432,7 +436,7 @@ public class CronService {
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
 			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
-		} catch (ComponentException e2) {
+		} catch (Exception e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error + " "+e2);
 			try {
@@ -443,9 +447,12 @@ public class CronService {
 		}
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
+				LOGGER.info("Ordine Amm");
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+				LOGGER.info("Dati Ist Amm");
 				if ((istituto.getMinutiPrimaInizioAmm() != null && istituto.getMinutiMinimiAmm() != null) || (istituto.getMinutiPassatiAmm() != null)){
 					try {
+						LOGGER.info("Start verify Amm");
 						stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
 					} catch (Exception e) {
 						String error = Utility.getMessageException(e);
