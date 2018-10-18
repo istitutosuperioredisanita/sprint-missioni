@@ -619,6 +619,7 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void verifyStepRespGruppo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
+		log.info("Start 2 Resp gruppo");
 		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 		ZonedDateTime oggi = ZonedDateTime.now();
 		long minutiDifferenza = 10000;
@@ -626,14 +627,17 @@ public class OrdineMissioneService {
 		if (oggi.isBefore(ordineMissione.getDataInizioMissione())){
 			minutiDifferenzaDaInizioMissione = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
 		}
+		log.info("Start 2.1 Resp gruppo");
 		if (ordineMissione.getDataInvioRespGruppo() != null){
 			minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioRespGruppo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
 		}
+		log.info("Start 2.2 Resp gruppo");
 		if (istituto.getMinutiPrimaInizioResp() != null && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioResp()){
 			if (istituto.getMinutiMinimiResp() != null && minutiDifferenza > istituto.getMinutiMinimiResp()){
 				bypassRespGruppo(principal, ordineMissione);
 			}
 		}
+		log.info("Start 2.3 Resp gruppo");
 		if (istituto.getMinutiPassatiResp() != null && minutiDifferenza > istituto.getMinutiPassatiResp()){
 			bypassRespGruppo(principal, ordineMissione);
 		}
@@ -648,25 +652,31 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void verifyStepAmministrativo(Principal principal, OrdineMissione ordineMissione)  throws ComponentException{
+		log.info("Start 2 Amm");
 		DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 		ZonedDateTime oggi = ZonedDateTime.now();
 		long minutiDifferenza = 10000;
 		long minutiDifferenzaDaInizioMissione = 0;
+		log.info("Start 2.1 Amm");
 		if (oggi.isBefore(ordineMissione.getDataInizioMissione())){
 			minutiDifferenzaDaInizioMissione = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
 		}
+		log.info("Start 2.2 Amm");
 		if (ordineMissione.getDataInvioAmministrativo() != null){
 			minutiDifferenza = ChronoUnit.MINUTES.between(ordineMissione.getDataInvioAmministrativo().truncatedTo(ChronoUnit.MINUTES), oggi.truncatedTo(ChronoUnit.MINUTES));
 		}
 
+		log.info("Start 2.3 Amm");
 		if (istituto.getMinutiPrimaInizioAmm() != null && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioAmm()){
 			if (istituto.getMinutiMinimiAmm() != null && minutiDifferenza > istituto.getMinutiMinimiAmm()){
 				bypassVerificaAmministrativo(principal, ordineMissione);
 			}
 		}
+		log.info("Start 2.4 Amm");
 		if (istituto.getMinutiPassatiAmm() != null && minutiDifferenza > istituto.getMinutiPassatiAmm()){
 			bypassVerificaAmministrativo(principal, ordineMissione);
 		}
+		log.info("Start 2.5 Amm");
 
     }
 
