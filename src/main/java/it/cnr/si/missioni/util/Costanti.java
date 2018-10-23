@@ -104,6 +104,7 @@ public class Costanti {
 	public final static String STATO_DA_AUTORIZZARE_PER_HOME = "D";
 	public final static String STATO_DA_VALIDARE_PER_HOME = "V";
 	public final static String STATO_DA_CONFERMARE_PER_HOME = "C";
+	public final static String STATO_ALLA_VALIDAZIONE_AMM_PER_HOME = "VA";
 	public final static String STATO_PER_RESPONSABILE_GRUPPO_PER_HOME = "M";
 	public final static String CDS_SAC = "000";
 	public final static String UO_SAC_PROGETTI = "000.000";

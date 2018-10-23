@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.springframework.util.StringUtils;
 
+import ch.qos.logback.classic.pattern.Util;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
@@ -134,6 +135,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Size(min = 0, max = 1)
     @Column(name = "AUTO_PROPRIA", length = 1, nullable = true)
     public String autoPropria;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "VALIDA_AMM", length = 1, nullable = true)
+    public String validaAmm;
 
     @Column(name = "CUG", length = 1, nullable = true)
     public String cug;
@@ -346,6 +351,10 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "NUMERO_INIZIALE", length = 50, nullable = true)
     public Long numeroIniziale;
 
+    @Size(min = 0, max = 20)
+    @Column(name = "UO_CONTR_AMM", length = 20, nullable = true)
+    private String uoContrAmm;
+
 	@Transient
     private String daValidazione;
 	
@@ -395,7 +404,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     private BigDecimal totaleRimborsoComplessivo;
 
 	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich, String trattamento){
+			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich, String trattamento, String validaAmm){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -412,6 +421,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.setValidato(validato);
 		this.setUoRich(uoRich);
 		this.setTrattamento(trattamento);
+		this.setValidaAmm(validaAmm);
 	}
 
 	public RimborsoMissione(){
@@ -433,7 +443,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			add(Projections.property("dataFineMissione")).
 			add(Projections.property("validato")).
 			add(Projections.property("uoRich")).
-			add(Projections.property("trattamento"));
+			add(Projections.property("trattamento")).
+			add(Projections.property("validaAmm"));
 
 	public void setStato(String stato) {
 		this.stato = stato;
@@ -1417,5 +1428,30 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setPresidente(String presidente) {
 		this.presidente = presidente;
+	}
+
+	public String getValidaAmm() {
+		return validaAmm;
+	}
+
+	public void setValidaAmm(String validaAmm) {
+		this.validaAmm = validaAmm;
+	}
+	public Boolean isAllaValidazioneAmministrativa(){
+		return Utility.nvl(getValidaAmm(), "S").equals("N");
+	}
+	public Boolean isValidazioneAmministrativaNonValorizzata(){
+		return getValidaAmm() == null;
+	}
+	public Boolean isPassataValidazioneAmministrativa(){
+		return Utility.nvl(getValidaAmm(), "N").equals("S");
+	}
+
+	public String getUoContrAmm() {
+		return uoContrAmm;
+	}
+
+	public void setUoContrAmm(String uoContrAmm) {
+		this.uoContrAmm = uoContrAmm;
 	}
 }
