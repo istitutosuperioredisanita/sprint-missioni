@@ -2,11 +2,12 @@
 
 missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         return {
-            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate) {
+            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate, idOrdineMissione, recuperoTotali) {
                 var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, 
                         daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, 
                         daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine, 
-                        includiMissioniAnnullate: includiMissioniAnnullate}}).then(function (response) {
+                        includiMissioniAnnullate: includiMissioniAnnullate, 
+                        idOrdineMissione: idOrdineMissione, recuperoTotali: recuperoTotali}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -56,7 +57,7 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         }
     });
 
-missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope, $scope, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService, DateService) {
+missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService, DateService) {
 
     $scope.tipiMissione = {
       		'Italia': 'I',
@@ -143,6 +144,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
         }
     }
 
+    $scope.accessToken = AccessToken.get();
     var accountLog = $sessionStorage.account;
     var uoForUsersSpecial = accountLog.uoForUsersSpecial;
     if (uoForUsersSpecial){

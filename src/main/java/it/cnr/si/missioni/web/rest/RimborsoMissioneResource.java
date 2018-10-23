@@ -78,6 +78,12 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione;
 		try {
 			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
+			if (Utility.nvl(filter.getRecuperoTotali(),"N").equals("S")){
+				for (RimborsoMissione rimborso : rimborsiMissione){
+					rimborsoMissioneService.retrieveDetails((Principal) SecurityUtils.getCurrentUser(), rimborso);
+					impostaTotaliRimborso(rimborso);
+				}
+			}
 		} catch (ComponentException e) {
 			log.error("ERRORE getRimborsoMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -160,11 +166,7 @@ public class RimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
         	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true, true);
-        	if (rimborsoMissione != null){
-            	rimborsoMissione.setTotaleRimborsoComplessivo(rimborsoMissione.getTotaleRimborso());
-            	rimborsoMissione.setTotaleRimborsoSenzaAnticipi(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate());
-            	rimborsoMissione.setRimborsoMissioneDettagli(null);
-        	}
+        	impostaTotaliRimborso(rimborsoMissione);
         	return JSONResponseEntity.ok(rimborsoMissione);
         } catch (AwesomeException e) {
 			log.error("ERRORE getRimborsoMissione",e);
@@ -174,6 +176,14 @@ public class RimborsoMissioneResource {
 			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
     }
+
+	protected void impostaTotaliRimborso(RimborsoMissione rimborsoMissione) {
+		if (rimborsoMissione != null){
+			rimborsoMissione.setTotaleRimborsoComplessivo(rimborsoMissione.getTotaleRimborso());
+			rimborsoMissione.setTotaleRimborsoSenzaAnticipi(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate());
+			rimborsoMissione.setRimborsoMissioneDettagli(null);
+		}
+	}
 
     @RequestMapping(value = "/rest/rimborsoMissione",
             method = RequestMethod.POST,

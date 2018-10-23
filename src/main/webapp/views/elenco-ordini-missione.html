@@ -227,6 +227,7 @@
               <th style="text-align: center">{{'elenco-ordini-missione.form.anticipo' | translate}}</th>
               <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
               <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+              <th style="text-align: center">{{'global.button.print' | translate}}</th>
           </tr>
         </thead>
 
@@ -244,6 +245,7 @@
                 <td class="col-md-1" style="text-align: center">{{ordineMissione.richiestaAnticipo}}</td>
                 <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="col-md-1" style="text-align: center" ng-click="$event.stopPropagation()"><a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
           </tr>
         </tbody>  
       </table>

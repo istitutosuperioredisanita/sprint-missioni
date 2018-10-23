@@ -131,6 +131,10 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "UO_RESP_RESPONSABILI", length = 20, nullable = true)
     private String uoRespResponsabili;
 
+    @Size(min = 0, max = 20)
+    @Column(name = "UO_CONTR_AMM", length = 20, nullable = true)
+    private String uoContrAmm;
+
     @Column(name = "SALTA_FIRMA_UOS_UO_CDS", length = 1, nullable = true)
     public String saltaFirmaUosUoCds;
 
@@ -451,6 +455,14 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setProgressivoAnnullamento(Long progressivoAnnullamento) {
 		this.progressivoAnnullamento = progressivoAnnullamento;
+	}
+
+	public String getUoContrAmm() {
+		return uoContrAmm;
+	}
+
+	public void setUoContrAmm(String uoContrAmm) {
+		this.uoContrAmm = uoContrAmm;
 	}
 
 }

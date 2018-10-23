@@ -116,6 +116,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoRimborsiAnnullati = true;
                     } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
                         $scope.esistonoRimborsiDaValidare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'VA'){
+                        $scope.esistonoRimborsiAllaValidazioneAmm = true;
                     }
                 }
             }

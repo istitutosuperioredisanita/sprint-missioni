@@ -12,6 +12,9 @@
         <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
                       <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{rimborsoMissioneModel.commentFlows}}
         </div>
+        <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.statoPagamento" align="center">
+                      <b>{{'rimborso-missione.form.stato-pagamento-sigla' | translate}} </b>{{rimborsoMissioneModel.statoPagamento}}
+        </div>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                     <p class="col-md-12">
                         <span class="input-group">
@@ -65,8 +68,8 @@
 </div>
 
 
-<div class="row">
-  <div class="panel panel-success" ng-hide="rimborsoMissioneModel.id">
+<div class="row" ng-hide="rimborsoMissioneModel.id">
+  <div class="panel panel-success" >
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-2">
                          <span class="input-group">
@@ -76,6 +79,34 @@
                             </label>
                         </span>
                 </p>
+  <div class="col-md-8">
+        <h4 ng-show="esistonoAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"></h4>
+    <table ng-show="esistonoAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.trattamentoView' | translate}}</th>
+            <th style="text-align: right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}</th>
+            <th style="text-align: center">{{'global.button.print' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listaAltriRimborsi" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
+              <td class="col-md-2" style="text-align: right">{{rimborsoMissione.totaleRimborsoComplessivo | currency : "€"}}</td>
+              <td class="col-md-1" style="text-align: center"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
+        </tr>
+      </tbody>  
+    </table>
+</div>
             </form>
               <form class="form-inline" role="form" id="missioni">
                       <p class="col-md-12">
@@ -100,13 +131,45 @@
     <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
   </div>
      <div class="panel-body my-panel-body">
-  <div class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.id" align="center">
+  <div class="my-panel-body panel panel-success small-margin-bottom" ng-show="rimborsoMissioneModel.id" align="center">
                           <b>{{'ordine-missione.title' | translate}} - {{'missione.form.numero' | translate}}:</b>
                           {{rimborsoMissioneModel.ordineMissione.anno}}/{{rimborsoMissioneModel.ordineMissione.numero}}
                           <b> - Dal </b> {{rimborsoMissioneModel.ordineMissione.dataInizioMissione | date:'dd/MM/yyyy'}}
                           <b> - Al </b>
                           {{rimborsoMissioneModel.ordineMissione.dataFineMissione | date:'dd/MM/yyyy'}} - {{rimborsoMissioneModel.ordineMissione.destinazione}}
   </div>
+
+        <h4 class="panel-heading small-padding" align="center" ng-show="rimborsoMissioneModel.id" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <table ng-show="rimborsoMissioneModel.id" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.trattamentoView' | translate}}</th>
+            <th style="text-align: right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}</th>
+            <th style="text-align: center">{{'global.button.print' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listaAltriRimborsi" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
+              <td class="col-md-2" style="text-align: right">{{rimborsoMissione.totaleRimborsoComplessivo | currency : "€"}}</td>
+              <td class="col-md-1" style="text-align: center"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
+        </tr>
+      </tbody>  
+    </table>
+  </div>
+
             <form class="form-inline" role="form" id ="missioni">
                 <p class="col-md-6">
                         <span class="input-group">
@@ -658,7 +721,8 @@
                 </p>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione && ((rimborsoMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo) || rimborsoMissioneModel.stato === 'INS'||!showEsisteRimborsoMissione)">
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione && ((rimborsoMissioneModel.stato === 'CON' && (utenteAbilitatoValidareUo == 'S' || 
+                    utenteAbilitatoValidareUoContrAmm == 'S')) || rimborsoMissioneModel.stato === 'INS'||!showEsisteRimborsoMissione)">
                             <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
@@ -668,12 +732,14 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' || 
+                    utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaRimborsoMissione">
+                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' || 
+                    utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
                             <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
                     </div>
             </form>
