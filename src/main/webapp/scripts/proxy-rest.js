@@ -329,6 +329,26 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
+    var recuperoMandatoMissioneSigla = function(rimborso){
+        var urlRestProxy = URL_REST.STANDARD;
+        var mand = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.MANDATO_MISSIONE_SIGLA;
+        var objectPostMandClauses = [{condition: 'AND', fieldName: 'cd_cds_doc_amm', operator: "=", fieldValue:rimborso.cdCdsSigla},
+                                    {condition: 'AND', fieldName: 'cd_uo_doc_amm', operator: "=", fieldValue:rimborso.cdUoSigla},
+                                    {condition: 'AND', fieldName: 'esercizio_doc_amm', operator: "=", fieldValue:rimborso.esercizioSigla},
+                                    {condition: 'AND', fieldName: 'ds_tipo_doc_amm', operator: "=", fieldValue:"Missione"},
+                                    {condition: 'AND', fieldName: 'pg_doc_amm', operator: "=", fieldValue:rimborso.pgMissioneSigla}];
+        var objectPostMand = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostMandClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostMand, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                mand = data.elements;
+            }
+            return mand;
+        }).error(function (data) {
+        });
+    }
+
     var recuperoMandato = function(cdTerzo, annoMandato, numeroMandato){
         var urlRestProxy = URL_REST.STANDARD;
         var man = [];
@@ -501,6 +521,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getInquadramento: recuperoDatiInquadramento,
              getTerzoPerCompenso: recuperoDatiTerzoPerCompenso,
              getModalitaPagamento: recuperoModalitaPagamento,
+             getMandatiMissioneSigla: recuperoMandatoMissioneSigla,
              getTipiSpesa: recuperoTipoSpesa,
              getRimborsoKm: recuperoRimborsoKm,
              getTipiPasto: recuperoTipoPasto,

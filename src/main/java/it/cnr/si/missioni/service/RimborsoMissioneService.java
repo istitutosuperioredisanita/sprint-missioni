@@ -46,7 +46,6 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
-import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -55,7 +54,6 @@ import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -241,6 +239,9 @@ public class RimborsoMissioneService {
     				} else if (rimborsoMissione.isMissioneInserita()){
     					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_CONFERMARE_PER_HOME);
     					listaNew.add(rimborsoMissione);
+    				} else if (rimborsoMissione.isMissioneConfermata() && !rimborsoMissione.isMissioneDaValidare() && rimborsoMissione.isAllaValidazioneAmministrativa()){
+    					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ALLA_VALIDAZIONE_AMM_PER_HOME);
+    					listaNew.add(rimborsoMissione);
     				}
     			}
     		}
@@ -255,6 +256,7 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
 		rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
+		rimborsoMissioneDaAggiornare.setValidato("N");
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 	}
 
@@ -360,6 +362,7 @@ public class RimborsoMissioneService {
 
     	RimborsoMissione rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
        	boolean isRitornoMissioneMittente = false;
+       	boolean isRitornoMissioneAmministrativi = false;
 
 		if (rimborsoMissioneDB==null){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
@@ -375,7 +378,7 @@ public class RimborsoMissioneService {
 			if (rimborsoMissioneDB.isStatoFlussoApprovato()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare il rimborso della missione. E' già stato approvato.");
 			}
-			if (!rimborsoMissioneDB.isMissioneDaValidare()){
+			if (!rimborsoMissioneDB.isMissioneDaValidare() && !rimborsoMissioneDB.isAllaValidazioneAmministrativa()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare il rimborso della missione. E' già stato avviato il flusso di approvazione.");
 			}
 		}
@@ -384,13 +387,21 @@ public class RimborsoMissioneService {
 			if (!rimborsoMissioneDB.getStato().equals(Costanti.STATO_CONFERMATO)){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione non confermato.");
 			}
-			if (!rimborsoMissioneDB.isMissioneDaValidare()){
+			if (!rimborsoMissioneDB.isMissioneDaValidare() && !rimborsoMissioneDB.isAllaValidazioneAmministrativa()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione già validato.");
 			}
-			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissioneDB.getUoSpesa())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi di missione.");
+			if (rimborsoMissioneDB.isMissioneDaValidare()){
+				if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissioneDB.getUoSpesa())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi di missione.");
+				}
 			}
 			
+			if (rimborsoMissioneDB.isAllaValidazioneAmministrativa()){
+				if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissioneDB.getUoContrAmm())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi di missione.");
+				}
+			}
+
 			if (!confirm){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Non è possibile modificare un rimborso di missione durante la fase di validazione. Rieseguire la ricerca.");
 			}
@@ -412,18 +423,38 @@ public class RimborsoMissioneService {
 			rimborsoMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 			rimborsoMissioneDB.setNoteRespingi(null);
 		} else if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R")){
-			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoSpesa())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo "+rimborsoMissione.getUoSpesa()+".");
-			}
-			if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isMissioneDaValidare()) {
-				if (StringUtils.isEmpty(rimborsoMissione.getNoteRespingi())){
-					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione senza indicarne il motivo.");
+			if (rimborsoMissione.isMissioneDaValidare()){
+				if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoSpesa())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi missione per la uo "+rimborsoMissione.getUoSpesa()+".");
 				}
-				rimborsoMissioneDB.setStato(Costanti.STATO_INSERITO);
-				rimborsoMissioneDB.setNoteRespingi(rimborsoMissione.getNoteRespingi());
-				isRitornoMissioneMittente = true;
+				if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isMissioneDaValidare()) {
+					if (StringUtils.isEmpty(rimborsoMissione.getNoteRespingi())){
+						throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione senza indicarne il motivo.");
+					}
+					rimborsoMissioneDB.setStato(Costanti.STATO_INSERITO);
+					rimborsoMissioneDB.setNoteRespingi(rimborsoMissione.getNoteRespingi());
+					isRitornoMissioneMittente = true;
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione se è stato già inviato al flusso.");
+				}
+			} else if (rimborsoMissione.getUoContrAmm() != null) {
+				if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoContrAmm())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato alla validazione amministrativa per la uo "+rimborsoMissione.getUoSpesa()+".");
+				}
+				if (rimborsoMissioneDB.isStatoNonInviatoAlFlusso() || rimborsoMissioneDB.isAllaValidazioneAmministrativa()) {
+					if (StringUtils.isEmpty(rimborsoMissione.getNoteRespingi())){
+						throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione senza indicarne il motivo.");
+					}
+					rimborsoMissioneDB.setStato(Costanti.STATO_INSERITO);
+					rimborsoMissioneDB.setNoteRespingi(rimborsoMissione.getNoteRespingi());
+					rimborsoMissioneDB.setValidaAmm(null);
+					isRitornoMissioneMittente = true;
+					isRitornoMissioneAmministrativi = true;
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione se è stato già inviato al flusso.");
+				}
 			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un rimborso missione se è stato già inviato al flusso.");
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non consentita.");
 			}
 		} else {
 			aggiornaDatiRimborsoMissione(principal, rimborsoMissione, confirm, rimborsoMissioneDB);
@@ -455,7 +486,7 @@ public class RimborsoMissioneService {
     	}
 
 		controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
-    	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare()){
+    	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare() && rimborsoMissioneDB.isPassataValidazioneAmministrativa()){
     		cmisRimborsoMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), rimborsoMissioneDB);
     		rimborsoMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_RIMBORSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_RIMBORSO_FROM_CMIS));
     	}
@@ -466,10 +497,25 @@ public class RimborsoMissioneService {
 
 	   if (confirm && rimborsoMissioneDB.isMissioneDaValidare()){
 			sendMailToAdministrative(basePath, rimborsoMissioneDB);
+	   } else if (confirm && rimborsoMissioneDB.isAllaValidazioneAmministrativa()){
+			DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
+			if (datiIstituto != null && datiIstituto.getUoContrAmm() != null){
+				sendMailToAdministrative(basePath, rimborsoMissioneDB, datiIstituto.getUoContrAmm());
+			}
 	   }
-    	if (isRitornoMissioneMittente){
-    		mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, rimborsoMissioneDB), false, true, getEmail(rimborsoMissioneDB.getUidInsert()));
-    	}
+	   if (isRitornoMissioneMittente){
+		   List<String> listaMail = new ArrayList<>();
+		   listaMail.add(getEmail(rimborsoMissioneDB.getUidInsert()));
+		   if (isRitornoMissioneAmministrativi){
+			   List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
+			   if (lista != null && lista.size() > 0){
+				   List<String> listaMailAmm = mailService.preparaListaMail(lista);
+				   listaMail.addAll(listaMailAmm);
+			   }
+		   }
+		   String[] elencoMail = mailService.preparaElencoMail(listaMail);
+		   mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, rimborsoMissioneDB), false, true, elencoMail);
+	   }
     	return rimborsoMissioneDB;
     }
 
@@ -484,13 +530,17 @@ public class RimborsoMissioneService {
 	}
 
     private void sendMailToAdministrative(String basePath, RimborsoMissione rimborsoMissioneDB) {
-		DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissioneDB.getUoSpesa(), rimborsoMissioneDB.getAnno());
+		sendMailToAdministrative(basePath, rimborsoMissioneDB, rimborsoMissioneDB.getUoSpesa());
+	}
+
+    private void sendMailToAdministrative(String basePath, RimborsoMissione rimborsoMissioneDB, String uo) {
+		DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, rimborsoMissioneDB.getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
 		String testoMail = getTextMailSendToAdministrative(basePath, rimborsoMissioneDB);
 		if (dati != null && dati.getMailNotificheRimborso() != null){
 			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotificheRimborso());
 		} else {
-			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
+			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(uo);
 			sendMailToAdministrative(lista, testoMail, subjectMail);
 		}
 	}
@@ -531,11 +581,13 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
 		rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
 		rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
+		rimborsoMissioneDB.setUoContrAmm(rimborsoMissione.getUoContrAmm());
 		rimborsoMissioneDB.setNoteSegreteria(rimborsoMissione.getNoteSegreteria());
 		if (confirm){
 			aggiornaValidazione(principal, rimborsoMissioneDB);
 		} else {
 			rimborsoMissioneDB.setValidato(rimborsoMissione.getValidato());
+			rimborsoMissioneDB.setValidaAmm(rimborsoMissione.getValidaAmm());
 		}
 		rimborsoMissioneDB.setOggetto(rimborsoMissione.getOggetto());
 		rimborsoMissioneDB.setTipoMissione(rimborsoMissione.getTipoMissione());
@@ -683,6 +735,9 @@ public class RimborsoMissioneService {
 			if (filter.getDaId() != null){
 				criterionList.add(Restrictions.ge("id", filter.getDaId()));
 			}
+			if (filter.getIdOrdineMissione() != null){
+				criterionList.add(Restrictions.eq("ordineMissione.id", filter.getIdOrdineMissione()));
+			}
 			if (filter.getStato() != null){
 				criterionList.add(Restrictions.eq("stato", filter.getStato()));
 			}
@@ -720,6 +775,7 @@ public class RimborsoMissioneService {
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
 					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", filter.getUoRich())));
+		    		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoContrAmm", filter.getUoRich())));
 					criterionList.add(condizioneOr);
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente "+principal.getName()+"  non è abilitato a vedere i dati della uo "+filter.getUoRich());
@@ -787,16 +843,10 @@ public class RimborsoMissioneService {
 							Disjunction condizioneOr = Restrictions.disjunction();
 							List<String> listaUoUtente = new ArrayList<String>();
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
-//					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
-//					    		if (uo != null){
-					    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))));
-//						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
-//						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", uoService.getUoSigla(uoUser))));
-//						    			}
-//						    		}
-//					    		}
+					    		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))));
+					    		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
+					    		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", uoService.getUoSigla(uoUser))));
+					    		condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoContrAmm", uoService.getUoSigla(uoUser))));
 					    	}
 					    	criterionList.add(condizioneOr);
 						} else {
@@ -892,6 +942,11 @@ public class RimborsoMissioneService {
     	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
     	rimborsoMissione.setAnnoIniziale(rimborsoMissione.getAnno());
     	rimborsoMissione.setNumeroIniziale(rimborsoMissione.getNumero());
+		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+		if (datiIstituto != null && datiIstituto.getUoContrAmm() != null){
+			rimborsoMissione.setUoContrAmm(datiIstituto.getUoContrAmm());
+		}
+
     	aggiornaValidazione(principal, rimborsoMissione);
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
@@ -1003,9 +1058,28 @@ public class RimborsoMissioneService {
 
 	private void aggiornaValidazione(Principal principal, RimborsoMissione rimborsoMissione) {
 		if (accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoSpesa())){
+			aggiornaValidazioneAmministrativa(principal, rimborsoMissione);
 			rimborsoMissione.setValidato("S");
 		} else {
-			rimborsoMissione.setValidato("N");
+			if (!rimborsoMissione.isMissioneDaValidare()){
+				aggiornaValidazioneAmministrativa(principal, rimborsoMissione);
+			} 
+		}
+	}
+
+	protected void aggiornaValidazioneAmministrativa(Principal principal, RimborsoMissione rimborsoMissione) {
+		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+		if (datiIstituto != null && datiIstituto.getUoContrAmm() != null){
+			if (accountService.isUserSpecialEnableToValidateOrder(principal.getName(), datiIstituto.getUoContrAmm())){
+				rimborsoMissione.setValidaAmm("S");
+			} else {
+				if (Utility.nvl(rimborsoMissione.getValidaAmm(),"S").equals("N") && (!rimborsoMissione.isMissioneDaValidare() && !rimborsoMissione.isMissioneInserita())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione al controllo amministrativo, conferma non possibile.");
+				}
+				rimborsoMissione.setValidaAmm("N");
+			}
+		} else {
+			rimborsoMissione.setValidaAmm("S");
 		}
 	}
 

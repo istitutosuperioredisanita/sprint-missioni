@@ -113,6 +113,7 @@
               <th style="text-align: center">{{'missione.form.trattamentoShort' | translate}}</th>
               <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
               <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+              <th style="text-align: center">{{'global.button.print' | translate}}</th>
           </tr>
         </thead>
 
@@ -129,6 +130,7 @@
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="col-md-1" style="text-align: center" ng-click="$event.stopPropagation()"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
           </tr>
         </tbody>  
       </table>

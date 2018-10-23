@@ -425,6 +425,39 @@
     </table>
 
     <div class="row">
+        <h2 ng-show="esistonoRimborsiAllaValidazioneAmm" class="text-center" translate="main.subtitle_da_validare_rimborso_amm"></h2>
+    </div>
+    <table ng-show="esistonoRimborsiAllaValidazioneAmm" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'missione.form.uo' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="rimborsoMissione in listRimborsiMissioniToValidate | filter: {statoFlussoRitornoHome:'VA'}" ng-click="doSelectRimborsoMissioneValidazione(rimborsoMissione)" data-method="get">
+              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+              <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{rimborsoMissione.uoRich}}</td>
+              <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+    <div class="row">
         <h2 ng-show="esistonoAnnullamentiDaConfermare" class="text-center" translate="main.subtitle_da_confermare_annullamenti"></h2>
     </div>
     <table ng-show="esistonoAnnullamentiDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">

@@ -59,7 +59,7 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
         }
     });
 
-missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $scope, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
+missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
 
     $scope.tipiMissione = {
       		'Italia': 'I',
@@ -165,6 +165,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
         }
     }
 
+    $scope.accessToken = AccessToken.get();
     $scope.rowsPerPage = 30;
     $scope.predicate = 'ordineMissione.dataInserimento';
     $scope.reverse = true;
