@@ -935,18 +935,21 @@ public class RimborsoMissioneService {
     	}
     	
     	Integer anno = recuperoAnno(rimborsoMissione);
-    	if (!isMissioneComunicabileSigla(rimborsoMissione)){
-    		anno = anno + 1;
+
+    	DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+		
+    	if (datiIstituto == null){
+    		throw new ComponentException("Dati uo non presenti per il codice: "+rimborsoMissione.getUoSpesa()); 
     	}
-    	rimborsoMissione.setAnno(anno);
+
+		bloccoInserimentoRimborsi(rimborsoMissione, datiIstituto);
+    	if (datiIstituto.getUoContrAmm() != null){
+    		rimborsoMissione.setUoContrAmm(datiIstituto.getUoContrAmm());
+    	}
+
     	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
     	rimborsoMissione.setAnnoIniziale(rimborsoMissione.getAnno());
     	rimborsoMissione.setNumeroIniziale(rimborsoMissione.getNumero());
-		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
-		if (datiIstituto != null && datiIstituto.getUoContrAmm() != null){
-			rimborsoMissione.setUoContrAmm(datiIstituto.getUoContrAmm());
-		}
-
     	aggiornaValidazione(principal, rimborsoMissione);
     	
     	rimborsoMissione.setStato(Costanti.STATO_INSERITO);
@@ -962,6 +965,18 @@ public class RimborsoMissioneService {
     	rimborsoMissione.setToBeCreated();
     }
 
+	protected void bloccoInserimentoRimborsi(RimborsoMissione rimborsoMissione, DatiIstituto datiIstituto) {
+		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+	    	if (datiIstituto.getDataBloccoInsRimborsiTam() != null && datiIstituto.getDataBloccoInsRimborsiTam().compareTo(rimborsoMissione.getDataInserimento()) < 0){
+	    		throw new ComponentException("Inserimento rimborsi missione di tipo TAM bloccato. Non è possibile inserire nuovi rimborsi TAM per l'anno in corso."); 
+	    	}
+		} else {
+	    	if (datiIstituto.getDataBloccoInsRimborsi() != null && datiIstituto.getDataBloccoInsRimborsi().compareTo(rimborsoMissione.getDataInserimento()) < 0){
+	    		throw new ComponentException("Inserimento rimborsi missione bloccato. Non è possibile inserire nuovi rimborsi per l'anno in corso."); 
+	    	}
+		}
+	}
+
     private OrdineMissioneAutoPropria getAutoPropriaOrdineMissione(Principal principal, RimborsoMissione rimborsoMissione){
     	if (rimborsoMissione.getOrdineMissione() != null){
         	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
@@ -973,9 +988,7 @@ public class RimborsoMissioneService {
     }
     
     private Integer recuperoAnno(RimborsoMissione rimborsoMissione) {
-		if (rimborsoMissione.getDataInserimento() == null){
-			rimborsoMissione.setDataInserimento(LocalDate.now());
-		}
+    	rimborsoMissione.setDataInserimento(LocalDate.now());
 		return rimborsoMissione.getDataInserimento().getYear();
 	}
 
@@ -1598,22 +1611,21 @@ public class RimborsoMissioneService {
 		buffer.append(label+Utility.nvl(value));
 		return buffer;
 	}
-	public Boolean isMissioneComunicabileSigla(RimborsoMissione rimborsoMissione){
+	public Boolean isMissioneComunicabileSigla(Principal principal, RimborsoMissione rimborsoMissione){
 		LocalDate data = LocalDate.now();
 		if (data.getYear() == rimborsoMissione.getAnno()){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
-			if (dati == null){
-				throw new ComponentException("Dati uo non presenti per il codice: "+rimborsoMissione.getUoSpesa()); 
-			}
 			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
 				if (dati.getDataBloccoRimborsiTam() != null){
 					if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
+						ribaltaMissione(principal, rimborsoMissione);
 						return false;
 					}
 				}
 			} 
 			if (dati.getDataBloccoRimborsi() != null){
 				if (dati.getDataBloccoRimborsi().compareTo(data) < 0){
+					ribaltaMissione(principal, rimborsoMissione);
 					return false;
 				}
 				return true;
@@ -1623,6 +1635,11 @@ public class RimborsoMissioneService {
 		} else {
 			return false;
 		}
+	}
+
+	protected void ribaltaMissione(Principal principal, RimborsoMissione rimborsoMissione) {
+		rimborsoMissione.setAnno(rimborsoMissione.getAnno() + 1);
+		rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno(), Costanti.TIPO_RIMBORSO_MISSIONE));
 	}
 	private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
 		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" è stata approvata.";
