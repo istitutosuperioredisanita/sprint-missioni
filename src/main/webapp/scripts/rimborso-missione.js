@@ -321,7 +321,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             }
 
             if (!trovatoInquadramento){
-                if (trovatoInquadramentoMistoInizio && !trovatoInquadramentoMistoFine){
+                if (trovatoInquadramentoMistoInizio && trovatoInquadramentoMistoFine){
                     $scope.rimborsoMissioneModel.inquadramento = inqMisto;
                     $scope.rimborsoMissioneModel.cdTipoRapporto = rappMisto;
                     return true;
