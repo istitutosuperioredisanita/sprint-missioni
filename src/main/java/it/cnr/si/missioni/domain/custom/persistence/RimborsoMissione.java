@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.springframework.util.StringUtils;
 
-import ch.qos.logback.classic.pattern.Util;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;

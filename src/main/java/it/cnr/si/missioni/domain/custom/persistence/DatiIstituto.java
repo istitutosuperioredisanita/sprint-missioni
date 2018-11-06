@@ -81,6 +81,12 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "DATA_BLOCCO_RIMBORSI", nullable = true)
     public LocalDate dataBloccoRimborsi;
 
+    @Column(name = "DATA_BLOCCO_INS_RIMBORSI_TAM", nullable = true)
+    public LocalDate dataBloccoInsRimborsiTam;
+
+    @Column(name = "DATA_BLOCCO_INS_RIMBORSI", nullable = true)
+    public LocalDate dataBloccoInsRimborsi;
+
     @Size(min = 0, max = 1)
     @Column(name = "TIPO_MAIL_DOPO_ORDINE", length = 1, nullable = true)
     private String tipoMailDopoOrdine;
@@ -463,6 +469,22 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 
 	public void setUoContrAmm(String uoContrAmm) {
 		this.uoContrAmm = uoContrAmm;
+	}
+
+	public LocalDate getDataBloccoInsRimborsiTam() {
+		return dataBloccoInsRimborsiTam;
+	}
+
+	public void setDataBloccoInsRimborsiTam(LocalDate dataBloccoInsRimborsiTam) {
+		this.dataBloccoInsRimborsiTam = dataBloccoInsRimborsiTam;
+	}
+
+	public LocalDate getDataBloccoInsRimborsi() {
+		return dataBloccoInsRimborsi;
+	}
+
+	public void setDataBloccoInsRimborsi(LocalDate dataBloccoInsRimborsi) {
+		this.dataBloccoInsRimborsi = dataBloccoInsRimborsi;
 	}
 
 }
