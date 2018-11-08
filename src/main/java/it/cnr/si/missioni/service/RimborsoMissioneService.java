@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
+import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
@@ -727,7 +728,6 @@ public class RimborsoMissioneService {
     public List<RimborsoMissione> getRimborsiMissione(Principal principal, RimborsoMissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
 		CriterionList criterionList = new CriterionList();
 		List<RimborsoMissione> rimborsoMissioneList=null;
-		String aliasRimborsoMissione = "Rimborso";
 		if (filter != null){
 			if (filter.getUoRich() != null && filter.getUser() != null){
 				filter.setUoRich(null);
@@ -785,13 +785,13 @@ public class RimborsoMissioneService {
 				}
 			}
 			if (filter.getAnnoOrdine() != null){
-				criterionList.add(Restrictions.eq(aliasRimborsoMissione+".anno", filter.getAnnoOrdine()));
+				criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and ord.stato != 'ANN' and ord.anno = "+filter.getAnnoOrdine()));
 			}
 			if (filter.getDaNumeroOrdine() != null){
-				criterionList.add(Restrictions.ge(aliasRimborsoMissione+".numero", filter.getDaNumeroOrdine()));
+				criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and ord.stato != 'ANN' and ord.numero >= "+filter.getDaNumeroOrdine()));
 			}
 			if (filter.getaNumeroOrdine() != null){
-				criterionList.add(Restrictions.le(aliasRimborsoMissione+".numero", filter.getaNumeroOrdine()));
+				criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and ord.stato != 'ANN' and ord.numero >= "+filter.getaNumeroOrdine()));
 			}
 			if (filter.getStatoInvioSigla() != null){
 				criterionList.add(Restrictions.eq("statoInvioSigla", filter.getStatoInvioSigla()));
