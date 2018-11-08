@@ -446,6 +446,9 @@ public class OrdineMissioneService {
 		CriterionList criterionList = new CriterionList();
 		List<OrdineMissione> ordineMissioneList=null;
 		if (filter != null){
+			if (filter.getUoRich() != null && filter.getUser() != null){
+				filter.setUoRich(null);
+			}
 			if (filter.getAnno() != null){
 				criterionList.add(Restrictions.eq("anno", filter.getAnno()));
 			}

@@ -1,11 +1,5 @@
 { "title" : "usersSpecialForUo",
 "usersSpecial":[
-{"uid":"patrizia.villani", "uoForUsersSpecial":[
-{"codice_uo":"000411"},
-{"codice_uo":"084000"},
-{"codice_uo":"084001"},
-{"codice_uo":"084002"},
-{"codice_uo":"084003"}]},
 {"uid":"fabiana.carinci", "uoForUsersSpecial":[
 {"codice_uo":"000407", "ordine_da_validare":"S"}]},
 {"uid" : "app.missioni", "all" : "S", "uoForUsersSpecial":[
@@ -718,6 +712,7 @@
 {"uid":"simona.balestracci", "uoForUsersSpecial":[{"codice_uo":"109000", "ordine_da_validare":"S"}]},
 {"uid":"islam.mddeen", "uoForUsersSpecial":[{"codice_uo":"109000", "ordine_da_validare":"S"}]},
 {"uid":"laura.innocenti", "uoForUsersSpecial":[{"codice_uo":"109001", "ordine_da_validare":"S"}]},
+{"uid":"joseguillermo.garcialorenzana", "uoForUsersSpecial":[{"codice_uo":"109000"}, {"codice_uo":"109001"}]},
 
 {"uid":"barbara.ciani", "uoForUsersSpecial":[{"codice_uo":"073000", "ordine_da_validare":"S"}]},
 {"uid":"laura.mengozzi", "uoForUsersSpecial":[{"codice_uo":"073000"}]},

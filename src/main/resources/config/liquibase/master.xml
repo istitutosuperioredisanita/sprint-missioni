@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -64,7 +64,8 @@
     <include file="classpath:config/liquibase/changelog/20180928145700_add_table_annullamento_rimborso.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20181004125700_update_dati_istituto.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20181019161000_add_column_rimborso_valida_amm.xml" relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog/20181107125700_update_rimborso_iniziale.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181107131000_add_column_date_blocco_ins_rimborso.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 
