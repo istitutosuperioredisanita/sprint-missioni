@@ -126,7 +126,7 @@
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
             <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
             <th style="text-align: center">{{'missione.form.data' | translate}}</th>
-            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th style="text-align: left">{{'main.userid' | translate}}</th>
             <th ng-show="userSpecial" style="text-align: left">{{'missione.form.uo' | translate}}</th>
             <th style="text-align: left">{{'ordine-missione.form.responsabile-gruppo' | translate}}</th>
             <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
@@ -141,7 +141,7 @@
               <td style="text-align: center" >{{ordineMissione.anno}}</td>
               <td style="text-align: right">{{ordineMissione.numero}}</td>
               <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-              <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{ordineMissione.uid}}</td>
+              <td class="col-md-1" style="text-align: left">{{ordineMissione.uid}}</td>
               <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{ordineMissione.uoRich}}</td>
               <td class="col-md-2" style="text-align: left">{{ordineMissione.responsabileGruppo}}</td>
               <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
