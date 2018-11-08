@@ -99,6 +99,8 @@ public class DatiIstitutoService {
 	            		datiIstitutoInsert.setId(null);
 	            		datiIstitutoInsert.setDataBloccoRimborsi(null);
 	            		datiIstitutoInsert.setDataBloccoRimborsiTam(null);
+	            		datiIstitutoInsert.setDataBloccoInsRimborsi(null);
+	            		datiIstitutoInsert.setDataBloccoInsRimborsiTam(null);
 	            		datiIstitutoInsert.setToBeCreated();
 	            		datiIstitutoInsert = (DatiIstituto)crudServiceBean.creaConBulk(principal, datiIstitutoInsert);
 	        		}
