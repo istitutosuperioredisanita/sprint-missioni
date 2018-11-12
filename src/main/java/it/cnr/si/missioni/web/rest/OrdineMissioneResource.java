@@ -99,6 +99,8 @@ public class OrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare" );
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         filter.setValidato("S");
+        filter.setDaAnnullare("S");
+        filter.setRecuperoAutoPropria("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_CONFERMATO);
@@ -136,6 +138,33 @@ public class OrdineMissioneResource {
 			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdiniMissioneDaRimborsare",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		}
+        return JSONResponseEntity.ok(ordiniMissione);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/ordiniMissione/listDaDuplicare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getOrdiniMissioneDaDuplicare(HttpServletRequest request,
+    		MissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare" );
+        filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+        filter.setValidato("S");
+        filter.setDaAnnullare("S");
+        List<String> listaStati = new ArrayList<>();
+        listaStati.add(Costanti.STATO_DEFINITIVO);
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        filter.setListaStatiMissione(listaStati);
+        List<OrdineMissione> ordiniMissione;
+		try {
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
+		} catch (ComponentException e) {
+			log.error("ERRORE getOrdiniMissioneDaDuplicare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
         return JSONResponseEntity.ok(ordiniMissione);
@@ -439,4 +468,6 @@ public class OrdineMissioneResource {
             return JSONResponseEntity.badRequest(error);
         }
     }
+
+
 }

@@ -78,6 +78,12 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione;
 		try {
 			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
+			if (Utility.nvl(filter.getRecuperoTotali(),"N").equals("S")){
+				for (RimborsoMissione rimborso : rimborsiMissione){
+					rimborsoMissioneService.retrieveDetails((Principal) SecurityUtils.getCurrentUser(), rimborso);
+					impostaTotaliRimborso(rimborso);
+				}
+			}
 		} catch (ComponentException e) {
 			log.error("ERRORE getRimborsoMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -103,6 +109,28 @@ public class RimborsoMissioneResource {
 					log.error("ERRORE getRimborsoMissioneToFinal",e);
 		            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 				}
+        return JSONResponseEntity.ok(rimborsiMissione);
+    }
+
+    /**
+     * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/rimborsoMissione/listToBeDeleted",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getRimborsiMissioneDaCancellare(HttpServletRequest request,
+    		RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati dei Rimborsi di Missione da cancellare" );
+        List<RimborsoMissione> rimborsiMissione;
+        filter.setStatoFlusso("APP");
+        filter.setStato("DEF");
+		try {
+			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, false);
+		} catch (ComponentException e) {
+			log.error("ERRORE getRimborsoMissione",e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+		}
         return JSONResponseEntity.ok(rimborsiMissione);
     }
 
@@ -138,11 +166,7 @@ public class RimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
         	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true, true);
-        	if (rimborsoMissione != null){
-            	rimborsoMissione.setTotaleRimborsoComplessivo(rimborsoMissione.getTotaleRimborso());
-            	rimborsoMissione.setTotaleRimborsoSenzaAnticipi(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate());
-            	rimborsoMissione.setRimborsoMissioneDettagli(null);
-        	}
+        	impostaTotaliRimborso(rimborsoMissione);
         	return JSONResponseEntity.ok(rimborsoMissione);
         } catch (AwesomeException e) {
 			log.error("ERRORE getRimborsoMissione",e);
@@ -152,6 +176,14 @@ public class RimborsoMissioneResource {
 			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
     }
+
+	protected void impostaTotaliRimborso(RimborsoMissione rimborsoMissione) {
+		if (rimborsoMissione != null){
+			rimborsoMissione.setTotaleRimborsoComplessivo(rimborsoMissione.getTotaleRimborso());
+			rimborsoMissione.setTotaleRimborsoSenzaAnticipi(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate());
+			rimborsoMissione.setRimborsoMissioneDettagli(null);
+		}
+	}
 
     @RequestMapping(value = "/rest/rimborsoMissione",
             method = RequestMethod.POST,

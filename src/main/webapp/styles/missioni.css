@@ -2,9 +2,8 @@
   border-width: 1px;
 }
 
-#missioni td{
+#missioni-ui-select span{
   font-size: 12px;
-  vertical-align: middle;
 }
 
 #missioni td{
@@ -21,6 +20,10 @@
   content:"*";color:red;
 }
 
+
+.a-verde {
+  color: #308614 !important;
+}
 
 .color-rosso-bruno {
   background-color: #b27b60 !important;
@@ -88,6 +91,14 @@
 
 .input-sm {
   padding: 5px 5px !important;
+}
+
+.small-padding {
+  padding: 2px 3px !important;
+}
+
+.small-margin-bottom {
+  margin-bottom: 1px;
 }
 
 .container-fluid {
@@ -183,6 +194,20 @@ input:-webkit-autofill {
 
 .select2-drop-mask {
   font-size: 12px;
+}
+
+.select2-choice {
+  height: 30px !important;
+}
+
+.select2-highlighted {
+  color: #000 !important;
+}
+ 
+
+.select2-container {
+  display: block;
+  height: 30px !important;
 }
 
 .row-empty-after {

@@ -5,6 +5,8 @@ public class RimborsoMissioneFilter extends MissioneFilter {
 	private Long daNumeroOrdine;
 	private Long aNumeroOrdine;
 	private String statoInvioSigla;
+	private String recuperoTotali;
+	private Long idOrdineMissione;
 	public Integer getAnnoOrdine() {
 		return annoOrdine;
 	}
@@ -28,5 +30,17 @@ public class RimborsoMissioneFilter extends MissioneFilter {
 	}
 	public void setStatoInvioSigla(String statoInvioSigla) {
 		this.statoInvioSigla = statoInvioSigla;
+	}
+	public Long getIdOrdineMissione() {
+		return idOrdineMissione;
+	}
+	public void setIdOrdineMissione(Long idOrdineMissione) {
+		this.idOrdineMissione = idOrdineMissione;
+	}
+	public String getRecuperoTotali() {
+		return recuperoTotali;
+	}
+	public void setRecuperoTotali(String recuperoTotali) {
+		this.recuperoTotali = recuperoTotali;
 	}
 }

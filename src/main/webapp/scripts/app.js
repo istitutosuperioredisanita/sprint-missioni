@@ -4,7 +4,7 @@
 var httpHeaders;
 
 var missioniApp = angular.module('missioniApp', ['http-auth-interceptor', 'tmh.dynamicLocale', 'ng-currency',
-    'ngResource', 'ngRoute', 'ngCookies', 'ngStorage', 'missioniAppUtils', 'pascalprecht.translate', 'truncate','selectize', 'blueimp.fileupload']);
+    'ngResource', 'ngRoute', 'ngCookies', 'ngStorage', 'missioniAppUtils', 'pascalprecht.translate', 'truncate','selectize', 'ui.select', 'ngSanitize','blueimp.fileupload']);
 
 missioniApp
   .service('ui', function () {
@@ -102,6 +102,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/release', {
+                    templateUrl: 'views/release.html',
+                    controller: 'ReleaseController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/faq', {
                     templateUrl: 'views/faq.html',
                     controller: 'FaqController',
@@ -195,6 +202,13 @@ missioniApp
                 .when('/annullamento-ordine-missione/:idMissione?/:validazione?', {
                     templateUrl: 'views/annullamento-ordine-missione.html',
                     controller: 'AnnullamentoOrdineMissioneController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
+                .when('/annullamento-rimborso-missione/:idMissione?/:validazione?', {
+                    templateUrl: 'views/annullamento-rimborso-missione.html',
+                    controller: 'AnnullamentoRimborsoMissioneController',
                     access: {
                         authorizedRoles: [USER_ROLES.user]
                     }

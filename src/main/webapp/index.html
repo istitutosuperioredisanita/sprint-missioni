@@ -21,6 +21,9 @@
         <link rel="stylesheet" href="styles/main.css">
 				<link rel="stylesheet" href="styles/jquery.fileupload.css">
 				<link rel="stylesheet" href="styles/jquery.fileupload-ui.css">
+        <link rel="stylesheet" href="styles/select2.css" />
+        <link rel="stylesheet" href="styles/select.css" />
+
         <link rel="stylesheet" href="styles/missioni.css">
         <!-- endbuild -->
     </head>
@@ -118,6 +121,8 @@
                                     &nbsp;<span translate="global.menu.account.rimborso-missione">Rimborso Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/elenco-rimborsi-missione"><span class="glyphicon glyphicon-list-alt"></span>
                                     &nbsp;<span translate="global.menu.account.elenco-rimborsi-missione">Elenco Rimborsi di Missione</span></a></li>
+                                <li ng-show="account.uoForUsersSpecial"><a href="#/annullamento-rimborso-missione"><span class="glyphicon glyphicon-remove"></span>
+                                    &nbsp;<span translate="global.menu.account.annullamento-rimborso-approvato">Annullamento Rimborso Missione Approvato</span></a></li>
                             </ul>
                         </li>
                         <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)" class="dropdown pointer" ng-controller="AdminController">
@@ -196,10 +201,12 @@
         <script src="bower_components/jquery-file-upload/js/jquery.fileupload-process.js"></script>
         <script src="bower_components/moment/min/moment.min.js"></script>
         <script src="bower_components/angular/angular.js"></script>
+
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-resource/angular-resource.js"></script>
         <script src="bower_components/angular-cookies/angular-cookies.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <script src="bower_components/angular-ui-select/dist/select.js"></script>
         <script src="bower_components/angular-translate/angular-translate.js"></script>
         <script src="bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
         <script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
@@ -212,6 +219,8 @@
         <script src="bower_components/selectize/dist/js/standalone/selectize.min.js"></script>
         <script src="bower_components/angular-selectize2/dist/selectize.js"></script>
         <script src="bower_components/ngstorage/ngStorage.js"></script>
+        <script src="bower_components/select2/select2.js"></script>
+        <script src="bower_components/markdown/lib/markdown.js"></script>
         <script src="bower_components/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
         <script src="bower_components/bootstrap-datepicker/js/locales/bootstrap-datepicker.it.js"></script>
         <script src="bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"></script>
@@ -226,6 +235,7 @@
         <script src="scripts/constants.js"></script>
         <script src="scripts/controllers.js"></script>
         <script src="scripts/config.js"></script>
+        <script src="scripts/release-notes.js"></script>
         <script src="scripts/ordine-missione/auto-propria.js"></script>
         <script src="scripts/ordine-missione/richiesta-anticipo.js"></script>
         <script src="scripts/autoPropria.js"></script>
@@ -235,6 +245,7 @@
         <script src="scripts/ordine-missione.js"></script>
         <script src="scripts/rimborso-missione.js"></script>
         <script src="scripts/annullamento-ordine-missione.js"></script>
+        <script src="scripts/annullamento-rimborso-missione.js"></script>
         <script src="scripts/elenco-ordini-missione.js"></script>
         <script src="scripts/rimborso-missione/elenco-rimborsi-missione.js"></script>
         <script src="scripts/rimborso-missione/rimborso-missione-dettagli.js"></script>
@@ -246,6 +257,7 @@
         <script src="scripts/services.js"></script> 
         <script src="scripts/datiIstituto.js"></script>
         <script src="scripts/directives/directives.js"></script>
+        <script src="scripts/directives/markdown.directive.js"></script>
         <script src="scripts/directives/cnr-widget-datetime-range.js"></script>
         <script src="scripts/directives/cnr-widget-date-range.js"></script>
         <script src="scripts/directives/cnr-widget-date.js"></script>

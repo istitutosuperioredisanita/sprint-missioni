@@ -10,6 +10,8 @@ public class PrintRimborsoMissione extends PrintMissione{
 
     private String modpag;
 
+    private String impegni;
+
     private String conto;
 
     private String iban;
@@ -183,5 +185,13 @@ public class PrintRimborsoMissione extends PrintMissione{
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public String getImpegni() {
+		return impegni;
+	}
+
+	public void setImpegni(String impegni) {
+		this.impegni = impegni;
 	}
 }

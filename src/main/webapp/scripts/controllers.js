@@ -16,6 +16,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     }
 
     $scope.endSearchCmisAnnullamenti = false;
+    $scope.endSearchCmisAnnullamentiRimborso = false;
     $scope.endSearchCmisOrdine = false;
     $scope.endSearchCmisRimborso = false;
     if (!$sessionStorage.account || !$sessionStorage.account.login) {
@@ -115,6 +116,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                         $scope.esistonoRimborsiAnnullati = true;
                     } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
                         $scope.esistonoRimborsiDaValidare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'VA'){
+                        $scope.esistonoRimborsiAllaValidazioneAmm = true;
                     }
                 }
             }
@@ -125,6 +128,20 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         });        
     }
     
+        ElencoRimborsiMissioneService.findListAnnullamentiToValidate().then(function(response){
+            $scope.listAnnullamentiRimborsiMissioniToValidate = response;
+            $scope.esistonoAnnullamentiRimborsiDaConfermare = false;
+            if ($scope.listAnnullamentiRimborsiMissioniToValidate){
+                for (var i=0; i< $scope.listAnnullamentiRimborsiMissioniToValidate.length; i++) {
+                    $scope.esistonoAnnullamentiRimborsiDaConfermare = true;
+                }
+            }
+            $scope.endSearchCmisAnnullamentiRimborso = true;
+        },
+        function(error){
+            $scope.endSearchCmisAnnullamentiRimborso = true;
+        });        
+
     $scope.doSelectRimborsoMissioneValidazione = function (rimborsoMissione) {
         $location.path('/rimborso-missione/'+rimborsoMissione.id+'/'+"S");
     };
@@ -146,6 +163,12 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     $scope.doSelectAnnullamentoOrdineMissioneValidazione = function (annullamento) {
         $location.path('/annullamento-ordine-missione/'+annullamento.id+'/'+"S");
     };
+    $scope.doSelectAnnullamentoRimborsoMissione = function (annullamento) {
+        $location.path('/annullamento-rimborso-missione/'+annullamento.id);
+    };
+    $scope.ricercaFinita = function (){
+        $scope.endSearchCmisOrdine && $scope.endSearchCmisRimborso && $scope.endSearchCmisAnnullamenti && $scope.endSearchCmisAnnullamentiRimborso;
+    }
 });
 
 missioniApp.controller('AdminController', function ($scope) {
