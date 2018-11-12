@@ -102,6 +102,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/release', {
+                    templateUrl: 'views/release.html',
+                    controller: 'ReleaseController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/faq', {
                     templateUrl: 'views/faq.html',
                     controller: 'FaqController',

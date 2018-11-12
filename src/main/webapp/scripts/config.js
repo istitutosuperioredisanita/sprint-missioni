@@ -1,5 +1,11 @@
 missioniApp.factory('ConfigService', function ($http, ui) {
         return {
+            getReleaseNotes: function() {
+                var promise = $http.get('api/rest/config/releaseNotes').then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
             getMessage: function() {
                 var promise = $http.get('api/rest/config/message').then(function (response) {
                     return response.data;

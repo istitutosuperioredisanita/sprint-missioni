@@ -291,7 +291,7 @@ public class AccountService {
 		String userNameFirmatario;
 		DatiSede dati = null;
 		Boolean delegaSpesa = false;
-		if (account.getCodiceSede() != null){
+		if (account.getCodiceSede() != null && account.getCodiceUo() != null && Utility.getUoSigla(account.getCodiceUo()).equals(uo)){
 			dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
 			if (dati != null && dati.getResponsabile() != null && Utility.nvl(dati.getDelegaSpesa()).equals("S")){
 				delegaSpesa = true;
