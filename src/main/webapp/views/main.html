@@ -1,6 +1,7 @@
 <div ng-cloak>
     <h3 translate="main.logged.message" translate-values="{username: '{{account.login}}'}"></h3>
     <h4 translate="main.message" translate-values="{message: '{{message}}'}"></h4>
+
     <div class="row">
         <h2 ng-show="!ricercaFinita" class="text-center" translate="main.wait"></h2>
            <div ng-show="!ricercaFinita" class="progress">
@@ -10,6 +11,8 @@
         <h2 ng-show="ricercaFinita && esistonoOrdiniRespinti" class="text-center color-rosso-mattone" translate="main.subtitle_ko"></h2>
         <h2 ng-show="flowsOk" class="text-center" translate="main.subtitle_ok"></h2>
     </div>
+
+    <h3> <a class="a-verde" href="#/release"><span translate="main.release"></span></a> </h3>
 
 
   <div ng-show="ricercaFinita">

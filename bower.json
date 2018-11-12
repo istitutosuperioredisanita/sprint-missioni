@@ -30,6 +30,7 @@
     "angular-selectize2": "~1.2.1",
     "selectize": "0.12.4",
     "blueimp-file-upload": "jquery-file-upload#^9.14.1",
+    "markdown": "~0.5.0",
     "angular-ui-select": "~0.19.8"
   },
   "devDependencies": {
