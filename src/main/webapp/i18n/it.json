@@ -104,6 +104,7 @@
         "gae":"Codice GAE"
     },
     "main": {
+        "release": "Clicca per le News di versione",
         "wait": "Controllo Flussi Missioni in corso",
         "subtitle_da_confermare": "Ordini di Missione da Confermare",
         "subtitle_da_confermare_annullamenti": "Annullamenti Ordini di Missione da Confermare",
