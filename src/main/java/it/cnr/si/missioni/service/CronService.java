@@ -245,7 +245,7 @@ public class CronService {
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
 				LOGGER.info("Comunica Missione: "+rimborsoMissione.getId());
-				if (rimborsoMissioneService.isMissioneComunicabileSigla(rimborsoMissione)){
+				if (rimborsoMissioneService.isMissioneComunicabileSigla(principal, rimborsoMissione)){
 					LOGGER.info("Missione Comunicabile: "+rimborsoMissione.getId());
 					try {
 						comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
@@ -410,20 +410,17 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-				if (istituto != null){
-					if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
+				if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
+					try {
+						stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
+					} catch (Exception e) {
+						String error = Utility.getMessageException(e);
+						String testoErrore = getTextErrorBypassResp(ordineMissione, error);
+						LOGGER.error(testoErrore + " "+e);
 						try {
-							LOGGER.info("Start verify Resp gruppo");
-							stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
-						} catch (Exception e) {
-							String error = Utility.getMessageException(e);
-							String testoErrore = getTextErrorBypassResp(ordineMissione, error);
-							LOGGER.error(testoErrore + " "+e);
-							try {
-								mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
-							} catch (Exception e1) {
-								LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
-							}
+							mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
+						} catch (Exception e1) {
+							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 						}
 					}
 				}
@@ -469,6 +466,7 @@ public class CronService {
 						}
 					}
 				}
+				
 			}
 		}
 	}

@@ -76,11 +76,21 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
             $('button[name="sendMail"]').unbind( "click" );
             $('button[name="sendMail"]').click(function () {
                 data.formData = new FormData();
-                data.formData.append("titolo", $scope.helpdeskModel.titolo);
-                data.formData.append("descrizione", $scope.helpdeskModel.descrizione);
-                data.formData.append("nota", $scope.helpdeskModel.nota);
-                data.formData.append("idSegnalazione", $scope.idHelpdesk);
-                data.formData.append("categoria", $scope.helpdeskModel.categoria);
+                if ($scope.helpdeskModel.titolo){
+                  data.formData.append("titolo", $scope.helpdeskModel.titolo);
+                }
+                if ($scope.helpdeskModel.descrizione){
+                  data.formData.append("descrizione", $scope.helpdeskModel.descrizione);
+                }
+                if ($scope.helpdeskModel.nota){
+                  data.formData.append("nota", $scope.helpdeskModel.nota);
+                }
+                if ($scope.idHelpdesk){
+                  data.formData.append("idSegnalazione", $scope.idHelpdesk);
+                }
+                if ($scope.helpdeskModel.categoria){
+                  data.formData.append("categoria", $scope.helpdeskModel.categoria);
+                }
                 for (var k=0; k<$scope.categorie.length; k++) {
                   if ($scope.helpdeskModel.categoria == $scope.categorie[k].id){
                     data.formData.append("categoriaDescrizione", $scope.categorie[k].descrizione);

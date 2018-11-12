@@ -3,6 +3,8 @@ package it.cnr.si.missioni.service;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,14 +28,16 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.RimborsoMissioneDettagliRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.TipoPasto;
+import it.cnr.si.missioni.util.proxy.json.service.TipoPastoService;
 import it.cnr.si.missioni.util.proxy.json.service.ValidaDettaglioRimborsoService;
 
 /**
@@ -65,6 +69,13 @@ public class RimborsoMissioneDettagliService {
 	@Autowired
 	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
 
+
+	@Autowired
+	private RimborsoImpegniService rimborsoImpegniService;
+	 
+	@Autowired
+	private TipoPastoService tipoPastoService;
+	 
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
@@ -105,6 +116,20 @@ public class RimborsoMissioneDettagliService {
 		return null;
 	}
 
+	@Transactional(readOnly = true)
+	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Principal principal, Long idRimborsoMissione, LocalDate data)
+			throws ComponentException {
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
+				RimborsoMissione.class, idRimborsoMissione);
+
+		if (rimborsoMissione != null) {
+			List<RimborsoMissioneDettagli> lista = rimborsoMissioneDettagliRepository
+					.getRimborsoMissioneDettagli(rimborsoMissione, data);
+			return lista;
+		}
+		return null;
+	}
+
 	private void validaCRUD(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws ComponentException {
 		RimborsoMissione rimborsoMissione = rimborsoMissioneDettagli.getRimborsoMissione();
 		if (rimborsoMissioneDettagli.getKmPercorsi() != null){
@@ -117,21 +142,70 @@ public class RimborsoMissioneDettagliService {
 	    			}
 	        	}
 	    	}
-		} else {
-//			if (rimborsoMissioneDettagli.isDettaglioPasto()){
-//				GregorianCalendar calFrom = DateUtils.getDate(rimborsoMissione.getDataInizioMissione());
-//				GregorianCalendar calTo = DateUtils.getDate(rimborsoMissione.getDataFineMissione());
-//				if (!((calFrom.get(GregorianCalendar.YEAR) < calTo.get(GregorianCalendar.YEAR)) || 
-//					(calFrom.get(GregorianCalendar.MONTH) < calTo.get(GregorianCalendar.MONTH))||
-//					(calFrom.get(GregorianCalendar.DAY_OF_MONTH) < calTo.get(GregorianCalendar.DAY_OF_MONTH))||
-//					(calTo.get(GregorianCalendar.HOUR_OF_DAY) - calFrom.get(GregorianCalendar.HOUR_OF_DAY) > 8) || 
-//					(calTo.get(GregorianCalendar.HOUR_OF_DAY) - calFrom.get(GregorianCalendar.HOUR_OF_DAY) == 7 &&
-//					calTo.get(GregorianCalendar.MINUTE) - calFrom.get(GregorianCalendar.MINUTE) >= 0))){
-//					return true;
-//				}
-//			}
+		}
+		if (StringUtils.isEmpty(rimborsoMissioneDettagli.getDsSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare una descrizione per la spesa.");
 		}
 		validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
+	}
+
+	private void controlliPasto(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli,
+			RimborsoMissione rimborsoMissione) {
+		if (rimborsoMissioneDettagli.isDettaglioPasto()){
+			List<RimborsoMissioneDettagli> listaDettagliGiorno = getRimborsoMissioneDettagli(principal, new Long (rimborsoMissione.getId().toString()), rimborsoMissioneDettagli.getDataSpesa());
+			for (RimborsoMissioneDettagli dett : listaDettagliGiorno){
+				if (dett.isDettaglioPasto() && dett.getRiga().compareTo(rimborsoMissioneDettagli.getRiga()) != 0){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile indicare più spese per il pasto nello stesso giorno");
+				}
+			}
+			Integer livelloRich = null;
+			if (rimborsoMissione.getLivelloRich() != null){
+				try{
+					livelloRich = new Integer(rimborsoMissione.getLivelloRich());
+				} catch (NumberFormatException e) {
+					livelloRich = recuperoLivelloEquivalente(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
+				}
+			} else {
+				livelloRich = recuperoLivelloEquivalente(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
+			}
+			controlloCongruenzaPasto(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
+		}
+	}
+
+	protected Integer recuperoLivelloEquivalente(RimborsoMissioneDettagli rimborsoMissioneDettagli,
+			RimborsoMissione rimborsoMissione, Integer livelloRich) {
+		List<TipoPasto> lista = tipoPastoService.loadTipoPasto(rimborsoMissioneDettagli.getCdTiPasto(), rimborsoMissione.getNazione(), rimborsoMissione.getInquadramento(), rimborsoMissioneDettagli.getDataSpesa());
+		if (lista!= null && !lista.isEmpty()){
+			TipoPasto tipoPasto = lista.get(0);
+			if (rimborsoMissioneDettagli.getCdTiPasto().startsWith("G")){
+				if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(50)) > 0){
+					livelloRich = 1;
+				} else {
+					livelloRich = 4;
+				}
+			} else {
+				if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(50)) > 0){
+					livelloRich = 1;
+				} else {
+					livelloRich = 4;
+				}
+			}
+		}
+		return livelloRich;
+	}
+
+	protected void controlloCongruenzaPasto(RimborsoMissioneDettagli rimborsoMissioneDettagli,
+			RimborsoMissione rimborsoMissione, Integer livello) {
+		long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
+		if (livello < 4){
+			if (oreDifferenza < 4 || (oreDifferenza < 12 && rimborsoMissioneDettagli.getCdTiPasto().startsWith("G"))){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Tipo pasto non spettante per la durata della missione");
+			}
+		} else {
+			if (oreDifferenza < 8 || (oreDifferenza < 12 && rimborsoMissioneDettagli.getCdTiPasto().startsWith("G"))){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Tipo pasto non spettante per la durata della missione");
+			}
+		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -160,10 +234,35 @@ public class RimborsoMissioneDettagliService {
 		controlloDatiObbligatoriDaGui(rimborsoMissioneDettagli);
 		impostaImportoDivisa(rimborsoMissioneDettagli);
 		validaCRUD(principal, rimborsoMissioneDettagli);
+		controlliPasto(principal, rimborsoMissioneDettagli, rimborsoMissione);
+
+		aggiornaDatiImpegni(principal, rimborsoMissioneDettagli);
+
 		rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean.creaConBulk(principal,
 				rimborsoMissioneDettagli);
 		log.debug("Created Information for RimborsoMissioneDettagli: {}", rimborsoMissioneDettagli);
 		return rimborsoMissioneDettagli;
+	}
+
+	public void aggiornaDatiImpegni(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli) {
+		if (rimborsoMissioneDettagli.getIdRimborsoImpegni() != null) {
+			RimborsoImpegni rimborsoImpegni = (RimborsoImpegni)crudServiceBean.findById(principal, RimborsoImpegni.class, rimborsoMissioneDettagli.getIdRimborsoImpegni());
+			if (rimborsoMissioneDettagli.getIdRimborsoImpegni() != null) {
+				rimborsoMissioneDettagli.setCdCdsObbligazione(rimborsoImpegni.getCdCdsObbligazione());
+				rimborsoMissioneDettagli.setEsercizioObbligazione(rimborsoImpegni.getEsercizioObbligazione());
+				rimborsoMissioneDettagli.setEsercizioOriginaleObbligazione(rimborsoImpegni.getEsercizioOriginaleObbligazione());
+				rimborsoMissioneDettagli.setPgObbligazione(rimborsoImpegni.getPgObbligazione());
+				rimborsoMissioneDettagli.setVoce(rimborsoImpegni.getVoce());
+				rimborsoMissioneDettagli.setDsVoce(rimborsoImpegni.getDsVoce());
+			}
+		} else {
+			rimborsoMissioneDettagli.setCdCdsObbligazione(null);
+			rimborsoMissioneDettagli.setEsercizioObbligazione(null);
+			rimborsoMissioneDettagli.setEsercizioOriginaleObbligazione(null);
+			rimborsoMissioneDettagli.setPgObbligazione(null);
+			rimborsoMissioneDettagli.setVoce(null);
+			rimborsoMissioneDettagli.setDsVoce(null);
+		}
 	}
 
 	private void controlloDatiObbligatoriDaGui(RimborsoMissioneDettagli dettaglio) {
@@ -242,7 +341,7 @@ public class RimborsoMissioneDettagliService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Rimborso Missione da aggiornare inesistente.");
 		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
 				RimborsoMissione.class, rimborsoMissioneDettagli.getRimborsoMissione().getId());
-		if (rimborsoMissione != null) {
+		if (rimborsoMissione != null && !rimborsoMissioneDettagli.isModificaSoloDatiFinanziari(rimborsoMissioneDettagliDB)) {
 			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissione);
 		}
 		rimborsoMissioneDettagli.setRimborsoMissione(rimborsoMissione);
@@ -264,17 +363,20 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setImportoEuro(rimborsoMissioneDettagli.getImportoEuro());
 		rimborsoMissioneDettagliDB.setDsNoGiustificativo(rimborsoMissioneDettagli.getDsNoGiustificativo());
 		rimborsoMissioneDettagliDB.setLocalitaSpostamento(rimborsoMissioneDettagli.getLocalitaSpostamento());
+		rimborsoMissioneDettagliDB.setIdRimborsoImpegni(rimborsoMissioneDettagli.getIdRimborsoImpegni());
 		impostaImportoDivisa(rimborsoMissioneDettagliDB);
 
 		rimborsoMissioneDettagliDB.setToBeUpdated();
 
 		validaCRUD(principal, rimborsoMissioneDettagliDB);
 
+		aggiornaDatiImpegni(principal, rimborsoMissioneDettagliDB);
+
 		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli) crudServiceBean.modificaConBulk(principal,
 				rimborsoMissioneDettagliDB);
 
 		log.debug("Updated Information for Dettaglio Rimborso Missione: {}", rimborsoMissioneDettagliDB);
-		return rimborsoMissioneDettagli;
+		return rimborsoMissioneDettagliDB;
 	}
 
 }

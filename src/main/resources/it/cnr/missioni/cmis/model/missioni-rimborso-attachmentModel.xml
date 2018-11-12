@@ -37,6 +37,10 @@
 			<title>Allegati al Rimborso della Missione</title>
 			<description>Allegati al Rimborso della Missione</description>
 		</aspect>
+		<aspect name="missioni_rimborso_attachment:allegati_annullamento">
+			<title>Allegati all'annullamento del Rimborso della Missione</title>
+			<description>Allegati all'annullamento del Rimborso della Missione</description>
+		</aspect>
 		<aspect name="missioni_rimborso_attachment:scontrini">
 			<title>Scontrini collegati al Rimborso della Missione</title>
 			<description>Scontrini collegati al Rimborso della Missione</description>

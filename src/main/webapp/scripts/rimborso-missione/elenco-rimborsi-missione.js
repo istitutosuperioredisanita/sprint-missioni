@@ -2,17 +2,24 @@
 
 missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         return {
-            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate) {
+            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate, idOrdineMissione, recuperoTotali) {
                 var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, 
                         daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, 
                         daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine, 
-                        includiMissioniAnnullate: includiMissioniAnnullate}}).then(function (response) {
+                        includiMissioniAnnullate: includiMissioniAnnullate, 
+                        idOrdineMissione: idOrdineMissione, recuperoTotali: recuperoTotali}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
             findRimborsiMissioneDaRendereDefinitive: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, uoRich, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
                 var promise = $http.get('api/rest/rimborsoMissione/listToFinal', {params: {user:user, anno: anno, cdsRich: cdsRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, uoRich: uoRich, annoOrdine: annoOrdine, daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine}}).success(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
+            findRimborsiMissioneDaAnnullare: function(user, anno, cdsRich, daNumero, aNumero, daData, aData, uoRich, annoOrdine, daNumeroOrdine, aNumeroOrdine) {
+                var promise = $http.get('api/rest/rimborsoMissione/listToBeDeleted', {params: {user:user}}).success(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -28,18 +35,29 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
                     return response.data;
                 });
                 return promise;
+            },
+            findAnnullamentoById: function(id) {
+                var promise = $http.get('api/rest/annullamentoRimborsoMissione/getById', {params: {id: id}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
+            findListAnnullamentiToValidate: function() {
+                var promise = $http.get('api/rest/annullamentoRimborsoMissione/listToValidate').then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
+            findRimborsoImpegni: function(id) {
+                var promise = $http.get('api/rest/rimborsoMissione/impegno/getImpegni', {params: {idRimborsoMissione: id}}).success(function (response) {
+                    return response.data;
+                });
+                return promise;
             }
         }
     });
 
-missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope, $scope, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService) {
-
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-            return today;
-    };
+missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService, DateService) {
 
     $scope.tipiMissione = {
       		'Italia': 'I',
@@ -126,29 +144,33 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
         }
     }
 
+    $scope.accessToken = AccessToken.get();
     var accountLog = $sessionStorage.account;
     var uoForUsersSpecial = accountLog.uoForUsersSpecial;
     if (uoForUsersSpecial){
         $scope.userSpecial = true;
-        var anno = $scope.today().getFullYear();
-        var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
-            $scope.uoForUsersSpecial = [];
-            if (result && result.data){
-                var uos = result.data.elements;
-                var ind = -1;
-                for (var i=0; i<uos.length; i++) {
-                    for (var k=0; k<uoForUsersSpecial.length; k++) {
-                        if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
-                            ind ++;
-                            $scope.uoForUsersSpecial[ind] = uos[i];
+        var today = DateService.today().then(function(result){
+            if (result){
+                var elenco = ProxyService.getUos(result.getFullYear(), null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
+                    $scope.uoForUsersSpecial = [];
+                    if (result && result.data){
+                        var uos = result.data.elements;
+                        var ind = -1;
+                        for (var i=0; i<uos.length; i++) {
+                            for (var k=0; k<uoForUsersSpecial.length; k++) {
+                                if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                    ind ++;
+                                    $scope.uoForUsersSpecial[ind] = uos[i];
+                                }
+                            }
                         }
+                        if ($scope.uoForUsersSpecial.length === 1){
+                            $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                        }
+                    } else {
+                        $scope.accountModel = accountLog;
                     }
-                }
-                if ($scope.uoForUsersSpecial.length === 1){
-                    $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
-                }
-            } else {
-                $scope.accountModel = accountLog;
+                });
             }
         });
     } else {

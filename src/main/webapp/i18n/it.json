@@ -33,6 +33,7 @@
                 "elenco-ordini-missione": "Elenco Ordini di Missione",
                 "elenco-ordini-missione-per-definitivo": "Ordini di Missione da Rendere Definitivi",
                 "annullamento-ordine-approvato": "Annullamento Ordine di Missione Approvato",
+                "annullamento-rimborso-approvato": "Annullamento Rimborso Missione Approvato",
                 "rimborso-missione": "Nuovo Rimborso Missione",
                 "elenco-rimborsi-missione": "Elenco Rimborsi Missione"
             },
@@ -103,9 +104,11 @@
         "gae":"Codice GAE"
     },
     "main": {
+        "release": "Clicca per le News di versione",
         "wait": "Controllo Flussi Missioni in corso",
         "subtitle_da_confermare": "Ordini di Missione da Confermare",
         "subtitle_da_confermare_annullamenti": "Annullamenti Ordini di Missione da Confermare",
+        "subtitle_da_confermare_annullamenti_rimborsi": "Annullamenti Rimborsi Missione da Confermare",
         "subtitle_da_confermare_rimborso": "Rimborsi Missione da Confermare",
         "subtitle_ko": "Flussi Respinti su Ordini di Missione",
         "subtitle_ko_rimborso": "Flussi Respinti Rimborso Missione",
@@ -121,6 +124,7 @@
         "subtitle_da_validare": "Ordini di Missione da Inviare alla firma",
         "subtitle_da_validare_annullamenti": "Annullamenti Ordini di Missione da Inviare alla firma",
         "subtitle_da_validare_rimborso": "Rimborsi Missione da Inviare alla firma",
+        "subtitle_da_validare_rimborso_amm": "Rimborsi Missione alla Validazione amministrativa",
         "subtitle_da_rendere_definitivi": "Ordini di Missione da Rendere Definitivi",
         "subtitle_resp_gruppo": "Ordini di Missione da Approvare dal Responsabile del gruppo",
         "comment": "Motivazione",
@@ -286,6 +290,7 @@
         "form": {
             "priorita": "Priorità*",
             "obbligo-rientro": "Obbligo di Rientro Giornaliero*",
+            "rientro": "Rientro*",
             "partenza": "Partenza Da*",
             "partenza-da-altro": "Luogo di Partenza*",
             "distanza": "Km. di distanza dalla sede",
@@ -308,7 +313,8 @@
             "persona-seguito": "Personale al Seguito",
             "fondi": "Fondi",
             "missione-gratuita": "Spese non a carico Ente",
-            "responsabile-gruppo": "Responsabile del Gruppo*"
+            "responsabile-gruppo": "Responsabile del Gruppo*",
+            "duplica-ordine": "Duplica Ordine di Missione"
         },
         "button": {
             "sendToFinal": "Rendi Definitivo l'Ordine di Missione",
@@ -381,6 +387,7 @@
             "nazione": "Nazione*",
             "trattamento": "Trattamento*",
             "trattamentoShort": "Tratt.",
+            "trattamentoView": "Trattamento",
             "note": "Note",
             "note.placeholder": "Annotazioni. Altre Disposizioni.",
             "voce": "Voce di Bilancio",
@@ -412,7 +419,9 @@
             "motivo-respingi-mittente": "Motivo Respingi al mittente",
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
             "cug": "Comitato Garanzia",
-            "presidenza": "Presidenza"        
+            "presidenza": "Presidenza",
+            "ordine-missione.placeholder": "Selezionare l'Ordine di Missione",
+            "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
 		},
         "button": {
             "sendToSign": "Invia alla Firma",
@@ -445,12 +454,24 @@
         "title": "ANNULLAMENTO ORDINE DI MISSIONE APPROVATO",
         "form": {
             "numero": "Progressivo di Annullamento",
-            "motivo-annullamento.placeholder": "Indicare il Motivo di Annuullamento dell'ordine di missione approvato",
-            "motivo-annullamento": "Motivo di Annuullamento"
+            "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
+            "motivo-annullamento": "Motivo di Annullamento"
         },
         "button": {
             "print": "Stampa Annullamento",
             "confirm": "Conferma l'Annullamento dell'Ordine di Missione"
+        }
+    },
+    "annullamento-rimborso-missione": {
+        "title": "ANNULLAMENTO RIMBORSO MISSIONE APPROVATO",
+        "form": {
+            "numero": "Progressivo di Annullamento",
+            "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
+            "motivo-annullamento": "Motivo di Annullamento"
+        },
+        "button": {
+            "print": "Stampa Annullamento",
+            "confirm": "Conferma l'Annullamento del Rimborso Missione"
         }
     },
     "rimborso-missione": {
@@ -482,10 +503,14 @@
             "rimborso-spese-terzi-importo": "Importo €",
             "stato-invio-sigla": "Stato Sigla",
             "id-sigla": "Id. SIGLA",
+            "stato-pagamento-sigla": "Stato Pagamento Missione: ",
             "ordini-con-rimborsi-diversi": "Ordini già rimborsati",
-            "rimborso-importo-0": "Importo 0"
+            "uso-auto-propria": "Richiesta Auto Propria su Ordine di Missione",
+            "rimborso-importo-0": "Importo 0",
+            "subtitle-esistono-altri-rimborsi": "Altri rimborsi dell'ordine di missione"
         },
         "button": {
+            "addImpegno": "Aggiungi impegno",
             "print": "Stampa Rimborso",
             "sendToFinal": "Rendi Definitivo il Rimborso Missione",
             "confirm": "Conferma il Rimborso Missione",
@@ -509,6 +534,7 @@
                     "download-file": "Download File",
                     "remove-file": "Elimina File",
                     "km": "Km percorsi*",
+                    "impegno": "Impegno",
                     "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
                     "localita-spostamento": "Località Spostamento*"
                 },

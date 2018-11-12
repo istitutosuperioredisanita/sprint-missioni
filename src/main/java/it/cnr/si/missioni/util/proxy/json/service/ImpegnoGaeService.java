@@ -1,5 +1,14 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -10,34 +19,27 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGaeJson;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
 public class ImpegnoGaeService {
 	@Autowired
     private CommonService commonService;
 
+
+	public ImpegnoGae loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
+		return loadImpegno(ordineMissione.getCdsSpesa(), ordineMissione.getUoSpesa(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione(), ordineMissione.getGae());
+
+	}
+
 	public ImpegnoGae loadImpegno(RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
+		return loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getUoSpesa(), rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione(), rimborsoMissione.getGae());
+	}
+
+	public ImpegnoGae loadImpegno(String cds, String unitaOrganizzativa, Integer esercizio, Long pgObbligazione, String gae) throws AwesomeException {
+		if (pgObbligazione != null && esercizio != null){
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
 
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getCdsSpesa(), anno, rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione(), rimborsoMissione.getGae());
-			return loadImpegno(clauses);
-		}
-		return null;
-	}
-	
-	public ImpegnoGae loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getPgObbligazione() != null && ordineMissione.getEsercizioOriginaleObbligazione() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getCdsSpesa(), ordineMissione.getAnno(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione(), ordineMissione.getGae());
+			List<JSONClause> clauses = prepareJSONClause(cds, unitaOrganizzativa, anno, esercizio, pgObbligazione, gae);
 			return loadImpegno(clauses);
 		}
 		return null;
@@ -63,7 +65,7 @@ public class ImpegnoGaeService {
 		return null;
 	}
 	
-	public List<JSONClause> prepareJSONClause(String cdsSpesa, Integer anno, Integer esercizioOriginaleObbligazione, Long pgObbligazione, String gae) {
+	public List<JSONClause> prepareJSONClause(String cdsSpesa, String cdUnitaOrganizzativa, Integer anno, Integer esercizioOriginaleObbligazione, Long pgObbligazione, String gae) {
 		JSONClause clause = new JSONClause();
 		clause.setFieldName("cdCds");
 		clause.setFieldValue(cdsSpesa);
@@ -74,6 +76,12 @@ public class ImpegnoGaeService {
 		clause = new JSONClause();
 		clause.setFieldName("esercizio");
 		clause.setFieldValue(anno);
+		clause.setCondition("AND");
+		clause.setOperator("=");
+		clauses.add(clause);
+		clause = new JSONClause();
+		clause.setFieldName("cdUnitaOrganizzativa");
+		clause.setFieldValue(cdUnitaOrganizzativa);
 		clause.setCondition("AND");
 		clause.setOperator("=");
 		clauses.add(clause);

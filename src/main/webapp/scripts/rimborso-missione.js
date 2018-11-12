@@ -20,16 +20,21 @@ missioniApp.factory('RimborsoMissioneService', function ($resource, DateUtils) {
     });
 
 missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, RimborsoMissioneService, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, AccessToken,
-            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session) {
+            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session, DateService) {
 
     $scope.giaRimborsato = "N";
     var urlRestProxy = URL_REST.STANDARD;
     $scope.today = function() {
-        // Today + 1 day - needed if the current day must be included
-        var today = new Date();
-        today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
+            // Today + 1 day - needed if the current day must be included
+        var today = DateService.today().then(function(result){
+            if (result){
+                var oggi = new Date(result.getFullYear(), result.getMonth(), result.getDate()); // create new date
+                $scope.oggi = oggi;
+                return oggi;
+            }
+        });
         return today;
-    }
+    };
 
     var isInQuery = function(){
         if ($scope.idMissione === undefined || $scope.idMissione === "" ) {
@@ -41,6 +46,9 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     
     $scope.reloadOrdineMissione = function(idOrdineMissione){
         $scope.rimborsoMissioneModel = {};
+        $scope.listaAltriRimborsi = {};
+        $scope.esistonoAltriRimborsi = false;
+
 
         for (var i=0; i<$scope.elencoOrdiniMissione.length; i++) {
             if ($scope.elencoOrdiniMissione[i].id === idOrdineMissione){
@@ -50,7 +58,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
                 $scope.rimborsoMissioneModel.idOrdineMissione = idOrdineMissione;
                 $scope.rimborsoMissioneModel.ordineMissione = ordineMissioneSelected;
-                var today = $scope.today();
+                var today = $scope.oggi;
                 $scope.rimborsoMissioneModel.dataInserimento = today;
                 $scope.rimborsoMissioneModel.anno = today.getFullYear();
 
@@ -102,6 +110,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.presidente = ordineMissioneSelected.presidente;
                 $scope.rimborsoMissioneModel.totaleRimborsoComplessivo = 0;
                 $scope.rimborsoMissioneModel.totaleRimborsoSenzaAnticipi = 0;
+                $scope.rimborsoMissioneModel.autoPropria = ordineMissioneSelected.utilizzoAutoPropria;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                     $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
@@ -121,6 +130,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.rimborso0 = "N";
                 inizializzaForm();
                 $scope.recuperoDatiDivisa();
+                $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.idOrdineMissione);
                 break;
             }
         }
@@ -152,11 +162,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         ProxyService.getDatiDivisa("EURO").then(function(ret){
             if (ret && ret.data){
                 $scope.divisa = ret.data.elements;
-//                ProxyService.validaRiga($scope.rimborsoMissioneModel.inquadramento, dataInizio, $scope.rimborsoMissioneModel.nazione, $scope.divisa.cd_divisa, "AEREO", null, 9999999999, null ).then(function(ret){
-//                    if (ret && ret.data ){
-//                        var rit = ret.data;
-//                    }
-//                });
+            }
+        });
+    }
+
+    $scope.recuperoDatiAltriRimborsi = function(idOrdineMissione){
+        ElencoRimborsiMissioneService.findRimborsiMissione(null, null, null, null, null, null, null, null, null, null, null, idOrdineMissione, "S").then(function(ret){
+            if (ret && ret.length > 0){
+                $scope.esistonoAltriRimborsi = true;
+                $scope.listaAltriRimborsi = ret;
+            } else {
+                $scope.esistonoAltriRimborsi = false;
             }
         });
     }
@@ -167,6 +183,27 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.inquadramento = ret.data.elements;
             } else {
                 ui.error("Inquadramento non trovato");
+            }
+        });
+    }
+
+
+    var recuperoDatiMandatoMissioneSigla = function(rimborsoMissione){
+        ProxyService.getMandatiMissioneSigla(rimborsoMissione).then(function(ret){
+            $scope.rimborsoMissioneModel.statoPagamento = 'Missione in Liquidazione';
+            if (ret && ret.data && ret.data.elements){
+                var mandatiMissione = ret.data.elements;
+                if (mandatiMissione.length > 0) {
+                    var mandato = mandatiMissione[0];
+                    var msgMandato = 'Mandato '+mandato.pg_mandato;
+                    if (mandato.dt_pagamento){
+                        $scope.rimborsoMissioneModel.statoPagamento = msgMandato+' pagato il '+moment(mandato.dt_pagamento).format("DD/MM/YYYY");
+                    } else if (mandato.dt_trasmissione){
+                        $scope.rimborsoMissioneModel.statoPagamento = msgMandato+' inviato in Banca il '+moment(mandato.dt_trasmissione).format("DD/MM/YYYY");
+                    } else if (mandato.dt_emissione){
+                        $scope.rimborsoMissioneModel.statoPagamento = msgMandato+' emesso il '+moment(mandato.dt_emissione).format("DD/MM/YYYY")+', non ancora inviato in Banca';
+                    } 
+                }
             }
         });
     }
@@ -313,24 +350,26 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     var caricaCds = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
-                $scope.rimborsoMissioneModel.cdsRich = $scope.formatResultCds(listaCds[0]);
+                $scope.rimborsoMissioneModel.cdsRich = listaCds[0].cd_proprio_unita;
             } else {
                 if (cds){
                     $scope.elencoCds = [];
                     var ind = 0;
                     for (var i=0; i<listaCds.length; i++) {
                         if (listaCds[i].cd_proprio_unita === cds){
-                            $scope.elencoCds[0] = $scope.formatResultCds(listaCds[i]);
+                            $scope.elencoCds[0] = listaCds[i];
+                            $scope.elencoCds[0].testo = listaCds[i].cd_proprio_unita+" "+listaCds[i].ds_unita_organizzativa;
 //                            $scope.elencoCds[0].selected = true;
 //                            $scope.elencoCds[0] = listaCds[i];
                         } else {
                             ind ++;
-                            $scope.elencoCds[ind] = $scope.formatResultCds(listaCds[i]);
+                            $scope.elencoCds[ind] = listaCds[i];
+                            $scope.elencoCds[ind].testo = listaCds[i].cd_proprio_unita+" "+listaCds[i].ds_unita_organizzativa;
                         }
                     }
-//                    if ($scope.rimborsoMissioneModel){
-//                        $scope.rimborsoMissioneModel.cdsRich = cds;
-//                    }
+                    if ($scope.rimborsoMissioneModel){
+                        $scope.rimborsoMissioneModel.cdsRich = cds;
+                    }
                 }
             }
         } else {
@@ -423,7 +462,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         }
     }
 
-    $scope.onChangeModpag = function() {
+    $scope.onChangeModpag = function(modpag) {
         var modpag = $scope.rimborsoMissioneModel.modpag;
         if (modpag){
             for (var i=0; i<$scope.modalitaPagamentos.length; i++) {
@@ -431,6 +470,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (modalitaPagamento.cd_modalita_pag === modpag){
                     $scope.rimborsoMissioneModel.tipoPagamento = modalitaPagamento.ti_pagamento;
                     $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, modalitaPagamento.ti_pagamento);
+                    $scope.rimborsoMissioneModel.iban = null;
+                    $scope.rimborsoMissioneModel.pgBanca = null;
                 }
             }
         }
@@ -711,7 +752,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 	                    var ind = -1;
     	                for (var i=0; i<listaVoci.length; i++) {
         	                ind ++;
-            	            $scope.elencoVoci[ind] = $scope.formatResultVoce(listaVoci[i]);
+                            $scope.elencoVoci[ind] = listaVoci[i];
                 	    }
                     } else {
                         $scope.elencoVoci = [];
@@ -785,6 +826,23 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             }
         }
     }
+
+    $scope.gestioneUtenteAbilitatoValidareContrAmm = function (uo){
+        $scope.utenteAbilitatoValidareUoContrAmm = 'N';
+        if (uo){
+            var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
+            var uoSiper = uo.replace('.','');
+            if (uoForUsersSpecial){
+                for (var k=0; k<uoForUsersSpecial.length; k++) {
+                    var uoForUserSpecial = uoForUsersSpecial[k];
+                    if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
+                    $scope.utenteAbilitatoValidareUoContrAmm = 'S';
+                    }
+                }
+            }
+        }
+    }
+
     $scope.reloadUoWork = function(uo){
         $scope.gestioneUtenteAbilitatoValidare(uo);
 
@@ -820,25 +878,13 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       $scope.restGae($scope.rimborsoMissioneModel.anno, pgProgetto, cdr, uo);
     }
 
-    $scope.tipiMissione = {
-        'Italia': 'I',
-        'Estera': 'E'
-    };
+    $scope.tipiMissione = ProxyService.valueTipiMissione;
 
-    $scope.luoghiDiPartenza = {
-        'Sede di Lavoro': 'S',
-        'Residenza/Domicilio Fiscale': 'R'
-    };
+    $scope.luoghiDiPartenza = ProxyService.valueLuoghiDiPartenza;
 
-    $scope.trattamenti = {
-        'Rimborso Documentato': 'R',
-        'Trattamento Alternativo di Missione': 'T'
-    };
+    $scope.valoriPriorita = ProxyService.valuePriorita;
 
-    $scope.obblighiRientro = {
-        'Sì': 'S',
-        'No': 'N'
-    };
+    $scope.trattamenti = ProxyService.valueTrattamenti;
 
     $scope.onChangeTipoMissione = function() {
         if ($scope.rimborsoMissioneModel.tipoMissione === 'E') {
@@ -911,7 +957,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     var impostadisabilitaRimborsoMissione = function() {
         if ($scope.esisteRimborsoMissione && ($scope.rimborsoMissioneModel.stato === 'DEF' || 
-            $scope.rimborsoMissioneModel.statoFlusso === 'APP' || $scope.rimborsoMissioneModel.stato === 'ANN' || 
+            $scope.rimborsoMissioneModel.statoFlusso === 'APP' || $scope.rimborsoMissioneModel.stato === 'ANN' || $scope.rimborsoMissioneModel.stato === 'ANA' || 
             ($scope.rimborsoMissioneModel.stato === 'CON' && 
                ($scope.rimborsoMissioneModel.stateFlows === 'ANNULLATO' ||
                 $scope.rimborsoMissioneModel.stateFlows === 'FIRMA SPESA RIMBORSO' ||
@@ -925,7 +971,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.inizializzaFormPerModifica = function(){
         $scope.showEsisteRimborsoMissione = true;
-        if ($scope.rimborsoMissioneModel.statoFlusso === "INV" && $scope.rimborsoMissioneModel.stato === "INS" && $scope.rimborsoMissioneModel.commentFlows){
+        if ($scope.rimborsoMissioneModel.statoFlusso === 'INV' && $scope.rimborsoMissioneModel.stato === 'INS' && $scope.rimborsoMissioneModel.commentFlows){
 	        $scope.showCommentFlows = true;
         } else {
 	        $scope.showCommentFlows = false;
@@ -983,7 +1029,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         $scope.missioneEsteraConTam = null;
         $scope.missioneEstera = null;
         $scope.rimborsoMissioneModel.uid = account.login;
-        var today = $scope.today();
+        var today = $scope.oggi;
         $scope.rimborsoMissioneModel.dataInserimento = today;
         $scope.rimborsoMissioneModel.anno = today.getFullYear();
         $scope.showObbligoRientro = null;
@@ -1168,6 +1214,85 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
       parent.history.back();
     }
 
+    $scope.editImpegno= function (impegno) {
+      impegno.editing = true;
+    }
+
+    var undoEditingImpegno = function (impegno) {
+      delete impegno.editing;
+    }
+
+    $scope.undoImpegno = function (impegno) {
+      undoEditingImpegno(impegno);
+    }
+
+    $scope.confirmDeleteImpegno = function (index) {
+        var impegnoDaEliminare = $scope.impegni[index];
+        ui.confirmCRUD("Confermi l'eliminazione dell'impegno "+impegnoDaEliminare.esercizioOriginaleObbligazione+" - "+impegnoDaEliminare.pgObbligazione+"?", deleteImpegno, index);
+    }
+
+    var deleteImpegno  = function (index) {
+        var id = $scope.impegni[index].id;
+            $rootScope.salvataggio = true;
+            $http.delete('api/rest/rimborsoMissione/impegno/' + id).success(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                        $scope.impegni.splice(index,1);
+                    }).error(
+                    function (data) {
+                        $rootScope.salvataggio = false;
+                    }
+            );
+    }
+
+    var annullaDatiNuovaRigaImpegno = function () {
+      delete $scope.addImpegno;
+      delete $scope.newImpegno;
+    }
+
+    $scope.undoAddImpegno = function () {
+        annullaDatiNuovaRigaImpegno();
+    }
+
+    $scope.aggiungiRigaImpegno = function () {
+      $scope.addImpegno = true;
+      $scope.newImpegno = {};
+    }
+
+    var aggiornaDatiFinanziari = function (rimborsoMissione) {
+        $scope.rimborsoMissioneModel.gae = rimborsoMissione.gae;
+        $scope.rimborsoMissioneModel.voce = rimborsoMissione.voce;
+    }
+
+
+
+    $scope.insertImpegno = function (newRigaImpegno) {
+        newRigaImpegno.rimborsoMissione = $scope.rimborsoMissioneModel;
+            $rootScope.salvataggio = true;
+            $http.post('api/rest/rimborsoMissione/impegno/create', newRigaImpegno).success(function(data){
+                    $rootScope.salvataggio = false;
+                    if (!$scope.impegni){
+                        $scope.impegni = [];
+                    }
+                    $scope.impegni.push(data);
+                    aggiornaDatiFinanziari(data.rimborsoMissione);
+                    $scope.undoAddImpegno();
+            }).error(function (data) {
+                $rootScope.salvataggio = false;
+            });
+    }
+
+    $scope.modifyImpegno = function (impegno) {
+        $rootScope.salvataggio = true;
+        $http.put('api/rest/rimborsoMissione/impegno/modify', impegno).success(function(data){
+            $rootScope.salvataggio = false;
+            aggiornaDatiFinanziari(data.rimborsoMissione);
+            undoEditingImpegno(impegno);
+        }).error(function (data) {
+            $rootScope.salvataggio = false;
+        });
+    }
+
     $scope.confirmDeleteAttachment = function (attachment, idRimborsoMissione) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
@@ -1215,7 +1340,17 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.attachments = {};
             });
         }
-//        $scope.anticipoOrdineMissioneModel.viewAttachment = true;
+    }
+
+    $scope.viewAttachmentsUndo = function () {
+        if ($scope.rimborsoMissioneModel.stato == 'ANA'){
+            $http.get('api/rest/annullamentoRimborsoMissione/viewAttachmentsFromRimborso/' + $scope.rimborsoMissioneModel.id).then(function (data) {
+                var attachments = data.data;
+                $scope.rimborsoMissioneModel.attachmentsUndo = attachments;
+            }, function () {
+                $scope.rimborsoMissioneModel.attachmentsUndo = {};
+            });
+        }
     }
 
     $scope.save = function () {
@@ -1294,8 +1429,28 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restCapitoli(model.anno);
                 $scope.rimborsoMissioneModel = model;
                 $scope.viewAttachments($scope.rimborsoMissioneModel.id);
+                $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.ordineMissione.id);
+                if ($scope.rimborsoMissioneModel.stato == 'ANA'){
+                    $scope.viewAttachmentsUndo();
+                }
+
                 $scope.inizializzaFormPerModifica();
-                $scope.gestioneUtenteAbilitatoValidare($scope.rimborsoMissioneModel.uoSpesa);
+                $scope.today();
+                if ($scope.rimborsoMissioneModel.validaAmm == 'N'){
+                    $scope.gestioneUtenteAbilitatoValidareContrAmm($scope.rimborsoMissioneModel.uoContrAmm);
+                    $scope.utenteAbilitatoValidareUo = 'N';
+                } else {
+                    $scope.gestioneUtenteAbilitatoValidare($scope.rimborsoMissioneModel.uoSpesa);
+                }
+                ElencoRimborsiMissioneService.findRimborsoImpegni(model.id).then(function(result){
+                    if (result.data && result.data.length > 0){
+                        $scope.impegni = result.data;
+                    }
+                });
+                if ($scope.rimborsoMissioneModel.stato == 'DEF' && $scope.rimborsoMissioneModel.cdCdsSigla){
+                    recuperoDatiMandatoMissioneSigla($scope.rimborsoMissioneModel);
+                }
+
             }
         });
     } else {
@@ -1303,29 +1458,34 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         var uoForUsersSpecial = accountLog.uoForUsersSpecial;
         if (uoForUsersSpecial){
             $scope.userSpecial = true;
-            var anno = $scope.today().getFullYear();
-            var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
-	            $scope.uoForUsersSpecial = [];
-	        	if (result && result.data){
-			        var uos = result.data.elements;
-			        var ind = -1;
-	                for (var i=0; i<uos.length; i++) {
-	                    for (var k=0; k<uoForUsersSpecial.length; k++) {
-	                        if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
-	                                ind ++;
-	                                $scope.uoForUsersSpecial[ind] = uos[i];
-	                        }
-	                    }
-	                }
-	                if ($scope.uoForUsersSpecial.length === 1){
-	                    $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
-	                }
-	            } 
+            var today = DateService.today().then(function(result){
+                if (result){
+                    $scope.oggi = result;
+                    var elenco = ProxyService.getUos(result.getFullYear(), null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
+                        $scope.uoForUsersSpecial = [];
+                        if (result && result.data){
+                            var uos = result.data.elements;
+                            var ind = -1;
+                            for (var i=0; i<uos.length; i++) {
+                                for (var k=0; k<uoForUsersSpecial.length; k++) {
+                                    if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                            ind ++;
+                                            $scope.uoForUsersSpecial[ind] = uos[i];
+                                    }
+                                }
+                            }
+                            if ($scope.uoForUsersSpecial.length === 1){
+                                $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                            }
+                        } 
+                    });
+                }   
             });
         } else {
             $scope.accountModel = $sessionStorage.account;
             $sessionStorage.accountWork = $scope.accountModel;
             $scope.restOrdiniMissioneDaRimborsare($sessionStorage.accountWork, $scope.giaRimborsato);
+            $scope.today();
             $scope.recuperoDatiTerzoSigla($scope.accountModel);
         }
     }

@@ -19,7 +19,7 @@ missioniApp.factory('RimborsoMissioneDettagliService', function (DateUtils, $htt
         }
     });
 
-missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils) {
+missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils, DateService) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.inizioMissione = $routeParams.inizioMissione;
@@ -28,18 +28,41 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     $scope.accessToken = AccessToken.get();
     $scope.accountModel = $sessionStorage.accountWork;
 
+    var recuperoImpegni = function(idRimborsoMissione){
+        $scope.impegni = [];
+        ElencoRimborsiMissioneService.findRimborsoImpegni($scope.idRimborsoMissione).then(function(result){
+            if (result.data && result.data.length > 0){
+                $scope.impegni = result.data;
+            }
+        });
+    }
+
+    recuperoImpegni($scope.idRimborsoMissione);
+
     $scope.aggiungiDettaglioSpesa = function () {
       $scope.addDettaglioSpesa = true;
       $scope.newDettaglioSpesa = {};
-      inizializzaNuovaRiga();
+      inizializzaNuovaRiga($scope.newDettaglioSpesa);
     }
 
-    var inizializzaNuovaRiga = function(){
+    var caricaImpegnoSingolo = function (dettaglioSpesa){
+        if ($scope.impegni && $scope.impegni.length == 1){
+            var impegno = $scope.impegni[0];
+            dettaglioSpesa.esercizioOriginaleObbligazione = impegno.esercizioOriginaleObbligazione;
+            dettaglioSpesa.idRimborsoImpegni = impegno.id;
+            dettaglioSpesa.pgObbligazione = impegno.pgObbligazione;
+            dettaglioSpesa.voce = impegno.voce;
+            dettaglioSpesa.dsVoce = impegno.dsVoce;
+        }
+    }
+
+    var inizializzaNuovaRiga = function(dettaglioSpesa){
         $scope.newDettaglioSpesa.flSpesaAnticipata = "N";
         $scope.newDettaglioSpesa.cdDivisa = "EURO";
         $scope.newDettaglioSpesa.cambio = 1;
         $scope.tipi_pasto = [];
         $scope.rimborsoKm = null;
+        caricaImpegnoSingolo(dettaglioSpesa);
     }
 
     $scope.confirmDeleteDettaglioSpesa = function (index) {
@@ -125,6 +148,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     var recuperoTipiSpesa = function(dataSpesa){
         recuperoTipiSpesa(dataSpesa, null);
     }
+
 
     var recuperoTipiSpesa = function(dataSpesa, cdTipoSpesa){
         $scope.tipi_spesa = [];
@@ -338,12 +362,32 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             });
     }
 
+    $scope.cambioSpesaAnticipata = function (dettaglioSpesa) {
+        if (dettaglioSpesa.flSpesaAnticipata == 'S'){
+            dettaglioSpesa.esercizioObbligazione = null;
+            dettaglioSpesa.esercizioOriginaleObbligazione = null;
+            dettaglioSpesa.cdCdsObbligazione = null;
+            dettaglioSpesa.idRimborsoImpegni = null;
+            dettaglioSpesa.pgObbligazione = null;
+            dettaglioSpesa.voce = null;
+            dettaglioSpesa.dsVoce = null;
+        } else {
+            caricaImpegnoSingolo(dettaglioSpesa);
+        }
+    }
+
+
+
     $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
         $rootScope.salvataggio = true;
         dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(dettaglioSpesa.dataSpesa);
         $http.put('api/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
             $rootScope.salvataggio = false;
             dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglioSpesa.dataSpesa);
+            dettaglioSpesa.esercizioOriginaleObbligazione = data.esercizioOriginaleObbligazione;
+            dettaglioSpesa.pgObbligazione = data.pgObbligazione;
+            dettaglioSpesa.voce = data.voce;
+            dettaglioSpesa.dsVoce = data.dsVoce;
             undoEditingDettaglioSpesa(dettaglioSpesa);
         }).error(function (data) {
             $rootScope.salvataggio = false;
@@ -407,13 +451,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     inizializzaDati();
 
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-
-            $scope.ordineMissioneModel.dataInserimento = $filter('date')(today, "dd-MM-yyyy");
-    };
 
     $scope.previousPage = function () {
       parent.history.back();

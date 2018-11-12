@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import it.cnr.si.missioni.domain.custom.ExternalProblem;
 import it.cnr.si.missioni.service.HelpdeskService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 
 @RolesAllowed({AuthoritiesConstants.USER})
@@ -34,15 +33,19 @@ public class HelpdeskResource {
 	public ResponseEntity sendWithAttachment(HttpServletRequest req, @RequestParam("file") MultipartFile uploadedMultipartFile) {
 		log.debug("HelpdeskResource:send");
 		ExternalProblem hd = new ExternalProblem();
-		hd.setTitolo(req.getParameter("titolo"));
-		if (StringUtils.hasLength(req.getParameter("idHelpdesk"))){
-			hd.setIdSegnalazione(new Long (req.getParameter("idHelpdesk")));
+		Long id = null;
+		if (StringUtils.hasLength(req.getParameter("idSegnalazione"))){
+			id = new Long (req.getParameter("idSegnalazione"));
+			hd.setIdSegnalazione(id);
 			hd.setNota(req.getParameter("nota"));
+		} else {
+			hd.setTitolo(req.getParameter("titolo"));
+			hd.setDescrizione(req.getParameter("descrizione"));
+			hd.setCategoria(new Integer(req.getParameter("categoria")));
+			hd.setCategoriaDescrizione(req.getParameter("categoriaDescrizione"));
 		}
-		hd.setDescrizione(req.getParameter("descrizione"));
-		hd.setCategoria(new Integer(req.getParameter("categoria")));
-		hd.setCategoriaDescrizione(req.getParameter("categoriaDescrizione"));
-		Long id = helpdeskService.newProblem(hd);
+		id = helpdeskService.newProblem(hd);
+
 		helpdeskService.addAttachments(id, uploadedMultipartFile);
 		
 		return JSONResponseEntity.ok();

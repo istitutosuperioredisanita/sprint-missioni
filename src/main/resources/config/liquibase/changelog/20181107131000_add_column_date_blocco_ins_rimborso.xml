@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="missioni" id="20181107131000">
+    	<addColumn 
+            tableName="DATI_ISTITUTO">
+            <column name="DATA_BLOCCO_INS_RIMBORSI" type="date">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DATA_BLOCCO_INS_RIMBORSI_TAM" type="date">
+                <constraints nullable="true"/>
+            </column>
+    	</addColumn>
+			<sql>update DATI_ISTITUTO set DATA_BLOCCO_INS_RIMBORSI = DATA_BLOCCO_RIMBORSI, DATA_BLOCCO_INS_RIMBORSI_TAM = DATA_BLOCCO_RIMBORSI_TAM</sql>
+    </changeSet>
+</databaseChangeLog>

@@ -14,7 +14,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
-                    <select ng-disabled="disableUo" ng-change="reloadUoWork(uoWorkForSpecialUser)" class="form-control" id="missioni" ng-model="uoWorkForSpecialUser" ng-options="uo.cd_unita_organizzativa as uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa for uo in uoForUsersSpecial"></select>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -22,7 +29,14 @@
                     <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
-                    <select ng-change="reloadUserWork(userWork)" class="form-control" id="missioni" ng-model="userWork" ng-options="persona.uid as persona.cognome+' - '+persona.nome+' ('+persona.matricola+')' for persona in elencoPersone"></select>
+    <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
+        <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
+    </ui-select-choices>
+    </ui-select>
                         </span>
                     </p>
             </form>
@@ -55,7 +69,14 @@
                       <p class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
-                      <select ng-disabled="!elencoOrdiniMissione || annullamentoModel.id" ng-change="reloadOrdineMissione(annullamentoModel.idOrdineMissione)" class="form-control" id="missioni" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" ng-model="annullamentoModel.idOrdineMissione" ng-options="ordineMissione.id as ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto for ordineMissione in elencoOrdiniMissione"></select>
+    <ui-select ng-disabled="!elencoOrdiniMissione || annullamentoModel.id" id="missioni-ui-select" theme="select2" on-select="reloadOrdineMissione(annullamentoModel.idOrdineMissione)" ng-model="annullamentoModel.idOrdineMissione"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.ordine-missione.placeholder' | translate}}" >
+        <span ng-bind="$select.selected.anno+' / '+$select.selected.numero+' - Dal '+ ($select.selected.dataInizioMissione | dateMissioni) +' Al '+ ($select.selected.dataFineMissione | dateMissioni)+' - '+$select.selected.destinazione+' - '+$select.selected.oggetto"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="ordineMissione.id as ordineMissione in elencoOrdiniMissione | filter: $select.search">
+        <span ng-bind="ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto"></span>
+    </ui-select-choices>
+    </ui-select>
                           </span>
                       </p>
               </form>
@@ -63,7 +84,7 @@
 </div>
 
 <div>
-<div class="panel panel-success" ng-hide="!annullamentoModel.idOrdineMissione || !annullamentoModel.id" >
+<div class="panel panel-success" ng-hide="!annullamentoModel.idOrdineMissione" >
   <div class="panel-heading color-verde-scuro text-center">
     <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
   </div>
@@ -218,7 +239,7 @@
             </form>
 
                     <p class="col-md-1">
-            <cnr-modal-info-impegno anno="annullamentoModel.ordineMissione.anno" cds="annullamentoModel.ordineMissione.cdsSpesa" gae="annullamentoModel.ordineMissione.gae" anno-impegno="annullamentoModel.ordineMissione.esercizioOriginaleObbligazione" numero="annullamentoModel.ordineMissione.pgObbligazione"> </cnr-modal-info-impegno>
+            <cnr-modal-info-impegno anno="annullamentoModel.ordineMissione.anno" cds="annullamentoModel.ordineMissione.cdsSpesa" uo="annullamentoModel.ordineMissione.uoSpesa" gae="annullamentoModel.ordineMissione.gae" anno-impegno="annullamentoModel.ordineMissione.esercizioOriginaleObbligazione" numero="annullamentoModel.ordineMissione.pgObbligazione"> </cnr-modal-info-impegno>
                     </p>
 
             <form class="form-inline" role="form" id="missioni">

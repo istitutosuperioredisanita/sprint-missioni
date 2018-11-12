@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="missioni" id="20180404121000">
+    	<addColumn 
+            tableName="RIMBORSO_MISSIONE_DETTAGLI">
+							<column name="CD_CDS_OBBLIGAZIONE" type="varchar(30)">
+		              <constraints nullable="true"/>
+		          </column>
+		          <column name="ESERCIZIO_OBBLIGAZIONE" type="integer">
+		              <constraints nullable="true"/>
+		          </column>
+		          <column name="ESERCIZIO_ORIGINALE_OBBLIGAZIONE" type="integer">
+		              <constraints nullable="true"/>
+		          </column>
+		          <column name="PG_OBBLIGAZIONE" type="bigint">
+		              <constraints nullable="true"/>
+		          </column>
+		          <column name="ID_RIMBORSO_IMPEGNI" type="bigint">
+		              <constraints nullable="true"/>
+		          </column>
+							<column name="VOCE" type="varchar(28)">
+		              <constraints nullable="true"/>
+		          </column>
+							<column name="DS_VOCE" type="varchar(500)">
+		              <constraints nullable="true"/>
+		          </column>
+    	</addColumn>
+    </changeSet>
+</databaseChangeLog>

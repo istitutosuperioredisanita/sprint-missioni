@@ -25,19 +25,20 @@ public class ImpegnoService {
     private CommonService commonService;
 
 	public Impegno loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getPgObbligazione() != null && ordineMissione.getEsercizioOriginaleObbligazione() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione.getCdsSpesa(), ordineMissione.getAnno(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione());
-			return loadImpegno(clauses);
-		}
-		return null;
+		return loadImpegno(ordineMissione.getCdsSpesa(), ordineMissione.getUoSpesa(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione());
+
 	}
 
 	public Impegno loadImpegno(RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
+		return loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getUoSpesa(), rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione());
+	}
+
+	public Impegno loadImpegno(String cds, String unitaOrganizzativa, Integer esercizio, Long pgObbligazione) throws AwesomeException {
+		if (pgObbligazione != null && esercizio != null){
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
 
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione.getCdsSpesa(), anno, rimborsoMissione.getEsercizioOriginaleObbligazione(), rimborsoMissione.getPgObbligazione());
+			List<JSONClause> clauses = prepareJSONClause(cds, unitaOrganizzativa, anno, esercizio, pgObbligazione);
 			return loadImpegno(clauses);
 		}
 		return null;
@@ -63,7 +64,7 @@ public class ImpegnoService {
 		return null;
 	}
 	
-	private List<JSONClause> prepareJSONClause(String cdsSpesa, Integer anno, Integer esercizioOriginaleObbligazione, Long pgObbligazione) {
+	private List<JSONClause> prepareJSONClause(String cdsSpesa, String cdUnitaOrganizzativa, Integer anno, Integer esercizioOriginaleObbligazione, Long pgObbligazione) {
 		JSONClause clause = new JSONClause();
 		clause.setFieldName("cdCds");
 		clause.setFieldValue(cdsSpesa);
@@ -71,12 +72,12 @@ public class ImpegnoService {
 		clause.setOperator("=");
 		List<JSONClause> clauses = new ArrayList<JSONClause>();
 		clauses.add(clause);
-//		clause = new JSONClause();
-//		clause.setFieldName("esercizio");
-//		clause.setFieldValue(anno);
-//		clause.setCondition("AND");
-//		clause.setOperator("=");
-//		clauses.add(clause);
+		clause = new JSONClause();
+		clause.setFieldName("cdUnitaOrganizzativa");
+		clause.setFieldValue(cdUnitaOrganizzativa);
+		clause.setCondition("AND");
+		clause.setOperator("=");
+		clauses.add(clause);
 		clause = new JSONClause();
 		clause.setFieldName("esercizioOriginale");
 		clause.setFieldValue(esercizioOriginaleObbligazione);

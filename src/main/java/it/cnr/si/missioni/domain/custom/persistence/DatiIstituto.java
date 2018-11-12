@@ -81,6 +81,12 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "DATA_BLOCCO_RIMBORSI", nullable = true)
     public LocalDate dataBloccoRimborsi;
 
+    @Column(name = "DATA_BLOCCO_INS_RIMBORSI_TAM", nullable = true)
+    public LocalDate dataBloccoInsRimborsiTam;
+
+    @Column(name = "DATA_BLOCCO_INS_RIMBORSI", nullable = true)
+    public LocalDate dataBloccoInsRimborsi;
+
     @Size(min = 0, max = 1)
     @Column(name = "TIPO_MAIL_DOPO_ORDINE", length = 1, nullable = true)
     private String tipoMailDopoOrdine;
@@ -131,11 +137,21 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
     @Column(name = "UO_RESP_RESPONSABILI", length = 20, nullable = true)
     private String uoRespResponsabili;
 
+    @Size(min = 0, max = 20)
+    @Column(name = "UO_CONTR_AMM", length = 20, nullable = true)
+    private String uoContrAmm;
+
     @Column(name = "SALTA_FIRMA_UOS_UO_CDS", length = 1, nullable = true)
     public String saltaFirmaUosUoCds;
 
     @Column(name = "UO_FIRMA_AGGIUNTA", length = 20, nullable = true)
     public String uoFirmaAggiunta;
+
+    @Column(name = "PROGRESSIVO_ANNULLAMENTO", length = 20, nullable = true)
+    private Long progressivoAnnullamento;
+
+    @Column(name = "PROGR_ANNULL_RIMBORSO", length = 20, nullable = true)
+    private Long progrAnnullRimborso;
 
 	public void setId(Long id) {
 		this.id = id;
@@ -430,4 +446,45 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 	public void setUoFirmaAggiunta(String uoFirmaAggiunta) {
 		this.uoFirmaAggiunta = uoFirmaAggiunta;
 	}
+
+	public Long getProgrAnnullRimborso() {
+		return progrAnnullRimborso;
+	}
+
+	public void setProgrAnnullRimborso(Long progrAnnullRimborso) {
+		this.progrAnnullRimborso = progrAnnullRimborso;
+	}
+
+	public Long getProgressivoAnnullamento() {
+		return progressivoAnnullamento;
+	}
+
+	public void setProgressivoAnnullamento(Long progressivoAnnullamento) {
+		this.progressivoAnnullamento = progressivoAnnullamento;
+	}
+
+	public String getUoContrAmm() {
+		return uoContrAmm;
+	}
+
+	public void setUoContrAmm(String uoContrAmm) {
+		this.uoContrAmm = uoContrAmm;
+	}
+
+	public LocalDate getDataBloccoInsRimborsiTam() {
+		return dataBloccoInsRimborsiTam;
+	}
+
+	public void setDataBloccoInsRimborsiTam(LocalDate dataBloccoInsRimborsiTam) {
+		this.dataBloccoInsRimborsiTam = dataBloccoInsRimborsiTam;
+	}
+
+	public LocalDate getDataBloccoInsRimborsi() {
+		return dataBloccoInsRimborsi;
+	}
+
+	public void setDataBloccoInsRimborsi(LocalDate dataBloccoInsRimborsi) {
+		this.dataBloccoInsRimborsi = dataBloccoInsRimborsi;
+	}
+
 }

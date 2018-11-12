@@ -2,6 +2,12 @@
 
 missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtils) {
         return {
+            findMissioniDaDuplicare: function(user) {
+                var promise = $http.get('api/rest/ordiniMissione/listDaDuplicare', {params: {user:user}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            },
             findMissioniDaAnnullare: function(user) {
                 var promise = $http.get('api/rest/ordiniMissione/listDaAnnullare', {params: {user:user}}).then(function (response) {
                     return response.data;
@@ -53,14 +59,7 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
         }
     });
 
-missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $scope, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService) {
-
-    $scope.today = function() {
-            // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-            return today;
-    };
+missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
 
     $scope.tipiMissione = {
       		'Italia': 'I',
@@ -129,6 +128,9 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
     };
 
     $scope.reloadUserWork = function(uid){
+        if (uid){
+            $scope.userWork = uid;
+        }
         $scope.ordiniMissione = [];
         $scope.messageOrdiniNonEsistenti = false;
         if (uid){
@@ -144,6 +146,9 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
     }
 
     $scope.reloadUoWork = function(uo){
+        if (uo){
+            $scope.uoWorkForSpecialUser = uo;
+        }
         $scope.accountModel = null;
         $scope.elencoPersone = [];
         $scope.ordiniMissione = [];
@@ -160,6 +165,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
         }
     }
 
+    $scope.accessToken = AccessToken.get();
     $scope.rowsPerPage = 30;
     $scope.predicate = 'ordineMissione.dataInserimento';
     $scope.reverse = true;
@@ -168,25 +174,28 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
     var uoForUsersSpecial = accountLog.uoForUsersSpecial;
     if (uoForUsersSpecial){
         $scope.userSpecial = true;
-        var anno = $scope.today().getFullYear();
-        var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
-            $scope.uoForUsersSpecial = [];
-            if (result && result.data){
-                var uos = result.data.elements;
-                var ind = -1;
-                for (var i=0; i<uos.length; i++) {
-                    for (var k=0; k<uoForUsersSpecial.length; k++) {
-                        if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
-                            ind ++;
-                            $scope.uoForUsersSpecial[ind] = uos[i];
+        var today = DateService.today().then(function(result){
+            if (result){
+                var elenco = ProxyService.getUos(result.getFullYear(), null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
+                    $scope.uoForUsersSpecial = [];
+                    if (result && result.data){
+                        var uos = result.data.elements;
+                        var ind = -1;
+                        for (var i=0; i<uos.length; i++) {
+                            for (var k=0; k<uoForUsersSpecial.length; k++) {
+                                if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                    ind ++;
+                                    $scope.uoForUsersSpecial[ind] = uos[i];
+                                }
+                            }
                         }
+                        if ($scope.uoForUsersSpecial.length === 1){
+                            $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                        }
+                    } else {
+                        $scope.accountModel = accountLog;
                     }
-                }
-                if ($scope.uoForUsersSpecial.length === 1){
-                    $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
-                }
-            } else {
-                $scope.accountModel = accountLog;
+                });
             }
         });
     } else {

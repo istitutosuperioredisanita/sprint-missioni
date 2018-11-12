@@ -3,6 +3,7 @@ package it.cnr.si.missioni.util.proxy.json.object.rimborso;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "rif_inquadramento",
     "modalita_pagamento",
     "tappeMissioneColl",
+    "missioneRigaColl",
     "speseMissioneColl",
     "annoMandatoAnticipo",
     "numeroMandatoAnticipo",
@@ -172,6 +174,8 @@ public class MissioneBulk implements Cloneable, Serializable{
     private RifInquadramento rifInquadramento;
     @JsonProperty("modalita_pagamento")
     private ModalitaPagamento modalitaPagamento;
+    @JsonProperty("missioneRigaColl")
+    private List<MissioneRigaColl> missioneRigaColl = new ArrayList<>();
     @JsonProperty("tappeMissioneColl")
     private List<TappeMissioneColl> tappeMissioneColl = null;
     @JsonProperty("speseMissioneColl")
@@ -1098,6 +1102,14 @@ public class MissioneBulk implements Cloneable, Serializable{
 
 	public void setVoceGeMis(String voceGeMis) {
 		this.voceGeMis = voceGeMis;
+	}
+
+	public List<MissioneRigaColl> getMissioneRigaColl() {
+		return missioneRigaColl;
+	}
+
+	public void setMissioneRigaColl(List<MissioneRigaColl> missioneRigaColl) {
+		this.missioneRigaColl = missioneRigaColl;
 	}
 
 }

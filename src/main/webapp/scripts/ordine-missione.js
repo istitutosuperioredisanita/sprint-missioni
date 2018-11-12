@@ -57,16 +57,9 @@ missioniApp.factory('OrdineMissioneService', function ($resource, DateUtils) {
     });
 
 missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
-            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session, DatiIstitutoService) {
+            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session, DatiIstitutoService, DateService, DateUtils) {
 
     var urlRestProxy = URL_REST.STANDARD;
-    $scope.today = function() {
-        // Today + 1 day - needed if the current day must be included
-        var today = new Date();
-        today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-        return today;
-    }
-
     var isInQuery = function(){
         if ($scope.idMissione === undefined || $scope.idMissione === "" ) {
             return false;
@@ -100,19 +93,21 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     var caricaCds = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
-                $scope.ordineMissioneModel.cdsSpesa = $scope.formatResultCds(listaCds[0]);
+                $scope.ordineMissioneModel.cdsSpesa = listaCds[0].cd_proprio_unita;
             } else {
                 if (cds){
                     $scope.elencoCds = [];
                     var ind = 0;
                     for (var i=0; i<listaCds.length; i++) {
                         if (listaCds[i].cd_proprio_unita === cds){
-                            $scope.elencoCds[0] = $scope.formatResultCds(listaCds[i]);
+                            $scope.elencoCds[0] = listaCds[i];
+                            $scope.elencoCds[0].testo = listaCds[i].cd_proprio_unita+" "+listaCds[i].ds_unita_organizzativa;
 //                            $scope.elencoCds[0].selected = true;
 //                            $scope.elencoCds[0] = listaCds[i];
                         } else {
                             ind ++;
-                            $scope.elencoCds[ind] = $scope.formatResultCds(listaCds[i]);
+                            $scope.elencoCds[ind] = listaCds[i];
+                            $scope.elencoCds[ind].testo = listaCds[i].cd_proprio_unita+" "+listaCds[i].ds_unita_organizzativa;
                         }
                     }
                     if ($scope.ordineMissioneModel){
@@ -410,7 +405,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 	                    var ind = -1;
     	                for (var i=0; i<listaVoci.length; i++) {
         	                ind ++;
-            	            $scope.elencoVoci[ind] = $scope.formatResultVoce(listaVoci[i]);
+            	            $scope.elencoVoci[ind] = listaVoci[i];
                 	    }
                     } else {
                         $scope.elencoVoci = [];
@@ -423,18 +418,80 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
     
 
-    $scope.formatResultVoce = function(item) {
-      return {
-        value: item.cd_elemento_voce,
-        text: item.cd_elemento_voce+' '+item.ds_elemento_voce
-      };
+    $scope.onChangeDuplica = function (duplica) {
+        if (duplica == 'S'){
+            $scope.restOrdiniMissioneDaDuplicare($sessionStorage.accountWork);
+        }
     }
 
-    $scope.formatResultCds = function(item) {
-      return {
-        value: item.cd_proprio_unita,
-        text: item.cd_proprio_unita+' '+item.ds_unita_organizzativa
-      };
+    $scope.reloadOrdineMissione = function(idOrdineMissione){
+
+        for (var i=0; i<$scope.elencoOrdiniMissione.length; i++) {
+            if ($scope.elencoOrdiniMissione[i].id === idOrdineMissione){
+                var ordineMissioneSelected = $scope.elencoOrdiniMissione[i];
+
+                var today = $scope.oggi;
+                $scope.ordineMissioneModel.dataInserimento = today;
+                $scope.ordineMissioneModel.anno = today.getFullYear();
+
+                $scope.ordineMissioneModel.priorita = ordineMissioneSelected.priorita;
+                $scope.ordineMissioneModel.oggetto = ordineMissioneSelected.oggetto;
+                $scope.ordineMissioneModel.destinazione = ordineMissioneSelected.destinazione;
+                $scope.ordineMissioneModel.nazione = ordineMissioneSelected.nazione;
+                $scope.ordineMissioneModel.tipoMissione = ordineMissioneSelected.tipoMissione;
+                $scope.ordineMissioneModel.trattamento = ordineMissioneSelected.trattamento;
+
+                if ($scope.ordineMissioneModel.tipoMissione === 'E') {
+                    $scope.missioneEstera = true;
+                } else {
+                    $scope.missioneEstera = null;
+                }
+
+                $scope.ordineMissioneModel.voce = ordineMissioneSelected.voce;
+                $scope.ordineMissioneModel.gae = ordineMissioneSelected.gae;
+                $scope.ordineMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
+                $scope.ordineMissioneModel.uoRich = ordineMissioneSelected.uoRich;
+                $scope.ordineMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
+                $scope.ordineMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
+                $scope.ordineMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
+                $scope.ordineMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
+                $scope.ordineMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
+                $scope.ordineMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
+                $scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
+                $scope.ordineMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
+                $scope.ordineMissioneModel.utilizzoAutoNoleggioServizio = ordineMissioneSelected.utilizzoAutoServizio;
+                $scope.ordineMissioneModel.personaleAlSeguito = ordineMissioneSelected.personaleAlSeguito;
+                $scope.ordineMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+                $scope.ordineMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
+                $scope.ordineMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
+                $scope.ordineMissioneModel.importoPresunto = ordineMissioneSelected.importoPresunto;
+                $scope.ordineMissioneModel.missioneGratuita = ordineMissioneSelected.missioneGratuita;
+                $scope.ordineMissioneModel.cup = ordineMissioneSelected.cup;
+                $scope.ordineMissioneModel.cug = ordineMissioneSelected.cug;
+                $scope.ordineMissioneModel.presidente = ordineMissioneSelected.presidente;
+                if ($scope.ordineMissioneModel.uoSpesa){
+                    $scope.restUo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsSpesa, $scope.ordineMissioneModel.uoSpesa);
+                    $scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
+                    $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                }
+                if ($scope.ordineMissioneModel.cdsCompetenza){
+                    $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsCompetenza);
+                }
+                if ($scope.ordineMissioneModel.uoCompetenza){
+                    $scope.restUoCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsCompetenza, $scope.ordineMissioneModel.uoCompetenza);
+                }
+                if ($scope.ordineMissioneModel.cdrSpesa){
+                    $scope.restCdr($scope.ordineMissioneModel.uoSpesa, "S");
+                }
+                break;
+            }
+        }
+    }
+
+    $scope.restOrdiniMissioneDaDuplicare = function(userWork){
+        ElencoOrdiniMissioneService.findMissioniDaDuplicare(userWork.login).then(function(data){
+            $scope.elencoOrdiniMissione = data;
+        });
     }
 
     $scope.annullaGae = function(){
@@ -555,37 +612,17 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
-    $scope.tipiMissione = {
-        'Italia': 'I',
-        'Estera': 'E'
-    };
+    $scope.tipiMissione = ProxyService.valueTipiMissione;
 
-    $scope.luoghiDiPartenza = {
-        'Sede di Lavoro': 'S',
-        'Residenza/Domicilio Fiscale': 'R',
-        'Altro': 'A'
-    };
+    $scope.luoghiDiPartenza = ProxyService.valueLuoghiDiPartenza;
 
-    $scope.valoriPriorita = {
-        'Critica': '5',
-        'Importante': '3',
-        'Media': '1'
-    };
+    $scope.valoriPriorita = ProxyService.valuePriorita;
 
-    $scope.trattamenti = {
-        'Rimborso Documentato': 'R',
-        'Trattamento Alternativo di Missione': 'T'
-    };
+    $scope.trattamenti = ProxyService.valueTrattamenti;
 
-    $scope.fondi = {
-        'Competenza': 'C',
-        'Residuo': 'R'
-    };
+    $scope.fondi = ProxyService.valueFondi;
 
-    $scope.obblighiRientro = {
-        'Sì': 'S',
-        'No': 'N'
-    };
+    $scope.obblighiRientro = ProxyService.valueObblighiRientro;
 
     $scope.onChangeTipoMissione = function() {
         if ($scope.ordineMissioneModel.tipoMissione === 'E') {
@@ -685,7 +722,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         return "";
     }
 
-    $scope.inizializzaFormPerInserimento = function(account){
+    $scope.inizializzaFormPerInserimento = function(account, restStart){
         $scope.ordineMissioneModel = {tipoMissione:'I', priorita:'1', nominativo:account.lastName+" "+account.firstName, 
                                         qualificaRich:account.profilo, livelloRich:account.livello, codiceFiscale:account.codice_fiscale, 
                                         dataNascita:account.data_nascita, luogoNascita:account.comune_nascita, validato:'N', 
@@ -704,11 +741,19 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
         $scope.missioneEstera = null;
         $scope.ordineMissioneModel.uid = account.login;
-        var today = $scope.today();
-        $scope.ordineMissioneModel.dataInserimento = today;
-        $scope.ordineMissioneModel.anno = today.getFullYear();
-        $scope.showObbligoRientro = null;
-        $scope.disabilitaOrdineMissione = false;
+            var today = DateService.today().then(function(result){
+                if (result){
+                    $scope.oggi = result;
+                    $scope.ordineMissioneModel.dataInserimento = $scope.oggi;
+                    $scope.ordineMissioneModel.anno = $scope.oggi.getFullYear();
+                    $scope.showObbligoRientro = null;
+                    $scope.disabilitaOrdineMissione = false;
+                    if (restStart){
+                        serviziRestInizialiInserimento();
+                    }
+                    return result;
+                }   
+            });
     }
 
     $scope.gestioneInCasoDiErrore = function(){
@@ -843,7 +888,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $rootScope.salvataggio = false;
                         $scope.idMissione = null;
                         $scope.ordineMissioneModel = {}
-                        $scope.inizializzaFormPerInserimento($sessionStorage.account);
+                        $scope.inizializzaFormPerInserimento($sessionStorage.account, false);
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
@@ -868,8 +913,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
                     $scope.accountModel = userWork;
                     $sessionStorage.accountWork = userWork;
-                    $scope.inizializzaFormPerInserimento($scope.accountModel);
-                    serviziRestInizialiInserimento();
+                    $scope.inizializzaFormPerInserimento($scope.accountModel,true);
                 }
             }
         }
@@ -1048,30 +1092,33 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         var uoForUsersSpecial = accountLog.uoForUsersSpecial;
         if (uoForUsersSpecial){
             $scope.userSpecial = true;
-            var anno = $scope.today().getFullYear();
-            var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
-	            $scope.uoForUsersSpecial = [];
-	        	if (result && result.data){
-			        var uos = result.data.elements;
-			        var ind = -1;
-	                for (var i=0; i<uos.length; i++) {
-	                    for (var k=0; k<uoForUsersSpecial.length; k++) {
-	                        if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
-	                                ind ++;
-	                                $scope.uoForUsersSpecial[ind] = uos[i];
-	                        }
-	                    }
-	                }
-	                if ($scope.uoForUsersSpecial.length === 1){
-	                    $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
-	                }
-	            } 
+            var today = DateService.today().then(function(result){
+                if (result){
+                    $scope.oggi = result;
+                    var elenco = ProxyService.getUos(result.getFullYear(), null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
+                        $scope.uoForUsersSpecial = [];
+                        if (result && result.data){
+                            var uos = result.data.elements;
+                            var ind = -1;
+                            for (var i=0; i<uos.length; i++) {
+                                for (var k=0; k<uoForUsersSpecial.length; k++) {
+                                    if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                            ind ++;
+                                            $scope.uoForUsersSpecial[ind] = uos[i];
+                                    }
+                                }
+                            }
+                            if ($scope.uoForUsersSpecial.length === 1){
+                                $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                            }
+                        } 
+                    });
+                }   
             });
         } else {
             $scope.accountModel = $sessionStorage.account;
             $sessionStorage.accountWork = $scope.accountModel;
-            $scope.inizializzaFormPerInserimento($scope.accountModel);
-            serviziRestInizialiInserimento();
+            $scope.inizializzaFormPerInserimento($scope.accountModel, true);
         }
     }
 });

@@ -21,6 +21,7 @@ public class Costanti {
 	public final static String REST_VOCE =  "ConsCapitoloAction.json";
 	public final static String REST_TERZO =  "ConsTerzoAction.json";
 	public final static String REST_INQUADRAMENTI =  "ConsInquadramentoAction.json";
+	public final static String REST_TIPO_PASTO =  "ConsMissioneTipoPastoAction.json";
 	public final static String REST_IMPEGNO =  "ConsImpegnoAction.json";
 	public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
     public final static String REST_TIPI_SPESA =  "ConsTipiSpesaAction.json";
@@ -46,6 +47,7 @@ public class Costanti {
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
 	public final static String NOME_CACHE_SERVICES_SIGLA = "cacheServicesSigla";
 	public final static String APP_AA = "AA";
+	public final static String TIPO_RAPPORTO_BORSISTA = "BORS";
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 	
 	
@@ -102,17 +104,20 @@ public class Costanti {
 	public final static String STATO_DA_AUTORIZZARE_PER_HOME = "D";
 	public final static String STATO_DA_VALIDARE_PER_HOME = "V";
 	public final static String STATO_DA_CONFERMARE_PER_HOME = "C";
+	public final static String STATO_ALLA_VALIDAZIONE_AMM_PER_HOME = "VA";
 	public final static String STATO_PER_RESPONSABILE_GRUPPO_PER_HOME = "M";
 	public final static String CDS_SAC = "000";
 	public final static String UO_SAC_PROGETTI = "000.000";
     public final static String TIPO_ORDINE_DI_MISSIONE = "O";
     public final static String TIPO_RIMBORSO_MISSIONE = "R";
     public final static String TIPO_ANNULLAMENTO_ORDINE_MISSIONE = "A";
+    public final static String TIPO_ANNULLAMENTO_RIMBORSO_MISSIONE = "C";
     public final static String CODICE_DIVISA_DEFAULT_SIGLA = "EURO";
 	public final static Long NAZIONE_ITALIA_SIGLA = new Long ("1");
 	public final static String SI = "Sì";
 	public final static String NO = "No";
 	public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
+	public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
 	
 	public final static Map<String, String> PRIORITA;
