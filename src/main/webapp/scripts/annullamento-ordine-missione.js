@@ -26,14 +26,19 @@ missioniApp.factory('AnnullamentoOrdineMissioneService', function ($resource, Da
 
 missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, AnnullamentoOrdineMissioneService, OrdineMissioneService, 
             ProxyService, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, AccessToken,
-            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session) {
+            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session, DateService) {
 
     $scope.giaRimborsato = "N";
     var urlRestProxy = URL_REST.STANDARD;
     $scope.today = function() {
         // Today + 1 day - needed if the current day must be included
-        var today = new Date();
-        today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
+        var today = DateService.today().then(function(result){
+            if (result){
+                var oggi = new Date(result.getFullYear(), result.getMonth(), result.getDate()); // create new date
+                $scope.oggi = oggi;
+                return oggi;
+            }
+        });
         return today;
     }
 
@@ -56,7 +61,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
 
                 $scope.annullamentoModel.idOrdineMissione = idOrdineMissione;
                 $scope.annullamentoModel.ordineMissione = ordineMissioneSelected;
-                var today = $scope.today();
+                var today = $scope.oggi;
                 $scope.annullamentoModel.dataInserimento = today;
                 $scope.annullamentoModel.anno = today.getFullYear();
 
@@ -625,7 +630,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
         $scope.missioneEsteraConTam = null;
         $scope.missioneEstera = null;
         $scope.annullamentoModel.uid = account.login;
-        var today = $scope.today();
+        var today = $scope.oggi;
         $scope.annullamentoModel.dataInserimento = today;
         $scope.annullamentoModel.anno = today.getFullYear();
         $scope.showObbligoRientro = null;
@@ -863,6 +868,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                                 $scope.restCapitoli(model.anno);
                                 $scope.annullamentoModel = model;
                                 $scope.inizializzaFormPerModifica();
+                                $scope.today();
                                 $scope.gestioneUtenteAbilitatoValidare(model.ordineMissione.uoSpesa);
                             }
             });
@@ -871,29 +877,35 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
         var uoForUsersSpecial = accountLog.uoForUsersSpecial;
         if (uoForUsersSpecial){
             $scope.userSpecial = true;
-            var anno = $scope.today().getFullYear();
-            var elenco = ProxyService.getUos(anno, null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
-	            $scope.uoForUsersSpecial = [];
-	        	if (result && result.data){
-			        var uos = result.data.elements;
-			        var ind = -1;
-	                for (var i=0; i<uos.length; i++) {
-	                    for (var k=0; k<uoForUsersSpecial.length; k++) {
-	                        if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
-	                                ind ++;
-	                                $scope.uoForUsersSpecial[ind] = uos[i];
-	                        }
-	                    }
-	                }
-	                if ($scope.uoForUsersSpecial.length === 1){
-	                    $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
-	                }
-	            } 
+            var today = DateService.today().then(function(result){
+                if (result){
+                    $scope.oggi = result;
+                    var elenco = ProxyService.getUos(result.getFullYear(), null, ProxyService.buildUoRichiedenteSiglaFromUoSiper(accountLog)).then(function(result){
+                        $scope.uoForUsersSpecial = [];
+                        if (result && result.data){
+                            var uos = result.data.elements;
+                            var ind = -1;
+                            for (var i=0; i<uos.length; i++) {
+                                for (var k=0; k<uoForUsersSpecial.length; k++) {
+                                    if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                            ind ++;
+                                            $scope.uoForUsersSpecial[ind] = uos[i];
+                                    }
+                                }
+                            }
+                            if ($scope.uoForUsersSpecial.length === 1){
+                                $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                            }
+                        } 
+                    });
+                }   
             });
+
         } else {
             $scope.accountModel = $sessionStorage.account;
             $sessionStorage.accountWork = $scope.accountModel;
             $scope.restOrdiniMissioneDaAnnullare($sessionStorage.accountWork);
+            $scope.today();
         }
     }
 });

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,6 +43,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati";
 	public static final String CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione";
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO = "Allegati al Rimborso Missione";
+	public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANNULLAMENTO = "Allegati all'Annullamento del Rimborso Missione";
 	public static final String CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO = "Giustificativo";
 	public static final String CMIS_PROPERTY_NAME_ID_ORDINE_MISSIONE = "missioni:ordine_id";
 	public static final String CMIS_PROPERTY_NAME_TOT_RIMBORSO_MISSIONE = "missioni:totRimborsoMissione";
@@ -128,6 +130,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Size(min = 0, max = 256)
     @Column(name = "UID", length = 256, nullable = false)
     public String uid;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "AUTO_PROPRIA", length = 1, nullable = true)
+    public String autoPropria;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "VALIDA_AMM", length = 1, nullable = true)
+    public String validaAmm;
 
     @Column(name = "CUG", length = 1, nullable = true)
     public String cug;
@@ -334,6 +344,16 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "RIMBORSO_0", length = 1, nullable = true)
     private String rimborso0;
 
+    @Column(name = "ANNO_INIZIALE", length = 4, nullable = true)
+    public Integer annoIniziale;
+
+    @Column(name = "NUMERO_INIZIALE", length = 50, nullable = true)
+    public Long numeroIniziale;
+
+    @Size(min = 0, max = 20)
+    @Column(name = "UO_CONTR_AMM", length = 20, nullable = true)
+    private String uoContrAmm;
+
 	@Transient
     private String daValidazione;
 	
@@ -383,7 +403,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     private BigDecimal totaleRimborsoComplessivo;
 
 	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
-			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich, String trattamento){
+			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich, String trattamento, String validaAmm){
 		super();
 		this.setId(id);
 		this.setAnno(anno);
@@ -400,6 +420,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.setValidato(validato);
 		this.setUoRich(uoRich);
 		this.setTrattamento(trattamento);
+		this.setValidaAmm(validaAmm);
 	}
 
 	public RimborsoMissione(){
@@ -421,7 +442,8 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 			add(Projections.property("dataFineMissione")).
 			add(Projections.property("validato")).
 			add(Projections.property("uoRich")).
-			add(Projections.property("trattamento"));
+			add(Projections.property("trattamento")).
+			add(Projections.property("validaAmm"));
 
 	public void setStato(String stato) {
 		this.stato = stato;
@@ -464,7 +486,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
 	public String constructCMISNomeFile() {
 		StringBuffer nomeFile = new StringBuffer();
-		nomeFile = nomeFile.append(Utility.lpad(this.getNumero().toString(),9,'0'));
+		nomeFile = nomeFile.append(Utility.lpad(this.getNumeroIniziale().toString(),9,'0'));
 		return nomeFile.toString();
 	}
 
@@ -1383,11 +1405,52 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.cug = cug;
 	}
 
+	public Integer getAnnoIniziale() {
+		return Optional.ofNullable(annoIniziale).orElse(getAnno());
+	}
+
+	public void setAnnoIniziale(Integer annoIniziale) {
+		this.annoIniziale = annoIniziale;
+	}
+
+	public Long getNumeroIniziale() {
+		return Optional.ofNullable(numeroIniziale).orElse(getNumero());
+	}
+
+	public void setNumeroIniziale(Long numeroIniziale) {
+		this.numeroIniziale = numeroIniziale;
+	}
+
 	public String getPresidente() {
 		return presidente;
 	}
 
 	public void setPresidente(String presidente) {
 		this.presidente = presidente;
+	}
+
+	public String getValidaAmm() {
+		return validaAmm;
+	}
+
+	public void setValidaAmm(String validaAmm) {
+		this.validaAmm = validaAmm;
+	}
+	public Boolean isAllaValidazioneAmministrativa(){
+		return Utility.nvl(getValidaAmm(), "S").equals("N");
+	}
+	public Boolean isValidazioneAmministrativaNonValorizzata(){
+		return getValidaAmm() == null;
+	}
+	public Boolean isPassataValidazioneAmministrativa(){
+		return Utility.nvl(getValidaAmm(), "N").equals("S");
+	}
+
+	public String getUoContrAmm() {
+		return uoContrAmm;
+	}
+
+	public void setUoContrAmm(String uoContrAmm) {
+		this.uoContrAmm = uoContrAmm;
 	}
 }

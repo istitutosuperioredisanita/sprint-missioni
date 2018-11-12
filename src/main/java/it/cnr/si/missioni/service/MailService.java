@@ -59,6 +59,11 @@ public class MailService {
     }
     
 	public String[] prepareTo(List<UsersSpecial> lista) {
+		List<String> listaEmail = preparaListaMail(lista);
+		return preparaElencoMail(listaEmail);
+	}
+
+	public List<String> preparaListaMail(List<UsersSpecial> lista) {
 		List<String> listaEmail = new ArrayList<>();
 		for (int i = 0; i < lista.size(); i++){
 			UsersSpecial user = lista.get(i);
@@ -67,6 +72,10 @@ public class MailService {
 				listaEmail.add(mail);
 			}
 		}
+		return listaEmail;
+	}
+
+	public String[] preparaElencoMail(List<String> listaEmail) {
 		if (!listaEmail.isEmpty()){
 			String[] elencoMail = new String[listaEmail.size()];
 			elencoMail = listaEmail.toArray(elencoMail); 

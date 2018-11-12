@@ -2,6 +2,7 @@ package it.cnr.si.missioni.cmis;
 
 public enum CMISRimborsoMissioneAspect {
 	RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI("P:missioni_rimborso_attachment:allegati"),
+	RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI_ANNULLAMENTO("P:missioni_rimborso_attachment:allegati_annullamento"),
 	RIMBORSO_MISSIONE_ATTACHMENT_SCONTRINI("P:missioni_rimborso_attachment:scontrini"),
 	RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO("P:missioni_rimborso_attachment:rimborso");
 	

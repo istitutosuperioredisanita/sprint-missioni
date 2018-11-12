@@ -424,6 +424,9 @@ public class OrdineMissioneService {
 		CriterionList criterionList = new CriterionList();
 		List<OrdineMissione> ordineMissioneList=null;
 		if (filter != null){
+			if (filter.getUoRich() != null && filter.getUser() != null){
+				filter.setUoRich(null);
+			}
 			if (filter.getAnno() != null){
 				criterionList.add(Restrictions.eq("anno", filter.getAnno()));
 			}
@@ -515,6 +518,17 @@ public class OrdineMissioneService {
 			criterionList.add(Restrictions.eq("stato", Costanti.STATO_CONFERMATO));
 			criterionList.add(Restrictions.eq("validato", "S"));
 			ordineMissioneList = crudServiceBean.findByProjection(principal, OrdineMissione.class, OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
+			if (Utility.nvl(filter.getRecuperoAutoPropria()).equals("S")){
+				for (OrdineMissione ordineMissione : ordineMissioneList){
+					OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()));
+					if (autoPropria != null){
+						ordineMissione.setUtilizzoAutoPropria("S");
+					} else {
+						ordineMissione.setUtilizzoAutoPropria("N");
+					}
+				}
+			}
+
 			return ordineMissioneList;
 			
 		} else {
@@ -585,6 +599,18 @@ public class OrdineMissioneService {
 				}
 			} else
 				ordineMissioneList = crudServiceBean.findByCriterion(principal, OrdineMissione.class, criterionList, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
+
+			if (Utility.nvl(filter.getRecuperoAutoPropria()).equals("S")){
+				for (OrdineMissione ordineMissione : ordineMissioneList){
+					OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()));
+					if (autoPropria != null){
+						ordineMissione.setUtilizzoAutoPropria("S");
+					} else {
+						ordineMissione.setUtilizzoAutoPropria("N");
+					}
+				}
+			}
+
 			return ordineMissioneList;
 		}
     }
@@ -1003,7 +1029,6 @@ public class OrdineMissioneService {
 		if (lista != null && lista.size() > 0){
 			String[] elencoMail = mailService.prepareTo(lista);
 			if (elencoMail != null && elencoMail.length > 0){
-				log.info("Users Administrative to send Mail: "+elencoMail.toString());
 				mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
 			}
 		}

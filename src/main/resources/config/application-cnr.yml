@@ -16,7 +16,8 @@ spring:
 
     proxy:
         SIGLA:
-            url: http://sigla-main.test.si.cnr.it/SIGLA/
+        #    url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
+            url: http://sigla-main-multi-impegni.test.si.cnr.it/SIGLA/
         #    url: http://localhost:8080/SIGLA/
         #    url: http://contab.cnr.it:90/SIGLA/
             username: MISSIONI
@@ -69,6 +70,8 @@ spring:
 ajp:
     port: 8009
     timeout: 120000
+
+audit: false
 
 siper:
   url: ${spring.proxy.SIPER.url}json/userinfo/

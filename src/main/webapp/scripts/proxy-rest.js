@@ -65,6 +65,10 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return codice.substring(0,3)+'.'+codice.substring(3,6);
     }
 
+    var estraiUo = function(codice){
+        return codice.substring(0,3)+'.'+codice.substring(3,6);
+    }
+
     var estraiUoRichFromAccount = function(account){
         if (account.codice_uo){
             return estraiUo(account.codice_uo);
@@ -80,6 +84,38 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         }
         return false;
     }
+
+    var tipiMissione = [
+       {tipo:'Italia', value: 'I'},
+       {tipo:'Estera', value: 'E'}
+    ];
+
+    var luoghiDiPartenza = [
+       {partenza:'Sede di Lavoro', value: 'S'},
+       {partenza:'Residenza/Domicilio Fiscale', value: 'R'},
+       {partenza:'Altro', value: 'A'}
+    ];
+
+    var valoriPriorita = [
+       {priorita:'Critica', value: '5'},
+       {priorita:'Importante', value: '3'},
+       {priorita:'Media', value: '1'}
+    ];
+
+    var trattamenti = [
+       {trattamento:'Rimborso Documentato', value: 'R'},
+       {trattamento:'Trattamento Alternativo di Missione', value: 'T'}
+    ];
+
+    var fondi = [
+       {fondo:'Competenza', value: 'C'},
+       {fondo:'Residuo', value: 'R'}
+    ];
+
+    var obblighiRientro = [
+       {rientro:'Sì', value: 'S'},
+       {rientro:'No', value: 'N'}
+    ];
 
     var recuperoDatiPerson = function(username){
         var urlRestProxy = URL_REST.STANDARD;
@@ -293,6 +329,26 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         });
     }
 
+    var recuperoMandatoMissioneSigla = function(rimborso){
+        var urlRestProxy = URL_REST.STANDARD;
+        var mand = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.MANDATO_MISSIONE_SIGLA;
+        var objectPostMandClauses = [{condition: 'AND', fieldName: 'cd_cds_doc_amm', operator: "=", fieldValue:rimborso.cdCdsSigla},
+                                    {condition: 'AND', fieldName: 'cd_uo_doc_amm', operator: "=", fieldValue:rimborso.cdUoSigla},
+                                    {condition: 'AND', fieldName: 'esercizio_doc_amm', operator: "=", fieldValue:rimborso.esercizioSigla},
+                                    {condition: 'AND', fieldName: 'ds_tipo_doc_amm', operator: "=", fieldValue:"Missione"},
+                                    {condition: 'AND', fieldName: 'pg_doc_amm', operator: "=", fieldValue:rimborso.pgMissioneSigla}];
+        var objectPostMand = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostMandClauses}
+        return $http.post(urlRestProxy + app+'/', objectPostMand, {params: {proxyURL: url}}).success(function (data) {
+            if (data){
+                mand = data.elements;
+            }
+            return mand;
+        }).error(function (data) {
+        });
+    }
+
     var recuperoMandato = function(cdTerzo, annoMandato, numeroMandato){
         var urlRestProxy = URL_REST.STANDARD;
         var man = [];
@@ -465,6 +521,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getInquadramento: recuperoDatiInquadramento,
              getTerzoPerCompenso: recuperoDatiTerzoPerCompenso,
              getModalitaPagamento: recuperoModalitaPagamento,
+             getMandatiMissioneSigla: recuperoMandatoMissioneSigla,
              getTipiSpesa: recuperoTipoSpesa,
              getRimborsoKm: recuperoRimborsoKm,
              getTipiPasto: recuperoTipoPasto,
@@ -475,6 +532,12 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              getTerzoModalitaPagamento: recuperoTerzoModalitaPagamento,
              buildPerson: createPerson ,
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
-             buildUoSiglaFromUoSiper: estraiUo };
+             buildUoSiglaFromUoSiper: estraiUo,
+             valueTipiMissione: tipiMissione,
+             valueLuoghiDiPartenza: luoghiDiPartenza,
+             valuePriorita: valoriPriorita,
+             valueTrattamenti: trattamenti,
+             valueFondi: fondi,
+             valueObblighiRientro: obblighiRientro };
 });
 

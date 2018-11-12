@@ -1,12 +1,16 @@
 'use strict';
 
-missioniApp.controller('OrdiniMissioneDaRendereDefinitiviController', function ($scope, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService) {
+missioniApp.controller('OrdiniMissioneDaRendereDefinitiviController', function ($scope, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
 
     $scope.today = function() {
             // Today + 1 day - needed if the current day must be included
-            var today = new Date();
-            today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // create new date
-            return today;
+        var today = DateService.today().then(function(result){
+            if (result){
+                var oggi = new Date(result.getFullYear(), result.getMonth(), result.getDate()); // create new date
+                return oggi;
+            }
+        });
+        return today;
     };
 
     $scope.ricerca = function () {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -56,6 +56,16 @@
     <include file="classpath:config/liquibase/changelog/20180411115500_add_column_delega_spesa.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180530153000_add_column_presidente.xml" relativeToChangelogFile="false"/>
 
+    <include file="classpath:config/liquibase/changelog/20180330110000_add_table_rimborso_impegni.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180404121000_add_column_rimborso_missioni_dettagli.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180410121000_add_column_rimborso_iniziale.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180201162400_add_column_dati_istituto_uo_firma.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180921141000_add_column_rimborso_auto_propria.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180928145700_add_table_annullamento_rimborso.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181004125700_update_dati_istituto.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181019161000_add_column_rimborso_valida_amm.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181107125700_update_rimborso_iniziale.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181107131000_add_column_date_blocco_ins_rimborso.xml" relativeToChangelogFile="false"/>
 
     <!-- JHipster will add liquibase changelogs here -->
 

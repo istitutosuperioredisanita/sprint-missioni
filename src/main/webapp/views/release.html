@@ -1,0 +1,12 @@
+                <div class="panel-body text-left">
+                    <ul class="list-unstyled releases">
+                        <li ng-repeat="release in releases">
+                            <markdown content="{{release.content}}"></markdown>
+                        </li>
+                    </ul>
+                </div>
+            <div >
+              <ul class="pager">
+                <li class="previous"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
+              </ul>
+            </div>

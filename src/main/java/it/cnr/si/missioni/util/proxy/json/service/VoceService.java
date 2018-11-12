@@ -24,9 +24,9 @@ public class VoceService {
 	@Autowired
     private CommonService commonService;
 
-	public Voce loadVoce(OrdineMissione ordineMissione) throws AwesomeException {
-		if (ordineMissione.getVoce() != null){
-			List<JSONClause> clauses = prepareJSONClause(ordineMissione);
+	public Voce loadVoce(Integer anno, String voce) throws AwesomeException {
+		if (voce != null){
+			List<JSONClause> clauses = prepareJSONClause(anno, voce);
 
 			String app = Costanti.APP_SIGLA;
 			String url = Costanti.REST_VOCE;
@@ -44,32 +44,19 @@ public class VoceService {
 			} catch (Exception ex) {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per le voci ("+Utility.getMessageException(ex)+").");
 			}
+			
 		}
 		return null;
 	}
+	public Voce loadVoce(OrdineMissione ordineMissione) throws AwesomeException {
+		return loadVoce(ordineMissione.getAnno(), ordineMissione.getVoce());
+	}
 
 	public Voce loadVoce(RimborsoMissione rimborsoMissione) throws AwesomeException {
-		if (rimborsoMissione.getVoce() != null){
-			List<JSONClause> clauses = prepareJSONClause(rimborsoMissione);
+		LocalDate data = LocalDate.now();
+		int anno = data.getYear();
 
-			String app = Costanti.APP_SIGLA;
-			String url = Costanti.REST_VOCE;
-			String risposta = commonService.process(clauses, app, url);
-
-			try {
-				ObjectMapper mapper = new ObjectMapper();
-				VoceJson voceJson = mapper.readValue(risposta, VoceJson.class);
-				if (voceJson != null){
-					List<Voce> lista = voceJson.getElements();
-					if (lista != null && !lista.isEmpty()){
-						return lista.get(0);
-					}
-				}
-			} catch (Exception ex) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per le voci ("+Utility.getMessageException(ex)+").");
-			}
-		}
-		return null;
+		return loadVoce(anno, rimborsoMissione.getVoce());
 	}
 
 	public List<JSONClause> prepareJSONClause(OrdineMissione ordineMissione) {
