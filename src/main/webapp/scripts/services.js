@@ -208,7 +208,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils) {
     var today = new Date();
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
@@ -278,7 +278,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 if (data.strutturaAppartenenza ) {
                                     if (data.comune_residenza){
                                         comune_residenza = data.comune_residenza;
-                                        if (data.matricola && ((data.data_cessazione && data.data_cessazione >= today) || (!data.data_cessazione))){
+                                        if (data.matricola && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
                                             Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                         data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                         data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
@@ -376,7 +376,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                         if (data.struttura_appartenenza){
                                             if (data.comune_residenza){
                                                 comune_residenza = data.comune_residenza;
-                                                if (data.matricola && ((data.data_cessazione && data.data_cessazione >= today) || (!data.data_cessazione))){
+                                                if (data.matricola && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
                                                     Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                 data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
