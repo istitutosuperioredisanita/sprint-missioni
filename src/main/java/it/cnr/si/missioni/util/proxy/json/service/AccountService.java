@@ -1,4 +1,4 @@
-﻿package it.cnr.si.missioni.util.proxy.json.service;
+package it.cnr.si.missioni.util.proxy.json.service;
 
 import java.security.Principal;
 import java.time.ZonedDateTime;
