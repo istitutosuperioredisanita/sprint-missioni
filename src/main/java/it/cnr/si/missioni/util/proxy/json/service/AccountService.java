@@ -1,4 +1,4 @@
-package it.cnr.si.missioni.util.proxy.json.service;
+﻿package it.cnr.si.missioni.util.proxy.json.service;
 
 import java.security.Principal;
 import java.time.ZonedDateTime;
@@ -291,7 +291,7 @@ public class AccountService {
 		String userNameFirmatario;
 		DatiSede dati = null;
 		Boolean delegaSpesa = false;
-		if (account.getCodiceSede() != null && account.getCodiceUo() != null && Utility.getUoSigla(account.getCodiceUo()).equals(uo)){
+		if (account.getCodiceSede() != null && account.getCodiceUo() != null && Utility.getUoSigla(account.getCodiceUo()).equals(Utility.getUoSigla(uo))){
 			dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
 			if (dati != null && dati.getResponsabile() != null && Utility.nvl(dati.getDelegaSpesa()).equals("S")){
 				delegaSpesa = true;
