@@ -6,9 +6,11 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     var calcoloDataDa = function(){
         var meseAttuale = today.getMonth();
         if (meseAttuale == 0){
+             return new Date(today.getFullYear() - 1 , 10, 1);
+        } else if (meseAttuale == 1){
              return new Date(today.getFullYear() - 1 , 11, 1);
         } else {
-             return new Date(today.getFullYear(), meseAttuale - 1, 1);
+             return new Date(today.getFullYear(), meseAttuale - 2, 1);
         }
         return today;
     }
