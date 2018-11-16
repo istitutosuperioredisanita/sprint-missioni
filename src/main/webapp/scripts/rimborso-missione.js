@@ -925,7 +925,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.inizializzaFormPerModifica = function(){
         $scope.showEsisteRimborsoMissione = true;
-        if ($scope.rimborsoMissioneModel.statoFlusso === "INV" && $scope.rimborsoMissioneModel.stato === "INS" && $scope.rimborsoMissioneModel.commentFlows){
+        if ($scope.rimborsoMissioneModel.statoFlusso === 'INV' && $scope.rimborsoMissioneModel.stato === 'INS' && $scope.rimborsoMissioneModel.commentFlows){
 	        $scope.showCommentFlows = true;
         } else {
 	        $scope.showCommentFlows = false;
