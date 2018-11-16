@@ -55,6 +55,9 @@
     <include file="classpath:config/liquibase/changelog/20180411113500_modify_column_note_respingi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180411115500_add_column_delega_spesa.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180530153000_add_column_presidente.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20180410121000_add_column_rimborso_iniziale.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181107125700_update_rimborso_iniziale.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20181107131000_add_column_date_blocco_ins_rimborso.xml" relativeToChangelogFile="false"/>
 
 
     <!-- JHipster will add liquibase changelogs here -->
