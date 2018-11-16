@@ -54,7 +54,6 @@ import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -424,6 +423,9 @@ public class OrdineMissioneService {
 		CriterionList criterionList = new CriterionList();
 		List<OrdineMissione> ordineMissioneList=null;
 		if (filter != null){
+			if (filter.getUoRich() != null && filter.getUser() != null){
+				filter.setUoRich(null);
+			}
 			if (filter.getAnno() != null){
 				criterionList.add(Restrictions.eq("anno", filter.getAnno()));
 			}
