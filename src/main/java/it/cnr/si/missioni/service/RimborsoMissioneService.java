@@ -1471,6 +1471,9 @@ public class RimborsoMissioneService {
 		LocalDate data = LocalDate.now();
 		if (data.getYear() == rimborsoMissione.getAnno()){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+			if (dati == null){
+				return false;
+			}
 			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
 				if (dati.getDataBloccoRimborsiTam() != null){
 					if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
