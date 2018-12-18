@@ -432,7 +432,7 @@ public class CMISRimborsoMissioneService {
 		CmisPath cmisPath = missioniCMISService.getBasePath();
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, rimborsoMissione.getUoSpesa());
 		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Rimborso Missione");
-		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Anno "+rimborsoMissione.getAnno());
+		cmisPath = missioniCMISService.createFolderIfNotPresent(cmisPath, "Anno "+rimborsoMissione.getAnnoIniziale());
 		cmisPath = createLastFolderIfNotPresent(cmisPath, rimborsoMissione);
 		return cmisPath;
 	}
@@ -890,7 +890,7 @@ public class CMISRimborsoMissioneService {
 						.orElse(""),
 				"Rimborso Missione",
 				Optional.ofNullable(rimborsoMissione)
-						.map(rimborso -> "Anno " + String.valueOf(rimborso.getAnno()))
+						.map(rimborso -> "Anno " + String.valueOf(rimborso.getAnnoIniziale()))
 						.orElse("0"),
 				String.valueOf(missioniCMISService.sanitizeFilename(rimborsoMissione.constructCMISNomeFile()))
 		).stream().collect(
