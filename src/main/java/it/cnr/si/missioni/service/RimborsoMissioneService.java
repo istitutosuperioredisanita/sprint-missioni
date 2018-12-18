@@ -857,6 +857,8 @@ public class RimborsoMissioneService {
 		bloccoInserimentoRimborsi(rimborsoMissione, datiIstituto);
 
     	rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), anno , Costanti.TIPO_RIMBORSO_MISSIONE));
+    	rimborsoMissione.setAnnoIniziale(rimborsoMissione.getAnno());
+    	rimborsoMissione.setNumeroIniziale(rimborsoMissione.getNumero());
 
     	aggiornaValidazione(principal, rimborsoMissione);
     	

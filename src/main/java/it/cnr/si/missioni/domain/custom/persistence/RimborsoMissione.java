@@ -334,6 +334,12 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "RIMBORSO_0", length = 1, nullable = true)
     private String rimborso0;
 
+    @Column(name = "ANNO_INIZIALE", length = 4, nullable = true)
+    public Integer annoIniziale;
+
+    @Column(name = "NUMERO_INIZIALE", length = 50, nullable = true)
+    public Long numeroIniziale;
+
 	@Transient
     private String daValidazione;
 	
@@ -464,7 +470,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
 	public String constructCMISNomeFile() {
 		StringBuffer nomeFile = new StringBuffer();
-		nomeFile = nomeFile.append(Utility.lpad(this.getNumero().toString(),9,'0'));
+		nomeFile = nomeFile.append(Utility.lpad(this.getNumeroIniziale().toString(),9,'0'));
 		return nomeFile.toString();
 	}
 
@@ -1381,6 +1387,22 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
 	public void setCug(String cug) {
 		this.cug = cug;
+	}
+
+	public Integer getAnnoIniziale() {
+		return Optional.ofNullable(annoIniziale).orElse(getAnno());
+	}
+
+	public void setAnnoIniziale(Integer annoIniziale) {
+		this.annoIniziale = annoIniziale;
+	}
+
+	public Long getNumeroIniziale() {
+		return Optional.ofNullable(numeroIniziale).orElse(getNumero());
+	}
+
+	public void setNumeroIniziale(Long numeroIniziale) {
+		this.numeroIniziale = numeroIniziale;
 	}
 
 	public String getPresidente() {
