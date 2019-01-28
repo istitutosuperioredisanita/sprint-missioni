@@ -84,8 +84,6 @@ public class FlowsService {
 					ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
 			    	return result;
 				}
-	    	} else {
-	    		rimborsoMissioneService.ribaltaMissione(principal, rimborsoMissione);
 			}
 		}
 		return null;
@@ -150,6 +148,8 @@ public class FlowsService {
 					rimborsoMissioneService.aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissione);
 			    	return result;
 				}
+	    	} else {
+	    		rimborsoMissioneService.ribaltaMissione(principal, rimborsoMissione);
 	    	}
 		}
     	return null;
