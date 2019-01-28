@@ -247,7 +247,7 @@ public class RimborsoMissioneService {
 			throws ComponentException {
 		retrieveDetails(principal, rimborsoMissioneDaAggiornare);
 		if (!rimborsoMissioneDaAggiornare.isTrattamentoAlternativoMissione()){
-			if (rimborsoMissioneDaAggiornare.getTotaleRimborso().compareTo(BigDecimal.ZERO) == 0){
+			if (rimborsoMissioneDaAggiornare.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) == 0){
 				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_DA_NON_COMUNICARE);
 			} else {
 				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
@@ -255,6 +255,11 @@ public class RimborsoMissioneService {
 		} else {
 			rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
 		}
+		LocalDate data = LocalDate.now();
+		if (rimborsoMissioneDaAggiornare.getStatoInvioSigla().equals(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE) && data.getYear() > rimborsoMissioneDaAggiornare.getAnno()){
+			ribaltaMissione(principal, rimborsoMissioneDaAggiornare);
+		}
+
 		gestioneMailResponsabileGruppo(principal, rimborsoMissioneDaAggiornare);
 		List<UsersSpecial> listaUtenti = new ArrayList<>();
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoRich(), rimborsoMissioneDaAggiornare.getAnno());
