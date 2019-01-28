@@ -84,6 +84,8 @@ public class FlowsService {
 					ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
 			    	return result;
 				}
+	    	} else {
+	    		rimborsoMissioneService.ribaltaMissione(principal, rimborsoMissione);
 			}
 		}
 		return null;
