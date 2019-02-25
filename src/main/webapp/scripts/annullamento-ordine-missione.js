@@ -544,10 +544,9 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
         if ($scope.esisteAnnullamento && ($scope.annullamentoModel.stato === 'DEF' || 
             $scope.annullamentoModel.statoFlusso === 'APP' || $scope.annullamentoModel.stato === 'ANN' || 
             ($scope.annullamentoModel.stato === 'CON' && 
-               ($scope.annullamentoModel.statoFlusso === 'INV' ||
-                $scope.annullamentoModel.stateFlows === 'ANNULLATO' ||
-                $scope.annullamentoModel.stateFlows === 'FIRMA SPESA RIMBORSO' ||
-                $scope.annullamentoModel.stateFlows === 'FIRMA UO RIMBORSO' ||
+               ($scope.annullamentoModel.stateFlows === 'ANNULLATO' ||
+                $scope.annullamentoModel.stateFlows === 'FIRMA SPESA REVOCA' ||
+                $scope.annullamentoModel.stateFlows === 'FIRMA UO REVOCA' ||
                 $scope.annullamentoModel.stateFlows === 'FIRMATO')))) {
           return true;
         } else {
