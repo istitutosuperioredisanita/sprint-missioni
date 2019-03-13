@@ -315,7 +315,8 @@ public class RimborsoMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
-					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
+					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+					rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
 			rabbitMQService.send(missione);
 		}
 	}
