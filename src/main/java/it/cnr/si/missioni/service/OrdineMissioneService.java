@@ -398,7 +398,8 @@ public class OrdineMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.ORDINE, new Long(ordineMissione.getId().toString()), idSede, 
-					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null, ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
+					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione(), null, ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+					ordineMissione.getAnno(), ordineMissione.getNumero());
 			rabbitMQService.send(missione);
 		}
 	}
