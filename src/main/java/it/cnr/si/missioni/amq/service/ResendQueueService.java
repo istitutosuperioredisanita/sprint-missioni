@@ -28,6 +28,7 @@ public class ResendQueueService {
 
     public void resendQueue(DataQueue dataQueue){
     	if (dataQueue != null){
+    	    LOGGER.info("Esiste Coda");
     		for (Queue queue : dataQueue.getQueues()){
     			switch (queue.getTipo()) {
 				case "Ordine":
