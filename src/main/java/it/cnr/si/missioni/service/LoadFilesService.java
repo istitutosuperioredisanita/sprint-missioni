@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import it.cnr.si.missioni.amq.service.ResendQueueService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.DataQueue;
 import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Faq;
@@ -32,6 +34,9 @@ public class LoadFilesService {
     private MissioniCMISService missioniCMISService;
 
     @Autowired
+    private ResendQueueService resendQueueService;
+
+	@Autowired
     private Environment env;
 
 	private RelaxedPropertyResolver propertyResolver;	
@@ -196,5 +201,33 @@ public class LoadFilesService {
 		return is;
 	}
 
+	public void resendQueue() {
+		DataQueue queue = loadDataForQueue();
+		resendQueueService.resendQueue(queue);
+	}
+	public DataQueue loadDataForQueue() {
+		InputStream is = getQueue();
+		if (is == null){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle uo non trovato.");
+		}
+		try {
+			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, DataQueue.class); 
+		} catch (Exception e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle uo." + Utility.getMessageException(e));
+		}
+	}
+
+	private String getFileNameFromQueue(){
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   			return "queueDev.json";
+   		} else {
+   			return "queue.json";
+   		}
+	}
+	
+	private InputStream getQueue() {
+		String fileName = getFileNameFromQueue();
+		return recuperoFile(fileName);
+	}
 
 }
