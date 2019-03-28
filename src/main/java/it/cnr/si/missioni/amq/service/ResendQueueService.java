@@ -31,13 +31,13 @@ public class ResendQueueService {
     	    LOGGER.info("Esiste Coda");
     		for (Queue queue : dataQueue.getQueues()){
     			switch (queue.getTipo()) {
-				case "Ordine":
+				case "ORDINE":
 					ordineMissioneService.popolaCoda(queue.getId());
 					break;
-				case "Annullamento":
+				case "ANNULLAMENTO":
 					annullamentoOrdineMissioneService.popolaCoda(queue.getId());
 					break;
-				case "Rimborso":
+				case "RIMBORSO":
 					rimborsoMissioneService.popolaCoda(queue.getId());
 					break;
 				}
