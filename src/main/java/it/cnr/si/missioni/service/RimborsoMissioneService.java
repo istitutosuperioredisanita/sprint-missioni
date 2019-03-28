@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
@@ -1533,6 +1534,10 @@ public class RimborsoMissioneService {
 		}
 	}
 
+	public void popolaCoda(String id){
+		RimborsoMissione missione = (RimborsoMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), RimborsoMissione.class, new Long(id));
+		popolaCoda(missione);
+	}
 
 }
 
