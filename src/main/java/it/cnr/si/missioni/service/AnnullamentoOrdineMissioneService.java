@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
@@ -676,5 +677,15 @@ public class AnnullamentoOrdineMissioneService {
 		return map;
 	}
 
+	public void popolaCoda(String id){
+		AnnullamentoOrdineMissione missione = (AnnullamentoOrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), AnnullamentoOrdineMissione.class, new Long(id));
+    	if (missione.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), OrdineMissione.class, missione.getOrdineMissione().getId());
+        	if (ordineMissione != null){
+        		missione.setOrdineMissione(ordineMissione);
+        	}
+    	}
+		popolaCoda(missione);
+	}
 }
 
