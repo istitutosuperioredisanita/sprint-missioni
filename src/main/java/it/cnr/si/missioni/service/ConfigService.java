@@ -116,4 +116,7 @@ public class ConfigService {
 		return utentiPresidenteSpeciali;
 	}
 
+	public void resendQueue() {
+		loadFilesService.resendQueue();
+	}
 }
