@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.BusyResourceException;
@@ -1361,5 +1362,9 @@ public class OrdineMissioneService {
         		missioniCMISService.deleteNode(idNodo);
 			}
 		}
+	}
+	public void popolaCoda(String id){
+		OrdineMissione missione = (OrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), OrdineMissione.class, new Long(id));
+		popolaCoda(missione);
 	}
 }
