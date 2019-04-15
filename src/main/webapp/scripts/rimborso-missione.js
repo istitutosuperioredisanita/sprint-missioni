@@ -432,6 +432,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 if (modalitaPagamento.cd_modalita_pag === modpag){
                     $scope.rimborsoMissioneModel.tipoPagamento = modalitaPagamento.ti_pagamento;
                     $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, modalitaPagamento.ti_pagamento);
+                    $scope.rimborsoMissioneModel.iban = null;
+                    $scope.rimborsoMissioneModel.pgBanca = null;
                 }
             }
         }
