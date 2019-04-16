@@ -59,7 +59,7 @@ public class HelpdeskService {
 			ResultProxy result = proxyService.process(HttpMethod.POST, hd, Costanti.APP_HELPDESK, url, null, null, false);
 
 		} else {
-			String descrizione = "[Missioni] "+hd.getDescrizione() + System.getProperty("line.separator")+System.getProperty("line.separator")+hd.getFirstName()+
+			String descrizione = hd.getDescrizione() + System.getProperty("line.separator")+System.getProperty("line.separator")+hd.getFirstName()+
 					" "+hd.getFamilyName()+"  Email: "+hd.getEmail()+"  Data: "+DateUtils.getDateAsString(ZonedDateTime.now(), DateUtils.PATTERN_DATETIME);
 
 			hd.setDescrizione(descrizione);
