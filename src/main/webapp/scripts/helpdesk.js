@@ -39,7 +39,7 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
         $('button[name="sendMail"]').unbind( "click" );
         $('button[name="sendMail"]').click(function () {
           var hdDataModel = {};
-          hdDataModel.titolo = $scope.helpdeskModel.titolo;
+          hdDataModel.titolo = "[Missioni] "+$scope.helpdeskModel.titolo;
           hdDataModel.descrizione = $scope.helpdeskModel.descrizione;
           hdDataModel.nota = $scope.helpdeskModel.nota;
           hdDataModel.categoria = $scope.helpdeskModel.categoria;
