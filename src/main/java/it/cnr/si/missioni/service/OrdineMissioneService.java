@@ -887,6 +887,7 @@ public class OrdineMissioneService {
 			if (parametri != null && StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(ordineMissione.getUid(),"N").equals(parametri.getDipendenteCda()) && Utility.nvl(ordineMissione.getPresidente(),"N").equals("S")){
             	ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMATO_FROM_CMIS));
             	ordineMissioneDB.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+				ordineMissioneDB.setValidato("S");
             	ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
 				
 			} else if (!ordineMissioneDB.isMissioneDaValidare()){
