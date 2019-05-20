@@ -218,7 +218,7 @@ public class CronService {
 
 						aggiornaRimborsiMissioneFlows(principal);
 
-						ribaltaMissione(principal);
+//						ribaltaMissione(principal);
 
 						comunicaRimborsoSigla(principal);
 
