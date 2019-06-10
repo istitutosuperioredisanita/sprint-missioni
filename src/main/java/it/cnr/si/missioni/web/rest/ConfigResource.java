@@ -170,7 +170,7 @@ public class ConfigResource {
 			method = RequestMethod.GET)
 	@Timed
 	public void resendQueue() {
-		log.debug("REST request per reinviare in coda i dati");
+		log.info("REST request per reinviare in coda i dati");
 		configService.resendQueue();
 	}
 }
