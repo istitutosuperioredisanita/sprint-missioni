@@ -174,8 +174,10 @@ public class MissioneBulk implements Cloneable, Serializable{
     private RifInquadramento rifInquadramento;
     @JsonProperty("modalita_pagamento")
     private ModalitaPagamento modalitaPagamento;
-    @JsonProperty("missioneRigaColl")
-    private List<MissioneRigaColl> missioneRigaColl = new ArrayList<>();
+ // inizio rem aggiunta per multi impegno			
+//    @JsonProperty("missioneRigaColl")
+//    private List<MissioneRigaColl> missioneRigaColl = new ArrayList<>();
+ // fine aggiunta per multi impegno			
     @JsonProperty("tappeMissioneColl")
     private List<TappeMissioneColl> tappeMissioneColl = null;
     @JsonProperty("speseMissioneColl")
@@ -1104,12 +1106,14 @@ public class MissioneBulk implements Cloneable, Serializable{
 		this.voceGeMis = voceGeMis;
 	}
 
-	public List<MissioneRigaColl> getMissioneRigaColl() {
-		return missioneRigaColl;
-	}
-
-	public void setMissioneRigaColl(List<MissioneRigaColl> missioneRigaColl) {
-		this.missioneRigaColl = missioneRigaColl;
-	}
+	// inizio rem per multi impegno			
+//	public List<MissioneRigaColl> getMissioneRigaColl() {
+//		return missioneRigaColl;
+//	}
+//
+//	public void setMissioneRigaColl(List<MissioneRigaColl> missioneRigaColl) {
+//		this.missioneRigaColl = missioneRigaColl;
+//	}
+	// fine rem per multi impegno			
 
 }

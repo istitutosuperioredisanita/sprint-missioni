@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -182,6 +183,8 @@ public class CronService {
 
 						aggiornaRimborsiMissioneFlows(principal);
 
+//						ribaltaMissione(principal);
+
 						comunicaRimborsoSigla(principal);
 
 				        LOGGER.info("work done.");
@@ -198,6 +201,41 @@ public class CronService {
 				throw new ComponentException(e);
 			}
     }
+    
+	public void ribaltaMissione(Principal principal) throws ComponentException {
+		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
+		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+		filtroRimborso.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
+		filtroRimborso.setDaCron("S");
+		List<RimborsoMissione> listaRimborsiMissione = null;
+		try {
+			listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
+		} catch (ComponentException e2) {
+			String error = Utility.getMessageException(e2);
+			LOGGER.error(error+" "+e2);
+			try {
+				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
+			} catch (Exception e1) {
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+			}
+		}
+		if (listaRimborsiMissione != null){
+			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
+				LocalDate data = LocalDate.now();
+				if (data.getYear() > rimborsoMissione.getAnno()){
+					try {
+						flowsService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione.getId());
+					} catch (Exception e) {
+						String error = Utility.getMessageException(e);
+						String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
+						LOGGER.error(testoErrore+" "+e);
+					}
+				}
+			}
+		}
+		
+	}
+
 
 	public void aggiornaRimborsiMissioneFlows(Principal principal) throws ComponentException {
 		LOGGER.info("Cron per Aggiornamenti Rimborso Missione");

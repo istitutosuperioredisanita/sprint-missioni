@@ -291,7 +291,7 @@ public class AccountService {
 		String userNameFirmatario;
 		DatiSede dati = null;
 		Boolean delegaSpesa = false;
-		if (account.getCodiceSede() != null && account.getCodiceUo() != null && Utility.getUoSigla(account.getCodiceUo()).equals(uo)){
+		if (account.getCodiceSede() != null && account.getCodiceUo() != null && Utility.getUoSigla(account.getCodiceUo()).equals(Utility.getUoSigla(uo))){
 			dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
 			if (dati != null && dati.getResponsabile() != null && Utility.nvl(dati.getDelegaSpesa()).equals("S")){
 				delegaSpesa = true;
@@ -359,7 +359,11 @@ public class AccountService {
 				}
 			}
 		} else {
-			userNameFirmatario = getDirector(uo);
+			if (isMissioneEstera && Utility.nvl(datiIstituto.getResponsabileSoloItalia(),"N").equals("S") && !StringUtils.isEmpty(datiIstituto.getUoRespEstero()) && !isDaUoRespEstero){
+				userNameFirmatario = recuperoDirettoreDaUo(anno, datiIstituto.getUoRespEstero(), isMissioneEstera, true);
+			} else {
+				userNameFirmatario = getDirector(uo);
+			}
 		}
 		if (StringUtils.isEmpty(userNameFirmatario)){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la uo "+uo);

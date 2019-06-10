@@ -148,6 +148,8 @@ public class FlowsService {
 					rimborsoMissioneService.aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissione);
 			    	return result;
 				}
+//	    	} else {
+//	    		rimborsoMissioneService.ribaltaMissione(principal, rimborsoMissione);
 	    	}
 		}
     	return null;

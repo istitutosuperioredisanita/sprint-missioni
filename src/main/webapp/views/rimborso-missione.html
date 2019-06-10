@@ -80,8 +80,8 @@
                         </span>
                 </p>
   <div class="col-md-8">
-        <h4 ng-show="esistonoAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"></h4>
-    <table ng-show="esistonoAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+        <h4 ng-show="listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"></h4>
+    <table ng-show="listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -139,11 +139,11 @@
                           {{rimborsoMissioneModel.ordineMissione.dataFineMissione | date:'dd/MM/yyyy'}} - {{rimborsoMissioneModel.ordineMissione.destinazione}}
   </div>
 
-        <h4 class="panel-heading small-padding" align="center" ng-show="rimborsoMissioneModel.id" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
+        <h4 class="panel-heading small-padding" align="center" ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
   <div class="col-md-2">
   </div>
   <div class="col-md-8">
-    <table ng-show="rimborsoMissioneModel.id" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -463,7 +463,7 @@
                         </span>
                     </p>
             </form>
-
+<!-- inizio commento per multi impegno
      <div class="panel-body my-panel-body" ng-show="showEsisteRimborsoMissione">
       <p class="col-md-2">
       <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.button.addImpegno' | translate}}" ng-click="aggiungiRigaImpegno()"><span class="glyphicon glyphicon-plus"></span>{{'rimborso-missione.button.addImpegno' | translate}}</button> 
@@ -518,7 +518,11 @@
         </table>
       </div>
       </div>
-            <div ng-hide="showEsisteRimborsoMissione">
+
+            <div ng-hide="showEsisteRimborsoMissione"> --da sostituire al primo div che sta sotto..
+fine commento multi impegno-->
+
+            <div>
               <form class="form-inline" role="form" id="missioni">
                       <p class="col-md-3">
                           <span class="input-group">
