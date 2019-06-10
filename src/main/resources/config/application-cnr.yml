@@ -16,8 +16,8 @@ spring:
 
     proxy:
         SIGLA:
-        #    url: http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/
-            url: http://sigla-main-multi-impegni.test.si.cnr.it/SIGLA/
+            url: http://sigla-main.test.si.cnr.it/SIGLA/
+        #    url: http://sigla-main-multi-impegni.test.si.cnr.it/SIGLA/
         #    url: http://localhost:8080/SIGLA/
         #    url: http://contab.cnr.it:90/SIGLA/
             username: MISSIONI
@@ -98,7 +98,7 @@ logging.config: classpath:logback-local.xml
 cron:
     comunicaDati:
         name: comunicaDati
-        active: false
+        active: true
         cronExpression: "0 */1 * * * MON-SAT"
 
     evictCache:

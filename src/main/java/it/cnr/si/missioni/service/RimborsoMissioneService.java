@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.BusyResourceException;
@@ -64,6 +65,8 @@ import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoGae;
 import it.cnr.si.missioni.util.proxy.json.object.Nazione;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompenso;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompensoJson;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
@@ -136,6 +139,9 @@ public class RimborsoMissioneService {
 	
 	@Autowired
 	NazioneService nazioneService;
+	
+	@Autowired
+	TerzoPerCompensoService terzoPerCompensoService;
 	
 	@Autowired
 	GaeService gaeService;
@@ -271,7 +277,7 @@ public class RimborsoMissioneService {
 			throws ComponentException {
 		retrieveDetails(principal, rimborsoMissioneDaAggiornare);
 		if (!rimborsoMissioneDaAggiornare.isTrattamentoAlternativoMissione()){
-			if (rimborsoMissioneDaAggiornare.getTotaleRimborso().compareTo(BigDecimal.ZERO) == 0){
+			if (rimborsoMissioneDaAggiornare.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) == 0){
 				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_DA_NON_COMUNICARE);
 			} else {
 				rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
@@ -279,6 +285,11 @@ public class RimborsoMissioneService {
 		} else {
 			rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
 		}
+		LocalDate data = LocalDate.now();
+		if (rimborsoMissioneDaAggiornare.getStatoInvioSigla().equals(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE) && data.getYear() > rimborsoMissioneDaAggiornare.getAnno()){
+			ribaltaMissione(principal, rimborsoMissioneDaAggiornare);
+		}
+
 		gestioneMailResponsabileGruppo(principal, rimborsoMissioneDaAggiornare);
 		List<UsersSpecial> listaUtenti = new ArrayList<>();
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoRich(), rimborsoMissioneDaAggiornare.getAnno());
@@ -334,7 +345,8 @@ public class RimborsoMissioneService {
 				idSede = account.getCodiceSede();
 			}
 			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
-					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
+					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+					rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
 			rabbitMQService.send(missione);
 		}
 	}
@@ -796,6 +808,9 @@ public class RimborsoMissioneService {
 			if (filter.getStatoInvioSigla() != null){
 				criterionList.add(Restrictions.eq("statoInvioSigla", filter.getStatoInvioSigla()));
 			}
+			if (filter.getCup() != null) {
+				criterionList.add(Restrictions.eq("cup", filter.getCup()));
+			}
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
 			return crudServiceBean.findByCriterion(principal, RimborsoMissione.class, criterionList, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
@@ -965,6 +980,17 @@ public class RimborsoMissioneService {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione con ID: "+rimborsoMissione.getOrdineMissione().getId()+" non esiste");
         	}
     	}
+		if (StringUtils.isEmpty(rimborsoMissione.getMatricola()) && StringUtils.isEmpty(rimborsoMissione.getQualificaRich())) {
+			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+			if (account != null && account.getCodiceFiscale() != null) {
+				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodiceFiscale(),
+						rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione());
+				for (TerzoPerCompenso terzo : terzoJson.getElements()) {
+					rimborsoMissione.setQualificaRich(terzo.getDsTipoRapporto());
+					break;
+				}
+			}
+		}
     	rimborsoMissione.setToBeCreated();
     }
 
@@ -1646,10 +1672,13 @@ public class RimborsoMissioneService {
 	}
 
 	protected void ribaltaMissione(Principal principal, RimborsoMissione rimborsoMissione) {
-		rimborsoMissione.setAnno(rimborsoMissione.getAnno() + 1);
-		rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno(), Costanti.TIPO_RIMBORSO_MISSIONE));
-		rimborsoMissione.setToBeUpdated();
-    	crudServiceBean.modificaConBulk(principal, rimborsoMissione);
+		retrieveDetails(principal, rimborsoMissione);
+		if (rimborsoMissione.isTrattamentoAlternativoMissione() || rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
+			rimborsoMissione.setAnno(rimborsoMissione.getAnno() + 1);
+			rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno(), Costanti.TIPO_RIMBORSO_MISSIONE));
+			rimborsoMissione.setToBeUpdated();
+	    	crudServiceBean.modificaConBulk(principal, rimborsoMissione);
+		}
 	}
 	private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
 		return "Il rimborso missione "+rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+getNominativo(rimborsoMissione.getUid())+" per la missione a "+rimborsoMissione.getDestinazione() + " dal "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+ " al "+DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione())+ " avente per oggetto "+rimborsoMissione.getOggetto()+" è stata approvata.";
@@ -1674,6 +1703,10 @@ public class RimborsoMissioneService {
 		}
 	}
 
+	public void popolaCoda(String id){
+		RimborsoMissione missione = (RimborsoMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), RimborsoMissione.class, new Long(id));
+		popolaCoda(missione);
+	}
 
 }
 

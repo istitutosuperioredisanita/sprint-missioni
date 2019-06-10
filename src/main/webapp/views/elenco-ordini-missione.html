@@ -66,6 +66,7 @@
                 <cnr-widget-date-range start-date="daData" end-date="aData" ng-model-date="daData" start-label="{{'elenco-ordini-missione.filter.da-data' | translate}}" end-label="{{'elenco-ordini-missione.filter.a-data' | translate}}"/></cnr-widget-date-range>
             </p>
         </div>
+            <form class="form-inline" role="form" id="missioni">
         <div class="col-md-2">
             <span class="input-group">
               <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
@@ -74,7 +75,7 @@
                 </label>
             </span>
         </div>
-        <div class="col-md-2" ng-show="!uoForUsersSpecial">
+        <div class="col-md-4" ng-show="!uoForUsersSpecial">
             <span class="input-group">
               <span class="input-group-addon" translate="ordine-missione.form.responsabile-gruppo">Responsabile del Gruppo</span>
                 <label class="checkbox">
@@ -82,9 +83,18 @@
                 </label>
             </span>
         </div>
+        <div class="col-md-4">
+            <span class="input-group">
+              <span class="input-group-addon" translate="missione.form.cup">CUP</span>
+                <input type="text" style="text-align:center" class="input-sm form-control" name="cup" ng-model="cup" />
+            </span>
+        </div>
+        </form>
+            <form class="form-inline" role="form" id="missioni">
        <div class="col-md-7 float-right">
-        <button type="button" class="btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
+        <button type="button" class="margin-top btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
        </div>
+        </form>
        <div class="col-md-12 text-center" ng-show="messageOrdiniNonEsistenti">
         <h5 translate="elenco-ordini-missione.no-result">Nessun Risultato</h5>
        </div>

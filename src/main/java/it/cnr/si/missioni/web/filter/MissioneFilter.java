@@ -22,6 +22,7 @@ public class MissioneFilter {
 	private String respGruppo;
 	private Long daNumero;
 	private Long aNumero;
+	private String cup;
 	private String daData;
 	private String aData;
 	private String cdsRich;
@@ -168,5 +169,11 @@ public class MissioneFilter {
 	}
 	public void setRecuperoAutoPropria(String recuperoAutoPropria) {
 		this.recuperoAutoPropria = recuperoAutoPropria;
+	}
+	public String getCup() {
+		return cup;
+	}
+	public void setCup(String cup) {
+		this.cup = cup;
 	}
 }

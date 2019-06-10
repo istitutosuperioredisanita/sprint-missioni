@@ -803,6 +803,7 @@
         "title": "Aggiorna i files di Configurazione",
         "refresh.button": "Aggiorna",
         "ribalta-dati-istituti.button": "Ribalta Dati per UO",
+        "rimanda-coda.button": "Reinvia Coda",
         "refreshCache.button": "Aggiorna Cache Servizi REST",
         "refreshCacheTerzoCompenso.button": "Aggiorna Cache Terzo Compenso",
         "sendMessage.button": "Invia Messaggio"

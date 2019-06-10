@@ -54,4 +54,9 @@ missioniApp.factory('ConfigService', function ($http, ui) {
             $scope.successRefresh = true;
         });
      }
+     $scope.reinviaCoda = function() {
+        $http.get('api/rest/config/resendQueue').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
  });
