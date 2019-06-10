@@ -118,6 +118,11 @@ public class ComunicaRimborsoSiglaService {
 				oggettoBulk.setPgAnticipoGeMis(rimborsoApprovato.getAnticipoNumeroMandato());
 				oggettoBulk.setCdsAnticipoGeMis(rimborsoApprovato.getCdsSpesa());
 			}
+/* Commento per Multi impegno
+			if (rimborsoApprovato.getGae() != null){
+				oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
+			}
+*/
 			if (rimborsoApprovato.getGae() != null){
 				oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
 			}
@@ -144,6 +149,32 @@ public class ComunicaRimborsoSiglaService {
 					}
 				}
 			}
+
+// inizio aggiunta per multi impegno			
+			if (!rimborsoApprovato.isTrattamentoAlternativoMissione()){
+				if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
+					oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
+				}
+				if (rimborsoApprovato.getEsercizioObbligazione() != null){
+					oggettoBulk.setEsercizioObblGeMis(rimborsoApprovato.getEsercizioObbligazione());
+				}
+				if (rimborsoApprovato.getEsercizioOriginaleObbligazione() != null){
+					oggettoBulk.setEsercizioOriObblGeMis(rimborsoApprovato.getEsercizioOriginaleObbligazione());
+				}
+				if (rimborsoApprovato.getPgObbligazione() != null){
+					oggettoBulk.setPgObblGeMis(rimborsoApprovato.getPgObbligazione());
+				}
+				if (rimborsoApprovato.getGae() != null){
+					oggettoBulk.setGaeGeMis(rimborsoApprovato.getGae());
+				}
+				if (rimborsoApprovato.getCdrSpesa() != null){
+					oggettoBulk.setCdrGeMis(rimborsoApprovato.getCdrSpesa());
+				}
+				if (rimborsoApprovato.getVoce() != null){
+					oggettoBulk.setVoceGeMis(rimborsoApprovato.getVoce());
+				}
+			}
+// fine aggiunta per multi impegno			
 			impostaModalitaPagamento(rimborsoApprovato, oggettoBulk);
 
 			impostaInquadramento(rimborsoApprovato, oggettoBulk);
@@ -201,8 +232,8 @@ public class ComunicaRimborsoSiglaService {
 						if (dettaglio.isGiustificativoObbligatorio()){
 							if (dettaglio.getDsNoGiustificativo() != null){
 								spesaMissione.setDsNoGiustificativo(dettaglio.getDsNoGiustificativo());
-//							} else {
-//								throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+" è obbligatorio allegare almeno un giustificativo.");
+							} else {
+								throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa "+ dettaglio.getDsTiSpesa()+" del "+ DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())+ " del rimborso missione con id "+ rimborsoApprovato.getId() + " della uo "+rimborsoApprovato.getUoRich()+", anno "+rimborsoApprovato.getAnno()+", numero "+rimborsoApprovato.getNumero()+" è obbligatorio allegare almeno un giustificativo.");
 							}
 						}
 					}
@@ -226,7 +257,9 @@ public class ComunicaRimborsoSiglaService {
 					spesaMissione.setTiSpesaDiaria("S");
 					speseMissioneColl.add(spesaMissione);
 					
-					impostaDatiMissioneRiga(dettaglio, oggettoBulk);
+// inizio rem per multi impegno			
+//					impostaDatiMissioneRiga(dettaglio, oggettoBulk);
+// fine rem per multi impegno			
 				
 				}
 				oggettoBulk.setSpeseMissioneColl(speseMissioneColl);

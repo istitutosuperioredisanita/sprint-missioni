@@ -259,7 +259,7 @@
                     "type": "calculateValues",
                     "condition": "AND",
                     "fieldName": "esercizio",
-                    "fromValue": 2017,
+                    "fromValue": 2018,
                     "toSpecialValue": "ANNO_CORRENTE"
                 },
                 {	

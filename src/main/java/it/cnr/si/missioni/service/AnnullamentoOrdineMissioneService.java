@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
@@ -34,6 +35,7 @@ import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -190,7 +192,8 @@ public class AnnullamentoOrdineMissioneService {
 			}
 			Missione missione = new Missione(TypeMissione.ANNULLAMENTO, new Long(annullamento.getId().toString()), idSede, 
 					annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(), 
-					annullamento.getOrdineMissione().getDataFineMissione(), new Long(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
+					annullamento.getOrdineMissione().getDataFineMissione(), new Long(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+					annullamento.getOrdineMissione().getAnno(), annullamento.getOrdineMissione().getNumero());
 			rabbitMQService.send(missione);
 		}
 	}
@@ -675,5 +678,15 @@ public class AnnullamentoOrdineMissioneService {
 		return map;
 	}
 
+	public void popolaCoda(String id){
+		AnnullamentoOrdineMissione missione = (AnnullamentoOrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), AnnullamentoOrdineMissione.class, new Long(id));
+    	if (missione.getOrdineMissione() != null){
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), OrdineMissione.class, missione.getOrdineMissione().getId());
+        	if (ordineMissione != null){
+        		missione.setOrdineMissione(ordineMissione);
+        	}
+    	}
+		popolaCoda(missione);
+	}
 }
 

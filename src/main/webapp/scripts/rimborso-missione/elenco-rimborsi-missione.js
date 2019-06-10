@@ -2,12 +2,12 @@
 
 missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         return {
-            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate, idOrdineMissione, recuperoTotali) {
+            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate, idOrdineMissione, recuperoTotali, cup) {
                 var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, 
                         daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, 
                         daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine, 
                         includiMissioniAnnullate: includiMissioniAnnullate, 
-                        idOrdineMissione: idOrdineMissione, recuperoTotali: recuperoTotali}}).then(function (response) {
+                        idOrdineMissione: idOrdineMissione, recuperoTotali: recuperoTotali, cup: cup}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -92,7 +92,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
 
         ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, 
                 $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine,
-                $scope.annullati).then(function(data){
+                $scope.annullati,null,null,$scope.cup).then(function(data){
             if (data && data.length > 0){
                 $scope.rimborsiMissione = data;
                 $scope.messageRimborsiNonEsistenti = false;

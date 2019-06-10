@@ -162,4 +162,15 @@ public class ConfigResource {
 		log.debug("REST request per ricaricare la configurazione di dei Servizi Rest in Cache da Alfresco");
 		configService.reloadServicesForCache();
 	}
+
+	/**
+	 * GET  /rest/config/datiUo -> rechargeDatiUo.
+	 */
+	@RequestMapping(value = "/rest/config/resendQueue",
+			method = RequestMethod.GET)
+	@Timed
+	public void resendQueue() {
+		log.debug("REST request per reinviare in coda i dati");
+		configService.resendQueue();
+	}
 }

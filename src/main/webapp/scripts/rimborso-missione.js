@@ -168,9 +168,20 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.recuperoDatiAltriRimborsi = function(idOrdineMissione){
         ElencoRimborsiMissioneService.findRimborsiMissione(null, null, null, null, null, null, null, null, null, null, null, idOrdineMissione, "S").then(function(ret){
+            $scope.listaAltriRimborsi = false;
+            var newRet = [];
             if (ret && ret.length > 0){
-                $scope.esistonoAltriRimborsi = true;
-                $scope.listaAltriRimborsi = ret;
+                for (var i=0; i<ret.length; i++) {
+                    if (ret[i].id != $scope.rimborsoMissioneModel.id){
+                        newRet.push(ret[i]);
+                    }
+                }    
+                if (newRet && newRet.length > 0){
+                    $scope.esistonoAltriRimborsi = true;
+                    $scope.listaAltriRimborsi = newRet;
+                } else {
+                    $scope.esistonoAltriRimborsi = false;
+                }   
             } else {
                 $scope.esistonoAltriRimborsi = false;
             }
@@ -273,17 +284,18 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             var trovatoInquadramentoMistoInizio = false;
             var trovatoInquadramentoMistoFine = false;
             var dataFineTroncata = new Date(new Date($scope.rimborsoMissioneModel.dataFineMissione).setHours(0,0,0,0));
+            var dataInizioTroncata = new Date(new Date($scope.rimborsoMissioneModel.dataInizioMissione).setHours(0,0,0,0));
             for (var i=0; i<$scope.inquadramento.length; i++) {
                 var inquadramento = $scope.inquadramento[i];
                 if (inquadramento.cd_tipo_rapporto == "DIP"){
-                    if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
+                    if (new Date(inquadramento.dt_ini_validita) <= dataInizioTroncata && 
                         new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
                         $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
                         $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                         trovatoInquadramento = true;
                     } else {
-                        if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
-                            new Date(inquadramento.dt_fin_validita) >= new Date($scope.rimborsoMissioneModel.dataInizioMissione)){
+                        if (new Date(inquadramento.dt_ini_validita) <= dataInizioTroncata && 
+                            new Date(inquadramento.dt_fin_validita) >= dataInizioTroncata){
                             inqMisto = inquadramento.pg_rif_inquadramento;
                             rappMisto = inquadramento.cd_tipo_rapporto;
                             trovatoInquadramentoMistoInizio = true;
@@ -298,15 +310,15 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             if (!trovatoInquadramento){
                 for (var i=0; i<$scope.inquadramento.length; i++) {
                     var inquadramento = $scope.inquadramento[i];
-                    if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
+                    if (new Date(inquadramento.dt_ini_validita) <= dataInizioTroncata && 
                         new Date(inquadramento.dt_fin_validita) >= dataFineTroncata){
                         $scope.rimborsoMissioneModel.inquadramento = inquadramento.pg_rif_inquadramento;
                         $scope.rimborsoMissioneModel.cdTipoRapporto = inquadramento.cd_tipo_rapporto;
                         trovatoInquadramento = true;
                     } else {
                         if (!trovatoInquadramentoMistoInizio || !trovatoInquadramentoMistoFine){
-                            if (new Date(inquadramento.dt_ini_validita) <= new Date($scope.rimborsoMissioneModel.dataInizioMissione) && 
-                                new Date(inquadramento.dt_fin_validita) >= new Date($scope.rimborsoMissioneModel.dataInizioMissione)){
+                            if (new Date(inquadramento.dt_ini_validita) <= dataInizioTroncata && 
+                                new Date(inquadramento.dt_fin_validita) >= dataInizioTroncata){
                                 inqMisto = inquadramento.pg_rif_inquadramento;
                                 rappMisto = inquadramento.cd_tipo_rapporto;
                                 trovatoInquadramentoMistoInizio = true;

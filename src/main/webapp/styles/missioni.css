@@ -122,6 +122,10 @@ input:-webkit-autofill {
   width: 40px;
 }
 
+.margin-top {
+  margin-top: 5px;
+}
+
 .td-small {
   width: 40px;
 }

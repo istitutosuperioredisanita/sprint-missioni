@@ -20,8 +20,8 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
                 });
                 return promise;
             },
-            findMissioni: function(user, anno, uoRich, daNumero, aNumero, daData, aData, includiMissioniAnnullate, respGruppo) {
-                var promise = $http.get('api/rest/ordiniMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, includiMissioniAnnullate: includiMissioniAnnullate, respGruppo: respGruppo}}).then(function (response) {
+            findMissioni: function(user, anno, uoRich, daNumero, aNumero, daData, aData, includiMissioniAnnullate, respGruppo, cup) {
+                var promise = $http.get('api/rest/ordiniMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, includiMissioniAnnullate: includiMissioniAnnullate, respGruppo: respGruppo, cup: cup}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -92,7 +92,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
             aDataFormatted = $filter('date')($scope.aData, "dd/MM/yyyy");
         }
 
-        ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annullati, $scope.respGruppo).then(function(data){
+        ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annullati, $scope.respGruppo, $scope.cup).then(function(data){
             if (data && data.length > 0){
                 $scope.ordiniMissione = data;
                 $scope.messageOrdiniNonEsistenti = false;

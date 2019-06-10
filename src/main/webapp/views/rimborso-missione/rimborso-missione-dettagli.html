@@ -40,8 +40,10 @@
                             <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.localita-spostamento' | translate}}:</b>{{dettaglioSpesa.localitaSpostamento}}</span>
+<!-- inizio commento multi impegno
                             <span ng-show="dettaglioSpesa.pgObbligazione"><br>
                             <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.impegno' | translate}}:</b> {{dettaglioSpesa.esercizioOriginaleObbligazione}} - {{dettaglioSpesa.pgObbligazione}}.   <b>{{'missione.form.voce' | translate}}:</b> {{dettaglioSpesa.voce}} - {{dettaglioSpesa.dsVoce}}</span>
+fine commento multi impegno-->
 
                             <div ng-show="dettaglioSpesa.viewAttachment">
                               <ul class="list-unstyled dettaglioSpesa.attachments" ng-show="dettaglioSpesa.attachmentsExists=true">
@@ -139,6 +141,8 @@
                                         </span>
                                     </p>
                             </form>
+<!-- inizio commento per multi impegno
+
                             <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0 && dettaglioSpesa.flSpesaAnticipata != 'S'">
                                     <p class="col-md-12">
                                         <span class="input-group">
@@ -147,6 +151,7 @@
                                         </span>
                                     </p>
                             </form>
+fine commento multi impegno-->
                           </div>
                         </div>
         <div class="col-md-1-button col-md-1 text-right" >
@@ -238,6 +243,7 @@
                         </span>
                     </p>
             </form>
+<!-- inizio commento per multi impegno
             <form class="form-inline" role="form" id="missioni" ng-show="impegni && impegni.length > 0 && newDettaglioSpesa.flSpesaAnticipata != 'S'">
                     <p class="col-md-12">
                       <span class="input-group">
@@ -246,6 +252,7 @@
                       </span>
                     </p>
             </form>
+fine commento multi impegno-->
         </div>
             <div class="col-md-1 text-right">
                   <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newDettaglioSpesa)" ng-click="insertDettaglioSpesa(newDettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
