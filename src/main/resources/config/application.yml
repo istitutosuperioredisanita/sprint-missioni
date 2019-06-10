@@ -77,6 +77,8 @@ spring:
                 oggetto: Verifica Ordine di Missione di
             invioAnnullamentoOrdineMissione:
                 oggetto: Richiesta Annullamento Ordine di Missione di
+            invioAnnullamentoRimborsoMissione:
+                oggetto: Richiesta Annullamento Rimborso Missione di
             invioRimborsoPerValidazioneDatiFinanziari:
                 oggetto: Verifica Rimborso Missione di
             ritornoOrdineMissioneMittente:
