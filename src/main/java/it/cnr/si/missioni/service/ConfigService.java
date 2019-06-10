@@ -1,10 +1,7 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
-
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -114,16 +111,6 @@ public class ConfigService {
     	return message;
     }
 
-    public String getReleaseNotes() {
-    	try {
-			return IOUtils.toString(this.getClass().getResourceAsStream("/releaseNotes/releaseNotes.md"), "utf-8");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-    }
-
 
 	public UtentiPresidenteSpeciali getUtentiPresidenteSpeciali() {
 		return utentiPresidenteSpeciali;
@@ -132,5 +119,4 @@ public class ConfigService {
 	public void resendQueue() {
 		loadFilesService.resendQueue();
 	}
-
 }
