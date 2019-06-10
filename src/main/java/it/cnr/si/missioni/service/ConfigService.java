@@ -1,12 +1,17 @@
 package it.cnr.si.missioni.service;
 
+import java.io.IOException;
+
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.data.DataUsersSpecial;
 import it.cnr.si.missioni.util.data.DatiUo;
@@ -119,4 +124,12 @@ public class ConfigService {
 	public void resendQueue() {
 		loadFilesService.resendQueue();
 	}
+    public String getReleaseNotes() {
+    	try {
+			return IOUtils.toString(this.getClass().getResourceAsStream("/releaseNotes/releaseNotes.md"), "utf-8");
+		} catch (IOException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN,
+					"File degli aggiornamenti di versione non trovato");
+		}
+    }
 }
