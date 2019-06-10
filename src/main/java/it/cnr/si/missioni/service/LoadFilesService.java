@@ -227,6 +227,7 @@ public class LoadFilesService {
 	
 	private InputStream getQueue() {
 		String fileName = getFileNameFromQueue();
+		log.info("Nome File: "+fileName);
 		return recuperoFile(fileName);
 	}
 
