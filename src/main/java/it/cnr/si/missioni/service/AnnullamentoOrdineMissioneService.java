@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
+import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
@@ -398,24 +399,15 @@ public class AnnullamentoOrdineMissioneService {
 			if (filter.getDaNumero() != null){
 				criterionList.add(Restrictions.ge("numero", filter.getDaNumero()));
 			}
-			if (filter.getaNumero() != null){
-				criterionList.add(Restrictions.le("ordine.numero", filter.getaNumero()));
-			}
 			if (filter.getDaData() != null){
 				criterionList.add(Restrictions.ge("dataInserimento", DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getaData() != null){
 				criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
 			}
-			if (filter.getCdsRich() != null){
-				criterionList.add(Restrictions.eq("ordine.cdsRich", filter.getCdsRich()));
-			}
 			if (filter.getUoRich() != null){
 				if (accountService.isUserEnableToWorkUo(principal, filter.getUoRich()) && !filter.isDaCron()){
-					Disjunction condizioneOr = Restrictions.disjunction();
-					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("ordine.uoRich", filter.getUoRich())));
-					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("ordine.uoSpesa", filter.getUoRich())));
-					criterionList.add(condizioneOr);
+					criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and (ord.uoRich = '"+filter.getUoRich()+"' or ord.uoSpesa = '"+filter.getUoRich()+"') "));
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente "+principal.getName()+"  non è abilitato a vedere i dati della uo "+filter.getUoRich());
 				}
@@ -435,7 +427,6 @@ public class AnnullamentoOrdineMissioneService {
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
 			Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoOrdineMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-			criteria.createAlias("ordineMissione", aliasOrdineMissione);
 			return  crudServiceBean.eseguiQuery(criteria);
 		} else if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")){
 			if (StringUtils.isEmpty(filter.getUoRich())){
@@ -485,18 +476,28 @@ public class AnnullamentoOrdineMissioneService {
 							boolean esisteUoConValidazioneConUserNonAbilitato = false;
 							Disjunction condizioneOr = Restrictions.disjunction();
 							List<String> listaUoUtente = new ArrayList<String>();
-					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
+							boolean primoGiro = true;
+							String subQuery = "";		
+							for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
 					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
 					    		if (uo != null){
-					    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("ordine.uoRich", uoService.getUoSigla(uoUser))));
+					    			String uoFilter = uoService.getUoSigla(uoUser);
+					    			if (primoGiro){
+					    				subQuery = "select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and (ord.uoRich = '"+uoFilter+"' ";
+					    			} else {
+					    				subQuery += " or ord.uoRich = '"+uoFilter+"' ";
+					    			}
 						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("ordine.uoSpesa", uoService.getUoSigla(uoUser))));
+						    				subQuery += " or ord.uoSpesa = '"+uoFilter+"' ";
 						    			}
 						    		}
 					    		}
 					    	}
-					    	criterionList.add(condizioneOr);
+							if (!subQuery.isEmpty()){
+			    				subQuery += " )";
+								criterionList.add(Subqueries.exists(subQuery));
+							}
 						} else {
 							criterionList.add(Restrictions.eq("uid", principal.getName()));
 						}
@@ -516,14 +517,11 @@ public class AnnullamentoOrdineMissioneService {
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
-				
 
 				Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoOrdineMissione.class, criterionList, AnnullamentoOrdineMissione.getProjectionForElencoMissioni(), Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-				criteria.createAlias("ordineMissione", aliasOrdineMissione);
 				annullamentiList = crudServiceBean.eseguiQuery(criteria);
 			} else{
 				Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoOrdineMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-				criteria.createAlias("ordineMissione", aliasOrdineMissione);
 				annullamentiList = crudServiceBean.eseguiQuery(criteria);
 			}
 			return annullamentiList;
