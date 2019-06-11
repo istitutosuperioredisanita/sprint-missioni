@@ -39,6 +39,7 @@ missioniApp.controller('DatiPatenteController', function ($scope, DatiPatenteSer
                         }
                         if ($scope.uoForUsersSpecial.length === 1){
                             $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                            $scope.reloadUoWork($scope.uoWorkForSpecialUser.cd_unita_organizzativa);
                         }
                         return uos;
                     } else {
