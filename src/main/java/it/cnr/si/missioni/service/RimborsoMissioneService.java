@@ -1165,7 +1165,7 @@ public class RimborsoMissioneService {
 				if (!StringUtils.isEmpty(rimborsoMissione.getPgProgetto()) && !StringUtils.isEmpty(gae.getPg_progetto())){
 					progettoCdrIndicato = true;
 					if (gae.getPg_progetto().compareTo(rimborsoMissione.getPgProgetto()) != 0){
-						throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La GAE indicata "+ rimborsoMissione.getGae()+" non corrisponde al modulo indicato.");
+						throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": La GAE indicata "+ rimborsoMissione.getGae()+" non corrisponde al progetto indicato.");
 					}
 				}
 				if (!StringUtils.isEmpty(rimborsoMissione.getCdrSpesa())){
@@ -1181,72 +1181,72 @@ public class RimborsoMissioneService {
 		}
 		
 		if (rimborsoMissione.isToBeCreated()){
-		if (!StringUtils.isEmpty(rimborsoMissione.getPgObbligazione())){
-			if (StringUtils.isEmpty(rimborsoMissione.getEsercizioOriginaleObbligazione())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre al numero dell'impegno è necessario indicare anche l'anno dell'impegno");
-			}
-			if (!StringUtils.isEmpty(rimborsoMissione.getGae())){
-				ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoMissione);
-				if (impegnoGae == null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoMissione.getGae()+" indicata oppure non esiste");
-				} else {
-					if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
-						if (!impegnoGae.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
-							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
+			if (!StringUtils.isEmpty(rimborsoMissione.getPgObbligazione())){
+				if (StringUtils.isEmpty(rimborsoMissione.getEsercizioOriginaleObbligazione())){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre al numero dell'impegno è necessario indicare anche l'anno dell'impegno");
+				}
+				if (!StringUtils.isEmpty(rimborsoMissione.getGae())){
+					ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoMissione);
+					if (impegnoGae == null){
+						throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoMissione.getGae()+" indicata oppure non esiste");
+					} else {
+						if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
+							if (!impegnoGae.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
+								throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
+							}
 						}
+						rimborsoMissione.setCdCdsObbligazione(impegnoGae.getCdCds());
+						rimborsoMissione.setEsercizioObbligazione(impegnoGae.getEsercizio());
 					}
-					rimborsoMissione.setCdCdsObbligazione(impegnoGae.getCdCds());
-					rimborsoMissione.setEsercizioObbligazione(impegnoGae.getEsercizio());
+				} else {
+					Impegno impegno = impegnoService.loadImpegno(rimborsoMissione);
+					if (impegno == null){
+						throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non esiste");
+					} else {
+						if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
+							if (!impegno.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
+								throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
+							}
+						}
+						rimborsoMissione.setCdCdsObbligazione(impegno.getCdCds());
+						rimborsoMissione.setEsercizioObbligazione(impegno.getEsercizio());
+					}
 				}
 			} else {
-				Impegno impegno = impegnoService.loadImpegno(rimborsoMissione);
-				if (impegno == null){
-					throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non esiste");
-				} else {
-					if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
-						if (!impegno.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
-							throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoMissione.getEsercizioOriginaleObbligazione() + "-" + rimborsoMissione.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
-						}
-					}
-					rimborsoMissione.setCdCdsObbligazione(impegno.getCdCds());
-					rimborsoMissione.setEsercizioObbligazione(impegno.getEsercizio());
-				}
+				//			if (!StringUtils.isEmpty(rimborsoMissione.getEsercizioOriginaleObbligazione())){
+				//				throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
+				//			}
+				rimborsoMissione.setCdCdsObbligazione(null);
+				rimborsoMissione.setEsercizioObbligazione(null);
 			}
-		} else {
-//			if (!StringUtils.isEmpty(rimborsoMissione.getEsercizioOriginaleObbligazione())){
-//				throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
-//			}
-			rimborsoMissione.setCdCdsObbligazione(null);
-			rimborsoMissione.setEsercizioObbligazione(null);
-		}
 		} else {
 			List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(principal, new Long(rimborsoMissione.getId().toString()));
 			if (lista != null && !lista.isEmpty()){
-					for (RimborsoImpegni rimborsoImpegni : lista){
-						if (!StringUtils.isEmpty(rimborsoMissione.getGae())){
-							ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getUoSpesa(), rimborsoImpegni.getEsercizioObbligazione(), rimborsoImpegni.getPgObbligazione(), rimborsoMissione.getGae());
-							if (impegnoGae == null){
-								throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoMissione.getGae());
-							} else {
-								if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
-									if (!impegnoGae.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
-										throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
-									}
+				for (RimborsoImpegni rimborsoImpegni : lista){
+					if (!StringUtils.isEmpty(rimborsoMissione.getGae())){
+						ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getUoSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione(), rimborsoMissione.getGae());
+						if (impegnoGae == null){
+							throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la GAE "+ rimborsoMissione.getGae());
+						} else {
+							if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
+								if (!impegnoGae.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
+									throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
 								}
 							}
+						}
+					} else {
+						Impegno impegno = impegnoService.loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getUoSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione());
+						if (impegno == null){
+							throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non esiste");
 						} else {
-							Impegno impegno = impegnoService.loadImpegno(rimborsoMissione.getCdsSpesa(), rimborsoMissione.getUoSpesa(), rimborsoImpegni.getEsercizioOriginaleObbligazione(), rimborsoImpegni.getPgObbligazione());
-							if (impegno == null){
-								throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato "+ rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non esiste");
-							} else {
-								if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
-									if (!impegno.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
-										throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
-									}
+							if (!StringUtils.isEmpty(rimborsoMissione.getVoce())){
+								if (!impegno.getCdElementoVoce().equals(rimborsoMissione.getVoce())){
+									throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": L'impegno indicato "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" non corrisponde con la voce di Bilancio indicata."+rimborsoMissione.getVoce());
 								}
 							}
 						}
 					}
+				}
 			}
 		}
     	if (rimborsoMissione.getOrdineMissione() != null){
