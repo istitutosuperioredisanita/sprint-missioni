@@ -448,19 +448,22 @@ public class CronService {
 		if (listaOrdiniMissione != null){
 			for (OrdineMissione ordineMissione : listaOrdiniMissione){
 				DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
-				if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
-					try {
-						stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
-					} catch (Exception e) {
-						String error = Utility.getMessageException(e);
-						String testoErrore = getTextErrorBypassResp(ordineMissione, error);
-						LOGGER.error(testoErrore + " "+e);
+				if (istituto != null){
+					if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
 						try {
-							mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
-						} catch (Exception e1) {
-							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+							stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
+						} catch (Exception e) {
+							String error = Utility.getMessageException(e);
+							String testoErrore = getTextErrorBypassResp(ordineMissione, error);
+							LOGGER.error(testoErrore + " "+e);
+							try {
+								mailService.sendEmailError(subjectErrorBypassResp, testoErrore, false, true);
+							} catch (Exception e1) {
+								LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+							}
 						}
 					}
+					
 				}
 			}
 		}
