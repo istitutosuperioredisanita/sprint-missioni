@@ -166,6 +166,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
                         }
                         if ($scope.uoForUsersSpecial.length === 1){
                             $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                            $scope.reloadUoWork($scope.uoWorkForSpecialUser.cd_unita_organizzativa);
                         }
                     } else {
                         $scope.accountModel = accountLog;
