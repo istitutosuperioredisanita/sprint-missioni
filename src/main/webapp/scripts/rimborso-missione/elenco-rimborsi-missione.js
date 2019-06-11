@@ -109,6 +109,9 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
     };
 
     $scope.reloadUserWork = function(uid){
+        if (uid){
+            $scope.userWork = uid;
+        }
         $scope.rimborsiMissione = [];
         $scope.messageRimborsiNonEsistenti = false;
         if (uid){
