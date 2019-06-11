@@ -128,6 +128,9 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
     };
 
     $scope.reloadUoWork = function(uo){
+        if (uo){
+            $scope.uoWorkForSpecialUser = uo;
+        }
         $scope.accountModel = null;
         $scope.elencoPersone = [];
         $scope.rimborsiMissione = [];

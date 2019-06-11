@@ -47,9 +47,9 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     @JsonProperty("limite_max_pasto")
     private Double limiteMaxPasto;
     @JsonProperty("dt_inizio_validita")
-    private Integer dtInizioValidita;
+    private Object dtInizioValidita;
     @JsonProperty("dt_fine_validita")
-    private Integer dtFineValidita;
+    private Object dtFineValidita;
     @JsonProperty("dt_cancellazione")
     private Object dtCancellazione;
     @JsonProperty("cd_area_estera")
@@ -205,7 +205,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
      *     The dtInizioValidita
      */
     @JsonProperty("dt_inizio_validita")
-    public Integer getDtInizioValidita() {
+    public Object getDtInizioValidita() {
         return dtInizioValidita;
     }
 
@@ -215,7 +215,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
      *     The dt_inizio_validita
      */
     @JsonProperty("dt_inizio_validita")
-    public void setDtInizioValidita(Integer dtInizioValidita) {
+    public void setDtInizioValidita(Object dtInizioValidita) {
         this.dtInizioValidita = dtInizioValidita;
     }
 
@@ -225,7 +225,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
      *     The dtFineValidita
      */
     @JsonProperty("dt_fine_validita")
-    public Integer getDtFineValidita() {
+    public Object getDtFineValidita() {
         return dtFineValidita;
     }
 
@@ -235,7 +235,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
      *     The dt_fine_validita
      */
     @JsonProperty("dt_fine_validita")
-    public void setDtFineValidita(Integer dtFineValidita) {
+    public void setDtFineValidita(Object dtFineValidita) {
         this.dtFineValidita = dtFineValidita;
     }
 
