@@ -484,6 +484,7 @@ public class AnnullamentoOrdineMissioneService {
 					    			String uoFilter = uoService.getUoSigla(uoUser);
 					    			if (primoGiro){
 					    				subQuery = "select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and (ord.uoRich = '"+uoFilter+"' ";
+					    				primoGiro = false;
 					    			} else {
 					    				subQuery += " or ord.uoRich = '"+uoFilter+"' ";
 					    			}

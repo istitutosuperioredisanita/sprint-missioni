@@ -375,6 +375,7 @@ public class AnnullamentoRimborsoMissioneService {
 					    			String uoFilter = uoService.getUoSigla(uoUser);
 					    			if (primoGiro){
 					    				subQuery = "select rim.id from RimborsoMissione AS rim where rim.id = this.rimborsoMissione.id and (rim.uoRich = '"+uoFilter+"' ";
+					    				primoGiro = false;
 					    			} else {
 					    				subQuery += " or rim.uoRich = '"+uoFilter+"' ";
 					    			}
