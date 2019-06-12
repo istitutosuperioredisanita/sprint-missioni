@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import it.cnr.jada.criterion.CriterionList;
+import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
@@ -25,7 +25,6 @@ import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.DatiFlusso;
-import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -322,24 +321,15 @@ public class AnnullamentoRimborsoMissioneService {
 			if (filter.getDaNumero() != null){
 				criterionList.add(Restrictions.ge("numero", filter.getDaNumero()));
 			}
-			if (filter.getaNumero() != null){
-				criterionList.add(Restrictions.le("rimborso.numero", filter.getaNumero()));
-			}
 			if (filter.getDaData() != null){
 				criterionList.add(Restrictions.ge("dataInserimento", DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
 			}
 			if (filter.getaData() != null){
 				criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
 			}
-			if (filter.getCdsRich() != null){
-				criterionList.add(Restrictions.eq("rimborso.cdsRich", filter.getCdsRich()));
-			}
 			if (filter.getUoRich() != null){
 				if (accountService.isUserEnableToWorkUo(principal, filter.getUoRich()) && !filter.isDaCron()){
-					Disjunction condizioneOr = Restrictions.disjunction();
-					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("rimborso.uoRich", filter.getUoRich())));
-					condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("rimborso.uoSpesa", filter.getUoRich())));
-					criterionList.add(condizioneOr);
+					criterionList.add(Subqueries.exists("select rim.id from RimborsoMissione AS rim where rim.id = this.rimborsoMissione.id and (rim.uoRich = '"+filter.getUoRich()+"' or rim.uoSpesa = '"+filter.getUoRich()+"') "));
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente "+principal.getName()+"  non è abilitato a vedere i dati della uo "+filter.getUoRich());
 				}
@@ -359,7 +349,6 @@ public class AnnullamentoRimborsoMissioneService {
 		}
 		if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")){
 			Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoRimborsoMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-			criteria.createAlias("rimborsoMissione", aliasRimborsoMissione);
 			return  crudServiceBean.eseguiQuery(criteria);
 		} else {
 			if (!isForValidateFlows){
@@ -378,18 +367,28 @@ public class AnnullamentoRimborsoMissioneService {
 							boolean esisteUoConValidazioneConUserNonAbilitato = false;
 							Disjunction condizioneOr = Restrictions.disjunction();
 							List<String> listaUoUtente = new ArrayList<String>();
+							boolean primoGiro = true;
+							String subQuery = "";		
 					    	for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()){
 					    		Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
 					    		if (uo != null){
-					    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("rimborso.uoRich", uoService.getUoSigla(uoUser))));
+					    			String uoFilter = uoService.getUoSigla(uoUser);
+					    			if (primoGiro){
+					    				subQuery = "select rim.id from RimborsoMissione AS rim where rim.id = this.rimborsoMissione.id and (rim.uoRich = '"+uoFilter+"' ";
+					    			} else {
+					    				subQuery += " or rim.uoRich = '"+uoFilter+"' ";
+					    			}
 						    		if (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
 						    			if (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-							    			condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("rimborso.uoSpesa", uoService.getUoSigla(uoUser))));
+						    				subQuery += " or rim.uoSpesa = '"+uoFilter+"' ";
 						    			}
 						    		}
 					    		}
 					    	}
-					    	criterionList.add(condizioneOr);
+							if (!subQuery.isEmpty()){
+			    				subQuery += " )";
+								criterionList.add(Subqueries.exists(subQuery));
+							}
 						} else {
 							criterionList.add(Restrictions.eq("uid", principal.getName()));
 						}
@@ -409,11 +408,9 @@ public class AnnullamentoRimborsoMissioneService {
 				
 
 				Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoRimborsoMissione.class, criterionList, AnnullamentoRimborsoMissione.getProjectionForElencoMissioni(), Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-				criteria.createAlias("rimborsoMissione", aliasRimborsoMissione);
 				annullamentiList = crudServiceBean.eseguiQuery(criteria);
 			} else{
 				Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoRimborsoMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-				criteria.createAlias("rimborsoMissione", aliasRimborsoMissione);
 				annullamentiList = crudServiceBean.eseguiQuery(criteria);
 			}
 			return annullamentiList;
