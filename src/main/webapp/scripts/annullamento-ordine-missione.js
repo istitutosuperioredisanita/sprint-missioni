@@ -580,11 +580,13 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
     $scope.gestioneUtenteAbilitatoValidare = function (uo){
         $scope.utenteAbilitatoValidareUo = 'N';
         var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
-        var uoSiper = uo.replace('.','');
-        for (var k=0; k<uoForUsersSpecial.length; k++) {
-            var uoForUserSpecial = uoForUsersSpecial[k];
-            if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
-            $scope.utenteAbilitatoValidareUo = 'S';
+            if (uo){
+            var uoSiper = uo.replace('.','');
+            for (var k=0; k<uoForUsersSpecial.length; k++) {
+                var uoForUserSpecial = uoForUsersSpecial[k];
+                if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
+                $scope.utenteAbilitatoValidareUo = 'S';
+                }
             }
         }
     }
