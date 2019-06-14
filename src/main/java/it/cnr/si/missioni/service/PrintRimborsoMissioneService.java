@@ -129,6 +129,7 @@ public class PrintRimborsoMissioneService {
     	printRimborsoMissione.setUoSpesa(caricaUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()));
     	printRimborsoMissione.setCdrSpesa(caricaCdr(rimborsoMissione.getCdrSpesa()));
     	Principal principal = new GenericPrincipal(currentLogin);
+/* INIZIO REM PER MULTI IMPEGNO
     	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(principal, new Long(rimborsoMissione.getId().toString()));
     	if (lista != null && !lista.isEmpty()){
     		String impegni = null;
@@ -142,7 +143,12 @@ public class PrintRimborsoMissioneService {
     		}
         	printRimborsoMissione.setImpegni(impegni);
     	} 
+    	FINE REM PER MULTI IMPEGNO */ 
     	if (rimborsoMissione.getPgObbligazione() != null && rimborsoMissione.getEsercizioOriginaleObbligazione() != null){
+// INIZIO AGGIUNTA MULTI IMPEGNI
+    		String impegni = rimborsoMissione.getEsercizioOriginaleObbligazione()+"-"+rimborsoMissione.getPgObbligazione();
+        	printRimborsoMissione.setImpegni(impegni);
+// FINE AGGIUNTA MULTI IMPEGNI
     		printRimborsoMissione.setPgObbligazione(rimborsoMissione.getPgObbligazione().toString());
     		printRimborsoMissione.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione().toString());
     	} else {
