@@ -16,7 +16,7 @@ spring:
 
     proxy:
         SIGLA:
-            url: http://sigla-main-ppe.test.si.cnr.it/SIGLA/
+            url: http://sigla-main.test.si.cnr.it/SIGLA/
         #    url: http://sigla-main-multi-impegni.test.si.cnr.it/SIGLA/
         #    url: http://localhost:8080/SIGLA/
         #    url: http://contab.cnr.it:90/SIGLA/
