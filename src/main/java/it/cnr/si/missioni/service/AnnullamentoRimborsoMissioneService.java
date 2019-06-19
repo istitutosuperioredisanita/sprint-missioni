@@ -173,9 +173,6 @@ public class AnnullamentoRimborsoMissioneService {
         	}
     	}
 		if (confirm){
-			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), annullamentoDB.getRimborsoMissione().getUoSpesa())){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a confermare gli annullamenti rimborso missione per la uo "+annullamentoDB.getRimborsoMissione().getUoSpesa()+".");
-			}
 			if (annullamentoDB.isMissioneConfermata()){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione già annullato.");
 			}
@@ -201,10 +198,9 @@ public class AnnullamentoRimborsoMissioneService {
     		rimborsoMissione = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissione);
     		
     		JSONBody body = new JSONBody();
-    		body.setIdRimborsoMissione(new Long(rimborsoMissione.getId().toString()));
 
 			String app = Costanti.APP_SIGLA;
-			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA;
+			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA+"/"+rimborsoMissione.getId();
 			commonService.process(body, app, url, true, HttpMethod.DELETE);
     		
     		sendMail(principal, annullamentoDB);
