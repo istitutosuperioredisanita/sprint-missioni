@@ -1281,8 +1281,8 @@ public class RimborsoMissioneService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI+": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio o del personale al seguito se si è scelto il loro utilizzo");
 		}
 		if (rimborsoMissione.isMissioneEstera() && rimborsoMissione.isTrattamentoAlternativoMissione()) {
-			if (Utility.nvl(rimborsoMissione.getCdTipoRapporto()).equals(Costanti.TIPO_RAPPORTO_BORSISTA)){
-				throw new AwesomeException(CodiciErrore.ERRGEN,CodiciErrore.DATI_INCONGRUENTI+": Per il tipo di rapporto borsista non è previsto il trattamento alternativo di missione.");
+			if (rimborsoMissione.isAssociato()){
+				throw new AwesomeException(CodiciErrore.ERRGEN,CodiciErrore.DATI_INCONGRUENTI+": Per gli associati non è previsto il trattamento alternativo di missione.");
 			}
 			
 			if (rimborsoMissione.getDataInizioEstero().isBefore(rimborsoMissione.getDataInizioMissione())){
