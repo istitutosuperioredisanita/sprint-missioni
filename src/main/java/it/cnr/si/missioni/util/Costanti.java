@@ -48,7 +48,12 @@ public class Costanti {
 	public final static String NOME_CACHE_USER_SPECIAL = "cacheUserSpecial";
 	public final static String NOME_CACHE_SERVICES_SIGLA = "cacheServicesSigla";
 	public final static String APP_AA = "AA";
-	public final static String TIPO_RAPPORTO_BORSISTA = "BORS";
+	public final static String TIPO_RAPPORTO_ASS = "ASS";
+	public final static String TIPO_RAPPORTO_COLL = "COLL";
+	public final static String TIPO_RAPPORTO_PROF = "PROF";
+	public final static String TIPO_RAPPORTO_EXDIP = "EXDIP";
+	public final static String TIPO_RAPPORTO_OCCA = "OCCA";
+	public final static Long INQUADRAMENTO_ASSEGNISTA = new Long(43);
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 	
 	
