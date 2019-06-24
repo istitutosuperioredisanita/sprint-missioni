@@ -168,7 +168,7 @@ public class RimborsoMissioneDettagliService {
 			} else {
 				livelloRich = recuperoLivelloEquivalente(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
 			}
-			controlloCongruenzaPasto(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
+			controlloCongruenzaPasto(principal, rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
 		}
 	}
 
@@ -194,9 +194,16 @@ public class RimborsoMissioneDettagliService {
 		return livelloRich;
 	}
 
-	protected void controlloCongruenzaPasto(RimborsoMissioneDettagli rimborsoMissioneDettagli,
+	protected void controlloCongruenzaPasto(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli,
 			RimborsoMissione rimborsoMissione, Integer livello) {
 		long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
+		if (rimborsoMissione.getOrdineMissione().getId() != null){
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal,
+					OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+			if (ordineMissione != null && Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S")){
+				livello = 3;
+			}
+		}
 		if (livello < 4){
 			if (oreDifferenza < 4 || (oreDifferenza < 12 && rimborsoMissioneDettagli.getCdTiPasto().startsWith("G"))){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Tipo pasto non spettante per la durata della missione");
@@ -369,6 +376,7 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagliDB.setToBeUpdated();
 
 		validaCRUD(principal, rimborsoMissioneDettagliDB);
+		controlliPasto(principal, rimborsoMissioneDettagli, rimborsoMissione);
 
 		aggiornaDatiImpegni(principal, rimborsoMissioneDettagliDB);
 
