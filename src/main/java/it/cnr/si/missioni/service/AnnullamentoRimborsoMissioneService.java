@@ -196,12 +196,13 @@ public class AnnullamentoRimborsoMissioneService {
     		rimborsoMissione.setStatoFlusso(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
     		rimborsoMissione.setToBeUpdated();
     		rimborsoMissione = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissione);
-    		
-    		JSONBody body = new JSONBody();
+    		if (rimborsoMissione.getPgMissioneSigla() != null){
+        		JSONBody body = new JSONBody();
 
-			String app = Costanti.APP_SIGLA;
-			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA+"/"+rimborsoMissione.getId();
-			commonService.process(body, app, url, true, HttpMethod.DELETE);
+    			String app = Costanti.APP_SIGLA;
+    			String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA+"/"+rimborsoMissione.getId();
+    			commonService.process(body, app, url, true, HttpMethod.DELETE);
+    		}
     		
     		sendMail(principal, annullamentoDB);
 
