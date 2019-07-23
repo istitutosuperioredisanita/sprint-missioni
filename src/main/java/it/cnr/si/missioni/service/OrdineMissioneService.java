@@ -533,10 +533,10 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita"))
 						.add(Restrictions.eq("missioneGratuita", "N")));
 			}
-			if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("S")) {
+			if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("N")) {
 				criterionList.add(Subqueries.notExists(
 						"select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
-			} else if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("N")) {
+			} else if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("R")) {
 				criterionList.add(Subqueries.exists(
 						"select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
 			}

@@ -94,8 +94,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
 
     var statoOrdineMissione = [
        {stato:'Tutti', value: 'T'},
-       {stato:'Da Rimborsare', value: 'S'},
-       {stato:'Gia Rimborsati', value: 'N'}
+       {stato:'Da Rimborsare', value: 'N'},
+       {stato:'Gia Rimborsati', value: 'R'}
     ];
 
     var luoghiDiPartenza = [
