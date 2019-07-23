@@ -200,7 +200,7 @@ public class RimborsoMissioneDettagliService {
 		if (rimborsoMissione.getOrdineMissione().getId() != null){
 			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal,
 					OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
-			if (ordineMissione != null && Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S") && !rimborsoMissione.isAssociato()){
+			if (ordineMissione != null && Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S") && (!rimborsoMissione.isAssociato() || (rimborsoMissione.getInquadramento() != null && rimborsoMissione.getInquadramento().compareTo(new Long(47)) < 0 ))){
 				livello = 3;
 			}
 		}

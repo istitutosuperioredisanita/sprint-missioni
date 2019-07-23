@@ -66,6 +66,13 @@
                 <cnr-widget-date-range start-date="daData" end-date="aData" ng-model-date="daData" start-label="{{'elenco-rimborsi-missione.filter.da-data' | translate}}" end-label="{{'elenco-rimborsi-missione.filter.a-data' | translate}}"/></cnr-widget-date-range>
             </p>
         </div>
+            <form class="form-inline" role="form" id="missioni">
+        <div>
+            <p class="input-group">
+                <cnr-widget-date-range start-date="daDataMissione" end-date="aDataMissione" ng-model-date="daDataMissione" start-label="{{'elenco-ordini-missione.filter.da-data-missione' | translate}}" end-label="{{'elenco-ordini-missione.filter.a-data-missione' | translate}}"/></cnr-widget-date-range>
+            </p>
+        </div>
+        </form>
         <div class="col-md-2">
             <p class="input-group">
                 <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.anno-ordine">from</span>

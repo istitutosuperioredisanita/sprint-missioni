@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -496,6 +497,22 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.le("dataInserimento",
 						DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
 			}
+			if (filter.getDaDataMissione() != null) {
+				Disjunction condizioneOr = Restrictions.disjunction();
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.ge("dataInizioMissione",
+						DateUtils.parseLocalDate(filter.getDaDataMissione(), DateUtils.PATTERN_DATE).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.ge("dataFineMissione",
+						DateUtils.parseLocalDate(filter.getDaDataMissione(), DateUtils.PATTERN_DATE).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				criterionList.add(condizioneOr);
+			}
+			if (filter.getaDataMissione() != null) {
+				Disjunction condizioneOr = Restrictions.disjunction();
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.lt("dataInizioMissione",
+						DateUtils.parseLocalDate(filter.getaDataMissione(), DateUtils.PATTERN_DATE).plusDays(1).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.lt("dataFineMissione",
+						DateUtils.parseLocalDate(filter.getaDataMissione(), DateUtils.PATTERN_DATE).plusDays(1).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				criterionList.add(condizioneOr);
+			}
 			if (filter.getCdsRich() != null) {
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
 			}
@@ -518,6 +535,9 @@ public class OrdineMissioneService {
 			}
 			if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("N")) {
 				criterionList.add(Subqueries.notExists(
+						"select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
+			} else if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("S")) {
+				criterionList.add(Subqueries.exists(
 						"select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
 			}
 			if (Utility.nvl(filter.getDaAnnullare(), "N").equals("S")) {

@@ -438,8 +438,11 @@
             "a-numero": "A Numero",
             "da-data": "Da Data Inserimento",
             "a-data": "A Data Inserimento",
+            "da-data-missione": "Da Data Missione",
+            "a-data-missione": "A Data Missione",
             "anno": "Anno",
-            "annullati": "Includi Annullati"
+            "annullati": "Includi Annullati",
+            "ordini-missione": "Ordini di Missione"
         },
         "form": {
             "anticipo": "Anticipo",

@@ -2,12 +2,12 @@
 
 missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
         return {
-            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate, idOrdineMissione, recuperoTotali, cup) {
+            findRimborsiMissione: function(user, anno, uoRich, daNumero, aNumero, daData, aData, annoOrdine, daNumeroOrdine, aNumeroOrdine, includiMissioniAnnullate, idOrdineMissione, recuperoTotali, cup, daDataMissione, aDataMissione) {
                 var promise = $http.get('api/rest/rimborsoMissione/list', {params: {user:user, anno: anno, uoRich: uoRich, 
                         daNumero: daNumero, aNumero: aNumero, daData: daData, aData: aData, annoOrdine: annoOrdine, 
                         daNumeroOrdine: daNumeroOrdine, aNumeroOrdine: aNumeroOrdine, 
                         includiMissioniAnnullate: includiMissioniAnnullate, 
-                        idOrdineMissione: idOrdineMissione, recuperoTotali: recuperoTotali, cup: cup}}).then(function (response) {
+                        idOrdineMissione: idOrdineMissione, recuperoTotali: recuperoTotali, cup: cup, daDataMissione: daDataMissione, aDataMissione: aDataMissione}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -83,6 +83,8 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
         $scope.rimborsiMissione = null;
         var daDataFormatted = null;
         var aDataFormatted = null;
+        var daDataMissioneFormatted = null;
+        var aDataMissioneFormatted = null;
         if ($scope.daData){
             daDataFormatted = $filter('date')($scope.daData, "dd/MM/yyyy");
         }
@@ -90,9 +92,15 @@ missioniApp.controller('ElencoRimborsiMissioneController', function ($rootScope,
             aDataFormatted = $filter('date')($scope.aData, "dd/MM/yyyy");
         }
 
+        if ($scope.daDataMissione){
+            daDataMissioneFormatted = $filter('date')($scope.daDataMissione, "dd/MM/yyyy");
+        }
+        if ($scope.aDataMissione){
+            aDataMissioneFormatted = $filter('date')($scope.aDataMissione, "dd/MM/yyyy");
+        }
         ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, 
                 $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine,
-                $scope.annullati,null,null,$scope.cup).then(function(data){
+                $scope.annullati,null,null,$scope.cup, daDataMissioneFormatted, aDataMissioneFormatted).then(function(data){
             if (data && data.length > 0){
                 $scope.rimborsiMissione = data;
                 $scope.messageRimborsiNonEsistenti = false;

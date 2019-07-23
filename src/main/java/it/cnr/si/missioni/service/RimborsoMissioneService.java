@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -500,6 +501,9 @@ public class RimborsoMissioneService {
 
 		controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
     	if (confirm && !rimborsoMissioneDB.isMissioneDaValidare() && rimborsoMissioneDB.isPassataValidazioneAmministrativa()){
+			if (!accountService.isUserSpecialEnableToValidateOrder(principal.getName(), rimborsoMissione.getUoSpesa())){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi missione per la uo "+rimborsoMissione.getUoSpesa()+".");
+			}
     		cmisRimborsoMissioneService.avviaFlusso((Principal) SecurityUtils.getCurrentUser(), rimborsoMissioneDB);
     		rimborsoMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_RIMBORSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_RIMBORSO_FROM_CMIS));
     	}
@@ -780,6 +784,22 @@ public class RimborsoMissioneService {
 			}
 			if (filter.getaData() != null){
 				criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
+			}
+			if (filter.getDaDataMissione() != null) {
+				Disjunction condizioneOr = Restrictions.disjunction();
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.ge("dataInizioMissione",
+						DateUtils.parseLocalDate(filter.getDaDataMissione(), DateUtils.PATTERN_DATE).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.ge("dataFineMissione",
+						DateUtils.parseLocalDate(filter.getDaDataMissione(), DateUtils.PATTERN_DATE).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				criterionList.add(condizioneOr);
+			}
+			if (filter.getaDataMissione() != null) {
+				Disjunction condizioneOr = Restrictions.disjunction();
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.lt("dataInizioMissione",
+						DateUtils.parseLocalDate(filter.getaDataMissione(), DateUtils.PATTERN_DATE).plusDays(1).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				condizioneOr.add(Restrictions.conjunction().add(Restrictions.lt("dataFineMissione",
+						DateUtils.parseLocalDate(filter.getaDataMissione(), DateUtils.PATTERN_DATE).plusDays(1).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
+				criterionList.add(condizioneOr);
 			}
 			if (filter.getCdsRich() != null){
 				criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));

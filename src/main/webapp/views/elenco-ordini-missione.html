@@ -67,6 +67,26 @@
             </p>
         </div>
             <form class="form-inline" role="form" id="missioni">
+        <div>
+            <p class="input-group">
+                <cnr-widget-date-range start-date="daDataMissione" end-date="aDataMissione" ng-model-date="daDataMissione" start-label="{{'elenco-ordini-missione.filter.da-data-missione' | translate}}" end-label="{{'elenco-ordini-missione.filter.a-data-missione' | translate}}"/></cnr-widget-date-range>
+            </p>
+        </div>
+        </form>
+            <form class="form-inline" role="form" id="missioni">
+                <div class="col-md-3">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="elenco-ordini-missione.filter.ordini-missione">Ordini di Missione</span>
+    <ui-select id="missioni-ui-select" theme="select2" ng-model="statoOrdineMissione" on-select="onChangeStatoOrdineMissione(statoOrdineMissione)"/>
+    <ui-select-match placeholder="{{'elenco-ordini-missione.filter.ordini-missione' | translate}}" >
+        <span ng-bind="$select.selected.stato"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in valoriStatoOrdineMissione | filter: $select.search">
+        <span ng-bind="val.stato"></span>
+    </ui-select-choices>
+    </ui-select>
+                        </span>
+                </div>
         <div class="col-md-2">
             <span class="input-group">
               <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
@@ -75,7 +95,7 @@
                 </label>
             </span>
         </div>
-        <div class="col-md-4" ng-show="!uoForUsersSpecial">
+        <div class="col-md-3" ng-show="!uoForUsersSpecial">
             <span class="input-group">
               <span class="input-group-addon" translate="ordine-missione.form.responsabile-gruppo">Responsabile del Gruppo</span>
                 <label class="checkbox">

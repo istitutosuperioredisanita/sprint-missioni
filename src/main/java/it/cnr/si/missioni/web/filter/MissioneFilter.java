@@ -25,6 +25,8 @@ public class MissioneFilter {
 	private String cup;
 	private String daData;
 	private String aData;
+	private String daDataMissione;
+	private String aDataMissione;
 	private String cdsRich;
 	private String uoRich;
 	private String toFinal;
@@ -175,5 +177,17 @@ public class MissioneFilter {
 	}
 	public void setCup(String cup) {
 		this.cup = cup;
+	}
+	public String getDaDataMissione() {
+		return daDataMissione;
+	}
+	public void setDaDataMissione(String daDataMissione) {
+		this.daDataMissione = daDataMissione;
+	}
+	public String getaDataMissione() {
+		return aDataMissione;
+	}
+	public void setaDataMissione(String aDataMissione) {
+		this.aDataMissione = aDataMissione;
 	}
 }
