@@ -86,7 +86,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.voce = ordineMissioneSelected.voce;
                 $scope.rimborsoMissioneModel.gae = ordineMissioneSelected.gae;
                 $scope.rimborsoMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
-                $scope.rimborsoMissioneModel.uoRich = ordineMissioneSelected.uoRich;
                 $scope.rimborsoMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
                 $scope.rimborsoMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
                 $scope.rimborsoMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
