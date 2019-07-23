@@ -92,6 +92,12 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
        {tipo:'Estera', value: 'E'}
     ];
 
+    var statoOrdineMissione = [
+       {stato:'Tutti', value: 'T'},
+       {stato:'Da Rimborsare', value: 'S'},
+       {stato:'Gia Rimborsati', value: 'N'}
+    ];
+
     var luoghiDiPartenza = [
        {partenza:'Sede di Lavoro', value: 'S'},
        {partenza:'Residenza/Domicilio Fiscale', value: 'R'},
@@ -536,6 +542,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              buildUoRichiedenteSiglaFromUoSiper: estraiUoRichFromAccount ,
              buildUoSiglaFromUoSiper: estraiUo,
              valueTipiMissione: tipiMissione,
+             valueStatoOrdineMissione: statoOrdineMissione,
              valueLuoghiDiPartenza: luoghiDiPartenza,
              valuePriorita: valoriPriorita,
              valueTrattamenti: trattamenti,
