@@ -1455,7 +1455,6 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	}
 	public Boolean isAssociato(){
 		return getCdTipoRapporto() != null && getInquadramento() != null && (getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_ASS) ||
-				getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_COLL) ||
 				getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_EXDIP) ||
 				getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_OCCA) ||
 				getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_PROF)) && getInquadramento().compareTo(Costanti.INQUADRAMENTO_ASSEGNISTA) != 0;
