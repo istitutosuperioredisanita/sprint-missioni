@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -38,6 +38,7 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <sprint.version>2.0.1.2</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
+		   <storage.cloud.version>1.0.2</storage.cloud.version>
     </properties>
     <dependencies>
         <dependency>
@@ -111,11 +112,6 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time-hibernate</artifactId>
             <version>${joda-time-hibernate.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-client-impl</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -417,6 +413,39 @@
             <properties>
                 <profile.swagger>,swagger</profile.swagger>
             </properties>
+        </profile>
+        <profile>
+            <id>CMIS</id>
+            <dependencies>
+                <dependency>
+                    <groupId>it.cnr.si</groupId>
+                    <artifactId>storage-cloud-cmis</artifactId>
+                    <version>${storage.cloud.version}</version>
+                </dependency>
+            </dependencies>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>AZURE</id>
+            <dependencies>
+                <dependency>
+                    <groupId>it.cnr.si</groupId>
+                    <artifactId>storage-cloud-azure</artifactId>
+                    <version>${storage.cloud.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>S3</id>
+            <dependencies>
+                <dependency>
+                    <groupId>it.cnr.si</groupId>
+                    <artifactId>storage-cloud-s3</artifactId>
+                    <version>${storage.cloud.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>dev</id>

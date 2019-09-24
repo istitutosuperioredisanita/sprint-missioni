@@ -15,16 +15,16 @@ public class JSONBody implements Cloneable, Serializable{
 	private List<JSONOrderBy> orderBy;
 	private List<JSONClause> clauses;
 	private Context context;
-	String data;
-	Long nazione;
-	Long inquadramento;
-	Long idRimborsoMissione;
-	String cdTipoSpesa;
-	String cdTipoPasto;
-	String divisa;
-	String km;
-	String importoSpesa;
-	MissioneBulk missioneBulk;
+	private String data;
+	private Long nazione;
+	private Long inquadramento;
+	private Long idRimborsoMissione;
+	private String cdTipoSpesa;
+	private String cdTipoPasto;
+	private String divisa;
+	private String km;
+	private String importoSpesa;
+	private MissioneBulk missioneBulk;
 	
 	public JSONBody() {
 		super();

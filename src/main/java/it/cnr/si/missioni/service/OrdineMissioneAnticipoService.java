@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.HashMap;
@@ -9,10 +8,6 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +33,7 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.spring.storage.StorageObject;
 
 /**
  * Service class for managing users.
@@ -200,13 +195,14 @@ public class OrdineMissioneAnticipoService {
 			crudServiceBean.modificaConBulk(principal, ordineMissioneAnticipo);
 			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, ordineMissioneAnticipo.getOrdineMissione().getId());
 
-			List<CmisObject> listaAllegati = cmisOrdineMissioneService.getAttachmentsAnticipo(ordineMissione);
+			List<StorageObject> listaAllegati = cmisOrdineMissioneService.getAttachmentsAnticipo(ordineMissione);
 			if (listaAllegati != null){
-				for (CmisObject object : listaAllegati){
+				for (StorageObject object : listaAllegati){
 					if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso())){
-						missioniCMISService.eliminaFilePresenteNelFlusso(principal, object.getId());
+						StorageObject folderOrdineMissione = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
+						missioniCMISService.eliminaFilePresenteNelFlusso(principal, object.getKey(), folderOrdineMissione);
 					} else {
-		        		missioniCMISService.deleteNode(object.getId());
+		        		missioniCMISService.deleteNode(object.getKey());
 					}
 				}
 			}
@@ -228,39 +224,7 @@ public class OrdineMissioneAnticipoService {
 		byte[] printOrdineMissione = null;
 		String fileName = null;
     	if ((ordineMissione.isStatoInviatoAlFlusso()  && (!ordineMissione.isMissioneInserita() || !ordineMissione.isMissioneDaValidare())) || (ordineMissione.isStatoFlussoApprovato())){
-			ContentStream content = null;
-			try {
-				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAnticipo(ordineMissioneAnticipo);
-			} catch (ComponentException e1) {
-				throw new ComponentException(
-						"Errore nel recupero del contenuto del file Anticipo sul documentale ("
-								+ Utility.getMessageException(e1) + ")",e1);
-			}
-			if (content != null) {
-				fileName = content.getFileName();
-				InputStream is = null;
-				try {
-					is = content.getStream();
-				} catch (Exception e) {
-					throw new ComponentException(
-							"Errore nel recupero dello stream del file Anticipo sul documentale ("
-									+ Utility.getMessageException(e) + ")",e);
-				}
-				if (is != null) {
-					try {
-						printOrdineMissione = IOUtils.toByteArray(is);
-						is.close();
-					} catch (IOException e) {
-						throw new ComponentException(
-								"Errore nella conversione dello stream in byte del file Anticipo ("
-										+ Utility.getMessageException(e) + ")",e);
-					}
-				}
-			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN,
-						"Errore nel recupero del contenuto del file Anticipo sul documentale");
-			}
-			map.put(fileName, printOrdineMissione);
+    		map = cmisOrdineMissioneService.getFileOrdineMissioneAnticipo(ordineMissioneAnticipo);
 		} else {
 			fileName = "OrdineMissioneAnticipo" + idMissione + ".pdf";
 			printOrdineMissione = printAnticipo(username, ordineMissioneAnticipo);

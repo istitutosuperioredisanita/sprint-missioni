@@ -15,7 +15,6 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +74,8 @@ import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import net.bzdyl.ejb3.criteria.Order;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
@@ -219,18 +220,18 @@ public class OrdineMissioneService {
 		String fileName = null;
 		if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
 				&& !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
-			ContentStream content = null;
+			StorageObject storage = null;
 			try {
-				content = cmisOrdineMissioneService.getContentStreamOrdineMissione(ordineMissione);
+				storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
 			} catch (ComponentException e1) {
 				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
 						+ Utility.getMessageException(e1) + ")", e1);
 			}
-			if (content != null) {
-				fileName = content.getFileName();
+			if (storage != null) {
+				fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
 				InputStream is = null;
 				try {
-					is = content.getStream();
+					is = missioniCMISService.getResource(storage);
 				} catch (Exception e) {
 					throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
 							+ Utility.getMessageException(e) + ")", e);
@@ -1652,7 +1653,8 @@ public class OrdineMissioneService {
 			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 					idOrdineMissione);
 			if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso())) {
-				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo);
+				StorageObject folderOrdineMissione = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
+				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo, folderOrdineMissione);
 			} else {
 				missioniCMISService.deleteNode(idNodo);
 			}

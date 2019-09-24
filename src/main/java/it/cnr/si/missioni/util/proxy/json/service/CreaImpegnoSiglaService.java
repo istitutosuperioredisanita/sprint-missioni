@@ -1,14 +1,10 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +12,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
@@ -30,11 +24,9 @@ import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
-import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.impegno.ObbligazioneBulk;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Banca;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.DivisaTappa;
@@ -43,9 +35,7 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneSigla;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.ModalitaPagamento;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Nazione;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.RifInquadramento;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.SpeseMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 
 @Service

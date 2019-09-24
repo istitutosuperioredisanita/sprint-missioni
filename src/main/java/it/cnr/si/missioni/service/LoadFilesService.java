@@ -1,8 +1,8 @@
 package it.cnr.si.missioni.service;
 
 import java.io.InputStream;
+import java.math.BigInteger;
 
-import org.apache.chemistry.opencmis.client.api.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,8 @@ import it.cnr.si.missioni.util.data.DatiUo;
 import it.cnr.si.missioni.util.data.Faq;
 import it.cnr.si.missioni.util.data.UtentiPresidenteSpeciali;
 import it.cnr.si.missioni.util.proxy.cache.json.Services;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 
 @Service
 public class LoadFilesService {
@@ -126,11 +128,12 @@ public class LoadFilesService {
     private InputStream getUsersSpecial() {
 		InputStream is = null;
 		String fileName = getFileNameFromUsersSpecial();
-		Document node = (Document) missioniCMISService.getNodeByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
-		if (node == null || node.getContentStream() == null){
+		StorageObject node = (StorageObject) missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
+		
+		if (node == null || (node.<BigInteger>getPropertyValue(StoragePropertyNames.CONTENT_STREAM_LENGTH.value())).compareTo(BigInteger.ZERO) == 0){
 			is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/"+fileName);
 		} else {
-			is = node.getContentStream().getStream();
+			is = missioniCMISService.getResource(node);
 		}
 		return is;
 	}
@@ -146,11 +149,11 @@ public class LoadFilesService {
 	}
 	protected InputStream recuperoFile(String fileName) {
 		InputStream is;
-		Document node = (Document) missioniCMISService.getNodeByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
-		if (node == null || node.getContentStream() == null){
+		StorageObject node = (StorageObject) missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathConfig()+"/"+missioniCMISService.sanitizeFilename(fileName));
+		if (node == null || (node.<BigInteger>getPropertyValue(StoragePropertyNames.CONTENT_STREAM_LENGTH.value())).compareTo(BigInteger.ZERO) == 0){
 			is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/"+fileName);
 		} else {
-			is = node.getContentStream().getStream();
+			is = missioniCMISService.getResource(node);
 		}
 		return is;
 	}
