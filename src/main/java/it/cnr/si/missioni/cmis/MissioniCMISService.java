@@ -1,13 +1,8 @@
 package it.cnr.si.missioni.cmis;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.math.BigInteger;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,75 +11,56 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.OperationContext;
-import org.apache.chemistry.opencmis.client.api.QueryResult;
-import org.apache.chemistry.opencmis.client.api.Session;
-import org.apache.chemistry.opencmis.client.api.SessionFactory;
-import org.apache.chemistry.opencmis.client.bindings.CmisBindingFactory;
-import org.apache.chemistry.opencmis.client.bindings.impl.CmisBindingsHelper;
-import org.apache.chemistry.opencmis.client.bindings.impl.SessionImpl;
-import org.apache.chemistry.opencmis.client.bindings.spi.AbstractAuthenticationProvider;
-import org.apache.chemistry.opencmis.client.bindings.spi.BindingSession;
-import org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker;
-import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
-import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
-import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
-import org.apache.chemistry.opencmis.client.util.OperationContextUtils;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.SessionParameter;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
-import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
-import org.apache.chemistry.opencmis.commons.enums.BindingType;
-import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
-import org.apache.chemistry.opencmis.commons.enums.VersioningState;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisUnauthorizedException;
-import org.apache.chemistry.opencmis.commons.impl.UrlBuilder;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.cmis.acl.ACLType;
 import it.cnr.si.missioni.cmis.acl.Permission;
-import it.cnr.si.missioni.service.MissioniCMISAccessService;
-import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.service.ProxyService;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
 import it.cnr.si.missioni.util.proxy.json.object.GruppoSAC;
+import it.cnr.si.spring.storage.StorageException;
+import it.cnr.si.spring.storage.StorageException.Type;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.StorageService;
+import it.cnr.si.spring.storage.StoreService;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 @Component
-@ConfigurationProperties(prefix="cmis")
-public class MissioniCMISService {
+public class MissioniCMISService extends StoreService {
 	private transient static final Log logger = LogFactory.getLog(MissioniCMISService.class);
 
 	@Autowired
 	private ApplicationContext appContext;
 	
 	@Autowired
-	private MissioniCMISAccessService missioniCMISAccessService;
+	private ProxyService proxyService;
+	
+    @Value("${spring.proxy.FLOWS.urlOrdineMissione}")
+    private String urlFlowOrdineMissione;
+	
+    @Value("${spring.proxy.FLOWS.urlAnnullamentoOrdineMissione}")
+    private String urlFlowAnnullamentoOrdineMissione;
+	
+    @Value("${spring.proxy.FLOWS.urlRimborsoMissione}")
+    private String urlFlowRimborsoMissione;
+	
+    @Value("${spring.proxy.STORAGE.urlForPerson}")
+    private String urlForPerson;
 	
 	public static final String ASPECT_TITLED = "P:cm:titled";
+	public static final String PROPERTY_LAST_MODIFICATION_DATE = "cmis:lastModificationDate";
 	public static final String ASPECT_FLUSSO = "P:wfcnr:parametriFlusso";
 	public static final String ASPECT_FLUSSO_MISSIONI = "P:cnrmissioni:parametriFlussoMissioni";
 	public static final String PROPERTY_TITLE = "cm:title"; 
@@ -95,9 +71,8 @@ public class MissioniCMISService {
 	public static final String PROPERTY_AUTOVERSION = "cm:autoVersion"; 
 	public static final String PROPERTY_AUTOVERSION_ON_UPDATE = "cm:autoVersionOnUpdateProps";
 	public static final String PROPERTY_FOLDER = "cmis:folder";
-	public static final String PATH_SERVICE_PERMISSIONS = "service/cnr/nodes/permissions/";
-
-
+	public static final String PROPERTY_NAME = "cmis:name";
+	
     private String url;
 
     private String username;
@@ -148,22 +123,9 @@ public class MissioniCMISService {
         this.alfresco = alfresco;
     }
     
-	@Value("${cmis.alfresco}")
-	private String baseURL;
-
-    public static Map<String, TypeDefinition> CACHE_TYPES = new HashMap<String, TypeDefinition> ();
-
-	public void setBaseURL(String baseURL) {
-		this.baseURL = baseURL;
-	}
-
-	public void makeVersionable(CmisObject node){
-		addAutoVersion((Document) node, false);
-	}
-	
 	public String sanitizeFilename(String name) {
 		name = name.trim();
-		Pattern pattern = Pattern.compile("([\\/:@()&\u20AC<>?\"])");
+		Pattern pattern = Pattern.compile(Costanti.STRING_FOR_SANITIZE_FILE_NAME);
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
 			return matcher.replaceAll("_"); 
@@ -174,7 +136,7 @@ public class MissioniCMISService {
 	
 	public String sanitizeFolderName(String name) {
 		name = name.trim();
-		Pattern pattern = Pattern.compile("([\\/:@()&\u20AC<>?\"])");
+		Pattern pattern = Pattern.compile(Costanti.STRING_FOR_SANITIZE_FILE_NAME);
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.matches()){
 			return matcher.replaceAll("'"); 
@@ -183,578 +145,178 @@ public class MissioniCMISService {
 		}		
 	}
 
-	public String getRepositoryURL() {
-		return baseURL;
+	public StoragePath getBasePath() {
+		return (StoragePath)appContext.getBean("storagePath");
 	}
 	
-	public CmisObject getNodeByPath(CmisPath cmisPath){
-		return getNodeByPath(cmisPath.getPath());
-	}
-
-	public CmisObject getNodeByPath(String path){
-		return getSession().getObjectByPath(path);
-	}
-	
-	public CmisObject getNodeByNodeRef(String nodeRef){
-		return getSession().getObject(nodeRef);
-	}
-
-	public CmisObject getNodeByNodeRef(String nodeRef, UsernamePasswordCredentials usernamePasswordCredentials){
-		return getSession().getObject(nodeRef);
-	}
-	
-	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, String folderName){
-		folderName = sanitizeFolderName(folderName);
-		Map<String, Object> metadataProperties = new HashMap<String, Object>();
-		metadataProperties.put(PropertyIds.OBJECT_TYPE_ID, PROPERTY_FOLDER);
-		metadataProperties.put(PROPERTY_DESCRIPTION, folderName);
-		metadataProperties.put(PropertyIds.NAME, folderName);
-		metadataProperties.put(PROPERTY_TITLE, folderName);
-		List<String> aspectsToAdd = new ArrayList<String>();
-		aspectsToAdd.add(ASPECT_TITLED);
-		cmisPath = createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName, false);
-		return cmisPath;
-	}
-	
-	public CmisPath getBasePath() {
-		return (CmisPath)appContext.getBean("cmisPath");
-	}
-	
-	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName) {
-		return createFolderIfNotPresent(cmisPath, metadataProperties, aspectsToAdd, folderName, true);
-	}
-	
-	public CmisPath createFolderIfNotPresent(CmisPath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName, Boolean updateProperties) {
-		CmisObject cmisObject = getNodeByPath(cmisPath);
-		try{
-			metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspectsToAdd);
-			Folder folder = (Folder) getNodeByNodeRef(getSession().createFolder(metadataProperties, cmisObject).getId());
-			return CmisPath.construct(folder.getPath());
-		}catch(CmisContentAlreadyExistsException _ex){
-				Folder folder = (Folder) getNodeByPath(cmisPath.getPath()+(cmisPath.getPath().equals("/")?"":"/")+sanitizeFilename(folderName).toLowerCase());
-				if (updateProperties){
-					List<String> aspects = folder.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
-			        aspects.addAll(aspectsToAdd);
-			        metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-					folder.updateProperties(metadataProperties, true);
-				}
-				return CmisPath.construct(folder.getPath());
-		} catch (Exception e) {
-			logger.error("Errore nella creazione della folder.", e);
-			throw new ComponentException(e);
-		}
-	}
-	
-	public void deleteNode(CmisObject cmisObject){
-		if (cmisObject.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER))
-			((Folder)cmisObject).deleteTree(true, UnfileObject.DELETE, false);
-		else	
-			getSession().delete(cmisObject);
-	}
-
-    public BindingSession getBindingSession()  {
-    	try{
-
-    		return recuperoBindingSession();
-    	} catch (CmisUnauthorizedException e) {
-    		missioniCMISAccessService.cacheEvict();
-    		try {
-				return recuperoBindingSession();
-			} catch (Exception e1) {
-	    		logger.error("Errore nella creazione della BindingSession", e);
-	    		throw new ComponentException(e);
-			}
-    	} catch (Exception e) {
-    		logger.error("Errore nella creazione della BindingSession", e);
-    		throw new ComponentException(e);
-        }
-    }
-
-	protected BindingSession recuperoBindingSession() throws Exception {
-		SessionImpl session = new SessionImpl();
-
-		session.put(SessionParameter.USER, "");
-		session.put(SessionParameter.PASSWORD, missioniCMISAccessService.getTicket(username, password));
-		session.put(SessionParameter.AUTH_HTTP_BASIC, Boolean.TRUE.toString());
-
-		try {
-			AbstractAuthenticationProvider authenticationProvider =
-					(AbstractAuthenticationProvider) Class.forName(CmisBindingFactory.STANDARD_AUTHENTICATION_PROVIDER)
-					.newInstance();
-			authenticationProvider.setSession(session);
-			session.put(CmisBindingsHelper.AUTHENTICATION_PROVIDER_OBJECT, authenticationProvider);
-		} catch (InstantiationException | ClassNotFoundException | IllegalAccessException e) {
-			logger.error("error creating AbstractAuthenticationProvider", e);
-		}
-
-		session.put(SessionParameter.HTTP_INVOKER_CLASS, DefaultHttpInvoker.class.getCanonicalName());
-		return session;
-	}
-
-    public Session getSession() {
-    	try {
-    		return recuperoSession();
-    	} catch (CmisUnauthorizedException e) {
-    		missioniCMISAccessService.cacheEvict();
-    		try {
-				return recuperoSession();
-			} catch (Exception e1) {
-	    		logger.error("Errore nella creazione della session", e);
-	    		throw new ComponentException(e);
-			}
-    	} catch (Exception e) {
-    		logger.error("Errore nella creazione della session", e);
-    		throw new ComponentException(e);
-    	}
-
-    }
-
-	protected Session recuperoSession() throws Exception {
-		SessionFactory factory = SessionFactoryImpl.newInstance();
-		Map<String, String> parameter = new HashMap<String, String>();
-
-		parameter.put(SessionParameter.PASSWORD, missioniCMISAccessService.getTicket(username, password));
-		parameter.put(SessionParameter.USER, "");
-		parameter.put(SessionParameter.ATOMPUB_URL, url);
-		parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-		parameter.put(SessionParameter.REPOSITORY_ID, "-default-");
-		parameter.put(SessionParameter.TYPE_DEFINITION_CACHE_CLASS, "it.cnr.si.missioni.cmis.MissioniTypeDefinitionCacheImpl");
-		parameter.put(SessionParameter.CACHE_SIZE_TYPES, "100");
-        parameter.put(SessionParameter.CACHE_PATH_OMIT, String.valueOf(Boolean.TRUE));
-
-        Session session = factory.createSession(parameter);
-
-        OperationContext operationContext = OperationContextUtils.createOperationContext();
-        operationContext.setIncludeAllowableActions(false);
-        operationContext.setIncludePathSegments(false);
-        session.setDefaultContext(operationContext);
-
-        return session;
-	}
-
-	public void deleteNode(String nodeRef){
-        CmisObject obj = getNodeByNodeRef(nodeRef);
-        deleteNode(obj);
-	}
-
-	public InputStream getResource(CmisObject cmisObject){
-		ContentStream content = getContent(cmisObject);
-		if (content != null){
-			return content.getStream();
-		}
-		return null;
-	}
-	
-	public ContentStream getContent(CmisObject cmisObject){
-		return ((Document)cmisObject).getContentStream();
-	}
-	
-	public Document storeSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
-			CmisPath cmisPath, Permission... permissions){
-		return storeSimpleDocument(metadataProperties, inputStream, contentType, name, cmisPath, null, false, permissions);
-	}
-	
-	public Document storeSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
-				CmisPath cmisPath, String objectTypeName, boolean makeVersionable, Permission... permissions){
-		CmisObject parentNode = getNodeByPath(cmisPath);
-		try {
-			name = sanitizeFilename(name);
-			metadataProperties.put(PropertyIds.NAME, name);
-
-			List<String> aspectsToAdd = new ArrayList<String>();
-			aspectsToAdd.add(ASPECT_TITLED);
-			aspectsToAdd.add(ASPECT_AUTHOR);
-			aspectsToAdd.add(ASPECT_FLUSSO);
-			aspectsToAdd.add(ASPECT_FLUSSO_MISSIONI);
-			metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspectsToAdd);
-
-			ContentStream contentStream = new ContentStreamImpl(
-					name,
-					BigInteger.ZERO,
-					contentType,
-					inputStream);			
-			Document node = (Document) getNodeByNodeRef(
-					getSession().createDocument(metadataProperties, parentNode, contentStream, VersioningState.MAJOR).getId());
-			if (permissions.length > 0 ){
-				setInheritedPermission(getBindingSession(), node.getProperty(ALFCMIS_NODEREF).getValueAsString(), Boolean.FALSE);
-				if (permissions != null && permissions.length > 0) {
-					addAcl(getBindingSession(), node.getProperty(ALFCMIS_NODEREF).getValueAsString(), Permission.convert(permissions));
-				}
-			}
-			if (makeVersionable)
-				addAutoVersion((Document) node, false);
-			return node;
-		}catch (CmisBaseException e) {
-			throw e;
-		}catch (Exception e) {
-			logger.error("Errore nel salvataggio del documento.", e);
-			throw new ComponentException(e);
-		}
+	public String createFolderIfNotPresent(StoragePath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName) {
+		metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), aspectsToAdd);
+		return createFolderIfNotPresent(cmisPath.getPath(), folderName, metadataProperties);
 	}
 	
 	
 	public InputStream recuperoStreamFileFromObjectID(String id){
 		if (id != null){
-			try{
-				return getResource(getNodeByNodeRef(id));
-			}catch (CmisObjectNotFoundException _ex){
-				throw new ComponentException(_ex);
-			}
+			return getResource(recuperoContentFileFromObjectID(id));
 		}
 		return null;
 	}
-	
-	public ContentStream recuperoContentFileFromObjectID(String id){
+
+	public StorageObject recuperoContentFileFromObjectID(String id){
 		if (id != null){
-			try{
-				return getContent(getNodeByNodeRef(id));
-			}catch (CmisObjectNotFoundException _ex){
-				throw new ComponentException(_ex);
-			}
+			return getStorageObjectBykey(id);
 		}
 		return null;
 	}
 	
     @Transactional(readOnly = true)
-	public Document restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
-			CmisPath cmisPath, Permission... permissions){
+	public StorageObject restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
+			StoragePath cmisPath, Permission... permissions){
 		return restoreSimpleDocument(metadataProperties, inputStream, contentType, name, cmisPath, null, false, permissions);
 	}
 
     @Transactional(readOnly = true)
-	public Document restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
-			CmisPath cmisPath, String objectTypeName, boolean makeVersionable, Permission... permissions){
-		Document node = null;
-		boolean existsDocument = false;
-		try {
-			node = (Document) getNodeByPath(cmisPath.getPath()+
-											(cmisPath.getPath().equals("/")?"":"/")+
-											sanitizeFilename(name).toLowerCase());
-			existsDocument = true;
-		} catch (CmisObjectNotFoundException e){
-			return storeSimpleDocument(metadataProperties, inputStream, contentType, name, cmisPath, objectTypeName, makeVersionable, permissions);
-		}
-		node = updateContent(node.getObjectOfLatestVersion(false).getId(), inputStream, contentType);
-		if (existsDocument){
-			addPropertyForExistingDocument(metadataProperties, node);
-		}
-		return node;
+	public StorageObject restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
+			StoragePath path, String objectTypeName, boolean makeVersionable, Permission... permissions){
+		StorageObject storage = null;
+	        Optional<StorageObject> optStorageObject = Optional.ofNullable(getStorageObjectByPath(path.getPath().concat(StorageService.SUFFIX).concat(sanitizeFilename(name))));
+			List<String> lista = new ArrayList<>();
+			lista.add(MissioniCMISService.ASPECT_FLUSSO);
+			lista.add(MissioniCMISService.ASPECT_AUTHOR);
+			lista.add(MissioniCMISService.ASPECT_TITLED);
+			lista.add(MissioniCMISService.ASPECT_FLUSSO_MISSIONI);
+			metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), lista);
+	        if (optStorageObject.isPresent()) {
+	            storage =  updateStream(optStorageObject.get().getKey(), inputStream, contentType);
+				addPropertyForExistingDocument(metadataProperties, storage);
+				return storage;
+	        } else {
+	            return storeSimpleDocument(inputStream, contentType, path.getPath(), metadataProperties);
+	        }
+
 	}
 
-	public void addPropertyForExistingDocument(Map<String, Object> metadataProperties, Document node) {
-		addAspect(node, ASPECT_FLUSSO);
-		addAspect(node, ASPECT_FLUSSO_MISSIONI);
+	public void addPropertyForExistingDocument(Map<String, Object> metadataProperties, StorageObject node) {
+		List<String> lista = new ArrayList<>();
+		lista.add(MissioniCMISService.ASPECT_FLUSSO);
+		lista.add(MissioniCMISService.ASPECT_AUTHOR);
+		lista.add(MissioniCMISService.ASPECT_TITLED);
+		lista.add(MissioniCMISService.ASPECT_FLUSSO_MISSIONI);
+		metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), lista);
 		updateProperties(metadataProperties, node);
 	}
 
-    @Transactional(readOnly = true)
-	public void updateProperties(Map<String, Object> metadataProperties, CmisObject node){
-		try {
-			if (node.getBaseTypeId().equals(BaseTypeId.CMIS_DOCUMENT)) {
-				node = ((Document)node).getObjectOfLatestVersion(false);
-				node = getSession().getObject(node);
-				node.refresh();
-			}
-			node.updateProperties(metadataProperties, true);
-		} catch (Exception e) {
-			logger.error("Errore nell'aggiornamento delle properties.", e);
-			throw new ComponentException(e);
-		}
-	}
 
-	public Document updateContent(String nodeRef, InputStream inputStream, String contentType){
-		Document document = (Document) getNodeByNodeRef(nodeRef);
-		return updateContent(document, inputStream, contentType, document.getName());
-	}
-
-	public Document updateContent(Document document, InputStream inputStream, String contentType, String name){
-		ContentStream contentStream = new ContentStreamImpl(
-				name,
-				BigInteger.ZERO,
-				contentType,
-				inputStream);
-		document.setContentStream(contentStream, true, true);
-		return document.getObjectOfLatestVersion(false);
-	}
-
-	public ItemIterable<CmisObject> getChildren(Folder folder){
-		return folder.getChildren();
-	}
-	
-	public void copyNode(Document source, Folder target){
-		source.addToFolder(target, true);
-	}
-	
-	public ItemIterable<QueryResult> search(StringBuilder query){
-		return search(query, getSession().getDefaultContext());
-	}
-
-	public ItemIterable<QueryResult> search(StringBuilder query, OperationContext operationContext){
-		return getSession().query(query.toString(), false, operationContext);
-	}
-	
-	public List<CmisObject> searchAndFetchNode(StringBuilder query){
-		List<CmisObject> results = new ArrayList<CmisObject>();
-		for (QueryResult queryResult : search(query)) {
-			results.add(getNodeByNodeRef((String) queryResult.getPropertyValueById(PropertyIds.OBJECT_ID)));
-		}
-		return results;
-	}
-
-    public void addAspect(CmisObject cmisObject, String... aspectName){
-        Map<String, Object> metadataProperties = new HashMap<String, Object>();
-        List<String> aspects = cmisObject.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
-        aspects.addAll(Arrays.asList(aspectName));
-        metadataProperties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-        cmisObject.updateProperties(metadataProperties);
-    }
-    
-	public void removeAspect(CmisObject cmisObject, String... aspectName){
-		List<Object> aspects = cmisObject.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues();
-		aspects.removeAll(Arrays.asList(aspectName));
-		cmisObject.updateProperties(Collections.singletonMap(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects));
-	}
-
-	public boolean hasAspect(CmisObject cmisObject, String aspectName) {
-		return cmisObject.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues().contains(aspectName);
-	}
-	
-	public void setInheritedPermission(CmisPath cmisPath, Boolean inheritedPermission){
-		setInheritedPermission(getBindingSession(), getNodeByPath(cmisPath).getProperty(ALFCMIS_NODEREF).getValueAsString(), inheritedPermission);
-	}
-		
-	private void setInheritedPermission(BindingSession cmisSession,
-			String objectId, final Boolean inheritedPermission) {
-		String link = baseURL
-				.concat(PATH_SERVICE_PERMISSIONS)
-				.concat(objectId.replace(":/", ""));
-		UrlBuilder url = new UrlBuilder(link);
-		Response resp = CmisBindingsHelper.getHttpInvoker(cmisSession).invokePOST(url,
-				MimeTypes.JSON.mimetype(), new Output() {
-					public void write(OutputStream out) throws Exception {
-						JSONObject jsonObject = new JSONObject();
-						JSONArray jsonArray = new JSONArray();
-						jsonObject.put("permissions", jsonArray);
-						jsonObject.put("isInherited", inheritedPermission);
-						out.write(jsonObject.toString().getBytes());
-					}
-				}, cmisSession);
-		int status = resp.getResponseCode();
-		if (status == HttpStatus.SC_NOT_FOUND
-				|| status == HttpStatus.SC_BAD_REQUEST
-				|| status == HttpStatus.SC_INTERNAL_SERVER_ERROR)
-			throw new CmisRuntimeException("Inherited Permission error. Exception: "
-					+ resp.getErrorContent());
-	}
-
-	private void addAcl(BindingSession cmisSession, String nodeRef,
-			Map<String, ACLType> permission) {
-		managePermission(cmisSession, nodeRef, permission, false);
-	}
-
-	private void managePermission(BindingSession cmisSession, String objectId,
-			final Map<String, ACLType> permission, final boolean remove) {
-		String link = baseURL
-				.concat(PATH_SERVICE_PERMISSIONS)
-				.concat(objectId.replace(":/", ""));
-		UrlBuilder url = new UrlBuilder(link);
-		Response resp = CmisBindingsHelper.getHttpInvoker(cmisSession).invokePOST(url,
-				MimeTypes.JSON.mimetype(), new Output() {
-					public void write(OutputStream out) throws Exception {
-						JSONObject jsonObject = new JSONObject();
-						JSONArray jsonArray = new JSONArray();
-						for (String authority : permission.keySet()) {
-							JSONObject jsonAutority = new JSONObject();
-							jsonAutority.put("authority", authority);
-							jsonAutority.put("role", permission.get(authority));
-							if (remove)
-								jsonAutority.put("remove", remove);
-							jsonArray.put(jsonAutority);
-						}
-						jsonObject.put("permissions", jsonArray);
-						out.write(jsonObject.toString().getBytes());
-					}
-				}, cmisSession);
-		int status = resp.getResponseCode();
-
-		logger.info((remove ? "remove" : "add") + " permission " + permission + " on item "
-				+ objectId + ", status = " + status);
-
-		if (status == HttpStatus.SC_NOT_FOUND
-				|| status == HttpStatus.SC_BAD_REQUEST
-				|| status == HttpStatus.SC_INTERNAL_SERVER_ERROR)
-			throw new CmisRuntimeException("Manage permission error. Exception: "
-					+ resp.getErrorContent());
-	}
-
-	public void addAutoVersion(Document doc,
-			final boolean autoVersionOnUpdateProps) {
-		String link = baseURL.concat(
-				"service/api/metadata/node/");
-		link = link.concat(doc.getProperty(ALFCMIS_NODEREF).getValueAsString().replace(":/", ""));
-		UrlBuilder url = new UrlBuilder(link);
-		Response resp = CmisBindingsHelper.getHttpInvoker(getBindingSession()).invokePOST(url,
-				MimeTypes.JSON.mimetype(), new Output() {
-					public void write(OutputStream out) throws Exception {
-						JSONObject jsonObject = new JSONObject();
-						JSONObject jsonObjectProp = new JSONObject();
-						jsonObjectProp.put(PROPERTY_AUTOVERSION, true);
-						jsonObjectProp.put(PROPERTY_AUTOVERSION_ON_UPDATE,
-								autoVersionOnUpdateProps);
-						jsonObject.put("properties", jsonObjectProp);
-						out.write(jsonObject.toString().getBytes());
-					}
-				}, getBindingSession());
-		int status = resp.getResponseCode();
-		if (status == HttpStatus.SC_NOT_FOUND
-				|| status == HttpStatus.SC_BAD_REQUEST
-				|| status == HttpStatus.SC_INTERNAL_SERVER_ERROR)
-			throw new CmisRuntimeException("Add Auto Version. Exception: "
-					+ resp.getErrorContent());
-	}
-
-	public Response invokeGET(UrlBuilder url) {
-		return CmisBindingsHelper.getHttpInvoker(getBindingSession()).invokeGET(url, getBindingSession());		
-	}
-	 
-	public Response invokePOST(UrlBuilder url, MimeTypes mimeType, final byte[] content) {
-		if (logger.isDebugEnabled())
-			logger.debug("Invoke URL:" + url);
-		return CmisBindingsHelper.getHttpInvoker(getBindingSession()).invokePOST(url, mimeType.mimetype(),
-				new Output() {
-					public void write(OutputStream out) throws Exception {
-            			out.write(content);
-            		}
-        		}, getBindingSession());
-	}
-
-	public Response invokePUT(UrlBuilder url, MimeTypes mimeType, final byte[] content, Map<String, String> headers) {
-		if (logger.isDebugEnabled())
-			logger.debug("Invoke URL:" + url);
-		return CmisBindingsHelper.getHttpInvoker(getBindingSession()).invokePUT(url, mimeType.mimetype(), headers, 
-				new Output() {
-					public void write(OutputStream out) throws Exception {
-            			out.write(content);
-            		}
-        		}, getBindingSession());
-	}
 
     public String recuperoNodeRefUtente(String username){
 		JsonFactory jsonFactory = new JsonFactory();
 		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
 		try {
-			Response responseFirmatario = invokeGET(new UrlBuilder(getRepositoryURL()+"service/cnr/person/person/"+username));
-			if (responseFirmatario.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Richiesta Utente " + username + ". Errore "+responseFirmatario.getResponseMessage());
+			String appUrl = "service/cnr/person/person/";
+			String url = appUrl+username;
+			String body = null;
+			ResultProxy result = proxyService.process(HttpMethod.GET, body, Costanti.APP_STORAGE, url, null, null, false);
+			String risposta = result.getBody();
 			TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-			HashMap<String,Object> mapFirmatario = mapper.readValue(responseFirmatario.getStream(), typeRef); 
+			HashMap<String,Object> mapFirmatario = mapper.readValue(risposta, typeRef); 
 			
 			Boolean userEnabled = (Boolean)mapFirmatario.get("enabled");
 			String userNodeRef = (String)mapFirmatario.get("node-uuid");
 			if (userEnabled==null || !userEnabled || userNodeRef==null)
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Utente " + username + " non registrato.");
+				throw new StorageException(Type.NOT_FOUND, "Errore in fase avvio flusso documentale. Utente " + username + " non registrato.");
 			return "workspace://SpacesStore/"+userNodeRef;
-		} catch (CMISException e) {
+		} catch (StorageException e) {
 			throw e;
 		} catch (Exception e) {
 			logger.error("Errore nel recuperoNodeRefUtente.", e);
-			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Utente " + username + " non registrato.");
+			throw new StorageException(Type.GENERIC, "Errore in fase avvio flusso documentale. Utente " + username);
 		}
 
     }
     
-	public Response startFlowOrdineMissione(StringWriter stringWriter) throws ComponentException{
-		String simpleUrl = getUrlOrdineMissione();
-		return startFlow(stringWriter, simpleUrl);
+	public String startFlowOrdineMissione(MessageForFlow message) throws ComponentException{
+		return startFlow(message, urlFlowOrdineMissione);
 	}
 
-	public Response startFlowAnnullamentoOrdineMissione(StringWriter stringWriter) throws ComponentException{
-		String simpleUrl = getUrlAnnullamentoOrdineMissione();
-		return startFlow(stringWriter, simpleUrl);
+	public String startFlowAnnullamentoOrdineMissione(MessageForFlow  message) throws ComponentException{
+		return startFlow(message, urlFlowAnnullamentoOrdineMissione);
 	}
 
-	private String getUrlOrdineMissione() {
-		return "service/api/workflow/activiti$flussoMissioniOrdine/formprocessor";
-	}
-	
-	private String getUrlAnnullamentoOrdineMissione() {
-		return "service/api/workflow/activiti$flussoMissioniRevoca/formprocessor";
-	}
-	
-	private String getUrlRimborsoMissione() {
-		return "service/api/workflow/activiti$flussoMissioniRimborso/formprocessor";
-	}
-	
-	public Response startFlowRimborsoMissione(StringWriter stringWriter) throws ComponentException{
-		String simpleUrl = getUrlRimborsoMissione();
-		return startFlow(stringWriter, simpleUrl);
+	public String startFlowRimborsoMissione(MessageForFlow message) throws ComponentException{
+		return startFlow(message, urlFlowRimborsoMissione);
 	}
 
-	private Response startFlow(StringWriter stringWriter, String simpleUrl) {
+	private String startFlow(MessageForFlow  message, String simpleUrl) {
+		JsonFactory jsonFactory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
 		try {
-			String url = getRepositoryURL()+simpleUrl;
-			logger.info("Start Flow. Url: "+url+" - Content: "+stringWriter.getBuffer().toString());
-			Response responsePost = invokePOST(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
-			if (responsePost.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: "+ responsePost.getErrorContent()+".");
-			return responsePost;
-		} catch (CMISException e) {
+			String url = simpleUrl;
+			ResultProxy result = proxyService.process(HttpMethod.POST, message, Costanti.APP_STORAGE, url, null, null, false);
+			String risposta = result.getBody();
+			logger.info("Risposta Start Flow. Content: "+message.toString() + ". Risposta: "+risposta);
+
+			TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+			HashMap<String,Object> map = mapper.readValue(risposta, typeRef); 
+			
+			String text = map.get(Costanti.PROPERTY_RESULT_FLOW).toString();
+
+			Pattern pattern = Pattern.compile(Costanti.PATTERN_RESULT_FLOW);
+			Matcher matcher = pattern.matcher(text);
+			if (matcher.find())
+				return matcher.group(1);
+			throw new StorageException(Type.GENERIC, "Flusso non avviato "+message.toString());
+		} catch (StorageException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			throw new StorageException(Type.GENERIC, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
 	
-	public void restartFlow(StringWriter stringWriter, ResultFlows result) {
-
+	public void restartFlow(MessageForFlow message, ResultFlows result) {
 		try {
-			String url = getRepositoryURL()+"service/api/task/"+result.getTaskId()+"/formprocessor";
-			logger.info("url for Restart: "+url + " body: "+stringWriter.getBuffer().toString());
-			Response responsePost = invokePOST(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes());
-			if (responsePost.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: "+ responsePost.getErrorContent()+".");
-		} catch (CMISException e) {
+			String url = "service/api/task/"+result.getTaskId()+"/formprocessor";
+			logger.info("url for Restart: "+url + " body: "+message.toString());
+			proxyService.process(HttpMethod.POST, message, Costanti.APP_STORAGE, url, null, null, false);
+		} catch (StorageException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			throw new StorageException(Type.GENERIC, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
 
 	private void nextStepForRestartFlow(ResultFlows result) {
 		try {
-			String next = "next";
-			Response responseNext = invokePOST(new UrlBuilder(getRepositoryURL()+"service/api/workflow/task/end/"+result.getTaskId()+"/Next" ), MimeTypes.JSON, next.getBytes());
-			if (responseNext.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di avanzamento del flusso documentale. Errore: "+ responseNext.getErrorContent()+".");
-		} catch (CMISException e) {
+			String url = "service/api/workflow/task/end/"+result.getTaskId()+"/Next";
+			MessageForFlowNext msg = new MessageForFlowNext();
+			msg.setNext("next");
+			proxyService.process(HttpMethod.POST, msg, Costanti.APP_STORAGE, url, null, null, false);
+		} catch (StorageException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di avanzamento del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			throw new StorageException(Type.GENERIC, "Errore in fase di avanzamento del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
 
-	public void abortFlow(StringWriter stringWriter, ResultFlows result) {
+	public void abortFlow(MessageForFlow message, ResultFlows result) {
 
 		try {
-			String url = getRepositoryURL()+"service/api/task-instances/"+result.getTaskId();
-			logger.info("url for Restart: "+url + " body: "+stringWriter.getBuffer().toString());
-			Response responsePut = invokePUT(new UrlBuilder(url), MimeTypes.JSON, stringWriter.getBuffer().toString().getBytes(), null);
-			if (responsePut.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: "+ responsePut.getErrorContent()+".");
+			String url = "service/api/task-instances/"+result.getTaskId();
+			logger.info("url for Restart: "+url + " body: "+message.toString());
+			proxyService.process(HttpMethod.POST, message, Costanti.APP_STORAGE, url, null, null, false);
 			nextStepForRestartFlow(result);
-		} catch (CMISException e) {
+		} catch (StorageException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			throw new StorageException(Type.GENERIC, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
 	public CMISFileContent getAttachment(String nodeRef){
 		CMISFileContent cmisFileContent = new CMISFileContent();
-        CmisObject obj = getNodeByNodeRef(nodeRef);
+        StorageObject obj = getStorageObjectBykey(nodeRef);
         if (obj != null){
         	cmisFileContent.setStream(getResource(obj));
-        	cmisFileContent.setFileName(obj.getName());
-        	cmisFileContent.setMimeType(obj.getPropertyValue(PropertyIds.CONTENT_STREAM_MIME_TYPE));
+        	cmisFileContent.setFileName(obj.getPropertyValue(StoragePropertyNames.NAME.value()));
+        	cmisFileContent.setMimeType(obj.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
         	return cmisFileContent;
         }
 
@@ -766,81 +328,84 @@ public class MissioniCMISService {
 		JsonFactory jsonFactory = new JsonFactory();
 		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
 		try {
-			String url = getRepositoryURL()+"service/api/groups/"+org.apache.commons.lang.StringUtils.rightPad(uo, 26, '0')+"/parents?";
+			String url = "service/api/groups/"+org.apache.commons.lang.StringUtils.rightPad(uo, 26, '0')+"/parents?";
 			logger.info("url for GET Dati Gruppo SAC: "+url);
-			Response responseGet = invokeGET(new UrlBuilder(url));
-			if (responseGet.getResponseCode()!=200) 
-				throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di GET Dati Gruppo SAC. Errore: "+ responseGet.getErrorContent()+".");
+			String body = null;
+			ResultProxy result = proxyService.process(HttpMethod.GET, body, Costanti.APP_STORAGE, url, null, null, false);
+			String risposta = result.getBody();
 			Class<GruppoSAC> grpSAC = GruppoSAC.class;
-			GruppoSAC gruppoSac = (GruppoSAC)mapper.readValue(responseGet.getStream(), grpSAC);
+			GruppoSAC gruppoSac = mapper.readValue(risposta, grpSAC); 
+			
 			if (gruppoSac != null && gruppoSac.getData() != null && gruppoSac.getData().size() > 0){
 				return gruppoSac.getData().get(0);
 			} else {
 				return null;
 			}
-		} catch (CMISException e) {
+		} catch (StorageException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CMISException(CodiciErrore.ERRGEN, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			throw new StorageException(Type.GENERIC, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
-	public QueryResult recupeorFlusso(String idFlusso) {
+	
+	
+	public Boolean deleteNode(String id) {
+		return super.delete(id);
+	}
+	public List<StorageObject> recuperoFlusso(String idFlusso) {
 		StringBuilder query = new StringBuilder("select parametriFlusso.wfcnr:statoFlusso, parametriFlusso.wfcnr:taskId, flussoMissioni.cnrmissioni:commento from cmis:document as t ");
 		query.append( "inner join wfcnr:parametriFlusso as parametriFlusso on t.cmis:objectId = parametriFlusso.cmis:objectId ");
 		query.append(" inner join cnrmissioni:parametriFlussoMissioni as flussoMissioni on t.cmis:objectId = flussoMissioni.cmis:objectId ");
 		query.append(" where parametriFlusso.wfcnr:wfInstanceId = '").append(idFlusso).append("'");
 
-		ItemIterable<QueryResult> resultsFolder = search(query);
-		if (resultsFolder.getTotalNumItems() == 0){
-			return null;
-		} else {
-			for (QueryResult queryResult : resultsFolder) {
-				return queryResult;
-			}
-		}
-		return null;
+		return super.search(query.toString());
 	}
-	protected List<CmisObject> recuperoDocumento(Folder node, String tipoDocumento) {
-		return Optional.ofNullable(node) 
-			.map(folder -> folder.getChildren())
-			.map(cmisObjects -> {
-                List<CmisObject> list = new ArrayList<CmisObject>();
-                cmisObjects.forEach(cmisObject ->
-                        list.add(cmisObject));
+	protected List<StorageObject> recuperoDocumento(StorageObject fo, String tipoDocumento) {
+		return Optional.ofNullable(fo) 
+			.map(folder -> super.getChildren(folder.getKey()))
+			.map(storageObjects -> {
+                List<StorageObject> list = new ArrayList<StorageObject>();
+                storageObjects.forEach(so ->
+                        list.add(so));
                 return list;
             })
 			.map(lista -> lista.stream()
-			.filter(cmisObj -> {
-				Boolean str = ((ArrayList<String>)cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(tipoDocumento) && 
-						!((ArrayList<String>)cmisObj.getPropertyValue(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
+			.filter(stor -> {
+				Boolean str = ((ArrayList<String>)stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value())).contains(tipoDocumento) && 
+						!((ArrayList<String>)stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value())).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
 				return str;
-			}).collect(Collectors.toList())).orElse(new ArrayList<CmisObject>());
+			}).collect(Collectors.toList())).orElse(new ArrayList<StorageObject>());
 	}
 	
-	public void eliminaFilePresenteNelFlusso(Principal principal, String idNodo) {
-		Document node = (Document)getNodeByNodeRef(idNodo);
-		String oldNomeFile = node.getName();
-		List<String> listaPath = node.getPaths();
+	public List<StorageObject> getChildren(StorageObject fo) {
+		return super.getChildren(fo.getKey());
+	}
+	
+	public void eliminaFilePresenteNelFlusso(Principal principal, String idNodo, StorageObject storageFolderRimborso) {
+		List<StorageObject> listaStorageObject = super.getChildren(storageFolderRimborso.getKey(), -1);
+		StorageObject node = (StorageObject)getStorageObjectByPath(idNodo);
+		String oldNomeFile = node.getPropertyValue(StoragePropertyNames.NAME.value());
 		Boolean nameAlreadyExists = true;
 		
 		String nomeFileEliminato = oldNomeFile;
 	    while( nameAlreadyExists ) {
 	    	nameAlreadyExists = false;
 			nomeFileEliminato = sanitizeFilename(nomeFileEliminato+".eliminato");
-			for (String path : listaPath){
+			for (StorageObject so : listaStorageObject){
+				String path = so.getPath();
 				String newPath = path.substring(0, path.length() - oldNomeFile.length());
 				try {
-					Document newNode = (Document) getNodeByPath(newPath+nomeFileEliminato);
+					getStorageObjectByPath(newPath+nomeFileEliminato);
 					nameAlreadyExists = true;
 					break;
-				} catch (CmisObjectNotFoundException e){
+				} catch (StorageException e){
 				}
 			}
 	    }
 		String nomeFile = nomeFileEliminato;
 		
 		Map<String, Object> metadataProperties = new HashMap<String, Object>();
-		metadataProperties.put(PropertyIds.NAME, nomeFile);
+		metadataProperties.put(StoragePropertyNames.NAME.value(), nomeFile);
 		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, nomeFile);
 		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, nomeFile);
 		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, principal.getName());

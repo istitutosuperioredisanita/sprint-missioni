@@ -1,7 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,8 +8,6 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -311,32 +307,7 @@ public class OrdineMissioneAutoPropriaService {
     	byte[] printOrdineMissione = null;
     	String fileName = null;
     	if ((ordineMissione.isStatoInviatoAlFlusso()  && (!ordineMissione.isMissioneInserita() || !ordineMissione.isMissioneDaValidare())) || (ordineMissione.isStatoFlussoApprovato())){
-    		ContentStream content = null;
-			try {
-				content = cmisOrdineMissioneService.getContentStreamOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
-			} catch (ComponentException e1) {
-				throw new ComponentException("Errore nel recupero del contenuto del file Auto Propria sul documentale (" + Utility.getMessageException(e1) + ")",e1);
-			}
-    		if (content != null){
-        		fileName = content.getFileName();
-        		InputStream is = null;
-    			try {
-    				is = content.getStream();
-    			} catch (Exception e) {
-    				throw new ComponentException("Errore nel recupero dello stream del file Auto Propria sul documentale (" + Utility.getMessageException(e) + ")",e);
-    			}
-        		if (is != null){
-            		try {
-    					printOrdineMissione = IOUtils.toByteArray(is);
-						is.close();
-    				} catch (IOException e) {
-    					throw new ComponentException("Errore nella conversione dello stream in byte del file Auto Propria (" + Utility.getMessageException(e) + ")",e);
-    				}
-        		}
-    		} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file Auto Propria sul documentale");
-    		}
-    		map.put(fileName, printOrdineMissione);
+    		map = cmisOrdineMissioneService.getFileOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
     	} else {
     		fileName = "OrdineMissioneAutoPropria"+idMissione+".pdf";
     		printOrdineMissione = printAutoPropria(username, ordineMissioneAutoPropria);

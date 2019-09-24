@@ -7,8 +7,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,6 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Banca;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.DivisaTappa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneRigaColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneSigla;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.ModalitaPagamento;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.Nazione;
@@ -46,6 +43,8 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.SpeseMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 
 @Service
 public class ComunicaRimborsoSiglaService {
@@ -133,9 +132,9 @@ public class ComunicaRimborsoSiglaService {
 			oggettoBulk.setNome(account.getNome());
 			impostaDescrizioneMissione(rimborsoApprovato, oggettoBulk);
 			oggettoBulk.setCodice_fiscale(account.getCodiceFiscale());
-			Folder folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
+			StorageObject folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
 			if (folder != null){
-				oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(PropertyIds.OBJECT_ID));
+				oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(StoragePropertyNames.OBJECT_TYPE_ID.value()));
 			}
 			if (rimborsoApprovato.getOrdineMissione() != null && rimborsoApprovato.getOrdineMissione().getId() != null){
 				OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
@@ -143,9 +142,9 @@ public class ComunicaRimborsoSiglaService {
 					if (ordineMissione.getIdFlusso() != null){
 						oggettoBulk.setIdFlussoOrdineMissione(ordineMissione.getIdFlusso());
 					}
-					Folder folderOrdine = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
+					StorageObject folderOrdine = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
 					if (folderOrdine != null){
-						oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getPropertyValue(PropertyIds.OBJECT_ID));
+						oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getPropertyValue(StoragePropertyNames.OBJECT_TYPE_ID.value()));
 					}
 				}
 			}

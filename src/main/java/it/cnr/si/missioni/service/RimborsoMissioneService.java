@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -15,8 +14,6 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +77,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.TerzoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import it.cnr.si.spring.storage.StorageObject;
 import net.bzdyl.ejb3.criteria.Order;
 import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
@@ -1383,34 +1381,7 @@ public class RimborsoMissioneService {
     	byte[] printRimborsoMissione = null;
     	String fileName = null;
     	if ((rimborsoMissione.isStatoInviatoAlFlusso()  && !rimborsoMissione.isMissioneInserita() && !rimborsoMissione.isMissioneDaValidare()) || (rimborsoMissione.isStatoFlussoApprovato())){
-    		ContentStream content = null;
-			try {
-				content = cmisRimborsoMissioneService.getContentStreamRimborsoMissione(rimborsoMissione);
-			} catch (ComponentException e1) {
-				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")",e1);
-			}
-    		if (content != null){
-        		fileName = content.getFileName();
-        		InputStream is = null;
-    			try {
-    				is = content.getStream();
-    			} catch (Exception e) {
-    				throw new ComponentException("Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")",e);
-    			}
-        		if (is != null){
-            		try {
-    					printRimborsoMissione = IOUtils.toByteArray(is);
-						is.close();
-    				} catch (IOException e) {
-    					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
-    				}
-        		}
-    		} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale");
-    		}
-    		Map<String, byte[]> map = new HashMap<String, byte[]>();
-    		map.put(fileName, printRimborsoMissione);
-    		return map;
+    		return cmisRimborsoMissioneService.getFileRimborsoMissione(rimborsoMissione);
     	} else {
     		return stampaRimborso(principal, rimborsoMissione);
     	}
@@ -1712,7 +1683,8 @@ public class RimborsoMissioneService {
 			RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
 			controlloAllegatoDettaglioModificabile(rimborsoMissione);
 			if (rimborsoMissione != null && StringUtils.hasLength(rimborsoMissione.getIdFlusso())){
-				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo);
+				StorageObject storage = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoMissione);
+				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo, storage);
 			} else {
         		missioniCMISService.deleteNode(idNodo);
 			}

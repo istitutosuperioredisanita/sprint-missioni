@@ -1,39 +1,26 @@
 package it.cnr.si.missioni.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.service.ConfigService;
-import it.cnr.si.missioni.service.CronService;
-import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Faq;
-import it.cnr.si.security.AuthoritiesConstants;
-
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.codahale.metrics.annotation.Timed;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import it.cnr.si.missioni.service.ConfigService;
+import it.cnr.si.missioni.service.CronService;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.data.Faq;
+import it.cnr.si.security.AuthoritiesConstants;
 
 /**
  * REST controller for managing config.

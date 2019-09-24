@@ -31,12 +31,22 @@ spring:
             url: https://siper.cnr.it/siper/
             username: app.selezioni
             password: pentagono
+        STORAGE:
+    #            url: https://testsiper.si.cnr.it/siper/
+            url: http://as1dock.si.cnr.it:8080/alfresco/
+            username: missioni.missioni
+            password: missioni
+            urlForPerson: service/cnr/person/person/
         OIL:
             username: missioni1
             password: missioni.1
             url: http://oil.test.si.cnr.it/rest/
             newProblem: pest
             instance: /HDSiper
+        FLOWS:
+            urlOrdineMissione: service/api/workflow/activiti$flussoMissioniOrdine/formprocessor
+            urlAnnullamentoOrdineMissione: service/api/workflow/activiti$flussoMissioniRevoca/formprocessor
+            urlRimborsoMissione: service/api/workflow/activiti$flussoMissioniRimborso/formprocessor
     ldap:
         userSearchBase: o=cnr, c=it
         userSearchFilter: uid={0}
@@ -79,16 +89,21 @@ siper:
   username: ${spring.proxy.SIPER.username}
   password: ${spring.proxy.SIPER.password}
 
-cmis:
-#    alfresco: http://gestdoc.cnr.it:90/alfresco/
-    alfresco: http://as1dock.si.cnr.it:8080/alfresco/
-    url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
-    username: app.missioni
-    password: bubbazza
+storage:
     maxItemsPerPage: 10
     folder_path: /Comunicazioni al CNR/Missioni
     folder_path_config: /Config
     folder_path_manual: /Config/Manuali
+
+user.admin.username: ${spring.proxy.STORAGE.username}
+user.admin.password: ${spring.proxy.STORAGE.password}
+org.apache.chemistry.opencmis.binding.atompub.url: ${spring.proxy.STORAGE.url}api/-default-/public/cmis/versions/1.1/atom
+repository.base.url: ${spring.proxy.STORAGE.url}
+org.apache.chemistry.opencmis.binding.browser.url: ${spring.proxy.STORAGE.url}api/-default-/public/cmis/versions/1.1/browser
+org.apache.chemistry.opencmis.binding.spi.type: atompub
+org.apache.chemistry.opencmis.binding.connecttimeout: 50000
+org.apache.chemistry.opencmis.binding.readtimeout: 3000000
+org.apache.chemistry.opencmis.binding.httpinvoker.classname: org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker
 
 cache:
     init_cache: true

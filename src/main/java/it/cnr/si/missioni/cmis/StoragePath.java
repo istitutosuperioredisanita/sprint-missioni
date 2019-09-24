@@ -11,20 +11,20 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-public class CmisPath {
+public class StoragePath {
 	
-	private final String CMIS_YML = "cmis";
+	private final String STORAGE_YML = "storage";
 	private final String FOLDER_PATH_YML = "folder_path";
 	private final String FOLDER_PATH_CONFIG_YML = "folder_path_config";
 	private final String FOLDER_PATH_MANUAL_YML = "folder_path_manual";
 	
-	@Value("${cmis.folder_path}")
+	@Value("${storage.folder_path}")
 	private String path;
 
-	@Value("${cmis.folder_path_config}")
+	@Value("${storage.folder_path_config}")
 	private String folderConfig;
 
-	@Value("${cmis.folder_path_manual}")
+	@Value("${storage.folder_path_manual}")
 	private String folderManual;
 
 	@Autowired
@@ -33,15 +33,15 @@ public class CmisPath {
 	private RelaxedPropertyResolver propertyResolver;	
 	
 
-	public CmisPath() {
+	public StoragePath() {
     	super();
 	}
 
-	public static CmisPath construct(String path){
-		return new CmisPath(path);
+	public static StoragePath construct(String path){
+		return new StoragePath(path);
 	}
 	
-	public CmisPath(String path) {
+	public StoragePath(String path) {
 		super();
 		this.path = path;
 	}
@@ -54,8 +54,8 @@ public class CmisPath {
 		this.path = path;
 	}
 	
-	public CmisPath appendToPath(String append){
-		return CmisPath.construct(getPath()+ "/" + append);
+	public StoragePath appendToPath(String append){
+		return StoragePath.construct(getPath()+ "/" + append);
 	}
 	
 	public String getPathConfig(){
@@ -68,7 +68,7 @@ public class CmisPath {
 	
 	@PostConstruct
 	public void init(){
-		this.propertyResolver = new RelaxedPropertyResolver(env, CMIS_YML+".");
+		this.propertyResolver = new RelaxedPropertyResolver(env, STORAGE_YML+".");
     	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_YML) != null) {
     		path = propertyResolver.getProperty(FOLDER_PATH_YML);
     	}
