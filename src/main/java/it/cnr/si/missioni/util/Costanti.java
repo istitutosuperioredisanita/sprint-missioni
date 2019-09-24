@@ -56,11 +56,15 @@ public class Costanti {
 	public final static Long INQUADRAMENTO_ASSEGNISTA = new Long(43);
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 	
-	
+	public final static String STRING_FOR_SANITIZE_FILE_NAME = "([\\/:@()&\u20AC<>?\"])";
 	public final static String REST_OIL_NEW_PROBLEM =  "pest/HDSiper";
 	public final static String APP_HELPDESK = "OIL";
+	public final static String PROPERTY_RESULT_FLOW = "persistedObject";
+	public final static String PATTERN_RESULT_FLOW = "id=(activiti\\$[0-9]+)";
 	public final static String APP_SIGLA = "SIGLA";
 	public final static String APP_SIPER = "SIPER";
+	public final static String APP_STORAGE = "STORAGE";
+	public final static String APP_FLOWS = "FLOWS";
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
 	public final static String STATO_ANNULLATO = "ANN";
 	public final static String STATO_ANNULLATO_DOPO_APPROVAZIONE = "ANA";

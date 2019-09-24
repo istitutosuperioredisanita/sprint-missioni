@@ -3,6 +3,7 @@ package it.cnr.si.missioni.cmis;
 import java.math.BigDecimal;
 
 public class CMISMissione {
+	private String nomeFile;
 	private String anno;
 	private String numero;
 	private String oggetto;
@@ -290,5 +291,11 @@ public class CMISMissione {
 	}
 	public void setNoteAutorizzazioniAggiuntive(String noteAutorizzazioniAggiuntive) {
 		this.noteAutorizzazioniAggiuntive = noteAutorizzazioniAggiuntive;
+	}
+	public String getNomeFile() {
+		return nomeFile;
+	}
+	public void setNomeFile(String nomeFile) {
+		this.nomeFile = nomeFile;
 	}
 }

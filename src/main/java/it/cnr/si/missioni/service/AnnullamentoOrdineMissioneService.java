@@ -1,7 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +32,6 @@ import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -627,37 +622,8 @@ public class AnnullamentoOrdineMissioneService {
    	public Map<String, byte[]> printAnnullamentoMissione(Authentication auth, Long idMissione) throws ComponentException {
     	Principal principal = (Principal)auth;
     	AnnullamentoOrdineMissione annullamento = getAnnullamentoOrdineMissione(principal, idMissione, true);
-    	byte[] printAnnullamentoMissione = null;
-    	String fileName = null;
     	if (!annullamento.isStatoNonInviatoAlFlusso()){
-    		ContentStream content = null;
-			try {
-				content = cmisOrdineMissioneService.getContentStreamAnnullamentoOrdineMissione(annullamento);
-			} catch (ComponentException e1) {
-				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e1) + ")",e1);
-			}
-    		if (content != null){
-        		fileName = content.getFileName();
-        		InputStream is = null;
-    			try {
-    				is = content.getStream();
-    			} catch (Exception e) {
-    				throw new ComponentException("Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")",e);
-    			}
-        		if (is != null){
-            		try {
-    					printAnnullamentoMissione = IOUtils.toByteArray(is);
-    					is.close();
-    				} catch (IOException e) {
-    					throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",e);
-					}
-        		}
-    		} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file sul documentale");
-    		}
-    		Map<String, byte[]> map = new HashMap<String, byte[]>();
-    		map.put(fileName, printAnnullamentoMissione);
-    		return map;
+        	return cmisOrdineMissioneService.getFileAnnullamentoOrdineMissione(annullamento);
     	} else {
     		return stampaAnnullamento(principal, annullamento);
     	}
