@@ -362,7 +362,7 @@
                             <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
-            <form name="form-inline" role="form" ng-submit="confirm()" ng-show="annullamentoModel.id && (uoForUsersSpecial || accountModel.uoForUsersSpecial)">
+            <form name="form-inline" role="form" ng-submit="confirm()" ng-show="annullamentoModel.id && (uoForUsersSpecial || accountModel.uoForUsersSpecial || utenteAbilitatoValidareUo == 'S')">
                     <div class="col-xs-4" >
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'annullamento-rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
                     </div>
