@@ -178,9 +178,9 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 var ind = -1;
 
                 var personPromise = DirettoreUoService.getDirettore(uoSiper);
-                return personPromise.then(function(result){
-                    if (result && result.data){
-                        var direttore = result.data;
+                return personPromise.then(function(result1){
+                    if (result1 && result1.data){
+                        var direttore = result1.data;
                         var trovatoDirettore = false;
                         for (var z=0; z<listaPersons.length; z++) {
                             if (listaPersons[z].uid == direttore.uid){
@@ -222,7 +222,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         return y;
     }
 
-    var recuperoPersonsForUo = function(uo, soloDipendenti){
+        var recuperoPersonsForUo = function(uo, soloDipendenti){
         return recuperoPersonsForCdsUo(null, uo, soloDipendenti, true);
     }
    
