@@ -133,6 +133,9 @@
                     "codice_uo" : "128000",
                     "ordine_da_validare" : "S"
                 }, {
+                    "codice_uo" : "125000",
+                    "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "506000",
                     "ordine_da_validare" : "S"
                 }
