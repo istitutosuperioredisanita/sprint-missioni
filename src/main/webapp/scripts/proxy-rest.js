@@ -133,23 +133,19 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var y = x.then(function (result) {
             if (result.data){
                 var persona = result.data;
-                if (persona.matricola != null && ((persona.data_cessazione && persona.data_cessazione >= dataDa) || (!persona.data_cessazione))){
-                    return createPerson(persona);
-                } else {
-                    var promise = recuperoDatiTerzoPerCompenso(persona.codice_fiscale, dataDa, dataA);
-                    return promise.then(function (terzo) {
-                        if (terzo && terzo.data && terzo.data.elements && terzo.data.elements.length > 0){
-                            var terziPerCompenso = terzo.data.elements;
-                            var terzoPerCompenso = terziPerCompenso[0];
-                            if (terzoPerCompenso.ti_dipendente_altro == 'A'){
-                                persona.matricola = "";
-                                persona.profilo = terzoPerCompenso.ds_tipo_rapporto;
-                                persona.comune_residenza = terzoPerCompenso.ds_comune_fiscale;
-                            }
+                var promise = recuperoDatiTerzoPerCompenso(persona.codice_fiscale, dataDa, dataA);
+                return promise.then(function (terzo) {
+                    if (terzo && terzo.data && terzo.data.elements && terzo.data.elements.length > 0){
+                        var terziPerCompenso = terzo.data.elements;
+                        var terzoPerCompenso = terziPerCompenso[0];
+                        if (terzoPerCompenso.ti_dipendente_altro == 'A'){
+                            persona.matricola = "";
+                            persona.profilo = terzoPerCompenso.ds_tipo_rapporto;
+                            persona.comune_residenza = terzoPerCompenso.ds_comune_fiscale;
                         }
-                        return createPerson(persona);
-                    });
-                }
+                    } 
+                    return createPerson(persona);
+                });
             } else {
                 return [];
             }
@@ -175,6 +171,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var y = x.then(function (result) {
             if (result.data){
                 var listaPersons = result.data;
+                var listaPersone = [];
+                var listaDuplicati = [];
                 var ind = -1;
 
                 var personPromise = DirettoreUoService.getDirettore(uoSiper);
@@ -191,15 +189,42 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                             listaPersons.push(direttore);
                         }
                     }
-
-                    if (soloDipendenti && !dipendentiCessati){
-                        return listaPersons;
+                    for (var i=0; i<listaPersons.length; i++) {
+                        var codiceFiscale = listaPersons[i].codice_fiscale;
+                        var uid = listaPersons[i].uid;
+                        var trovatoDuplicato = false;
+                        var duplicatoGiaInserito = false;
+                        for (var k=0; k<listaPersons.length; k++) {
+                            if (codiceFiscale == listaPersons[k].codice_fiscale && uid !== listaPersons[k].uid){
+                                trovatoDuplicato = true;
+                            }
+                        }
+                        if (!trovatoDuplicato){
+                            listaPersone[listaPersone.length] = listaPersons[i];
+                        } else {
+                            if (listaDuplicati){
+                                for (var k=0; k<listaDuplicati.length; k++) {
+                                    if (codiceFiscale == listaDuplicati[k].codice_fiscale){
+                                        duplicatoGiaInserito = true;
+                                    }
+                                }
+                            }
+                            if (!duplicatoGiaInserito){
+                                listaPersone[listaPersone.length] = listaPersons[i];
+                                listaDuplicati[listaDuplicati.length] = listaPersons[i];
+                            }
+                        }
                     }
 
-                    var promises = listaPersons.map(function (personaz) {
+
+                    if (soloDipendenti && !dipendentiCessati){
+                        return listaPersone;
+                    }
+
+                    var promises = listaPersone.map(function (personaz) {
                         return recuperoDatiTerzoPerCompenso(personaz.codice_fiscale, dataDa, dataA)
                                 .then(function (data) {
-                                    return processXhr(data, personaz, soloDipendenti, listaPersons, ind, dataDa);
+                                    return processXhr(data, personaz, soloDipendenti, listaPersone, ind, dataDa);
                                 });
                     });
 
@@ -227,9 +252,6 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     }
    
     var processXhr = function(data, personaz, soloDipendenti, listaPersons, ind, dataDa){
-        if (personaz.matricola != null && ((personaz.data_cessazione && personaz.data_cessazione >= dataDa) || (!personaz.data_cessazione))){
-            return personaz;
-        }
         if (data && data.data && data.data.elements && data.data.elements.length > 0){
             var terziPerCompenso = data.data.elements;
             var terzoPerCompenso = terziPerCompenso[0];
@@ -240,11 +262,18 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                         listaPersons[i].matricola = "";
                         listaPersons[i].comune_residenza = terzoPerCompenso.ds_comune_fiscale;
                         listaPersons[i].profilo = terzoPerCompenso.ds_tipo_rapporto;
+                    } else {
+                        if (personaz.matricola != null && ((personaz.data_cessazione && personaz.data_cessazione >= dataDa) || (!personaz.data_cessazione))){
+                            return personaz;
+                        }
                     }
                     return listaPersons[i];
                 }
             }
         } else {
+            if (personaz.matricola != null && ((personaz.data_cessazione && personaz.data_cessazione >= dataDa) || (!personaz.data_cessazione))){
+                return personaz;
+            }
             return false;
         }
         return false;
