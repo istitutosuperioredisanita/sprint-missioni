@@ -301,7 +301,6 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                             data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
                                             } else {
                                                 var matr = null;
-                                                var comune_residenza = null;    
                                                 var profilo = null;    
                                                 if (result.ti_dipendente_altro == 'A'){
                                                     matr = "";
@@ -399,7 +398,6 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
 
                                                     } else {
                                                         var matr = null;
-                                                        var comune_residenza = null;    
                                                         var profilo = null;    
                                                         if (result.ti_dipendente_altro == 'A'){
                                                             matr = "";
