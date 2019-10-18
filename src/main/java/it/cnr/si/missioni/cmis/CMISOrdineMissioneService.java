@@ -316,6 +316,10 @@ public class CMISOrdineMissioneService {
 					(userNameAggiunto != null && userNameAggiunto.equals(userNameFirmatarioSpesa))){
 				userNameFirmatario = userNameAggiunto;
 			}
+
+			if (userNameFirmatarioSpesa.equals(ordineMissione.getUid())){
+				userNameFirmatario = userNameFirmatarioSpesa;
+			}
 			cmisOrdineMissione.setUsernameFirmatarioAggiunto(userNameAggiunto);
 			cmisOrdineMissione.setUsernameFirmatarioSpesaAggiunto(userNameSpesaAggiunto);
 			cmisOrdineMissione.setAnno(ordineMissione.getAnno().toString());
