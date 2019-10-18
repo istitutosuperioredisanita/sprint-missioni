@@ -275,6 +275,11 @@ public class CMISRimborsoMissioneService {
 				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
 			}
 		}
+
+		if (userNameFirmatarioSpesa.equals(rimborsoMissione.getUid())){
+			userNameFirmatario = userNameFirmatarioSpesa;
+		}
+
 		datiFlusso.setUsernameFirmatarioSpesa(userNameFirmatarioSpesa);
 		datiFlusso.setUsernamePrimoFirmatario(userNameFirmatario);
 		datiFlusso.setUoCompetenzaPerFlusso(uoCompetenzaPerFlusso);

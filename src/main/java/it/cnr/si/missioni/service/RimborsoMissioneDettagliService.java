@@ -184,7 +184,7 @@ public class RimborsoMissioneDettagliService {
 					livelloRich = 4;
 				}
 			} else {
-				if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(50)) > 0){
+				if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(30)) > 0){
 					livelloRich = 1;
 				} else {
 					livelloRich = 4;
