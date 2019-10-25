@@ -289,7 +289,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             ).success(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                                 var comune_residenza = null;    
-                                if (data.login == "app.missioni"){
+                                if (data.uid == "app.missioni"){
                                     Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
@@ -392,7 +392,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 AccountFromToken.get({token: token},
                                     function (data, responseHeaders) {
                                         var comune_residenza = null;
-                                        if (data.login == "app.missioni"){
+                                        if (data.uid == "app.missioni"){
                                             Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
                                             $rootScope.account = Session;
                                             $sessionStorage.account = Session;
