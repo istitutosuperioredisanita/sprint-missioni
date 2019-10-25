@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -1327,22 +1328,36 @@ public class RimborsoMissioneService {
 		if (!rimborsoMissione.isMissioneEstera()){
 			rimborsoMissione.setNazione(new Long("1"));
 		}
-		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
-			long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
-			if (oreDifferenza < 24 ){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
-			}
-		}
 		if (!StringUtils.hasLength(rimborsoMissione.getMatricola())){
 			rimborsoMissione.setMatricola(null);
 		}
 		OrdineMissione ordine = rimborsoMissione.getOrdineMissione();
-		if (ordine.getCdsRich() != null){
-			ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
-		}
-		if (Utility.nvl(ordine.getPresidente(),"N").equals("S")){
-			if (!Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S")){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione è per la presidenza, quindi anche il rimborso missione deve essere per la presidenza.");
+		if (ordine != null){
+			if (ordine.getCdsRich() != null){
+				ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
+			}
+			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+				RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
+				filter.setIdOrdineMissione(new Long(ordine.getId().toString()));
+				List<RimborsoMissione> rimborsi = getRimborsiMissione(principal, filter, false);
+				if (rimborsi != null && !rimborsi.isEmpty()){
+					for (RimborsoMissione rimb : rimborsi){
+						if (rimb.isTrattamentoAlternativoMissione()){
+							if (rimborsoMissione.getId() == null || rimb.getId().toString().compareTo(rimborsoMissione.getId().toString()) != 0){
+								throw new AwesomeException(CodiciErrore.ERRGEN, "E' stato già inserito un rimborso missione con la richiesta di trattamento alternativo di missione. Cambiare il trattamento.");
+							}
+						}
+					}
+				}
+				long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
+				if (oreDifferenza < 24 ){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
+				}
+			}
+			if (Utility.nvl(ordine.getPresidente(),"N").equals("S")){
+				if (!Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S")){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione è per la presidenza, quindi anche il rimborso missione deve essere per la presidenza.");
+				}
 			}
 		}
 	}
