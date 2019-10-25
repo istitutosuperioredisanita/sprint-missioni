@@ -151,7 +151,8 @@ public class ComunicaRimborsoSiglaService {
 			}
 
 // inizio aggiunta per multi impegno			
-			if (!rimborsoApprovato.isTrattamentoAlternativoMissione()){
+			if (!rimborsoApprovato.isTrattamentoAlternativoMissione() &&
+					Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())).compareTo(BigDecimal.ZERO) > 0){
 				if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())){
 					oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
 				}

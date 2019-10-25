@@ -449,9 +449,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
                 $scope.ordineMissioneModel.voce = ordineMissioneSelected.voce;
                 $scope.ordineMissioneModel.gae = ordineMissioneSelected.gae;
-                $scope.ordineMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
-                $scope.ordineMissioneModel.uoRich = ordineMissioneSelected.uoRich;
-                $scope.ordineMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
                 $scope.ordineMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
                 $scope.ordineMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
                 $scope.ordineMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
@@ -541,12 +538,12 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.gestioneUtenteAbilitatoValidare = function (uo){
         $scope.utenteAbilitatoValidareUo = 'N';
         var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
-        if (uo){
+        if (uo && uoForUsersSpecial){
             var uoSiper = uo.replace('.','');
             for (var k=0; k<uoForUsersSpecial.length; k++) {
                 var uoForUserSpecial = uoForUsersSpecial[k];
                 if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
-                $scope.utenteAbilitatoValidareUo = 'S';
+                    $scope.utenteAbilitatoValidareUo = 'S';
                 }
             }
         }
@@ -802,7 +799,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
                             $scope.viewAttachments($scope.ordineMissioneModel.id);
-                            $scope.inizializzaFormPerModifica();
                         });
                     },
                     function (httpResponse) {
