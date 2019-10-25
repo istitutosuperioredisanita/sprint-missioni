@@ -296,7 +296,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                     authService.loginConfirmed(data);
                                 } else {
                                     recuperoDatiTerzo(data).then(function (result){
-                                        if (data.strutturaAppartenenza ) {
+                                        if (data.struttura_appartenenza ) {
                                             if (data.comune_residenza){
                                                 comune_residenza = data.comune_residenza;
                                                 if (data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
@@ -392,7 +392,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 AccountFromToken.get({token: token},
                                     function (data, responseHeaders) {
                                         var comune_residenza = null;
-                                        if (data.login = "app.missioni"){
+                                        if (data.login == "app.missioni"){
                                             Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
                                             $rootScope.account = Session;
                                             $sessionStorage.account = Session;
