@@ -299,7 +299,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                         if (data.struttura_appartenenza ) {
                                             if (data.comune_residenza){
                                                 comune_residenza = data.comune_residenza;
-                                                if (data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
+                                                if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
                                                     Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                 data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
@@ -308,7 +308,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 } else {
                                                     var matr = null;
                                                     var profilo = null;    
-                                                    if (result.ti_dipendente_altro == 'A'){
+                                                    if (result && result.ti_dipendente_altro == 'A'){
                                                         matr = "";
                                                         comune_residenza = result.ds_comune_fiscale;
                                                         profilo = result.ds_tipo_rapporto;
@@ -408,7 +408,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 if (data.struttura_appartenenza){
                                                     if (data.comune_residenza){
                                                         comune_residenza = data.comune_residenza;
-                                                        if (data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
+                                                        if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
                                                             Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                                         data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                         data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
@@ -418,7 +418,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                         } else {
                                                             var matr = null;
                                                             var profilo = null;    
-                                                            if (result.ti_dipendente_altro == 'A'){
+                                                            if (result && result.ti_dipendente_altro == 'A'){
                                                                 matr = "";
                                                                 comune_residenza = result.ds_comune_fiscale;
                                                                 profilo = result.ds_tipo_rapporto;
