@@ -262,7 +262,9 @@ angular.module('missioniApp')
               scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
             }
 
-            scope.accountBanner.qualificaRich = account.profilo; 
+            if (account.profilo){
+                scope.accountBanner.qualificaRich = account.profilo.trim();
+            }
             scope.accountBanner.livelloRich = account.livello; 
             scope.accountBanner.codiceFiscale = account.codice_fiscale; 
             scope.accountBanner.dataNascita = account.data_nascita; 

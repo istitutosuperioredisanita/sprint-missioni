@@ -300,7 +300,9 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         userWork.cap_residenza = data.cap_residenza;
         userWork.provincia_residenza = data.provincia_residenza;
         userWork.codice_fiscale = data.codice_fiscale;
-        userWork.profilo = data.profilo;
+        if (data.profilo){
+            userWork.profilo = data.profilo.trim();
+        }
         userWork.struttura_appartenenza = data.struttura_appartenenza;
         userWork.codice_sede = data.codice_sede;
         userWork.codice_uo = data.codice_uo;
