@@ -173,7 +173,9 @@ missioniApp.factory('Session', function (ProxyService) {
             this.cap_residenza = cap_residenza;
             this.provincia_residenza = provincia_residenza;
             this.codice_fiscale = codice_fiscale;
-            this.profilo = profilo;
+            if (profilo){
+                this.profilo = profilo.trim();
+            }
             this.struttura_appartenenza = struttura_appartenenza;
             this.codice_sede = codice_sede;
             this.codice_uo = codice_uo;
