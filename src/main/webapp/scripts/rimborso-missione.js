@@ -129,7 +129,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.rimborso0 = "N";
                 inizializzaForm();
                 $scope.recuperoDatiDivisa();
-                $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.idOrdineMissione);
+                $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.idOrdineMissione, $scope.rimborsoMissioneModel.uid);
                 break;
             }
         }
@@ -165,8 +165,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
         });
     }
 
-    $scope.recuperoDatiAltriRimborsi = function(idOrdineMissione){
-        ElencoRimborsiMissioneService.findRimborsiMissione(null, null, null, null, null, null, null, null, null, null, null, idOrdineMissione, "S").then(function(ret){
+    $scope.recuperoDatiAltriRimborsi = function(idOrdineMissione, uid){
+        ElencoRimborsiMissioneService.findRimborsiMissione(uid, null, null, null, null, null, null, null, null, null, null, idOrdineMissione, "S").then(function(ret){
             $scope.listaAltriRimborsi = false;
             var newRet = [];
             if (ret && ret.length > 0){
@@ -1442,7 +1442,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restCapitoli(model.anno);
                 $scope.rimborsoMissioneModel = model;
                 $scope.viewAttachments($scope.rimborsoMissioneModel.id);
-                $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.ordineMissione.id);
+                $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.ordineMissione.id, $scope.rimborsoMissioneModel.ordineMissione.uid);
                 if ($scope.rimborsoMissioneModel.stato == 'ANA'){
                     $scope.viewAttachmentsUndo();
                 }
