@@ -107,6 +107,9 @@
                     "codice_uo" : "016001",
                     "ordine_da_validare" : "S"
                 }, {
+                    "codice_uo" : "ASR108",
+                    "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "028001",
                     "ordine_da_validare" : "S"
                 }, {
@@ -115,7 +118,7 @@
                     "codice_uo" : "084000",
                     "ordine_da_validare" : "S"
                 }, {
-                    "codice_uo" : "094000",
+                    "codice_uo" : "032000",
                     "ordine_da_validare" : "S"
                 }, {
                     "codice_uo" : "000413",
