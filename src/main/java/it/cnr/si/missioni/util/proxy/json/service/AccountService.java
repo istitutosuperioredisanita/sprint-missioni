@@ -349,7 +349,7 @@ public class AccountService {
 		String userNameFirmatario;
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(Utility.getUoSigla(uo), anno);
 		if (datiIstituto != null && datiIstituto.getResponsabile() != null){
-			if (!isMissioneEstera || (Utility.nvl(datiIstituto.getResponsabileSoloItalia(),"N").equals("N"))){
+			if (!isMissioneEstera || (Utility.nvl(datiIstituto.getResponsabileSoloItalia(),"N").equals("N"))|| (isMissioneEstera && isDaUoRespEstero )){
 				userNameFirmatario = datiIstituto.getResponsabile();
 			} else {
 				if (!StringUtils.isEmpty(datiIstituto.getUoRespEstero()) && !isDaUoRespEstero){
