@@ -66,7 +66,7 @@ missioniApp.constant('SIGLA_REST', {
 missioniApp.constant('COSTANTI', {
         'UTENTE_SPECIALE': 'app.missioni',
         'FORMATO_DATA': 'dd/MM/yyyy',
-        'CDS_SAC': '000',
+        'CDS_SAC': 'ASR',
         'ANNO_PARTENZA': 2017,
         'UO_STANDARD_SAC': '000.000',
         'DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST':4999,
