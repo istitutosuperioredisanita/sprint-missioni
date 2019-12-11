@@ -112,8 +112,8 @@ public class Costanti {
 	public final static String STATO_DA_CONFERMARE_PER_HOME = "C";
 	public final static String STATO_ALLA_VALIDAZIONE_AMM_PER_HOME = "VA";
 	public final static String STATO_PER_RESPONSABILE_GRUPPO_PER_HOME = "M";
-	public final static String CDS_SAC = "000";
-	public final static String UO_SAC_PROGETTI = "000.000";
+	public final static String CDS_SAC = "ASR";
+	public final static String UO_SAC_PROGETTI = "ASR.666";
     public final static String TIPO_ORDINE_DI_MISSIONE = "O";
     public final static String TIPO_RIMBORSO_MISSIONE = "R";
     public final static String TIPO_ANNULLAMENTO_ORDINE_MISSIONE = "A";
