@@ -1481,8 +1481,12 @@ public class OrdineMissioneService {
 			Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), anno,
 					ordineMissione.getUoSpesa());
 			if (progetto == null) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-						+ ": Il modulo indicato non è corretto rispetto alla UO " + ordineMissione.getUoSpesa());
+				progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(),
+						ordineMissione.getUoSpesa());
+				if (progetto == null) {
+					throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
+							+ ": Il modulo indicato non è corretto rispetto alla UO " + ordineMissione.getUoSpesa());
+				}
 			}
 		}
 		if (!StringUtils.isEmpty(ordineMissione.getGae())) {
