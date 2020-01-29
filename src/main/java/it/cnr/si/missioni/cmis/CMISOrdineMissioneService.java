@@ -281,13 +281,10 @@ public class CMISOrdineMissioneService {
 					} else 	if (Utility.nvl(ordineMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
 						userNameFirmatarioSpesa = parametri.getPresidente();
 
-						UtentePresidenteSpeciale utente = utentiPresidenteSpecialeService.esisteUtente(Utility.nvl(ordineMissione.getUid(),"N"));
-						if (utente != null){
-							String primo = userNameFirmatario;
-							userNameFirmatario = userNameFirmatarioSpesa;
-							userNameFirmatarioSpesa = primo;
-						}
-											
+						String primo = userNameFirmatario;
+						userNameFirmatario = userNameFirmatarioSpesa;
+						userNameFirmatarioSpesa = primo;
+
 					} else if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 						if (uoCompetenzaPerFlusso != null){
 							if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
