@@ -250,16 +250,9 @@ public class CMISRimborsoMissioneService {
 			if (Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
 				userNameFirmatarioSpesa = parametri.getResponsabileCug();
 			} else  if (Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
-				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
+				userNameFirmatarioSpesa = parametri.getPresidente();
 				if (StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(rimborsoMissione.getUid(),"N").equals(parametri.getDipendenteCda())){
 					userNameFirmatario = userNameFirmatarioSpesa;
-				}else{
-					UtentePresidenteSpeciale utente = utentiPresidenteSpecialeService.esisteUtente(Utility.nvl(rimborsoMissione.getUid(),"N"));
-					if (utente != null){
-						String primo = userNameFirmatario;
-						userNameFirmatario = userNameFirmatarioSpesa;
-						userNameFirmatarioSpesa = primo;
-					}
 				}
 			} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 				if (uoCompetenzaPerFlusso != null){
