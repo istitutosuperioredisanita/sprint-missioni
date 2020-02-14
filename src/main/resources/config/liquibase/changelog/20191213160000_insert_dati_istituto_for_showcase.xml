@@ -9,7 +9,7 @@
             <column name="progressivo_ordine" type="NUMERIC" value="0"/>
             <column name="progressivo_rimborso" type="NUMERIC" value="0"/>
             <column name="progressivo_annullamento" type="NUMERIC" value="0"/>
-            <column name="progressivo_annull_rimborso" type="NUMERIC" value="0"/>
+            <column name="progr_annull_rimborso" type="NUMERIC" value="0"/>
             <column name="gestione_resp_modulo" type="STRING" value="N"/>
             <column name="dacr" type="${date.type}" valueDate="${now}"/>
             <column name="utcr" type="STRING" value="SYSTEM"/>
