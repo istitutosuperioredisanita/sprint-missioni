@@ -400,7 +400,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     if (listaVoci){
                         $scope.elencoVoci = [];
                         if (listaVoci.length === 1){
-                            $scope.ordineMissioneModel.voce = listaVoci[0];
+                            $scope.ordineMissioneModel.voce = listaVoci[0].cd_elemento_voce;
                         }
 	                    var ind = -1;
     	                for (var i=0; i<listaVoci.length; i++) {

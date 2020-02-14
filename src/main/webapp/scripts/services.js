@@ -176,9 +176,17 @@ missioniApp.factory('Session', function (ProxyService) {
             if (profilo){
                 this.profilo = profilo.trim();
             }
-            this.struttura_appartenenza = struttura_appartenenza;
+            if (codice_uo){
+                this.codice_uo = codice_uo;
+            } else {
+                this.codice_uo = "ZZZZZZ";
+            }
+            if (struttura_appartenenza){
+                this.struttura_appartenenza = struttura_appartenenza;
+            } else {
+                this.struttura_appartenenza = "ZZZ.ZZZ";
+            }
             this.codice_sede = codice_sede;
-            this.codice_uo = codice_uo;
             this.livello = livello;
             this.allUoForUsersSpecial = allUoForUsersSpecial;
             this.uoForUsersSpecial = uoForUsersSpecial;
