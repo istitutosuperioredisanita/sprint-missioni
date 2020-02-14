@@ -4,7 +4,7 @@
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.3</version>
+        <version>1.0.15</version>
     </parent>
     <groupId>it.cnr.si.sprint</groupId>
     <artifactId>sprint-missioni</artifactId>
@@ -40,6 +40,11 @@
         <start-class>it.cnr.si.SprintApp</start-class>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+            <version>1.2.3.RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
