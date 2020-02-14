@@ -16,6 +16,7 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter{
 
         web.ignoring()
         	.antMatchers("/views/**")
-            .antMatchers("/api/rest/public/**");
+            .antMatchers("/api/rest/public/**")
+            .antMatchers("/SIGLA/**");
     }
 }
