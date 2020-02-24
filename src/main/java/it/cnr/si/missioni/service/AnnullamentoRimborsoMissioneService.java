@@ -114,6 +114,15 @@ public class AnnullamentoRimborsoMissioneService {
 		List<AnnullamentoRimborsoMissione> listaAnnullamentiMissione = getAnnullamenti(principal, filter, false, true);
 		if (listaAnnullamentiMissione != null && !listaAnnullamentiMissione.isEmpty()){
 			annullamento = listaAnnullamentiMissione.get(0);
+			RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, annullamento.getRimborsoMissione().getId());
+			if (rimborsoMissione != null){
+				Uo datiUo = uoService.recuperoUoSigla(annullamento.getRimborsoMissione().getUoSpesa());
+				if (datiUo != null && Utility.nvl(datiUo.getOrdineDaValidare(),"N").equals("N")){
+					annullamento.setIsUoDaValidare("N");
+				} else {
+					annullamento.setIsUoDaValidare("S");
+				}
+			}
 		}
 		return annullamento;
     }

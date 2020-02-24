@@ -28,7 +28,7 @@
 {"codice_uo":"000407", "uid_direttore":"angelo.grisanti", "ordine_da_validare":"S", "firma_spesa":"N"},
 {"codice_uo":"000408", "uid_direttore":"giuliano.salberini"},
 {"codice_uo":"000410", "uid_direttore":"massimo.fraticelli"},
-{"codice_uo":"000411", "uid_direttore":"maurizio.lancia", "ordine_da_validare":"S"},
+{"codice_uo":"000411", "uid_direttore":"maurizio.lancia", "ordine_da_validare":"S", "firma_spesa":"N"},
 {"codice_uo":"000412", "uid_direttore":"maurizio.lancia"},
 {"codice_uo":"000413", "uid_direttore":"patrizia.villani", "ordine_da_validare":"S"},
 {"codice_uo":"000414", "uid_direttore":"alberto.derosa", "ordine_da_validare":"S"},
