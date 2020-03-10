@@ -103,7 +103,7 @@ public class OrdineMissioneResource {
         filter.setRecuperoAutoPropria("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
-        listaStati.add(Costanti.STATO_CONFERMATO);
+        listaStati.add(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);
         filter.setListaStatiMissione(listaStati);
         List<OrdineMissione> ordiniMissione;
 		try {
@@ -131,7 +131,6 @@ public class OrdineMissioneResource {
         filter.setDaAnnullare("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
-        listaStati.add(Costanti.STATO_CONFERMATO);
         filter.setListaStatiMissione(listaStati);
         List<OrdineMissione> ordiniMissione;
 		try {

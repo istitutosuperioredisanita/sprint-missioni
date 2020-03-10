@@ -177,7 +177,11 @@ public class AnnullamentoOrdineMissioneService {
 		annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		annullamentoDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		AnnullamentoOrdineMissione annullamento = updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
-		ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
+		if (annullamento.isConsentitoRimborso()){
+			ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);
+		} else {
+			ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
+		}
 		ordineMissione = ordineMissioneService.updateOrdineMissione(principal, ordineMissione, true, false);
 		popolaCoda(annullamento);
 		ordineMissioneService.gestioneEmailDopoApprovazione(ordineMissione, true);
@@ -287,7 +291,9 @@ public class AnnullamentoOrdineMissioneService {
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(annullamento.getUid());
 		String testoMail = getTextMailSendToAdministrative(basePath, annullamento);
 		if (dati != null && dati.getMailNotifiche() != null){
-			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
+			if (!dati.getMailNotifiche().equals("N")){
+				mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
+			}
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(annullamento.getOrdineMissione().getUoSpesa());
 			sendMailToAdministrative(lista, testoMail, subjectMail);
@@ -313,6 +319,7 @@ public class AnnullamentoOrdineMissioneService {
 		annullamentoDB.setStato(annullamento.getStato());
 		annullamentoDB.setStatoFlusso(annullamento.getStatoFlusso());
 		annullamentoDB.setMotivoAnnullamento(annullamento.getMotivoAnnullamento());
+		annullamentoDB.setConsentiRimborso(annullamento.getConsentiRimborso());
 		if (confirm){
 			aggiornaValidazione(principal, annullamentoDB);
 		}

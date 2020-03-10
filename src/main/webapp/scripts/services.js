@@ -292,7 +292,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
-                        if (data.strutturaAppartenenza || data.login=="app.missioni") {
+                        if (data.strutturaAppartenenza || data.login=="app.missioni" || data.profilo ) {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username.toLowerCase() + ':' + param.password);
                             $http.get(
                                 'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username.toLowerCase()
@@ -306,7 +306,13 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                     authService.loginConfirmed(data);
                                 } else {
                                     recuperoDatiTerzo(data).then(function (result){
-                                        if (data.struttura_appartenenza ) {
+                                        if (data.struttura_appartenenza || data.sigla_sede) {
+                                            var sede = "";
+                                            if (data.struttura_appartenenza){
+                                                sede = data.struttura_appartenenza;
+                                            } else {
+                                                sede = data.sigla_sede;
+                                            }
                                             if (data.comune_residenza){
                                                 comune_residenza = data.comune_residenza;
                                                 if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
@@ -314,7 +320,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                 data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                 data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                                data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
                                                 } else {
                                                     var matr = null;
                                                     var profilo = null;    
@@ -330,7 +336,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                             data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                             data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                             data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                            profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, null);
+                                                            profilo, sede, data.codice_sede, data.codice_uo, null);
                                                 }
                                             } else {
                                                 recuperoResidenza(data).then(function (result){
@@ -339,7 +345,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                             data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                             data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                            data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                            data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
                                                 });
                                             }    
                                         } else {
@@ -386,7 +392,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             return;
                         }
                         AccountLDAP.get(function(data) {
-                            if (!data.strutturaAppartenenza && data.login != "app.missioni" ) {
+                            if (!data.strutturaAppartenenza && data.login != "app.missioni" && !data.profilo) {
                                 Account.get(function(data) {
                                     Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
@@ -415,7 +421,13 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                             }
                                         } else {
                                             recuperoDatiTerzo(data).then(function (result){
+                                            if (data.struttura_appartenenza || data.sigla_sede) {
+                                                var sede = "";
                                                 if (data.struttura_appartenenza){
+                                                    sede = data.struttura_appartenenza;
+                                                } else {
+                                                    sede = data.sigla_sede;
+                                                }
                                                     if (data.comune_residenza){
                                                         comune_residenza = data.comune_residenza;
                                                         if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
@@ -423,7 +435,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                         data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                         data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                         data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                        data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                                        data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
 
                                                         } else {
                                                             var matr = null;
@@ -440,7 +452,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                         data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                         data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                         data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                        profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, null);
+                                                                        profilo, sede, data.codice_sede, data.codice_uo, null);
                                                         }
                                                     } else {
                                                         recuperoResidenza(data).then(function (result){
@@ -449,7 +461,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                     data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                     data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                     data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                    data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                                    data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
                                                             });
                                                     }    
                                                 } else {
