@@ -363,6 +363,16 @@
                         </span>
                     </p>
             </form>
+            <form class="form-inline" role="form" id="missioni">
+                <p class="col-md-12">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="annullamento-ordine-missione.form.consenti-rimborso">Consenti</span>
+                            <label class="checkbox">
+                                    <input type="checkbox" ng-model="annullamentoModel.consentiRimborso" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                </p>
+            </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
                     <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento && (annullamentoModel.stato == 'INS'|| !showEsisteAnnullamento)">
                             <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>

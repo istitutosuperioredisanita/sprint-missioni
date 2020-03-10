@@ -64,6 +64,7 @@ public class Costanti {
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
 	public final static String STATO_ANNULLATO = "ANN";
 	public final static String STATO_ANNULLATO_DOPO_APPROVAZIONE = "ANA";
+    public final static String STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO = "ANC";
 	public final static String STATO_INSERITO = "INS";
 	public final static String STATO_DEFINITIVO = "DEF";
 	public final static String STATO_NON_INVIATO_FLUSSO = "INS";
@@ -124,6 +125,7 @@ public class Costanti {
 	public final static String NO = "No";
 	public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
 	public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
+    public final static String TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO = "Annullamento Ordine di missione con Rimborso missione Consentito";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
 	
 	public final static Map<String, String> PRIORITA;
@@ -165,6 +167,7 @@ public class Costanti {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(STATO_ANNULLATO, "Annullato");
         aMap.put(STATO_ANNULLATO_DOPO_APPROVAZIONE, "Annullato dopo l'approvazione");
+        aMap.put(STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO, "Annullato dopo l'approvazione.Permesso il Rimborso");
         aMap.put(STATO_CONFERMATO, "Confermato");
         aMap.put(STATO_INVIATO_RESPONSABILE, "Inviato al responsabile");
         aMap.put(STATO_INSERITO, "Inserito");
