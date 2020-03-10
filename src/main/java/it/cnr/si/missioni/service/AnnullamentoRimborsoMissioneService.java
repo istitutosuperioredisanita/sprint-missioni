@@ -242,7 +242,7 @@ public class AnnullamentoRimborsoMissioneService {
 		if (!datiFlusso.getUsernameFirmatarioSpesa().equals(datiFlusso.getUsernamePrimoFirmatario())){
 			listaMail.add(accountService.getEmail(datiFlusso.getUsernameFirmatarioSpesa()));
 		}
-		if (dati != null && dati.getMailNotifiche() != null){
+		if (dati != null && dati.getMailNotificheRimborso() != null && !dati.getMailNotificheRimborso().equals("N")){
 			listaMail.add(dati.getMailNotificheRimborso());
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(annullamento.getRimborsoMissione().getUoSpesa());

@@ -647,7 +647,7 @@ public class CMISOrdineMissioneService {
 			jGenerator.writeStringField("prop_cnrmissioni_missioneGratuita" , cmisOrdineMissione.getMissioneGratuita());
 			jGenerator.writeStringField("prop_cnrmissioni_descrizioneOrdine" , cmisOrdineMissione.getOggetto());
 			jGenerator.writeStringField("prop_cnrmissioni_note" , cmisOrdineMissione.getNote());
-			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , cmisOrdineMissione.getNoteSegreteria());
+			jGenerator.writeStringField("prop_cnrmissioni_noteSegreteria" , Utility.nvl(annullamento.getConsentiRimborso(),"N").equals("S") ? Costanti.TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO : cmisOrdineMissione.getNoteSegreteria());
 			jGenerator.writeStringField("prop_bpm_workflowDescription" , cmisOrdineMissione.getWfDescription());
 			jGenerator.writeStringField("prop_bpm_workflowDueDate" , cmisOrdineMissione.getWfDueDate());
 			jGenerator.writeStringField("prop_bpm_status" , "Not Yet Started");

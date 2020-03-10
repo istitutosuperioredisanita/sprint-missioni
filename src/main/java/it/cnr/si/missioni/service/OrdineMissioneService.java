@@ -345,8 +345,10 @@ public class OrdineMissioneService {
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
 					ordineMissioneDaAggiornare.getAnno());
 			if (dati != null && dati.getMailNotifiche() != null) {
-				mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
-						true, dati.getMailNotifiche());
+				if (!dati.getMailNotifiche().equals("N")){
+					mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
+							true, dati.getMailNotifiche());
+				}
 			} else {
 				List<UsersSpecial> lista = accountService
 						.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
@@ -398,7 +400,7 @@ public class OrdineMissioneService {
 			mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("E")
-				&& !StringUtils.isEmpty(datiIstituto.getMailNotifiche())) {
+				&& !StringUtils.isEmpty(datiIstituto.getMailNotifiche()) && !datiIstituto.getMailNotifiche().equals("N")) {
 			mailService.sendEmail(oggetto, testo, false, true, datiIstituto.getMailNotifiche());
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("A")
@@ -407,7 +409,7 @@ public class OrdineMissioneService {
 		}
 		if (datiIstitutoSpesa != null) {
 			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("E")
-					&& !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotifiche())) {
+					&& !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotifiche()) && !datiIstitutoSpesa.getMailNotifiche().equals("N")) {
 				mailService.sendEmail(oggetto, testo, false, true, datiIstitutoSpesa.getMailNotifiche());
 			}
 			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("A")
@@ -540,9 +542,9 @@ public class OrdineMissioneService {
 				criterionList.add(Subqueries.exists(
 						"select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
 			}
-			if (Utility.nvl(filter.getDaAnnullare(), "N").equals("S")) {
-				criterionList.add(Subqueries.notExists(
-						"select ann.id from AnnullamentoOrdineMissione AS ann where ann.ordineMissione.id = this.id and ann.stato != 'ANN' and ann.stato != 'ANA' "));
+			if (Utility.nvl(filter.getDaAnnullare(), "N").equals("S") ) {
+				String notExists = "select ann.id from AnnullamentoOrdineMissione AS ann where ann.ordineMissione.id = this.id and ann.stato != 'ANN' and ann.stato != 'ANA' and ann.stato != 'DEF' " ;
+				criterionList.add(Subqueries.notExists(notExists));
 			}
 			if (filter.getCup() != null) {
 				criterionList.add(Restrictions.eq("cup", filter.getCup()));
@@ -656,6 +658,10 @@ public class OrdineMissioneService {
 				criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
 				criterionList
 						.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE)));
+				if (StringUtils.isEmpty(filter.getGiaRimborsato())){
+					criterionList
+							.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO)));
+				}
 			}
 
 			if (isServiceRest) {
@@ -1170,7 +1176,9 @@ public class OrdineMissioneService {
 		String testoMail = getTextMailSendToAdministrative(basePath, ordineMissioneDB);
 		String subjectMail = subjectSendToAdministrative + " " + getNominativo(ordineMissioneDB.getUid());
 		if (dati != null && dati.getMailNotifiche() != null) {
-			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
+			if (!dati.getMailNotifiche().equals("N")){
+				mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotifiche());
+			}
 		} else {
 			log.info("Ricerca amministrativi per mail. Uo: " + ordineMissioneDB.getUoSpesa());
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());

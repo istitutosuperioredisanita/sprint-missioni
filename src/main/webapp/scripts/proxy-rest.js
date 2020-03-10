@@ -303,7 +303,13 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         if (data.profilo){
             userWork.profilo = data.profilo.trim();
         }
-        userWork.struttura_appartenenza = data.struttura_appartenenza;
+        var sede = "";
+        if (data.struttura_appartenenza){
+            sede = data.struttura_appartenenza;
+        } else if (data.sigla_sede){
+            sede = data.sigla_sede;
+        }
+        userWork.struttura_appartenenza = sede;
         userWork.codice_sede = data.codice_sede;
         userWork.codice_uo = data.codice_uo;
         userWork.livello = data.livello_profilo;

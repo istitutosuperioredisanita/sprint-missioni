@@ -318,14 +318,14 @@ public class RimborsoMissioneService {
 		if (listaUtenti.size() > 0){
 			mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
 		}
-		if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso())){
+		if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso()) &&  !datiIstituto.getMailNotificheRimborso().equals("N")){
 			mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailNotificheRimborso());
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(),"N").equals("A") && !StringUtils.isEmpty(datiIstituto.getMailDopoRimborso())){
 			mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailDopoRimborso());
 		}
 		if (datiIstitutoSpesa != null){
-			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso())){
+			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso()) && !datiIstitutoSpesa.getMailNotificheRimborso().equals("N")){
 				mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailNotificheRimborso());
 			}
 			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(),"N").equals("A") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoRimborso())){
@@ -555,7 +555,7 @@ public class RimborsoMissioneService {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, rimborsoMissioneDB.getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
 		String testoMail = getTextMailSendToAdministrative(basePath, rimborsoMissioneDB);
-		if (dati != null && dati.getMailNotificheRimborso() != null){
+		if (dati != null && dati.getMailNotificheRimborso() != null  && !dati.getMailNotificheRimborso().equals("N")){
 			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotificheRimborso());
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(uo);

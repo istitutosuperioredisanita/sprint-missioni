@@ -112,6 +112,10 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
     @Column(name = "STATO_FLUSSO", length = 3, nullable = false)
     public String statoFlusso;
 
+	@Size(min = 0, max = 1)
+	@Column(name = "CONSENTI_RIMBORSO", length = 1, nullable = true)
+	public String consentiRimborso;
+
 	@Transient
     private String daValidazione;
 	
@@ -470,4 +474,14 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 		this.motivoAnnullamento = motivoAnnullamento;
 	}
 
+	public String getConsentiRimborso() {
+		return consentiRimborso;
+	}
+
+	public void setConsentiRimborso(String consentiRimborso) {
+		this.consentiRimborso = consentiRimborso;
+	}
+	public boolean isConsentitoRimborso(){
+		return Utility.nvl(getConsentiRimborso(),"N").equals("S");
+	}
 }
