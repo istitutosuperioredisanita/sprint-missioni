@@ -610,7 +610,10 @@ public class AnnullamentoOrdineMissioneService {
     private void controlloCongruenzaDatiInseriti(Principal principal, AnnullamentoOrdineMissione annullamento) {
 		if (StringUtils.isEmpty(annullamento.getIdFlusso()) &&  annullamento.isStatoInviatoAlFlusso()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
-		} 
+		}
+		if (!StringUtils.hasLength(annullamento.getMatricola())) {
+			annullamento.setMatricola(null);
+		}
 	}
 	
 	private void controlloCampiObbligatori(AnnullamentoOrdineMissione annullamento) {
