@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -315,14 +317,14 @@ public class RimborsoMissioneService {
 		if (listaUtenti.size() > 0){
 			mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
 		}
-		if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso())){
+		if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso()) &&  !datiIstituto.getMailNotificheRimborso().equals("N")){
 			mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailNotificheRimborso());
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(),"N").equals("A") && !StringUtils.isEmpty(datiIstituto.getMailDopoRimborso())){
 			mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailDopoRimborso());
 		}
 		if (datiIstitutoSpesa != null){
-			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso())){
+			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(),"N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso()) && !datiIstitutoSpesa.getMailNotificheRimborso().equals("N")){
 				mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailNotificheRimborso());
 			}
 			if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(),"N").equals("A") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoRimborso())){
@@ -552,7 +554,7 @@ public class RimborsoMissioneService {
 		DatiIstituto dati = datiIstitutoService.getDatiIstituto(uo, rimborsoMissioneDB.getAnno());
 		String subjectMail = subjectSendToAdministrative + " "+ getNominativo(rimborsoMissioneDB.getUid());
 		String testoMail = getTextMailSendToAdministrative(basePath, rimborsoMissioneDB);
-		if (dati != null && dati.getMailNotificheRimborso() != null){
+		if (dati != null && dati.getMailNotificheRimborso() != null  && !dati.getMailNotificheRimborso().equals("N")){
 			mailService.sendEmail(subjectMail, testoMail, false, true, dati.getMailNotificheRimborso());
 		} else {
 			List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(uo);
@@ -1325,26 +1327,40 @@ public class RimborsoMissioneService {
 		if (!rimborsoMissione.isMissioneEstera()){
 			rimborsoMissione.setNazione(new Long("1"));
 		}
-		if (rimborsoMissione.isTrattamentoAlternativoMissione()){
-			long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
-			if (oreDifferenza < 24 ){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
-			}
-		}
 		if (!StringUtils.hasLength(rimborsoMissione.getMatricola())){
 			rimborsoMissione.setMatricola(null);
 		}
 		OrdineMissione ordine = rimborsoMissione.getOrdineMissione();
-		if (ordine.getCdsRich() != null){
-			ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
-		}
-		if (Utility.nvl(ordine.getPresidente(),"N").equals("S")){
-			if (!Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S")){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione è per la presidenza, quindi anche il rimborso missione deve essere per la presidenza.");
+		if (ordine != null){
+			if (ordine.getCdsRich() != null){
+				ordine = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordine.getId());
+			}
+			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+				RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
+				filter.setIdOrdineMissione(new Long(ordine.getId().toString()));
+				List<RimborsoMissione> rimborsi = getRimborsiMissione(principal, filter, false);
+				if (rimborsi != null && !rimborsi.isEmpty()){
+					for (RimborsoMissione rimb : rimborsi){
+						if (rimb.isTrattamentoAlternativoMissione()){
+							if (rimborsoMissione.getId() == null || rimb.getId().toString().compareTo(rimborsoMissione.getId().toString()) != 0){
+								throw new AwesomeException(CodiciErrore.ERRGEN, "E' stato già inserito un rimborso missione con la richiesta di trattamento alternativo di missione. Cambiare il trattamento.");
+							}
+						}
+					}
+				}
+				long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
+				if (oreDifferenza < 24 ){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
+				}
+			}
+			if (Utility.nvl(ordine.getPresidente(),"N").equals("S")){
+				if (!Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S")){
+					throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione è per la presidenza, quindi anche il rimborso missione deve essere per la presidenza.");
+				}
 			}
 		}
 	}
-	
+
 	private void controlloCampiObbligatori(RimborsoMissione rimborsoMissione) {
 		if (!rimborsoMissione.isToBeCreated()){
 			controlloDatiObbligatoriDaGUI(rimborsoMissione);

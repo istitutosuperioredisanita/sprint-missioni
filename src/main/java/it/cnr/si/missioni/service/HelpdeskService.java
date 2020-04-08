@@ -52,6 +52,7 @@ public class HelpdeskService {
 		hd.setFirstName(account.getNome());
 		hd.setFamilyName(account.getCognome());
 		hd.setEmail(account.getEmailComunicazioni());
+		hd.setConfirmRequested("y");
 		String url = Costanti.REST_OIL_NEW_PROBLEM;
 
 		if (hd.getIdSegnalazione() != null){

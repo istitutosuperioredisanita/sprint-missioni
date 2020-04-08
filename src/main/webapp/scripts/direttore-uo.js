@@ -11,8 +11,9 @@ missioniApp.factory('DirettoreUoService', function($http) {
                     direttore = data.elements;
                     return direttore;
                 } else {
+                    direttore = data;
                     return direttore;
-                }
+                } 
             } else {
                 return direttore;
             }

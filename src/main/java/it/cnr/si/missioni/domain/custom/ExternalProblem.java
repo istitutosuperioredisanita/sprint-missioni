@@ -18,8 +18,17 @@ public class ExternalProblem extends JSONBody implements Serializable {
     private String descrizione;
     private Integer categoria;
     private String categoriaDescrizione;
-    
-    // note
+    private String confirmRequested;
+
+	public String getConfirmRequested() {
+		return confirmRequested;
+	}
+
+	public void setConfirmRequested(String confirmRequested) {
+		this.confirmRequested = confirmRequested;
+	}
+
+	// note
     private String nota;
     private Integer stato;
     
