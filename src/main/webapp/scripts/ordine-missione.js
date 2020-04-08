@@ -400,7 +400,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                     if (listaVoci){
                         $scope.elencoVoci = [];
                         if (listaVoci.length === 1){
-                            $scope.ordineMissioneModel.voce = listaVoci[0];
+                            $scope.ordineMissioneModel.voce = listaVoci[0].cd_elemento_voce;
                         }
 	                    var ind = -1;
     	                for (var i=0; i<listaVoci.length; i++) {
@@ -449,9 +449,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
                 $scope.ordineMissioneModel.voce = ordineMissioneSelected.voce;
                 $scope.ordineMissioneModel.gae = ordineMissioneSelected.gae;
-                $scope.ordineMissioneModel.cdsRich = ordineMissioneSelected.cdsRich;
-                $scope.ordineMissioneModel.uoRich = ordineMissioneSelected.uoRich;
-                $scope.ordineMissioneModel.cdrRich = ordineMissioneSelected.cdrRich;
                 $scope.ordineMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
                 $scope.ordineMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
                 $scope.ordineMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
@@ -541,12 +538,12 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     $scope.gestioneUtenteAbilitatoValidare = function (uo){
         $scope.utenteAbilitatoValidareUo = 'N';
         var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
-        if (uo){
+        if (uo && uoForUsersSpecial){
             var uoSiper = uo.replace('.','');
             for (var k=0; k<uoForUsersSpecial.length; k++) {
                 var uoForUserSpecial = uoForUsersSpecial[k];
                 if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
-                $scope.utenteAbilitatoValidareUo = 'S';
+                    $scope.utenteAbilitatoValidareUo = 'S';
                 }
             }
         }
@@ -680,7 +677,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     var impostaDisabilitaOrdineMissione = function() {
         if ($scope.esisteOrdineMissione && 
             (($scope.ordineMissioneModel.stato === 'INR' && $scope.ordineMissioneModel.responsabileGruppo != $sessionStorage.account.login) || 
-              $scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.statoFlusso === 'APP' || $scope.ordineMissioneModel.stato === 'ANA'||$scope.ordineMissioneModel.stato === 'ANN'||
+              $scope.ordineMissioneModel.stato === 'DEF' || $scope.ordineMissioneModel.stato === 'ANC' || $scope.ordineMissioneModel.statoFlusso === 'APP' || $scope.ordineMissioneModel.stato === 'ANA'||$scope.ordineMissioneModel.stato === 'ANN'||
               ($scope.ordineMissioneModel.stato === 'CON' && 
                 ($scope.ordineMissioneModel.stateFlows === 'ANNULLATO' ||
                  $scope.ordineMissioneModel.stateFlows === 'FIRMA SPESA' ||
@@ -802,7 +799,6 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
                             $scope.viewAttachments($scope.ordineMissioneModel.id);
-                            $scope.inizializzaFormPerModifica();
                         });
                     },
                     function (httpResponse) {

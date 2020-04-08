@@ -4,16 +4,16 @@
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.3</version>
+        <version>1.0.15</version>
     </parent>
     <groupId>it.cnr.si.sprint</groupId>
     <artifactId>sprint-missioni</artifactId>
-    <version>3.1.97-SNAPSHOT</version>
+    <version>3.1.124-SNAPSHOT</version>
     <packaging>war</packaging>
     <scm>
         <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-missioni.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-missioni.git</developerConnection>
-        <tag>sprint-missioni-3.0.69</tag>
+        <tag>HEAD</tag>
     </scm>
     <properties>
         <assertj-core.version>3.5.2</assertj-core.version>
@@ -134,6 +134,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
             <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+            <version>1.2.3.RELEASE</version>
         </dependency>
     </dependencies>
     <build>

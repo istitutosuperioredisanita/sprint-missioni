@@ -461,7 +461,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
     }
 
     $scope.reloadUoWork = function(uo){
-        $scope.gestioneUtenteAbilitatoValidare(uo);
+        $scope.gestioneUtenteAbilitatoValidare(uo, null);
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
@@ -571,15 +571,15 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         inizializzaForm();
     }
 
-    $scope.gestioneUtenteAbilitatoValidare = function (uo){
+    $scope.gestioneUtenteAbilitatoValidare = function (uo, annullamentoModel){
         $scope.utenteAbilitatoValidareUo = 'N';
         var uoForUsersSpecial= $sessionStorage.account.uoForUsersSpecial;
         if (uo){
             var uoSiper = uo.replace('.','');
             for (var k=0; k<uoForUsersSpecial.length; k++) {
                 var uoForUserSpecial = uoForUsersSpecial[k];
-                if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
-                $scope.utenteAbilitatoValidareUo = 'S';
+                if (uoSiper == uoForUserSpecial.codice_uo && (uoForUserSpecial.ordine_da_validare == 'S' || (annullamentoModel != null && annullamentoModel.isUoDaValidare == 'N'))){
+                    $scope.utenteAbilitatoValidareUo = 'S';
                 }
             }
         }
@@ -814,7 +814,6 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
     $scope.validazione = $routeParams.validazione;
     $scope.accessToken = AccessToken.get();
     $sessionStorage.accountWork = null;
-
     if (isInQuery() || ($scope.annullamentoModel != null && $scope.annullamentoModel.idMissione)){
         ElencoRimborsiMissioneService.findAnnullamentoById($scope.idMissione).then(function(data){
                 var model = data;
@@ -843,7 +842,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                                 $scope.viewAttachments($scope.annullamentoModel.id);
                                 $scope.inizializzaFormPerModifica();
                                 $scope.today();
-                                $scope.gestioneUtenteAbilitatoValidare(model.rimborsoMissione.uoSpesa);
+                                $scope.gestioneUtenteAbilitatoValidare(model.rimborsoMissione.uoSpesa, model);
                             }
             });
     } else {

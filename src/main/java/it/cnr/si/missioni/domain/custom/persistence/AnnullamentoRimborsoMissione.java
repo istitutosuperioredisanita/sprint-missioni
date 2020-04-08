@@ -52,7 +52,15 @@ public class AnnullamentoRimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "UID", length = 256, nullable = false)
     public String uid;
 
-    @Size(min = 0, max = 16)
+	public String getIsUoDaValidare() {
+		return isUoDaValidare;
+	}
+
+	public void setIsUoDaValidare(String isUoDaValidare) {
+		this.isUoDaValidare = isUoDaValidare;
+	}
+
+	@Size(min = 0, max = 16)
     @Column(name = "CODICE_FISCALE", length = 16, nullable = false)
     public String codiceFiscale;
 
@@ -106,7 +114,10 @@ public class AnnullamentoRimborsoMissione extends OggettoBulkXmlTransient {
 
 	@Transient
     private String decodeStato;
-	
+
+	@Transient
+	private String isUoDaValidare;
+
 	public AnnullamentoRimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String motivoAnnullamento){
 		super();
 		this.setId(id);

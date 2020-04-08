@@ -20,6 +20,26 @@ angular.module('missioniApp')
             }
         };
     })
+    .directive('onlyNumbers', function () {
+      return  {
+        require: 'ngModel',
+        link: function (scope, element, attr, ngModelCtrl) {
+            function fromUser(text) {
+                if (text) {
+                    var transformedInput = text.replace(/[^0-9]/g, '');
+
+                    if (transformedInput !== text) {
+                        ngModelCtrl.$setViewValue(transformedInput);
+                        ngModelCtrl.$render();
+                    }
+                    return transformedInput;
+                }
+                return undefined;
+            }            
+            ngModelCtrl.$parsers.push(fromUser);
+        }
+     };
+    })
     .directive('activeLink', function(location) {
         return {
             restrict: 'A',
@@ -242,7 +262,9 @@ angular.module('missioniApp')
               scope.accountBanner.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
             }
 
-            scope.accountBanner.qualificaRich = account.profilo; 
+            if (account.profilo){
+                scope.accountBanner.qualificaRich = account.profilo.trim();
+            }
             scope.accountBanner.livelloRich = account.livello; 
             scope.accountBanner.codiceFiscale = account.codice_fiscale; 
             scope.accountBanner.dataNascita = account.data_nascita; 
