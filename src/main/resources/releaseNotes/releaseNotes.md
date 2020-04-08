@@ -1,31 +1,7 @@
 # NOVITA' VERSIONE MISSIONI
 
-## VERSIONE 3.0 del 07/06/2019
+## VERSIONE 3.0.1 del 05/03/2020
 
-### Generali
+### Annullamento Ordine di Missione Approvato
 
-* Aggiornato il manuale
-* Permessa la ricerca testuale nei campi con la selezione attraverso una lista
-
-### Ordine di Missione
-
-* Aggiunta duplica di un ordine di missione esistente.
-
-### Rimborso Missione
-
-* Aggiunto controllo sulle ore di missione per l'indicazione del pasto
-* Resa obbligatoria la descrizione del dettaglio della spesa
-* Aggiunto data e stato del pagamento della Missione
-
-### Elenco Ordini di Missione
-
-* Aggiunto bottone di stampa dei singoli ordini di missione visualizzati
-
-### Elenco Rimborsi Missione
-
-* Aggiunto bottone di stampa dei singoli rimborsi missione visualizzati
-
-
-### Annullamento Rimborso missione approvato
-
-* Creata nuova funzione. Consultare il manuale di Missioni
+* Aggiunta del campo "Consentire la richiesta di rimborso delle spese di missione già sostenute", da poter indicare in fase di inserimento dell'annullamento dell'ordine di missione. Selezionando questa opzione sara' possibile richiedere il rimborso delle spese di missione gia' sostenute anche se l'ordine di missione viene annullato.

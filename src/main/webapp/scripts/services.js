@@ -173,10 +173,20 @@ missioniApp.factory('Session', function (ProxyService) {
             this.cap_residenza = cap_residenza;
             this.provincia_residenza = provincia_residenza;
             this.codice_fiscale = codice_fiscale;
-            this.profilo = profilo;
-            this.struttura_appartenenza = struttura_appartenenza;
+            if (profilo){
+                this.profilo = profilo.trim();
+            }
+            if (codice_uo){
+                this.codice_uo = codice_uo;
+            } else {
+                this.codice_uo = "ZZZZZZ";
+            }
+            if (struttura_appartenenza){
+                this.struttura_appartenenza = struttura_appartenenza;
+            } else {
+                this.struttura_appartenenza = "ZZZ.ZZZ";
+            }
             this.codice_sede = codice_sede;
-            this.codice_uo = codice_uo;
             this.livello = livello;
             this.allUoForUsersSpecial = allUoForUsersSpecial;
             this.uoForUsersSpecial = uoForUsersSpecial;
@@ -282,59 +292,70 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
-                        if (data.strutturaAppartenenza || data.login=="app.missioni") {
+                        if (data.strutturaAppartenenza || data.login=="app.missioni" || data.profilo ) {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username.toLowerCase() + ':' + param.password);
                             $http.get(
                                 'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username.toLowerCase()
                             ).success(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                                 var comune_residenza = null;    
-                                if (data.strutturaAppartenenza ) {
-                                    if (data.comune_residenza){
-                                        comune_residenza = data.comune_residenza;
-                                        if (data.matricola && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
-                                            Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
-                                                        data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                        data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
-                                        } else {
-                                            var matr = null;
-                                            var comune_residenza = null;    
-                                            var profilo = null;    
-                                            recuperoDatiTerzo(data).then(function (result){
-                                                if (result.ti_dipendente_altro == 'A'){
-                                                    matr = "";
-                                                    comune_residenza = result.ds_comune_fiscale;
-                                                    profilo = result.ds_tipo_rapporto;
-                                                } else {
-                                                    matr = data.matricola;
-                                                    profilo = data.profilo;
-                                                }
-                                                Session.create(data.uid, matr, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
-                                                        data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                        profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
-                                            });
-    
-                                        }    
-                                    } else {
-                                        recuperoResidenza(data).then(function (result){
-                                                    comune_residenza = result;
-                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
-                                                            data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                        data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
-                                        });
-                                    }    
-                                } else {
+                                if (data.uid == "app.missioni"){
                                     Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                    $rootScope.account = Session;
+                                    $sessionStorage.account = Session;
+                                    authService.loginConfirmed(data);
+                                } else {
+                                    recuperoDatiTerzo(data).then(function (result){
+                                        if (data.struttura_appartenenza || data.sigla_sede) {
+                                            var sede = "";
+                                            if (data.struttura_appartenenza){
+                                                sede = data.struttura_appartenenza;
+                                            } else {
+                                                sede = data.sigla_sede;
+                                            }
+                                            if (data.comune_residenza){
+                                                comune_residenza = data.comune_residenza;
+                                                if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
+                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                                data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                                data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                } else {
+                                                    var matr = null;
+                                                    var profilo = null;    
+                                                    if (result && result.ti_dipendente_altro == 'A'){
+                                                        matr = "";
+                                                        comune_residenza = result.ds_comune_fiscale;
+                                                        profilo = result.ds_tipo_rapporto;
+                                                    } else {
+                                                        matr = data.matricola;
+                                                        profilo = data.profilo;
+                                                    }
+                                                    Session.create(data.uid, matr, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                            data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                            data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                            data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                            profilo, sede, data.codice_sede, data.codice_uo, null);
+                                                }
+                                            } else {
+                                                recuperoResidenza(data).then(function (result){
+                                                        comune_residenza = result;
+                                                        Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                                data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                            data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                            data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                            data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                });
+                                            }    
+                                        } else {
+                                            Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                        }
+                                        $rootScope.account = Session;
+                                        $sessionStorage.account = Session;
+                                        authService.loginConfirmed(data);
+                                    });    
                                 }
-                                $rootScope.account = Session;
-                                $sessionStorage.account = Session;
-                                authService.loginConfirmed(data);
                             }).error(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                             });
@@ -371,7 +392,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             return;
                         }
                         AccountLDAP.get(function(data) {
-                            if (!data.strutturaAppartenenza && data.login != "app.missioni" ) {
+                            if (!data.strutturaAppartenenza && data.login != "app.missioni" && !data.profilo) {
                                 Account.get(function(data) {
                                     Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
@@ -387,59 +408,75 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 AccountFromToken.get({token: token},
                                     function (data, responseHeaders) {
                                         var comune_residenza = null;
-                                        if (data.struttura_appartenenza){
-                                            if (data.comune_residenza){
-                                                comune_residenza = data.comune_residenza;
-                                                if (data.matricola && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
-                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
-                                                                data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
-                                                } else {
-                                                    var matr = null;
-                                                    var comune_residenza = null;    
-                                                    var profilo = null;    
-                                                    recuperoDatiTerzo(data).then(function (result){
-                                                        if (result.ti_dipendente_altro == 'A'){
-                                                            matr = "";
-                                                            comune_residenza = result.ds_comune_fiscale;
-                                                            profilo = result.ds_tipo_rapporto;
-                                                        } else {
-                                                            matr = data.matricola;
-                                                            profilo = data.profilo;
-                                                        }
-                                                    Session.create(data.uid, matr, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
-                                                                data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
-                                                    });
-            
-                                                }    
-                                            } else {
-                                                recuperoResidenza(data).then(function (result){
-                                                            comune_residenza = result;
-                                                        Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
-                                                                        data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                data.profilo, data.struttura_appartenenza, data.codice_sede, data.codice_uo, data.livello_profilo);
-                                                        });
-                                            }    
-                                        } else {
+                                        if (data.uid == "app.missioni"){
                                             Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
-                                        }
-                                        $rootScope.account = Session;
-                                        $sessionStorage.account = Session;
+                                            $rootScope.account = Session;
+                                            $sessionStorage.account = Session;
 
-                                        $rootScope.account = Session;
-                                        $sessionStorage.account = Session;
-                                        if (!$rootScope.isAuthorized(authorizedRoles)) {
-                                            // user is not allowed
-                                            $rootScope.$broadcast("event:auth-notAuthorized");
+                                            if (!$rootScope.isAuthorized(authorizedRoles)) {
+                                                // user is not allowed
+                                                $rootScope.$broadcast("event:auth-notAuthorized");
+                                            } else {
+                                                $rootScope.$broadcast("event:auth-loginConfirmed");
+                                            }
                                         } else {
-                                            $rootScope.$broadcast("event:auth-loginConfirmed");
+                                            recuperoDatiTerzo(data).then(function (result){
+                                            if (data.struttura_appartenenza || data.sigla_sede) {
+                                                var sede = "";
+                                                if (data.struttura_appartenenza){
+                                                    sede = data.struttura_appartenenza;
+                                                } else {
+                                                    sede = data.sigla_sede;
+                                                }
+                                                    if (data.comune_residenza){
+                                                        comune_residenza = data.comune_residenza;
+                                                        if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
+                                                            Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                                        data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                                        data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+
+                                                        } else {
+                                                            var matr = null;
+                                                            var profilo = null;    
+                                                            if (result && result.ti_dipendente_altro == 'A'){
+                                                                matr = "";
+                                                                comune_residenza = result.ds_comune_fiscale;
+                                                                profilo = result.ds_tipo_rapporto;
+                                                            } else {
+                                                                matr = data.matricola;
+                                                                profilo = data.profilo;
+                                                            }
+                                                            Session.create(data.uid, matr, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                                        data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                                        profilo, sede, data.codice_sede, data.codice_uo, null);
+                                                        }
+                                                    } else {
+                                                        recuperoResidenza(data).then(function (result){
+                                                                comune_residenza = result;
+                                                                Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                                    data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
+                                                                    data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                                    data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                                    data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                            });
+                                                    }    
+                                                } else {
+                                                    Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                }
+                                                $rootScope.account = Session;
+                                                $sessionStorage.account = Session;
+
+                                                if (!$rootScope.isAuthorized(authorizedRoles)) {
+                                                    // user is not allowed
+                                                    $rootScope.$broadcast("event:auth-notAuthorized");
+                                                } else {
+                                                    $rootScope.$broadcast("event:auth-loginConfirmed");
+                                                }
+                                            });    
                                         }
                                     },
                                     function (httpResponse) {

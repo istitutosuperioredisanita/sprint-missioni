@@ -104,7 +104,7 @@
         "gae":"Codice GAE"
     },
     "main": {
-        "release": "Clicca per le News di versione",
+        "release": "Aggiornamento versione 05/03/2020. Clicca per le News di versione",
         "wait": "Controllo Flussi Missioni in corso",
         "subtitle_da_confermare": "Ordini di Missione da Confermare",
         "subtitle_da_confermare_annullamenti": "Annullamenti Ordini di Missione da Confermare",
@@ -458,7 +458,8 @@
         "form": {
             "numero": "Progressivo di Annullamento",
             "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
-            "motivo-annullamento": "Motivo di Annullamento"
+            "motivo-annullamento": "Motivo di Annullamento",
+            "consenti-rimborso": "Consentire la richiesta di rimborso delle spese di missione già sostenute"
         },
         "button": {
             "print": "Stampa Annullamento",

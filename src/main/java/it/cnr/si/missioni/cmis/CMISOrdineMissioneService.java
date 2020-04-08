@@ -262,13 +262,10 @@ public class CMISOrdineMissioneService {
 					} else 	if (Utility.nvl(ordineMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
 						userNameFirmatarioSpesa = parametri.getPresidente();
 
-						UtentePresidenteSpeciale utente = utentiPresidenteSpecialeService.esisteUtente(Utility.nvl(ordineMissione.getUid(),"N"));
-						if (utente != null){
-							String primo = userNameFirmatario;
-							userNameFirmatario = userNameFirmatarioSpesa;
-							userNameFirmatarioSpesa = primo;
-						}
-											
+						String primo = userNameFirmatario;
+						userNameFirmatario = userNameFirmatarioSpesa;
+						userNameFirmatarioSpesa = primo;
+
 					} else if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
 						if (uoCompetenzaPerFlusso != null){
 							if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
@@ -296,6 +293,10 @@ public class CMISOrdineMissioneService {
 			if ((userNameSpesaAggiunto != null && (userNameFirmatario.equals(userNameSpesaAggiunto) || (userNameAggiunto != null && userNameAggiunto.equals(userNameSpesaAggiunto))))|| 
 					(userNameAggiunto != null && userNameAggiunto.equals(userNameFirmatarioSpesa))){
 				userNameFirmatario = userNameAggiunto;
+			}
+
+			if (userNameFirmatarioSpesa.equals(ordineMissione.getUid())){
+				userNameFirmatario = userNameFirmatarioSpesa;
 			}
 			cmisOrdineMissione.setUsernameFirmatarioAggiunto(userNameAggiunto);
 			cmisOrdineMissione.setUsernameFirmatarioSpesaAggiunto(userNameSpesaAggiunto);
@@ -924,7 +925,7 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 	
-	
+
 	public InputStream getStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException{
 		String id = getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
 		if (id != null){
@@ -949,7 +950,7 @@ public class CMISOrdineMissioneService {
 		else if (ordine.size() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		} else {
-			StorageObject storageObject = ordine.get(0); 
+			StorageObject storageObject = ordine.get(0);
 			return storageObject;
 		}
 	}
@@ -962,7 +963,7 @@ public class CMISOrdineMissioneService {
 		else if (ordine.size() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files Annullamento ordini di missione aventi l'ID :"+ annullamento.getId()+", Anno:"+annullamento.getAnno()+", Numero:"+annullamento.getNumero());
 		} else {
-			StorageObject nodeFile = ordine.get(0); 
+			StorageObject nodeFile = ordine.get(0);
 				return nodeFile;
 		}
 	}
@@ -975,7 +976,7 @@ public class CMISOrdineMissioneService {
 		else if (ant.size() > 1){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files anticipo di missione aventi l'ID :"+ anticipo.getId());
 		} else {
-			StorageObject nodeFile = ant.get(0); 
+			StorageObject nodeFile = ant.get(0);
 				return nodeFile;
 		}
 	}
@@ -987,7 +988,7 @@ public class CMISOrdineMissioneService {
 			StorageObject nodeFile = getStorageAnnullamentoOrdineMissione(annullamento);
 			return nodeFile.getKey();
 	}
-	
+
 	public StorageObject getStorageAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException{
 		OrdineMissione ordineMissione = annullamento.getOrdineMissione();
 		StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
@@ -1002,7 +1003,7 @@ public class CMISOrdineMissioneService {
 			return objs.get(0);
 		}
 	}
-	
+
 	public StorageObject getStorageOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException{
 		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
@@ -1017,7 +1018,7 @@ public class CMISOrdineMissioneService {
 			return objs.get(0);
 		}
 	}
-	
+
 	public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException{
 		OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
 		StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
@@ -1304,7 +1305,7 @@ public class CMISOrdineMissioneService {
 
 		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO);
 		try{
-			StorageObject so = missioniCMISService.restoreSimpleDocument(
+			Document node = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,
 					stream,
 					mimeTypes.mimetype(),
