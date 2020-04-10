@@ -11,9 +11,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.flows.json.object.flowsStatus.FlowsStatus;
+import it.cnr.si.missioni.cmis.flows.json.object.flowsStatus.Task;
+import it.cnr.si.missioni.util.proxy.json.object.ImpegnoJson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +61,11 @@ public class MissioniCMISService extends StoreService {
 	
     @Value("${spring.proxy.FLOWS.urlRimborsoMissione}")
     private String urlFlowRimborsoMissione;
-	
-    @Value("${spring.proxy.STORAGE.urlForPerson}")
+
+	@Value("${spring.proxy.FLOWS.urlStatusFlows}")
+	private String urlStatusFlows;
+
+	@Value("${spring.proxy.STORAGE.urlForPerson}")
     private String urlForPerson;
 	
 	public static final String ASPECT_TITLED = "P:cm:titled";
@@ -246,6 +255,52 @@ public class MissioniCMISService extends StoreService {
 		return startFlow(message, urlFlowRimborsoMissione);
 	}
 
+	public ResultFlows recuperoFlusso(String idFlusso) {
+    	if (idFlusso.startsWith(Costanti.INITIAL_NAME_OLD_FLOWS)){
+    		idFlusso = idFlusso.substring(9);
+		}
+		JsonFactory jsonFactory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper(jsonFactory);
+		FlowsStatus flowsStatus =null;
+		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+		try {
+			String url = urlStatusFlows+idFlusso;
+			ResultProxy result = proxyService.process(HttpMethod.GET, new String(), Costanti.APP_FLOWS, url, "includeTasks=true", null, false);
+			String risposta = result.getBody();
+			logger.info("Risposta Status Flow: "+risposta);
+
+			flowsStatus = mapper.readValue(risposta, FlowsStatus.class);
+		} catch (Exception e) {
+			throw new AwesomeException( "Errore in fase di lettura dello stato del flusso: " + Utility.getMessageException(e) + ".");
+		}
+		if (flowsStatus != null && flowsStatus.getData() != null){
+			ResultFlows resultFlows = new ResultFlows();
+			if (flowsStatus.getData().getIsActive()){
+				if (!flowsStatus.getData().getTasks().isEmpty()){
+					for (Task task : flowsStatus.getData().getTasks()){
+						if (task.isInProgress()){
+							resultFlows.setState(task.getTitle());
+							resultFlows.setTaskId(task.getId());
+							resultFlows.setComment(task.getProperties() == null ? null : task.getProperties().getBpmComment());
+							return resultFlows;
+						}
+					}
+					if (resultFlows.getState() == null){
+						throw new AwesomeException( "Task non coerenti per il flusso: " + idFlusso);
+					}
+				} else {
+					throw new AwesomeException( "Task non esistenti per il flusso: " + idFlusso);
+				}
+			} else {
+				resultFlows.setState(Costanti.STATO_FIRMATO_FROM_CMIS);
+			}
+
+		} else {
+			throw new AwesomeException( "Flusso non esistente: " + idFlusso);
+		}
+		return null;
+    }
+
 	private String startFlow(MessageForFlow  message, String simpleUrl) {
 		JsonFactory jsonFactory = new JsonFactory();
 		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
@@ -351,14 +406,6 @@ public class MissioniCMISService extends StoreService {
 	
 	public Boolean deleteNode(String id) {
 		return super.delete(id);
-	}
-	public List<StorageObject> recuperoFlusso(String idFlusso) {
-		StringBuilder query = new StringBuilder("select parametriFlusso.wfcnr:statoFlusso, parametriFlusso.wfcnr:taskId, flussoMissioni.cnrmissioni:commento from cmis:document as t ");
-		query.append( "inner join wfcnr:parametriFlusso as parametriFlusso on t.cmis:objectId = parametriFlusso.cmis:objectId ");
-		query.append(" inner join cnrmissioni:parametriFlussoMissioni as flussoMissioni on t.cmis:objectId = flussoMissioni.cmis:objectId ");
-		query.append(" where parametriFlusso.wfcnr:wfInstanceId = '").append(idFlusso).append("'");
-
-		return super.search(query.toString());
 	}
 	protected List<StorageObject> recuperoDocumento(StorageObject fo, String tipoDocumento) {
 		return Optional.ofNullable(fo) 

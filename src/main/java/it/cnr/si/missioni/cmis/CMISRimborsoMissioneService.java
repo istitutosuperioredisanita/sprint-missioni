@@ -885,18 +885,7 @@ public class CMISRimborsoMissioneService {
     }
 
 	public ResultFlows getFlowsRimborsoMissione(String idFlusso)throws AwesomeException{
-		String fieldStato = "wfcnr:statoFlusso"; 
-		String fieldTaskId = "wfcnr:taskId"; 
-		String fieldComment = "cnrmissioni:commento"; 
-		List<StorageObject> result = recuperoFlusso(idFlusso);
-		if (result != null && result.size() == 1){
-			ResultFlows flows = new ResultFlows();
-			flows.setState((String) result.get(0).getPropertyValue(fieldStato));
-			flows.setComment((String) result.get(0).getPropertyValue(fieldComment));
-			flows.setTaskId((String) result.get(0).getPropertyValue(fieldTaskId));
-			return flows;
-		}
-		return null;
+		return missioniCMISService.recuperoFlusso(idFlusso);
 	}
 
 	private void abortFlowRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
@@ -909,7 +898,7 @@ public class CMISRimborsoMissioneService {
 		}
     }
 
-	public List<StorageObject> recuperoFlusso(String idFlusso)throws AwesomeException{
+	public ResultFlows recuperoFlusso(String idFlusso)throws AwesomeException{
 		return missioniCMISService.recuperoFlusso(idFlusso);
 	}
 
