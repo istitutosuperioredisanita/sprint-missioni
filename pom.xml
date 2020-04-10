@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -38,7 +38,7 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <sprint.version>2.0.1.2</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
-		   <storage.cloud.version>1.0.2</storage.cloud.version>
+        <storage.cloud.version>1.0.2</storage.cloud.version>
     </properties>
     <dependencies>
         <dependency>
@@ -421,6 +421,9 @@
         </profile>
         <profile>
             <id>CMIS</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>it.cnr.si</groupId>
@@ -428,9 +431,6 @@
                     <version>${storage.cloud.version}</version>
                 </dependency>
             </dependencies>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>AZURE</id>

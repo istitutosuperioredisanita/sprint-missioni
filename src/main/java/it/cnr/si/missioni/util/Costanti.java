@@ -61,6 +61,7 @@ public class Costanti {
 	public final static String APP_HELPDESK = "OIL";
 	public final static String PROPERTY_RESULT_FLOW = "persistedObject";
 	public final static String PATTERN_RESULT_FLOW = "id=(activiti\\$[0-9]+)";
+    public final static String INITIAL_NAME_OLD_FLOWS = "activiti$";
 	public final static String APP_SIGLA = "SIGLA";
 	public final static String APP_SIPER = "SIPER";
 	public final static String APP_STORAGE = "STORAGE";
