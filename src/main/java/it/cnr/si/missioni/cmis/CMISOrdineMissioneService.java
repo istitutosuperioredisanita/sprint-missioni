@@ -630,7 +630,7 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setProp_cnrmissioni_missioneGratuita(cmisOrdineMissione.getMissioneGratuita());
 			messageForFlows.setProp_cnrmissioni_descrizioneOrdine(cmisOrdineMissione.getOggetto());
 			messageForFlows.setProp_cnrmissioni_note(cmisOrdineMissione.getNote());
-			messageForFlows.setProp_cnrmissioni_noteSegreteria(cmisOrdineMissione.getNoteSegreteria());
+			messageForFlows.setProp_cnrmissioni_noteSegreteria(Utility.nvl(annullamento.getConsentiRimborso(),"N").equals("S") ? Costanti.TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO : cmisOrdineMissione.getNoteSegreteria());
 			messageForFlows.setProp_bpm_workflowDescription(cmisOrdineMissione.getWfDescription());
 			messageForFlows.setProp_bpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
 			messageForFlows.setProp_bpm_status("Not Yet Started");
@@ -1102,18 +1102,7 @@ public class CMISOrdineMissioneService {
     }
 
 	public ResultFlows getFlowsOrdineMissione(String idFlusso){
-		String fieldStato = "wfcnr:statoFlusso"; 
-		String fieldTaskId = "wfcnr:taskId"; 
-		String fieldComment = "cnrmissioni:commento"; 
-		List<StorageObject> result = recuperoFlusso(idFlusso);
-		if (result != null && result.size() == 1){
-			ResultFlows flows = new ResultFlows();
-			flows.setState((String) result.get(0).getPropertyValue(fieldStato));
-			flows.setComment((String) result.get(0).getPropertyValue(fieldComment));
-			flows.setTaskId((String) result.get(0).getPropertyValue(fieldTaskId));
-			return flows;
-		}
-		return null;
+		return missioniCMISService.recuperoFlusso(idFlusso);
 	}
 
 	private void abortFlowOrdineMissione(OrdineMissione ordineMissione)  {
@@ -1125,10 +1114,6 @@ public class CMISOrdineMissioneService {
     		throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
     	}
     }
-
-	public List<StorageObject> recuperoFlusso(String idFlusso){
-		return missioniCMISService.recuperoFlusso(idFlusso);
-	}
 
 	private MessageForFlowOrdine createJsonForAbortFlowOrdineMissione() {
 		MessageForFlowOrdine message = new MessageForFlowOrdine();
@@ -1305,7 +1290,7 @@ public class CMISOrdineMissioneService {
 
 		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO);
 		try{
-			Document node = missioniCMISService.restoreSimpleDocument(
+			StorageObject so = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,
 					stream,
 					mimeTypes.mimetype(),
