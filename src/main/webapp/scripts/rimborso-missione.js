@@ -663,7 +663,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
             if ($scope.gaeSelected){
                 url = SIGLA_REST.IMPEGNO_GAE;
-                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", anno},
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.rimborsoMissioneModel.cdsSpesa},
                               {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.rimborsoMissioneModel.esercizioOriginaleObbligazione},
                               {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.rimborsoMissioneModel.pgObbligazione},
@@ -671,7 +671,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             } else {
                 url = SIGLA_REST.IMPEGNO;
                 varClauses = [{condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.rimborsoMissioneModel.cdsSpesa},
-                              {condition: 'AND', fieldName: 'esercizio', operator: "=", anno},
+                              {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.rimborsoMissioneModel.esercizioOriginaleObbligazione},
                               {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.rimborsoMissioneModel. pgObbligazione}];
             }
