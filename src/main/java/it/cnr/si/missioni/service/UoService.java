@@ -42,7 +42,10 @@ public class UoService {
 		} else {
 			direttore = accountService.getDirector(uo);		
 		}
-    	return accountService.loadAccountFromRest(direttore);
+    	if (direttore != null){
+			return accountService.loadAccountFromRest(direttore);
+		}
+		return null;
     }
 
 	private boolean isDevProfile(){

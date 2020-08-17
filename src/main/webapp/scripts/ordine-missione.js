@@ -300,9 +300,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             var app = APP_FOR_REST.SIGLA;
             var url = null;
             var varClauses = [];
+            var today = new Date();
+            var anno = today.getFullYear();
             if ($scope.gaeSelected){
                 url = SIGLA_REST.IMPEGNO_GAE;
-                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:$scope.ordineMissioneModel.anno},
+                varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.ordineMissioneModel.cdsSpesa},
                               {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.ordineMissioneModel.esercizioOriginaleObbligazione},
                               {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.ordineMissioneModel.pgObbligazione},
@@ -310,7 +312,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             } else {
                 url = SIGLA_REST.IMPEGNO;
                 varClauses = [{condition: 'AND', fieldName: 'cdCds', operator: "=", fieldValue:$scope.ordineMissioneModel.cdsSpesa},
-                              {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:$scope.ordineMissioneModel.anno},
+                              {condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'esercizioOriginale', operator: "=", fieldValue:$scope.ordineMissioneModel.esercizioOriginaleObbligazione},
                               {condition: 'AND', fieldName: 'pgObbligazione', operator: "=", fieldValue:$scope.ordineMissioneModel. pgObbligazione}];
             }
