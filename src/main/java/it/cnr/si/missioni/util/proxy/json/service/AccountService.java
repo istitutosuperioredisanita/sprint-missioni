@@ -224,10 +224,10 @@ public class AccountService {
 			if (lista != null && lista.length > 0){
 				return lista[0].getUid();
 			} else if (lista == null || lista.length == 0){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato possibile recuperare il direttore per la uo." + uo);
+				return null;
 			}
 		} catch (Exception ex) {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i Direttori ("+Utility.getMessageException(ex)+").");
+			return null;
 		}
 		return risposta;
 	}
