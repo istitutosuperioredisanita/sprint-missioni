@@ -19,6 +19,7 @@
         <assertj-core.version>3.5.2</assertj-core.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
+        <flows.version>1.6.1</flows.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jada.version>2.9</jada.version>
         <!-- upgrade -->
@@ -39,7 +40,6 @@
         <sprint.version>2.0.1.2</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
         <storage.cloud.version>1.0.2</storage.cloud.version>
-        <flows.version>1.6.1</flows.version>
     </properties>
     <dependencies>
         <dependency>
@@ -78,6 +78,26 @@
                     <groupId>javax.persistence</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>flows-client</artifactId>
+            <version>${flows.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>storage-cloud-azure</artifactId>
+            <version>${storage.cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>storage-cloud-cmis</artifactId>
+            <version>${storage.cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>storage-cloud-s3</artifactId>
+            <version>${storage.cloud.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -140,11 +160,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-config-server</artifactId>
             <version>1.2.3.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.si</groupId>
-            <artifactId>flows-client</artifactId>
-            <version>${flows.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -424,39 +439,6 @@
             <properties>
                 <profile.swagger>,swagger</profile.swagger>
             </properties>
-        </profile>
-        <profile>
-            <id>CMIS</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>it.cnr.si</groupId>
-                    <artifactId>storage-cloud-cmis</artifactId>
-                    <version>${storage.cloud.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>AZURE</id>
-            <dependencies>
-                <dependency>
-                    <groupId>it.cnr.si</groupId>
-                    <artifactId>storage-cloud-azure</artifactId>
-                    <version>${storage.cloud.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>S3</id>
-            <dependencies>
-                <dependency>
-                    <groupId>it.cnr.si</groupId>
-                    <artifactId>storage-cloud-s3</artifactId>
-                    <version>${storage.cloud.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>dev</id>
