@@ -8,7 +8,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContextException;
@@ -55,8 +54,6 @@ import it.cnr.si.missioni.web.rest.ProxyResource;
 @Service
 public class ProxyService implements EnvironmentAware{
     private final Logger log = LoggerFactory.getLogger(ProxyService.class);
-
-	private RelaxedPropertyResolver propertyResolver;
 
     private Environment environment;
     
@@ -199,7 +196,7 @@ public class ProxyService implements EnvironmentAware{
 	}
 
 	public String impostaUrl(String app, String url, String queryString) {
-		String appUrl = propertyResolver.getProperty(app + ".url");
+		String appUrl = environment.getProperty("spring.proxy."+app + ".url");
 		String proxyURL = null;
 		if (appUrl == null) {
 			log.error("Cannot find properties for app: " + app + " Current profile are: ", Arrays.toString(environment.getActiveProfiles()));
@@ -221,8 +218,8 @@ public class ProxyService implements EnvironmentAware{
 
 	public HttpHeaders impostaAutenticazione(String app, String authorization) {
 		HttpHeaders headers = new HttpHeaders();
-		String username = propertyResolver.getProperty(app + ".username"), 
-				password = propertyResolver.getProperty(app + ".password");
+		String username = environment.getProperty("spring.proxy."+app + ".username"),
+				password = environment.getProperty("spring.proxy."+app + ".password");
 		if (username != null && password != null) {
 			String plainCreds = username.concat(":").concat(password);
 			byte[] plainCredsBytes = plainCreds.getBytes();
@@ -255,20 +252,19 @@ public class ProxyService implements EnvironmentAware{
 	@Override
 	public void setEnvironment(Environment environment) {
         this.environment = environment;
-        this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.proxy.");
         this.restTemplateMap = new HashMap<String, RestTemplate>();
 	}
 
 	public Context getDefaultContext(String app){
-		String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
+		String uoContext = environment.getProperty("spring.proxy."+app + ".context.cd_unita_organizzativa");
 		Context context = new Context();
     	if (!StringUtils.isEmpty(uoContext)){
     		context.setCd_unita_organizzativa(uoContext);
     		if (StringUtils.isEmpty(context.getCd_cds())){
-    			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
+    			context.setCd_cds(environment.getProperty("spring.proxy."+app + ".context.cd_cds"));
     		}
     		if (StringUtils.isEmpty(context.getCd_cdr())){
-    			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
+    			context.setCd_cdr(environment.getProperty("spring.proxy."+app + ".context.cd_cdr"));
     		}
     	}
     	return context;

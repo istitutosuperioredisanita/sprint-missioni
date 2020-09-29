@@ -8,7 +8,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,8 +38,6 @@ public class PrintService{
 	@Autowired	
 	private Environment env;
 
-	private RelaxedPropertyResolver propertyResolver;
-
     public String createJsonForPrint(Object object){
 		ObjectMapper mapper = new ObjectMapper();
 		String myJson = null;
@@ -53,10 +50,9 @@ public class PrintService{
     }
     
     public ResponseEntity<byte[]> processForPrint(HttpMethod httpMethod, Params params) throws ComponentException{
-    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
     	String url = "";
-    	if (propertyResolver != null && propertyResolver.getProperty("endpoint") != null) {
-    		url = propertyResolver.getProperty("endpoint");
+    	if (env != null && env.getProperty("spring.print."+"endpoint") != null) {
+    		url = env.getProperty("spring.print."+"endpoint");
     	} else {
     		throw new ComponentException("Configurare l'EndPoint per le stampe");
     	}

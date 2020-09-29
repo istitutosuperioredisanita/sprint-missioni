@@ -6,7 +6,6 @@ import java.math.BigInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
@@ -41,7 +40,6 @@ public class LoadFilesService {
 	@Autowired
     private Environment env;
 
-	private RelaxedPropertyResolver propertyResolver;	
 	
 	@CacheEvict(value = Costanti.NOME_CACHE_FAQ, allEntries = true)
 	public void evictFaq() {
@@ -195,9 +193,8 @@ public class LoadFilesService {
 	}
 	private InputStream getServicesForCache() {
 		InputStream is = null;
-		this.propertyResolver = new RelaxedPropertyResolver(env, "cache.");
-		
-    	if (this.propertyResolver != null && Boolean.valueOf(this.propertyResolver.getProperty("init_cache")).equals(true)) {
+
+    	if (env != null && Boolean.valueOf(env.getProperty("cache."+"init_cache")).equals(true)) {
     		String fileName = getFileNameFromRestServices();
     		is = recuperoFile(fileName);
     	}	
