@@ -22,6 +22,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
+import it.cnr.si.missioni.util.DateUtils;
 import org.springframework.util.StringUtils;
 
 import it.cnr.si.missioni.util.Costanti;
@@ -354,6 +355,18 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "UO_CONTR_AMM", length = 20, nullable = true)
     private String uoContrAmm;
 
+	@Size(min = 0, max = 2000)
+	@Column(name = "COMMENTO_FLUSSO", length = 1000, nullable = true)
+	public String commentoFlusso;
+
+	public String getCommentoFlusso() {
+		return commentoFlusso;
+	}
+
+	public void setCommentoFlusso(String commentoFlusso) {
+		this.commentoFlusso = commentoFlusso;
+	}
+
 	@Transient
     private String daValidazione;
 	
@@ -402,7 +415,18 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	@Transient
     private BigDecimal totaleRimborsoComplessivo;
 
-	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione, 
+	@Transient
+	private String stringBasePath;
+
+	public String getStringBasePath() {
+		return stringBasePath;
+	}
+
+	public void setStringBasePath(String stringBasePath) {
+		this.stringBasePath = stringBasePath;
+	}
+
+	public RimborsoMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione,
 			String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String uoRich, String trattamento, String validaAmm){
 		super();
 		this.setId(id);
@@ -1153,7 +1177,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 	}
 
 	public Boolean isStatoInviatoAlFlusso(){
-		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO)){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && (getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO) || getStatoFlusso().equals(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO))){
 			return true;
 		}
 		return false;

@@ -23,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"livello_profilo",
 	"matricola",
 	"nome",
-	"cognome",
-	"codice_fiscale",
 	"sesso",
 	"data_nascita",
 	"comune_nascita",

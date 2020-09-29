@@ -623,7 +623,7 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
 	}
 
 	public Boolean isStatoInviatoAlFlusso(){
-		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO)){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && (getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO) || getStatoFlusso().equals(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO))){
 			return true;
 		}
 		return false;

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import it.cnr.si.missioni.domain.custom.FlowResult;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,8 +101,15 @@ public class AnnullamentoOrdineMissioneService {
     
     @Value("${spring.mail.messages.ritornoAnnullamentoOrdineMittente.oggetto}")
     private String subjectReturnToSender;
-    
-    @Transactional(readOnly = true)
+
+	@Value("${spring.mail.messages.erroreLetturaFlussoAnnullamento.oggetto}")
+	private String subjectErrorFlowsAnnullamento;
+
+	@Value("${spring.mail.messages.erroreLetturaFlussoAnnullamento.testo}")
+	private String textErrorFlowsAnnullamento;
+
+
+	@Transactional(readOnly = true)
     public AnnullamentoOrdineMissione getAnnullamentoOrdineMissione(Principal principal, Long idAnnullamento, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
     	filter.setDaId(idAnnullamento);
@@ -111,11 +120,7 @@ public class AnnullamentoOrdineMissioneService {
 			annullamento = listaAnnullamentiMissione.get(0);
 			if (retrieveDataFromFlows){
 				if (annullamento.isStatoInviatoAlFlusso()){
-	    			ResultFlows result = retrieveDataFromFlows(annullamento);
-	    			if (result != null){
-	    				annullamento.setStateFlows(retrieveStateFromFlows(result));
-	    				annullamento.setCommentFlows(result.getComment());
-	    			}
+// TODO alla firma di chi
 				}
 			}
 		}
@@ -152,23 +157,53 @@ public class AnnullamentoOrdineMissioneService {
     	return lista;
     }
 
-	public void aggiornaAnnullamentoRespinto(Principal principal, ResultFlows result,
+	public void aggiornaAnnullamentoOrdineMissioneRespinto(Principal principal, FlowResult result,
 			AnnullamentoOrdineMissione annullamentoDaAggiornare) throws ComponentException{
 		aggiornaValidazione(principal, annullamentoDaAggiornare);
-		annullamentoDaAggiornare.setCommentFlows(result.getComment());
-		annullamentoDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+		annullamentoDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
+		annullamentoDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getEsito()));
 		annullamentoDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
 	}
 
-	public void aggiornaAnnullamentoOrdineMissioneAnnullato(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare)
-			throws ComponentException {
-		annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
-		updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void aggiornaAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare, FlowResult flowResult) {
+		try {
+			if (annullamentoDaAggiornare != null){
+				if (annullamentoDaAggiornare.isStatoInviatoAlFlusso() && annullamentoDaAggiornare.isMissioneConfermata() &&
+						!annullamentoDaAggiornare.isMissioneDaValidare())	{
+					switch (flowResult.getEsito() ) {
+						case FlowResult.ESITO_FLUSSO_FIRMATO:
+							aggiornaAnnullamentoOrdineMissioneFirmato(principal, annullamentoDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
+							aggiornaAnnullamentoOrdineMissionePrimaFirma(principal, annullamentoDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
+							aggiornaAnnullamentoOrdineMissioneRespinto(principal, flowResult, annullamentoDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
+							aggiornaAnnullamentoOrdineMissioneRespinto(principal, flowResult, annullamentoDaAggiornare);
+							break;
+					}
+				} else {
+					erroreAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, flowResult);
+				}
+			}
+		} catch (Exception e){
+			mailService.sendEmailError(subjectErrorFlowsAnnullamento, "Errore in aggiornaAnnullamentoOrdineMissione: "+e.getMessage(), false, true);
+		}
 	}
 
-	public AnnullamentoOrdineMissione aggiornaAnnullamentoMissioneApprovato(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare, OrdineMissione ordineMissione)
+	private void aggiornaAnnullamentoOrdineMissionePrimaFirma(Principal principal, AnnullamentoOrdineMissione annullamentoOrdineMissione) {
+		annullamentoOrdineMissione.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
+		AnnullamentoOrdineMissione annullamento = updateAnnullamentoOrdineMissione(principal, annullamentoOrdineMissione, true, null);
+	}
+
+	public AnnullamentoOrdineMissione aggiornaAnnullamentoOrdineMissioneFirmato(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare)
 			throws ComponentException {
+		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamentoDaAggiornare.getOrdineMissione().getId());
+		log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", annullamentoDaAggiornare.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 		annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		annullamentoDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		AnnullamentoOrdineMissione annullamento = updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
@@ -517,6 +552,7 @@ public class AnnullamentoOrdineMissioneService {
 				if (isForValidateFlows){
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
@@ -662,6 +698,17 @@ public class AnnullamentoOrdineMissioneService {
         	}
     	}
 		popolaCoda(missione);
+	}
+	private void erroreAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flowResult) {
+		String errore = "Esito flusso non corrispondente con lo stato dell'annullamento.";
+		String testoErrore = getTextErrorAnnullamentoOrdineMissione(principal, annullamentoOrdineMissione, flowResult, errore);
+		mailService.sendEmailError(subjectErrorFlowsAnnullamento, testoErrore, false, true);
+	}
+
+
+	private String getTextErrorAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flow, String error){
+		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamentoOrdineMissione.getOrdineMissione().getId());
+		return " con id "+annullamentoOrdineMissione.getId()+ " relativo all'ordine di missione "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getIdFlusso()+" con esito "+flow.getEsito()+" è andato in errore per il seguente motivo: " + error;
 	}
 }
 

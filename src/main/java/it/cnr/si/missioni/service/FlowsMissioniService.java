@@ -22,7 +22,7 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.Costanti;
 
 @Service
-public class FlowsService {
+public class FlowsMissioniService {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
 
@@ -73,15 +73,18 @@ public class FlowsService {
 				}
 				if (result.isApprovato()){
 					log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
+//TODO
+//					ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
 					return result;
 				} else if (result.isAnnullato()){
 	    			log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} annullato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					ordineMissioneService.aggiornaOrdineMissioneAnnullato(principal, ordineMissione);
+//TODO
+//					ordineMissioneService.aggiornaOrdineMissioneAnnullato(principal, ordineMissione);
 					return result;
 				} else if (result.isStateReject()){
 	    			log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
+//TODO
+//					ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
 			    	return result;
 				}
 			}
@@ -99,6 +102,7 @@ public class FlowsService {
 					return null;
 				}
 				if (result.isApprovato()){
+/*
 					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
 					log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 					annullamentoOrdineMissioneService.aggiornaAnnullamentoMissioneApprovato(principal, annullamento, ordineMissione);
@@ -112,7 +116,7 @@ public class FlowsService {
 					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
 	    			log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
 	    			annullamentoOrdineMissioneService.aggiornaAnnullamentoRespinto(principal, result, annullamento);
-			    	return result;
+			    	return result;*/
 				}
 			}
 		}
@@ -137,7 +141,8 @@ public class FlowsService {
 				}
 	    		if (result.isApprovato()){
 	    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} approvato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-	    			rimborsoMissioneService.aggiornaRimborsoMissioneApprovato(principal, rimborsoMissione);
+//TODO
+//	    			rimborsoMissioneService.aggiornaRimborsoMissioneApprovato(principal, rimborsoMissione);
 					return result;
 	    		} else if (result.isAnnullato()){
 	    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} annullato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
@@ -145,7 +150,8 @@ public class FlowsService {
 					return result;
 				} else if (result.isStateReject()){
 	    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} respinto.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-					rimborsoMissioneService.aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissione);
+//TODO
+//					rimborsoMissioneService.aggiornaRimborsoMissioneRespinto(principal, result, rimborsoMissione);
 			    	return result;
 				}
 //	    	} else {

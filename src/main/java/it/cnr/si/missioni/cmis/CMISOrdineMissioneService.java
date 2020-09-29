@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.cnr.si.service.application.FlowsService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.ComponentException;
@@ -50,7 +55,6 @@ import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
-import it.cnr.si.missioni.util.data.UtentePresidenteSpeciale;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.Gae;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
@@ -140,6 +144,9 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private AccountService accountService;
+
+	@Autowired
+	private FlowsService flowsService;
 
 	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione) throws ComponentException{
 		return create(principal, ordineMissione,ordineMissione.getAnno());
@@ -302,8 +309,8 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setUsernameFirmatarioSpesaAggiunto(userNameSpesaAggiunto);
 			cmisOrdineMissione.setAnno(ordineMissione.getAnno().toString());
 			cmisOrdineMissione.setNumero(ordineMissione.getNumero().toString());
-			cmisOrdineMissione.setAnticipo(ordineMissione.getRichiestaAnticipo().equals("S") ? "true" : "false");
-			cmisOrdineMissione.setAutoPropriaFlag(ordineMissione.getUtilizzoAutoPropria().equals("S") ? "true" : "false");
+			cmisOrdineMissione.setAnticipo(ordineMissione.getRichiestaAnticipo().equals("S") ? "si" : "no");
+			cmisOrdineMissione.setAutoPropriaFlag(ordineMissione.getUtilizzoAutoPropria().equals("S") ? "si" : "no");
 			cmisOrdineMissione.setCapitolo(voce == null ? "" : ordineMissione.getVoce());
 			cmisOrdineMissione.setDescrizioneCapitolo(voce == null ? "" : voce.getDs_elemento_voce());
 			cmisOrdineMissione.setDescrizioneGae(gae == null ? "" : Utility.nvl(gae.getDs_linea_attivita(),""));
@@ -319,15 +326,15 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setImpegnoNumero(ordineMissione.getPgObbligazione());
 			cmisOrdineMissione.setImportoMissione(ordineMissione.getImportoPresunto() == null ? null : Utility.nvl(ordineMissione.getImportoPresunto()));
 			cmisOrdineMissione.setModulo(progetto == null ? "" : progetto.getCd_progetto());
-			cmisOrdineMissione.setNoleggioFlag(ordineMissione.getUtilizzoAutoNoleggio().equals("S") ? "true" : "false");
+			cmisOrdineMissione.setNoleggioFlag(ordineMissione.getUtilizzoAutoNoleggio().equals("S") ? "si" : "no");
 			cmisOrdineMissione.setTrattamento(ordineMissione.decodeTrattamento());
 			cmisOrdineMissione.setNote(ordineMissione.getNote() == null ? "" : ordineMissione.getNote());
 			cmisOrdineMissione.setNoteSegreteria(ordineMissione.getNoteSegreteria() == null ? "" : ordineMissione.getNoteSegreteria());
 			cmisOrdineMissione.setOggetto(ordineMissione.getOggetto());
 			cmisOrdineMissione.setPriorita(ordineMissione.getPriorita());
-			cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "true" : "false");
-			cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "true" : "false");
-			cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "true" : "false");
+			cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "si" : "no");
+			cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
+			cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");
 			cmisOrdineMissione.setUoOrdine(uoRichPerFlusso);
 			cmisOrdineMissione.setUoSpesa(uoSpesaPerFlusso);
 			cmisOrdineMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
@@ -338,13 +345,15 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setNoteAutorizzazioniAggiuntive(ordineMissione.getNoteUtilizzoTaxiNoleggio() == null ? "": ordineMissione.getNoteUtilizzoTaxiNoleggio());
 			cmisOrdineMissione.setUsernameRichiedente(Utility.nvl(username,""));
 			cmisOrdineMissione.setUsernameUtenteOrdine(ordineMissione.getUid());
-			cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "false" : "true");
-			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "true" : "false");
+			cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "no" : "si");
+			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "si" : "no");
 			cmisOrdineMissione.setValidazioneSpesa(impostaValidazioneSpesa(userNameFirmatario, userNameFirmatarioSpesa));
+
 			cmisOrdineMissione.setWfDescription("Ordine di Missione n. "+ordineMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
+			cmisOrdineMissione.setWfDescriptionComplete(cmisOrdineMissione.getWfDescription()+" a "+ordineMissione.getDestinazione()+" del "+ DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()));
 			cmisOrdineMissione.setWfDueDate(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 			cmisOrdineMissione.setDestinazione(ordineMissione.getDestinazione());
-			cmisOrdineMissione.setMissioneEsteraFlag(ordineMissione.getTipoMissione().equals("E") ? "true" : "false");
+			cmisOrdineMissione.setMissioneEsteraFlag(ordineMissione.getTipoMissione().equals("E") ? "si" : "no");
 			cmisOrdineMissione.setDataInizioMissione(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 			cmisOrdineMissione.setDataFineMissione(DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 			cmisOrdineMissione.setFondi(ordineMissione.getDecodeFondi());
@@ -392,9 +401,9 @@ public class CMISOrdineMissioneService {
 	}
 	private String impostaValidazioneSpesa(String userNameFirmatario, String userNameFirmatarioSpesa){
 		if (userNameFirmatario != null && userNameFirmatarioSpesa != null && userNameFirmatario.equals(userNameFirmatarioSpesa)){
-			return "false";
+			return "no";
 		}
-		return "true";
+		return "si";
 	}
 	
 	private void caricaDatiDerivati(Principal principal, OrdineMissione ordineMissione) {
@@ -468,6 +477,7 @@ public class CMISOrdineMissioneService {
 			CMISOrdineMissione cmisOrdineMissione) {
 		InputStream streamStampa = new ByteArrayInputStream(stampa);
 		String path = createFolderOrdineMissione(ordineMissione);
+		ordineMissione.setStringBasePath(path);
 		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissione(principal.getName(), cmisOrdineMissione);
 		try{
 			StorageObject so = null;
@@ -549,7 +559,7 @@ public class CMISOrdineMissioneService {
 
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANNO_IMPEGNO_COMP, cmisOrdineMissione.getImpegnoAnnoCompetenza());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANNO_IMPEGNO_RES, cmisOrdineMissione.getImpegnoAnnoResiduo());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANTICIPO, cmisOrdineMissione.getAnticipo().equals("true"));
+			metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANTICIPO, cmisOrdineMissione.getAnticipo().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_PROPRIA, cmisOrdineMissione.getAutoPropriaFlag().equals("true"));
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_CAPITOLO, cmisOrdineMissione.getCapitolo());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE, cmisOrdineMissione.getOggetto());
@@ -591,7 +601,7 @@ public class CMISOrdineMissioneService {
 		
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE, cmisOrdineMissione.getUsernameRichiedente());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, StringUtils.isEmpty(cmisOrdineMissione.getUsernameResponsabileGruppo()) ? false : true);
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA, cmisOrdineMissione.getValidazioneSpesa().equals("true"));
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA, cmisOrdineMissione.getValidazioneSpesa().equals("si"));
 		return metadataProperties;
 	}
 
@@ -618,81 +628,83 @@ public class CMISOrdineMissioneService {
 			StringBuilder nodeRefs = new StringBuilder();
 			if (annullamento.isStatoNonInviatoAlFlusso()){
 				aggiungiDocumento(so, nodeRefs);
-				messageForFlows.setProp_bpm_comment("");
-				messageForFlows.setProp_bpm_percentComplete("0");
 			}
 
-			messageForFlows.setAssoc_packageItems_added(nodeRefs.toString());
-			messageForFlows.setAssoc_packageItems_removed("");
+			messageForFlows.setTitolo("Annullamento "+cmisOrdineMissione.getWfDescription());
+			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
 
+/* TODO
+			messageForFlows.setGruppoFirmatarioSpesa();
+			messageForFlows.setGruppoFirmatarioUo();
+			messageForFlows.setIdStrutturaSpesaMissioni();
+			messageForFlows.setIdStrutturaUoMissioni();
+*/
 
-			messageForFlows.setProp_cnrmissioni_noteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
-			messageForFlows.setProp_cnrmissioni_missioneGratuita(cmisOrdineMissione.getMissioneGratuita());
-			messageForFlows.setProp_cnrmissioni_descrizioneOrdine(cmisOrdineMissione.getOggetto());
-			messageForFlows.setProp_cnrmissioni_note(cmisOrdineMissione.getNote());
-			messageForFlows.setProp_cnrmissioni_noteSegreteria(Utility.nvl(annullamento.getConsentiRimborso(),"N").equals("S") ? Costanti.TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO : cmisOrdineMissione.getNoteSegreteria());
-			messageForFlows.setProp_bpm_workflowDescription(cmisOrdineMissione.getWfDescription());
-			messageForFlows.setProp_bpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
-			messageForFlows.setProp_bpm_status("Not Yet Started");
-			messageForFlows.setProp_wfcnr_groupName("GENERICO");
-			messageForFlows.setProp_wfcnr_wfCounterIndex( "");
-			messageForFlows.setProp_wfcnr_wfCounterId("");
-			messageForFlows.setProp_wfcnr_wfCounterAnno("");
-			messageForFlows.setProp_bpm_workflowPriority(cmisOrdineMissione.getPriorita());
-			messageForFlows.setProp_cnrmissioni_validazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
-			messageForFlows.setProp_cnrmissioni_missioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
-			messageForFlows.setProp_cnrmissioni_validazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "false": "true");
-			messageForFlows.setProp_cnrmissioni_userNameUtenteOrdineMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
-			messageForFlows.setProp_cnrmissioni_userNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
-			messageForFlows.setProp_cnrmissioni_userNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
-			messageForFlows.setProp_cnrmissioni_userNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
-			messageForFlows.setProp_cnrmissioni_userNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
-			messageForFlows.setProp_cnrmissioni_userNameAmministrativo1("");
-			messageForFlows.setProp_cnrmissioni_userNameAmministrativo2("");
-			messageForFlows.setProp_cnrmissioni_userNameAmministrativo3("");
-			messageForFlows.setProp_cnrmissioni_uoOrdine(cmisOrdineMissione.getUoOrdine());
-			messageForFlows.setProp_cnrmissioni_descrizioneUoOrdine(cmisOrdineMissione.getDescrizioneUoOrdine());
-			messageForFlows.setProp_cnrmissioni_uoSpesa(cmisOrdineMissione.getUoSpesa());
-			messageForFlows.setProp_cnrmissioni_descrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
-			messageForFlows.setProp_cnrmissioni_uoCompetenza(cmisOrdineMissione.getUoCompetenza());
-			messageForFlows.setProp_cnrmissioni_descrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
-			messageForFlows.setProp_cnrmissioni_autoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
-			messageForFlows.setProp_cnrmissioni_noleggioFlag(cmisOrdineMissione.getNoleggioFlag());
-			messageForFlows.setProp_cnrmissioni_taxiFlag(cmisOrdineMissione.getTaxiFlag());
-			messageForFlows.setProp_cnrmissioni_servizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
-			messageForFlows.setProp_cnrmissioni_personaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
-			messageForFlows.setProp_cnrmissioni_capitolo(cmisOrdineMissione.getCapitolo());
-			messageForFlows.setProp_cnrmissioni_descrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
-			messageForFlows.setProp_cnrmissioni_modulo(cmisOrdineMissione.getModulo());
-			messageForFlows.setProp_cnrmissioni_descrizioneModulo(cmisOrdineMissione.getDescrizioneModulo());
-			messageForFlows.setProp_cnrmissioni_gae(cmisOrdineMissione.getGae());
-			messageForFlows.setProp_cnrmissioni_descrizioneGae(cmisOrdineMissione.getDescrizioneGae());
-			messageForFlows.setProp_cnrmissioni_impegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
-			messageForFlows.setProp_cnrmissioni_impegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
-			messageForFlows.setProp_cnrmissioni_impegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
-			messageForFlows.setProp_cnrmissioni_descrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
-			messageForFlows.setProp_cnrmissioni_importoMissione(cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
-			messageForFlows.setProp_cnrmissioni_disponibilita(cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
-			messageForFlows.setProp_cnrmissioni_missioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
-			messageForFlows.setProp_cnrmissioni_destinazione(cmisOrdineMissione.getDestinazione());
-			messageForFlows.setProp_cnrmissioni_dataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
-			messageForFlows.setProp_cnrmissioni_dataFineMissione(cmisOrdineMissione.getDataFineMissione());
-			messageForFlows.setProp_cnrmissioni_trattamento(cmisOrdineMissione.getTrattamento());
-			messageForFlows.setProp_cnrmissioni_competenzaResiduo(cmisOrdineMissione.getFondi());
-			messageForFlows.setProp_cnrmissioni_autoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
-			messageForFlows.setProp_cnrmissioni_autoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
-			messageForFlows.setProp_cnrmissioni_autoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
-			messageForFlows.setProp_cnrmissioni_autoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
-			messageForFlows.setProp_cnrmissioni_wfOrdineDaRevoca(annullamento.getOrdineMissione().getIdFlusso());
+			messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
+			messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
+			messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
+			messageForFlows.setNote(cmisOrdineMissione.getNote());
+			messageForFlows.setNoteSegreteria(Utility.nvl(annullamento.getConsentiRimborso(),"N").equals("S") ? Costanti.TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO : cmisOrdineMissione.getNoteSegreteria());
+			messageForFlows.setBpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
+			messageForFlows.setBpm_workflowPriority(cmisOrdineMissione.getPriorita());
+			messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
+			messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
+			messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no": "si");
+			messageForFlows.setUserNameUtenteOrdineMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
+			messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
+			messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
+			messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
+			messageForFlows.setUserNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
+			messageForFlows.setUserNameAmministrativo1("");
+			messageForFlows.setUserNameAmministrativo2("");
+			messageForFlows.setUserNameAmministrativo3("");
+			messageForFlows.setUoOrdine(cmisOrdineMissione.getUoOrdine());
+			messageForFlows.setDescrizioneUoOrdine(cmisOrdineMissione.getDescrizioneUoOrdine());
+			messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
+			messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
+			messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
+			messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
+			messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+			messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
+			messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+			messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+			messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+			messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
+			messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
+			messageForFlows.setModulo(cmisOrdineMissione.getModulo());
+			messageForFlows.setDescrizioneModulo(cmisOrdineMissione.getDescrizioneModulo());
+			messageForFlows.setGae(cmisOrdineMissione.getGae());
+			messageForFlows.setDescrizioneGae(cmisOrdineMissione.getDescrizioneGae());
+			messageForFlows.setImpegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
+			messageForFlows.setImpegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
+			messageForFlows.setImpegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
+			messageForFlows.setDescrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
+			messageForFlows.setImportoMissione(cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
+			messageForFlows.setDisponibilita(cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
+			messageForFlows.setMissioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
+			messageForFlows.setDestinazione(cmisOrdineMissione.getDestinazione());
+			messageForFlows.setDataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
+			messageForFlows.setDataFineMissione(cmisOrdineMissione.getDataFineMissione());
+			messageForFlows.setTrattamento(cmisOrdineMissione.getTrattamento());
+			messageForFlows.setCompetenzaResiduo(cmisOrdineMissione.getFondi());
+			messageForFlows.setAutoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
+			messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
+			messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
+			messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+			messageForFlows.setWfOrdineDaRevoca(annullamento.getOrdineMissione().getIdFlusso());
 			
 			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
-				messageForFlows.setProp_bpm_comment("AVANZAMENTO");
-				messageForFlows.setProp_wfcnr_reviewOutcome(FlowResubmitType.RESTART_FLOW.operation());
-				messageForFlows.setProp_transitions("Next");
+
 			}
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: "+e);
 		}
+		MultiValueMap parameters = new LinkedMultiValueMap<String, String>();
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, String> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, String>>() {});
+		parameters.setAll(maps);
+
+		caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANNULLAMENTO, so);
 
 		if (annullamento.isStatoNonInviatoAlFlusso()){
 			try {
@@ -724,23 +736,62 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
+	private void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so){
+		if (so != null){
+			params.add(tipoDocumento+"_label", Costanti.TIPO_DOCUMENTO_FLOWS.get(tipoDocumento));
+			params.add(tipoDocumento+"_nodeRef", so.getKey());
+			params.add(tipoDocumento+"_mimetype", so.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
+			params.add(tipoDocumento+"_aggiorna", "true");
+			params.add(tipoDocumento+"_path", so.getPath());
+			params.add(tipoDocumento+"_filename", so.getPropertyValue(StoragePropertyNames.NAME.value()));
+		}
+	}
+
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
-		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
+		//TODO Da togliere commento
+		//byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
+		byte[] stampa = null;
+		String fileName = null;
+		StorageObject storage = null;
+		try {
+			storage = getStorageObjectOrdineMissione(ordineMissione);
+		} catch (ComponentException e1) {
+			throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
+					+ Utility.getMessageException(e1) + ")", e1);
+		}
+			fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+			InputStream is = null;
+			try {
+				is = missioniCMISService.getResource(storage);
+			} catch (Exception e) {
+				throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
+						+ Utility.getMessageException(e) + ")", e);
+			}
+			if (is != null) {
+				try {
+					stampa = IOUtils.toByteArray(is);
+					is.close();
+				} catch (IOException e) {
+					throw new ComponentException("Errore nella conversione dello stream in byte del file ("
+							+ Utility.getMessageException(e) + ")", e);
+				}
+			}
+
+			CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
 		StorageObject documento = salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
 		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
 		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
 		StorageObject documentoAnticipo = null;
-		List<CMISFileAttachment> allegati = new ArrayList<>();
-		List<CMISFileAttachment> allegatiOrdineMissione = getAttachmentsOrdineMissione(ordineMissione, new Long(ordineMissione.getId().toString()));
+		List<StorageObject> allegati = new ArrayList<>();
+		List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione);
 		if (allegatiOrdineMissione != null && !allegatiOrdineMissione.isEmpty()){
 			allegati.addAll(allegatiOrdineMissione);
 		}
 		if (anticipo != null){
 			anticipo.setOrdineMissione(ordineMissione);
 			documentoAnticipo = creaDocumentoAnticipo(username, anticipo);
-			List<CMISFileAttachment> allegatiAnticipo = getAttachmentsAnticipo(ordineMissione, new Long(anticipo.getId().toString()));
+			List<StorageObject> allegatiAnticipo = getAttachmentsAnticipo(ordineMissione);
 			if (allegatiAnticipo != null && !allegatiAnticipo.isEmpty()){
 				allegati.addAll(allegatiAnticipo);
 			}
@@ -753,104 +804,85 @@ public class CMISOrdineMissioneService {
 			documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
 		}
 
-		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
 
 		MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
 		try {
-			messageForFlows.setAssoc_bpm_assignee_added(nodeRefFirmatario);
-			messageForFlows.setAssoc_bpm_assignee_removed("");
-			StringBuilder nodeRefs = new StringBuilder();
-			aggiungiDocumento(documento, nodeRefs);
-			aggiungiDocumento(documentoAnticipo, nodeRefs);
-			aggiungiAllegati(allegati, nodeRefs);
-			if (ordineMissione.isStatoNonInviatoAlFlusso()){
-				messageForFlows.setProp_bpm_comment("");
-				messageForFlows.setProp_bpm_percentComplete("0");
-			}
 
-			aggiungiDocumento(documentoAutoPropria, nodeRefs);
+			messageForFlows.setTitolo(cmisOrdineMissione.getWfDescription());
+			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
 
-			StringBuilder nodeRefsPrimoFirmatario = new StringBuilder();
-			aggiungiFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario(), nodeRefsPrimoFirmatario);
-//			String nodeRefFirmatarioAggiunto = null;
-//			String nodeRefFirmatarioSpesaAggiunto = null;
-//			if (cmisOrdineMissione.getUsernameFirmatarioAggiunto() != null){
-//				nodeRefFirmatarioAggiunto = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUsernameFirmatarioAggiunto());
-//			}
-			aggiungiFirmatario(cmisOrdineMissione.getUsernameFirmatarioAggiunto(), nodeRefsPrimoFirmatario);
-			StringBuilder nodeRefsFirmatarioSpesa = new StringBuilder();
-			aggiungiFirmatario(cmisOrdineMissione.getUserNameFirmatarioSpesa(), nodeRefsFirmatarioSpesa);
-			aggiungiFirmatario(cmisOrdineMissione.getUsernameFirmatarioSpesaAggiunto(), nodeRefsFirmatarioSpesa);
+/* TODO
+			messageForFlows.setGruppoFirmatarioSpesa();
+			messageForFlows.setGruppoFirmatarioUo();
+			messageForFlows.setIdStrutturaSpesaMissioni();
+			messageForFlows.setIdStrutturaUoMissioni();
+*/			messageForFlows.setPathFascicoloDocumenti(ordineMissione.getStringBasePath());
 
-
-			
-			
-			messageForFlows.setAssoc_packageItems_added(nodeRefs.toString());
-			messageForFlows.setAssoc_packageItems_removed("");
-
-
-			messageForFlows.setProp_cnrmissioni_noteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
-			messageForFlows.setProp_cnrmissioni_missioneGratuita(cmisOrdineMissione.getMissioneGratuita());
-			messageForFlows.setProp_cnrmissioni_descrizioneOrdine(cmisOrdineMissione.getOggetto());
-			messageForFlows.setProp_cnrmissioni_note(cmisOrdineMissione.getNote());
-			messageForFlows.setProp_cnrmissioni_noteSegreteria(cmisOrdineMissione.getNoteSegreteria());
-			messageForFlows.setProp_bpm_workflowDescription(cmisOrdineMissione.getWfDescription());
-			messageForFlows.setProp_bpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
-			messageForFlows.setProp_bpm_status("Not Yet Started");
-			messageForFlows.setProp_wfcnr_groupName("GENERICO");
-			messageForFlows.setProp_wfcnr_wfCounterIndex("");
-			messageForFlows.setProp_wfcnr_wfCounterId("");
-			messageForFlows.setProp_wfcnr_wfCounterAnno("");
-			messageForFlows.setProp_bpm_workflowPriority(cmisOrdineMissione.getPriorita());
-			messageForFlows.setProp_cnrmissioni_validazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
-			messageForFlows.setProp_cnrmissioni_missioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
-			messageForFlows.setProp_cnrmissioni_validazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "false": "true");
-			messageForFlows.setProp_cnrmissioni_userNameUtenteOrdineMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
-			messageForFlows.setProp_cnrmissioni_userNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
-			messageForFlows.setProp_cnrmissioni_userNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
-			messageForFlows.setProp_cnrmissioni_userNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
-			messageForFlows.setProp_cnrmissioni_userNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
-			messageForFlows.setProp_cnrmissioni_userNameAmministrativo1("");
-			messageForFlows.setProp_cnrmissioni_userNameAmministrativo2("");
-			messageForFlows.setProp_cnrmissioni_userNameAmministrativo3("");
-			messageForFlows.setProp_cnrmissioni_uoOrdine(cmisOrdineMissione.getUoOrdine());
-			messageForFlows.setProp_cnrmissioni_descrizioneUoOrdine(cmisOrdineMissione.getDescrizioneUoOrdine());
-			messageForFlows.setProp_cnrmissioni_uoSpesa(cmisOrdineMissione.getUoSpesa());
-			messageForFlows.setProp_cnrmissioni_descrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
-			messageForFlows.setProp_cnrmissioni_uoCompetenza(cmisOrdineMissione.getUoCompetenza());
-			messageForFlows.setProp_cnrmissioni_descrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
-			messageForFlows.setProp_cnrmissioni_autoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
-			messageForFlows.setProp_cnrmissioni_noleggioFlag(cmisOrdineMissione.getNoleggioFlag());
-			messageForFlows.setProp_cnrmissioni_taxiFlag(cmisOrdineMissione.getTaxiFlag());
-			messageForFlows.setProp_cnrmissioni_servizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
-			messageForFlows.setProp_cnrmissioni_personaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
-			messageForFlows.setProp_cnrmissioni_capitolo(cmisOrdineMissione.getCapitolo());
-			messageForFlows.setProp_cnrmissioni_descrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
-			messageForFlows.setProp_cnrmissioni_modulo(cmisOrdineMissione.getModulo());
-			messageForFlows.setProp_cnrmissioni_descrizioneModulo(cmisOrdineMissione.getDescrizioneModulo());
-			messageForFlows.setProp_cnrmissioni_gae(cmisOrdineMissione.getGae());
-			messageForFlows.setProp_cnrmissioni_descrizioneGae(cmisOrdineMissione.getDescrizioneGae());
-			messageForFlows.setProp_cnrmissioni_impegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
-			messageForFlows.setProp_cnrmissioni_impegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
-			messageForFlows.setProp_cnrmissioni_impegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
-			messageForFlows.setProp_cnrmissioni_descrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
-			messageForFlows.setProp_cnrmissioni_importoMissione(cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
-			messageForFlows.setProp_cnrmissioni_disponibilita(cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
-			messageForFlows.setProp_cnrmissioni_missioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
-			messageForFlows.setProp_cnrmissioni_destinazione(cmisOrdineMissione.getDestinazione());
-			messageForFlows.setProp_cnrmissioni_dataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
-			messageForFlows.setProp_cnrmissioni_dataFineMissione(cmisOrdineMissione.getDataFineMissione());
-			messageForFlows.setProp_cnrmissioni_trattamento(cmisOrdineMissione.getTrattamento());
-			messageForFlows.setProp_cnrmissioni_competenzaResiduo(cmisOrdineMissione.getFondi());
-			messageForFlows.setProp_cnrmissioni_autoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
-			messageForFlows.setProp_cnrmissioni_autoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
-			messageForFlows.setProp_cnrmissioni_autoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
-			messageForFlows.setProp_cnrmissioni_autoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+			messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
+			messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
+			messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
+			messageForFlows.setNote(cmisOrdineMissione.getNote());
+			messageForFlows.setNoteSegreteria(cmisOrdineMissione.getNoteSegreteria());
+			messageForFlows.setBpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
+			messageForFlows.setBpm_workflowPriority(cmisOrdineMissione.getPriorita());
+			messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
+			messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
+			messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no": "si");
+			messageForFlows.setUserNameUtenteOrdineMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
+			messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
+			messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
+			messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
+			messageForFlows.setUserNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
+			messageForFlows.setUserNameAmministrativo1("");
+			messageForFlows.setUserNameAmministrativo2("");
+			messageForFlows.setUserNameAmministrativo3("");
+			messageForFlows.setUoOrdine(cmisOrdineMissione.getUoOrdine());
+			messageForFlows.setDescrizioneUoOrdine(cmisOrdineMissione.getDescrizioneUoOrdine());
+			messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
+			messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
+			messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
+			messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
+			messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+			messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
+			messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+			messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+			messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+			messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
+			messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
+			messageForFlows.setModulo(cmisOrdineMissione.getModulo());
+			messageForFlows.setDescrizioneModulo(cmisOrdineMissione.getDescrizioneModulo());
+			messageForFlows.setGae(cmisOrdineMissione.getGae());
+			messageForFlows.setDescrizioneGae(cmisOrdineMissione.getDescrizioneGae());
+			messageForFlows.setImpegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "": cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
+			messageForFlows.setImpegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "": cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
+			messageForFlows.setImpegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "": cmisOrdineMissione.getImpegnoNumero().toString());
+			messageForFlows.setDescrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
+			messageForFlows.setImportoMissione(cmisOrdineMissione.getImportoMissione() == null ? "": cmisOrdineMissione.getImportoMissione().toString());
+			messageForFlows.setDisponibilita(cmisOrdineMissione.getDisponibilita() == null ? "": cmisOrdineMissione.getDisponibilita().toString());
+			messageForFlows.setMissioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
+			messageForFlows.setDestinazione(cmisOrdineMissione.getDestinazione());
+			messageForFlows.setDataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
+			messageForFlows.setDataFineMissione(cmisOrdineMissione.getDataFineMissione());
+			messageForFlows.setTrattamento(cmisOrdineMissione.getTrattamento());
+			messageForFlows.setCompetenzaResiduo(cmisOrdineMissione.getFondi());
+			messageForFlows.setAutoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
+			messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
+			messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
+			messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
 			if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
-				messageForFlows.setProp_bpm_comment("AVANZAMENTO");
-				messageForFlows.setProp_wfcnr_reviewOutcome(FlowResubmitType.RESTART_FLOW.operation());
-				messageForFlows.setProp_transitions("Next");
+
 			}
+			MultiValueMap parameters = new LinkedMultiValueMap<String, String>();
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, String> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, String>>() {});
+			parameters.setAll(maps);
+
+			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ORDINE, documento);
+			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo);
+			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria);
+
+			aggiungiAllegati(allegati, parameters);
+
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: "+e);
 		}
@@ -905,14 +937,11 @@ public class CMISOrdineMissioneService {
 		 }
 	}
 
-	private void aggiungiAllegati(List<CMISFileAttachment> allegati,
-			StringBuilder nodeRefs) {
+	private void aggiungiAllegati(List<StorageObject> allegati,
+								  MultiValueMap params) {
 		if (allegati != null && !allegati.isEmpty()){
-			for (CMISFileAttachment cmisFileAttachment : allegati){
-				if (nodeRefs.length() > 0){
-					 nodeRefs.append(",");
-				}
-				nodeRefs.append(cmisFileAttachment.getNodeRef());
+			for (StorageObject so : allegati){
+				caricaDocumento(params, Costanti.TIPO_DOCUMENTO_ALLEGATO, so);
 			}
 		 }
 	}
@@ -1117,8 +1146,6 @@ public class CMISOrdineMissioneService {
 
 	private MessageForFlowOrdine createJsonForAbortFlowOrdineMissione() {
 		MessageForFlowOrdine message = new MessageForFlowOrdine();
-		message.setProp_bpm_comment( "AVANZAMENTO");
-		message.setProp_wfcnr_reviewOutcome(FlowResubmitType.ABORT_FLOW.operation());
 		return message;
 	}
 	public Map<String, Object> createMetadataForFileOrdineMissioneAnticipo(String currentLogin, OrdineMissioneAnticipo anticipo){

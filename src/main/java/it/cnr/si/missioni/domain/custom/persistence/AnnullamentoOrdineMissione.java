@@ -116,6 +116,18 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 	@Column(name = "CONSENTI_RIMBORSO", length = 1, nullable = true)
 	public String consentiRimborso;
 
+	@Size(min = 0, max = 2000)
+	@Column(name = "COMMENTO_FLUSSO", length = 1000, nullable = true)
+	public String commentoFlusso;
+
+	public String getCommentoFlusso() {
+		return commentoFlusso;
+	}
+
+	public void setCommentoFlusso(String commentoFlusso) {
+		this.commentoFlusso = commentoFlusso;
+	}
+
 	@Transient
     private String daValidazione;
 	
@@ -422,7 +434,7 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 	}
 
 	public Boolean isStatoInviatoAlFlusso(){
-		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO)){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && (getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO) || getStatoFlusso().equals(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO))){
 			return true;
 		}
 		return false;
