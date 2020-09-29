@@ -40,7 +40,7 @@ import it.cnr.si.missioni.util.proxy.json.object.GruppoSAC;
 import it.cnr.si.spring.storage.StorageException;
 import it.cnr.si.spring.storage.StorageException.Type;
 import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.StorageService;
+import it.cnr.si.spring.storage.StorageDriver;
 import it.cnr.si.spring.storage.StoreService;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 @Component
@@ -188,7 +188,7 @@ public class MissioniCMISService extends StoreService {
 	public StorageObject restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
 			StoragePath path, String objectTypeName, boolean makeVersionable, Permission... permissions){
 		StorageObject storage = null;
-	        Optional<StorageObject> optStorageObject = Optional.ofNullable(getStorageObjectByPath(path.getPath().concat(StorageService.SUFFIX).concat(sanitizeFilename(name))));
+	        Optional<StorageObject> optStorageObject = Optional.ofNullable(getStorageObjectByPath(path.getPath().concat(StorageDriver.SUFFIX).concat(sanitizeFilename(name))));
 			List<String> lista = new ArrayList<>();
 			lista.add(MissioniCMISService.ASPECT_FLUSSO);
 			lista.add(MissioniCMISService.ASPECT_AUTHOR);

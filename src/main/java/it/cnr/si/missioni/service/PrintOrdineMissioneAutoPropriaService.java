@@ -10,7 +10,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +32,6 @@ public class PrintOrdineMissioneAutoPropriaService {
 
 	@Autowired	
 	private Environment env;
-
-	private RelaxedPropertyResolver propertyResolver;
 
     @Autowired
     private PrintService printService;
@@ -102,10 +99,9 @@ public class PrintOrdineMissioneAutoPropriaService {
 
 	public byte[] printOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintOrdineMissioneAutoPropria(ordineMissioneAutoPropria, currentLogin);
-    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
     	String nomeStampa = "";
-    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_AUTO_PROPRIA) != null) {
-    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_AUTO_PROPRIA);
+    	if (env != null && env.getProperty("spring.print."+Costanti.NOME_STAMPA_AUTO_PROPRIA) != null) {
+    		nomeStampa = env.getProperty("spring.print."+Costanti.NOME_STAMPA_AUTO_PROPRIA);
     	} else {
     		throw new ComponentException("Configurare il nome stampa dell'auto propria");
     	}
