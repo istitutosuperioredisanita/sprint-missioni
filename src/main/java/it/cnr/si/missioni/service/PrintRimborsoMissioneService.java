@@ -11,7 +11,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +46,6 @@ public class PrintRimborsoMissioneService {
 
 	@Autowired	
 	private Environment env;
-
-	private RelaxedPropertyResolver propertyResolver;
 
 	@Autowired
     private PrintService printService;
@@ -274,10 +271,9 @@ public class PrintRimborsoMissioneService {
 	
 	public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintRimborsoMissione(rimborsoMissione, currentLogin);
-    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
     	String nomeStampa = "";
-    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_RIMBORSO) != null) {
-    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_RIMBORSO);
+    	if (env != null && env.getProperty("spring.print."+Costanti.NOME_STAMPA_RIMBORSO) != null) {
+    		nomeStampa = env.getProperty("spring.print."+Costanti.NOME_STAMPA_RIMBORSO);
     	} else {
     		throw new ComponentException("Configurare il nome stampa del rimborso");
     	}

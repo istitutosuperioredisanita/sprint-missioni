@@ -71,7 +71,7 @@ import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.util.proxy.json.service.VoceService;
 import it.cnr.si.spring.storage.StorageException;
 import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.StorageService;
+import it.cnr.si.spring.storage.StorageDriver;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 
 @Service
@@ -438,7 +438,7 @@ public class CMISOrdineMissioneService {
 
 	private String getPathStorage(OrdineMissione ordineMissione) {
 		return getBasePathStorage(ordineMissione).stream().collect(
-				Collectors.joining(StorageService.SUFFIX)
+				Collectors.joining(StorageDriver.SUFFIX)
 		);
 	}
 

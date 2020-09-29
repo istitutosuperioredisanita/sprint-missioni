@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationListener;
@@ -59,8 +58,6 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
     
 	@Autowired
 	private ConfigService configService;
-	
-	private RelaxedPropertyResolver propertyResolver;
 
 	private Environment environment;
 
@@ -176,7 +173,7 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 	}
 
 	public void setContext(JSONBody jBody, String app) {
-		String uoContext = propertyResolver.getProperty(app + ".context.cd_unita_organizzativa");
+		String uoContext = environment.getProperty("spring.proxy."+app + ".context.cd_unita_organizzativa");
     	if (!StringUtils.isEmpty(uoContext)){
     		Context context = jBody.getContext();
     		if (context == null){
@@ -186,10 +183,10 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
     			context.setCd_unita_organizzativa(uoContext);
     		}
     		if (StringUtils.isEmpty(context.getCd_cds())){
-    			context.setCd_cds(propertyResolver.getProperty(app + ".context.cd_cds"));
+    			context.setCd_cds(environment.getProperty("spring.proxy."+app + ".context.cd_cds"));
     		}
     		if (StringUtils.isEmpty(context.getCd_cdr())){
-    			context.setCd_cdr(propertyResolver.getProperty(app + ".context.cd_cdr"));
+    			context.setCd_cdr(environment.getProperty("spring.proxy."+app + ".context.cd_cdr"));
     		}
     		jBody.setContext(context);
     	}
@@ -605,7 +602,6 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 	@Override
 	public void setEnvironment(Environment environment) {
         this.environment = environment;
-        this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.proxy.");
 	}
 
 

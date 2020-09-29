@@ -4,7 +4,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -29,9 +28,6 @@ public class StoragePath {
 
 	@Autowired
 	private Environment env;
-
-	private RelaxedPropertyResolver propertyResolver;	
-	
 
 	public StoragePath() {
     	super();
@@ -68,15 +64,14 @@ public class StoragePath {
 	
 	@PostConstruct
 	public void init(){
-		this.propertyResolver = new RelaxedPropertyResolver(env, STORAGE_YML+".");
-    	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_YML) != null) {
-    		path = propertyResolver.getProperty(FOLDER_PATH_YML);
+    	if (env != null && env.getProperty(STORAGE_YML+"."+FOLDER_PATH_YML) != null) {
+    		path = env.getProperty(STORAGE_YML+"."+FOLDER_PATH_YML);
     	}
-    	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_CONFIG_YML) != null) {
-    		folderConfig = propertyResolver.getProperty(FOLDER_PATH_CONFIG_YML);
+    	if (env != null && env.getProperty(STORAGE_YML+"."+FOLDER_PATH_CONFIG_YML) != null) {
+    		folderConfig = env.getProperty(STORAGE_YML+"."+FOLDER_PATH_CONFIG_YML);
     	}
-    	if (propertyResolver != null && propertyResolver.getProperty(FOLDER_PATH_MANUAL_YML) != null) {
-    		folderManual = propertyResolver.getProperty(FOLDER_PATH_MANUAL_YML);
+    	if (env != null && env.getProperty(STORAGE_YML+"."+FOLDER_PATH_MANUAL_YML) != null) {
+    		folderManual = env.getProperty(STORAGE_YML+"."+FOLDER_PATH_MANUAL_YML);
     	}
 	}
 

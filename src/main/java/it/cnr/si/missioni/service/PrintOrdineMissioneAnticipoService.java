@@ -5,7 +5,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,6 @@ public class PrintOrdineMissioneAnticipoService {
 
 	@Autowired	
 	private Environment env;
-
-	private RelaxedPropertyResolver propertyResolver;
 
     @Autowired
     private PrintService printService;
@@ -72,10 +69,9 @@ public class PrintOrdineMissioneAnticipoService {
 
 	public byte[] printOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, ComponentException {
 		String myJson = createJsonPrintOrdineMissioneAnticipo(ordineMissioneAnticipo, currentLogin);
-    	this.propertyResolver = new RelaxedPropertyResolver(env, "spring.print.");
     	String nomeStampa = "";
-    	if (propertyResolver != null && propertyResolver.getProperty(Costanti.NOME_STAMPA_ANTICIPO) != null) {
-    		nomeStampa = propertyResolver.getProperty(Costanti.NOME_STAMPA_ANTICIPO);
+    	if (env != null && env.getProperty("spring.print."+Costanti.NOME_STAMPA_ANTICIPO) != null) {
+    		nomeStampa = env.getProperty("spring.print."+Costanti.NOME_STAMPA_ANTICIPO);
     	} else {
     		throw new ComponentException("Configurare il nome stampa dell'anticipo");
     	}
