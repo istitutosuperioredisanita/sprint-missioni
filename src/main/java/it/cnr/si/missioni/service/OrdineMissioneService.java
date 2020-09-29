@@ -15,6 +15,8 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.missioni.domain.custom.FlowResult;
+import it.cnr.si.missioni.domain.custom.persistence.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +45,6 @@ import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.ResultFlows;
-import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -175,6 +172,22 @@ public class OrdineMissioneService {
 	@Value("${spring.mail.messages.approvazioneAnnullamentoOrdineMissione.oggetto}")
 	private String approvazioneAnnullamentoOrdineMissione;
 
+	@Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
+	private String subjectErrorFlowsOrdine;
+
+	@Value("${spring.mail.messages.erroreLetturaFlussoOrdine.testo}")
+	private String textErrorFlowsOrdine;
+
+	@Value("${spring.mail.messages.erroreComunicazioneRimborsoSigla.oggetto}")
+	private String subjectErrorComunicazioneRimborso;
+
+	@Value("${spring.mail.messages.erroreComunicazioneRimborsoSigla.testo}")
+	private String textErrorComunicazioneRimborso;
+
+	@Value("${spring.mail.messages.erroreGenerico.oggetto}")
+	private String subjectGenericError;
+
+
 	public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows)
 			throws ComponentException {
 		MissioneFilter filter = new MissioneFilter();
@@ -194,11 +207,7 @@ public class OrdineMissioneService {
 					ordineMissione.setRichiestaAnticipo("S");
 				}
 				if (ordineMissione.isStatoInviatoAlFlusso()) {
-					ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
-					if (result != null) {
-						ordineMissione.setStateFlows(retrieveStateFromFlows(result));
-						ordineMissione.setCommentFlows(result.getComment());
-					}
+// TODO alla firma di chi
 				}
 			}
 
@@ -301,11 +310,11 @@ public class OrdineMissioneService {
 		return lista;
 	}
 
-	public void aggiornaOrdineMissioneRespinto(Principal principal, ResultFlows result,
+	public void aggiornaOrdineMissioneRespinto(Principal principal, FlowResult result,
 			OrdineMissione ordineMissioneDaAggiornare) throws ComponentException {
 		aggiornaValidazione(principal, ordineMissioneDaAggiornare);
-		ordineMissioneDaAggiornare.setCommentFlows(result.getComment());
-		ordineMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+		ordineMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
+		ordineMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getEsito()));
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		ordineMissioneDaAggiornare.setDataInvioAmministrativo(null);
 		ordineMissioneDaAggiornare.setDataInvioFirma(null);
@@ -335,7 +344,50 @@ public class OrdineMissioneService {
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 	}
 
-	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare) {
+	private String getTextErrorOrdine(OrdineMissione ordineMissione, FlowResult flow, String error) {
+		return textErrorFlowsOrdine+getTextErrorOrdineMissione(ordineMissione, flow, error);
+	}
+
+	private String getTextErrorOrdineMissione(OrdineMissione ordineMissione, FlowResult flow, String error){
+		return " con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getIdFlusso()+" con esito "+flow.getEsito()+" è andata in errore per il seguente motivo: " + error;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void aggiornaOrdineMissione(Principal principal, OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
+		try {
+			if (ordineMissioneDaAggiornare != null){
+				if (ordineMissioneDaAggiornare.isStatoInviatoAlFlusso() && ordineMissioneDaAggiornare.isMissioneConfermata() &&
+						!ordineMissioneDaAggiornare.isMissioneDaValidare())	{
+					switch (flowResult.getEsito() ) {
+						case FlowResult.ESITO_FLUSSO_FIRMATO:
+							aggiornaOrdineMissioneFirmato(principal, ordineMissioneDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
+							aggiornaOrdineMissionePrimaFirma(principal, ordineMissioneDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
+							aggiornaOrdineMissioneRespinto(principal, flowResult, ordineMissioneDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
+							aggiornaOrdineMissioneRespinto(principal, flowResult, ordineMissioneDaAggiornare);
+							break;
+					}
+				} else {
+					erroreOrdineMissione(ordineMissioneDaAggiornare, flowResult);
+				}
+			}
+		} catch (Exception e){
+			mailService.sendEmailError(subjectErrorFlowsOrdine, "Errore in aggiornaOrdineMissione: "+e.getMessage(), false, true);
+		}
+	}
+
+	private void erroreOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
+		String errore = "Esito flusso non corrispondente con lo stato dell'ordine.";
+		String testoErrore = getTextErrorOrdine(ordineMissioneDaAggiornare, flowResult, errore);
+		mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+	}
+
+	private void aggiornaOrdineMissioneFirmato(Principal principal, OrdineMissione ordineMissioneDaAggiornare) {
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
@@ -361,6 +413,11 @@ public class OrdineMissioneService {
 		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 		popolaCoda(ordineMissioneDaAggiornare);
+	}
+
+	private void aggiornaOrdineMissionePrimaFirma(Principal principal, OrdineMissione ordineMissioneDaAggiornare) {
+		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 	}
 
 	public void gestioneEmailDopoApprovazione(OrdineMissione ordineMissioneDaAggiornare) {
@@ -669,6 +726,7 @@ public class OrdineMissioneService {
 				if (isForValidateFlows) {
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction()
 							.add(Restrictions.in("statoFlusso", listaStatiFlusso))

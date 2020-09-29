@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,8 +177,14 @@ public class RimborsoMissioneService {
     
     @Value("${spring.mail.messages.approvazioneRimborsoMissione.oggetto}")
     private String approvazioneRimborsoMissione;
-    
-    @Autowired
+
+	@Value("${spring.mail.messages.erroreLetturaFlussoRimborso.oggetto}")
+	private String subjectErrorFlowsRimborso;
+
+	@Value("${spring.mail.messages.erroreLetturaFlussoRimborso.testo}")
+	private String textErrorFlowsRimborso;
+
+	@Autowired
     private MissioniCMISService missioniCMISService;
 
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
@@ -190,11 +197,6 @@ public class RimborsoMissioneService {
 			rimborsoMissione = listaRimborsiMissione.get(0);
 			if (retrieveDataFromFlows){
 				if (rimborsoMissione.isStatoInviatoAlFlusso()){
-	    			ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
-	    			if (result != null){
-	    				rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
-	    				rimborsoMissione.setCommentFlows(result.getComment());
-	    			}
 				}
 			}
 			if (retrieveDetail){
@@ -210,10 +212,7 @@ public class RimborsoMissioneService {
 	}
 
 	private boolean isDevProfile(){
-   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
-   			return true;
-   		}
-   		return false;
+		return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT);
 	}
 
     public List<RimborsoMissione> getRimborsiMissioneForValidateFlows(Principal principal, RimborsoMissioneFilter filter,  Boolean isServiceRest) throws ComponentException{
@@ -222,24 +221,8 @@ public class RimborsoMissioneService {
     		List<RimborsoMissione> listaNew = new ArrayList<RimborsoMissione>();
     		for (RimborsoMissione rimborsoMissione : lista){
     			if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
-    				ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
-    				if (result != null){
-    					RimborsoMissione rimborsoMissioneDaAggiornare = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
-    					if (result.isStateReject()){
-    						rimborsoMissione.setCommentFlows(result.getComment());
-    						rimborsoMissione.setStateFlows(retrieveStateFromFlows(result));
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_RESPINTO_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-    					} else if (result.isAnnullato()){
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_ANNULLATO_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-            			} else if (result.isApprovato()){
-            				
-            			} else {
-    						rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
-    						listaNew.add(rimborsoMissione);
-    					}
-    				}
+    				rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
+    				listaNew.add(rimborsoMissione);
     			} else {
     				if (rimborsoMissione.isMissioneDaValidare() && rimborsoMissione.isMissioneConfermata()){
     					rimborsoMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_VALIDARE_PER_HOME);
@@ -258,11 +241,12 @@ public class RimborsoMissioneService {
     	return lista;
     }
 
-	public void aggiornaRimborsoMissioneRespinto(Principal principal, ResultFlows result,
+    private void aggiornaRimborsoMissioneRespinto(Principal principal, FlowResult result,
 			RimborsoMissione rimborsoMissioneDaAggiornare) throws ComponentException{
 		aggiornaValidazione(principal, rimborsoMissioneDaAggiornare);
-		rimborsoMissioneDaAggiornare.setCommentFlows(result.getComment());
-		rimborsoMissioneDaAggiornare.setStateFlows(retrieveStateFromFlows(result));
+		rimborsoMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
+		rimborsoMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getEsito()));
+		rimborsoMissioneDaAggiornare.setStateFlows(result.getEsito());
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		rimborsoMissioneDaAggiornare.setValidato("N");
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
@@ -274,7 +258,7 @@ public class RimborsoMissioneService {
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 	}
 
-	public RimborsoMissione aggiornaRimborsoMissioneApprovato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
+	public RimborsoMissione aggiornaRimborsoMissioneFirmato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws ComponentException {
 		retrieveDetails(principal, rimborsoMissioneDaAggiornare);
 		if (!rimborsoMissioneDaAggiornare.isTrattamentoAlternativoMissione()){
@@ -335,6 +319,13 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
 		RimborsoMissione rimborso = updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 		popolaCoda(rimborso);
+		return rimborso;
+	}
+
+	private RimborsoMissione aggiornaRimborsoMissionePrimaFirma(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
+			throws ComponentException {
+		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
+		RimborsoMissione rimborso = updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 		return rimborso;
 	}
 
@@ -904,6 +895,7 @@ public class RimborsoMissioneService {
 				if (isForValidateFlows){
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
@@ -1718,6 +1710,49 @@ public class RimborsoMissioneService {
 	public void popolaCoda(String id){
 		RimborsoMissione missione = (RimborsoMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), RimborsoMissione.class, new Long(id));
 		popolaCoda(missione);
+	}
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void aggiornaRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
+		try {
+			if (rimborsoMissioneDaAggiornare != null){
+				if (rimborsoMissioneDaAggiornare.isStatoInviatoAlFlusso() && rimborsoMissioneDaAggiornare.isMissioneConfermata() &&
+						!rimborsoMissioneDaAggiornare.isMissioneDaValidare())	{
+					switch (flowResult.getEsito() ) {
+						case FlowResult.ESITO_FLUSSO_FIRMATO:
+							aggiornaRimborsoMissioneFirmato(principal, rimborsoMissioneDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
+							aggiornaRimborsoMissionePrimaFirma(principal, rimborsoMissioneDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
+							aggiornaRimborsoMissioneRespinto(principal, flowResult, rimborsoMissioneDaAggiornare);
+							break;
+						case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
+							aggiornaRimborsoMissioneRespinto(principal, flowResult, rimborsoMissioneDaAggiornare);
+							break;
+					}
+				} else {
+					erroreRimborsoMissione(rimborsoMissioneDaAggiornare, flowResult);
+				}
+			}
+		} catch (Exception e ){
+			mailService.sendEmailError(subjectErrorFlowsRimborso, "Errore in aggiornaRimborsoMissione: "+e.getMessage(), false, true);
+		}
+	}
+
+
+	private void erroreRimborsoMissione(RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
+		String errore = "Esito flusso non corrispondente con lo stato del rimborso.";
+		String testoErrore = getTextErrorRimborso(rimborsoMissioneDaAggiornare, flowResult, errore);
+		mailService.sendEmailError(subjectErrorFlowsRimborso, testoErrore, false, true);
+	}
+
+	private String getTextErrorRimborso(RimborsoMissione rimborsoMissione, FlowResult flow, String error) {
+		return textErrorFlowsRimborso+getTextErrorRimborsoMissione(rimborsoMissione, flow, error);
+	}
+
+	private String getTextErrorRimborsoMissione(RimborsoMissione rimborsoMissione, FlowResult flow, String error){
+		return " con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getIdFlusso()+" con esito "+flow.getEsito()+" è andata in errore per il seguente motivo: " + error;
 	}
 
 }
