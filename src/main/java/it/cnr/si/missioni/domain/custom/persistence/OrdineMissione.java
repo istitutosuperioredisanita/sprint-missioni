@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 
+import it.cnr.si.missioni.util.DateUtils;
 import org.springframework.util.StringUtils;
 
 import it.cnr.si.missioni.util.Costanti;
@@ -181,7 +182,19 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "OGGETTO", length = 1000, nullable = false)
     public String oggetto;
 
-    @Size(min = 0, max = 200)
+	@Size(min = 0, max = 2000)
+	@Column(name = "COMMENTO_FLUSSO", length = 1000, nullable = true)
+	public String commentoFlusso;
+
+	public String getCommentoFlusso() {
+		return commentoFlusso;
+	}
+
+	public void setCommentoFlusso(String commentoFlusso) {
+		this.commentoFlusso = commentoFlusso;
+	}
+
+	@Size(min = 0, max = 200)
     @Column(name = "DESTINAZIONE", length = 200, nullable = false)
     public String destinazione;
 
@@ -363,7 +376,18 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	
 	@Transient
     private String richiestaAnticipo;
-	
+
+	@Transient
+	private String stringBasePath;
+
+	public String getStringBasePath() {
+		return stringBasePath;
+	}
+
+	public void setStringBasePath(String stringBasePath) {
+		this.stringBasePath = stringBasePath;
+	}
+
 	@Transient
     private Cds objCdsSpesa;
 	
@@ -1071,7 +1095,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 
 	public Boolean isStatoInviatoAlFlusso(){
-		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO)){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && (getStatoFlusso().equals(Costanti.STATO_INVIATO_FLUSSO) || getStatoFlusso().equals(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO))){
 			return true;
 		}
 		return false;

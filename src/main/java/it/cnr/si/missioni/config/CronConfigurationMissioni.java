@@ -30,7 +30,7 @@ public class CronConfigurationMissioni {
 	@Scheduled(cron = "${cron.comunicaDati.cronExpression}")
     public void cronComunicaDati() throws Exception {
     	if (cronComunicaDatiActive)
-    		cronService.verificaFlussoEComunicaDatiRimborsoSigla(new GenericPrincipal("cronMissioni"));
+    		cronService.comunicaDatiRimborsoSigla(new GenericPrincipal("cronMissioni"));
     }
 
 	@Scheduled(cron = "${cron.verifyStep.cronExpression}")

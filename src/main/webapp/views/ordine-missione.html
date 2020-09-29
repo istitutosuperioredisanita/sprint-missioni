@@ -7,7 +7,7 @@
                 <b>  {{'missione.form.stato' | translate}}: </b>{{ordineMissioneModel.decodeStato}}  -  
                 <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{ordineMissioneModel.decodeStatoFlusso}}
   </div>
-  <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
+  <div  class="my-panel-body panel panel-success" ng-show="commentoFlusso" align="center">
                 <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{ordineMissioneModel.commentFlows}}  -  
   </div>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">

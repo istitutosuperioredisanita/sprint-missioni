@@ -74,7 +74,10 @@ public class Costanti {
 	public final static String STATO_DEFINITIVO = "DEF";
 	public final static String STATO_NON_INVIATO_FLUSSO = "INS";
 	public final static String STATO_INVIATO_FLUSSO = "INV";
+    public final static String STATO_FIRMATO_PRIMA_FIRMA_FLUSSO = "FPF";
 	public final static String STATO_APPROVATO_FLUSSO = "APP";
+    public final static String STATO_RESPINTO_UO_SPESA_FLUSSO = "RUS";
+    public final static String STATO_RESPINTO_UO_FLUSSO = "RUO";
 	public final static String STATO_CONFERMATO = "CON";
     public final static String STATO_INVIATO_RESPONSABILE = "INR";
 	public final static String MISSIONE_ITALIANA = "I";
@@ -128,11 +131,30 @@ public class Costanti {
 	public final static Long NAZIONE_ITALIA_SIGLA = new Long ("1");
 	public final static String SI = "Sì";
 	public final static String NO = "No";
+    public final static String TIPO_DOCUMENTO_ORDINE = "ordineMissione";
+    public final static String TIPO_DOCUMENTO_RIMBORSO = "rimborsoMissione";
+    public final static String TIPO_DOCUMENTO_ALLEGATO = "allegatoMissione";
+    public final static String TIPO_DOCUMENTO_ANNULLAMENTO = "annullamentoMissione";
+    public final static String TIPO_DOCUMENTO_ANTICIPO = "anticipoMissione";
+    public final static String TIPO_DOCUMENTO_AUTO_PROPRIA = "autoPropriaMissione";
+    public final static String TIPO_DOCUMENTO_GIUSTIFICATIVO = "giustificativoMissione";
 	public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
 	public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
     public final static String TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO = "Annullamento Ordine di missione con Rimborso missione Consentito";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
-	
+
+    public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(TIPO_DOCUMENTO_ALLEGATO, "Allegato");
+        aMap.put(TIPO_DOCUMENTO_ANNULLAMENTO, "Annullamento");
+        aMap.put(TIPO_DOCUMENTO_ANTICIPO, "Anticipo");
+        aMap.put(TIPO_DOCUMENTO_AUTO_PROPRIA, "Auto Propria");
+        aMap.put(TIPO_DOCUMENTO_ORDINE, "Ordine");
+        aMap.put(TIPO_DOCUMENTO_RIMBORSO, "Rimborso");
+        aMap.put(TIPO_DOCUMENTO_GIUSTIFICATIVO, "Giustificativo");
+        TIPO_DOCUMENTO_FLOWS = Collections.unmodifiableMap(aMap);
+    }
 	public final static Map<String, String> PRIORITA;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
@@ -200,6 +222,7 @@ public class Costanti {
     static {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(STATO_INVIATO_FLUSSO, "Inviato");
+        aMap.put(STATO_FIRMATO_PRIMA_FIRMA_FLUSSO, "Prima Firma Effettuata");
         aMap.put(STATO_INSERITO, "Non Inviato");
         aMap.put(STATO_ANNULLATO, "Annullato");
         aMap.put(STATO_APPROVATO_FLUSSO, "Approvato");

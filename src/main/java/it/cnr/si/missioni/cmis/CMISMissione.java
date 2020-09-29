@@ -10,8 +10,18 @@ public class CMISMissione {
 	private String note;
 	private String noteSegreteria;
 	private String wfDescription;
+	private String wfDescriptionComplete;
 	private String wfDueDate;
 	private String priorita;
+
+	public String getWfDescriptionComplete() {
+		return wfDescriptionComplete;
+	}
+
+	public void setWfDescriptionComplete(String wfDescriptionComplete) {
+		this.wfDescriptionComplete = wfDescriptionComplete;
+	}
+
 	private String validazioneSpesa;
 	private String usernameUtenteOrdine;
 	private String usernameRichiedente;
