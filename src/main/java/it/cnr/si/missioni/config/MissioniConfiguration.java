@@ -1,8 +1,8 @@
 package it.cnr.si.missioni.config;
 
 import it.cnr.si.config.SecurityConfiguration;
-import it.cnr.si.security.jwt.JWTConfigurer;
-import it.cnr.si.security.jwt.TokenProvider;
+import it.cnr.si.missioni.security.jwt.JWTConfigurer;
+import it.cnr.si.missioni.security.jwt.TokenProvider;
 
 public class MissioniConfiguration extends SecurityConfiguration {
 
