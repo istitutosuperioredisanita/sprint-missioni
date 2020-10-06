@@ -6,6 +6,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.security.Principal;
 import java.util.TimerTask;
@@ -20,6 +21,12 @@ public class TimerComunicaRimborso extends TimerTask {
     @Autowired
     private ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
+    @Value("${spring.mail.messages.erroreComunicazioneRimborsoSigla.oggetto}")
+    private String subjectErrorComunicazioneRimborso;
+
+    @Value("${spring.mail.messages.erroreComunicazioneRimborsoSigla.testo}")
+    private String textErrorComunicazioneRimborso;
+
     private RimborsoMissione rimborsoMissione;
     private Principal principal;
     TimerComunicaRimborso(RimborsoMissione rimborsoMissione, Principal principal){
@@ -33,10 +40,10 @@ public class TimerComunicaRimborso extends TimerTask {
             comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
         } catch (Exception e) {
             String error = Utility.getMessageException(e);
-            String testoErrore = "Errore nel lancio della comunicazione del rimborso a SIGLA"(rimborsoMissione, error);
+            String testoErrore = "Errore nel lancio della comunicazione del rimborso a SIGLA";
             LOGGER.error(testoErrore+" "+e);
             try {
-                mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
+                mailService.sendEmailError("errore", testoErrore, false, true);
             } catch (Exception e1) {
                 LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
             }

@@ -20,6 +20,8 @@ management:
 spring:
   application:
     name: sprint
+  liquibase:
+    change-log: classpath:config/liquibase/master.xml
   profiles:
     # The commented value for `active` can be replaced with valid spring profiles to load.
     # Otherwise, it will be filled in by maven when building the WAR file
