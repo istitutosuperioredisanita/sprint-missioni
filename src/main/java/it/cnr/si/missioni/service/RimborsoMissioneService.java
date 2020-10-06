@@ -8,10 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.OptimisticLockException;
 
@@ -1720,6 +1717,8 @@ public class RimborsoMissioneService {
 					switch (flowResult.getEsito() ) {
 						case FlowResult.ESITO_FLUSSO_FIRMATO:
 							aggiornaRimborsoMissioneFirmato(principal, rimborsoMissioneDaAggiornare);
+							Timer timer = new Timer();
+							timer.schedule(new TimerComunicaRimborso(rimborsoMissioneDaAggiornare, principal), 1);
 							break;
 						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
 							aggiornaRimborsoMissionePrimaFirma(principal, rimborsoMissioneDaAggiornare);

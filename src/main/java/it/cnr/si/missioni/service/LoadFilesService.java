@@ -63,7 +63,7 @@ public class LoadFilesService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle uo non trovato.");
 		}
 		try {
-			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, UtentiPresidenteSpeciali.class); 
+			return new ObjectMapper().readValue(is, UtentiPresidenteSpeciali.class);
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON degli utenti presidente speciali." + Utility.getMessageException(e));
 		}
@@ -76,7 +76,7 @@ public class LoadFilesService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle uo non trovato.");
 		}
 		try {
-			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, DatiUo.class); 
+			return new ObjectMapper().readValue(is, DatiUo.class);
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle uo." + Utility.getMessageException(e));
 		}
@@ -89,7 +89,7 @@ public class LoadFilesService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle faq non trovato.");
 		}
 		try {
-			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, Faq.class); 
+			return new ObjectMapper().readValue(is, Faq.class);
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle faq." + Utility.getMessageException(e));
 		}
@@ -211,7 +211,7 @@ public class LoadFilesService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "File dati delle uo non trovato.");
 		}
 		try {
-			return new org.codehaus.jackson.map.ObjectMapper().readValue(is, DataQueue.class); 
+			return new ObjectMapper().readValue(is, DataQueue.class);
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle uo." + Utility.getMessageException(e));
 		}
