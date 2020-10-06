@@ -11,17 +11,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.json.object.flowsStatus.FlowsStatus;
 import it.cnr.si.missioni.cmis.flows.json.object.flowsStatus.Task;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoJson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -219,7 +219,7 @@ public class MissioniCMISService extends StoreService {
 
     public String recuperoNodeRefUtente(String username){
 		JsonFactory jsonFactory = new JsonFactory();
-		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
+		ObjectMapper mapper = new ObjectMapper(jsonFactory);
 		try {
 			String appUrl = "service/cnr/person/person/";
 			String url = appUrl+username;
@@ -262,7 +262,7 @@ public class MissioniCMISService extends StoreService {
 		JsonFactory jsonFactory = new JsonFactory();
 		ObjectMapper mapper = new ObjectMapper(jsonFactory);
 		FlowsStatus flowsStatus =null;
-		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
 		try {
 			String url = urlStatusFlows+idFlusso;
 			ResultProxy result = proxyService.process(HttpMethod.GET, new String(), Costanti.APP_FLOWS, url, "includeTasks=true", null, false);

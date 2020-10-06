@@ -47,63 +47,63 @@ module.exports = function (grunt) {
                 {
                     context: '/app',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/api',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/metrics',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/dump',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/health',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/configprops',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/beans',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/api-docs',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 },
                 {
                     context: '/oauth/token',
                     host: 'localhost',
-                    port: 8081,
+                    port: 8080,
                     https: false,
                     changeOrigin: false
                 }
