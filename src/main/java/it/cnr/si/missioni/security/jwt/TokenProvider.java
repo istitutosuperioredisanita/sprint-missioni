@@ -45,14 +45,14 @@ public class TokenProvider {
     @PostConstruct
     public void init() {
         byte[] keyBytes;
-        String secret = "MDc4Zjg4YTUxMzkzY2ViZDA0N2JjNmJmNTcyY2M0ODc0NDg1YTNmZmFkYzNiNmVmYjE3ZWRjYjIyZGFkYWYzMGYwMWM1ODUzOWUwODQ0NmZkNmJkZWU0NjdkNjMwNWNiMGE1MjhjOTM2MzllNTdiMDgyZjA1N2Q4ZTVmN2M2NjMwNzhmODhhNTEzOTNjZWJkMDQ3YmM2YmY1NzJjYzQ4NzQ0ODVhM2ZmYWRjM2I2ZWZiMTdlZGNiMjJkYWRhZjMwZjAxYzU4NTM5ZTA4NDQ2ZmQ2YmRlZTQ2N2Q2MzA1Y2IwYTUyOGM5MzYzOWU1N2IwODJmMDU3ZDhlNWY3YzY2MzA3OGY4OGE1MTM5M2NlYmQwNDdiYzZiZjU3MmNjNDg3NDQ4NWEzZmZhZGMzYjZlZmIxN2VkY2IyMmRhZGFmMzBmMDFjNTg1MzllMDg0NDZmZDZiZGVlNDY3ZDYzMDVjYjBhNTI4YzkzNjM5ZTU3YjA4MmYwNTdkOGU1ZjdjNjYzMDc4Zjg4YTUxMzkzY2ViZDA0N2JjNmJmNTcyY2M0ODc0NDg1YTNmZmFkYzNiNmVmYjE3ZWRjYjIyZGFkYWYzMGYwMWM1ODUzOWUwODQ0NmZkNmJkZWU0NjdkNjMwNWNiMGE1MjhjOTM2MzllNTdiMDgyZjA1N2Q4ZTVmN2M2NjM=";
+        String secret = "secretTokenToChangeInProductionSecretTokenToChangeInProductionSecretTokenToChangeInProductionSecretTokenToChangeInProductionSecretTokenToChangeInProduction";
         if (!StringUtils.isEmpty(secret)) {
             log.warn("Warning: the JWT key used is not Base64-encoded. " +
                 "We recommend using the `jhipster.security.authentication.jwt.base64-secret` key for optimum security.");
             keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         } else {
             log.debug("Using a Base64-encoded JWT secret key");
-            keyBytes = Decoders.BASE64.decode("MDc4Zjg4YTUxMzkzY2ViZDA0N2JjNmJmNTcyY2M0ODc0NDg1YTNmZmFkYzNiNmVmYjE3ZWRjYjIyZGFkYWYzMGYwMWM1ODUzOWUwODQ0NmZkNmJkZWU0NjdkNjMwNWNiMGE1MjhjOTM2MzllNTdiMDgyZjA1N2Q4ZTVmN2M2NjMwNzhmODhhNTEzOTNjZWJkMDQ3YmM2YmY1NzJjYzQ4NzQ0ODVhM2ZmYWRjM2I2ZWZiMTdlZGNiMjJkYWRhZjMwZjAxYzU4NTM5ZTA4NDQ2ZmQ2YmRlZTQ2N2Q2MzA1Y2IwYTUyOGM5MzYzOWU1N2IwODJmMDU3ZDhlNWY3YzY2MzA3OGY4OGE1MTM5M2NlYmQwNDdiYzZiZjU3MmNjNDg3NDQ4NWEzZmZhZGMzYjZlZmIxN2VkY2IyMmRhZGFmMzBmMDFjNTg1MzllMDg0NDZmZDZiZGVlNDY3ZDYzMDVjYjBhNTI4YzkzNjM5ZTU3YjA4MmYwNTdkOGU1ZjdjNjYzMDc4Zjg4YTUxMzkzY2ViZDA0N2JjNmJmNTcyY2M0ODc0NDg1YTNmZmFkYzNiNmVmYjE3ZWRjYjIyZGFkYWYzMGYwMWM1ODUzOWUwODQ0NmZkNmJkZWU0NjdkNjMwNWNiMGE1MjhjOTM2MzllNTdiMDgyZjA1N2Q4ZTVmN2M2NjM=");
+            keyBytes = Decoders.BASE64.decode("NGJjZDA1OGEzZjAzOWI2MjA2YmFmYzMzZTY3ZDZlOTNiZWI5ZWQwMzg4ZTEzZGEzY2E0MzlkNDJkMDQ1ZDQ3MDI2YjA5Mzk4ZGU3OTE4ZWE5Y2RiMjMwNTYxODI4NmVlZGJiYTc5Y2NjZTRkMzBkYWYwNGZkNmRlYTMzNmI5NDQ=");
         }
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.tokenValidityInMilliseconds =
