@@ -83,8 +83,8 @@ public class ComunicaRimborsoSiglaService {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) {
+		RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoApprovatoId);
 		try {
-			RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoApprovatoId);
 			rimborsoMissioneService.retrieveDetails(principal, rimborsoApprovato);
 			if (rimborsoApprovato.isTrattamentoAlternativoMissione() || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
 				return comunicaRimborso(principal, rimborsoApprovato);
@@ -92,7 +92,7 @@ public class ComunicaRimborsoSiglaService {
 			return null;
 		} catch (Exception e) {
 			String error = Utility.getMessageException(e);
-			String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
+			String testoErrore = getTextErrorComunicaRimborso(rimborsoApprovato, error);
 			log.error(testoErrore+" "+e);
 			try {
 				mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
