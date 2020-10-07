@@ -282,15 +282,20 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
         return {
             login: function (param) {
 //                var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
-                var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret="+param.password+"&client_id="+param.username.toLowerCase();
-                $http.post('oauth/token', data, {
+//                var data = "username=" + param.username.toLowerCase() + "&password=" + param.password;
+        var data = {
+            username: param.username.toLowerCase(),
+            password: param.password,
+            rememberMe: "true"
+        };
+                $http.post('api/authenticate', data, {
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Content-Type": "application/json",
                         "Accept": "application/json"
                     },
                     ignoreAuthModule: 'ignoreAuthModule'
                 }).success(function (data, status, headers, config) {
-                    httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
+                    httpHeaders.common['Authorization'] = 'Bearer ' + data.id_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
                         if (data.strutturaAppartenenza || data.login=="app.missioni" || data.profilo ) {
