@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -50,10 +51,11 @@ public class AccountLDAPResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<String> getAccountFromToken(@RequestParam(value = "token") String token) {
-    	OAuth2Authentication auth = tokenStore.readAuthentication(token);
-    	if (auth != null){
-    		String username = SecurityUtils.getCurrentUserLogin();
+    public ResponseEntity<String> getAccountFromToken() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        if (userDetails != null){
+    		String username = userDetails.getUsername();
     		String risposta = accountService.getAccount(username, true);    		
         	return new ResponseEntity<String>(risposta, HttpStatus.OK);
     	} else {
