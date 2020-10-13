@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -37,6 +40,8 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
 
+@SpringBootApplication(scanBasePackages={
+		"it.cnr.si.service"})
 @Service
 public class AccountService {
 	private transient static final Log logger = LogFactory.getLog(AccountService.class);
@@ -58,6 +63,9 @@ public class AccountService {
 
 	@Autowired
     private UoService uoService;
+
+	@Autowired
+	private AceService aceService;
 
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
@@ -187,6 +195,8 @@ public class AccountService {
 	}
 
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
+		UserInfoDto userInfoDto = aceService.getUserInfoByUsername(currentLogin);
+		userInfoDto.getCitta_sede();
 		ResultProxy result = proxyService.process(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_ACCOUNT+currentLogin, "proxyURL="+Costanti.REST_ACCOUNT+currentLogin, null);
 		String risposta = result.getBody();
 		String resp = manageResponseForAccountRest(currentLogin, risposta, loadSpecialUserData);
