@@ -216,97 +216,6 @@ public class CMISOrdineMissioneService {
 				uoDatiCompetenza = uoService.recuperoUo(uoCompetenzaPerFlusso);
 			}
 			
-			String userNameFirmatario = null;
-			String userNameFirmatarioSpesa = null;
-			Boolean usernameImpostati = false;
-			if (!Utility.nvl(ordineMissione.getCug(),"N").equals("S") && !Utility.nvl(ordineMissione.getPresidente(),"N").equals("S") && !Costanti.CDS_SAC.equals(ordineMissione.getCdsRich())){
-				String uoSiglaRich = ordineMissione.getUoRich();
-				String uoSiglaSpesa = null;
-				if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-					if (StringUtils.hasLength(ordineMissione.getUoCompetenza())){
-						uoSiglaSpesa = ordineMissione.getUoCompetenza();
-					} else {
-						uoSiglaSpesa = uoSiglaRich;
-					}
-				} else {
-					uoSiglaSpesa = ordineMissione.getUoSpesa();
-				}
-				if (!uoSiglaRich.equals(uoSiglaSpesa) && uoSiglaRich.substring(0,3).equals(uoSiglaSpesa.substring(0,3))){
-					UnitaOrganizzativa uoSigla = unitaOrganizzativaService.loadUo(uoSiglaSpesa, null, ordineMissione.getAnno());
-					if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
-						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaSpesa, annoGestione);
-						if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaSpesa, ".", ""), account, annoGestione);
-							userNameFirmatarioSpesa = userNameFirmatario;
-							usernameImpostati = true;
-						}
-					}
-					uoSigla = unitaOrganizzativaService.loadUo(uoSiglaRich, null, ordineMissione.getAnno());
-					if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
-						DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, annoGestione);
-						if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-							userNameFirmatario = recuperoDirettore(ordineMissione, Utility.replace(uoSiglaRich, ".", ""), account, annoGestione, true);
-							userNameFirmatarioSpesa = userNameFirmatario;
-							usernameImpostati = true;
-						}
-					}
-				}
-			}
-			
-			String userNameAggiunto = null;
-			String userNameSpesaAggiunto = null;
-			if (!usernameImpostati){
-				userNameFirmatario = recuperoDirettore(ordineMissione, uoRichPerFlusso, account, annoGestione, true);
-				if (StringUtils.hasLength(datiIstitutoUoRich.getUoFirmaAggiunta())){
-					userNameAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoRich.getUoFirmaAggiunta(),".",""), account, annoGestione);
-				}
-				if (ordineMissione.isMissioneGratuita()){
-					userNameFirmatarioSpesa = userNameFirmatario;
-				} else {
-					Parametri parametri = parametriService.getParametri();
-					if (Utility.nvl(ordineMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
-						userNameFirmatarioSpesa = parametri.getResponsabileCug();
-					} else 	if (Utility.nvl(ordineMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
-						userNameFirmatarioSpesa = parametri.getPresidente();
-
-						String primo = userNameFirmatario;
-						userNameFirmatario = userNameFirmatarioSpesa;
-						userNameFirmatarioSpesa = primo;
-
-					} else if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-						if (uoCompetenzaPerFlusso != null){
-							if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
-								userNameFirmatarioSpesa = userNameFirmatario;
-							} else {
-								DatiIstituto datiIstitutoUoComp = datiIstitutoService.getDatiIstituto(ordineMissione.getUoCompetenza(), annoGestione);
-								if (StringUtils.hasLength(datiIstitutoUoComp.getUoFirmaAggiunta())){
-									userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoComp.getUoFirmaAggiunta(),".",""), account, annoGestione);
-								}
-								userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoCompetenzaPerFlusso, account, annoGestione);
-							}
-						} else {
-							userNameFirmatarioSpesa = userNameFirmatario;
-						}
-					} else {
-						userNameFirmatarioSpesa = recuperoDirettore(ordineMissione, uoSpesaPerFlusso, account, annoGestione);
-						DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), annoGestione);
-						if (StringUtils.hasLength(datiIstitutoUoSpesa.getUoFirmaAggiunta())){
-							userNameSpesaAggiunto = recuperoDirettore(ordineMissione, Utility.replace(datiIstitutoUoSpesa.getUoFirmaAggiunta(),".",""), account, annoGestione);
-						}
-					}
-				}
-			}
-			
-			if ((userNameSpesaAggiunto != null && (userNameFirmatario.equals(userNameSpesaAggiunto) || (userNameAggiunto != null && userNameAggiunto.equals(userNameSpesaAggiunto))))|| 
-					(userNameAggiunto != null && userNameAggiunto.equals(userNameFirmatarioSpesa))){
-				userNameFirmatario = userNameAggiunto;
-			}
-
-			if (userNameFirmatarioSpesa.equals(ordineMissione.getUid())){
-				userNameFirmatario = userNameFirmatarioSpesa;
-			}
-			cmisOrdineMissione.setUsernameFirmatarioAggiunto(userNameAggiunto);
-			cmisOrdineMissione.setUsernameFirmatarioSpesaAggiunto(userNameSpesaAggiunto);
 			cmisOrdineMissione.setAnno(ordineMissione.getAnno().toString());
 			cmisOrdineMissione.setNumero(ordineMissione.getNumero().toString());
 			cmisOrdineMissione.setAnticipo(ordineMissione.getRichiestaAnticipo().equals("S") ? "si" : "no");
@@ -338,8 +247,6 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setUoOrdine(uoRichPerFlusso);
 			cmisOrdineMissione.setUoSpesa(uoSpesaPerFlusso);
 			cmisOrdineMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
-			cmisOrdineMissione.setUserNameFirmatarioSpesa(userNameFirmatarioSpesa);
-			cmisOrdineMissione.setUserNamePrimoFirmatario(userNameFirmatario);
 			cmisOrdineMissione.setUserNameResponsabileModulo("");
 			cmisOrdineMissione.setUsernameResponsabileGruppo("");
 			cmisOrdineMissione.setNoteAutorizzazioniAggiuntive(ordineMissione.getNoteUtilizzoTaxiNoleggio() == null ? "": ordineMissione.getNoteUtilizzoTaxiNoleggio());
@@ -347,7 +254,6 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setUsernameUtenteOrdine(ordineMissione.getUid());
 			cmisOrdineMissione.setValidazioneModulo(StringUtils.isEmpty(ordineMissione.getResponsabileGruppo()) ? "no" : "si");
 			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "si" : "no");
-			cmisOrdineMissione.setValidazioneSpesa(impostaValidazioneSpesa(userNameFirmatario, userNameFirmatarioSpesa));
 
 			cmisOrdineMissione.setWfDescription("Ordine di Missione n. "+ordineMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
 			cmisOrdineMissione.setWfDescriptionComplete(cmisOrdineMissione.getWfDescription()+" a "+ordineMissione.getDestinazione()+" del "+ DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()));
@@ -498,8 +404,8 @@ public class CMISOrdineMissioneService {
 			return so;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - File ["+ordineMissione.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
-			throw new AwesomeException(CodiciErrore.ERRGEN, "CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
+				throw new AwesomeException(CodiciErrore.ERRGEN, "File ["+ordineMissione.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
 		}
 	}
 
@@ -527,9 +433,9 @@ public class CMISOrdineMissioneService {
 			return so;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File [" + annullamento.getFileName()
+				throw new ComponentException("File [" + annullamento.getFileName()
 						+ "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale ("
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
 					+ Utility.getMessageException(e) + ")",e);
 		}
 	}
@@ -601,7 +507,6 @@ public class CMISOrdineMissioneService {
 		
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE, cmisOrdineMissione.getUsernameRichiedente());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, StringUtils.isEmpty(cmisOrdineMissione.getUsernameResponsabileGruppo()) ? false : true);
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA, cmisOrdineMissione.getValidazioneSpesa().equals("si"));
 		return metadataProperties;
 	}
 
@@ -1218,8 +1123,8 @@ public class CMISOrdineMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+ordineMissioneAutoPropria.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+ordineMissioneAutoPropria.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -1246,9 +1151,9 @@ public class CMISOrdineMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File [" + ordineMissioneAnticipo.getFileName()
+				throw new ComponentException("File [" + ordineMissioneAnticipo.getFileName()
 						+ "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale ("
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
 					+ Utility.getMessageException(e) + ")",e);
 		}
 	}
@@ -1327,8 +1232,8 @@ public class CMISOrdineMissioneService {
 			return so;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -1372,8 +1277,8 @@ public class CMISOrdineMissioneService {
 			return so;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 	public Map<String, byte[]> getFileAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) {

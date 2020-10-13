@@ -15,16 +15,22 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import it.cnr.si.missioni.security.jwt.TokenProvider;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,12 +68,12 @@ public class OrdineMissioneResource {
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneResource.class);
 
     @Autowired
-    private TokenStore tokenStore;
- 
-    @Autowired
     private OrdineMissioneService ordineMissioneService;
 
-    /**
+	@Autowired
+	private TokenProvider tokenProvider;
+
+	/**
      * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
      */
     @RequestMapping(value = "/rest/ordiniMissione/list",
@@ -334,10 +340,10 @@ public class OrdineMissioneResource {
         
         if (!StringUtils.isEmpty(idMissione)){
             try {
-            	Long idMissioneLong = new Long (idMissione); 
-            	OAuth2Authentication auth = tokenStore.readAuthentication(token);
-            	if (auth != null){
-            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(auth, idMissioneLong);
+            	Long idMissioneLong = new Long (idMissione);
+				Authentication authentication = tokenProvider.getAuthentication(token);
+            	if (authentication != null){
+            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(authentication, idMissioneLong);
             		if (map != null){
             			res.setContentType("application/pdf");
                     	try {
@@ -360,7 +366,8 @@ public class OrdineMissioneResource {
             		}
             	}
     		} catch (Exception e) {
-    			log.error("ERRORE printOrdineMissione",e);
+				String exc = ExceptionUtils.getStackTrace(e);
+    			log.error("ERRORE printOrdineMissione",exc);
     			throw new AwesomeException(Utility.getMessageException(e));
     		} 
         }
@@ -406,11 +413,15 @@ public class OrdineMissioneResource {
     public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idOrdineMissione") String idOrdineMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
         log.debug("REST request per l'upload di allegati dell'ordine di missione" );
         if (idOrdineMissione != null){
-        	Long idMissioneLong = new Long (idOrdineMissione); 
-        	OAuth2Authentication auth = tokenStore.readAuthentication(token);
+        	Long idMissioneLong = new Long (idOrdineMissione);
+			Jwt user = Jwts.parserBuilder()
+					.requireAudience("string")
+					.build()
+					.parse(token);
 
-        	if (auth != null){
-        		Principal principal = (Principal) auth;
+
+			if (user != null){
+        		Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
