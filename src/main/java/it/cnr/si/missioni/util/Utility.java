@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -140,7 +141,7 @@ public class Utility {
 	}
 	
 	public static String getMessageException(Exception e){
-		String obj = e.getLocalizedMessage() == null ? (e.getCause() == null ? "Errore Generico" : e.getCause().toString()) : e.getLocalizedMessage();
+		String obj = e.getLocalizedMessage() == null ? (e.getCause() == null ? ExceptionUtils.getStackTrace(e) : e.getCause().toString()) : e.getLocalizedMessage();
 		log.debug("Errore", e);
 
 		ErrorRestSigla errorRest = null;

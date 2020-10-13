@@ -809,6 +809,7 @@
 {"uid":"barbara.ciani", "uoForUsersSpecial":[{"codice_uo":"073000", "ordine_da_validare":"S"}]},
 {"uid":"laura.mengozzi", "uoForUsersSpecial":[{"codice_uo":"073000"}]},
 {"uid":"francesco.montaleone", "uoForUsersSpecial":[{"codice_uo":"073000", "ordine_da_validare":"S"}]},
+{"uid":"manuel.nisi", "uoForUsersSpecial":[{"codice_uo":"309000", "ordine_da_validare":"S"}]},
 {"uid":"anika.manzari", "uoForUsersSpecial":[{"codice_uo":"073000"}]},
 {"uid":"milena.demarinis", "uoForUsersSpecial":[{"codice_uo":"073000"}]},
 
@@ -937,7 +938,7 @@
 {"uid":"salvatore.lisi", "uoForUsersSpecial":[{"codice_uo":"077003", "ordine_da_validare":"S"}]},
 {"uid":"annamaria.pascali", "uoForUsersSpecial":[{"codice_uo":"077003", "ordine_da_validare":"S"}]},
 {"uid":"gianluca.lintas", "uoForUsersSpecial":[{"codice_uo":"077004", "ordine_da_validare":"S"}]},
-{"uid":"domenico.genchi", "uoForUsersSpecial":[{"codice_uo":"077005", "ordine_da_validare":"S"}]},
+{"uid":"domenico.genchi", "uoForUsersSpecial":[{"codice_uo":"077005", "ordine_da_validare":"S"}, {"codice_uo":"077000"}]},
 
 {"uid":"luigi.franco", "uoForUsersSpecial":[{"codice_uo":"055000", "ordine_da_validare":"S"}]},
 {"uid":"margherita.santarsiere", "uoForUsersSpecial":[{"codice_uo":"055000", "ordine_da_validare":"S"}]},
@@ -1213,7 +1214,6 @@
 {"uid" : "gaetana.irrera","uoForUsersSpecial" : [{"codice_uo" : "002003","ordine_da_validare" : "S"}]}, 
 {"uid" : "giulia.calafiore","uoForUsersSpecial" : [{"codice_uo" : "002003","ordine_da_validare" : "S"}, {"codice_uo" : "122000","ordine_da_validare" : "S"}]}, 
 {"uid" : "mariangela.giglio","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}, {"codice_uo":"122003", "ordine_da_validare":"S"}]}, 
-{"uid" : "cecilia.spagnolo","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}]}, 
 {"uid" : "giuseppe.pantaleo","uoForUsersSpecial" : [{"codice_uo" : "002004","ordine_da_validare" : "S"}, {"codice_uo":"122003", "ordine_da_validare":"S"}]}, 
 {"uid" : "evelyn.scicchigno","uoForUsersSpecial" : [{"codice_uo" : "124006","ordine_da_validare" : "S"},{"codice_uo" : "124002","ordine_da_validare" : "S"}]}, 
 {"uid" : "marialuisa.carelli","uoForUsersSpecial" : [{"codice_uo" : "124006","ordine_da_validare" : "S"},{"codice_uo" : "124002","ordine_da_validare" : "S"}]}, 

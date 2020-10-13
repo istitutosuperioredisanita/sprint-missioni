@@ -511,8 +511,8 @@ public class CMISRimborsoMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+rimborsoMissione.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+rimborsoMissione.getFileName()+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -573,8 +573,8 @@ public class CMISRimborsoMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -1017,8 +1017,8 @@ public class CMISRimborsoMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 
@@ -1027,7 +1027,7 @@ public class CMISRimborsoMissioneService {
 		
 		StoragePath cmisPath = searchFolderRimborsoMissione(rimborsoMissione);
 		if (cmisPath == null){
-			throw new ComponentException("CMIS - Errore nel salvataggio del file sul Documentale. Cartella del rimborso non trovata");
+			throw new ComponentException("Errore nel salvataggio del file sul Documentale. Cartella del rimborso non trovata");
 		}
 
 		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANNULLAMENTO);
@@ -1042,8 +1042,8 @@ public class CMISRimborsoMissioneService {
 			return node;
 		} catch (Exception e) {
 			if (e.getCause() instanceof StorageException)
-				throw new ComponentException("CMIS - File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
-			throw new ComponentException("CMIS - Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
+				throw new ComponentException("File ["+fileName+"] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!",e);
+			throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")",e);
 		}
 	}
 

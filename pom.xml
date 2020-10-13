@@ -16,6 +16,7 @@
         <tag>3.1.124</tag>
     </scm>
     <properties>
+        <ace.version>3.0.3</ace.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
@@ -39,7 +40,7 @@
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <sprint.version>3.0.1</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
-        <storage.cloud.version>2.0.6</storage.cloud.version>
+        <storage.cloud.version>2.0.7</storage.cloud.version>
     </properties>
     <dependencies>
         <dependency>
@@ -91,16 +92,6 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-            <version>2.2.7.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>2.2.7.RELEASE</version>
-        </dependency>
-        <dependency>
             <groupId>it.cnr</groupId>
             <artifactId>jada-ejb3</artifactId>
             <version>${jada.version}</version>
@@ -110,6 +101,11 @@
                     <groupId>javax.persistence</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>ace-client</artifactId>
+            <version>${ace.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si</groupId>
@@ -141,6 +137,10 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>spring-boot-starter-web</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-boot-actuator</artifactId>
                     <groupId>org.springframework.boot</groupId>
                 </exclusion>
             </exclusions>
@@ -196,6 +196,16 @@
             <artifactId>hibernate-core</artifactId>
             <version>5.2.4.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+            <version>2.2.7.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>2.2.7.RELEASE</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -225,7 +235,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
