@@ -418,8 +418,8 @@ public class MissioniCMISService extends StoreService {
             })
 			.map(lista -> lista.stream()
 			.filter(stor -> {
-				Boolean str = ((ArrayList<String>)stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value())).contains(tipoDocumento) && 
-						!((ArrayList<String>)stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value())).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
+				Boolean str = (new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value()))).contains(tipoDocumento) &&
+						!(new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value()))).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
 				return str;
 			}).collect(Collectors.toList())).orElse(new ArrayList<StorageObject>());
 	}

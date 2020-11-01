@@ -116,7 +116,7 @@ public class PrintMissione {
 		this.matricolaRich = matricolaRich;
 	}
 
-	public String getCodiceFiscaleRich() {
+	public String getCodice_fiscaleRich() {
 		return codiceFiscaleRich;
 	}
 

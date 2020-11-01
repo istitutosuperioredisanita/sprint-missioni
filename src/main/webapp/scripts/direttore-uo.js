@@ -3,9 +3,9 @@
 /* Direttore uo */
 
 missioniApp.factory('DirettoreUoService', function($http) {
-    var recuperoDirettore = function(uo){
+    var recuperoDirettore = function(username){
         var direttore = [];
-        return $http.get('api/rest/direttore', {params: {uo: uo}}).then(function (data) {
+        return $http.get('api/rest/direttore', {params: {username: username}}).then(function (data) {
             if (data){
                 if (data.elements){
                     direttore = data.elements;

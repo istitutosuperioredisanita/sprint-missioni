@@ -75,7 +75,7 @@ public class TerzoPerCompenso extends RestServiceBean  implements Serializable {
 	}
 
 	@JsonProperty("codice_fiscale")
-	public String getCodiceFiscale() {
+	public String getCodice_fiscale() {
 	return codiceFiscale;
 	}
 

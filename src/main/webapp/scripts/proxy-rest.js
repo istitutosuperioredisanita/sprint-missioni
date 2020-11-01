@@ -129,7 +129,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var urlRestProxy = URL_REST.STANDARD;
         var app = APP_FOR_REST.SIPER;
         var url = SIPER_REST.GET_PERSON;
-        var x = $http.get('api/proxy/SIPER?proxyURL=json/userinfo/'+ username);
+        var x = $http.get('api/account-info?username='+ username);
         var y = x.then(function (result) {
             if (result.data){
                 var persona = result.data;
@@ -160,14 +160,12 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         var app = APP_FOR_REST.SIPER;
         var url = SIPER_REST.PERSONS_FOR_UO;
         var persons = [];
-        var titCa = null;
         var uoSiper = uo.replace('.','');
         if (cds){
-            titCa = cds.replace('.','');
+            var x = $http.get('api/rest/personForCds', {params: {cds: uoSiper}});
         } else {
-            titCa = uo.replace('.','');
+            var x = $http.get('api/rest/personForUo', {params: {uo: uoSiper}});
         }
-        var x = $http.get(urlRestProxy + app +'?proxyURL=json/sedi/', {params: {titCa: titCa, userinfo:true, cessati:dipendentiCessati}});
         var y = x.then(function (result) {
             if (result.data){
                 var listaPersons = result.data;
@@ -175,77 +173,84 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 var listaDuplicati = [];
                 var ind = -1;
 
-                var personPromise = DirettoreUoService.getDirettore(uoSiper);
-                return personPromise.then(function(result1){
-                    if (result1 && result1.data){
-                        var direttore = result1.data;
-                        var trovatoDirettore = false;
-                        for (var z=0; z<listaPersons.length; z++) {
-                            if (listaPersons[z].uid == direttore.uid){
-                                trovatoDirettore = true;
-                            }
-                        }
-                        if (!trovatoDirettore){
-                            listaPersons.push(direttore);
+                var dipendenteUo = null;
+                    for (var i=0; i<listaPersons.length; i++) {
+                        if (listaPersons[i].matricola){
+                            dipendenteUo = listaPersons[i].uid;
                         }
                     }
-                    for (var i=0; i<listaPersons.length; i++) {
-                        var codiceFiscale = listaPersons[i].codice_fiscale;
-                        var uid = listaPersons[i].uid;
-                        var trovatoDuplicato = false;
-                        var duplicatoGiaInserito = false;
-                        for (var k=0; k<listaPersons.length; k++) {
-                            if (codiceFiscale == listaPersons[k].codice_fiscale && uid !== listaPersons[k].uid){
-                                trovatoDuplicato = true;
-                            }
-                        }
-                        if (!trovatoDuplicato){
-                            listaPersone[listaPersone.length] = listaPersons[i];
-                        } else {
-                            if (listaDuplicati){
-                                for (var k=0; k<listaDuplicati.length; k++) {
-                                    if (codiceFiscale == listaDuplicati[k].codice_fiscale){
-                                        duplicatoGiaInserito = true;
-                                    }
+
+                    var personPromise = DirettoreUoService.getDirettore(dipendenteUo);
+                    return personPromise.then(function(result1){
+                        if (result1 && result1.data){
+                            var direttore = result1.data;
+                            var trovatoDirettore = false;
+                            for (var z=0; z<listaPersons.length; z++) {
+                                if (listaPersons[z].uid == direttore.uid){
+                                    trovatoDirettore = true;
                                 }
                             }
-                            if (!duplicatoGiaInserito){
-                                listaPersone[listaPersone.length] = listaPersons[i];
-                                listaDuplicati[listaDuplicati.length] = listaPersons[i];
+                            if (!trovatoDirettore){
+                                listaPersons.push(direttore);
                             }
                         }
-                    }
+                        for (var i=0; i<listaPersons.length; i++) {
+                            var codiceFiscale = listaPersons[i].codice_fiscale;
+                            var uid = listaPersons[i].uid;
+                            var trovatoDuplicato = false;
+                            var duplicatoGiaInserito = false;
+                            for (var k=0; k<listaPersons.length; k++) {
+                                if (codiceFiscale == listaPersons[k].codice_fiscale && uid !== listaPersons[k].uid){
+                                    trovatoDuplicato = true;
+                                }
+                            }
+                            if (!trovatoDuplicato){
+                                listaPersone[listaPersone.length] = listaPersons[i];
+                            } else {
+                                if (listaDuplicati){
+                                    for (var k=0; k<listaDuplicati.length; k++) {
+                                        if (codiceFiscale == listaDuplicati[k].codice_fiscale){
+                                            duplicatoGiaInserito = true;
+                                        }
+                                    }
+                                }
+                                if (!duplicatoGiaInserito){
+                                    listaPersone[listaPersone.length] = listaPersons[i];
+                                    listaDuplicati[listaDuplicati.length] = listaPersons[i];
+                                }
+                            }
+                        }
 
 
-                    if (soloDipendenti && !dipendentiCessati){
-                        return listaPersone;
-                    }
+                        if (soloDipendenti && !dipendentiCessati){
+                            return listaPersone;
+                        }
 
-                    var promises = listaPersone.map(function (personaz) {
-                        return recuperoDatiTerzoPerCompenso(personaz.codice_fiscale, dataDa, dataA)
-                                .then(function (data) {
-                                    return processXhr(data, personaz, soloDipendenti, listaPersone, ind, dataDa);
-                                });
-                    });
-
-                    return $q.all(promises)
-                        .then(function (items) {
-                            return items.filter(function (item) {
-                                return item != false;
-                            });
+                        var promises = listaPersone.map(function (personaz) {
+                            return recuperoDatiTerzoPerCompenso(personaz.codice_fiscale, dataDa, dataA)
+                                    .then(function (data) {
+                                        return processXhr(data, personaz, soloDipendenti, listaPersone, ind, dataDa);
+                                    });
                         });
 
-                });
-            } else {
-                var deferred = $q.defer();
-                deferred.resolve([]);
-                return deferred;
-            }
-        });
-        x.error(function (data) {
-        });
-        return y;
-    }
+                        return $q.all(promises)
+                            .then(function (items) {
+                                return items.filter(function (item) {
+                                    return item != false;
+                                });
+                            });
+
+                    });
+                } else {
+                    var deferred = $q.defer();
+                    deferred.resolve([]);
+                    return deferred;
+                }
+            });
+            x.error(function (data) {
+            });
+            return y;
+        }
 
         var recuperoPersonsForUo = function(uo, soloDipendenti){
         return recuperoPersonsForCdsUo(null, uo, soloDipendenti, true);

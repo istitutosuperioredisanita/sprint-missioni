@@ -223,7 +223,7 @@ public class AnnullamentoOrdineMissioneService {
 			Account account = accountService.loadAccountFromRest(annullamento.getUid());
 			String idSede = null;
 			if (account != null){
-				idSede = account.getCodiceSede();
+				idSede = account.getCodice_sede();
 			}
 			Missione missione = new Missione(TypeMissione.ANNULLAMENTO, new Long(annullamento.getId().toString()), idSede, 
 					annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(), 
@@ -357,7 +357,7 @@ public class AnnullamentoOrdineMissioneService {
 
     private String getEmail(String user){
 		Account utente = accountService.loadAccountFromRest(user);
-		return utente.getEmailComunicazioni();
+		return utente.getEmail_comunicazioni();
     }
 
     private String getNominativo(String user){

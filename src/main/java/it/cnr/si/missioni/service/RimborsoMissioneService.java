@@ -331,7 +331,7 @@ public class RimborsoMissioneService {
 			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 			String idSede = null;
 			if (account != null){
-				idSede = account.getCodiceSede();
+				idSede = account.getCodice_sede();
 			}
 			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
 					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
@@ -642,7 +642,7 @@ public class RimborsoMissioneService {
 
     private String getEmail(String user){
 		Account utente = accountService.loadAccountFromRest(user);
-		return utente.getEmailComunicazioni();
+		return utente.getEmail_comunicazioni();
     }
 
     private String getNominativo(String user){
@@ -991,8 +991,8 @@ public class RimborsoMissioneService {
     	}
 		if (StringUtils.isEmpty(rimborsoMissione.getMatricola()) && StringUtils.isEmpty(rimborsoMissione.getQualificaRich())) {
 			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
-			if (account != null && account.getCodiceFiscale() != null) {
-				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodiceFiscale(),
+			if (account != null && account.getCodice_fiscale() != null) {
+				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodice_fiscale(),
 						rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione());
 				for (TerzoPerCompenso terzo : terzoJson.getElements()) {
 					rimborsoMissione.setQualificaRich(terzo.getDsTipoRapporto());

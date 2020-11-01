@@ -414,14 +414,8 @@ public class OrdineMissioneResource {
         log.debug("REST request per l'upload di allegati dell'ordine di missione" );
         if (idOrdineMissione != null){
         	Long idMissioneLong = new Long (idOrdineMissione);
-			Jwt user = Jwts.parserBuilder()
-					.requireAudience("string")
-					.build()
-					.parse(token);
-
-
-			if (user != null){
-        		Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Authentication principal = tokenProvider.getAuthentication(token);
+			if (principal != null){
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());

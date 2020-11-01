@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.missioni.security.jwt.TokenProvider;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,7 +59,7 @@ public class RimborsoMissioneResource {
 
 
     @Autowired
-    private TokenStore tokenStore;
+    private TokenProvider tokenProvider;
 
     
     @Autowired
@@ -288,8 +288,8 @@ public class RimborsoMissioneResource {
         
         if (!StringUtils.isEmpty(idMissione)){
             try {
-            	Long idMissioneLong = new Long (idMissione); 
-            	OAuth2Authentication auth = tokenStore.readAuthentication(token);
+            	Long idMissioneLong = new Long (idMissione);
+				Authentication auth = tokenProvider.getAuthentication(token);
             	if (auth != null){
             		Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(auth, idMissioneLong);
             		if (map != null){
@@ -344,8 +344,8 @@ public class RimborsoMissioneResource {
     public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idRimborso") String idRimborsoMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
     	log.debug("REST request per l'upload di allegati dell'ordine di missione" );
     	if (idRimborsoMissione != null){
-    		Long idRimborsoLong = new Long (idRimborsoMissione); 
-    		OAuth2Authentication auth = tokenStore.readAuthentication(token);
+    		Long idRimborsoLong = new Long (idRimborsoMissione);
+			Authentication auth = tokenProvider.getAuthentication(token);
 
     		if (auth != null){
     			Principal principal = (Principal) auth;
