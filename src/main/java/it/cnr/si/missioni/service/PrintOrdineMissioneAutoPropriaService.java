@@ -46,18 +46,18 @@ public class PrintOrdineMissioneAutoPropriaService {
     	PrintOrdineMissioneAutoPropria printOrdineMissioneAutoPropria = new PrintOrdineMissioneAutoPropria();
     	printOrdineMissioneAutoPropria.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAutoPropria.setNumero(ordineMissione.getNumero());
-    	printOrdineMissioneAutoPropria.setCodiceFiscaleRich(account.getCodiceFiscale());
+    	printOrdineMissioneAutoPropria.setCodiceFiscaleRich(account.getCodice_fiscale());
     	printOrdineMissioneAutoPropria.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
-    	if (account.getDataNascita() != null){
-    		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
+    	if (account.getData_nascita() != null){
+    		Date dataNas = DateUtils.parseDate(account.getData_nascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissioneAutoPropria.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
     	}
     	printOrdineMissioneAutoPropria.setDatoreLavoroRich(ordineMissione.getDatoreLavoroRich());
     	printOrdineMissioneAutoPropria.setDomicilioFiscaleRich(Utility.nvl(ordineMissione.getDomicilioFiscaleRich()));
     	printOrdineMissioneAutoPropria.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissioneAutoPropria.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
-    	printOrdineMissioneAutoPropria.setLuogoDiNascitaRich(account.getComuneNascita());
-    	printOrdineMissioneAutoPropria.setMatricolaRich(account.getMatricola());
+    	printOrdineMissioneAutoPropria.setLuogoDiNascitaRich(account.getComune_nascita());
+    	printOrdineMissioneAutoPropria.setMatricolaRich(account.getMatricola() != null ? account.getMatricola().toString() : "");
     	printOrdineMissioneAutoPropria.setCognomeRich(account.getCognome());
     	printOrdineMissioneAutoPropria.setNomeRich(account.getNome());
     	printOrdineMissioneAutoPropria.setQualificaRich(ordineMissione.getQualificaRich() == null ? "" : ordineMissione.getQualificaRich());

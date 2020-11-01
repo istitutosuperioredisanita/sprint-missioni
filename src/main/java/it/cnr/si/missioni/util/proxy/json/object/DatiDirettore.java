@@ -127,7 +127,7 @@ public class DatiDirettore {
 	* The codiceSede
 	*/
 	@JsonProperty("codice_sede")
-	public String getCodiceSede() {
+	public String getCodice_sede() {
 	return codiceSede;
 	}
 
@@ -307,7 +307,7 @@ public class DatiDirettore {
 	* The codiceFiscale
 	*/
 	@JsonProperty("codice_fiscale")
-	public String getCodiceFiscale() {
+	public String getCodice_fiscale() {
 	return codiceFiscale;
 	}
 
@@ -347,7 +347,7 @@ public class DatiDirettore {
 	* The dataNascita
 	*/
 	@JsonProperty("data_nascita")
-	public String getDataNascita() {
+	public String getData_nascita() {
 	return dataNascita;
 	}
 
@@ -367,7 +367,7 @@ public class DatiDirettore {
 	* The comuneNascita
 	*/
 	@JsonProperty("comune_nascita")
-	public String getComuneNascita() {
+	public String getComune_nascita() {
 	return comuneNascita;
 	}
 
@@ -687,7 +687,7 @@ public class DatiDirettore {
 	* The emailComunicazioni
 	*/
 	@JsonProperty("email_comunicazioni")
-	public String getEmailComunicazioni() {
+	public String getEmail_comunicazioni() {
 	return emailComunicazioni;
 	}
 

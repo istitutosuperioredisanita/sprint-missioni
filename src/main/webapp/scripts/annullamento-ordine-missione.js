@@ -735,15 +735,13 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
 
     $scope.reloadUserWork = function(uid){
         if (uid){
-            for (var i=0; i<$scope.elencoPersone.length; i++) {
-                if (uid == $scope.elencoPersone[i].uid){
-                    var data = $scope.elencoPersone[i];
-                    var userWork = ProxyService.buildPerson(data);
-                    $scope.restOrdiniMissioneDaAnnullare(userWork);
-                    $scope.accountModel = userWork;
-                    $sessionStorage.accountWork = userWork;
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.restOrdiniMissioneDaAnnullare(result);
+                    $scope.accountModel = result;
+                    $sessionStorage.accountWork = result;
                 }
-            }
+            });
         }
     }
 

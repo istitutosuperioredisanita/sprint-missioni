@@ -150,14 +150,11 @@ missioniApp.controller('ElencoOrdiniMissioneController', function ($rootScope, $
         $scope.ordiniMissione = [];
         $scope.messageOrdiniNonEsistenti = false;
         if (uid){
-            for (var i=0; i<$scope.elencoPersone.length; i++) {
-                if (uid == $scope.elencoPersone[i].uid){
-                    var data = $scope.elencoPersone[i];
-                    var userWork = ProxyService.buildPerson(data);
-
-                    $scope.accountModel = userWork;
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.accountModel = result;
                 }
-            }
+            });
         }
     }
 

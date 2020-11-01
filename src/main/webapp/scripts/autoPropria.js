@@ -191,19 +191,28 @@ missioniApp.controller('AutoPropriaController', function ($scope, AutoProprieSer
     }
 
     $scope.reloadUserWork = function(uid){
+        if (uid){
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.restRimborsiMissioneDaAnnullare(result);
+                    $scope.accountModel = result;
+                    $sessionStorage.accountWork = result;
+                }
+            });
+        }
+    }
+
+    $scope.reloadUserWork = function(uid){
         $scope.success = null;
         $scope.delSuccess = null;
         $scope.error = null;
         if (uid){
-            for (var i=0; i<$scope.elencoPersone.length; i++) {
-                if (uid == $scope.elencoPersone[i].uid){
-                    var data = $scope.elencoPersone[i];
-                    var userWork = ProxyService.buildPerson(data);
-
-                    $scope.accountModel = userWork;
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.accountModel = result;
                     $scope.autoProprie = AutoProprieService.get($scope.accountModel.login);
                 }
-            }
+            });
         }
     }
 
