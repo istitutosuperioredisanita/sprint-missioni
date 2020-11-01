@@ -115,7 +115,7 @@ public class CreaImpegnoSiglaService {
 //			oggettoBulk.setCognome(account.getCognome());
 //			oggettoBulk.setNome(account.getNome());
 //			impostaDescrizioneMissione(rimborsoApprovato, oggettoBulk);
-//			oggettoBulk.setCodice_fiscale(account.getCodiceFiscale());
+//			oggettoBulk.setCodice_fiscale(account.getCodice_fiscale());
 //			Folder folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
 //			if (folder != null){
 //				oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(PropertyIds.OBJECT_ID));

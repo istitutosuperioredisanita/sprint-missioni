@@ -906,16 +906,13 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.reloadUserWork = function(uid){
         if (uid){
-            for (var i=0; i<$scope.elencoPersone.length; i++) {
-                if (uid == $scope.elencoPersone[i].uid){
-                    var data = $scope.elencoPersone[i];
-                    var userWork = ProxyService.buildPerson(data);
-
-                    $scope.accountModel = userWork;
-                    $sessionStorage.accountWork = userWork;
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.accountModel = result;
+                    $sessionStorage.accountWork = $scope.accountModel;
                     $scope.inizializzaFormPerInserimento($scope.accountModel,true);
                 }
-            }
+            });
         }
     }
 

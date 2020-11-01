@@ -298,15 +298,15 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.id_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
-                        if (data.strutturaAppartenenza || data.login=="app.missioni" || data.profilo ) {
+                        if (data.struttura_appartenenza || data.uid=="app.missioni" || data.profilo ) {
                             httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(param.username.toLowerCase() + ':' + param.password);
                             $http.get(
-                                'api/proxy/SIPER?proxyURL=json/userinfo/' + param.username.toLowerCase()
+                                'api/account-info?username=' + param.username.toLowerCase()
                             ).success(function (data, status, headers, config) {
                                 delete httpHeaders.common['X-Proxy-Authorization'];
                                 var comune_residenza = null;    
-                                if (data.uid == "app.missioni"){
-                                    Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                if (param.username.toLowerCase() == "app.missioni"){
+                                    Session.create(param.username.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
                                     authService.loginConfirmed(data);
@@ -322,7 +322,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                             if (data.comune_residenza){
                                                 comune_residenza = data.comune_residenza;
                                                 if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
-                                                    Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                    Session.create(param.username.toLowerCase(), data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                                 data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                 data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
@@ -338,7 +338,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                         matr = data.matricola;
                                                         profilo = data.profilo;
                                                     }
-                                                    Session.create(data.uid, matr, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                    Session.create(param.username.toLowerCase(), matr, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                             data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                             data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                             data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
@@ -347,7 +347,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                             } else {
                                                 recuperoResidenza(data).then(function (result){
                                                         comune_residenza = result;
-                                                        Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
+                                                        Session.create(param.username.toLowerCase(), data.matricola, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], 
                                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
                                                             data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                             data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
@@ -355,7 +355,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 });
                                             }    
                                         } else {
-                                            Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                            Session.create(param.username.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
                                         }
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
@@ -367,7 +367,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             });
                         } else {
                             Account.get(function(data) {
-                                Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
+                                Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.authorities);
                                 $rootScope.account = Session;
                                 $sessionStorage.account = Session;
                                 authService.loginConfirmed(data);
@@ -398,9 +398,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             return;
                         }
                         AccountLDAP.get(function(data) {
-                            if (!data.strutturaAppartenenza && data.login != "app.missioni" && !data.profilo) {
+                            if (!data.struttura_appartenenza && data.uid != "app.missioni" && !data.profilo) {
                                 Account.get(function(data) {
-                                    Session.create(data.login, null, data.firstName, data.lastName, data.email, data.authorities);
+                                    Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
                                     if (!$rootScope.isAuthorized(authorizedRoles)) {
@@ -411,8 +411,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                     }
                                 });
                             } else {
-                                AccountFromToken.get({token: token},
-                                    function (data, responseHeaders) {
+
                                         var comune_residenza = null;
                                         if (data.uid == "app.missioni"){
                                             Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
@@ -484,11 +483,6 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 }
                                             });    
                                         }
-                                    },
-                                    function (httpResponse) {
-                                        $scope.success = null;
-                                        $scope.error = "ERROR";
-                                    });
 
                             }
                         });

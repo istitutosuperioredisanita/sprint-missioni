@@ -60,7 +60,7 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
 	public Serializable getId() {
 		return id;
 	}
-	public String getCodiceSede() {
+	public String getCodice_sede() {
 		return codiceSede;
 	}
 	public void setCodiceSede(String codiceSede) {

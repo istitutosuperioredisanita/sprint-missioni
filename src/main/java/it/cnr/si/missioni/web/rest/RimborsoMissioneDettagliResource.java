@@ -8,6 +8,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.missioni.security.jwt.TokenProvider;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -17,8 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +63,7 @@ public class RimborsoMissioneDettagliResource {
     private MissioniCMISService missioniCMISService;
 
     @Autowired
-    private TokenStore tokenStore;
+    private TokenProvider tokenProvider;
 
     @RequestMapping(value = "/rest/rimborsoMissione/dettagli/get",
             method = RequestMethod.GET,
@@ -165,8 +165,8 @@ public class RimborsoMissioneDettagliResource {
     public ResponseEntity<?> uploadAllegatiDettaglioRimborsoMissione(@RequestParam(value = "idDettaglioRimborso") String idDettaglioRimborsoMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
     	log.debug("REST request per l'upload di allegati al dettaglio del Rimborso Missione" );
     	if (idDettaglioRimborsoMissione != null){
-    		Long idDettaglioRimborsoLong = new Long (idDettaglioRimborsoMissione); 
-    		OAuth2Authentication auth = tokenStore.readAuthentication(token);
+    		Long idDettaglioRimborsoLong = new Long (idDettaglioRimborsoMissione);
+            Authentication auth = tokenProvider.getAuthentication(token);
 
     		if (auth != null){
     			Principal principal = (Principal) auth;
@@ -215,7 +215,7 @@ public class RimborsoMissioneDettagliResource {
         
         if (!StringUtils.isEmpty(id)){
             try {
-            	OAuth2Authentication auth = tokenStore.readAuthentication(token);
+                Authentication auth = tokenProvider.getAuthentication(token);
             	if (auth != null){
                     CMISFileContent cmisFileContent = missioniCMISService.getAttachment(id);
 

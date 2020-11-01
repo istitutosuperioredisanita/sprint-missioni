@@ -482,7 +482,7 @@ public class OrdineMissioneService {
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			String idSede = null;
 			if (account != null) {
-				idSede = account.getCodiceSede();
+				idSede = account.getCodice_sede();
 			}
 			Missione missione = new Missione(TypeMissione.ORDINE, new Long(ordineMissione.getId().toString()), idSede,
 					ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(),
@@ -913,8 +913,8 @@ public class OrdineMissioneService {
 		ordineMissione.setStatoFlusso(Costanti.STATO_INSERITO);
 		if (StringUtils.isEmpty(ordineMissione.getMatricola()) && StringUtils.isEmpty(ordineMissione.getQualificaRich())) {
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
-			if (account != null && account.getCodiceFiscale() != null) {
-				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodiceFiscale(),
+			if (account != null && account.getCodice_fiscale() != null) {
+				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodice_fiscale(),
 						ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione());
 				for (TerzoPerCompenso terzo : terzoJson.getElements()) {
 					ordineMissione.setQualificaRich(terzo.getDsTipoRapporto());
@@ -1262,10 +1262,10 @@ public class OrdineMissioneService {
 	private List<String> getTosMail(OrdineMissione ordineMissione) {
 		List<String> mails = new ArrayList<>();
 		Account utenteMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
-		mails.add(utenteMissione.getEmailComunicazioni());
+		mails.add(utenteMissione.getEmail_comunicazioni());
 		if (!ordineMissione.getUid().equals(ordineMissione.getUidInsert())) {
 			Account utenteInserimentoMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
-			mails.add(utenteInserimentoMissione.getEmailComunicazioni());
+			mails.add(utenteInserimentoMissione.getEmail_comunicazioni());
 		}
 		return mails;
 	}

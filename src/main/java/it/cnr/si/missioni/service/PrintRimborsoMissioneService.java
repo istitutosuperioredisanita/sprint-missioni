@@ -85,18 +85,18 @@ public class PrintRimborsoMissioneService {
     	PrintRimborsoMissione printRimborsoMissione = new PrintRimborsoMissione();
     	printRimborsoMissione.setAnno(rimborsoMissione.getAnno());
     	printRimborsoMissione.setNumero(rimborsoMissione.getNumero());
-    	printRimborsoMissione.setCodiceFiscaleRich(account.getCodiceFiscale());
+    	printRimborsoMissione.setCodiceFiscaleRich(account.getCodice_fiscale());
     	printRimborsoMissione.setComuneResidenzaRich(Utility.nvl(rimborsoMissione.getComuneResidenzaRich()));
-    	if (account.getDataNascita() != null){
-    		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
+    	if (account.getData_nascita() != null){
+    		Date dataNas = DateUtils.parseDate(account.getData_nascita().substring(0, 10),"yyyy-MM-dd");
     		printRimborsoMissione.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
     	}
     	printRimborsoMissione.setDatoreLavoroRich(rimborsoMissione.getDatoreLavoroRich());
     	printRimborsoMissione.setDomicilioFiscaleRich(Utility.nvl(rimborsoMissione.getDomicilioFiscaleRich()));
     	printRimborsoMissione.setIndirizzoResidenzaRich(Utility.nvl(rimborsoMissione.getIndirizzoResidenzaRich()));
     	printRimborsoMissione.setLivelloRich(rimborsoMissione.getLivelloRich() == null ? "" : rimborsoMissione.getLivelloRich());
-    	printRimborsoMissione.setLuogoDiNascitaRich(account.getComuneNascita());
-    	printRimborsoMissione.setMatricolaRich(account.getMatricola());
+    	printRimborsoMissione.setLuogoDiNascitaRich(account.getComune_nascita());
+    	printRimborsoMissione.setMatricolaRich(account.getMatricola() != null ? account.getMatricola().toString() : "");
     	printRimborsoMissione.setCognomeRich(account.getCognome());
     	printRimborsoMissione.setNomeRich(account.getNome());
     	printRimborsoMissione.setQualificaRich(rimborsoMissione.getQualificaRich() == null ? "" : rimborsoMissione.getQualificaRich());

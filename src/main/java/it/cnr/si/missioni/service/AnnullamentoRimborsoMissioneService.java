@@ -147,7 +147,7 @@ public class AnnullamentoRimborsoMissioneService {
 //			Account account = accountService.loadAccountFromRest(annullamento.getUid());
 //			String idSede = null;
 //			if (account != null){
-//				idSede = account.getCodiceSede();
+//				idSede = account.getCodice_sede();
 //			}
 //			Missione missione = new Missione(TypeMissione.ANNULLAMENTO, new Long(annullamento.getId().toString()), idSede, 
 //					annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(), 
@@ -236,7 +236,7 @@ public class AnnullamentoRimborsoMissioneService {
 		int anno = data.getYear();
 
 		List<String> listaMail = new ArrayList<>();
-		listaMail.add(account.getEmailComunicazioni());
+		listaMail.add(account.getEmail_comunicazioni());
 		DatiFlusso datiFlusso = cmisRimborsoMissioneService.recuperoDatiFlusso(annullamento.getRimborsoMissione(), anno, account);
 		listaMail.add(accountService.getEmail(datiFlusso.getUsernamePrimoFirmatario()));
 		if (!datiFlusso.getUsernameFirmatarioSpesa().equals(datiFlusso.getUsernamePrimoFirmatario())){

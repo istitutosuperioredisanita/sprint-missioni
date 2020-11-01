@@ -83,10 +83,10 @@ public class PrintOrdineMissioneService {
     	printOrdineMissione.setCdrSpesa(caricaCdr(ordineMissione.getCdrSpesa()));
     	printOrdineMissione.setCdsRich(ordineMissione.getCdsRich());
     	printOrdineMissione.setCdsSpesa(ordineMissione.getCdsSpesa());
-    	printOrdineMissione.setCodiceFiscaleRich(account.getCodiceFiscale());
+    	printOrdineMissione.setCodiceFiscaleRich(account.getCodice_fiscale());
     	printOrdineMissione.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
-    	if (account.getDataNascita() != null){
-    		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
+    	if (account.getData_nascita() != null){
+    		Date dataNas = DateUtils.parseDate(account.getData_nascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissione.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
     	}
     	printOrdineMissione.setDataFineMissione(DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC));
@@ -105,8 +105,8 @@ public class PrintOrdineMissioneService {
 
        	printOrdineMissione.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissione.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich());
-    	printOrdineMissione.setLuogoDiNascitaRich(account.getComuneNascita());
-    	printOrdineMissione.setMatricolaRich(account.getMatricola());
+    	printOrdineMissione.setLuogoDiNascitaRich(account.getComune_nascita());
+    	printOrdineMissione.setMatricolaRich(account.getMatricola() != null ? account.getMatricola().toString() : "");
     	if (progetto != null){
         	printOrdineMissione.setModulo(progetto.getCd_progetto()+" "+progetto.getDs_progetto());
     	} else {

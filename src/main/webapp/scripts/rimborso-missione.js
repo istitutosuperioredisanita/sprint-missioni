@@ -1168,16 +1168,29 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.reloadUserWork = function(uid){
         if (uid){
-            for (var i=0; i<$scope.elencoPersone.length; i++) {
-                if (uid == $scope.elencoPersone[i].uid){
-                    var data = $scope.elencoPersone[i];
-                    var userWork = ProxyService.buildPerson(data);
-                    $scope.recuperoDatiTerzoSigla(userWork);
-                    $scope.restOrdiniMissioneDaRimborsare(userWork, $scope.giaRimborsato);
-                    $scope.accountModel = userWork;
-                    $sessionStorage.accountWork = userWork;
+            $scope.userWork = uid;
+        }
+        $scope.ordiniMissione = [];
+        $scope.messageOrdiniNonEsistenti = false;
+        if (uid){
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.accountModel = result;
                 }
-            }
+            });
+        }
+    }
+
+    $scope.reloadUserWork = function(uid){
+        if (uid){
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.recuperoDatiTerzoSigla(result);
+                    $scope.restOrdiniMissioneDaRimborsare(result, $scope.giaRimborsato);
+                    $scope.accountModel = result;
+                    $sessionStorage.accountWork = result;
+                }
+            });
         }
     }
 

@@ -16,7 +16,7 @@
         <tag>3.1.124</tag>
     </scm>
     <properties>
-        <ace.version>3.0.3</ace.version>
+        <ace.version>3.0.11</ace.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
@@ -40,12 +40,17 @@
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <sprint.version>3.0.1</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
-        <storage.cloud.version>2.0.7</storage.cloud.version>
+        <storage.cloud.version>2.0.9</storage.cloud.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-paranamer</artifactId>
             <version>2.9.4</version>
         </dependency>
         <dependency>
@@ -144,11 +149,6 @@
                     <groupId>org.springframework.boot</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.si.sprint</groupId>
-            <artifactId>sprint-ldap</artifactId>
-            <version>${sprint.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>

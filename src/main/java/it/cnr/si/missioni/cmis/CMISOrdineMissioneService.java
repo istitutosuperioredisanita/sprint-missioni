@@ -654,36 +654,8 @@ public class CMISOrdineMissioneService {
 
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
-		//TODO Da togliere commento
-		//byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-		byte[] stampa = null;
-		String fileName = null;
-		StorageObject storage = null;
-		try {
-			storage = getStorageObjectOrdineMissione(ordineMissione);
-		} catch (ComponentException e1) {
-			throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
-					+ Utility.getMessageException(e1) + ")", e1);
-		}
-			fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
-			InputStream is = null;
-			try {
-				is = missioniCMISService.getResource(storage);
-			} catch (Exception e) {
-				throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
-						+ Utility.getMessageException(e) + ")", e);
-			}
-			if (is != null) {
-				try {
-					stampa = IOUtils.toByteArray(is);
-					is.close();
-				} catch (IOException e) {
-					throw new ComponentException("Errore nella conversione dello stream in byte del file ("
-							+ Utility.getMessageException(e) + ")", e);
-				}
-			}
-
-			CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
+		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
+		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
 		StorageObject documento = salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
 		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
 		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);

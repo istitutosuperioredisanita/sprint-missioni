@@ -44,6 +44,7 @@ public class CronConfigurationMissioni {
     	if (cronEvictCacheActive){
     		cronService.evictCache();
     		cronService.evictCacheTerzoCompenso();
+            cronService.evictCachePersone();
     	}
     }
 

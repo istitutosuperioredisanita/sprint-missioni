@@ -39,10 +39,10 @@ public class PrintOrdineMissioneAnticipoService {
     	PrintOrdineMissioneAnticipo printOrdineMissioneAnticipo = new PrintOrdineMissioneAnticipo();
     	printOrdineMissioneAnticipo.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAnticipo.setNumero(ordineMissione.getNumero());
-    	printOrdineMissioneAnticipo.setCodiceFiscaleRich(account.getCodiceFiscale());
+    	printOrdineMissioneAnticipo.setCodiceFiscaleRich(account.getCodice_fiscale());
     	printOrdineMissioneAnticipo.setComuneResidenzaRich(Utility.nvl(ordineMissione.getComuneResidenzaRich()));
-    	if (account.getDataNascita() != null){
-    		Date dataNas = DateUtils.parseDate(account.getDataNascita().substring(0, 10),"yyyy-MM-dd");
+    	if (account.getData_nascita() != null){
+    		Date dataNas = DateUtils.parseDate(account.getData_nascita().substring(0, 10),"yyyy-MM-dd");
     		printOrdineMissioneAnticipo.setDataDiNascitaRich(DateUtils.getDateAsString(dataNas, DateUtils.PATTERN_DATE));
     	}
     	printOrdineMissioneAnticipo.setDataFineMissione(DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC));
@@ -54,8 +54,8 @@ public class PrintOrdineMissioneAnticipoService {
     	printOrdineMissioneAnticipo.setImportoPresunto(Utility.numberFormat(ordineMissione.getImportoPresunto()));
     	printOrdineMissioneAnticipo.setIndirizzoResidenzaRich(Utility.nvl(ordineMissione.getIndirizzoResidenzaRich()));
     	printOrdineMissioneAnticipo.setLivelloRich(ordineMissione.getLivelloRich() == null ? "" : ordineMissione.getLivelloRich().toString());
-    	printOrdineMissioneAnticipo.setLuogoDiNascitaRich(account.getComuneNascita());
-    	printOrdineMissioneAnticipo.setMatricolaRich(account.getMatricola());
+    	printOrdineMissioneAnticipo.setLuogoDiNascitaRich(account.getComune_nascita());
+    	printOrdineMissioneAnticipo.setMatricolaRich(account.getMatricola() != null ? account.getMatricola().toString() : "");
     	printOrdineMissioneAnticipo.setCognomeRich(account.getCognome());
     	printOrdineMissioneAnticipo.setNomeRich(account.getNome());
     	printOrdineMissioneAnticipo.setNote(Utility.nvl(ordineMissioneAnticipo.getNote()));

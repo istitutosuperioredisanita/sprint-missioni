@@ -476,7 +476,7 @@ public class DateUtils {
 	}
 	
 	public static String getDateAsString(LocalDate data, String pattern) {
-		return data.format(DateTimeFormatter.ofPattern(pattern));
+		return data != null ? data.format(DateTimeFormatter.ofPattern(pattern)) : null;
 	}
 
 	/**

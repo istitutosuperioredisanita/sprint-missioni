@@ -712,15 +712,13 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
 
     $scope.reloadUserWork = function(uid){
         if (uid){
-            for (var i=0; i<$scope.elencoPersone.length; i++) {
-                if (uid == $scope.elencoPersone[i].uid){
-                    var data = $scope.elencoPersone[i];
-                    var userWork = ProxyService.buildPerson(data);
-                    $scope.restRimborsiMissioneDaAnnullare(userWork);
-                    $scope.accountModel = userWork;
-                    $sessionStorage.accountWork = userWork;
+            var person = ProxyService.getPerson(uid).then(function(result){
+                if (result){
+                    $scope.restRimborsiMissioneDaAnnullare(result);
+                    $scope.accountModel = result;
+                    $sessionStorage.accountWork = result;
                 }
-            }
+            });
         }
     }
 

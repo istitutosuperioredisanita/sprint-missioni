@@ -6,12 +6,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.module.paranamer.ParanamerModule;
+import it.cnr.si.missioni.service.*;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.SiperService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,11 +27,6 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
-import it.cnr.si.missioni.service.ConfigService;
-import it.cnr.si.missioni.service.DatiIstitutoService;
-import it.cnr.si.missioni.service.DatiSedeService;
-import it.cnr.si.missioni.service.ProxyService;
-import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -65,7 +65,7 @@ public class AccountService {
     private UoService uoService;
 
 	@Autowired
-	private AceService aceService;
+	PersonaService personaService;
 
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
@@ -150,9 +150,7 @@ public class AccountService {
 		return null;
 	}
 
-	private String manageResponseForAccountRest(String uid, 
-			String body, Boolean loadSpecialUserData) {
-		Account account = getAccount(body);
+	private String manageResponseForAccountRest(String uid, Account account, Boolean loadSpecialUserData) {
 		if (account != null){
 			return getResponseAccount(uid, account, loadSpecialUserData);
 		}
@@ -187,23 +185,20 @@ public class AccountService {
 	public Account loadAccountFromRest(String currentLogin){
 		return loadAccountFromRest(currentLogin, false);
 	}
-	
-	public Account loadAccountFromRest(String currentLogin, Boolean loadSpecialUserData){
 
+	public Account loadAccountFromRest(String currentLogin, Boolean loadSpecialUserData){
 		String risposta = getAccount(currentLogin, loadSpecialUserData);
 		return getAccount(risposta);
 	}
 
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
-		UserInfoDto userInfoDto = aceService.getUserInfoByUsername(currentLogin);
-		userInfoDto.getCitta_sede();
-		ResultProxy result = proxyService.process(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_ACCOUNT+currentLogin, "proxyURL="+Costanti.REST_ACCOUNT+currentLogin, null);
-		String risposta = result.getBody();
-		String resp = manageResponseForAccountRest(currentLogin, risposta, loadSpecialUserData);
+		UserInfoDto userInfoDto = personaService.getAccountFromSiper(currentLogin);
+		Account account = new Account(userInfoDto);
+		String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
 		if (resp != null){
 			return resp;
 		}
-		return risposta;
+		return "";
 	}
 
 	public String getDirectorFromSede(String codiceSede) {
@@ -222,28 +217,6 @@ public class AccountService {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i responsabili della sede ("+Utility.getMessageException(ex)+").");
 		}
 		return risposta;
-	}
-
-	public String getDirectorFromUo(String uo) {
-		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+Utility.getUoSiper(uo)+"&userinfo=true&ruolo=resp", null, null);
-		ResultProxy result = proxyService.processInCache(callCache);
-		String risposta = result.getBody();
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			DatiDirettore [] lista = mapper.readValue(risposta, DatiDirettore[].class);
-			if (lista != null && lista.length > 0){
-				return lista[0].getUid();
-			} else if (lista == null || lista.length == 0){
-				return null;
-			}
-		} catch (Exception ex) {
-			return null;
-		}
-		return risposta;
-	}
-
-	public String getDirector(String uo) {
-		return getDirectorFromUo(uo);
 	}
 
 	public Boolean isUserSpecialEnableToFinalizeOrder(String user, String uo){
@@ -272,6 +245,7 @@ public class AccountService {
 	public Account getAccount(String risposta) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
+			mapper.registerModule(new ParanamerModule());
 			Account account = mapper.readValue(risposta, Account.class);
 			return account;
 		} catch (Exception ex) {
@@ -291,7 +265,7 @@ public class AccountService {
 
     public String getEmail(String user){
 		Account utente = loadAccountFromRest(user);
-		return utente.getEmailComunicazioni();
+		return utente.getEmail_comunicazioni();
     }
 
 	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean isUoRich ) {
@@ -301,13 +275,13 @@ public class AccountService {
 		String userNameFirmatario;
 		DatiSede dati = null;
 		Boolean delegaSpesa = false;
-		if (account.getCodiceSede() != null && account.getCodiceUo() != null && Utility.getUoSigla(account.getCodiceUo()).equals(Utility.getUoSigla(uo))){
-			dati = datiSedeService.getDatiSede(account.getCodiceSede(), data);
+		if (account.getCodice_sede() != null && account.getCodice_uo() != null && Utility.getUoSigla(account.getCodice_uo()).equals(Utility.getUoSigla(uo))){
+			dati = datiSedeService.getDatiSede(account.getCodice_sede(), data);
 			if (dati != null && dati.getResponsabile() != null && Utility.nvl(dati.getDelegaSpesa()).equals("S")){
 				delegaSpesa = true;
 			}
 		}
-		if ((!isUoRich && !delegaSpesa) || (account.getMatricola() == null || (account.getDataCessazione() != null && ZonedDateTime.parse(account.getDataCessazione()).compareTo(data) < 0))){
+		if ((!isUoRich && !delegaSpesa) || (account.getMatricola() == null || (account.getData_cessazione() != null && ZonedDateTime.parse(account.getData_cessazione()).compareTo(data) < 0))){
 			userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
 		} else {
 			if (dati != null && dati.getResponsabile() != null){
@@ -315,7 +289,7 @@ public class AccountService {
 					userNameFirmatario = dati.getResponsabile();
 				} else {
 					if (StringUtils.isEmpty(dati.getSedeRespEstero())){
-						userNameFirmatario = getDirectorFromSede(dati.getCodiceSede());		
+						userNameFirmatario = getDirectorFromSede(dati.getCodice_sede());
 					} else {
 						DatiSede datiAltraSede = datiSedeService.getDatiSede(dati.getSedeRespEstero(), data);
 						if (datiAltraSede != null && datiAltraSede.getResponsabile() != null){
@@ -329,7 +303,7 @@ public class AccountService {
 				userNameFirmatario = recuperoDirettoreDaUo(anno, uo, isMissioneEstera);
 			}
 			if (StringUtils.isEmpty(userNameFirmatario)){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la sede "+dati.getCodiceSede());
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Non è stato possibile recuperare il direttore per la sede "+dati.getCodice_sede());
 			}
 		}
 		if (userNameFirmatario != null && userNameFirmatario.equalsIgnoreCase(account.getUid())){
@@ -365,14 +339,14 @@ public class AccountService {
 				if (!StringUtils.isEmpty(datiIstituto.getUoRespEstero()) && !isDaUoRespEstero){
 					userNameFirmatario = recuperoDirettoreDaUo(anno, datiIstituto.getUoRespEstero(), isMissioneEstera, true);
 				} else {
-					userNameFirmatario = getDirector(uo);
+					userNameFirmatario = getDirettore(uo);
 				}
 			}
 		} else {
 			if (isMissioneEstera && Utility.nvl(datiIstituto.getResponsabileSoloItalia(),"N").equals("S") && !StringUtils.isEmpty(datiIstituto.getUoRespEstero()) && !isDaUoRespEstero){
 				userNameFirmatario = recuperoDirettoreDaUo(anno, datiIstituto.getUoRespEstero(), isMissioneEstera, true);
 			} else {
-				userNameFirmatario = getDirector(uo);
+				userNameFirmatario = getDirettore(uo);
 			}
 		}
 		if (StringUtils.isEmpty(userNameFirmatario)){
@@ -381,6 +355,9 @@ public class AccountService {
 		return userNameFirmatario;
 	}
 
+	public String getDirettore(String uo){
+		return personaService.getDirettore(uo);
+	}
 	public Boolean isUserEnableToWorkUo(Principal principal, String uo){
 		UsersSpecial userSpecial = getUoForUsersSpecial(principal.getName());
 		boolean uoAbilitata = false;

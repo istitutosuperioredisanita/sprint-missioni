@@ -245,7 +245,7 @@ public class PrintOrdineMissioneAnticipo {
 	 * The codiceFiscaleRich
 	 */
 	@JsonProperty("codiceFiscaleRich")
-	public String getCodiceFiscaleRich() {
+	public String getCodice_fiscaleRich() {
 		return codiceFiscaleRich;
 	}
 

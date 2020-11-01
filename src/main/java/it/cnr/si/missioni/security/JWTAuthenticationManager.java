@@ -1,10 +1,16 @@
 package it.cnr.si.missioni.security;
 
+import feign.FeignException;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.AuthService;
+import it.cnr.si.service.SiperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -15,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -22,6 +30,14 @@ public class JWTAuthenticationManager implements AuthenticationManager {
 
     private final Logger log = LoggerFactory.getLogger(JWTAuthenticationManager.class);
 
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private AceService aceService;
+
+    @Autowired
+    private SiperService siperService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -30,9 +46,20 @@ public class JWTAuthenticationManager implements AuthenticationManager {
         String credentials = (String) authentication.getCredentials();
             // login ACE
 
-            List<GrantedAuthority> authorities = new ArrayList<>();
+        authService.getToken(principal, credentials);
 
-            authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+/*        try {
+            authorities = aceService.ruoliAttivi(principal).stream()
+                    .filter(ruolo -> ruolo.getContesto().stream()
+                            .anyMatch(r -> r.getSigla().equals("missioni")))
+                    .map(a -> new SimpleGrantedAuthority(a.getSigla()))
+                    .collect(Collectors.toList());
+        } catch (FeignException e) {
+            log.info(e.getMessage() + " for user: "+ "\"" +  principal + "\"");
+        }
+*/
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
             User utente = new User(principal.toLowerCase(), credentials, authorities);
 
             return new UsernamePasswordAuthenticationToken(utente, authentication, authorities);

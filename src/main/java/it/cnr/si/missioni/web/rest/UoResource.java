@@ -16,6 +16,8 @@ import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 
+import java.util.List;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -29,18 +31,46 @@ public class UoResource {
     UoService uoService;
     
     /**
-     * GET  /rest/account -> get the current user.
+     * GET  /rest/direttore -> get the director.
      */
     @RequestMapping(value = "/rest/direttore",
             method = RequestMethod.GET,
-            params = {"uo"}, 
+            params = {"username"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity getDirettore(@RequestParam(value = "uo") String uo) {
+    public ResponseEntity getDirettore(@RequestParam(value = "username") String username) {
         log.debug("REST request per recuperare i dati del direttore");
         
-        Account direttore = uoService.getDirettore(uo);
+        Account direttore = uoService.getDirettore(username);
         return JSONResponseEntity.ok(direttore);
     }
 
+    /**
+     * GET  /rest/account -> get the current user.
+     */
+    @RequestMapping(value = "/rest/personForCds",
+            method = RequestMethod.GET,
+            params = {"cds"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity getPersonForCds(@RequestParam(value = "cds") String cds) {
+        log.debug("REST request per recuperare i dati delle persone di un cds");
+
+        String rest = uoService.getPersone(null, cds);
+        return JSONResponseEntity.ok(rest);
+    }
+    /**
+     * GET  /rest/account -> get the current user.
+     */
+    @RequestMapping(value = "/rest/personForUo",
+            method = RequestMethod.GET,
+            params = {"uo"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity getPersonForUo(@RequestParam(value = "uo") String uo) {
+        log.debug("REST request per recuperare i dati delle persone di un UO");
+
+        String rest = uoService.getPersone(uo, null);
+        return JSONResponseEntity.ok(rest);
+    }
 }
