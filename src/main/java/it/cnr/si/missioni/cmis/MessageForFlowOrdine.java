@@ -3,11 +3,13 @@ package it.cnr.si.missioni.cmis;
 import java.io.Serializable;
 
 public class MessageForFlowOrdine extends MessageForFlow implements Serializable{
-
 	@Override
 	public String toString() {
 		return "MessageForFlowOrdine{" +
-				"noteAutorizzazioniAggiuntive='" + noteAutorizzazioniAggiuntive + '\'' +
+				"oggetto='" + oggetto + '\'' +
+				", anno='" + anno + '\'' +
+				", numero='" + numero + '\'' +
+				", noteAutorizzazioniAggiuntive='" + noteAutorizzazioniAggiuntive + '\'' +
 				", missioneGratuita='" + missioneGratuita + '\'' +
 				", descrizioneOrdine='" + descrizioneOrdine + '\'' +
 				", note='" + note + '\'' +
@@ -38,8 +40,8 @@ public class MessageForFlowOrdine extends MessageForFlow implements Serializable
 				", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
 				", capitolo='" + capitolo + '\'' +
 				", descrizioneCapitolo='" + descrizioneCapitolo + '\'' +
-				", modulo='" + modulo + '\'' +
-				", descrizioneModulo='" + descrizioneModulo + '\'' +
+				", progetto='" + progetto + '\'' +
+				", descrizioneProgetto='" + descrizioneProgetto + '\'' +
 				", gae='" + gae + '\'' +
 				", descrizioneGae='" + descrizioneGae + '\'' +
 				", impegnoAnnoResiduo='" + impegnoAnnoResiduo + '\'' +

@@ -5,8 +5,40 @@ import java.io.Serializable;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 
 public class MessageForFlow extends JSONBody implements Serializable{
+	public final static String TIPOLOGIA_MISSIONE_ORDINE = "ordine";
+	public final static String TIPOLOGIA_MISSIONE_REVOCA = "revoca";
+	public final static String TIPOLOGIA_MISSIONE_RIMBORSO = "rimborso";
+
+	String oggetto;
+	String anno;
+	String numero;
 	String noteAutorizzazioniAggiuntive;
 	String missioneGratuita;
+
+	public String getOggetto() {
+		return oggetto;
+	}
+
+	public void setOggetto(String oggetto) {
+		this.oggetto = oggetto;
+	}
+
+	public String getAnno() {
+		return anno;
+	}
+
+	public void setAnno(String anno) {
+		this.anno = anno;
+	}
+
+	public String getNumero() {
+		return numero;
+	}
+
+	public void setNumero(String numero) {
+		this.numero = numero;
+	}
+
 	String descrizioneOrdine;
 	String note;
 	String noteSegreteria;
@@ -35,9 +67,26 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String servizioFlagOk;
 	String personaSeguitoFlagOk;
 	String capitolo;
+
+	public String getProgetto() {
+		return progetto;
+	}
+
+	public void setProgetto(String progetto) {
+		this.progetto = progetto;
+	}
+
+	public String getDescrizioneProgetto() {
+		return descrizioneProgetto;
+	}
+
+	public void setDescrizioneProgetto(String descrizioneProgetto) {
+		this.descrizioneProgetto = descrizioneProgetto;
+	}
+
 	String descrizioneCapitolo;
-	String modulo;
-	String descrizioneModulo;
+	String progetto;
+	String descrizioneProgetto;
 	String gae;
 	String descrizioneGae;
 	String impegnoAnnoResiduo;
@@ -63,6 +112,15 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String gruppoFirmatarioSpesa;
 	String idStrutturaUoMissioni;
 	String idStrutturaSpesaMissioni;
+	private String tipologiaMissione;
+	public String getTipologiaMissione() {
+		return tipologiaMissione;
+	}
+
+	public void setTipologiaMissione(String tipologiaMissione) {
+		this.tipologiaMissione = tipologiaMissione;
+	}
+
 
 	public String getNoteAutorizzazioniAggiuntive() {
 		return noteAutorizzazioniAggiuntive;
@@ -310,22 +368,6 @@ public class MessageForFlow extends JSONBody implements Serializable{
 
 	public void setDescrizioneCapitolo(String descrizioneCapitolo) {
 		this.descrizioneCapitolo = descrizioneCapitolo;
-	}
-
-	public String getModulo() {
-		return modulo;
-	}
-
-	public void setModulo(String modulo) {
-		this.modulo = modulo;
-	}
-
-	public String getDescrizioneModulo() {
-		return descrizioneModulo;
-	}
-
-	public void setDescrizioneModulo(String descrizioneModulo) {
-		this.descrizioneModulo = descrizioneModulo;
 	}
 
 	public String getGae() {

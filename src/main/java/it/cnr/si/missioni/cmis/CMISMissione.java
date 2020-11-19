@@ -8,6 +8,7 @@ public class CMISMissione {
 	private String numero;
 	private String oggetto;
 	private String note;
+
 	private String noteSegreteria;
 	private String wfDescription;
 	private String wfDescriptionComplete;

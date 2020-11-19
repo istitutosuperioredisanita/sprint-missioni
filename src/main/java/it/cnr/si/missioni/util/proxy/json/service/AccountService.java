@@ -186,6 +186,10 @@ public class AccountService {
 		return loadAccountFromRest(currentLogin, false);
 	}
 
+	public Account loadAccount(String currentLogin){
+		return loadAccountFromRest(currentLogin);
+	}
+
 	public Account loadAccountFromRest(String currentLogin, Boolean loadSpecialUserData){
 		String risposta = getAccount(currentLogin, loadSpecialUserData);
 		return getAccount(risposta);
@@ -200,6 +204,8 @@ public class AccountService {
 		}
 		return "";
 	}
+
+	// TODO Da eliminare-
 
 	public String getDirectorFromSede(String codiceSede) {
 		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_SEDE+codiceSede+"&userinfo=true&ruolo=dir", null, null);
@@ -218,6 +224,8 @@ public class AccountService {
 		}
 		return risposta;
 	}
+
+	// TODO Fine da eliminare-
 
 	public Boolean isUserSpecialEnableToFinalizeOrder(String user, String uo){
 		if (uo == null){
@@ -268,6 +276,7 @@ public class AccountService {
 		return utente.getEmail_comunicazioni();
     }
 
+	// TODO Da eliminare-
 	public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean isUoRich ) {
 		return recuperoDirettore(anno, uo, isMissioneEstera, account, data, isUoRich, false);
 	}
@@ -295,7 +304,7 @@ public class AccountService {
 						if (datiAltraSede != null && datiAltraSede.getResponsabile() != null){
 							userNameFirmatario = datiAltraSede.getResponsabile();
 						} else {
-							userNameFirmatario = getDirectorFromSede(dati.getSedeRespEstero());		
+							userNameFirmatario = getDirectorFromSede(dati.getSedeRespEstero());
 						}
 					}
 				}
@@ -321,8 +330,8 @@ public class AccountService {
 					userNameFirmatario = recuperoDirettore(anno, datiIstituto.getUoRespResponsabili(), isMissioneEstera, account, data, isUoRich, fromDatiSAC);
 				}
 			}
-		} 
-			
+		}
+
 		return userNameFirmatario;
 	}
 
@@ -354,6 +363,8 @@ public class AccountService {
 		}
 		return userNameFirmatario;
 	}
+
+	// TODO Fine da eliminare-
 
 	public String getDirettore(String uo){
 		return personaService.getDirettore(uo);

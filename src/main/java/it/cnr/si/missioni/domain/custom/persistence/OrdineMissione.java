@@ -1321,4 +1321,21 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public void setPresidente(String presidente) {
 		this.presidente = presidente;
 	}
+
+	@Transient
+	public Boolean isMissioneCug() {
+		if (Utility.nvl(getCug(),"N").equals("S")){
+			return true;
+		}
+		return false;
+	}
+
+	@Transient
+	public Boolean isMissionePresidente() {
+		if (Utility.nvl(getPresidente(),"N").equals("S")){
+			return true;
+		}
+		return false;
+	}
+
 }
