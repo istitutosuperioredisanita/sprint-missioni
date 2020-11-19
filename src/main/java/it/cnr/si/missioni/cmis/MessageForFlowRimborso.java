@@ -119,8 +119,8 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 				", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
 				", capitolo='" + capitolo + '\'' +
 				", descrizioneCapitolo='" + descrizioneCapitolo + '\'' +
-				", modulo='" + modulo + '\'' +
-				", descrizioneModulo='" + descrizioneModulo + '\'' +
+				", modulo='" + progetto + '\'' +
+				", descrizioneProgetto='" + descrizioneProgetto + '\'' +
 				", gae='" + gae + '\'' +
 				", descrizioneGae='" + descrizioneGae + '\'' +
 				", impegnoAnnoResiduo='" + impegnoAnnoResiduo + '\'' +

@@ -52,7 +52,7 @@ public class MissioniDatabaseConfiguration extends DatabaseConfiguration {
     public Hibernate5Module hibernate5Module() {
         return new Hibernate5Module();
     }
-
+/*
     @Bean
     public ServletRegistrationBean dispatcherRegistration() {
         return new ServletRegistrationBean<>(dispatcherServlet());
@@ -61,5 +61,5 @@ public class MissioniDatabaseConfiguration extends DatabaseConfiguration {
     @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
     public DispatcherServlet dispatcherServlet() {
         return new LoggableDispatcherServlet();
-    }
+    }*/
 }

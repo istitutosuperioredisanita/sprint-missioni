@@ -1,12 +1,14 @@
 package it.cnr.si.missioni.service;
 
 import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.util.CodiciErrore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,8 +93,10 @@ public class FlowService {
                     errore = "ID Missione non presente per l'id del flusso "+flowResult.getIdFlusso();
                     log.info(errore);
                     mailService.sendEmailError(subjectGenericError + this.toString(), errore, false, true);
+                    throw new AwesomeException(CodiciErrore.ERRGEN, errore);
                 } catch (Exception e1) {
                     log.error("Errore durante l'invio dell'e-mail: "+e1);
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Errore durante l'invio dell'e-mail: "+e1);
                 }
             }
         } catch (Exception e){
@@ -104,33 +108,5 @@ public class FlowService {
                 log.error("Errore durante l'invio dell'e-mail: "+e1);
             }
         }
-/*
-
-        if (idOrdineMissione != null){
-            OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
-            if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
-                ResultFlows result = retrieveDataFromFlows(ordineMissione);
-                if (result == null){
-                    return null;
-                }
-                if (result.isApprovato()){
-                    log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-                    ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
-                    return result;
-                } else if (result.isAnnullato()){
-                    log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} annullato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-                    ordineMissioneService.aggiornaOrdineMissioneAnnullato(principal, ordineMissione);
-                    return result;
-                } else if (result.isStateReject()){
-                    log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-                    ordineMissioneService.aggiornaOrdineMissioneRespinto(principal, result, ordineMissione);
-                    return result;
-                }
-            }
-        }
-        return null;*/
     }
-
-
-
 }
