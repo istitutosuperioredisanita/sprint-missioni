@@ -48,8 +48,8 @@ public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements 
 				", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
 				", capitolo='" + capitolo + '\'' +
 				", descrizioneCapitolo='" + descrizioneCapitolo + '\'' +
-				", modulo='" + modulo + '\'' +
-				", descrizioneModulo='" + descrizioneModulo + '\'' +
+				", progetto='" + progetto + '\'' +
+				", descrizioneProgetto='" + descrizioneProgetto + '\'' +
 				", gae='" + gae + '\'' +
 				", descrizioneGae='" + descrizioneGae + '\'' +
 				", impegnoAnnoResiduo='" + impegnoAnnoResiduo + '\'' +

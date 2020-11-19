@@ -68,7 +68,7 @@ public class FlowResource {
     /**
      * POST  /rest/flows/aggiornaFlusso -> update flows.
      */
-    @RequestMapping(value = "/rest/flows/aggiornaFlusso",
+        @RequestMapping(value = "/rest/flows/aggiornaFlusso",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed

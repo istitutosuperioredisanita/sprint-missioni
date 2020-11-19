@@ -342,7 +342,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setUsernameUtenteOrdine(rimborsoMissione.getUid());
 		cmisRimborsoMissione.setValidazioneSpesa(impostaValidazioneSpesa(datiFlusso.getUsernamePrimoFirmatario(), datiFlusso.getUsernameFirmatarioSpesa()));
 		cmisRimborsoMissione.setWfDescription("Rimborso Missione n. "+rimborsoMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
-		cmisRimborsoMissione.setWfDescriptionComplete(cmisRimborsoMissione.getWfDescription()+" a "+rimborsoMissione.getDestinazione()+" del "+ DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+" di "+Utility.nvl(account.getCognome())+" "+ Utility.nvl(account.getNome())+" - "+rimborsoMissione.getOggetto());
+		cmisRimborsoMissione.setWfDescriptionComplete("Missione a "+rimborsoMissione.getDestinazione()+" del "+ DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione())+" per "+rimborsoMissione.getOggetto());
 		cmisRimborsoMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDestinazione(rimborsoMissione.getDestinazione());
 		cmisRimborsoMissione.setTrattamento(rimborsoMissione.decodeTrattamento());
@@ -752,7 +752,7 @@ public class CMISRimborsoMissioneService {
 			Map<String, String> maps = mapper.convertValue(messageForFlow, new TypeReference<Map<String, String>>() {});
 			parameters.setAll(maps);
 
-			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ORDINE, documento);
+			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
 
 			aggiungiDocumenti(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 			aggiungiDocumenti(giustificativi, parameters, Costanti.TIPO_DOCUMENTO_GIUSTIFICATIVO);
