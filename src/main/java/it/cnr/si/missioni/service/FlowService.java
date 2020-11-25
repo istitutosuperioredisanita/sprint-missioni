@@ -1,8 +1,6 @@
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -15,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.security.Principal;
-import java.util.Optional;
 
 @Service
 public class FlowService {
@@ -55,13 +51,13 @@ public class FlowService {
         String errore = "";
         try {
             if (flowResult.getIdMissione() != null){
-                switch (flowResult.getTipoFlusso() ) {
+                switch (flowResult.getTipologiaMissione() ) {
                     case FlowResult.TIPO_FLUSSO_ORDINE:
                         OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, new Long(flowResult.getIdMissione()));
                         if (ordineMissione != null){
                             ordineMissioneService.aggiornaOrdineMissione(principal, ordineMissione, flowResult);
                         } else {
-                            errore = "L'ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getIdFlusso()+" non è presente";
+                            errore = "L'ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
                             mailService.sendEmailError(subjectErrorFlowsOrdine + this.toString(), errore, false, true);
                         }
@@ -71,7 +67,7 @@ public class FlowService {
                         if (rimborsoMissione != null){
                             rimborsoMissioneService.aggiornaRimborsoMissione(principal, rimborsoMissione, flowResult);
                         } else {
-                            errore = "Il rimborso missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getIdFlusso()+" non è presente";
+                            errore = "Il rimborso missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
                             mailService.sendEmailError(subjectErrorFlowsRimborso + this.toString(), errore, false, true);
                         }
@@ -81,7 +77,7 @@ public class FlowService {
                         if (annullamento != null){
                             annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissione(principal, annullamento, flowResult);
                         } else {
-                            errore = "L'annullamento ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getIdFlusso()+" non è presente";
+                            errore = "L'annullamento ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
                             mailService.sendEmailError(subjectErrorFlowsAnnullamento + this.toString(), errore, false, true);
                         }
@@ -90,7 +86,7 @@ public class FlowService {
 
             } else {
                 try {
-                    errore = "ID Missione non presente per l'id del flusso "+flowResult.getIdFlusso();
+                    errore = "ID Missione non presente per l'id del flusso "+flowResult.getProcessInstanceId();
                     log.info(errore);
                     mailService.sendEmailError(subjectGenericError + this.toString(), errore, false, true);
                     throw new AwesomeException(CodiciErrore.ERRGEN, errore);

@@ -1483,4 +1483,20 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 				getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_OCCA) ||
 				getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_PROF)) && getInquadramento().compareTo(Costanti.INQUADRAMENTO_ASSEGNISTA) != 0;
 	}
+	@Transient
+	public Boolean isMissioneCug() {
+		if (Utility.nvl(getCug(),"N").equals("S")){
+			return true;
+		}
+		return false;
+	}
+
+	@Transient
+	public Boolean isMissionePresidente() {
+		if (Utility.nvl(getPresidente(),"N").equals("S")){
+			return true;
+		}
+		return false;
+	}
+
 }

@@ -5,6 +5,14 @@ import java.io.Serializable;
 public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements Serializable{
 	private String wfOrdineDaRevoca;
 
+	public String getIdMissioneRevoca() {
+		return idMissioneRevoca;
+	}
+
+	public void setIdMissioneRevoca(String idMissioneRevoca) {
+		this.idMissioneRevoca = idMissioneRevoca;
+	}
+
 	public String getWfOrdineDaRevoca() {
 		return wfOrdineDaRevoca;
 	}
@@ -12,6 +20,8 @@ public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements 
 	public void setWfOrdineDaRevoca(String wfOrdineDaRevoca) {
 		this.wfOrdineDaRevoca = wfOrdineDaRevoca;
 	}
+
+	String idMissioneRevoca;
 
 	@Override
 	public String toString() {
@@ -35,8 +45,8 @@ public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements 
 				", userNameAmministrativo1='" + userNameAmministrativo1 + '\'' +
 				", userNameAmministrativo2='" + userNameAmministrativo2 + '\'' +
 				", userNameAmministrativo3='" + userNameAmministrativo3 + '\'' +
-				", uoOrdine='" + uoOrdine + '\'' +
-				", descrizioneUoOrdine='" + descrizioneUoOrdine + '\'' +
+				", uoOrdine='" + uoRich + '\'' +
+				", descrizioneUoOrdine='" + descrizioneUoRich + '\'' +
 				", uoSpesa='" + uoSpesa + '\'' +
 				", descrizioneUoSpesa='" + descrizioneUoSpesa + '\'' +
 				", uoCompetenza='" + uoCompetenza + '\'' +

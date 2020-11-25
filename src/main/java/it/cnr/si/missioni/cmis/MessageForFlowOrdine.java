@@ -3,12 +3,22 @@ package it.cnr.si.missioni.cmis;
 import java.io.Serializable;
 
 public class MessageForFlowOrdine extends MessageForFlow implements Serializable{
+	String idMissioneOrdine;
+
+	public String getIdMissioneOrdine() {
+		return idMissioneOrdine;
+	}
+
+	public void setIdMissioneOrdine(String idMissioneOrdine) {
+		this.idMissioneOrdine = idMissioneOrdine;
+	}
+
 	@Override
 	public String toString() {
 		return "MessageForFlowOrdine{" +
 				"oggetto='" + oggetto + '\'' +
-				", anno='" + anno + '\'' +
-				", numero='" + numero + '\'' +
+				", anno='" + annoMissione + '\'' +
+				", numero='" + numeroMissione + '\'' +
 				", noteAutorizzazioniAggiuntive='" + noteAutorizzazioniAggiuntive + '\'' +
 				", missioneGratuita='" + missioneGratuita + '\'' +
 				", descrizioneOrdine='" + descrizioneOrdine + '\'' +
@@ -27,8 +37,8 @@ public class MessageForFlowOrdine extends MessageForFlow implements Serializable
 				", userNameAmministrativo1='" + userNameAmministrativo1 + '\'' +
 				", userNameAmministrativo2='" + userNameAmministrativo2 + '\'' +
 				", userNameAmministrativo3='" + userNameAmministrativo3 + '\'' +
-				", uoOrdine='" + uoOrdine + '\'' +
-				", descrizioneUoOrdine='" + descrizioneUoOrdine + '\'' +
+				", uoOrdine='" + uoRich + '\'' +
+				", descrizioneUoOrdine='" + descrizioneUoRich + '\'' +
 				", uoSpesa='" + uoSpesa + '\'' +
 				", descrizioneUoSpesa='" + descrizioneUoSpesa + '\'' +
 				", uoCompetenza='" + uoCompetenza + '\'' +

@@ -12,7 +12,17 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 	String importoMandato;
 	String wfOrdineDaRimborso;
 	String differenzeOrdineRimborso;
+
+	public String getIdMissioneRimborso() {
+		return idMissioneRimborso;
+	}
+
+	public void setIdMissioneRimborso(String idMissioneRimborso) {
+		this.idMissioneRimborso = idMissioneRimborso;
+	}
+
 	String totaleRimborsoMissione;
+	String idMissioneRimborso;
 
 		public String getBpm_sendEMailNotifications() {
 		return bpm_sendEMailNotifications;
@@ -106,8 +116,8 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 				", userNameAmministrativo1='" + userNameAmministrativo1 + '\'' +
 				", userNameAmministrativo2='" + userNameAmministrativo2 + '\'' +
 				", userNameAmministrativo3='" + userNameAmministrativo3 + '\'' +
-				", uoOrdine='" + uoOrdine + '\'' +
-				", descrizioneUoOrdine='" + descrizioneUoOrdine + '\'' +
+				", uoOrdine='" + uoRich + '\'' +
+				", descrizioneUoOrdine='" + descrizioneUoRich + '\'' +
 				", uoSpesa='" + uoSpesa + '\'' +
 				", descrizioneUoSpesa='" + descrizioneUoSpesa + '\'' +
 				", uoCompetenza='" + uoCompetenza + '\'' +

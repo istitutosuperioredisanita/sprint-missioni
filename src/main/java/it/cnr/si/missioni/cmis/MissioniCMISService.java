@@ -181,7 +181,7 @@ public class MissioniCMISService extends StoreService {
     @Transactional(readOnly = true)
 	public StorageObject restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, 
 			StoragePath cmisPath, Permission... permissions){
-		return restoreSimpleDocument(metadataProperties, inputStream, contentType, name, cmisPath, null, false, permissions);
+		return restoreSimpleDocument(metadataProperties, inputStream, contentType, name, cmisPath, null, true, permissions);
 	}
 
     @Transactional(readOnly = true)

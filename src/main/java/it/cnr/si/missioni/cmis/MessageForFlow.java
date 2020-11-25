@@ -10,8 +10,8 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	public final static String TIPOLOGIA_MISSIONE_RIMBORSO = "rimborso";
 
 	String oggetto;
-	String anno;
-	String numero;
+	String annoMissione;
+	String numeroMissione;
 	String noteAutorizzazioniAggiuntive;
 	String missioneGratuita;
 
@@ -23,20 +23,20 @@ public class MessageForFlow extends JSONBody implements Serializable{
 		this.oggetto = oggetto;
 	}
 
-	public String getAnno() {
-		return anno;
+	public String getAnnoMissione() {
+		return annoMissione;
 	}
 
-	public void setAnno(String anno) {
-		this.anno = anno;
+	public void setAnnoMissione(String annoMissione) {
+		this.annoMissione = annoMissione;
 	}
 
-	public String getNumero() {
-		return numero;
+	public String getNumeroMissione() {
+		return numeroMissione;
 	}
 
-	public void setNumero(String numero) {
-		this.numero = numero;
+	public void setNumeroMissione(String numeroMissione) {
+		this.numeroMissione = numeroMissione;
 	}
 
 	String descrizioneOrdine;
@@ -55,9 +55,34 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String userNameAmministrativo1;
 	String userNameAmministrativo2;
 	String userNameAmministrativo3;
-	String uoOrdine;
-	String descrizioneUoOrdine;
+	String uoRich;
+	String descrizioneUoRich;
 	String uoSpesa;
+
+	public String getUoRichSigla() {
+		return uoRichSigla;
+	}
+
+	public void setUoRichSigla(String uoRichSigla) {
+		this.uoRichSigla = uoRichSigla;
+	}
+
+	public String getUoCompetenzaSigla() {
+		return uoCompetenzaSigla;
+	}
+
+	public void setUoCompetenzaSigla(String uoCompetenzaSigla) {
+		this.uoCompetenzaSigla = uoCompetenzaSigla;
+	}
+
+	public String getUoSpesaSigla() {
+		return uoSpesaSigla;
+	}
+
+	public void setUoSpesaSigla(String uoSpesaSigla) {
+		this.uoSpesaSigla = uoSpesaSigla;
+	}
+
 	String descrizioneUoSpesa;
 	String uoCompetenza;
 	String descrizioneUoCompetenza;
@@ -67,6 +92,9 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String servizioFlagOk;
 	String personaSeguitoFlagOk;
 	String capitolo;
+	String uoRichSigla;
+	String uoCompetenzaSigla;
+	String uoSpesaSigla;
 
 	public String getProgetto() {
 		return progetto;
@@ -266,20 +294,20 @@ public class MessageForFlow extends JSONBody implements Serializable{
 		this.userNameAmministrativo3 = userNameAmministrativo3;
 	}
 
-	public String getUoOrdine() {
-		return uoOrdine;
+	public String getUoRich() {
+		return uoRich;
 	}
 
-	public void setUoOrdine(String uoOrdine) {
-		this.uoOrdine = uoOrdine;
+	public void setUoRich(String uoRich) {
+		this.uoRich = uoRich;
 	}
 
-	public String getDescrizioneUoOrdine() {
-		return descrizioneUoOrdine;
+	public String getDescrizioneUoRich() {
+		return descrizioneUoRich;
 	}
 
-	public void setDescrizioneUoOrdine(String descrizioneUoOrdine) {
-		this.descrizioneUoOrdine = descrizioneUoOrdine;
+	public void setDescrizioneUoRich(String descrizioneUoRich) {
+		this.descrizioneUoRich = descrizioneUoRich;
 	}
 
 	public String getUoSpesa() {
