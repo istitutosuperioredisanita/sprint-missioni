@@ -6,29 +6,23 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.flows.model.ProcessDefinitions;
 import it.cnr.si.flows.model.StartWorkflowResponse;
+import it.cnr.si.flows.model.TaskResponse;
+import it.cnr.si.missioni.service.*;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.application.FlowsService;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,25 +32,11 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.domain.custom.persistence.Parametri;
-import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
-import it.cnr.si.missioni.service.DatiIstitutoService;
-import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
-import it.cnr.si.missioni.service.OrdineMissioneAutoPropriaService;
-import it.cnr.si.missioni.service.OrdineMissioneService;
-import it.cnr.si.missioni.service.ParametriService;
-import it.cnr.si.missioni.service.PrintAnnullamentoOrdineMissioneService;
-import it.cnr.si.missioni.service.PrintOrdineMissioneAnticipoService;
-import it.cnr.si.missioni.service.PrintOrdineMissioneAutoPropriaService;
-import it.cnr.si.missioni.service.PrintOrdineMissioneService;
-import it.cnr.si.missioni.service.UoService;
-import it.cnr.si.missioni.service.UtentiPresidenteSpecialiService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -91,8 +71,11 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private DatiIstitutoService datiIstitutoService;
-	
-    @Autowired
+
+	@Autowired
+	private MessageForFlowsService messageForFlowsService;
+
+	@Autowired
     private Environment env;
 
 	@Autowired
@@ -164,6 +147,7 @@ public class CMISOrdineMissioneService {
 	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione, Integer annoGestione) throws ComponentException{
 		if (ordineMissione != null){
 			CMISOrdineMissione cmisOrdineMissione = new CMISOrdineMissione();
+			cmisOrdineMissione.setIdMissioneOrdine(new Long(ordineMissione.getId().toString()));
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			account.setUid(ordineMissione.getUid());
 			caricaDatiDerivati(principal, ordineMissione);
@@ -217,6 +201,9 @@ public class CMISOrdineMissioneService {
 			}
 
 			DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(ordineMissione.getUoRich(), annoGestione);
+			cmisOrdineMissione.setUoCompetenzaSigla(ordineMissione.getUoCompetenza());
+			cmisOrdineMissione.setUoSpesaSigla(ordineMissione.getUoSpesa());
+			cmisOrdineMissione.setUoRichSigla(ordineMissione.getUoRich());
 			String uoCompetenzaPerFlusso = Utility.replace(ordineMissione.getUoCompetenza(), ".", "");
 			String uoSpesaPerFlusso = Utility.replace(ordineMissione.getUoSpesa(), ".", "");
 			String uoRichPerFlusso = Utility.replace(ordineMissione.getUoRich(), ".", "");
@@ -225,7 +212,13 @@ public class CMISOrdineMissioneService {
 			if (uoCompetenzaPerFlusso != null){
 				uoDatiCompetenza = uoService.recuperoUo(uoCompetenzaPerFlusso);
 			}
-			
+
+			cmisOrdineMissione.setMissioneGratuita(ordineMissione.isMissioneGratuita());
+			cmisOrdineMissione.setMissionePresidente(ordineMissione.isMissionePresidente());
+			cmisOrdineMissione.setMissioneCug(ordineMissione.isMissioneCug());
+			cmisOrdineMissione.setMissioneEstera(ordineMissione.isMissioneEstera());
+			cmisOrdineMissione.setCdsRich(ordineMissione.getCdsRich());
+			cmisOrdineMissione.setCdsSpesa(ordineMissione.getCdsSpesa());
 			cmisOrdineMissione.setAnno(ordineMissione.getAnno().toString());
 			cmisOrdineMissione.setNumero(ordineMissione.getNumero().toString());
 			cmisOrdineMissione.setAnticipo(ordineMissione.getRichiestaAnticipo().equals("S") ? "si" : "no");
@@ -235,7 +228,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setDescrizioneGae(gae == null ? "" : Utility.nvl(gae.getDs_linea_attivita(),""));
 			cmisOrdineMissione.setDescrizioneImpegno(descrImpegno);
 			cmisOrdineMissione.setDescrizioneModulo(progetto == null ? "" : progetto.getDs_progetto());
-			cmisOrdineMissione.setDescrizioneUoOrdine(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
+			cmisOrdineMissione.setDescrizioneUoRich(uoRich == null ? "" : uoRich.getDs_unita_organizzativa());
 			cmisOrdineMissione.setDescrizioneUoSpesa(uoSpesa == null ? "" : uoSpesa.getDs_unita_organizzativa());
 			cmisOrdineMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
 			cmisOrdineMissione.setDisponibilita(Utility.nvl(dispImpegno));
@@ -254,7 +247,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "si" : "no");
 			cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
 			cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");
-			cmisOrdineMissione.setUoOrdine(uoRichPerFlusso);
+			cmisOrdineMissione.setUoRich(uoRichPerFlusso);
 			cmisOrdineMissione.setUoSpesa(uoSpesaPerFlusso);
 			cmisOrdineMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
 			cmisOrdineMissione.setUserNameResponsabileModulo("");
@@ -483,7 +476,7 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_GAE, cmisOrdineMissione.getDescrizioneGae());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_IMPEGNO, cmisOrdineMissione.getDescrizioneImpegno());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_MODULO, cmisOrdineMissione.getDescrizioneModulo());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_ORDINE, cmisOrdineMissione.getDescrizioneUoOrdine());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_ORDINE, cmisOrdineMissione.getDescrizioneUoRich());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_SPESA, cmisOrdineMissione.getDescrizioneUoSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO, cmisOrdineMissione.getDisponibilita());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_GAE, cmisOrdineMissione.getGae());
@@ -502,7 +495,7 @@ public class CMISOrdineMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DATA_INIZIO_MISSIONE, cmisOrdineMissione.getDataInizioMissione());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DATA_FINE_MISSIONE, cmisOrdineMissione.getDataFineMissione());
 		
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_ORDINE, cmisOrdineMissione.getUoOrdine());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_ORDINE, cmisOrdineMissione.getUoRich());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_SPESA, cmisOrdineMissione.getUoSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA, cmisOrdineMissione.getUserNameFirmatarioSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO, cmisOrdineMissione.getUserNamePrimoFirmatario());
@@ -545,6 +538,7 @@ public class CMISOrdineMissioneService {
 				aggiungiDocumento(so, nodeRefs);
 			}
 
+			messageForFlows.setIdMissioneRevoca(cmisOrdineMissione.getIdMissioneRevoca().toString());
 			messageForFlows.setTitolo("Annullamento "+cmisOrdineMissione.getWfDescription());
 			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
 
@@ -573,8 +567,8 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setUserNameAmministrativo1("");
 			messageForFlows.setUserNameAmministrativo2("");
 			messageForFlows.setUserNameAmministrativo3("");
-			messageForFlows.setUoOrdine(cmisOrdineMissione.getUoOrdine());
-			messageForFlows.setDescrizioneUoOrdine(cmisOrdineMissione.getDescrizioneUoOrdine());
+			messageForFlows.setUoRich(cmisOrdineMissione.getUoRich());
+			messageForFlows.setDescrizioneUoRich(cmisOrdineMissione.getDescrizioneUoRich());
 			messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
 			messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
 			messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
@@ -657,52 +651,9 @@ public class CMISOrdineMissioneService {
 			params.add(tipoDocumento+"_nodeRef", so.getKey());
 			params.add(tipoDocumento+"_mimetype", so.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
 			params.add(tipoDocumento+"_aggiorna", "true");
-			params.add(tipoDocumento+"_path", so.getPath());
+			params.add(tipoDocumento+"_path", ((LinkedList)params.get("pathFascicoloDocumenti")).get(0));
 			params.add(tipoDocumento+"_filename", so.getPropertyValue(StoragePropertyNames.NAME.value()));
 		}
-	}
-
-	public String recuperoGruppoSecondoFirmatarioStandard(String uo, String ruolo, Integer idSedePrimoGruppoFirmatario){
-		List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediDaUo(uo);
-		if (lista.size() == 0){
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Non sono state recuperate sedi per la uo "+uo);
-		}
-		SimpleEntitaOrganizzativaWebDto sede = recuperoSedePrincipale(lista);
-		if (sede != null){
-			return costruisciGruppoFirmatario(ruolo, sede.getId());
-		} else {
-			for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativaWebDto : lista){
-				if (entitaOrganizzativaWebDto.getId().compareTo(idSedePrimoGruppoFirmatario) == 0){
-					return costruisciGruppoFirmatario(ruolo, entitaOrganizzativaWebDto.getId());
-				}
-			}
-			return costruisciGruppoFirmatario(ruolo, lista.get(0).getId());
-		}
-	}
-
-	public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo){
-		List<SimpleEntitaOrganizzativaWebDto> lista = aceService.entitaOrganizzativaFindByTerm(uo);
-		List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
-				.filter(entita -> {
-					return entita.getCdsuo().equals(uo) ;
-				}).collect(Collectors.toList())).orElse(new ArrayList<SimpleEntitaOrganizzativaWebDto>());
-		return listaEntitaUo;
-	}
-
-	public SimpleEntitaOrganizzativaWebDto recuperoSedePrincipale(List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo ){
-		for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativaWebDto : listaEntitaUo){
-			String tipoEntitaOrganizzativa = entitaOrganizzativaWebDto.getTipo().getSigla();
-			if (tipoEntitaOrganizzativa.equals("UFF") ||
-					tipoEntitaOrganizzativa.equals("SPRINC")||
-					tipoEntitaOrganizzativa.equals("AREA")||
-					tipoEntitaOrganizzativa.equals("DIP")){
-				return entitaOrganizzativaWebDto;
-			}
-		}
-		return null;
-	}
-	private String costruisciGruppoFirmatario(String ruolo, Integer idSede){
-		return ruolo+"@"+idSede;
 	}
 
 
@@ -739,108 +690,21 @@ public class CMISOrdineMissioneService {
 		MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
 		try {
 
+			messageForFlows.setIdMissioneOrdine(cmisOrdineMissione.getIdMissioneOrdine().toString());
 			messageForFlows.setTitolo(cmisOrdineMissione.getWfDescription());
 			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
 			messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_ORDINE);
 
-			// Cug, Presidente e SAC.....da gestire...
+			messageForFlows = (MessageForFlowOrdine) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
 
-			Uo uoDatiSpesa = uoService.recuperoUo(cmisOrdineMissione.getUoSpesa());
-			String uoRich = ordineMissione.getUoRich();
-			String uoSpesa = null;
-			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-				if (StringUtils.hasLength(cmisOrdineMissione.getUoCompetenza())){
-					uoSpesa = ordineMissione.getUoCompetenza();
-				} else {
-					uoSpesa = ordineMissione.getUoRich();
-				}
-			} else {
-				uoSpesa = ordineMissione.getUoSpesa();
-			}
-
-			String gruppoPrimoFirmatario = null;
-			String gruppoSecondoFirmatario = null;
-
-			DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(uoSpesa, ordineMissione.getAnno());
-			DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(uoRich, ordineMissione.getAnno());
-
-			uoRich = uoRich.replace(".","");
-			uoSpesa = uoSpesa.replace(".","");
-
-			SimplePersonaWebDto persona = aceService.getPersonaByUsername(ordineMissione.getUid());
-			Integer idSede = persona.getSede().getId();
-			String ruolo = "firma-missioni";
-			if (ordineMissione.isMissioneEstera() && !ordineMissione.isMissionePresidente()){
-				ruolo = ruolo+"-estere";
-				if (uoRich.startsWith(Costanti.CDS_SAC)){
-					Account direttore = uoService.getDirettore(uoRich);
-					if (direttore.getUid().equals(ordineMissione.getUid())){
-						BossDto boss = aceService.findResponsabileUtente(direttore.getUid());
-						idSede = boss.getEntitaOrganizzativa().getId();
-					}
-				}
-			}
-
-			if (ordineMissione.isMissioneGratuita()){
-				gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-				gruppoSecondoFirmatario = gruppoPrimoFirmatario;
-			} else {
-				if (ordineMissione.isMissioneCug()){
-					gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-//TODO					Gestione recupero CUG
-//					gruppoSecondoFirmatario = ;
-				} else if (ordineMissione.isMissionePresidente()){
-//TODO Verificare se è corretto passare la sede per il presidente.
-					gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo+"-presidente", idSede);
-					gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-				} else {
-					List<SimpleEntitaOrganizzativaWebDto> listaSediSpesa = recuperoSediDaUo(uoSpesa);
-					if (ordineMissione.getCdsRich().equals(ordineMissione.getCdsSpesa()) ){
-						if (Utility.nvl(datiIstitutoUoSpesa.getSaltaFirmaUosUoCds(),"N").equals("S") ){
-							SimpleEntitaOrganizzativaWebDto sedePrincipale = recuperoSedePrincipale(listaSediSpesa);
-							if (sedePrincipale != null){
-								gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePrincipale.getId());
-								gruppoSecondoFirmatario = gruppoPrimoFirmatario;
-							}
-						} else if (Utility.nvl(datiIstitutoUoRich.getSaltaFirmaUosUoCds(),"N").equals("S")){
-							List<SimpleEntitaOrganizzativaWebDto> listaSediRich = recuperoSediDaUo(uoRich);
-							SimpleEntitaOrganizzativaWebDto sedePrincipale = recuperoSedePrincipale(listaSediRich);
-							if (sedePrincipale != null){
-								gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePrincipale.getId());
-								gruppoSecondoFirmatario = gruppoPrimoFirmatario;
-							}
-						} else {
-							gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-							gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede);
-						}
-					} else {
-						gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-						if (uoSpesa.equals(uoRich)){
-							gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-						} else {
-							gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede);
-						}
-					}
-				}
-			}
-			if (gruppoPrimoFirmatario == null){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è state recuperate un gruppo per il primo firmatario.");
-			}
-
-			if (gruppoSecondoFirmatario == null){
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è state recuperate un gruppo per il secondo firmatario.");
-			}
-
-			messageForFlows.setGruppoFirmatarioUo(gruppoPrimoFirmatario);
-			messageForFlows.setGruppoFirmatarioSpesa(gruppoSecondoFirmatario);
 			messageForFlows.setPathFascicoloDocumenti(ordineMissione.getStringBasePath());
 			messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
 			messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
 			messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
 			messageForFlows.setNote(cmisOrdineMissione.getNote());
 			messageForFlows.setOggetto(cmisOrdineMissione.getOggetto());
-			messageForFlows.setAnno(cmisOrdineMissione.getAnno());
-			messageForFlows.setNumero(cmisOrdineMissione.getNumero());
+			messageForFlows.setAnnoMissione(cmisOrdineMissione.getAnno());
+			messageForFlows.setNumeroMissione(cmisOrdineMissione.getNumero());
 			messageForFlows.setNoteSegreteria(cmisOrdineMissione.getNoteSegreteria());
 			messageForFlows.setBpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
 			messageForFlows.setBpm_workflowPriority(cmisOrdineMissione.getPriorita());
@@ -855,8 +719,8 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setUserNameAmministrativo1("");
 			messageForFlows.setUserNameAmministrativo2("");
 			messageForFlows.setUserNameAmministrativo3("");
-			messageForFlows.setUoOrdine(cmisOrdineMissione.getUoOrdine());
-			messageForFlows.setDescrizioneUoOrdine(cmisOrdineMissione.getDescrizioneUoOrdine());
+			messageForFlows.setUoRich(cmisOrdineMissione.getUoRich());
+			messageForFlows.setDescrizioneUoRich(cmisOrdineMissione.getDescrizioneUoRich());
 			messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
 			messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
 			messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
@@ -892,7 +756,7 @@ public class CMISOrdineMissioneService {
 
 			}
 
-			messageForFlows.setValidazioneSpesaFlag("S");
+			messageForFlows.setValidazioneSpesaFlag("si");
 
 			MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
 			ObjectMapper mapper = new ObjectMapper();
@@ -912,6 +776,8 @@ public class CMISOrdineMissioneService {
 					} else {
 						ResponseEntity<ProcessDefinitions> processDefinitions = flowsService.getProcessDefinitions(Costanti.NOME_PROCESSO_FLOWS_MISSIONI);
 						if (processDefinitions.getStatusCode().is2xxSuccessful()){
+
+							logger.info("Avvio Flusso. Parametri: "+parameters);
 							ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(processDefinitions.getBody().getId(), parameters);
 							if(startWorkflowResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
 								String idFlusso = startWorkflowResponseResponseEntity.getBody().getId();
