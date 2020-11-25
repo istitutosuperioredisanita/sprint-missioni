@@ -3,12 +3,22 @@ package it.cnr.si.missioni.cmis;
 import java.math.BigDecimal;
 
 public class CMISRimborsoMissione extends CMISMissione {
+	private Long idMissioneRimborso;
 	private String wfOrdineMissione;
 	private String idOrdineMissione;
 	private String dataInizioEstero;
 	private String dataFineEstero;
 	private String anticipoRicevuto;
 	private String annoMandato;
+
+	public Long getIdMissioneRimborso() {
+		return idMissioneRimborso;
+	}
+
+	public void setIdMissioneRimborso(Long idMissioneRimborso) {
+		this.idMissioneRimborso = idMissioneRimborso;
+	}
+
 	private String numeroMandato;
 	private String importoMandato;
 	private String differenzeOrdineRimborso;

@@ -1,8 +1,27 @@
 package it.cnr.si.missioni.cmis;
 
 public class CMISOrdineMissione extends CMISMissione {
+	private Long idMissioneOrdine;
+	private Long idMissioneRevoca;
 	private String usernameFirmatarioAggiunto;
 	private String usernameFirmatarioSpesaAggiunto;
+
+	public Long getIdMissioneRevoca() {
+		return idMissioneRevoca;
+	}
+
+	public void setIdMissioneRevoca(Long idMissioneRevoca) {
+		this.idMissioneRevoca = idMissioneRevoca;
+	}
+
+	public Long getIdMissioneOrdine() {
+		return idMissioneOrdine;
+	}
+
+	public void setIdMissioneOrdine(Long idMissioneOrdine) {
+		this.idMissioneOrdine = idMissioneOrdine;
+	}
+
 	private String usernameResponsabileGruppo;
 	private String fondi;
 	private String altriMotiviAutoPropria;

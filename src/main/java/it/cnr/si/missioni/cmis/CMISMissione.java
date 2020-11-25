@@ -8,6 +8,42 @@ public class CMISMissione {
 	private String numero;
 	private String oggetto;
 	private String note;
+	private boolean missioneEstera;
+	private boolean missioneCug;
+	private boolean missionePresidente;
+	private boolean missioneGratuita = false;
+
+	public boolean isMissioneCug() {
+		return missioneCug;
+	}
+
+	public void setMissioneCug(boolean missioneCug) {
+		this.missioneCug = missioneCug;
+	}
+
+	public boolean isMissionePresidente() {
+		return missionePresidente;
+	}
+
+	public void setMissionePresidente(boolean missionePresidente) {
+		this.missionePresidente = missionePresidente;
+	}
+
+	public boolean isMissioneGratuita() {
+		return missioneGratuita;
+	}
+
+	public void setMissioneGratuita(boolean missioneGratuita) {
+		this.missioneGratuita = missioneGratuita;
+	}
+
+	public boolean isMissioneEstera() {
+		return missioneEstera;
+	}
+
+	public void setMissioneEstera(boolean missioneEstera) {
+		this.missioneEstera = missioneEstera;
+	}
 
 	private String noteSegreteria;
 	private String wfDescription;
@@ -23,15 +59,61 @@ public class CMISMissione {
 		this.wfDescriptionComplete = wfDescriptionComplete;
 	}
 
+	private String cdsRich;
+	private String cdsSpesa;
 	private String validazioneSpesa;
 	private String usernameUtenteOrdine;
 	private String usernameRichiedente;
 	private String userNameResponsabileModulo;
 	private String userNamePrimoFirmatario;
 	private String userNameFirmatarioSpesa;
-	private String uoOrdine;
-	private String descrizioneUoOrdine;
+	private String uoRich;
+	private String descrizioneUoRich;
+	private String uoRichSigla;
+	private String uoCompetenzaSigla;
+	private String uoSpesaSigla;
 	private String uoSpesa;
+
+	public String getCdsRich() {
+		return cdsRich;
+	}
+
+	public void setCdsRich(String cdsRich) {
+		this.cdsRich = cdsRich;
+	}
+
+	public String getCdsSpesa() {
+		return cdsSpesa;
+	}
+
+	public String getUoRichSigla() {
+		return uoRichSigla;
+	}
+
+	public void setUoRichSigla(String uoRichSigla) {
+		this.uoRichSigla = uoRichSigla;
+	}
+
+	public String getUoCompetenzaSigla() {
+		return uoCompetenzaSigla;
+	}
+
+	public void setUoCompetenzaSigla(String uoCompetenzaSigla) {
+		this.uoCompetenzaSigla = uoCompetenzaSigla;
+	}
+
+	public String getUoSpesaSigla() {
+		return uoSpesaSigla;
+	}
+
+	public void setUoSpesaSigla(String uoSpesaSigla) {
+		this.uoSpesaSigla = uoSpesaSigla;
+	}
+
+	public void setCdsSpesa(String cdsSpesa) {
+		this.cdsSpesa = cdsSpesa;
+	}
+
 	private String uoCompetenza;
 	private String descrizioneUoSpesa;
 	private String descrizioneUoCompetenza;
@@ -123,17 +205,17 @@ public class CMISMissione {
 	public void setUserNameFirmatarioSpesa(String userNameFirmatarioSpesa) {
 		this.userNameFirmatarioSpesa = userNameFirmatarioSpesa;
 	}
-	public String getUoOrdine() {
-		return uoOrdine;
+	public String getUoRich() {
+		return uoRich;
 	}
-	public void setUoOrdine(String uoOrdine) {
-		this.uoOrdine = uoOrdine;
+	public void setUoRich(String uoRich) {
+		this.uoRich = uoRich;
 	}
-	public String getDescrizioneUoOrdine() {
-		return descrizioneUoOrdine;
+	public String getDescrizioneUoRich() {
+		return descrizioneUoRich;
 	}
-	public void setDescrizioneUoOrdine(String descrizioneUoOrdine) {
-		this.descrizioneUoOrdine = descrizioneUoOrdine;
+	public void setDescrizioneUoRich(String descrizioneUoRich) {
+		this.descrizioneUoRich = descrizioneUoRich;
 	}
 	public String getUoSpesa() {
 		return uoSpesa;
@@ -309,4 +391,5 @@ public class CMISMissione {
 	public void setNomeFile(String nomeFile) {
 		this.nomeFile = nomeFile;
 	}
+
 }

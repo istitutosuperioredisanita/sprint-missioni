@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -13,7 +12,6 @@ import java.util.*;
 import javax.persistence.OptimisticLockException;
 
 import it.cnr.si.missioni.domain.custom.FlowResult;
-import it.cnr.si.missioni.web.filter.MissioneFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,8 +240,8 @@ public class RimborsoMissioneService {
 			RimborsoMissione rimborsoMissioneDaAggiornare) throws ComponentException{
 		aggiornaValidazione(principal, rimborsoMissioneDaAggiornare);
 		rimborsoMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
-		rimborsoMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getEsito()));
-		rimborsoMissioneDaAggiornare.setStateFlows(result.getEsito());
+		rimborsoMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
+		rimborsoMissioneDaAggiornare.setStateFlows(result.getStato());
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		rimborsoMissioneDaAggiornare.setValidato("N");
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
@@ -1714,7 +1712,7 @@ public class RimborsoMissioneService {
 			if (rimborsoMissioneDaAggiornare != null){
 				if (rimborsoMissioneDaAggiornare.isStatoInviatoAlFlusso() && rimborsoMissioneDaAggiornare.isMissioneConfermata() &&
 						!rimborsoMissioneDaAggiornare.isMissioneDaValidare())	{
-					switch (flowResult.getEsito() ) {
+					switch (flowResult.getStato() ) {
 						case FlowResult.ESITO_FLUSSO_FIRMATO:
 							aggiornaRimborsoMissioneFirmato(principal, rimborsoMissioneDaAggiornare);
 							Timer timer = new Timer();
@@ -1751,7 +1749,7 @@ public class RimborsoMissioneService {
 	}
 
 	private String getTextErrorRimborsoMissione(RimborsoMissione rimborsoMissione, FlowResult flow, String error){
-		return " con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getIdFlusso()+" con esito "+flow.getEsito()+" è andata in errore per il seguente motivo: " + error;
+		return " con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getProcessInstanceId()+" con esito "+flow.getStato()+" è andata in errore per il seguente motivo: " + error;
 	}
 
 }

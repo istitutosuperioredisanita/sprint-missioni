@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FlowResult implements Serializable {
-    private String idFlusso;
-    private String tipoFlusso;
+    private String processInstanceId;
+    private String tipologiaMissione;
     private String idMissione;
-    private String esito;
+    private String stato;
     private String commento;
 
-    public final static String TIPO_FLUSSO_ORDINE = "missioni-ordine";
-    public final static String TIPO_FLUSSO_RIMBORSO = "missioni-rimborso";
-    public final static String TIPO_FLUSSO_REVOCA = "missioni-revoca";
+    public final static String TIPO_FLUSSO_ORDINE = "ordine";
+    public final static String TIPO_FLUSSO_RIMBORSO = "rimborso";
+    public final static String TIPO_FLUSSO_REVOCA = "revoca";
 
     public final static String ESITO_FLUSSO_FIRMATO = "FIRMATO";
     public final static String ESITO_FLUSSO_FIRMA_UO = "FIRMA_UO";
@@ -32,31 +32,31 @@ public class FlowResult implements Serializable {
         this.commento = commento;
     }
 
-    public String getIdFlusso() {
-        return idFlusso;
+    public String getProcessInstanceId() {
+        return processInstanceId;
     }
 
-    public void setIdFlusso(String idFlusso) {
-        this.idFlusso = idFlusso;
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
     @Override
     public String toString() {
         return "FlowResult{" +
-                "idFlusso='" + idFlusso + '\'' +
-                ", tipoFlusso='" + tipoFlusso + '\'' +
+                "idFlusso='" + processInstanceId + '\'' +
+                ", tipoFlusso='" + tipologiaMissione + '\'' +
                 ", idMissione='" + idMissione + '\'' +
-                ", esito='" + esito + '\'' +
+                ", esito='" + stato + '\'' +
                 ", commento='" + commento + '\'' +
                 '}';
     }
 
-    public String getTipoFlusso() {
-        return tipoFlusso;
+    public String getTipologiaMissione() {
+        return tipologiaMissione;
     }
 
-    public void setTipoFlusso(String tipoFlusso) {
-        this.tipoFlusso = tipoFlusso;
+    public void setTipologiaMissione(String tipologiaMissione) {
+        this.tipologiaMissione = tipologiaMissione;
     }
 
     public String getIdMissione() {
@@ -67,12 +67,12 @@ public class FlowResult implements Serializable {
         this.idMissione = idMissione;
     }
 
-    public String getEsito() {
-        return esito;
+    public String getStato() {
+        return stato;
     }
 
-    public void setEsito(String esito) {
-        this.esito = esito;
+    public void setStato(String stato) {
+        this.stato = stato;
     }
 
     public final static Map<String, String> STATO_FLUSSO_SCRIVANIA_MISSIONI;

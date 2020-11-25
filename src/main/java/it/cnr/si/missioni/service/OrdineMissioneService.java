@@ -314,7 +314,7 @@ public class OrdineMissioneService {
 			OrdineMissione ordineMissioneDaAggiornare) throws ComponentException {
 		aggiornaValidazione(principal, ordineMissioneDaAggiornare);
 		ordineMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
-		ordineMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getEsito()));
+		ordineMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
 		ordineMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		ordineMissioneDaAggiornare.setDataInvioAmministrativo(null);
 		ordineMissioneDaAggiornare.setDataInvioFirma(null);
@@ -349,7 +349,7 @@ public class OrdineMissioneService {
 	}
 
 	private String getTextErrorOrdineMissione(OrdineMissione ordineMissione, FlowResult flow, String error){
-		return " con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getIdFlusso()+" con esito "+flow.getEsito()+" è andata in errore per il seguente motivo: " + error;
+		return " con id "+ordineMissione.getId()+ " "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getProcessInstanceId()+" con esito "+flow.getStato()+" è andata in errore per il seguente motivo: " + error;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -358,7 +358,7 @@ public class OrdineMissioneService {
 			if (ordineMissioneDaAggiornare != null){
 				if (ordineMissioneDaAggiornare.isStatoInviatoAlFlusso() && ordineMissioneDaAggiornare.isMissioneConfermata() &&
 						!ordineMissioneDaAggiornare.isMissioneDaValidare())	{
-					switch (flowResult.getEsito() ) {
+					switch (flowResult.getStato() ) {
 						case FlowResult.ESITO_FLUSSO_FIRMATO:
 							aggiornaOrdineMissioneFirmato(principal, ordineMissioneDaAggiornare);
 							break;

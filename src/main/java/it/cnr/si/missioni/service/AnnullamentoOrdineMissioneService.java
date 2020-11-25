@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import it.cnr.si.missioni.domain.custom.FlowResult;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,7 +160,7 @@ public class AnnullamentoOrdineMissioneService {
 			AnnullamentoOrdineMissione annullamentoDaAggiornare) throws ComponentException{
 		aggiornaValidazione(principal, annullamentoDaAggiornare);
 		annullamentoDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
-		annullamentoDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getEsito()));
+		annullamentoDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
 		annullamentoDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
 	}
@@ -172,7 +171,7 @@ public class AnnullamentoOrdineMissioneService {
 			if (annullamentoDaAggiornare != null){
 				if (annullamentoDaAggiornare.isStatoInviatoAlFlusso() && annullamentoDaAggiornare.isMissioneConfermata() &&
 						!annullamentoDaAggiornare.isMissioneDaValidare())	{
-					switch (flowResult.getEsito() ) {
+					switch (flowResult.getStato() ) {
 						case FlowResult.ESITO_FLUSSO_FIRMATO:
 							aggiornaAnnullamentoOrdineMissioneFirmato(principal, annullamentoDaAggiornare);
 							break;
@@ -708,7 +707,7 @@ public class AnnullamentoOrdineMissioneService {
 
 	private String getTextErrorAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flow, String error){
 		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamentoOrdineMissione.getOrdineMissione().getId());
-		return " con id "+annullamentoOrdineMissione.getId()+ " relativo all'ordine di missione "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getIdFlusso()+" con esito "+flow.getEsito()+" è andato in errore per il seguente motivo: " + error;
+		return " con id "+annullamentoOrdineMissione.getId()+ " relativo all'ordine di missione "+ ordineMissione.getAnno()+"-"+ordineMissione.getNumero()+ " di "+ ordineMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getProcessInstanceId()+" con esito "+flow.getStato()+" è andato in errore per il seguente motivo: " + error;
 	}
 }
 

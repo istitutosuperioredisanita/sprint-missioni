@@ -30,7 +30,6 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.domain.custom.DatiFlusso;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -258,6 +257,7 @@ public class CMISRimborsoMissioneService {
 	
 	public CMISRimborsoMissione create(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException{
 		CMISRimborsoMissione cmisRimborsoMissione = new CMISRimborsoMissione();
+		cmisRimborsoMissione.setIdMissioneRimborso(new Long(rimborsoMissione.getId().toString()));
 		caricaDatiDerivati(principal, rimborsoMissione);
 
 		if (rimborsoMissione != null && rimborsoMissione.getOrdineMissione() != null){
@@ -305,13 +305,21 @@ public class CMISRimborsoMissioneService {
 		dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
 		dataScadenzaFlusso.add(Calendar.DAY_OF_MONTH, 7);
 
+		cmisRimborsoMissione.setUoCompetenzaSigla(rimborsoMissione.getUoCompetenza());
+		cmisRimborsoMissione.setUoSpesaSigla(rimborsoMissione.getUoSpesa());
+		cmisRimborsoMissione.setUoRichSigla(rimborsoMissione.getUoRich());
+		cmisRimborsoMissione.setMissionePresidente(rimborsoMissione.isMissionePresidente());
+		cmisRimborsoMissione.setMissioneCug(rimborsoMissione.isMissioneCug());
+		cmisRimborsoMissione.setMissioneEstera(rimborsoMissione.isMissioneEstera());
+		cmisRimborsoMissione.setCdsRich(rimborsoMissione.getCdsRich());
+		cmisRimborsoMissione.setCdsSpesa(rimborsoMissione.getCdsSpesa());
 		cmisRimborsoMissione.setAnno(rimborsoMissione.getAnno().toString());
 		cmisRimborsoMissione.setNumero(rimborsoMissione.getNumero().toString());
 		cmisRimborsoMissione.setCapitolo(voce == null ? "" : rimborsoMissione.getVoce());
 		cmisRimborsoMissione.setDescrizioneCapitolo(voce == null ? "" : voce.getDs_elemento_voce());
 		cmisRimborsoMissione.setDescrizioneGae(gae == null ? "" : Utility.nvl(gae.getDs_linea_attivita(),""));
 		cmisRimborsoMissione.setDescrizioneImpegno(descrImpegno);
-		cmisRimborsoMissione.setDescrizioneUoOrdine(datiFlusso.getUoRich() == null ? "" : datiFlusso.getUoRich().getDs_unita_organizzativa());
+		cmisRimborsoMissione.setDescrizioneUoRich(datiFlusso.getUoRich() == null ? "" : datiFlusso.getUoRich().getDs_unita_organizzativa());
 		cmisRimborsoMissione.setDescrizioneUoSpesa(datiFlusso.getUoSpesa() == null ? "" : datiFlusso.getUoSpesa().getDs_unita_organizzativa());
 		cmisRimborsoMissione.setDescrizioneUoCompetenza(uoCompetenza == null ? "" : uoCompetenza.getDs_unita_organizzativa());
 		cmisRimborsoMissione.setDisponibilita(Utility.nvl(dispImpegno));
@@ -326,7 +334,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setTaxiFlag(rimborsoMissione.getUtilizzoTaxi().equals("S") ? "si" : "no");
 		cmisRimborsoMissione.setAutoServizioFlag(rimborsoMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
 		cmisRimborsoMissione.setPersonaSeguitoFlag(rimborsoMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");
-		cmisRimborsoMissione.setUoOrdine(datiFlusso.getUoRichPerFlusso());
+		cmisRimborsoMissione.setUoRich(datiFlusso.getUoRichPerFlusso());
 		cmisRimborsoMissione.setUoSpesa(datiFlusso.getUoSpesaPerFlusso());
 		cmisRimborsoMissione.setUoCompetenza(datiFlusso.getUoCompetenzaPerFlusso() == null ? "" : datiFlusso.getUoCompetenzaPerFlusso());
 		cmisRimborsoMissione.setUserNameFirmatarioSpesa(datiFlusso.getUsernameFirmatarioSpesa());
@@ -384,9 +392,6 @@ public class CMISRimborsoMissioneService {
    		return false;
 	}
 	private String impostaValidazioneSpesa(String userNameFirmatario, String userNameFirmatarioSpesa){
-		if (userNameFirmatario != null && userNameFirmatarioSpesa != null && userNameFirmatario.equals(userNameFirmatarioSpesa)){
-			return "no";
-		}
 		return "si";
 	}
 	
@@ -622,7 +627,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_CAPITOLO, cmisRimborsoMissione.getDescrizioneCapitolo());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_GAE, cmisRimborsoMissione.getDescrizioneGae());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_IMPEGNO, cmisRimborsoMissione.getDescrizioneImpegno());
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_ORDINE, cmisRimborsoMissione.getDescrizioneUoOrdine());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_ORDINE, cmisRimborsoMissione.getDescrizioneUoRich());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_UO_SPESA, cmisRimborsoMissione.getDescrizioneUoSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DISPONIBILITA_IMPEGNO, cmisRimborsoMissione.getDisponibilita());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_GAE, cmisRimborsoMissione.getGae());
@@ -647,7 +652,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_TOTALE_RIMBORSO_MISSIONE, cmisRimborsoMissione.getTotaleRimborsoMissione());
 		metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_DIFFERENZE_ORDINE_RIMBORSO, cmisRimborsoMissione.getDifferenzeOrdineRimborso());
 
-		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_ORDINE, cmisRimborsoMissione.getUoOrdine());
+		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_ORDINE, cmisRimborsoMissione.getUoRich());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_UO_SPESA, cmisRimborsoMissione.getUoSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA, cmisRimborsoMissione.getUserNameFirmatarioSpesa());
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO, cmisRimborsoMissione.getUserNamePrimoFirmatario());
@@ -668,6 +673,7 @@ public class CMISRimborsoMissioneService {
 		MessageForFlowRimborso messageForFlow = new MessageForFlowRimborso();
 		try {
 
+			messageForFlow.setIdMissioneRimborso(cmisRimborsoMissione.getIdMissioneRimborso().toString());
 			messageForFlow.setTitolo(cmisRimborsoMissione.getWfDescription());
 			messageForFlow.setDescrizione(cmisRimborsoMissione.getWfDescriptionComplete());
 
@@ -711,8 +717,8 @@ public class CMISRimborsoMissioneService {
 			messageForFlow.setUserNameAmministrativo1("");
 			messageForFlow.setUserNameAmministrativo2("");
 			messageForFlow.setUserNameAmministrativo3("");
-			messageForFlow.setUoOrdine( cmisRimborsoMissione.getUoOrdine());
-			messageForFlow.setDescrizioneUoOrdine(cmisRimborsoMissione.getDescrizioneUoOrdine());
+			messageForFlow.setUoRich( cmisRimborsoMissione.getUoRich());
+			messageForFlow.setDescrizioneUoRich(cmisRimborsoMissione.getDescrizioneUoRich());
 			messageForFlow.setUoSpesa(cmisRimborsoMissione.getUoSpesa());
 			messageForFlow.setDescrizioneUoSpesa( cmisRimborsoMissione.getDescrizioneUoSpesa());
 			messageForFlow.setUoCompetenza( cmisRimborsoMissione.getUoCompetenza());
