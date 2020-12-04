@@ -190,4 +190,36 @@ public class MissioneFilter {
 	public void setaDataMissione(String aDataMissione) {
 		this.aDataMissione = aDataMissione;
 	}
+
+	@Override
+	public String toString() {
+		return "MissioneFilter{" +
+				"listaStatiMissione=" + listaStatiMissione +
+				", listaStatiFlussoMissione=" + listaStatiFlussoMissione +
+				", user='" + user + '\'' +
+				", stato='" + stato + '\'' +
+				", statoFlusso='" + statoFlusso + '\'' +
+				", validato='" + validato + '\'' +
+				", giaRimborsato='" + giaRimborsato + '\'' +
+				", daAnnullare='" + daAnnullare + '\'' +
+				", anno=" + anno +
+				", daId=" + daId +
+				", aId=" + aId +
+				", soloMissioniNonGratuite=" + soloMissioniNonGratuite +
+				", includiMissioniAnnullate='" + includiMissioniAnnullate + '\'' +
+				", recuperoAutoPropria='" + recuperoAutoPropria + '\'' +
+				", respGruppo='" + respGruppo + '\'' +
+				", daNumero=" + daNumero +
+				", aNumero=" + aNumero +
+				", cup='" + cup + '\'' +
+				", daData='" + daData + '\'' +
+				", aData='" + aData + '\'' +
+				", daDataMissione='" + daDataMissione + '\'' +
+				", aDataMissione='" + aDataMissione + '\'' +
+				", cdsRich='" + cdsRich + '\'' +
+				", uoRich='" + uoRich + '\'' +
+				", toFinal='" + toFinal + '\'' +
+				", daCron='" + daCron + '\'' +
+				'}';
+	}
 }

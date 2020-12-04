@@ -496,4 +496,30 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 	public boolean isConsentitoRimborso(){
 		return Utility.nvl(getConsentiRimborso(),"N").equals("S");
 	}
+
+	@Override
+	public String toString() {
+		return "AnnullamentoOrdineMissione{" +
+				"id=" + id +
+				", uidInsert='" + uidInsert + '\'' +
+				", uid='" + uid + '\'' +
+				", anno=" + anno +
+				", numero=" + numero +
+				", dataInserimento=" + dataInserimento +
+				", comuneResidenzaRich='" + comuneResidenzaRich + '\'' +
+				", matricola='" + matricola + '\'' +
+				", indirizzoResidenzaRich='" + indirizzoResidenzaRich + '\'' +
+				", domicilioFiscaleRich='" + domicilioFiscaleRich + '\'' +
+				", datoreLavoroRich='" + datoreLavoroRich + '\'' +
+				", contrattoRich='" + contrattoRich + '\'' +
+				", qualificaRich='" + qualificaRich + '\'' +
+				", livelloRich='" + livelloRich + '\'' +
+				", motivoAnnullamento='" + motivoAnnullamento + '\'' +
+				", validato='" + validato + '\'' +
+				", stato='" + stato + '\'' +
+				", idFlusso='" + idFlusso + '\'' +
+				", statoFlusso='" + statoFlusso + '\'' +
+				", consentiRimborso='" + consentiRimborso + '\'' +
+				'}';
+	}
 }

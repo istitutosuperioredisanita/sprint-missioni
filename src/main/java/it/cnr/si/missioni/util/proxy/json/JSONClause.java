@@ -8,7 +8,17 @@ public class JSONClause  implements Serializable{
 	private String operator;
 
 	private Object fieldValue;
-	
+
+	@Override
+	public String toString() {
+		return "JSONClause{" +
+				"condition='" + condition + '\'' +
+				", fieldName='" + fieldName + '\'' +
+				", operator='" + operator + '\'' +
+				", fieldValue=" + fieldValue +
+				'}';
+	}
+
 	public JSONClause(){
 		super();
 	}
