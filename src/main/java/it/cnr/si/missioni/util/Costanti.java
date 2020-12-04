@@ -224,6 +224,8 @@ public class Costanti {
         aMap.put(STATO_INSERITO, "Non Inviato");
         aMap.put(STATO_ANNULLATO, "Annullato");
         aMap.put(STATO_APPROVATO_FLUSSO, "Approvato");
+        aMap.put(STATO_RESPINTO_UO_SPESA_FLUSSO, "Respinto da Uo Spesa");
+        aMap.put(STATO_RESPINTO_UO_FLUSSO, "Respinto da Uo");
         STATO_FLUSSO = Collections.unmodifiableMap(aMap);
     }
 

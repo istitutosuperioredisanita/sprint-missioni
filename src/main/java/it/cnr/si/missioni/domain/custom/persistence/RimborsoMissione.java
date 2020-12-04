@@ -1499,4 +1499,88 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "RimborsoMissione{" +
+				"dataInizioEstero=" + dataInizioEstero +
+				", dataFineEstero=" + dataFineEstero +
+				", cdTerzoSigla=" + cdTerzoSigla +
+				", modpag='" + modpag + '\'' +
+				", tipoPagamento='" + tipoPagamento + '\'' +
+				", iban='" + iban + '\'' +
+				", anticipoRicevuto='" + anticipoRicevuto + '\'' +
+				", anticipoAnnoMandato=" + anticipoAnnoMandato +
+				", anticipoNumeroMandato=" + anticipoNumeroMandato +
+				", anticipoImporto=" + anticipoImporto +
+				", altreSpeseAntDescrizione='" + altreSpeseAntDescrizione + '\'' +
+				", altreSpeseAntImporto=" + altreSpeseAntImporto +
+				", speseTerziRicevute='" + speseTerziRicevute + '\'' +
+				", speseTerziImporto=" + speseTerziImporto +
+				", pgBanca=" + pgBanca +
+				", inquadramento=" + inquadramento +
+				", id=" + id +
+				", uidInsert='" + uidInsert + '\'' +
+				", uid='" + uid + '\'' +
+				", autoPropria='" + autoPropria + '\'' +
+				", validaAmm='" + validaAmm + '\'' +
+				", cug='" + cug + '\'' +
+				", presidente='" + presidente + '\'' +
+				", anno=" + anno +
+				", numero=" + numero +
+				", dataInserimento=" + dataInserimento +
+				", comuneResidenzaRich='" + comuneResidenzaRich + '\'' +
+				", matricola='" + matricola + '\'' +
+				", indirizzoResidenzaRich='" + indirizzoResidenzaRich + '\'' +
+				", domicilioFiscaleRich='" + domicilioFiscaleRich + '\'' +
+				", datoreLavoroRich='" + datoreLavoroRich + '\'' +
+				", contrattoRich='" + contrattoRich + '\'' +
+				", qualificaRich='" + qualificaRich + '\'' +
+				", livelloRich='" + livelloRich + '\'' +
+				", oggetto='" + oggetto + '\'' +
+				", destinazione='" + destinazione + '\'' +
+				", nazione=" + nazione +
+				", tipoMissione='" + tipoMissione + '\'' +
+				", trattamento='" + trattamento + '\'' +
+				", dataInizioMissione=" + dataInizioMissione +
+				", dataFineMissione=" + dataFineMissione +
+				", validato='" + validato + '\'' +
+				", utilizzoTaxi='" + utilizzoTaxi + '\'' +
+				", utilizzoAutoNoleggio='" + utilizzoAutoNoleggio + '\'' +
+				", note='" + note + '\'' +
+				", noteSegreteria='" + noteSegreteria + '\'' +
+				", voce='" + voce + '\'' +
+				", gae='" + gae + '\'' +
+				", cdrRich='" + cdrRich + '\'' +
+				", uoRich='" + uoRich + '\'' +
+				", cdrSpesa='" + cdrSpesa + '\'' +
+				", uoSpesa='" + uoSpesa + '\'' +
+				", cdsCompetenza='" + cdsCompetenza + '\'' +
+				", uoCompetenza='" + uoCompetenza + '\'' +
+				", cdsRich='" + cdsRich + '\'' +
+				", cdsSpesa='" + cdsSpesa + '\'' +
+				", stato='" + stato + '\'' +
+				", pgProgetto=" + pgProgetto +
+				", cdCdsObbligazione='" + cdCdsObbligazione + '\'' +
+				", esercizioObbligazione=" + esercizioObbligazione +
+				", pgObbligazione=" + pgObbligazione +
+				", esercizioOriginaleObbligazione=" + esercizioOriginaleObbligazione +
+				", idFlusso='" + idFlusso + '\'' +
+				", statoFlusso='" + statoFlusso + '\'' +
+				", statoInvioSigla='" + statoInvioSigla + '\'' +
+				", noteUtilizzoTaxiNoleggio='" + noteUtilizzoTaxiNoleggio + '\'' +
+				", pgMissioneSigla=" + pgMissioneSigla +
+				", esercizioSigla=" + esercizioSigla +
+				", cdCdsSigla='" + cdCdsSigla + '\'' +
+				", cdUoSigla='" + cdUoSigla + '\'' +
+				", cdTipoRapporto='" + cdTipoRapporto + '\'' +
+				", utilizzoAutoServizio='" + utilizzoAutoServizio + '\'' +
+				", personaleAlSeguito='" + personaleAlSeguito + '\'' +
+				", cup='" + cup + '\'' +
+				", noteRespingi='" + noteRespingi + '\'' +
+				", rimborso0='" + rimborso0 + '\'' +
+				", annoIniziale=" + annoIniziale +
+				", numeroIniziale=" + numeroIniziale +
+				", uoContrAmm='" + uoContrAmm + '\'' +
+				'}';
+	}
 }

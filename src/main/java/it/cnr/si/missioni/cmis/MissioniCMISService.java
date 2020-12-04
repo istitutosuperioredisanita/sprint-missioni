@@ -158,9 +158,9 @@ public class MissioniCMISService extends StoreService {
 		return (StoragePath)appContext.getBean("storagePath");
 	}
 	
-	public String createFolderIfNotPresent(StoragePath cmisPath, Map<String, Object> metadataProperties, List<String> aspectsToAdd, String folderName) {
-		metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), aspectsToAdd);
-		return createFolderIfNotPresent(cmisPath.getPath(), folderName, metadataProperties);
+	public String createFolderIfNotPresent(String path, String folderName, Map<String, Object> metadataProperties) {
+		StorageObject parentObject = getStorageObjectByPath(path, true, true);
+		return super.createFolderIfNotPresent(path, folderName, metadataProperties);
 	}
 	
 	

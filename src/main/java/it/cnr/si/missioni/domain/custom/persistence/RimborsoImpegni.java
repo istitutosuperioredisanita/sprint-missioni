@@ -137,4 +137,17 @@ public class RimborsoImpegni extends OggettoBulkXmlTransient implements Serializ
 		this.dsVoce = dsVoce;
 	}
 
+	@Override
+	public String toString() {
+		return "RimborsoImpegni{" +
+				"id=" + id +
+				", cdCdsObbligazione='" + cdCdsObbligazione + '\'' +
+				", esercizioObbligazione=" + esercizioObbligazione +
+				", pgObbligazione=" + pgObbligazione +
+				", esercizioOriginaleObbligazione=" + esercizioOriginaleObbligazione +
+				", stato='" + stato + '\'' +
+				", voce='" + voce + '\'' +
+				", dsVoce='" + dsVoce + '\'' +
+				'}';
+	}
 }

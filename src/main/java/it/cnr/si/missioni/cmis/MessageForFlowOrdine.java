@@ -29,7 +29,7 @@ public class MessageForFlowOrdine extends MessageForFlow implements Serializable
 				", validazioneSpesaFlag='" + validazioneSpesaFlag + '\'' +
 				", missioneConAnticipoFlag='" + missioneConAnticipoFlag + '\'' +
 				", validazioneModuloFlag='" + validazioneModuloFlag + '\'' +
-				", userNameUtenteOrdineMissione='" + userNameUtenteOrdineMissione + '\'' +
+				", userNameUtenteOrdineMissione='" + userNameUtenteMissione + '\'' +
 				", userNameRichiedente='" + userNameRichiedente + '\'' +
 				", userNameResponsabileModulo='" + userNameResponsabileModulo + '\'' +
 				", userNamePrimoFirmatario='" + userNamePrimoFirmatario + '\'' +

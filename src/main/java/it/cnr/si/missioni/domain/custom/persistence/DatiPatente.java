@@ -122,4 +122,16 @@ public class DatiPatente extends OggettoBulkXmlTransient implements Serializable
 	public void setEnte(String ente) {
 		this.ente = ente;
 	}
+
+	@Override
+	public String toString() {
+		return "DatiPatente{" +
+				"id=" + id +
+				", numero='" + numero + '\'' +
+				", dataRilascio=" + dataRilascio +
+				", dataScadenza=" + dataScadenza +
+				", ente='" + ente + '\'' +
+				", uid='" + uid + '\'' +
+				'}';
+	}
 }

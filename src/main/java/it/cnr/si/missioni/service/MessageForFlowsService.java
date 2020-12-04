@@ -1,7 +1,11 @@
 package it.cnr.si.missioni.service;
 
+import it.cnr.si.flows.model.ProcessDefinitions;
+import it.cnr.si.flows.model.StartWorkflowResponse;
+import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISMissione;
+import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.MessageForFlow;
 import it.cnr.si.missioni.cmis.MessageForFlowRimborso;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
@@ -11,11 +15,16 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.application.FlowsService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -25,6 +34,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class MessageForFlowsService {
+    private static final Log logger = LogFactory.getLog(MessageForFlowsService.class);
+
     @Autowired
     UoService uoService;
 
@@ -33,6 +44,9 @@ public class MessageForFlowsService {
 
     @Autowired
     DatiIstitutoService datiIstitutoService;
+
+    @Autowired
+    private FlowsService flowsService;
 
 
     public MessageForFlow impostaGruppiFirmatari(CMISMissione cmisMissione, MessageForFlow messageForFlows){
@@ -177,4 +191,37 @@ public class MessageForFlowsService {
         return ruolo+"@"+idSede;
     }
 
+    public MultiValueMap<String, Object> aggiungiParametriRiavviaFlusso(MultiValueMap<String, Object> parameters , String idFlusso){
+        ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
+        String taskId = taskIdResponse.getBody().getId();
+        parameters.add("taskId", taskId);
+        parameters.add("commento", "Riproponi");
+        parameters.add("sceltaUtente", "Aggiorna");
+        return parameters;
+    }
+
+    public String avviaFlusso(MultiValueMap<String, Object> parameters){
+        String tipoFlusso = (String) ((List<Object>)parameters.get("tipologiaMissione")).get(0);
+        String idMissione = (String) ((List<Object>)parameters.get("idMissione")).get(0);
+
+        ResponseEntity<ProcessDefinitions> processDefinitions = flowsService.getProcessDefinitions(Costanti.NOME_PROCESSO_FLOWS_MISSIONI);
+        if (processDefinitions.getStatusCode().is2xxSuccessful()){
+
+            logger.info("Avvio Flusso. Parametri: "+parameters);
+            ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(processDefinitions.getBody().getId(), parameters);
+            if(startWorkflowResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
+                logger.info(tipoFlusso+" missione "+idMissione+" inviato alla firma");
+                    return startWorkflowResponseResponseEntity.getBody().getId();
+            } else {
+                String erroreFlows = "Errore Flows! "+ startWorkflowResponseResponseEntity.getStatusCode().value()+" per "+ tipoFlusso+" missione "+ idMissione+" Status Code ritornato: "+startWorkflowResponseResponseEntity.getStatusCode().toString();
+                logger.info(erroreFlows);
+                throw new AwesomeException(CodiciErrore.ERRGEN, erroreFlows);
+            }
+        } else {
+            String erroreFlows = "Errore Recupero Process Definitions! "+ processDefinitions.getStatusCode().value()+" per "+tipoFlusso+" missione "+ idMissione+" Status Code ritornato: "+processDefinitions.getStatusCode().toString();
+            logger.info(erroreFlows);
+            throw new AwesomeException(CodiciErrore.ERRGEN, erroreFlows);
+        }
+
+    }
 }

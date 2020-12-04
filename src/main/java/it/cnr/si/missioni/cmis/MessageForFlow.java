@@ -9,9 +9,19 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	public final static String TIPOLOGIA_MISSIONE_REVOCA = "revoca";
 	public final static String TIPOLOGIA_MISSIONE_RIMBORSO = "rimborso";
 
+	String idMissione;
 	String oggetto;
 	String annoMissione;
 	String numeroMissione;
+
+	public String getIdMissione() {
+		return idMissione;
+	}
+
+	public void setIdMissione(String idMissione) {
+		this.idMissione = idMissione;
+	}
+
 	String noteAutorizzazioniAggiuntive;
 	String missioneGratuita;
 
@@ -47,7 +57,7 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String validazioneSpesaFlag;
 	String missioneConAnticipoFlag;
 	String validazioneModuloFlag;
-	String userNameUtenteOrdineMissione;
+	String userNameUtenteMissione;
 	String userNameRichiedente;
 	String userNameResponsabileModulo;
 	String userNamePrimoFirmatario;
@@ -230,14 +240,6 @@ public class MessageForFlow extends JSONBody implements Serializable{
 		this.validazioneModuloFlag = validazioneModuloFlag;
 	}
 
-	public String getUserNameUtenteOrdineMissione() {
-		return userNameUtenteOrdineMissione;
-	}
-
-	public void setUserNameUtenteOrdineMissione(String userNameUtenteOrdineMissione) {
-		this.userNameUtenteOrdineMissione = userNameUtenteOrdineMissione;
-	}
-
 	public String getUserNameRichiedente() {
 		return userNameRichiedente;
 	}
@@ -256,6 +258,14 @@ public class MessageForFlow extends JSONBody implements Serializable{
 
 	public String getUserNamePrimoFirmatario() {
 		return userNamePrimoFirmatario;
+	}
+
+	public String getUserNameUtenteMissione() {
+		return userNameUtenteMissione;
+	}
+
+	public void setUserNameUtenteMissione(String userNameUtenteMissione) {
+		this.userNameUtenteMissione = userNameUtenteMissione;
 	}
 
 	public void setUserNamePrimoFirmatario(String userNamePrimoFirmatario) {

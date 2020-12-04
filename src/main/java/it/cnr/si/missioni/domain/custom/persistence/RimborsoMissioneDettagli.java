@@ -312,6 +312,33 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
 		this.flSpesaAnticipata = flSpesaAnticipata;
 	}
 
+	@Override
+	public String toString() {
+		return "RimborsoMissioneDettagli{" +
+				"id=" + id +
+				", uid='" + uid + '\'' +
+				", note='" + note + '\'' +
+				", dsNoGiustificativo='" + dsNoGiustificativo + '\'' +
+				", localitaSpostamento='" + localitaSpostamento + '\'' +
+				", riga=" + riga +
+				", dataSpesa=" + dataSpesa +
+				", stato='" + stato + '\'' +
+				", tiSpesaDiaria='" + tiSpesaDiaria + '\'' +
+				", cdTiSpesa='" + cdTiSpesa + '\'' +
+				", dsTiSpesa='" + dsTiSpesa + '\'' +
+				", dsSpesa='" + dsSpesa + '\'' +
+				", cdTiPasto='" + cdTiPasto + '\'' +
+				", kmPercorsi=" + kmPercorsi +
+				", flSpesaAnticipata='" + flSpesaAnticipata + '\'' +
+				", cdDivisa='" + cdDivisa + '\'' +
+				", importoDivisa=" + importoDivisa +
+				", importoEuro=" + importoEuro +
+				", cambio=" + cambio +
+				", giustificativo='" + giustificativo + '\'' +
+				", tiCdTiSpesa='" + tiCdTiSpesa + '\'' +
+				'}';
+	}
+
 	public String getCdDivisa() {
 		return cdDivisa;
 	}

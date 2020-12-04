@@ -136,9 +136,6 @@ public class CMISOrdineMissioneService {
 	private AccountService accountService;
 
 	@Autowired
-	private FlowsService flowsService;
-
-	@Autowired
 	private AceService aceService;
 
 	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione) throws ComponentException{
@@ -259,7 +256,7 @@ public class CMISOrdineMissioneService {
 			cmisOrdineMissione.setMissioneGratuita(Utility.nvl(ordineMissione.getMissioneGratuita(),"N").equals("S") ? "si" : "no");
 
 			cmisOrdineMissione.setWfDescription("Ordine di Missione n. "+ordineMissione.getNumero()+" di "+account.getCognome() + " "+account.getNome());
-			cmisOrdineMissione.setWfDescriptionComplete("Missione a "+ordineMissione.getDestinazione()+" del "+ DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+" per "+ordineMissione.getOggetto());
+			cmisOrdineMissione.setWfDescriptionComplete(ordineMissione.getDestinazione()+" "+ DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione())+" per "+ordineMissione.getOggetto());
 			cmisOrdineMissione.setWfDueDate(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 			cmisOrdineMissione.setDestinazione(ordineMissione.getDestinazione());
 			cmisOrdineMissione.setMissioneEsteraFlag(ordineMissione.getTipoMissione().equals("E") ? "si" : "no");
@@ -538,6 +535,7 @@ public class CMISOrdineMissioneService {
 				aggiungiDocumento(so, nodeRefs);
 			}
 
+			messageForFlows.setIdMissione(cmisOrdineMissione.getIdMissioneOrdine().toString());
 			messageForFlows.setIdMissioneRevoca(cmisOrdineMissione.getIdMissioneRevoca().toString());
 			messageForFlows.setTitolo("Annullamento "+cmisOrdineMissione.getWfDescription());
 			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
@@ -559,7 +557,7 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
 			messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
 			messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no": "si");
-			messageForFlows.setUserNameUtenteOrdineMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
+			messageForFlows.setUserNameUtenteMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
 			messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
 			messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
 			messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
@@ -690,6 +688,7 @@ public class CMISOrdineMissioneService {
 		MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
 		try {
 
+			messageForFlows.setIdMissione(cmisOrdineMissione.getIdMissioneOrdine().toString());
 			messageForFlows.setIdMissioneOrdine(cmisOrdineMissione.getIdMissioneOrdine().toString());
 			messageForFlows.setTitolo(cmisOrdineMissione.getWfDescription());
 			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
@@ -711,7 +710,7 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
 			messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
 			messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no": "si");
-			messageForFlows.setUserNameUtenteOrdineMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
+			messageForFlows.setUserNameUtenteMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
 			messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
 			messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
 			messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
@@ -752,9 +751,6 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
 			messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
 			messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
-			if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
-
-			}
 
 			messageForFlows.setValidazioneSpesaFlag("si");
 
@@ -769,31 +765,27 @@ public class CMISOrdineMissioneService {
 
 			aggiungiAllegati(allegati, parameters);
 
-			if (ordineMissione.isStatoNonInviatoAlFlusso()){
+			if (ordineMissione.isStatoInviatoAlFlusso()){
+				if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
+					parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, ordineMissione.getIdFlusso());
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
+				}
+			} else {
+				parameters.add("commento", "");
+			}
+
 				try {
 					if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
 						ordineMissioneService.popolaCoda(ordineMissione);
 					} else {
-						ResponseEntity<ProcessDefinitions> processDefinitions = flowsService.getProcessDefinitions(Costanti.NOME_PROCESSO_FLOWS_MISSIONI);
-						if (processDefinitions.getStatusCode().is2xxSuccessful()){
-
-							logger.info("Avvio Flusso. Parametri: "+parameters);
-							ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(processDefinitions.getBody().getId(), parameters);
-							if(startWorkflowResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
-								String idFlusso = startWorkflowResponseResponseEntity.getBody().getId();
-								ordineMissione.setIdFlusso(idFlusso);
-								ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-								logger.info("Ordine di missione "+ordineMissione.getId()+" inviato alla firma");
-								if (anticipo != null){
-									anticipo.setIdFlusso(idFlusso);
-								}
-							} else {
-								logger.info("Errore Flows! "+ startWorkflowResponseResponseEntity.getStatusCode().value()+" per l'ordine di missione "+ ordineMissione.getId());
-								logger.error("Status Code ritornato: "+startWorkflowResponseResponseEntity.getStatusCode().toString());
+						String idFlusso = messageForFlowsService.avviaFlusso(parameters);
+						if (StringUtils.isEmpty(ordineMissione.getIdFlusso())){
+							ordineMissione.setIdFlusso(idFlusso);
+							ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+							if (anticipo != null){
+								anticipo.setIdFlusso(idFlusso);
 							}
-						} else {
-							logger.info("Errore Recupero Process Definitions! "+ processDefinitions.getStatusCode().value()+" per l'ordine di missione "+ ordineMissione.getId());
-							logger.error("Status Code ritornato: "+processDefinitions.getStatusCode().toString());
 						}
 
 					}
@@ -802,18 +794,6 @@ public class CMISOrdineMissioneService {
 				} catch (Exception e) {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 				}
-			} else {
-				if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
-					ResultFlows result = getFlowsOrdineMissione(ordineMissione.getIdFlusso());
-					if (!StringUtils.isEmpty(result.getTaskId())){
-						missioniCMISService.restartFlow(messageForFlows, result);
-					} else {
-						throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
-					}
-				} else {
-					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
-				}
-			}
 
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: "+e);
