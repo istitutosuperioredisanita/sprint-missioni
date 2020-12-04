@@ -43,4 +43,16 @@ public class RimborsoMissioneFilter extends MissioneFilter {
 	public void setRecuperoTotali(String recuperoTotali) {
 		this.recuperoTotali = recuperoTotali;
 	}
+
+	@Override
+	public String toString() {
+		return "RimborsoMissioneFilter{" +
+				"annoOrdine=" + annoOrdine +
+				", daNumeroOrdine=" + daNumeroOrdine +
+				", aNumeroOrdine=" + aNumeroOrdine +
+				", statoInvioSigla='" + statoInvioSigla + '\'' +
+				", recuperoTotali='" + recuperoTotali + '\'' +
+				", idOrdineMissione=" + idOrdineMissione +
+				"} " + super.toString();
+	}
 }

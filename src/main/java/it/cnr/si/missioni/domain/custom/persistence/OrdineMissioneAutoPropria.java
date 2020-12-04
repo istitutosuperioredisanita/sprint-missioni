@@ -264,5 +264,26 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
 	public void setUtilizzoAltriMotivi(String utilizzoAltriMotivi) {
 		this.utilizzoAltriMotivi = utilizzoAltriMotivi;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "OrdineMissioneAutoPropria{" +
+				"id=" + id +
+				", targa='" + targa + '\'' +
+				", cartaCircolazione='" + cartaCircolazione + '\'' +
+				", polizzaAssicurativa='" + polizzaAssicurativa + '\'' +
+				", uid='" + uid + '\'' +
+				", marca='" + marca + '\'' +
+				", modello='" + modello + '\'' +
+				", numeroPatente='" + numeroPatente + '\'' +
+				", dataRilascioPatente=" + dataRilascioPatente +
+				", dataScadenzaPatente=" + dataScadenzaPatente +
+				", entePatente='" + entePatente + '\'' +
+				", stato='" + stato + '\'' +
+				", utilizzoMotiviIspettivi='" + utilizzoMotiviIspettivi + '\'' +
+				", utilizzoMotiviUrgenza='" + utilizzoMotiviUrgenza + '\'' +
+				", utilizzoMotiviTrasporto='" + utilizzoMotiviTrasporto + '\'' +
+				", utilizzoAltriMotivi='" + utilizzoAltriMotivi + '\'' +
+				"} " ;
+	}
 }
