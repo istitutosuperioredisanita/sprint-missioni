@@ -108,7 +108,7 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 				", validazioneSpesaFlag='" + validazioneSpesaFlag + '\'' +
 				", missioneConAnticipoFlag='" + missioneConAnticipoFlag + '\'' +
 				", validazioneModuloFlag='" + validazioneModuloFlag + '\'' +
-				", userNameUtenteOrdineMissione='" + userNameUtenteOrdineMissione + '\'' +
+				", userNameUtenteOrdineMissione='" + userNameUtenteMissione + '\'' +
 				", userNameRichiedente='" + userNameRichiedente + '\'' +
 				", userNameResponsabileModulo='" + userNameResponsabileModulo + '\'' +
 				", userNamePrimoFirmatario='" + userNamePrimoFirmatario + '\'' +

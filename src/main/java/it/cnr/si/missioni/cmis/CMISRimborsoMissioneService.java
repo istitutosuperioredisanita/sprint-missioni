@@ -673,6 +673,7 @@ public class CMISRimborsoMissioneService {
 		MessageForFlowRimborso messageForFlow = new MessageForFlowRimborso();
 		try {
 
+			messageForFlow.setIdMissione(cmisRimborsoMissione.getIdMissioneRimborso().toString());
 			messageForFlow.setIdMissioneRimborso(cmisRimborsoMissione.getIdMissioneRimborso().toString());
 			messageForFlow.setTitolo(cmisRimborsoMissione.getWfDescription());
 			messageForFlow.setDescrizione(cmisRimborsoMissione.getWfDescriptionComplete());
@@ -710,7 +711,7 @@ public class CMISRimborsoMissioneService {
 			messageForFlow.setBpm_workflowDueDate(cmisRimborsoMissione.getWfDueDate());
 			messageForFlow.setBpm_workflowPriority(Utility.nvl(cmisRimborsoMissione.getPriorita(),Costanti.PRIORITA_MEDIA));
 			messageForFlow.setValidazioneSpesaFlag(cmisRimborsoMissione.getValidazioneSpesa());
-			messageForFlow.setUserNameUtenteOrdineMissione(cmisRimborsoMissione.getUsernameUtenteOrdine());
+			messageForFlow.setUserNameUtenteMissione(cmisRimborsoMissione.getUsernameUtenteOrdine());
 			messageForFlow.setUserNameRichiedente(cmisRimborsoMissione.getUsernameRichiedente());
 			messageForFlow.setUserNamePrimoFirmatario(cmisRimborsoMissione.getUserNamePrimoFirmatario());
 			messageForFlow.setUserNameFirmatarioSpesa(cmisRimborsoMissione.getUserNameFirmatarioSpesa());

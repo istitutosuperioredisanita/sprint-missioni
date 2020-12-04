@@ -356,4 +356,26 @@ public class AnnullamentoRimborsoMissione extends OggettoBulkXmlTransient {
 		this.rimborsoMissione = rimborsoMissione;
 	}
 
+	@Override
+	public String toString() {
+		return "AnnullamentoRimborsoMissione{" +
+				"id=" + id +
+				", uidInsert='" + uidInsert + '\'' +
+				", uid='" + uid + '\'' +
+				", codiceFiscale='" + codiceFiscale + '\'' +
+				", anno=" + anno +
+				", numero=" + numero +
+				", dataInserimento=" + dataInserimento +
+				", comuneResidenzaRich='" + comuneResidenzaRich + '\'' +
+				", matricola='" + matricola + '\'' +
+				", indirizzoResidenzaRich='" + indirizzoResidenzaRich + '\'' +
+				", domicilioFiscaleRich='" + domicilioFiscaleRich + '\'' +
+				", datoreLavoroRich='" + datoreLavoroRich + '\'' +
+				", contrattoRich='" + contrattoRich + '\'' +
+				", qualificaRich='" + qualificaRich + '\'' +
+				", livelloRich='" + livelloRich + '\'' +
+				", motivoAnnullamento='" + motivoAnnullamento + '\'' +
+				", stato='" + stato + '\'' +
+				'}';
+	}
 }
