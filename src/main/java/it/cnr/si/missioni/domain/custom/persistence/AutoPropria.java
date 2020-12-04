@@ -144,4 +144,17 @@ public class AutoPropria extends OggettoBulkXmlTransient implements Serializable
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
+
+	@Override
+	public String toString() {
+		return "AutoPropria{" +
+				"id=" + id +
+				", targa='" + targa + '\'' +
+				", cartaCircolazione='" + cartaCircolazione + '\'' +
+				", polizzaAssicurativa='" + polizzaAssicurativa + '\'' +
+				", uid='" + uid + '\'' +
+				", marca='" + marca + '\'' +
+				", modello='" + modello + '\'' +
+				"} ";
+	}
 }
