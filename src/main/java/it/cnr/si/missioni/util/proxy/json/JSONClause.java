@@ -46,7 +46,19 @@ public class JSONClause  implements Serializable{
 	public Object getFieldValue() {
 		return fieldValue;
 	}
+
+
 	public void setFieldValue(Object fieldValue) {
 		this.fieldValue = fieldValue;
+	}
+
+	@Override
+	public String toString() {
+		return "JSONClause{" +
+				"condition='" + condition + '\'' +
+				", fieldName='" + fieldName + '\'' +
+				", operator='" + operator + '\'' +
+				", fieldValue=" + fieldValue +
+				'}';
 	}
 }

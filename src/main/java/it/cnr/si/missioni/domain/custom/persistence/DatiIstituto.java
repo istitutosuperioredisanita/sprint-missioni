@@ -487,4 +487,46 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 		this.dataBloccoInsRimborsi = dataBloccoInsRimborsi;
 	}
 
+	@Override
+	public String toString() {
+		return "DatiIstituto{" +
+				"id=" + id +
+				", istituto='" + istituto + '\'' +
+				", anno=" + anno +
+				", progressivoOrdine=" + progressivoOrdine +
+				", progressivoRimborso=" + progressivoRimborso +
+				", descrIstituto='" + descrIstituto + '\'' +
+				", gestioneRespModulo='" + gestioneRespModulo + '\'' +
+				", mailNotifiche='" + mailNotifiche + '\'' +
+				", mailNotificheRimborso='" + mailNotificheRimborso + '\'' +
+				", mailDopoOrdine='" + mailDopoOrdine + '\'' +
+				", mailDopoRimborso='" + mailDopoRimborso + '\'' +
+				", responsabile='" + responsabile + '\'' +
+				", responsabileSoloItalia='" + responsabileSoloItalia + '\'' +
+				", dataBloccoRimborsiTam=" + dataBloccoRimborsiTam +
+				", dataBloccoRimborsi=" + dataBloccoRimborsi +
+				", dataBloccoInsRimborsiTam=" + dataBloccoInsRimborsiTam +
+				", dataBloccoInsRimborsi=" + dataBloccoInsRimborsi +
+				", tipoMailDopoOrdine='" + tipoMailDopoOrdine + '\'' +
+				", tipoMailDopoRimborso='" + tipoMailDopoRimborso + '\'' +
+				", obbligoAllegatiValidazione='" + obbligoAllegatiValidazione + '\'' +
+				", uoRespEstero='" + uoRespEstero + '\'' +
+				", minutiMinimiResp=" + minutiMinimiResp +
+				", minutiPrimaInizioResp=" + minutiPrimaInizioResp +
+				", minutiPassatiResp=" + minutiPassatiResp +
+				", minutiMinimiAmm=" + minutiMinimiAmm +
+				", minutiPrimaInizioAmm=" + minutiPrimaInizioAmm +
+				", minutiPassatiAmm=" + minutiPassatiAmm +
+				", creaImpegnoAut='" + creaImpegnoAut + '\'' +
+				", terzoImpDefault=" + terzoImpDefault +
+				", gaeImpDefault='" + gaeImpDefault + '\'' +
+				", progettoImpDefault=" + progettoImpDefault +
+				", uoRespResponsabili='" + uoRespResponsabili + '\'' +
+				", uoContrAmm='" + uoContrAmm + '\'' +
+				", saltaFirmaUosUoCds='" + saltaFirmaUosUoCds + '\'' +
+				", uoFirmaAggiunta='" + uoFirmaAggiunta + '\'' +
+				", progressivoAnnullamento=" + progressivoAnnullamento +
+				", progrAnnullRimborso=" + progrAnnullRimborso +
+				"} ";
+	}
 }

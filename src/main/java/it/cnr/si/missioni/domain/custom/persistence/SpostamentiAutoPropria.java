@@ -108,4 +108,15 @@ public class SpostamentiAutoPropria extends OggettoBulkXmlTransient implements S
 		this.stato = stato;
 	}
 
+	@Override
+	public String toString() {
+		return "SpostamentiAutoPropria{" +
+				"id=" + id +
+				", uid='" + uid + '\'' +
+				", percorsoDa='" + percorsoDa + '\'' +
+				", percorsoA='" + percorsoA + '\'' +
+				", riga=" + riga +
+				", stato='" + stato + '\'' +
+				"} " ;
+	}
 }

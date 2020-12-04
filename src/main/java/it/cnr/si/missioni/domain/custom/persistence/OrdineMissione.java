@@ -1297,4 +1297,76 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	public void setPresidente(String presidente) {
 		this.presidente = presidente;
 	}
+
+	@Override
+	public String toString() {
+		return "OrdineMissione{" +
+				"obbligoRientro='" + obbligoRientro + '\'' +
+				", distanzaDallaSede=" + distanzaDallaSede +
+				", modulo='" + modulo + '\'' +
+				", priorita='" + priorita + '\'' +
+				", importoPresunto=" + importoPresunto +
+				", id=" + id +
+				", uidInsert='" + uidInsert + '\'' +
+				", uid='" + uid + '\'' +
+				", anno=" + anno +
+				", numero=" + numero +
+				", dataInserimento=" + dataInserimento +
+				", comuneResidenzaRich='" + comuneResidenzaRich + '\'' +
+				", indirizzoResidenzaRich='" + indirizzoResidenzaRich + '\'' +
+				", matricola='" + matricola + '\'' +
+				", domicilioFiscaleRich='" + domicilioFiscaleRich + '\'' +
+				", datoreLavoroRich='" + datoreLavoroRich + '\'' +
+				", contrattoRich='" + contrattoRich + '\'' +
+				", qualificaRich='" + qualificaRich + '\'' +
+				", livelloRich='" + livelloRich + '\'' +
+				", oggetto='" + oggetto + '\'' +
+				", destinazione='" + destinazione + '\'' +
+				", nazione=" + nazione +
+				", tipoMissione='" + tipoMissione + '\'' +
+				", trattamento='" + trattamento + '\'' +
+				", dataInizioMissione=" + dataInizioMissione +
+				", dataFineMissione=" + dataFineMissione +
+				", dataInvioRespGruppo=" + dataInvioRespGruppo +
+				", dataInvioAmministrativo=" + dataInvioAmministrativo +
+				", dataInvioFirma=" + dataInvioFirma +
+				", bypassRespGruppo='" + bypassRespGruppo + '\'' +
+				", bypassAmministrativo='" + bypassAmministrativo + '\'' +
+				", validato='" + validato + '\'' +
+				", utilizzoTaxi='" + utilizzoTaxi + '\'' +
+				", utilizzoAutoNoleggio='" + utilizzoAutoNoleggio + '\'' +
+				", note='" + note + '\'' +
+				", noteSegreteria='" + noteSegreteria + '\'' +
+				", partenzaDaAltro='" + partenzaDaAltro + '\'' +
+				", voce='" + voce + '\'' +
+				", gae='" + gae + '\'' +
+				", cdrRich='" + cdrRich + '\'' +
+				", uoRich='" + uoRich + '\'' +
+				", cdrSpesa='" + cdrSpesa + '\'' +
+				", uoSpesa='" + uoSpesa + '\'' +
+				", cdsCompetenza='" + cdsCompetenza + '\'' +
+				", uoCompetenza='" + uoCompetenza + '\'' +
+				", cdsRich='" + cdsRich + '\'' +
+				", cdsSpesa='" + cdsSpesa + '\'' +
+				", stato='" + stato + '\'' +
+				", pgProgetto=" + pgProgetto +
+				", cdCdsObbligazione='" + cdCdsObbligazione + '\'' +
+				", esercizioObbligazione=" + esercizioObbligazione +
+				", pgObbligazione=" + pgObbligazione +
+				", esercizioOriginaleObbligazione=" + esercizioOriginaleObbligazione +
+				", idFlusso='" + idFlusso + '\'' +
+				", statoFlusso='" + statoFlusso + '\'' +
+				", noteUtilizzoTaxiNoleggio='" + noteUtilizzoTaxiNoleggio + '\'' +
+				", partenzaDa='" + partenzaDa + '\'' +
+				", fondi='" + fondi + '\'' +
+				", responsabileGruppo='" + responsabileGruppo + '\'' +
+				", utilizzoAutoServizio='" + utilizzoAutoServizio + '\'' +
+				", personaleAlSeguito='" + personaleAlSeguito + '\'' +
+				", cup='" + cup + '\'' +
+				", missioneGratuita='" + missioneGratuita + '\'' +
+				", cug='" + cug + '\'' +
+				", presidente='" + presidente + '\'' +
+				", noteRespingi='" + noteRespingi + '\'' +
+				"} ";
+	}
 }

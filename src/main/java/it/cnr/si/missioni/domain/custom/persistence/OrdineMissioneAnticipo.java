@@ -206,4 +206,18 @@ public class OrdineMissioneAnticipo extends OggettoBulkXmlTransient implements S
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "OrdineMissioneAnticipo{" +
+				"id=" + id +
+				", uid='" + uid + '\'' +
+				", importo=" + importo +
+				", note='" + note + '\'' +
+				", dataRichiesta=" + dataRichiesta +
+				", stato='" + stato + '\'' +
+				", idFlusso='" + idFlusso + '\'' +
+				", statoFlusso='" + statoFlusso + '\'' +
+				"} " ;
+	}
 }
