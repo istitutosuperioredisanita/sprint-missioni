@@ -3,7 +3,6 @@ package it.cnr.si.missioni.cmis;
 import java.io.Serializable;
 
 public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements Serializable{
-	private String wfOrdineDaRevoca;
 
 	public String getIdMissioneRevoca() {
 		return idMissioneRevoca;
@@ -13,20 +12,12 @@ public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements 
 		this.idMissioneRevoca = idMissioneRevoca;
 	}
 
-	public String getWfOrdineDaRevoca() {
-		return wfOrdineDaRevoca;
-	}
-
-	public void setWfOrdineDaRevoca(String wfOrdineDaRevoca) {
-		this.wfOrdineDaRevoca = wfOrdineDaRevoca;
-	}
-
 	String idMissioneRevoca;
 
 	@Override
 	public String toString() {
 		return "MessageForFlowAnnullamento{" +
-				"wfOrdineDaRevoca='" + wfOrdineDaRevoca + '\'' +
+				"linkToOtherWorkflows='" + linkToOtherWorkflows + '\'' +
 				", noteAutorizzazioniAggiuntive='" + noteAutorizzazioniAggiuntive + '\'' +
 				", missioneGratuita='" + missioneGratuita + '\'' +
 				", descrizioneOrdine='" + descrizioneOrdine + '\'' +

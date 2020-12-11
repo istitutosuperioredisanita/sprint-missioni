@@ -120,16 +120,16 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     private String tiCdTiSpesa;
 
     @Size(min = 0, max = 30)
-    @Column(name = "CD_CDS_OBBLIGAZIONE", length = 30, nullable = false)
+    @Column(name = "CD_CDS_OBBLIGAZIONE", length = 30, nullable = true)
     public String cdCdsObbligazione;
 
-    @Column(name = "ESERCIZIO_OBBLIGAZIONE", length = 4, nullable = false)
+    @Column(name = "ESERCIZIO_OBBLIGAZIONE", length = 4, nullable = true)
     public Integer esercizioObbligazione;
 
-    @Column(name = "PG_OBBLIGAZIONE", length = 50, nullable = false)
+    @Column(name = "PG_OBBLIGAZIONE", length = 50, nullable = true)
     public Long pgObbligazione;
 
-    @Column(name = "ESERCIZIO_ORIGINALE_OBBLIGAZIONE", length = 4, nullable = false)
+    @Column(name = "ESERCIZIO_ORIGINALE_OBBLIGAZIONE", length = 4, nullable = true)
     public Integer esercizioOriginaleObbligazione;
     
     @Size(min = 0, max = 28)

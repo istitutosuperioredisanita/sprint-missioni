@@ -10,7 +10,6 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 	String annoMandato;
 	String numeroMandatoOk;
 	String importoMandato;
-	String wfOrdineDaRimborso;
 	String differenzeOrdineRimborso;
 
 	public String getIdMissioneRimborso() {
@@ -66,12 +65,6 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 	public void setImportoMandato(String importoMandato) {
 		this.importoMandato = importoMandato;
 	}
-	public String getWfOrdineDaRimborso() {
-		return wfOrdineDaRimborso;
-	}
-	public void setWfOrdineDaRimborso(String wfOrdineDaRimborso) {
-		this.wfOrdineDaRimborso = wfOrdineDaRimborso;
-	}
 	public String getDifferenzeOrdineRimborso() {
 		return differenzeOrdineRimborso;
 	}
@@ -95,7 +88,7 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
 				", annoMandato='" + annoMandato + '\'' +
 				", numeroMandatoOk='" + numeroMandatoOk + '\'' +
 				", importoMandato='" + importoMandato + '\'' +
-				", wfOrdineDaRimborso='" + wfOrdineDaRimborso + '\'' +
+				", linkToOtherWorkflows='" + linkToOtherWorkflows + '\'' +
 				", differenzeOrdineRimborso='" + differenzeOrdineRimborso + '\'' +
 				", totaleRimborsoMissione='" + totaleRimborsoMissione + '\'' +
 				", noteAutorizzazioniAggiuntive='" + noteAutorizzazioniAggiuntive + '\'' +

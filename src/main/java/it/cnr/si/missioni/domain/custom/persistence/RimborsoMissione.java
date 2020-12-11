@@ -1183,12 +1183,20 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		return false;
 	}
 
+	public Boolean isStatoRespintoFlusso(){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && (getStatoFlusso().equals(Costanti.STATO_RESPINTO_UO_FLUSSO) || getStatoFlusso().equals(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO))){
+			return true;
+		}
+		return false;
+	}
+
 	public Boolean isStatoNonInviatoAlFlusso(){
 		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INSERITO)){
 			return true;
 		}
 		return false;
 	}
+
 
 	public Boolean isStatoFlussoApprovato(){
 		if (getStatoFlusso() != null && getStatoFlusso().equals(Costanti.STATO_APPROVATO_FLUSSO)){

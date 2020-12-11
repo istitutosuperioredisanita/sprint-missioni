@@ -6,19 +6,12 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.cnr.si.missioni.service.*;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -37,13 +30,6 @@ import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
-import it.cnr.si.missioni.service.DatiIstitutoService;
-import it.cnr.si.missioni.service.ParametriService;
-import it.cnr.si.missioni.service.PrintRimborsoMissioneService;
-import it.cnr.si.missioni.service.RimborsoMissioneDettagliService;
-import it.cnr.si.missioni.service.RimborsoMissioneService;
-import it.cnr.si.missioni.service.UoService;
-import it.cnr.si.missioni.service.UtentiPresidenteSpecialiService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -122,6 +108,9 @@ public class CMISRimborsoMissioneService {
 	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
 
 	@Autowired
+	private MessageForFlowsService messageForFlowsService;
+
+	@Autowired
 	NazioneService nazioneService;
 	
 	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
@@ -142,10 +131,13 @@ public class CMISRimborsoMissioneService {
 	}
 
 	public List<StorageObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio) {
+		return getChildrenDettaglio(dettaglio, false);
+	}
+	public List<StorageObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio, Boolean recuperoFileEliminati) {
 		StorageObject folderDettaglio = getFolderDettaglioRimborso(dettaglio);
 		
 		if (folderDettaglio != null){
-	        List<StorageObject> children = missioniCMISService.recuperoDocumento(folderDettaglio, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_SCONTRINI.value());
+	        List<StorageObject> children = missioniCMISService.recuperoDocumento(folderDettaglio, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_SCONTRINI.value(), recuperoFileEliminati);
 	        return children;
 		}
 		return null;
@@ -173,80 +165,6 @@ public class CMISRimborsoMissioneService {
 		String uoCompetenzaPerFlusso = Utility.replace(rimborsoMissione.getUoCompetenza(), ".", "");
 		String uoSpesaPerFlusso = Utility.replace(rimborsoMissione.getUoSpesa(), ".", "");
 		String uoRichPerFlusso = Utility.replace(rimborsoMissione.getUoRich(), ".", "");
-		Uo uoDatiSpesa = uoService.recuperoUo(uoSpesaPerFlusso);
-		Uo uoDatiCompetenza = null;
-		if (uoCompetenzaPerFlusso != null){
-			uoDatiCompetenza = uoService.recuperoUo(uoCompetenzaPerFlusso);
-		}
-		String userNameFirmatario = null;
-		String userNameFirmatarioSpesa = null;
-		Boolean usernameImpostati = false;
-		if (!Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && !Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S") && !Costanti.CDS_SAC.equals(rimborsoMissione.getCdsRich())){
-			String uoSiglaRich = rimborsoMissione.getUoRich();
-			String uoSiglaSpesa = null;
-			if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-				if (StringUtils.hasLength(rimborsoMissione.getUoCompetenza())){
-					uoSiglaSpesa = rimborsoMissione.getUoCompetenza();
-				} else {
-					uoSiglaSpesa = uoSiglaRich;
-				}
-			} else {
-				uoSiglaSpesa = rimborsoMissione.getUoSpesa();
-			}
-			if (!uoSiglaRich.equals(uoSiglaSpesa) && uoSiglaRich.substring(0,3).equals(uoSiglaSpesa.substring(0,3))){
-				UnitaOrganizzativa uoSigla = unitaOrganizzativaService.loadUo(uoSiglaSpesa, null, rimborsoMissione.getAnno());
-				if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
-					DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaSpesa, rimborsoMissione.getAnno());
-					if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-						userNameFirmatario = recuperoDirettore(rimborsoMissione, Utility.replace(uoSiglaSpesa, ".", ""), account);
-						userNameFirmatarioSpesa = userNameFirmatario;
-						usernameImpostati = true;
-					}
-				}
-				uoSigla = unitaOrganizzativaService.loadUo(uoSiglaRich, null, rimborsoMissione.getAnno());
-				if (uoSigla != null && Utility.nvl(uoSigla.getFl_uo_cds()).equals("true")){
-					DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(uoSiglaRich, rimborsoMissione.getAnno());
-					if (Utility.nvl(datiIstituto.getSaltaFirmaUosUoCds(),"N").equals("S")){
-						userNameFirmatario = recuperoDirettore(rimborsoMissione, Utility.replace(uoSiglaRich, ".", ""), account, true);
-						userNameFirmatarioSpesa = userNameFirmatario;
-						usernameImpostati = true;
-					}
-				}
-			}
-		}
-		
-		if (!usernameImpostati){
-			userNameFirmatario = recuperoDirettore(rimborsoMissione, uoRichPerFlusso, account, true);
-			
-			Parametri parametri = parametriService.getParametri();
-			if (Utility.nvl(rimborsoMissione.getCug(),"N").equals("S") && parametri != null && parametri.getResponsabileCug() != null){
-				userNameFirmatarioSpesa = parametri.getResponsabileCug();
-			} else  if (Utility.nvl(rimborsoMissione.getPresidente(),"N").equals("S") && parametri != null && parametri.getPresidente() != null){
-				userNameFirmatarioSpesa = parametri.getPresidente();
-				if (StringUtils.hasLength(parametri.getDipendenteCda()) && Utility.nvl(rimborsoMissione.getUid(),"N").equals(parametri.getDipendenteCda())){
-					userNameFirmatario = userNameFirmatarioSpesa;
-				}
-			} else  if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")){
-				if (uoCompetenzaPerFlusso != null){
-					if (uoDatiCompetenza != null && uoDatiCompetenza.getFirmaSpesa() != null && uoDatiCompetenza.getFirmaSpesa().equals("N")){
-						userNameFirmatarioSpesa = userNameFirmatario;
-					} else {
-						userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoCompetenzaPerFlusso, account);
-					}
-				} else {
-					userNameFirmatarioSpesa = userNameFirmatario;
-				}
-			} else {
-				userNameFirmatarioSpesa = recuperoDirettore(rimborsoMissione, uoSpesaPerFlusso, account);
-			}
-		}
-
-		if (userNameFirmatarioSpesa.equals(rimborsoMissione.getUid())){
-			userNameFirmatario = userNameFirmatarioSpesa;
-		}
-
-		datiFlusso.setUsernameFirmatarioSpesa(userNameFirmatarioSpesa);
-		datiFlusso.setUsernamePrimoFirmatario(userNameFirmatario);
 		datiFlusso.setUoCompetenzaPerFlusso(uoCompetenzaPerFlusso);
 		datiFlusso.setUoRichPerFlusso(uoRichPerFlusso);
 		datiFlusso.setUoSpesaPerFlusso(uoSpesaPerFlusso);
@@ -300,7 +218,7 @@ public class CMISRimborsoMissioneService {
 		}
 
 		DatiFlusso datiFlusso = recuperoDatiFlusso(rimborsoMissione, anno, account);
-		
+
 		GregorianCalendar dataScadenzaFlusso = new GregorianCalendar();
 		dataScadenzaFlusso.setTime(DateUtils.getCurrentTime());
 		dataScadenzaFlusso.add(Calendar.DAY_OF_MONTH, 7);
@@ -337,8 +255,6 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setUoRich(datiFlusso.getUoRichPerFlusso());
 		cmisRimborsoMissione.setUoSpesa(datiFlusso.getUoSpesaPerFlusso());
 		cmisRimborsoMissione.setUoCompetenza(datiFlusso.getUoCompetenzaPerFlusso() == null ? "" : datiFlusso.getUoCompetenzaPerFlusso());
-		cmisRimborsoMissione.setUserNameFirmatarioSpesa(datiFlusso.getUsernameFirmatarioSpesa());
-		cmisRimborsoMissione.setUserNamePrimoFirmatario(datiFlusso.getUsernamePrimoFirmatario());
 		cmisRimborsoMissione.setUserNameResponsabileModulo("");
 		cmisRimborsoMissione.setUsernameRichiedente(username);
 		cmisRimborsoMissione.setNoteAutorizzazioniAggiuntive(rimborsoMissione.getNoteUtilizzoTaxiNoleggio() == null ? "": rimborsoMissione.getNoteUtilizzoTaxiNoleggio());
@@ -661,7 +577,7 @@ public class CMISRimborsoMissioneService {
 		metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_SPESA, cmisRimborsoMissione.getValidazioneSpesa().equals("si"));
 		return metadataProperties;
 	}
-	
+
 	
 	@Transactional(readOnly = true)
 	public void avviaFlusso(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
@@ -673,24 +589,22 @@ public class CMISRimborsoMissioneService {
 		MessageForFlowRimborso messageForFlow = new MessageForFlowRimborso();
 		try {
 
+			messageForFlow.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_RIMBORSO);
 			messageForFlow.setIdMissione(cmisRimborsoMissione.getIdMissioneRimborso().toString());
+			messageForFlow.setIdMissioneOrdine(cmisRimborsoMissione.getIdMissioneRimborso().toString());
 			messageForFlow.setIdMissioneRimborso(cmisRimborsoMissione.getIdMissioneRimborso().toString());
 			messageForFlow.setTitolo(cmisRimborsoMissione.getWfDescription());
 			messageForFlow.setDescrizione(cmisRimborsoMissione.getWfDescriptionComplete());
+			messageForFlow = (MessageForFlowRimborso) messageForFlowsService.impostaGruppiFirmatari(cmisRimborsoMissione, messageForFlow);
 
-/* TODO
-			messageForFlow.setGruppoFirmatarioSpesa();
-			messageForFlow.setGruppoFirmatarioUo();
-			messageForFlow.setIdStrutturaSpesaMissioni();
-			messageForFlow.setIdStrutturaUoMissioni();
-*/			messageForFlow.setPathFascicoloDocumenti(rimborsoMissione.getStringBasePath());
+			messageForFlow.setPathFascicoloDocumenti(rimborsoMissione.getStringBasePath());
 
-			List<StorageObject> allegati = getDocumentsAllegatiRimborsoMissione(rimborsoMissione);
+			List<StorageObject> allegati = getDocumentsAllegatiRimborsoMissione(rimborsoMissione, true);
 			List<StorageObject> giustificativi = new ArrayList<StorageObject>();
 			if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()){
 				for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()){
-					List<StorageObject> children = getChildrenDettaglio(dettaglio);
-					if (children != null){
+					List<StorageObject> children = getChildrenDettaglio(dettaglio, true);
+					if (children != null && missioniCMISService.esisteAlmenoUnDocumentoValido(children)){
 						giustificativi.addAll(children);
 					} else {
 						if (dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())){
@@ -700,9 +614,6 @@ public class CMISRimborsoMissioneService {
 				}
 			}
 
-
-			if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
-			}
 			messageForFlow.setNoteAutorizzazioniAggiuntive(cmisRimborsoMissione.getNoteAutorizzazioniAggiuntive());
 			messageForFlow.setDescrizioneOrdine(cmisRimborsoMissione.getOggetto());
 			messageForFlow.setNote(cmisRimborsoMissione.getNote());
@@ -749,46 +660,52 @@ public class CMISRimborsoMissioneService {
 			messageForFlow.setAnnoMandato( cmisRimborsoMissione.getAnnoMandato());
 			messageForFlow.setNumeroMandatoOk( cmisRimborsoMissione.getNumeroMandato());
 			messageForFlow.setImportoMandato( cmisRimborsoMissione.getImportoMandato());
-			messageForFlow.setWfOrdineDaRimborso( cmisRimborsoMissione.getWfOrdineMissione());
+			messageForFlow.setLinkToOtherWorkflows( cmisRimborsoMissione.getWfOrdineMissione());
 			messageForFlow.setDifferenzeOrdineRimborso( cmisRimborsoMissione.getDifferenzeOrdineRimborso());
 			messageForFlow.setTotaleRimborsoMissione( cmisRimborsoMissione.getTotaleRimborsoMissione() == null ? "": cmisRimborsoMissione.getTotaleRimborsoMissione().toString());
-			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
-			}
-			MultiValueMap parameters = new LinkedMultiValueMap<String, String>();
+
+
+			MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
 			ObjectMapper mapper = new ObjectMapper();
-			Map<String, String> maps = mapper.convertValue(messageForFlow, new TypeReference<Map<String, String>>() {});
+			Map<String, Object> maps = mapper.convertValue(messageForFlow, new TypeReference<Map<String, Object>>() {});
 			parameters.setAll(maps);
 
-			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
 
-			aggiungiDocumenti(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
-			aggiungiDocumenti(giustificativi, parameters, Costanti.TIPO_DOCUMENTO_GIUSTIFICATIVO);
-		} catch (Exception e) {
-			throw new ComponentException("Errore in fase avvio flusso documentale. Errore: "+e,e);
-		}
+			messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
+			messageForFlowsService.aggiungiDocumentiMultipli(giustificativi, parameters, Costanti.TIPO_DOCUMENTO_GIUSTIFICATIVO);
 
-		avviaFlusso(rimborsoMissione, messageForFlow);
-	}
-	private void aggiungiDocumenti(List<StorageObject> allegati,
-								  MultiValueMap params, String tipoDocumento) {
-		if (allegati != null && !allegati.isEmpty()){
-			for (StorageObject so : allegati){
-				caricaDocumento(params, tipoDocumento, so);
+			if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
+				parameters.add("commento", "");
+			} else {
+				if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+					parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, rimborsoMissione.getIdFlusso());
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
+				}
 			}
+
+			try {
+				if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
+					rimborsoMissioneService.popolaCoda(rimborsoMissione);
+				} else {
+					String idFlusso = messageForFlowsService.avviaFlusso(parameters);
+					if (StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+						rimborsoMissione.setIdFlusso(idFlusso);
+					}
+					rimborsoMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+				}
+			} catch (AwesomeException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+			}
+
+		} catch (Exception e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: "+e);
 		}
 	}
-
-	private void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so){
-		if (so != null){
-			params.add(tipoDocumento+"_label", Costanti.TIPO_DOCUMENTO_FLOWS.get(tipoDocumento));
-			params.add(tipoDocumento+"_nodeRef", so.getKey());
-			params.add(tipoDocumento+"_mimetype", so.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
-			params.add(tipoDocumento+"_aggiorna", "true");
-			params.add(tipoDocumento+"_path", so.getPath());
-			params.add(tipoDocumento+"_filename", so.getPropertyValue(StoragePropertyNames.NAME.value()));
-		}
-	}
-
 
 	private void aggiungiAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs) {
 		List<CMISFileAttachment> allegatiRimborsoMissione = getAttachmentsRimborsoMissione(rimborsoMissione, new Long(rimborsoMissione.getId().toString()));
@@ -823,43 +740,6 @@ public class CMISRimborsoMissioneService {
 					}
 				}
 			}
-		}
-	}
-
-	private void avviaFlusso(RimborsoMissione rimborsoMissione, MessageForFlowRimborso flowRimborso) {
-		if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
-			if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()).getTipoMailDopoRimborso(),"N").equals("C")){
-				rimborsoMissioneService.popolaCoda(rimborsoMissione);
-			} else {
-				startFlow(rimborsoMissione, flowRimborso);
-			}
-		} else {
-			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
-				restartFlow(rimborsoMissione, flowRimborso);
-			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
-			}
-		}
-	}
-
-	private void startFlow(RimborsoMissione rimborsoMissione, MessageForFlowRimborso flowRimborso) {
-		try {
-			String idFlusso = missioniCMISService.startFlowRimborsoMissione(flowRimborso);
-			rimborsoMissione.setIdFlusso(idFlusso);
-			rimborsoMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-		} catch (AwesomeException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new ComponentException("Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".",e);
-		}
-	}
-
-	private void restartFlow(RimborsoMissione rimborsoMissione, MessageForFlowRimborso flowRimborso) {
-		ResultFlows result = getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
-		if (!StringUtils.isEmpty(result.getTaskId())){
-			missioniCMISService.restartFlow(flowRimborso, result);
-		} else {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
 		}
 	}
 
@@ -931,22 +811,14 @@ public class CMISRimborsoMissioneService {
 	}
 	
     public void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException {
-    	abortFlowRimborsoMissione(rimborsoMissione);
-    	rimborsoMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
-    }
-
-	public ResultFlows getFlowsRimborsoMissione(String idFlusso)throws AwesomeException{
-		return missioniCMISService.recuperoFlusso(idFlusso);
-	}
-
-	private void abortFlowRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
-		ResultFlows result = getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
-		if (!StringUtils.isEmpty(result.getTaskId())){
-			MessageForFlowRimborso rimborso = createJsonForAbortFlowOrdineMissione();
-			missioniCMISService.abortFlow(rimborso, result);
+		MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
+		ObjectMapper mapper = new ObjectMapper();
+		if ( rimborsoMissione.isStatoRespintoFlusso()  && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+			messageForFlowsService.annullaFlusso(parameters, rimborsoMissione.getIdFlusso());
 		} else {
-			throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Rimborso "+rimborsoMissione.getId());
 		}
+    	rimborsoMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }
 
 	private MessageForFlowRimborso createJsonForAbortFlowOrdineMissione() {
@@ -1089,8 +961,12 @@ public class CMISRimborsoMissioneService {
 	}
 
 	public List<StorageObject> getDocumentsAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione) {
+		return getDocumentsAllegatiRimborsoMissione(rimborsoMissione, false);
+	}
+
+	public List<StorageObject> getDocumentsAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione, Boolean recuperoFileEliminati) {
 		StorageObject node = recuperoFolderRimborsoMissione(rimborsoMissione);
-		return missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI.value());
+		return missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_ALLEGATI.value(), recuperoFileEliminati);
 	}
 
 	public List<StorageObject> getDocumentsAllegatiAnnullamentoRimborsoMissione(RimborsoMissione rimborsoMissione) {

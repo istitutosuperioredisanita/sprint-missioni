@@ -284,7 +284,7 @@ public class CronService {
 				if (rimborsoMissioneService.isMissioneComunicabileSigla(principal, rimborsoMissione)){
 					LOGGER.info("Missione Comunicabile: "+rimborsoMissione.getId());
 					try {
-						comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
+//						comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
 					} catch (Exception e) {
 						String error = Utility.getMessageException(e);
 						String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);

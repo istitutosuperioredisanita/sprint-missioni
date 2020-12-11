@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,11 +84,12 @@ public class ComunicaRimborsoSiglaService {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) {
+
 		RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoApprovatoId);
 		try {
 			rimborsoMissioneService.retrieveDetails(principal, rimborsoApprovato);
 			if (rimborsoApprovato.isTrattamentoAlternativoMissione() || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
-				return comunicaRimborso(principal, rimborsoApprovato);
+				comunicaRimborso(principal, rimborsoApprovato);
 			}
 			return null;
 		} catch (Exception e) {
@@ -107,6 +109,7 @@ public class ComunicaRimborsoSiglaService {
 		return textErrorComunicazioneRimborso+" con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" è andata in errore per il seguente motivo: " + error;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public MissioneBulk comunicaRimborso(Principal principal, RimborsoMissione rimborsoApprovato) throws Exception {
 			MissioneSigla missioneSigla = new MissioneSigla();
 			impostaUserContext(principal, rimborsoApprovato, missioneSigla);
@@ -170,7 +173,7 @@ public class ComunicaRimborsoSiglaService {
 			oggettoBulk.setCodice_fiscale(account.getCodice_fiscale());
 			StorageObject folder = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoApprovato);
 			if (folder != null){
-				oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(StoragePropertyNames.OBJECT_TYPE_ID.value()));
+				oggettoBulk.setIdFolderRimborsoMissione(folder.getKey());
 			}
 			if (rimborsoApprovato.getOrdineMissione() != null && rimborsoApprovato.getOrdineMissione().getId() != null){
 				OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
@@ -180,7 +183,7 @@ public class ComunicaRimborsoSiglaService {
 					}
 					StorageObject folderOrdine = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
 					if (folderOrdine != null){
-						oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getPropertyValue(StoragePropertyNames.OBJECT_TYPE_ID.value()));
+						oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getKey());
 					}
 				}
 			}

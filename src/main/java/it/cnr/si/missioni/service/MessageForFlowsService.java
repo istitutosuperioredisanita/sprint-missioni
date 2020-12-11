@@ -4,10 +4,7 @@ import it.cnr.si.flows.model.ProcessDefinitions;
 import it.cnr.si.flows.model.StartWorkflowResponse;
 import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.CMISMissione;
-import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
-import it.cnr.si.missioni.cmis.MessageForFlow;
-import it.cnr.si.missioni.cmis.MessageForFlowRimborso;
+import it.cnr.si.missioni.cmis.*;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -19,6 +16,8 @@ import it.cnr.si.service.application.FlowsService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +47,8 @@ public class MessageForFlowsService {
     @Autowired
     private FlowsService flowsService;
 
+    @Autowired
+    private MissioniCMISService missioniCMISService;
 
     public MessageForFlow impostaGruppiFirmatari(CMISMissione cmisMissione, MessageForFlow messageForFlows){
         Uo uoDatiSpesa = uoService.recuperoUo(cmisMissione.getUoSpesa());
@@ -195,9 +196,32 @@ public class MessageForFlowsService {
         ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
         String taskId = taskIdResponse.getBody().getId();
         parameters.add("taskId", taskId);
-        parameters.add("commento", "Riproponi");
-        parameters.add("sceltaUtente", "Aggiorna");
+        parameters.add("commento", "");
+        parameters.add("sceltaUtente", "Riproponi");
         return parameters;
+    }
+
+    public void annullaFlusso(MultiValueMap<String, Object> parameters , String idFlusso){
+        ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
+        String taskId = taskIdResponse.getBody().getId();
+        parameters.add("taskId", taskId);
+        parameters.add("commento", "");
+        parameters.add("sceltaUtente", "Annulla");
+        ResponseEntity<ProcessDefinitions> processDefinitions = flowsService.getProcessDefinitions(Costanti.NOME_PROCESSO_FLOWS_MISSIONI);
+        if (processDefinitions.getStatusCode().is2xxSuccessful()){
+
+            logger.info("Annulla Flusso. Parametri: "+parameters);
+            ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(processDefinitions.getBody().getId(), parameters);
+            if(!startWorkflowResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
+                String erroreFlows = "Errore Annullamento Flusso! "+ startWorkflowResponseResponseEntity.getStatusCode().value()+" per Id Flusso "+ idFlusso+" Status Code ritornato: "+startWorkflowResponseResponseEntity.getStatusCode().toString();
+                logger.info(erroreFlows);
+                throw new AwesomeException(CodiciErrore.ERRGEN, erroreFlows);
+            }
+        } else {
+            String erroreFlows = "Errore Recupero Process Definitions! "+ processDefinitions.getStatusCode().value()+" per id Flusso "+idFlusso+" Status Code ritornato: "+processDefinitions.getStatusCode().toString();
+            logger.info(erroreFlows);
+            throw new AwesomeException(CodiciErrore.ERRGEN, erroreFlows);
+        }
     }
 
     public String avviaFlusso(MultiValueMap<String, Object> parameters){
@@ -211,7 +235,10 @@ public class MessageForFlowsService {
             ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(processDefinitions.getBody().getId(), parameters);
             if(startWorkflowResponseResponseEntity.getStatusCode().is2xxSuccessful()) {
                 logger.info(tipoFlusso+" missione "+idMissione+" inviato alla firma");
+                if (startWorkflowResponseResponseEntity.getBody() != null){
                     return startWorkflowResponseResponseEntity.getBody().getId();
+                }
+                return "";
             } else {
                 String erroreFlows = "Errore Flows! "+ startWorkflowResponseResponseEntity.getStatusCode().value()+" per "+ tipoFlusso+" missione "+ idMissione+" Status Code ritornato: "+startWorkflowResponseResponseEntity.getStatusCode().toString();
                 logger.info(erroreFlows);
@@ -223,5 +250,37 @@ public class MessageForFlowsService {
             throw new AwesomeException(CodiciErrore.ERRGEN, erroreFlows);
         }
 
+    }
+    public void aggiungiDocumentiMultipli(List<StorageObject> allegati,
+                                  MultiValueMap params, String tipoDocumento) {
+        if (allegati != null && !allegati.isEmpty()){
+            int i = 0;
+            for (StorageObject so : allegati){
+                caricaDocumento(params, tipoDocumento, so, tipoDocumento+i);
+                i++;
+            }
+        }
+    }
+
+    public void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so){
+        caricaDocumento(params, tipoDocumento, so, tipoDocumento);
+    }
+
+    private String getPathWithoutFileName(StorageObject so) {
+        return so.getPath().substring(0, so.getPath().length() - so.getPropertyValue(StoragePropertyNames.NAME.value()).toString().length() -1);
+    }
+
+    private void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so, String nomeDocumentoFlows){
+        if (so != null){
+            params.add(nomeDocumentoFlows+"_label", Costanti.TIPO_DOCUMENTO_FLOWS.get(tipoDocumento));
+            params.add(nomeDocumentoFlows+"_nodeRef", so.getKey());
+            params.add(nomeDocumentoFlows+"_mimetype", so.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
+            params.add(nomeDocumentoFlows+"_aggiorna", "true");
+            params.add(nomeDocumentoFlows+"_path", getPathWithoutFileName(so));
+            params.add(nomeDocumentoFlows+"_filename", so.getPropertyValue(StoragePropertyNames.NAME.value()));
+            if (missioniCMISService.isDocumentoEliminato(so)){
+                params.add(nomeDocumentoFlows+"_stati_json", "Annullato");
+            }
+        }
     }
 }

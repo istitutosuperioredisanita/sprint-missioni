@@ -206,13 +206,9 @@ public class OrdineMissioneService {
 				if (anticipo != null) {
 					ordineMissione.setRichiestaAnticipo("S");
 				}
-				if (ordineMissione.isStatoInviatoAlFlusso()) {
-// TODO alla firma di chi
-				}
 			}
 
 		}
-		// popolaCoda(ordineMissione);
 		return ordineMissione;
 	}
 
@@ -727,7 +723,9 @@ public class OrdineMissioneService {
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
-					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_INSERITO);
+					listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction()
 							.add(Restrictions.in("statoFlusso", listaStatiFlusso))
 							.add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));

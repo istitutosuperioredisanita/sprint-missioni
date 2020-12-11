@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -30,6 +31,12 @@ public class FlowService {
 
     @Autowired
     RimborsoMissioneService rimborsoMissioneService;
+
+    @Autowired
+    private ComunicaMissioneSiglaService comunicaMissioneSiglaService;
+
+    @Autowired
+    TaskExecutor taskExecutor;
 
     @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
     private String subjectErrorFlowsOrdine;
@@ -65,7 +72,14 @@ public class FlowService {
                     case FlowResult.TIPO_FLUSSO_RIMBORSO:
                         RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, new Long(flowResult.getIdMissione()));
                         if (rimborsoMissione != null){
-                            rimborsoMissioneService.aggiornaRimborsoMissione(principal, rimborsoMissione, flowResult);
+                            final RimborsoMissione rimborsoMissioneAggiornato = rimborsoMissioneService.aggiornaRimborsoMissione(principal, rimborsoMissione, flowResult);
+                            if (rimborsoMissioneAggiornato != null){
+                                taskExecutor.execute( new Runnable() {
+                                    public void run() {
+                                        comunicaMissioneSiglaService.comunicaRimborsoSiglaAsync(principal, rimborsoMissioneAggiornato.getId());
+                                    }
+                                });
+                            }
                         } else {
                             errore = "Il rimborso missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);

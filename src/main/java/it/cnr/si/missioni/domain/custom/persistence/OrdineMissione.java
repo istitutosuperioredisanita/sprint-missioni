@@ -1174,8 +1174,18 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		return false;
 	}
 
+	public Boolean isStatoRespintoFlusso(){
+		if (!StringUtils.isEmpty(getStatoFlusso()) && (getStatoFlusso().equals(Costanti.STATO_RESPINTO_UO_FLUSSO) || getStatoFlusso().equals(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO))){
+			return true;
+		}
+		return false;
+	}
+
 	public Boolean isStatoNonInviatoAlFlusso(){
-		return !isStatoInviatoAlFlusso();
+		if (!StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INSERITO)){
+			return true;
+		}
+		return false;
 	}
 
 	public Boolean isStatoFlussoApprovato(){

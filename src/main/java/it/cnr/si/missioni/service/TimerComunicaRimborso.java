@@ -7,9 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.security.Principal;
 import java.util.TimerTask;
+
 
 public class TimerComunicaRimborso extends TimerTask {
 
@@ -38,6 +40,7 @@ public class TimerComunicaRimborso extends TimerTask {
     public void run() {
         try {
             comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
+
         } catch (Exception e) {
             String error = Utility.getMessageException(e);
             String testoErrore = "Errore nel lancio della comunicazione del rimborso a SIGLA";
