@@ -656,7 +656,8 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                     function (responseHeaders) {
                         $rootScope.salvataggio = false;
 	                    ui.ok_message("Annullamento Ordine di Missione confermato e inviato all'approvazione.");
-                        AnnullamentoOrdineMissioneService.get($scope.annullamentoModel.id).then(function(data){
+                
+                        ElencoOrdiniMissioneService.findAnnullamentoById($scope.annullamentoModel.id).then(function(data){
                             $scope.annullamentoModel = data;
                             $scope.inizializzaFormPerModifica();
                         });

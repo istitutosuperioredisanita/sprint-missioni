@@ -12,11 +12,13 @@ import java.util.*;
 import javax.persistence.OptimisticLockException;
 
 import it.cnr.si.missioni.domain.custom.FlowResult;
+import it.cnr.si.missioni.util.proxy.json.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -65,15 +67,6 @@ import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompenso;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompensoJson;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
-import it.cnr.si.missioni.util.proxy.json.service.AccountService;
-import it.cnr.si.missioni.util.proxy.json.service.CdrService;
-import it.cnr.si.missioni.util.proxy.json.service.GaeService;
-import it.cnr.si.missioni.util.proxy.json.service.ImpegnoGaeService;
-import it.cnr.si.missioni.util.proxy.json.service.ImpegnoService;
-import it.cnr.si.missioni.util.proxy.json.service.NazioneService;
-import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
-import it.cnr.si.missioni.util.proxy.json.service.TerzoService;
-import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.cnr.si.spring.storage.StorageObject;
 import net.bzdyl.ejb3.criteria.Order;
@@ -190,10 +183,6 @@ public class RimborsoMissioneService {
 		List<RimborsoMissione> listaRimborsiMissione = getRimborsiMissione(principal, filter, false, true);
 		if (listaRimborsiMissione != null && !listaRimborsiMissione.isEmpty()){
 			rimborsoMissione = listaRimborsiMissione.get(0);
-			if (retrieveDataFromFlows){
-				if (rimborsoMissione.isStatoInviatoAlFlusso()){
-				}
-			}
 			if (retrieveDetail){
 				retrieveDetails(principal, rimborsoMissione);
 			}
@@ -201,6 +190,7 @@ public class RimborsoMissioneService {
 		return rimborsoMissione;
     }
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void retrieveDetails(Principal principal, RimborsoMissione rimborsoMissione) throws NumberFormatException, ComponentException {
 		List<RimborsoMissioneDettagli> list = rimborsoMissioneDettagliService.getRimborsoMissioneDettagli(principal, new Long(rimborsoMissione.getId().toString()));
 		rimborsoMissione.setRimborsoMissioneDettagli(list);
@@ -325,19 +315,22 @@ public class RimborsoMissioneService {
 	}
 
 	public void popolaCoda(RimborsoMissione rimborsoMissione) {
-		if (rimborsoMissione.getMatricola() != null){
-			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
-			String idSede = null;
-			if (account != null){
-				idSede = account.getCodice_sede();
+    	if (!isDevProfile()){
+			if (rimborsoMissione.getMatricola() != null){
+				Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+				String idSede = null;
+				if (account != null){
+					idSede = account.getCodice_sede();
+				}
+				Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede,
+						rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+						rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
+				rabbitMQService.send(missione);
 			}
-			Missione missione = new Missione(TypeMissione.RIMBORSO, new Long(rimborsoMissione.getId().toString()), idSede, 
-					rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), new Long(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
-					rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-			rabbitMQService.send(missione);
 		}
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public RimborsoMissione aggiornaRimborsoMissioneComunicata(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, MissioneBulk missioneBulk)
 			throws ComponentException {
 		rimborsoMissioneDaAggiornare.setEsercizioSigla(missioneBulk.getEsercizio());
@@ -704,16 +697,6 @@ public class RimborsoMissioneService {
 		}
 	}
 	
-	public String retrieveStateFromFlows(ResultFlows result) {
-		return result.getState();
-	}
-
-	public ResultFlows retrieveDataFromFlows(RimborsoMissione rimborsoMissione)
-			throws ComponentException {
-		ResultFlows result = cmisRimborsoMissioneService.getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
-		return result;
-	}
-
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail) throws ComponentException {
 		return getRimborsoMissione(principal, idMissione, retrieveDetail, false);
     }
@@ -891,7 +874,9 @@ public class RimborsoMissioneService {
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
-					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_INSERITO);
+					listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
 				rimborsoMissioneList = crudServiceBean.findByProjection(principal, RimborsoMissione.class, RimborsoMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
@@ -1707,17 +1692,15 @@ public class RimborsoMissioneService {
 		popolaCoda(missione);
 	}
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void aggiornaRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
+	public RimborsoMissione aggiornaRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
 		try {
 			if (rimborsoMissioneDaAggiornare != null){
 				if (rimborsoMissioneDaAggiornare.isStatoInviatoAlFlusso() && rimborsoMissioneDaAggiornare.isMissioneConfermata() &&
 						!rimborsoMissioneDaAggiornare.isMissioneDaValidare())	{
 					switch (flowResult.getStato() ) {
 						case FlowResult.ESITO_FLUSSO_FIRMATO:
-							aggiornaRimborsoMissioneFirmato(principal, rimborsoMissioneDaAggiornare);
-							Timer timer = new Timer();
-							timer.schedule(new TimerComunicaRimborso(rimborsoMissioneDaAggiornare, principal), 1);
-							break;
+							RimborsoMissione rimborsoMissione = aggiornaRimborsoMissioneFirmato(principal, rimborsoMissioneDaAggiornare);
+							return rimborsoMissione;
 						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
 							aggiornaRimborsoMissionePrimaFirma(principal, rimborsoMissioneDaAggiornare);
 							break;
@@ -1732,8 +1715,10 @@ public class RimborsoMissioneService {
 					erroreRimborsoMissione(rimborsoMissioneDaAggiornare, flowResult);
 				}
 			}
+		return null;
 		} catch (Exception e ){
 			mailService.sendEmailError(subjectErrorFlowsRimborso, "Errore in aggiornaRimborsoMissione: "+e.getMessage(), false, true);
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in aggiornaRimborsoMissione:" + Utility.getMessageException(e));
 		}
 	}
 

@@ -67,7 +67,7 @@ public class FlowsMissioniService {
 		if (idOrdineMissione != null){
 			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
 			if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
-				ResultFlows result = retrieveDataFromFlows(ordineMissione);
+				ResultFlows result = null;
 				if (result == null){
 					return null;
 				}
@@ -97,7 +97,7 @@ public class FlowsMissioniService {
 		if (idAnnullamento != null){
 			AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById(principal, AnnullamentoOrdineMissione.class, idAnnullamento);
 			if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneDaValidare()){
-				ResultFlows result = retrieveDataFromFlows(annullamento);
+				ResultFlows result = null;
 				if (result == null){
 					return null;
 				}
@@ -135,7 +135,7 @@ public class FlowsMissioniService {
 		if (idRimborsoMissione != null){
 			RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
 	    	if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
-	    		ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
+	    		ResultFlows result = null;
 				if (result == null){
 					return null;
 				}
@@ -160,22 +160,4 @@ public class FlowsMissioniService {
 		}
     	return null;
     }
-
-	private ResultFlows retrieveDataFromFlows(OrdineMissione ordineMissione)
-			throws ComponentException {
-		ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(ordineMissione.getIdFlusso());
-		return result;
-	}
-
-	private ResultFlows retrieveDataFromFlows(AnnullamentoOrdineMissione annullamento)
-			throws ComponentException {
-		ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(annullamento.getIdFlusso());
-		return result;
-	}
-
-	private ResultFlows retrieveDataFromFlows(RimborsoMissione rimborsoMissione)
-			throws ComponentException {
-		ResultFlows result = cmisRimborsoMissioneService.getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
-		return result;
-	}
 }

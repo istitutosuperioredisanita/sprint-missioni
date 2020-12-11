@@ -44,14 +44,14 @@ missioniApp.factory('ElencoOrdiniMissioneService', function ($http, ui, DateUtil
                 });
                 return promise;
             },
-            findListAnnullamentiToValidate: function() {
-                var promise = $http.get('api/rest/annullamentoOrdineMissione/listToValidate').then(function (response) {
+            findListAnnullamentiToValidate: function(uo) {
+                var promise = $http.get('api/rest/annullamentoOrdineMissione/listToValidate', {params: {uoRich: uo}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
-            findListToValidate: function() {
-                var promise = $http.get('api/rest/ordiniMissione/listToValidate').success(function (response) {
+            findListToValidate: function(uo) {
+                var promise = $http.get('api/rest/ordiniMissione/listToValidate', {params: {uoRich: uo}}).success(function (response) {
                     return response.data;
                 });
                 return promise;

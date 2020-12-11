@@ -14,6 +14,23 @@
 
     <h3> <a class="a-verde" href="#/release"><span translate="main.release"></span></a> </h3>
 
+    <div class="row">
+        <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
+               <p class="col-md-12">
+                  <span class="input-group">
+                  <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-work">uo</span>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="selectUo(uoWorkForSpecialUser)"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+    </ui-select>
+                   </span>
+               </p>
+            </form>
+    </div>
 
   <div ng-show="ricercaFinita">
     <table ng-show="esistonoAnnullamentiRespinti" class="table table-condensed table-striped table-bordered table-responsive table-selected">
@@ -330,38 +347,6 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoAnnullamentiDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare_annullamenti"></h2>
-    </div>
-    <table ng-show="esistonoAnnullamentiDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
-      <thead>
-        <tr>
-            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
-            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
-            <th ng-show="userSpecial" style="text-align: left">{{'missione.form.uo' | translate}}</th>
-            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
-            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
-            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
-        </tr>
-      </thead>
-
-      <tbody id ="missioni">
-        <tr ng-repeat="annullamento in listAnnullamentiOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'V'}" ng-click="doSelectAnnullamentoOrdineMissioneValidazione(annullamento)" data-method="get">
-              <td style="text-align: center" >{{annullamento.ordineMissione.anno}}</td>
-              <td style="text-align: right">{{annullamento.ordineMissione.numero}}</td>
-              <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{annullamento.ordineMissione.uid}}</td>
-              <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{annullamento.ordineMissione.uoRich}}</td>
-              <td class="col-md-2" style="text-align: left">{{annullamento.ordineMissione.destinazione}}</td>
-              <td class="col-md-3" style="text-align: left">{{annullamento.ordineMissione.oggetto}}</td>
-              <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-              <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-        </tr>
-      </tbody>  
-    </table>
-    <div class="row">
         <h2 ng-show="esistonoOrdiniDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare"></h2>
     </div>
     <table ng-show="esistonoOrdiniDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
@@ -394,6 +379,38 @@
       </tbody>  
     </table>
 
+    <div class="row">
+        <h2 ng-show="esistonoAnnullamentiDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare_annullamenti"></h2>
+    </div>
+    <table ng-show="esistonoAnnullamentiDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'main.userid' | translate}}</th>
+            <th ng-show="userSpecial" style="text-align: left">{{'missione.form.uo' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+            <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+            <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="annullamento in listAnnullamentiOrdiniMissioniToValidate | filter: {statoFlussoRitornoHome:'V'}" ng-click="doSelectAnnullamentoOrdineMissioneValidazione(annullamento)" data-method="get">
+              <td style="text-align: center" >{{annullamento.ordineMissione.anno}}</td>
+              <td style="text-align: right">{{annullamento.ordineMissione.numero}}</td>
+              <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+              <td ng-show="userSpecial" class="col-md-2" style="text-align: left">{{annullamento.ordineMissione.uid}}</td>
+              <td ng-show="userSpecial" class="col-md-1" style="text-align: left">{{annullamento.ordineMissione.uoRich}}</td>
+              <td class="col-md-2" style="text-align: left">{{annullamento.ordineMissione.destinazione}}</td>
+              <td class="col-md-3" style="text-align: left">{{annullamento.ordineMissione.oggetto}}</td>
+              <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="col-md-1" style="text-align: center">{{annullamento.ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+      </tbody>  
+    </table>
     <div class="row">
         <h2 ng-show="esistonoRimborsiDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare_rimborso"></h2>
     </div>

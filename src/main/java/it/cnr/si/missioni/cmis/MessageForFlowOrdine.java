@@ -3,20 +3,11 @@ package it.cnr.si.missioni.cmis;
 import java.io.Serializable;
 
 public class MessageForFlowOrdine extends MessageForFlow implements Serializable{
-	String idMissioneOrdine;
-
-	public String getIdMissioneOrdine() {
-		return idMissioneOrdine;
-	}
-
-	public void setIdMissioneOrdine(String idMissioneOrdine) {
-		this.idMissioneOrdine = idMissioneOrdine;
-	}
-
 	@Override
 	public String toString() {
 		return "MessageForFlowOrdine{" +
 				"oggetto='" + oggetto + '\'' +
+				", linkToOtherWorkflows='" + linkToOtherWorkflows + '\'' +
 				", anno='" + annoMissione + '\'' +
 				", numero='" + numeroMissione + '\'' +
 				", noteAutorizzazioniAggiuntive='" + noteAutorizzazioniAggiuntive + '\'' +
