@@ -13,13 +13,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.flows.json.object.flowsStatus.FlowsStatus;
-import it.cnr.si.missioni.cmis.flows.json.object.flowsStatus.Task;
-import it.cnr.si.missioni.util.proxy.json.object.ImpegnoJson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +23,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.cmis.acl.Permission;
 import it.cnr.si.missioni.service.ProxyService;
 import it.cnr.si.missioni.util.Costanti;
@@ -243,128 +236,6 @@ public class MissioniCMISService extends StoreService {
 
     }
     
-	public String startFlowOrdineMissione(MessageForFlow message) throws ComponentException{
-		return startFlow(message, urlFlowOrdineMissione);
-	}
-
-	public String startFlowAnnullamentoOrdineMissione(MessageForFlow  message) throws ComponentException{
-		return startFlow(message, urlFlowAnnullamentoOrdineMissione);
-	}
-
-	public String startFlowRimborsoMissione(MessageForFlow message) throws ComponentException{
-		return startFlow(message, urlFlowRimborsoMissione);
-	}
-
-	public ResultFlows recuperoFlusso(String idFlusso) {
-    	if (idFlusso.startsWith(Costanti.INITIAL_NAME_OLD_FLOWS)){
-    		idFlusso = idFlusso.substring(9);
-		}
-		JsonFactory jsonFactory = new JsonFactory();
-		ObjectMapper mapper = new ObjectMapper(jsonFactory);
-		FlowsStatus flowsStatus =null;
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-		try {
-			String url = urlStatusFlows+idFlusso;
-			ResultProxy result = proxyService.process(HttpMethod.GET, new String(), Costanti.APP_FLOWS, url, "includeTasks=true", null, false);
-			String risposta = result.getBody();
-			logger.info("Risposta Status Flow: "+risposta);
-
-			flowsStatus = mapper.readValue(risposta, FlowsStatus.class);
-		} catch (Exception e) {
-			throw new AwesomeException( "Errore in fase di lettura dello stato del flusso: " + Utility.getMessageException(e) + ".");
-		}
-		if (flowsStatus != null && flowsStatus.getData() != null){
-			ResultFlows resultFlows = new ResultFlows();
-			if (flowsStatus.getData().getIsActive()){
-				if (!flowsStatus.getData().getTasks().isEmpty()){
-					for (Task task : flowsStatus.getData().getTasks()){
-						if (task.isInProgress()){
-							resultFlows.setState(task.getTitle());
-							resultFlows.setTaskId(task.getId());
-							resultFlows.setComment(task.getProperties() == null ? null : task.getProperties().getBpmComment());
-							return resultFlows;
-						}
-					}
-					if (resultFlows.getState() == null){
-						throw new AwesomeException( "Task non coerenti per il flusso: " + idFlusso);
-					}
-				} else {
-					throw new AwesomeException( "Task non esistenti per il flusso: " + idFlusso);
-				}
-			} else {
-				resultFlows.setState(Costanti.STATO_FIRMATO_FROM_CMIS);
-			}
-
-		} else {
-			throw new AwesomeException( "Flusso non esistente: " + idFlusso);
-		}
-		return null;
-    }
-
-	private String startFlow(MessageForFlow  message, String simpleUrl) {
-		JsonFactory jsonFactory = new JsonFactory();
-		ObjectMapper mapper = new ObjectMapper(jsonFactory); 
-		try {
-			String url = simpleUrl;
-			ResultProxy result = proxyService.process(HttpMethod.POST, message, Costanti.APP_STORAGE, url, null, null, false);
-			String risposta = result.getBody();
-			logger.info("Risposta Start Flow. Content: "+message.toString() + ". Risposta: "+risposta);
-
-			TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-			HashMap<String,Object> map = mapper.readValue(risposta, typeRef); 
-			
-			String text = map.get(Costanti.PROPERTY_RESULT_FLOW).toString();
-
-			Pattern pattern = Pattern.compile(Costanti.PATTERN_RESULT_FLOW);
-			Matcher matcher = pattern.matcher(text);
-			if (matcher.find())
-				return matcher.group(1);
-			throw new StorageException(Type.GENERIC, "Flusso non avviato "+message.toString());
-		} catch (StorageException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new StorageException(Type.GENERIC, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-		}
-	}
-	
-	public void restartFlow(MessageForFlow message, ResultFlows result) {
-		try {
-			String url = "service/api/task/"+result.getTaskId()+"/formprocessor";
-			logger.info("url for Restart: "+url + " body: "+message.toString());
-			proxyService.process(HttpMethod.POST, message, Costanti.APP_STORAGE, url, null, null, false);
-		} catch (StorageException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new StorageException(Type.GENERIC, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-		}
-	}
-
-	private void nextStepForRestartFlow(ResultFlows result) {
-		try {
-			String url = "service/api/workflow/task/end/"+result.getTaskId()+"/Next";
-			MessageForFlowNext msg = new MessageForFlowNext();
-			msg.setNext("next");
-			proxyService.process(HttpMethod.POST, msg, Costanti.APP_STORAGE, url, null, null, false);
-		} catch (StorageException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new StorageException(Type.GENERIC, "Errore in fase di avanzamento del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-		}
-	}
-
-	public void abortFlow(MessageForFlow message, ResultFlows result) {
-
-		try {
-			String url = "service/api/task-instances/"+result.getTaskId();
-			logger.info("url for Restart: "+url + " body: "+message.toString());
-			proxyService.process(HttpMethod.POST, message, Costanti.APP_STORAGE, url, null, null, false);
-			nextStepForRestartFlow(result);
-		} catch (StorageException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new StorageException(Type.GENERIC, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-		}
-	}
 	public CMISFileContent getAttachment(String nodeRef){
 		CMISFileContent cmisFileContent = new CMISFileContent();
         StorageObject obj = getStorageObjectBykey(nodeRef);
@@ -402,12 +273,26 @@ public class MissioniCMISService extends StoreService {
 			throw new StorageException(Type.GENERIC, "Errore in fase di riproposizione del flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
-	
+	public Boolean isDocumentoEliminato(StorageObject stor){
+		return new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value())).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
+    }
+	public Boolean esisteAlmenoUnDocumentoValido(List<StorageObject> list){
+    	for (StorageObject stor : list){
+			if (!isDocumentoEliminato(stor)){
+				return true;
+			}
+		}
+    	return false;
+	}
 	
 	public Boolean deleteNode(String id) {
 		return super.delete(id);
 	}
+
 	protected List<StorageObject> recuperoDocumento(StorageObject fo, String tipoDocumento) {
+    	return recuperoDocumento(fo, tipoDocumento, false);
+	}
+	protected List<StorageObject> recuperoDocumento(StorageObject fo, String tipoDocumento, Boolean recuperoFileEliminati) {
 		return Optional.ofNullable(fo) 
 			.map(folder -> super.getChildren(folder.getKey()))
 			.map(storageObjects -> {
@@ -418,8 +303,8 @@ public class MissioniCMISService extends StoreService {
             })
 			.map(lista -> lista.stream()
 			.filter(stor -> {
-				Boolean str = (new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value()))).contains(tipoDocumento) &&
-						!(new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value()))).contains(CMISMissioniAspect.FILE_ELIMINATO.value());
+				Boolean str = (new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value()))).contains(tipoDocumento) && (recuperoFileEliminati ||
+						!(new ArrayList(stor.getPropertyValue(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value()))).contains(CMISMissioniAspect.FILE_ELIMINATO.value()));
 				return str;
 			}).collect(Collectors.toList())).orElse(new ArrayList<StorageObject>());
 	}
@@ -430,7 +315,7 @@ public class MissioniCMISService extends StoreService {
 	
 	public void eliminaFilePresenteNelFlusso(Principal principal, String idNodo, StorageObject storageFolderRimborso) {
 		List<StorageObject> listaStorageObject = super.getChildren(storageFolderRimborso.getKey(), -1);
-		StorageObject node = (StorageObject)getStorageObjectByPath(idNodo);
+		StorageObject node = (StorageObject)getStorageObjectBykey(idNodo);
 		String oldNomeFile = node.getPropertyValue(StoragePropertyNames.NAME.value());
 		Boolean nameAlreadyExists = true;
 		
@@ -440,12 +325,12 @@ public class MissioniCMISService extends StoreService {
 			nomeFileEliminato = sanitizeFilename(nomeFileEliminato+".eliminato");
 			for (StorageObject so : listaStorageObject){
 				String path = so.getPath();
-				String newPath = path.substring(0, path.length() - oldNomeFile.length());
-				try {
-					getStorageObjectByPath(newPath+nomeFileEliminato);
+				String nomeFile = so.getPropertyValue(StoragePropertyNames.NAME.value());
+				String newPath = path.substring(0, path.length() - nomeFile.length());
+				StorageObject fileEsistente = getStorageObjectByPath(newPath+nomeFileEliminato);
+				if (fileEsistente != null){
 					nameAlreadyExists = true;
 					break;
-				} catch (StorageException e){
 				}
 			}
 	    }

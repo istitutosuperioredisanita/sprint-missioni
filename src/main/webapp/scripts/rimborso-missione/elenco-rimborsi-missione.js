@@ -30,8 +30,8 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
                 });
                 return promise;
             },
-            findListToValidate: function() {
-                var promise = $http.get('api/rest/rimborsoMissione/listToValidate').success(function (response) {
+            findListToValidate: function(uo) {
+                var promise = $http.get('api/rest/rimborsoMissione/listToValidate', {params: {uoRich: uo}}).success(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -42,8 +42,8 @@ missioniApp.factory('ElencoRimborsiMissioneService', function ($http, ui) {
                 });
                 return promise;
             },
-            findListAnnullamentiToValidate: function() {
-                var promise = $http.get('api/rest/annullamentoRimborsoMissione/listToValidate').then(function (response) {
+            findListAnnullamentiToValidate: function(uo) {
+                var promise = $http.get('api/rest/annullamentoRimborsoMissione/listToValidate', {params: {uoRich: uo}}).then(function (response) {
                     return response.data;
                 });
                 return promise;

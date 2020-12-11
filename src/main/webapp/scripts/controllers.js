@@ -5,7 +5,27 @@
 missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
 });
 
-missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService) {
+missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService, DateService, ProxyService) {
+    $scope.reloadUoWork = function(uo){
+        if (uo){
+            $scope.uoWorkForSpecialUser = uo;
+        }
+        $scope.accountModel = null;
+        $scope.elencoPersone = [];
+        $scope.ordiniMissione = [];
+        $scope.messageOrdiniNonEsistenti = false;
+        $scope.userWork = null;
+        if (uo){
+            $scope.disableUo = true;
+            var persons = ProxyService.getPersons(uo).then(function(result){
+                if (result ){
+                    $scope.elencoPersone = result;
+                    $scope.disableUo = false;
+                }
+            });
+        }
+    }
+
     var recuperoMessaggio = function(){
                 var x = ConfigService.getMessage();
                 var y = x.then(function (result) {
@@ -15,24 +35,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                 });
     }
 
-    $scope.endSearchCmisAnnullamenti = false;
-    $scope.endSearchCmisAnnullamentiRimborso = false;
-    $scope.endSearchCmisOrdine = false;
-    $scope.endSearchCmisRimborso = false;
-    if (!$sessionStorage.account || !$sessionStorage.account.login) {
-      $location.path('/login');
-    } else {
-        $scope.account = $sessionStorage.account;
-        recuperoMessaggio();
-        var uoForUsersSpecial = $scope.account.uoForUsersSpecial;
-        if (uoForUsersSpecial){
-            $scope.userSpecial = true;
-        }  else {
-            $scope.userSpecial = false;
-        }    
-
-
-        ElencoOrdiniMissioneService.findListAnnullamentiToValidate().then(function(response){
+    var recuperoMissioni = function(uo){
+        ElencoOrdiniMissioneService.findListAnnullamentiToValidate(uo).then(function(response){
             $scope.listAnnullamentiOrdiniMissioniToValidate = response;
             $scope.esistonoAnnullamentiDaApprovare = false;
             $scope.esistonoAnnullamentiApprovati = false;
@@ -60,7 +64,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
             $scope.endSearchCmisAnnullamenti = true;
         });        
 
-        ElencoOrdiniMissioneService.findListToValidate().then(function(response){
+        ElencoOrdiniMissioneService.findListToValidate(uo).then(function(response){
             $scope.listOrdiniMissioniToValidate = response.data;
             $scope.esistonoOrdiniDaRendereDefinitivi = false;
             $scope.esistonoOrdiniDaApprovare = false;
@@ -68,6 +72,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
             $scope.esistonoOrdiniApprovati = false;
             $scope.esistonoOrdiniRespinti = false;
             $scope.esistonoOrdiniDaConfermare = false;
+            $scope.esistonoOrdiniDaValidare = false;
+            $scope.esistonoOrdiniResponsabileGruppo = false;
             if ($scope.listOrdiniMissioniToValidate){
                 for (var i=0; i< $scope.listOrdiniMissioniToValidate.length; i++) {
                     if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
@@ -95,7 +101,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
             $scope.endSearchCmisOrdine = true;
         });        
 
-        ElencoRimborsiMissioneService.findListToValidate().then(function(response){
+        ElencoRimborsiMissioneService.findListToValidate(uo).then(function(response){
             $scope.listRimborsiMissioniToValidate = response.data;
             $scope.esistonoRimborsiDaApprovare = false;
             $scope.esistonoRimborsiAnnullati = false;
@@ -126,9 +132,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         function(error){
             $scope.endSearchCmisRimborso = true;
         });        
-    }
-    
-        ElencoRimborsiMissioneService.findListAnnullamentiToValidate().then(function(response){
+   
+        ElencoRimborsiMissioneService.findListAnnullamentiToValidate(uo).then(function(response){
             $scope.listAnnullamentiRimborsiMissioniToValidate = response;
             $scope.esistonoAnnullamentiRimborsiDaConfermare = false;
             if ($scope.listAnnullamentiRimborsiMissioniToValidate){
@@ -141,6 +146,58 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         function(error){
             $scope.endSearchCmisAnnullamentiRimborso = true;
         });        
+    }
+
+    $scope.uoWorkForSpecialUser = null;
+    $scope.endSearchCmisAnnullamenti = false;
+    $scope.endSearchCmisAnnullamentiRimborso = false;
+    $scope.endSearchCmisOrdine = false;
+    $scope.endSearchCmisRimborso = false;
+    if (!$sessionStorage.account || !$sessionStorage.account.login) {
+      $location.path('/login');
+    } else {
+        $scope.account = $sessionStorage.account;
+        recuperoMessaggio();
+        var uoForUsersSpecial = $scope.account.uoForUsersSpecial;
+        if (uoForUsersSpecial){
+            $scope.userSpecial = true;
+            var today = DateService.today().then(function(result){
+                if (result){
+                    var elenco = ProxyService.getUos(result.getFullYear(), null, ProxyService.buildUoRichiedenteSiglaFromUoSiper($scope.account)).then(function(result){
+                        $scope.uoForUsersSpecial = [];
+                        if (result && result.data){
+                            var uos = result.data.elements;
+                            var ind = -1;
+                            for (var i=0; i<uos.length; i++) {
+                                for (var k=0; k<uoForUsersSpecial.length; k++) {
+                                    if (uos[i].cd_unita_organizzativa == ProxyService.buildUoSiglaFromUoSiper(uoForUsersSpecial[k].codice_uo)){
+                                        ind ++;
+                                        $scope.uoForUsersSpecial[ind] = uos[i];
+                                    }
+                                }
+                            }
+                            if ($scope.uoForUsersSpecial.length === 1){
+                                $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
+                                $scope.selectUo($scope.uoWorkForSpecialUser.cd_unita_organizzativa);
+                            } else {
+                                recuperoMissioni(null);
+                            }
+                        } else {
+                            $scope.userSpecial = false;
+                            recuperoMissioni(null);
+                        }
+                    });
+                }
+            });
+        } else {
+            $scope.userSpecial = false;
+            recuperoMissioni(null);
+        }
+    }
+
+    $scope.selectUo = function (uo) {
+        recuperoMissioni(uo);
+    };
 
     $scope.doSelectRimborsoMissioneValidazione = function (rimborsoMissione) {
         $location.path('/rimborso-missione/'+rimborsoMissione.id+'/'+"S");

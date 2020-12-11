@@ -4,6 +4,7 @@ import it.cnr.si.missioni.security.JWTAuthenticationManager;
 import it.cnr.si.missioni.security.jwt.JWTConfigurer;
 import it.cnr.si.missioni.security.jwt.TokenProvider;
 import it.cnr.si.security.AuthoritiesConstants;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import javax.inject.Inject;
 
@@ -23,6 +26,13 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter 
     @Inject
     private TokenProvider tokenProvider;
 
+    @Bean
+    public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowSemicolon(true);
+        return firewall;
+    }
+
     @Override
     public void configure(WebSecurity web) throws Exception {
 
@@ -32,6 +42,7 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter 
             .antMatchers("/SIGLA/**")
                 .antMatchers("/api/rest/flows")
         ;
+        web.httpFirewall(allowUrlEncodedSlashHttpFirewall());
     }
 
     @Override

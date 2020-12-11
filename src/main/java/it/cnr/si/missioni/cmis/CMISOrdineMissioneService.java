@@ -516,37 +516,20 @@ public class CMISOrdineMissioneService {
 		CMISOrdineMissione cmisOrdineMissione = create(principal, annullamento.getOrdineMissione(), annullamento.getAnno());
 		StorageObject so = salvaStampaAnnullamentoOrdineMissioneSuCMIS(principal, stampa, annullamento);
 
-//		String nodeRefFirmatario = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUserNamePrimoFirmatario());
-
-
-//		String nodeRefFirmatarioAggiunto = null;
-//		String nodeRefFirmatarioSpesaAggiunto = null;
-//		if (cmisOrdineMissione.getUsernameFirmatarioAggiunto() != null){
-//			nodeRefFirmatarioAggiunto = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUsernameFirmatarioAggiunto());
-//		}
-//		if (cmisOrdineMissione.getUsernameFirmatarioSpesaAggiunto() != null){
-//			nodeRefFirmatarioSpesaAggiunto = missioniCMISService.recuperoNodeRefUtente(cmisOrdineMissione.getUsernameFirmatarioSpesaAggiunto());
-//		}
-
 		MessageForFlowAnnullamento messageForFlows = new MessageForFlowAnnullamento();
 		try {
-			StringBuilder nodeRefs = new StringBuilder();
-			if (annullamento.isStatoNonInviatoAlFlusso()){
-				aggiungiDocumento(so, nodeRefs);
-			}
 
-			messageForFlows.setIdMissione(cmisOrdineMissione.getIdMissioneOrdine().toString());
-			messageForFlows.setIdMissioneRevoca(cmisOrdineMissione.getIdMissioneRevoca().toString());
+			messageForFlows.setIdMissione(annullamento.getId().toString());
+			messageForFlows.setIdMissioneOrdine(annullamento.getOrdineMissione().getId().toString());
+
+			messageForFlows.setIdMissioneRevoca(annullamento.getId().toString());
 			messageForFlows.setTitolo("Annullamento "+cmisOrdineMissione.getWfDescription());
 			messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
+			messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_REVOCA);
 
-/* TODO
-			messageForFlows.setGruppoFirmatarioSpesa();
-			messageForFlows.setGruppoFirmatarioUo();
-			messageForFlows.setIdStrutturaSpesaMissioni();
-			messageForFlows.setIdStrutturaUoMissioni();
-*/
+			messageForFlows = (MessageForFlowAnnullamento) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
 
+			messageForFlows.setPathFascicoloDocumenti(createFolderOrdineMissione(annullamento.getOrdineMissione()));
 			messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
 			messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
 			messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
@@ -598,62 +581,43 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
 			messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
 			messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
-			messageForFlows.setWfOrdineDaRevoca(annullamento.getOrdineMissione().getIdFlusso());
-			
-			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
+			messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().getIdFlusso());
+			messageForFlows.setValidazioneSpesaFlag("si");
 
-			}
 		} catch (Exception e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: "+e);
 		}
 		MultiValueMap parameters = new LinkedMultiValueMap<String, String>();
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, String>>() {});
+		Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {});
 		parameters.setAll(maps);
 
-		caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, so);
+		messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, so);
 
 		if (annullamento.isStatoNonInviatoAlFlusso()){
-			try {
-				OrdineMissione ordineMissione = annullamento.getOrdineMissione();
-				if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(),"N").equals("C")){
-					annullamentoOrdineMissioneService.popolaCoda(annullamento);
-				} else {
-					String idFlusso = missioniCMISService.startFlowAnnullamentoOrdineMissione(messageForFlows);
-
-					annullamento.setIdFlusso(idFlusso);
-					annullamento.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-				}
-			} catch (AwesomeException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-			}
+			parameters.add("commento", "");
 		} else {
-			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
-				ResultFlows result = getFlowsOrdineMissione(annullamento.getIdFlusso());
-				if (!StringUtils.isEmpty(result.getTaskId())){
-					missioniCMISService.restartFlow(messageForFlows, result);
-				} else {
-					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
-				}
+			if ((annullamento.isStatoInviatoAlFlusso() || annullamento.isStatoRespintoFlusso()) && !StringUtils.isEmpty(annullamento.getIdFlusso())){
+				parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, annullamento.getIdFlusso());
 			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Annullamento "+annullamento.getId());
 			}
 		}
-	}
 
-	private void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so){
-		if (so != null){
-			params.add(tipoDocumento+"_label", Costanti.TIPO_DOCUMENTO_FLOWS.get(tipoDocumento));
-			params.add(tipoDocumento+"_nodeRef", so.getKey());
-			params.add(tipoDocumento+"_mimetype", so.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
-			params.add(tipoDocumento+"_aggiorna", "true");
-			params.add(tipoDocumento+"_path", ((LinkedList)params.get("pathFascicoloDocumenti")).get(0));
-			params.add(tipoDocumento+"_filename", so.getPropertyValue(StoragePropertyNames.NAME.value()));
+
+		try {
+				String idFlusso = messageForFlowsService.avviaFlusso(parameters);
+				if (StringUtils.isEmpty(annullamento.getIdFlusso())){
+					annullamento.setIdFlusso(idFlusso);
+				}
+				annullamento.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+		} catch (AwesomeException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
 		}
 	}
-
 
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
@@ -664,7 +628,7 @@ public class CMISOrdineMissioneService {
 		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
 		StorageObject documentoAnticipo = null;
 		List<StorageObject> allegati = new ArrayList<>();
-		List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione);
+		List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione, true);
 		if (allegatiOrdineMissione != null && !allegatiOrdineMissione.isEmpty()){
 			allegati.addAll(allegatiOrdineMissione);
 		}
@@ -759,20 +723,20 @@ public class CMISOrdineMissioneService {
 			Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {});
 			parameters.setAll(maps);
 
-			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
-			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo);
-			caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria);
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo);
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria);
 
-			aggiungiAllegati(allegati, parameters);
+			messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 
-			if (ordineMissione.isStatoInviatoAlFlusso()){
-				if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
+			if (ordineMissione.isStatoNonInviatoAlFlusso()){
+				parameters.add("commento", "");
+			} else {
+				if ((ordineMissione.isStatoInviatoAlFlusso() || ordineMissione.isStatoRespintoFlusso())  && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
 					parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, ordineMissione.getIdFlusso());
 				} else {
-					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
+					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Ordine "+ordineMissione.getId());
 				}
-			} else {
-				parameters.add("commento", "");
 			}
 
 				try {
@@ -782,11 +746,11 @@ public class CMISOrdineMissioneService {
 						String idFlusso = messageForFlowsService.avviaFlusso(parameters);
 						if (StringUtils.isEmpty(ordineMissione.getIdFlusso())){
 							ordineMissione.setIdFlusso(idFlusso);
-							ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 							if (anticipo != null){
 								anticipo.setIdFlusso(idFlusso);
 							}
 						}
+						ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 
 					}
 				} catch (AwesomeException e) {
@@ -800,35 +764,6 @@ public class CMISOrdineMissioneService {
 		}
 
 	}
-	private void aggiungiDocumento(StorageObject documento,
-			StringBuilder nodeRefs) {
-		if (documento != null){
-			if (nodeRefs.length() > 0){
-				 nodeRefs.append(",");
-			}
-			nodeRefs.append(documento.getKey());
-		 }
-	}
-
-	private void aggiungiFirmatario(String newFirmatario,
-			StringBuilder nodeRefs) {
-		if (newFirmatario != null){
-			if (nodeRefs.length() > 0){
-				 nodeRefs.append(",");
-			}
-			nodeRefs.append(newFirmatario);
-		 }
-	}
-
-	private void aggiungiAllegati(List<StorageObject> allegati,
-								  MultiValueMap params) {
-		if (allegati != null && !allegati.isEmpty()){
-			for (StorageObject so : allegati){
-				caricaDocumento(params, Costanti.TIPO_DOCUMENTO_ALLEGATO, so);
-			}
-		 }
-	}
-
 	public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException{
 		String id = getNodeRefOrdineMissione(ordineMissione);
 		if (id != null){
@@ -1013,18 +948,14 @@ public class CMISOrdineMissioneService {
 		ordineMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }
 
-	public ResultFlows getFlowsOrdineMissione(String idFlusso){
-		return missioniCMISService.recuperoFlusso(idFlusso);
-	}
-
 	private void abortFlowOrdineMissione(OrdineMissione ordineMissione)  {
-    	ResultFlows result = getFlowsOrdineMissione(ordineMissione.getIdFlusso());
-    	if (!StringUtils.isEmpty(result.getTaskId())){
-        		MessageForFlowOrdine message = createJsonForAbortFlowOrdineMissione();
-        		missioniCMISService.abortFlow(message, result);
-    	} else {
-    		throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Task Id del flusso non trovato.");
-    	}
+		MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
+		ObjectMapper mapper = new ObjectMapper();
+		if ( ordineMissione.isStatoRespintoFlusso()  && !StringUtils.isEmpty(ordineMissione.getIdFlusso())){
+			messageForFlowsService.annullaFlusso(parameters, ordineMissione.getIdFlusso());
+		} else {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Ordine "+ordineMissione.getId());
+		}
     }
 
 	private MessageForFlowOrdine createJsonForAbortFlowOrdineMissione() {
@@ -1175,8 +1106,12 @@ public class CMISOrdineMissioneService {
 	}
 
 	public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione) {
+		return getDocumentsOrdineMissione(ordineMissione, false);
+	}
+
+	public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione, Boolean recuperoFileEliminati) {
 		StorageObject folder = recuperoFolderOrdineMissione(ordineMissione);
-		List<StorageObject> objs = missioniCMISService.recuperoDocumento(folder, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value());
+		List<StorageObject> objs = missioniCMISService.recuperoDocumento(folder, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value(), recuperoFileEliminati);
 
 		return objs;
 	}

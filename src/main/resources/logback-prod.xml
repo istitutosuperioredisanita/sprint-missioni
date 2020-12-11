@@ -22,6 +22,7 @@
     </appender>
 
     <!-- logger CNR -->
+    <logger name="Log Request" level="INFO"/>
     <logger name="it.cnr" level="INFO"/>
     <logger name="com.sun" level="WARN"/>
     <logger name="com.hazelcast" level="DEBUG"/>

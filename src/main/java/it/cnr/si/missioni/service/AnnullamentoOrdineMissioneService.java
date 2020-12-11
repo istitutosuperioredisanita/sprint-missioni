@@ -117,11 +117,6 @@ public class AnnullamentoOrdineMissioneService {
 		List<AnnullamentoOrdineMissione> listaAnnullamentiMissione = getAnnullamenti(principal, filter, false, true);
 		if (listaAnnullamentiMissione != null && !listaAnnullamentiMissione.isEmpty()){
 			annullamento = listaAnnullamentiMissione.get(0);
-			if (retrieveDataFromFlows){
-				if (annullamento.isStatoInviatoAlFlusso()){
-// TODO alla firma di chi
-				}
-			}
 		}
 		return annullamento;
     }
@@ -384,16 +379,6 @@ public class AnnullamentoOrdineMissioneService {
 		}
 	}
 	
-	public String retrieveStateFromFlows(ResultFlows result) {
-		return result.getState();
-	}
-
-	public ResultFlows retrieveDataFromFlows(AnnullamentoOrdineMissione annullamento)
-			throws ComponentException {
-		ResultFlows result = cmisOrdineMissioneService.getFlowsOrdineMissione(annullamento.getIdFlusso());
-		return result;
-	}
-
     @Transactional(readOnly = true)
     public AnnullamentoOrdineMissione getAnnullamentoMissione(Principal principal, Long idMissione) throws ComponentException {
 		return getAnnullamentoOrdineMissione(principal, idMissione, false);
@@ -552,7 +537,9 @@ public class AnnullamentoOrdineMissioneService {
 					List<String> listaStatiFlusso = new ArrayList<String>();
 					listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
 					listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
-					listaStatiFlusso.add(Costanti.STATO_NON_INVIATO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_INSERITO);
+					listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_FLUSSO);
+					listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
 					criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction().add(Restrictions.in("statoFlusso", listaStatiFlusso)).add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
 				}
 

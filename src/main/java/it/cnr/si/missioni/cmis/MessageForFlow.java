@@ -10,8 +10,18 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	public final static String TIPOLOGIA_MISSIONE_RIMBORSO = "rimborso";
 
 	String idMissione;
+	String idMissioneOrdine;
 	String oggetto;
 	String annoMissione;
+
+	public String getIdMissioneOrdine() {
+		return idMissioneOrdine;
+	}
+
+	public void setIdMissioneOrdine(String idMissioneOrdine) {
+		this.idMissioneOrdine = idMissioneOrdine;
+	}
+
 	String numeroMissione;
 
 	public String getIdMissione() {
@@ -59,6 +69,15 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String validazioneModuloFlag;
 	String userNameUtenteMissione;
 	String userNameRichiedente;
+
+	public String getLinkToOtherWorkflows() {
+		return linkToOtherWorkflows;
+	}
+
+	public void setLinkToOtherWorkflows(String linkToOtherWorkflows) {
+		this.linkToOtherWorkflows = linkToOtherWorkflows;
+	}
+
 	String userNameResponsabileModulo;
 	String userNamePrimoFirmatario;
 	String userNameFirmatarioSpesa;
@@ -68,6 +87,7 @@ public class MessageForFlow extends JSONBody implements Serializable{
 	String uoRich;
 	String descrizioneUoRich;
 	String uoSpesa;
+	String linkToOtherWorkflows;
 
 	public String getUoRichSigla() {
 		return uoRichSigla;
