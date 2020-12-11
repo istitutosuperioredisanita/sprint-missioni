@@ -76,7 +76,7 @@ public class FlowService {
                             if (rimborsoMissioneAggiornato != null){
                                 taskExecutor.execute( new Runnable() {
                                     public void run() {
-                                        comunicaMissioneSiglaService.comunicaRimborsoSiglaAsync(principal, rimborsoMissioneAggiornato.getId());
+                                        comunicaMissioneSiglaService.comunicaRimborsoSigla(principal, rimborsoMissioneAggiornato.getId());
                                     }
                                 });
                             }

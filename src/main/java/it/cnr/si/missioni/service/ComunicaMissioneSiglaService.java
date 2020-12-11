@@ -14,7 +14,7 @@ public class ComunicaMissioneSiglaService {
     @Autowired
     ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
-    public MissioneBulk comunicaRimborsoSiglaAsync(Principal principal, Serializable rimborsoApprovatoId) {
+    public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) {
         return comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoApprovatoId);
     }
 }
