@@ -1,9 +1,7 @@
 package it.cnr.si.missioni.util;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -152,6 +150,13 @@ public class Costanti {
         aMap.put(TIPO_DOCUMENTO_MISSIONE, "Missione");
         aMap.put(TIPO_DOCUMENTO_GIUSTIFICATIVO, "Giustificativo");
         TIPO_DOCUMENTO_FLOWS = Collections.unmodifiableMap(aMap);
+    }
+    public final static List<String> TIPI_DOCUMENTO_FLOWS_DA_FIRMARE;
+    static {
+        List<String> list = new ArrayList<String>();
+        list.add(TIPO_DOCUMENTO_MISSIONE);
+        list.add(TIPO_DOCUMENTO_ANTICIPO);
+        TIPI_DOCUMENTO_FLOWS_DA_FIRMARE = Collections.unmodifiableList(list);
     }
 	public final static Map<String, String> PRIORITA;
     static {

@@ -57,7 +57,7 @@ missioniApp.factory('OrdineMissioneService', function ($resource, DateUtils) {
     });
 
 missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope, $routeParams, $sessionStorage, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
-            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session, DatiIstitutoService, DateService, DateUtils) {
+            ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session, DatiIstitutoService, DateService, DateUtils, MissioniRespinte) {
 
     var urlRestProxy = URL_REST.STANDARD;
     var isInQuery = function(){
@@ -1049,6 +1049,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
         }
     }
 
+    $scope.histories = [];
     $scope.idMissione = $routeParams.idMissione;
     $scope.validazione = $routeParams.validazione;
     $scope.accessToken = AccessToken.get();

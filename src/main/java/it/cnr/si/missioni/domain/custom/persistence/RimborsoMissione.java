@@ -1507,6 +1507,14 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		return false;
 	}
 
+	@Transient
+	public Boolean isMissioneDaComunicareSigla() {
+		if (Utility.nvl(getStatoInvioSigla(),"N").equals(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE)){
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return "RimborsoMissione{" +

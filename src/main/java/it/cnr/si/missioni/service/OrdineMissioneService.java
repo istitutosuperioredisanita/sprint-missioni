@@ -154,6 +154,9 @@ public class OrdineMissioneService {
 	@Autowired
 	private MissioniCMISService missioniCMISService;
 
+	@Autowired
+	private MissioneRespintaService missioneRespintaService;
+
 	@Value("${spring.mail.messages.invioResponsabileGruppo.oggetto}")
 	private String subjectSendToManagerOrdine;
 
@@ -323,6 +326,8 @@ public class OrdineMissioneService {
 			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
 		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+
+		missioneRespintaService.inserisciMissioneRespinta(principal, result);
 	}
 
 	public OrdineMissioneAnticipo getAnticipo(Principal principal, OrdineMissione ordineMissioneDaAggiornare)
@@ -374,13 +379,14 @@ public class OrdineMissioneService {
 			}
 		} catch (Exception e){
 			mailService.sendEmailError(subjectErrorFlowsOrdine, "Errore in aggiornaOrdineMissione: "+e.getMessage(), false, true);
+			throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
 		}
 	}
 
 	private void erroreOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
 		String errore = "Esito flusso non corrispondente con lo stato dell'ordine.";
 		String testoErrore = getTextErrorOrdine(ordineMissioneDaAggiornare, flowResult, errore);
-		mailService.sendEmailError(subjectErrorFlowsOrdine, testoErrore, false, true);
+		throw new AwesomeException(CodiciErrore.ERRGEN, errore+" "+ testoErrore);
 	}
 
 	private void aggiornaOrdineMissioneFirmato(Principal principal, OrdineMissione ordineMissioneDaAggiornare) {
@@ -474,7 +480,7 @@ public class OrdineMissioneService {
 	}
 
 	public void popolaCoda(OrdineMissione ordineMissione) {
-		if (ordineMissione.getMatricola() != null) {
+		if (ordineMissione.getMatricola() != null && !isDevProfile()) {
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			String idSede = null;
 			if (account != null) {
@@ -1162,6 +1168,7 @@ public class OrdineMissioneService {
 			sendMailToAdministrative(basePath, ordineMissioneDB);
 		}
 		if (isRitornoMissioneMittente) {
+			missioneRespintaService.inserisciOrdineMissioneRespinto(principal, ordineMissioneDB, ordineMissione.isMissioneInviataResponsabile() ? MissioneRespinta.FASE_RESPINGI_RESP_GRUPPO : MissioneRespinta.FASE_RESPINGI_AMMINISTRATIVI);
 			mailService.sendEmail(subjectReturnToSenderOrdine,
 					getTextMailReturnToSender(principal, basePath, ordineMissioneDB), false, true,
 					accountService.getEmail(ordineMissioneDB.getUidInsert()));
@@ -1225,6 +1232,7 @@ public class OrdineMissioneService {
 		ordineMissioneDB.setDataInvioAmministrativo(ordineMissione.getDataInvioAmministrativo());
 		ordineMissioneDB.setDataInvioRespGruppo(ordineMissione.getDataInvioRespGruppo());
 		ordineMissioneDB.setDataInvioFirma(ordineMissione.getDataInvioFirma());
+		ordineMissioneDB.setCommentoFlusso(ordineMissione.getCommentoFlusso());
 	}
 
 	private void sendMailToAdministrative(String basePath, OrdineMissione ordineMissioneDB) {

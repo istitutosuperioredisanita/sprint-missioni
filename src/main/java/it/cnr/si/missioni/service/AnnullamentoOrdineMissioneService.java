@@ -94,8 +94,11 @@ public class AnnullamentoOrdineMissioneService {
     
 	@Autowired
 	private UoService uoService;
-    
-    @Value("${spring.mail.messages.invioAnnullamentoOrdineMissione.oggetto}")
+
+	@Autowired
+	private MissioneRespintaService missioneRespintaService;
+
+	@Value("${spring.mail.messages.invioAnnullamentoOrdineMissione.oggetto}")
     private String subjectSendToAdministrative;
     
     @Value("${spring.mail.messages.ritornoAnnullamentoOrdineMittente.oggetto}")
@@ -158,6 +161,7 @@ public class AnnullamentoOrdineMissioneService {
 		annullamentoDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
 		annullamentoDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
+		missioneRespintaService.inserisciMissioneRespinta(principal, result);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -186,6 +190,7 @@ public class AnnullamentoOrdineMissioneService {
 			}
 		} catch (Exception e){
 			mailService.sendEmailError(subjectErrorFlowsAnnullamento, "Errore in aggiornaAnnullamentoOrdineMissione: "+e.getMessage(), false, true);
+			throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
 		}
 	}
 
@@ -344,6 +349,7 @@ public class AnnullamentoOrdineMissioneService {
 		annullamentoDB.setStatoFlusso(annullamento.getStatoFlusso());
 		annullamentoDB.setMotivoAnnullamento(annullamento.getMotivoAnnullamento());
 		annullamentoDB.setConsentiRimborso(annullamento.getConsentiRimborso());
+		annullamentoDB.setCommentoFlusso(annullamento.getCommentoFlusso());
 		if (confirm){
 			aggiornaValidazione(principal, annullamentoDB);
 		}
@@ -688,9 +694,8 @@ public class AnnullamentoOrdineMissioneService {
 	private void erroreAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flowResult) {
 		String errore = "Esito flusso non corrispondente con lo stato dell'annullamento.";
 		String testoErrore = getTextErrorAnnullamentoOrdineMissione(principal, annullamentoOrdineMissione, flowResult, errore);
-		mailService.sendEmailError(subjectErrorFlowsAnnullamento, testoErrore, false, true);
+		throw new AwesomeException(CodiciErrore.ERRGEN, errore+" "+testoErrore);
 	}
-
 
 	private String getTextErrorAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flow, String error){
 		OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamentoOrdineMissione.getOrdineMissione().getId());

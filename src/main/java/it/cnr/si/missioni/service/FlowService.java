@@ -7,6 +7,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,24 +67,24 @@ public class FlowService {
                         } else {
                             errore = "L'ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
-                            mailService.sendEmailError(subjectErrorFlowsOrdine + this.toString(), errore, false, true);
+                            throw new AwesomeException(CodiciErrore.ERRGEN, errore);
                         }
                         break;
                     case FlowResult.TIPO_FLUSSO_RIMBORSO:
                         RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, new Long(flowResult.getIdMissione()));
                         if (rimborsoMissione != null){
-                            final RimborsoMissione rimborsoMissioneAggiornato = rimborsoMissioneService.aggiornaRimborsoMissione(principal, rimborsoMissione, flowResult);
-                            if (rimborsoMissioneAggiornato != null){
+                            final RimborsoMissione rimborsoMissioneDaComunicare = rimborsoMissioneService.aggiornaRimborsoMissione(principal, rimborsoMissione, flowResult);
+                            if (rimborsoMissioneDaComunicare != null){
                                 taskExecutor.execute( new Runnable() {
                                     public void run() {
-                                        comunicaMissioneSiglaService.comunicaRimborsoSigla(principal, rimborsoMissioneAggiornato.getId());
+                                        comunicaMissioneSiglaService.comunicaRimborsoSigla(principal, rimborsoMissioneDaComunicare.getId());
                                     }
                                 });
                             }
                         } else {
                             errore = "Il rimborso missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
-                            mailService.sendEmailError(subjectErrorFlowsRimborso + this.toString(), errore, false, true);
+                            throw new AwesomeException(CodiciErrore.ERRGEN, errore);
                         }
                         break;
                     case FlowResult.TIPO_FLUSSO_REVOCA:
@@ -93,30 +94,21 @@ public class FlowService {
                         } else {
                             errore = "L'annullamento ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
-                            mailService.sendEmailError(subjectErrorFlowsAnnullamento + this.toString(), errore, false, true);
+                            throw new AwesomeException(CodiciErrore.ERRGEN, errore);
                         }
                         break;
                 }
 
             } else {
-                try {
                     errore = "ID Missione non presente per l'id del flusso "+flowResult.getProcessInstanceId();
                     log.info(errore);
-                    mailService.sendEmailError(subjectGenericError + this.toString(), errore, false, true);
                     throw new AwesomeException(CodiciErrore.ERRGEN, errore);
-                } catch (Exception e1) {
-                    log.error("Errore durante l'invio dell'e-mail: "+e1);
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Errore durante l'invio dell'e-mail: "+e1);
-                }
             }
         } catch (Exception e){
-            try {
                 errore = e.getMessage();
                 log.info(errore);
                 mailService.sendEmailError(subjectGenericError, errore,  false, true);
-            } catch (Exception e1) {
-                log.error("Errore durante l'invio dell'e-mail: "+e1);
-            }
+                throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
         }
     }
 }

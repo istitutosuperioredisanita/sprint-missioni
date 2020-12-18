@@ -7,8 +7,8 @@
                 <b>  {{'missione.form.stato' | translate}}: </b>{{ordineMissioneModel.decodeStato}}  -  
                 <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{ordineMissioneModel.decodeStatoFlusso}}
   </div>
-  <div  class="my-panel-body panel panel-success" ng-show="commentoFlusso" align="center">
-                <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{ordineMissioneModel.commentFlows}}  -  
+  <div  class="my-panel-body panel panel-success" ng-show="ordineMissioneModel.commentoFlusso && ordineMissioneModel.stato == 'INS'  && (ordineMissioneModel.statoFlusso == 'RUO' ||  ordineMissioneModel.statoFlusso == 'RUS')" align="center">
+                <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{ordineMissioneModel.commentoFlusso}}
   </div>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                     <p class="col-md-12">
@@ -524,6 +524,7 @@
                 <li><a ng-hide="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-no">Anticipo</a></li>
                 <li><a ng-show="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si"></a></li>
                 <li><a ng-show="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-si">Anticipo</a></li>
+                <cnr-modal-history id-missione="ordineMissioneModel.id" tipo-missione="'OR'"> </cnr-modal-history>
               </ul>
             </div>
   </div>

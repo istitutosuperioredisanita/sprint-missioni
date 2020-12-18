@@ -154,6 +154,9 @@ public class RimborsoMissioneService {
 	@Autowired
 	private MailService mailService;
 
+	@Autowired
+	private MissioneRespintaService missioneRespintaService;
+
 	@Value("${spring.mail.messages.ritornoMissioneMittente.oggetto}")
     private String subjectReturnToSenderOrdine;
     
@@ -235,6 +238,7 @@ public class RimborsoMissioneService {
 		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_INSERITO);
 		rimborsoMissioneDaAggiornare.setValidato("N");
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
+		missioneRespintaService.inserisciMissioneRespinta(principal, result);
 	}
 
 	public void aggiornaRimborsoMissioneAnnullato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
@@ -257,7 +261,7 @@ public class RimborsoMissioneService {
 		}
 		LocalDate data = LocalDate.now();
 		if (rimborsoMissioneDaAggiornare.getStatoInvioSigla().equals(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE) && data.getYear() > rimborsoMissioneDaAggiornare.getAnno()){
-			ribaltaMissione(principal, rimborsoMissioneDaAggiornare);
+			ribaltaMissione(principal, rimborsoMissioneDaAggiornare, data.getYear());
 		}
 
 		gestioneMailResponsabileGruppo(principal, rimborsoMissioneDaAggiornare);
@@ -500,17 +504,18 @@ public class RimborsoMissioneService {
 			}
 	   }
 	   if (isRitornoMissioneMittente){
-		   List<String> listaMail = new ArrayList<>();
-		   listaMail.add(getEmail(rimborsoMissioneDB.getUidInsert()));
-		   if (isRitornoMissioneAmministrativi){
+	   		missioneRespintaService.inserisciRimborsoMissioneRespinto(principal, rimborsoMissioneDB);
+		   	List<String> listaMail = new ArrayList<>();
+		   	listaMail.add(getEmail(rimborsoMissioneDB.getUidInsert()));
+		   	if (isRitornoMissioneAmministrativi){
 			   List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(rimborsoMissioneDB.getUoSpesa());
 			   if (lista != null && lista.size() > 0){
 				   List<String> listaMailAmm = mailService.preparaListaMail(lista);
 				   listaMail.addAll(listaMailAmm);
 			   }
-		   }
-		   String[] elencoMail = mailService.preparaElencoMail(listaMail);
-		   mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, rimborsoMissioneDB), false, true, elencoMail);
+		   	}
+		   	String[] elencoMail = mailService.preparaElencoMail(listaMail);
+		   	mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(principal, basePath, rimborsoMissioneDB), false, true, elencoMail);
 	   }
     	return rimborsoMissioneDB;
     }
@@ -571,6 +576,7 @@ public class RimborsoMissioneService {
 		}
 		rimborsoMissioneDB.setCdsCompetenza(rimborsoMissione.getCdsCompetenza());
 		rimborsoMissioneDB.setUoCompetenza(rimborsoMissione.getUoCompetenza());
+		rimborsoMissioneDB.setCommentoFlusso(rimborsoMissione.getCommentoFlusso());
 		rimborsoMissioneDB.setDomicilioFiscaleRich(rimborsoMissione.getDomicilioFiscaleRich());
 		rimborsoMissioneDB.setDataInizioMissione(rimborsoMissione.getDataInizioMissione());
 		rimborsoMissioneDB.setDataFineMissione(rimborsoMissione.getDataFineMissione());
@@ -1626,38 +1632,41 @@ public class RimborsoMissioneService {
 		return buffer;
 	}
 	public Boolean isMissioneComunicabileSigla(Principal principal, RimborsoMissione rimborsoMissione){
-		LocalDate data = LocalDate.now();
-		if (data.getYear() == rimborsoMissione.getAnno()){
-			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
-			if (dati == null){
-				return false;
-			}
-			if (rimborsoMissione.isTrattamentoAlternativoMissione()){
-				if (dati.getDataBloccoRimborsiTam() != null){
-					if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
-						ribaltaMissione(principal, rimborsoMissione);
-						return false;
-					}
-				}
-			} 
-			if (dati.getDataBloccoRimborsi() != null){
-				if (dati.getDataBloccoRimborsi().compareTo(data) < 0){
-					ribaltaMissione(principal, rimborsoMissione);
+    	if (rimborsoMissione.isMissioneDaComunicareSigla()){
+			LocalDate data = LocalDate.now();
+			if (data.getYear() == rimborsoMissione.getAnno()){
+				DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
+				if (dati == null){
 					return false;
 				}
-				return true;
+				if (rimborsoMissione.isTrattamentoAlternativoMissione()){
+					if (dati.getDataBloccoRimborsiTam() != null){
+						if (dati.getDataBloccoRimborsiTam().compareTo(data) < 0){
+							ribaltaMissione(principal, rimborsoMissione, data.getYear() + 1);
+							return false;
+						}
+					}
+				}
+				if (dati.getDataBloccoRimborsi() != null){
+					if (dati.getDataBloccoRimborsi().compareTo(data) < 0){
+						ribaltaMissione(principal, rimborsoMissione, data.getYear() + 1);
+						return false;
+					}
+					return true;
+				} else {
+					return true;
+				}
 			} else {
-				return true;
+				return false;
 			}
-		} else {
-			return false;
 		}
+    	return false;
 	}
 
-	protected void ribaltaMissione(Principal principal, RimborsoMissione rimborsoMissione) {
+	protected void ribaltaMissione(Principal principal, RimborsoMissione rimborsoMissione, Integer anno) {
 		retrieveDetails(principal, rimborsoMissione);
 		if (rimborsoMissione.isTrattamentoAlternativoMissione() || rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
-			rimborsoMissione.setAnno(rimborsoMissione.getAnno() + 1);
+			rimborsoMissione.setAnno(anno);
 			rimborsoMissione.setNumero(datiIstitutoService.getNextPG(principal, rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno(), Costanti.TIPO_RIMBORSO_MISSIONE));
 			rimborsoMissione.setToBeUpdated();
 	    	crudServiceBean.modificaConBulk(principal, rimborsoMissione);
@@ -1700,7 +1709,9 @@ public class RimborsoMissioneService {
 					switch (flowResult.getStato() ) {
 						case FlowResult.ESITO_FLUSSO_FIRMATO:
 							RimborsoMissione rimborsoMissione = aggiornaRimborsoMissioneFirmato(principal, rimborsoMissioneDaAggiornare);
-							return rimborsoMissione;
+							if (isMissioneComunicabileSigla(principal, rimborsoMissione)){
+								return rimborsoMissione;
+							}
 						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
 							aggiornaRimborsoMissionePrimaFirma(principal, rimborsoMissioneDaAggiornare);
 							break;
@@ -1726,7 +1737,7 @@ public class RimborsoMissioneService {
 	private void erroreRimborsoMissione(RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
 		String errore = "Esito flusso non corrispondente con lo stato del rimborso.";
 		String testoErrore = getTextErrorRimborso(rimborsoMissioneDaAggiornare, flowResult, errore);
-		mailService.sendEmailError(subjectErrorFlowsRimborso, testoErrore, false, true);
+		throw new AwesomeException(CodiciErrore.ERRGEN, errore + " "+testoErrore);
 	}
 
 	private String getTextErrorRimborso(RimborsoMissione rimborsoMissione, FlowResult flow, String error) {
