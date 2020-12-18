@@ -283,4 +283,9 @@ input:-webkit-autofill {
   .my-panel-body {
     background: #FFF !important;
   }
+
+  .modal-dialog .mdl-large {
+    width: 1100px;
+  }
+
 }

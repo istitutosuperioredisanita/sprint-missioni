@@ -7,8 +7,8 @@
                 <b>  {{'missione.form.stato' | translate}}: </b>{{annullamentoModel.decodeStato}}  --  
                 <span ng-show="annullamentoModel.statoFlusso && annullamentoModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{annullamentoModel.decodeStatoFlusso}}
   </div>
-        <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
-                      <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{annullamentoModel.commentFlows}}
+        <div  class="my-panel-body panel panel-success" ng-show="annullamentoModel.commentoFlusso && annullamentoModel.stato == 'INS'  && (annullamentoModel.statoFlusso == 'RUO' ||  annullamentoModel.statoFlusso == 'RUS')" align="center">
+                      <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{annullamentoModel.commentoFlusso}}
         </div>
             <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
                     <p class="col-md-12">

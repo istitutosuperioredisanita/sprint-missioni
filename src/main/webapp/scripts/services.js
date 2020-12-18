@@ -31,6 +31,18 @@ missioniApp.factory('Activate', function ($resource) {
         });
     });
 
+missioniApp.factory('MissioniRespinte', function ($http) {
+        return {
+            findHistoryMissioniRespinte: function(tipoMissione,  idMissione) {
+                var promise = $http.get('api/rest/missioniRespinte/history', {params: {tipoMissione : tipoMissione, 
+                        idMissione: idMissione}}).then(function (response) {
+                    return response.data;
+                });
+                return promise;
+            }    
+        }    
+    });
+
 missioniApp.factory('Account', function ($resource) {
         return $resource('api/siper-account', {}, {
         });

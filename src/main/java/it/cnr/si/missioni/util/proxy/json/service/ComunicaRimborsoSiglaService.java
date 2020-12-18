@@ -101,7 +101,7 @@ public class ComunicaRimborsoSiglaService {
 			} catch (Exception e1) {
 				log.error("Errore durante l'invio dell'e-mail: "+e1);
 			}
-			return null;
+			throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
 		}
 	}
 

@@ -1,5 +1,7 @@
 package it.cnr.si.missioni.domain.custom;
 
+import it.cnr.si.missioni.amq.domain.Missione;
+import it.cnr.si.missioni.domain.custom.persistence.MissioneRespinta;
 import it.cnr.si.missioni.util.Costanti;
 
 import java.io.Serializable;
@@ -9,17 +11,19 @@ import java.util.Map;
 
 public class FlowResult implements Serializable {
     private String processInstanceId;
+
     private String tipologiaMissione;
     private String idMissione;
     private String stato;
     private String commento;
+    private String user;
 
     public final static String TIPO_FLUSSO_ORDINE = "ordine";
     public final static String TIPO_FLUSSO_RIMBORSO = "rimborso";
     public final static String TIPO_FLUSSO_REVOCA = "revoca";
 
     public final static String ESITO_FLUSSO_FIRMATO = "FIRMATO";
-    public final static String ESITO_FLUSSO_FIRMA_UO = "FIRMA_UO";
+    public final static String ESITO_FLUSSO_FIRMA_UO = "FIRMATO_UO";
     public final static String ESITO_FLUSSO_RESPINTO_UO = "RESPINTO_UO";
     public final static String ESITO_FLUSSO_RESPINTO_UO_SPESA = "RESPINTO_UO_SPESA";
 
@@ -84,5 +88,21 @@ public class FlowResult implements Serializable {
         aMap.put(ESITO_FLUSSO_RESPINTO_UO_SPESA, Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
         STATO_FLUSSO_SCRIVANIA_MISSIONI = Collections.unmodifiableMap(aMap);
     }
+    public final static Map<String, String> TIPO_FLUSSO_MISSIONE;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(TIPO_FLUSSO_ORDINE, MissioneRespinta.OPERAZIONE_MISSIONE_ORDINE);
+        aMap.put(TIPO_FLUSSO_REVOCA, MissioneRespinta.OPERAZIONE_MISSIONE_ANNULLAMENTO_ORDINE);
+        aMap.put(TIPO_FLUSSO_RIMBORSO, MissioneRespinta.OPERAZIONE_MISSIONE_RIMBORSO);
+        TIPO_FLUSSO_MISSIONE = Collections.unmodifiableMap(aMap);
+    }
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
 
 }

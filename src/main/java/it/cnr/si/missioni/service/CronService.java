@@ -280,21 +280,25 @@ public class CronService {
 		}
 		if (listaRimborsiMissione != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
-				LOGGER.info("Comunica Missione: "+rimborsoMissione.getId());
-				if (rimborsoMissioneService.isMissioneComunicabileSigla(principal, rimborsoMissione)){
-					LOGGER.info("Missione Comunicabile: "+rimborsoMissione.getId());
-					try {
-//						comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
-					} catch (Exception e) {
-						String error = Utility.getMessageException(e);
-						String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
-						LOGGER.error(testoErrore+" "+e);
-						try {
-							mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
-						} catch (Exception e1) {
-							LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
-						}
-					}
+				comunicaRimborsoSigla(principal, rimborsoMissione);
+			}
+		}
+	}
+
+	private void comunicaRimborsoSigla(Principal principal, RimborsoMissione rimborsoMissione) {
+		LOGGER.info("Comunica Missione: "+ rimborsoMissione.getId());
+		if (rimborsoMissioneService.isMissioneComunicabileSigla(principal, rimborsoMissione)){
+			LOGGER.info("Missione Comunicabile: "+ rimborsoMissione.getId());
+			try {
+				comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
+			} catch (Exception e) {
+				String error = Utility.getMessageException(e);
+				String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
+				LOGGER.error(testoErrore+" "+e);
+				try {
+					mailService.sendEmailError(subjectErrorComunicazioneRimborso, testoErrore, false, true);
+				} catch (Exception e1) {
+					LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 				}
 			}
 		}

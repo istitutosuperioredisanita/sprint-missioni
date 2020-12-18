@@ -378,6 +378,25 @@ angular.module('missioniApp')
 
       }
     };
+  }).directive('cnrModalHistory', function ($log, $http, MissioniRespinte) {
+    return {
+      restrict: 'E',
+      scope: {
+        idMissione: '=',
+        tipoMissione: '='
+      },
+      templateUrl: 'views/cnr-modal-history.html',
+      link: function (scope) {
+        scope.getHistory = function(){
+            if (scope.idMissione){
+                MissioniRespinte.findHistoryMissioniRespinte(scope.tipoMissione, scope.idMissione).then(function(data){
+                    scope.histories = data;
+                    $('#modalHistory').modal('toggle');
+                });
+            }
+        }
+      }
+    };
   }).directive("numberFormat", [
   '$filter', function(filter) {
     return {
