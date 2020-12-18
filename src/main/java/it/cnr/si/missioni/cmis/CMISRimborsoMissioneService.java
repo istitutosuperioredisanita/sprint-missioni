@@ -670,7 +670,7 @@ public class CMISRimborsoMissioneService {
 			Map<String, Object> maps = mapper.convertValue(messageForFlow, new TypeReference<Map<String, Object>>() {});
 			parameters.setAll(maps);
 
-			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento, rimborsoMissione.getStatoFlusso());
 
 			messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 			messageForFlowsService.aggiungiDocumentiMultipli(giustificativi, parameters, Costanti.TIPO_DOCUMENTO_GIUSTIFICATIVO);

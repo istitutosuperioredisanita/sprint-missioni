@@ -592,7 +592,7 @@ public class CMISOrdineMissioneService {
 		Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {});
 		parameters.setAll(maps);
 
-		messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, so);
+		messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, so, annullamento.getStatoFlusso());
 
 		if (annullamento.isStatoNonInviatoAlFlusso()){
 			parameters.add("commento", "");
@@ -723,9 +723,9 @@ public class CMISOrdineMissioneService {
 			Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {});
 			parameters.setAll(maps);
 
-			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento);
-			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo);
-			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria);
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento, ordineMissione.getStatoFlusso());
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo, ordineMissione.getStatoFlusso());
+			messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria, ordineMissione.getStatoFlusso());
 
 			messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 

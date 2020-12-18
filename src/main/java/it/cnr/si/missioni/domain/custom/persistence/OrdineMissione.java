@@ -182,7 +182,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "OGGETTO", length = 1000, nullable = false)
     public String oggetto;
 
-	@Size(min = 0, max = 2000)
+	@Size(min = 0, max = 1000)
 	@Column(name = "COMMENTO_FLUSSO", length = 1000, nullable = true)
 	public String commentoFlusso;
 

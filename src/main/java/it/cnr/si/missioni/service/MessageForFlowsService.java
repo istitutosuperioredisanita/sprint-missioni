@@ -193,19 +193,20 @@ public class MessageForFlowsService {
     }
 
     public MultiValueMap<String, Object> aggiungiParametriRiavviaFlusso(MultiValueMap<String, Object> parameters , String idFlusso){
-        ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
-        String taskId = taskIdResponse.getBody().getId();
-        parameters.add("taskId", taskId);
-        parameters.add("commento", "");
-        parameters.add("sceltaUtente", "Riproponi");
+        preparaParametriPerRiavvioFlusso(parameters, idFlusso);
+        parameters.add("sceltaUtente", "FirmaUo");
         return parameters;
     }
 
-    public void annullaFlusso(MultiValueMap<String, Object> parameters , String idFlusso){
+    private void preparaParametriPerRiavvioFlusso(MultiValueMap<String, Object> parameters, String idFlusso) {
         ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
         String taskId = taskIdResponse.getBody().getId();
         parameters.add("taskId", taskId);
         parameters.add("commento", "");
+    }
+
+    public void annullaFlusso(MultiValueMap<String, Object> parameters , String idFlusso){
+        preparaParametriPerRiavvioFlusso(parameters, idFlusso);
         parameters.add("sceltaUtente", "Annulla");
         ResponseEntity<ProcessDefinitions> processDefinitions = flowsService.getProcessDefinitions(Costanti.NOME_PROCESSO_FLOWS_MISSIONI);
         if (processDefinitions.getStatusCode().is2xxSuccessful()){
@@ -262,24 +263,26 @@ public class MessageForFlowsService {
         }
     }
 
-    public void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so){
-        caricaDocumento(params, tipoDocumento, so, tipoDocumento);
+    public void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so, String statoFlusso){
+        caricaDocumento(params, tipoDocumento, so, statoFlusso, tipoDocumento);
     }
 
     private String getPathWithoutFileName(StorageObject so) {
         return so.getPath().substring(0, so.getPath().length() - so.getPropertyValue(StoragePropertyNames.NAME.value()).toString().length() -1);
     }
 
-    private void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so, String nomeDocumentoFlows){
+    private void caricaDocumento(MultiValueMap params, String tipoDocumento, StorageObject so, String statoFlusso, String nomeDocumentoFlows){
         if (so != null){
             params.add(nomeDocumentoFlows+"_label", Costanti.TIPO_DOCUMENTO_FLOWS.get(tipoDocumento));
             params.add(nomeDocumentoFlows+"_nodeRef", so.getKey());
             params.add(nomeDocumentoFlows+"_mimetype", so.getPropertyValue(StoragePropertyNames.CONTENT_STREAM_MIME_TYPE.value()));
             params.add(nomeDocumentoFlows+"_aggiorna", "true");
-            params.add(nomeDocumentoFlows+"_path", getPathWithoutFileName(so));
+            params.add(nomeDocumentoFlows+"_path", so.getPath());
             params.add(nomeDocumentoFlows+"_filename", so.getPropertyValue(StoragePropertyNames.NAME.value()));
             if (missioniCMISService.isDocumentoEliminato(so)){
                 params.add(nomeDocumentoFlows+"_stati_json", "Annullato");
+            } else if (Costanti.TIPI_DOCUMENTO_FLOWS_DA_FIRMARE.contains(tipoDocumento) && Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO.equals(statoFlusso)){
+                params.add(nomeDocumentoFlows+"_stati_json", "[]");
             }
         }
     }

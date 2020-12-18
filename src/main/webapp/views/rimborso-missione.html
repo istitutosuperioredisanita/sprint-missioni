@@ -9,8 +9,8 @@
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.stato-invio-sigla' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoInvioSigla}}  --  
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.id-sigla' | translate}}: </b>{{rimborsoMissioneModel.idSigla}}
   </div>
-        <div  class="my-panel-body panel panel-success" ng-show="showCommentFlows" align="center">
-                      <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{rimborsoMissioneModel.commentFlows}}
+        <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.commentoFlusso && rimborsoMissioneModel.stato == 'INS'  && (rimborsoMissioneModel.statoFlusso == 'RUO' ||  rimborsoMissioneModel.statoFlusso == 'RUS')" align="center">
+                      <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{rimborsoMissioneModel.commentoFlusso}}
         </div>
         <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.statoPagamento" align="center">
                       <b>{{'rimborso-missione.form.stato-pagamento-sigla' | translate}} </b>{{rimborsoMissioneModel.statoPagamento}}
@@ -685,7 +685,8 @@ fine commento multi impegno-->
               <ul class="pager" ng-show="showEsisteRimborsoMissione">
                 <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
                 <li ng-show = "!rimborsoMissioneModel.rimborso0 || rimborsoMissioneModel.rimborso0 != 'S'"><a ng-click="goDettagliSpesa()" translate="rimborso-missione.button.dettagli"></a></li>
-              </ul>
+                 <cnr-modal-history id-missione="rimborsoMissioneModel.id" tipo-missione="'RI'"> </cnr-modal-history>
+             </ul>
             </div>
   </div>
      <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoComplessivo | currency : "€"}}     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli-non-anticipati' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoSenzaAnticipi | currency : "€"}}
