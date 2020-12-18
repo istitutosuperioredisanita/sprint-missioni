@@ -11,7 +11,10 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +50,7 @@ public class MissioneRespinta extends OggettoBulkXmlTransient {
 	private Long idMissione;
 
     @Column(name = "DATA_INSERIMENTO", nullable = false)
-    public LocalDate dataInserimento;
+    public Timestamp dataInserimento;
 
     @Size(min = 0, max = 2)
     @Column(name = "TIPO_OPERAZIONE_MISSIONE", length = 2, nullable = false)
@@ -103,11 +106,11 @@ public class MissioneRespinta extends OggettoBulkXmlTransient {
 		this.idMissione = idMissione;
 	}
 
-	public LocalDate getDataInserimento() {
+	public Timestamp getDataInserimento() {
 		return dataInserimento;
 	}
 
-	public void setDataInserimento(LocalDate dataInserimento) {
+	public void setDataInserimento(Timestamp dataInserimento) {
 		this.dataInserimento = dataInserimento;
 	}
 

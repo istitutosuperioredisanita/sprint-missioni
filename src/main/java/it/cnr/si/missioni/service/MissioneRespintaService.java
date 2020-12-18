@@ -12,7 +12,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,7 +31,7 @@ public class MissioneRespintaService {
     public void inserisciMissioneRespinta(Principal principal, FlowResult flowResult){
         MissioneRespinta missioneRespinta = new MissioneRespinta();
         missioneRespinta.setIdMissione(new Long(flowResult.getIdMissione()));
-        missioneRespinta.setDataInserimento(LocalDate.now());
+        missioneRespinta.setDataInserimento(new Timestamp(new Date().getTime()));
         missioneRespinta.setTipoFaseRespingi(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(flowResult.getStato()));
         missioneRespinta.setMotivoRespingi(flowResult.getCommento());
         missioneRespinta.setUidInsert(flowResult.getUser());
@@ -41,7 +44,7 @@ public class MissioneRespintaService {
     public void inserisciOrdineMissioneRespinto(Principal principal, OrdineMissione ordineMissione, String tipoFaseRespingi){
         MissioneRespinta missioneRespinta = new MissioneRespinta();
         missioneRespinta.setIdMissione(new Long(ordineMissione.getId().toString()));
-        missioneRespinta.setDataInserimento(LocalDate.now());
+        missioneRespinta.setDataInserimento(new Timestamp(new Date().getTime()));
         missioneRespinta.setTipoFaseRespingi(tipoFaseRespingi);
         missioneRespinta.setMotivoRespingi(ordineMissione.getNoteRespingi());
         missioneRespinta.setUidInsert(principal.getName());
@@ -54,7 +57,7 @@ public class MissioneRespintaService {
     public void inserisciRimborsoMissioneRespinto(Principal principal, RimborsoMissione rimborsoMissione){
         MissioneRespinta missioneRespinta = new MissioneRespinta();
         missioneRespinta.setIdMissione(new Long(rimborsoMissione.getId().toString()));
-        missioneRespinta.setDataInserimento(LocalDate.now());
+        missioneRespinta.setDataInserimento(new Timestamp(new Date().getTime()));
         missioneRespinta.setTipoFaseRespingi(MissioneRespinta.FASE_RESPINGI_AMMINISTRATIVI);
         missioneRespinta.setMotivoRespingi(rimborsoMissione.getNoteRespingi());
         missioneRespinta.setUidInsert(principal.getName());
