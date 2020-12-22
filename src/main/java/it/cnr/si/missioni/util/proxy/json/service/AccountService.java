@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -65,7 +66,7 @@ public class AccountService {
     private UoService uoService;
 
 	@Autowired
-	PersonaService personaService;
+	MissioniAceService missioniAceService;
 
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
@@ -196,8 +197,11 @@ public class AccountService {
 	}
 
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
-		UserInfoDto userInfoDto = personaService.getAccountFromSiper(currentLogin);
+		UserInfoDto userInfoDto = missioniAceService.getAccountFromSiper(currentLogin);
 		Account account = new Account(userInfoDto);
+		if (loadSpecialUserData){
+			account.setRoles(missioniAceService.getRoles(currentLogin));
+		}
 		String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
 		if (resp != null){
 			return resp;
@@ -221,6 +225,24 @@ public class AccountService {
 			}
 		} catch (Exception ex) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i responsabili della sede ("+Utility.getMessageException(ex)+").");
+		}
+		return risposta;
+	}
+
+	public String getDirectorFromUo(String uo) {
+		CallCache callCache = new CallCache(HttpMethod.GET, null, Costanti.APP_SIPER, Costanti.REST_UO_DIRECTOR, Costanti.REST_UO_TIT_CA+uo+"&userinfo=true&ruolo=dir", null, null);
+		ResultProxy result = proxyService.processInCache(callCache);
+		String risposta = result.getBody();
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			DatiDirettore [] lista = mapper.readValue(risposta, DatiDirettore[].class);
+			if (lista != null && lista.length > 0){
+				return lista[0].getUid();
+			} else if (lista == null || lista.length == 0){
+				throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stato possibile recuperare il responsabile per la uo:" + uo);
+			}
+		} catch (Exception ex) {
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura del file JSON per i responsabili della uo ("+Utility.getMessageException(ex)+").");
 		}
 		return risposta;
 	}
@@ -367,7 +389,7 @@ public class AccountService {
 	// TODO Fine da eliminare-
 
 	public String getDirettore(String uo){
-		return personaService.getDirettore(uo);
+		return missioniAceService.getDirettore(uo);
 	}
 	public Boolean isUserEnableToWorkUo(Principal principal, String uo){
 		UsersSpecial userSpecial = getUoForUsersSpecial(principal.getName());

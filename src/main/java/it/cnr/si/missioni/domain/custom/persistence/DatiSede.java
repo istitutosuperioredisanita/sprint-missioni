@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.util.Utility;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -101,5 +103,8 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
 	}
 	public void setDelegaSpesa(String delegaSpesa) {
 		this.delegaSpesa = delegaSpesa;
+	}
+	public boolean isResponsabileEstero(){
+		return Utility.nvl(getResponsabileSoloItalia(),"N").equals("N");
 	}
 }

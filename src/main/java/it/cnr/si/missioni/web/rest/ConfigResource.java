@@ -160,4 +160,14 @@ public class ConfigResource {
 		log.info("REST request per reinviare in coda i dati");
 		configService.resendQueue();
 	}
+	/**
+	 * GET  /rest/config/datiUo -> rechargeDatiUo.
+	 */
+	@RequestMapping(value = "/rest/config/populateSignerMissioni",
+			method = RequestMethod.GET)
+	@Timed
+	public void populateSignerMissioni() {
+		log.info("REST request per popolare i dati su ACE");
+		configService.populateSignerMissioni();
+	}
 }

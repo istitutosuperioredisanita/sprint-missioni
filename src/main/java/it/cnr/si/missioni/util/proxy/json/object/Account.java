@@ -65,6 +65,9 @@ public class Account extends UserInfoDto implements Serializable {
 	private String cdTerzoSigla;
 	@JsonProperty("inquadramenti")
 	private List<Inquadramento> inquadramenti;
+	@JsonProperty("")
+	private List<String> roles;
+
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -213,5 +216,12 @@ public class Account extends UserInfoDto implements Serializable {
 		this.inquadramenti = inquadramenti;
 	}
 
+	public List<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
 }
 

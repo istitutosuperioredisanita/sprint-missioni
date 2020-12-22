@@ -81,8 +81,8 @@ public class DatiIstitutoService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void ribaltaDatiIstituti(Principal principal) throws ComponentException {
-    	List<DatiIstituto> lista = datiIstitutoRepository.getDatiIstituti(new Integer(DateUtils.getCurrentYear()));
-    	if (lista != null){
+		List<DatiIstituto> lista = getDatiIstituti();
+		if (lista != null){
         	for (DatiIstituto datiIstituto : lista){
         		DatiIstituto datiIstitutoInsert;
 				try {
@@ -110,7 +110,12 @@ public class DatiIstitutoService {
         	}
     	}
     }
-    
+
+	public List<DatiIstituto> getDatiIstituti() {
+		List<DatiIstituto> lista = datiIstitutoRepository.getDatiIstituti(new Integer(DateUtils.getCurrentYear()));
+		return lista;
+	}
+
 	private DatiIstituto creaDatiIstituto(Principal principal, String istituto, Integer anno, String tipo) throws ComponentException {
 		DatiIstituto datiIstitutoInsert = new DatiIstituto();
 		datiIstitutoInsert.setAnno(anno);
