@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
+import it.cnr.si.missioni.util.Utility;
 import org.springframework.util.StringUtils;
 
 /**
@@ -528,5 +529,8 @@ public class DatiIstituto extends OggettoBulkXmlTransient implements Serializabl
 				", progressivoAnnullamento=" + progressivoAnnullamento +
 				", progrAnnullRimborso=" + progrAnnullRimborso +
 				'}';
+	}
+	public boolean isResponsabileEstero(){
+		return Utility.nvl(getResponsabileSoloItalia(),"N").equals("N");
 	}
 }

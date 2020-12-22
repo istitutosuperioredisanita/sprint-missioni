@@ -44,25 +44,28 @@ public class JWTAuthenticationManager implements AuthenticationManager {
 
         String principal = (String) authentication.getPrincipal();
         String credentials = (String) authentication.getCredentials();
-            // login ACE
 
         authService.getToken(principal, credentials);
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-/*        try {
+        try {
             authorities = aceService.ruoliAttivi(principal).stream()
-                    .filter(ruolo -> ruolo.getContesto().stream()
-                            .anyMatch(r -> r.getSigla().equals("missioni")))
+                    .filter(ruolo -> ruolo.getContesto().getSigla().equals("missioni-app"))
                     .map(a -> new SimpleGrantedAuthority(a.getSigla()))
                     .collect(Collectors.toList());
         } catch (FeignException e) {
             log.info(e.getMessage() + " for user: "+ "\"" +  principal + "\"");
         }
-*/
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-            User utente = new User(principal.toLowerCase(), credentials, authorities);
 
-            return new UsernamePasswordAuthenticationToken(utente, authentication, authorities);
+        if (authorities.stream().filter(auth -> auth.getAuthority().equals("supervisore@missioni")).count() > 0){
+            authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+        }
+
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+
+        User utente = new User(principal.toLowerCase(), credentials, authorities);
+
+        return new UsernamePasswordAuthenticationToken(utente, authentication, authorities);
 
     }
 

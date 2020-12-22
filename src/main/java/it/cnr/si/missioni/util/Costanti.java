@@ -40,6 +40,7 @@ public class Costanti {
 	public final static String NOME_CACHE_PROXY = "cacheProxy";
 	public final static String NOME_CACHE_TERZO_COMPENSO_SERVICE = "cacheTerzoCompensoService";
 	public final static String NOME_CACHE_TICKET_ALFRESCO = "cacheTicketAlfresco";
+    public final static String NOME_CACHE_RUOLI = "cacheRuoli";
     public final static String NOME_CACHE_DATI_PERSONE = "cachePersone";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_DATI_UTENTI_PRESIDENTE_SPECIALI = "cacheDatiUtentiPresidenteSpeciali";
@@ -140,6 +141,8 @@ public class Costanti {
     public final static String TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO = "Annullamento Ordine di missione con Rimborso missione Consentito";
 	public final static BigDecimal IMPORTO_SPESA_MAX_DEFAULT = new BigDecimal(999999999);
     public final static String NOME_PROCESSO_FLOWS_MISSIONI = "missioni";
+    public final static String RUOLO_FIRMA = "firma-missioni";
+    public final static String RUOLO_FIRMA_ESTERE = RUOLO_FIRMA+"-estere";
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
     static {

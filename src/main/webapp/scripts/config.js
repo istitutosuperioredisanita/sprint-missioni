@@ -59,4 +59,9 @@ missioniApp.factory('ConfigService', function ($http, ui) {
             $scope.successRefresh = true;
         });
      }
+     $scope.populateSignerMissioni = function() {
+        $http.get('api/rest/config/populateSignerMissioni').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
  });

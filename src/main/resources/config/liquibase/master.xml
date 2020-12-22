@@ -70,6 +70,8 @@
     <include file="classpath:config/liquibase/changelog/20200303160200_add_column_annullamento_consenti_rimborso.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20200922195200_add_columns_commento_flusso.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20201214180700_add_table_missione_respinta.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20201218220700_modify_column_data_ins_missione_respinta.xml" relativeToChangelogFile="false"/>
+    
 
     <!-- JHipster will add liquibase changelogs here -->
 
