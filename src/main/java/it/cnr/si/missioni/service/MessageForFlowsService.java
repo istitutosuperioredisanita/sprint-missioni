@@ -77,9 +77,9 @@ public class MessageForFlowsService {
 
         SimplePersonaWebDto persona = aceService.getPersonaByUsername(cmisMissione.getUsernameUtenteOrdine());
         Integer idSede = persona.getSede().getId();
-        String ruolo = "firma-missioni";
+        String ruolo = Costanti.RUOLO_FIRMA;
         if (cmisMissione.isMissioneEstera() && !cmisMissione.isMissionePresidente()){
-            ruolo = ruolo+"-estere";
+            ruolo = Costanti.RUOLO_FIRMA_ESTERE;
             if (uoRich.startsWith(Costanti.CDS_SAC)){
                 Account direttore = uoService.getDirettore(uoRich);
                 if (direttore.getUid().equals(cmisMissione.getUsernameUtenteOrdine())){

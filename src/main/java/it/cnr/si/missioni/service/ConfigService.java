@@ -1,9 +1,23 @@
 package it.cnr.si.missioni.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
+import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
+import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.UserInfoDto;
+import it.cnr.si.service.dto.anagrafica.scritture.RuoloPersonaDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,7 +38,19 @@ public class ConfigService {
 
 	@Autowired
     private LoadFilesService loadFilesService;
-	
+
+	@Autowired
+	private DatiIstitutoService datiIstitutoService;
+
+	@Autowired
+	private DatiSedeService datiSedeService;
+
+	@Autowired
+	private MissioniAceService missioniAceService;
+
+	@Autowired
+	private AccountService accountService;
+
 	Services services = null;
 	DatiUo datiUo = null;
 	UtentiPresidenteSpeciali utentiPresidenteSpeciali = null;
@@ -132,4 +158,64 @@ public class ConfigService {
 					"File degli aggiornamenti di versione non trovato");
 		}
     }
+	public void populateSignerMissioni() {
+		List<DatiIstituto> list = datiIstitutoService.getDatiIstituti();
+		SimpleRuoloWebDto ruoloMissioni = missioniAceService.recuperoRuolo(Costanti.RUOLO_FIRMA);
+		SimpleRuoloWebDto ruoloMissioniEstere = missioniAceService.recuperoRuolo(Costanti.RUOLO_FIRMA_ESTERE);
+		for (DatiIstituto datiIstituto : list){
+
+			List<SimpleEntitaOrganizzativaWebDto> listaSedi = missioniAceService.recuperoSediDaUo(Utility.replace(datiIstituto.getIstituto(),".",""));
+
+			for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativa : listaSedi){
+				RuoloPersonaDto ruoloPersonaDto = preparePersonaDto(entitaOrganizzativa);
+				RuoloPersonaDto ruoloPersonaDtoEstera = preparePersonaDto(entitaOrganizzativa);
+				ruoloPersonaDto.setRuolo(ruoloMissioni.getId());
+				ruoloPersonaDtoEstera.setRuolo(ruoloMissioniEstere.getId());
+
+				DatiSede datiSede = datiSedeService.getDatiSede(entitaOrganizzativa.getIdnsip().toString(), LocalDate.now());
+				if (datiSede != null){
+					SimplePersonaWebDto persona = missioniAceService.getPersona(datiSede.getResponsabile());
+					ruoloPersonaDto.setPersona(persona.getId());
+					if (datiSede.isResponsabileEstero()){
+						ruoloPersonaDtoEstera.setPersona(persona.getId());
+					} else {
+						String uid = accountService.getDirectorFromSede(datiSede.getSedeRespEstero());
+						SimplePersonaWebDto personaEstera = missioniAceService.getPersona(uid);
+						ruoloPersonaDtoEstera.setPersona(personaEstera.getId());
+					}
+				} else {
+					if (datiIstituto.getResponsabile() != null){
+						SimplePersonaWebDto persona = missioniAceService.getPersona(datiIstituto.getResponsabile());
+						ruoloPersonaDto.setPersona(persona.getId());
+						if (datiIstituto.isResponsabileEstero()){
+							ruoloPersonaDtoEstera.setPersona(persona.getId());
+						} else {
+							String uid = accountService.getDirectorFromUo(datiIstituto.getUoRespEstero().replace(".",""));
+							SimplePersonaWebDto personaEstera = missioniAceService.getPersona(uid);
+							ruoloPersonaDtoEstera.setPersona(personaEstera.getId());
+						}
+					} else {
+						String uid = accountService.getDirectorFromUo(datiIstituto.getIstituto().replace(".",""));
+						SimplePersonaWebDto personaEstera = missioniAceService.getPersona(uid);
+						ruoloPersonaDto.setPersona(personaEstera.getId());
+						ruoloPersonaDtoEstera.setPersona(personaEstera.getId());
+					}
+				}
+
+				missioniAceService.associaRuoloPersona(ruoloPersonaDto);
+			}
+
+		}
+	}
+	private RuoloPersonaDto preparePersonaDto(SimpleEntitaOrganizzativaWebDto sede){
+		LocalDate now = LocalDate.now();
+		LocalDate firstDayOfYear = now.with(TemporalAdjusters.firstDayOfYear());
+
+		RuoloPersonaDto ruoloPersonaDto = new RuoloPersonaDto();
+		ruoloPersonaDto.setAdmin(false);
+		ruoloPersonaDto.setAttivo(true);
+		ruoloPersonaDto.setInizioValidita(now);
+		ruoloPersonaDto.setEntitaOrganizzativa(sede.getId());
+		return ruoloPersonaDto;
+	}
 }

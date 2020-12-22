@@ -22,20 +22,4 @@ public class PersonaService {
     AceService aceService;
 
     private transient static final Log logger = LogFactory.getLog(AccountService.class);
-
-    @Cacheable(value = Costanti.NOME_CACHE_DATI_PERSONE)
-    public UserInfoDto getAccountFromSiper(String currentLogin) {
-        logger.info("getAccountFromSiper: "+ currentLogin);
-        UserInfoDto userInfoDto = siperService.getUserInfoByUsername(currentLogin);
-        return userInfoDto;
-    }
-
-    @Cacheable(value = Costanti.NOME_CACHE_DATI_PERSONE)
-    public String getDirettore(String username) {
-        BossDto direttore = aceService.findResponsabileStruttura(username);
-        if (direttore != null){
-            return direttore.getUtente().getUsername();
-        }
-        return "";
-    }
 }

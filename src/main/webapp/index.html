@@ -97,9 +97,9 @@
                                 </span>
                             </a>
                             <ul class="dropdown-menu" ng-controller="MenuController">
-                                <li ng-switch-when="true" ng-show="!account.isAccountLDAP"><a href="#/config"><span class="glyphicon glyphicon-refresh"></span>
+                                <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/config"><span class="glyphicon glyphicon-refresh"></span>
                                     &nbsp;<span translate="global.menu.account.config">Config</span></a></li>
-                                <li ng-switch-when="true" ng-show="!account.isAccountLDAP"><a href="#/settings"><span class="glyphicon glyphicon-wrench"></span>
+                                <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/settings"><span class="glyphicon glyphicon-wrench"></span>
                                     &nbsp;<span translate="global.menu.account.settings">Settings</span></a></li>
                                 <li ng-switch-when="true" ng-show="!account.isAccountLDAP"><a href="#/password"><span class="glyphicon glyphicon-lock"></span>
                                     &nbsp;<span translate="global.menu.account.password">Password</span></a></li>
