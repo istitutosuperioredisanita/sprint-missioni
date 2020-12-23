@@ -355,7 +355,9 @@ missioniApp
                     $rootScope.isAuthorized = AuthenticationSharedService.isAuthorized;
                     $rootScope.userRoles = USER_ROLES;
                     if (next.access){
-                        AuthenticationSharedService.valid(next.access.authorizedRoles);
+                        if (!$location || !$location.$$absUrl || !$location.$$absUrl.endsWith("logout")){
+                            AuthenticationSharedService.valid(next.access.authorizedRoles);
+                        }
                     } else {
                         var role = new Array();
                         AuthenticationSharedService.valid(role);

@@ -41,7 +41,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                  <a class="navbar-brand" href="#"><span translate="global.title">Missioni</span></a>
+                  <a class="navbar-brand" href="#/"><span translate="global.title">Missioni</span></a>
                 </div>
                 <div class="collapse navbar-collapse" id="navbar-collapse" ng-switch="authenticated">
                     <ul class="nav navbar-nav navbar-right">
@@ -101,14 +101,12 @@
                                     &nbsp;<span translate="global.menu.account.config">Config</span></a></li>
                                 <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/settings"><span class="glyphicon glyphicon-wrench"></span>
                                     &nbsp;<span translate="global.menu.account.settings">Settings</span></a></li>
-                                <li ng-switch-when="true" ng-show="!account.isAccountLDAP"><a href="#/password"><span class="glyphicon glyphicon-lock"></span>
+                                <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/password"><span class="glyphicon glyphicon-lock"></span>
                                     &nbsp;<span translate="global.menu.account.password">Password</span></a></li>
                                 <li ng-switch-when="true"><a href="#/logout"><span class="glyphicon glyphicon-log-out"></span>
                                     &nbsp;<span translate="global.menu.account.logout">Log out</span></a></li>
                                 <li ng-switch-when="false"><a href="#/login"><span class="glyphicon glyphicon-log-in"></span>
                                     &nbsp;<span translate="global.menu.account.login">Authenticate</span></a></li>
-                                <li ng-switch-when="true" ng-show="!account.isAccountLDAP"><a href="#/register"><span class="glyphicon glyphicon-plus-sign"></span>
-                                    &nbsp;<span translate="global.menu.account.register">Register</span></a></li>
                                 <li ng-switch-when="true"><a href="#/ordine-missione"><span class="fa fa-pencil-square-o"></span>
                                     &nbsp;<span translate="global.menu.account.ordine-missione">Ordine di Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/elenco-ordini-missione"><span class="glyphicon glyphicon-list-alt"></span>

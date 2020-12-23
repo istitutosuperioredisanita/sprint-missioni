@@ -62,6 +62,7 @@ public class JWTAuthenticationManager implements AuthenticationManager {
         }
 
         authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
 
         User utente = new User(principal.toLowerCase(), credentials, authorities);
 

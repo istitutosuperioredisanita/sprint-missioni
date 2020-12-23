@@ -55,7 +55,10 @@ public class Costanti {
 	public final static String TIPO_RAPPORTO_OCCA = "OCCA";
 	public final static Long INQUADRAMENTO_ASSEGNISTA = new Long(43);
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
-	
+
+    public final static String ACE_SIGLA_CUG = "CUG";
+    public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
+
 	public final static String STRING_FOR_SANITIZE_FILE_NAME = "([\\/:@()&\u20AC<>?\"])";
 	public final static String REST_OIL_NEW_PROBLEM =  "pest/HDSiper";
 	public final static String APP_HELPDESK = "OIL";

@@ -1421,4 +1421,12 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 		return false;
 	}
 
+	@Transient
+	public Boolean isOrdineMissioneVecchiaScrivania() {
+		if (getIdFlusso() != null && getIdFlusso().startsWith("activiti")){
+			return true;
+		}
+		return false;
+	}
+
 }

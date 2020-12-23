@@ -3,10 +3,13 @@ package it.cnr.si.missioni.cmis;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,12 +17,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.flows.model.ProcessDefinitions;
 import it.cnr.si.flows.model.StartWorkflowResponse;
 import it.cnr.si.flows.model.TaskResponse;
+import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.application.FlowsService;
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -620,6 +628,14 @@ public class CMISOrdineMissioneService {
 	}
 
 	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
+		if (ordineMissione.isOrdineMissioneVecchiaScrivania()){
+//			avviaFlussoVecchiaScrivania(principal, ordineMissione);
+		} else {
+			avviaFlussoNuovaScrivania(principal, ordineMissione);
+		}
+	}
+
+	public void avviaFlussoNuovaScrivania(Principal principal, OrdineMissione ordineMissione) {
 		String username = principal.getName();
 		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
 		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
