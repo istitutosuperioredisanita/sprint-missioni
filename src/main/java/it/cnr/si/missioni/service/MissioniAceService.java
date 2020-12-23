@@ -81,8 +81,13 @@ public class MissioniAceService {
         return aceService.getRuoloBySigla(tipoRuolo);
     }
     public RuoloPersonaWebDto associaRuoloPersona(RuoloPersonaDto ruoloPersona){
-        RuoloPersonaWebDto ruolo = aceService.associaRuoloPersona(ruoloPersona);
-        return ruolo;
+        try{
+            RuoloPersonaWebDto ruolo = aceService.associaRuoloPersona(ruoloPersona);
+            return ruolo;
+        } catch (FeignException e) {
+            logger.info(e.getMessage() + " for Ruolo: idPersona: "  + ruoloPersona.getPersona() + " idRuolo: "+ ruoloPersona.getRuolo()+" Id Entita Organizzativa "+ruoloPersona.getEntitaOrganizzativa());
+        }
+        return null;
     }
 
     @Cacheable(value = Costanti.NOME_CACHE_DATI_PERSONE)
@@ -105,6 +110,7 @@ public class MissioniAceService {
         }
 
         authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
         return authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList());
     }
 

@@ -95,15 +95,16 @@ public class MessageForFlowsService {
         } else {
             if (cmisMissione.isMissioneCug()){
                 gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-//TODO					Gestione recupero CUG
-//					gruppoSecondoFirmatario = ;
+                SimpleEntitaOrganizzativaWebDto sedeCug = recuperoSedeCug();
+                gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedeCug.getId());
             } else if (cmisMissione.isMissionePresidente()){
-//TODO Verificare se è corretto passare la sede per il presidente.
+                SimpleEntitaOrganizzativaWebDto sedePresidente = recuperoSedePresidenza();
+
                 if (messageForFlows instanceof MessageForFlowRimborso){
                     gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-                    gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo+"-presidente", idSede);
+                    gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
                 } else {
-                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo+"-presidente", idSede);
+                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
                     gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
                 }
             } else {
@@ -171,9 +172,39 @@ public class MessageForFlowsService {
         List<SimpleEntitaOrganizzativaWebDto> lista = aceService.entitaOrganizzativaFindByTerm(uo);
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
                 .filter(entita -> {
-                    return entita.getCdsuo().equals(uo) ;
+                    return uo.equals(entita.getCdsuo()) ;
                 }).collect(Collectors.toList())).orElse(new ArrayList<SimpleEntitaOrganizzativaWebDto>());
         return listaEntitaUo;
+    }
+
+    private SimpleEntitaOrganizzativaWebDto recuperoSedeCug(){
+        List<SimpleEntitaOrganizzativaWebDto> lista = aceService.entitaOrganizzativaFindByTerm(Costanti.ACE_SIGLA_CUG);
+        List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
+                .filter(entita -> {
+                    return Costanti.ACE_SIGLA_CUG.equals(entita.getSigla());
+                }).collect(Collectors.toList())).orElse(new ArrayList<SimpleEntitaOrganizzativaWebDto>());
+        if (listaEntitaUo.size() == 0){
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Entità organizzativa CUG non trovata.");
+        } else if (listaEntitaUo.size() > 1){
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Esistono più entità organizzativa CUG.");
+        } else {
+            return lista.get(0);
+        }
+    }
+
+    private SimpleEntitaOrganizzativaWebDto recuperoSedePresidenza(){
+        List<SimpleEntitaOrganizzativaWebDto> lista = aceService.entitaOrganizzativaFindByTerm(Costanti.ACE_SIGLA_PRESIDENTE);
+        List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
+                .filter(entita -> {
+                    return Costanti.ACE_SIGLA_PRESIDENTE.equals(entita.getSigla());
+                }).collect(Collectors.toList())).orElse(new ArrayList<SimpleEntitaOrganizzativaWebDto>());
+        if (listaEntitaUo.size() == 0){
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Entità organizzativa Presidenza non trovata.");
+        } else if (listaEntitaUo.size() > 1){
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Esistono più entità organizzativa Presidenza.");
+        } else {
+            return lista.get(0);
+        }
     }
 
     private SimpleEntitaOrganizzativaWebDto recuperoSedePrincipale(List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo ){
