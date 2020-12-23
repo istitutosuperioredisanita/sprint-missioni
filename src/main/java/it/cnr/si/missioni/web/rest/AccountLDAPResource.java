@@ -78,7 +78,7 @@ public class AccountLDAPResource {
     @Timed
     public ResponseEntity<String> getAccountInfo(HttpServletRequest request,
                                                  @RequestParam(value = "username") String username) {
-        String resp = accountService.getAccount(username, false);
+        String resp = accountService.getAccount(username, true);
         return new ResponseEntity<String>(resp, HttpStatus.OK);
     }
 
