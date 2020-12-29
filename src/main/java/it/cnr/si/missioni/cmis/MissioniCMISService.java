@@ -46,21 +46,6 @@ public class MissioniCMISService extends StoreService {
 	@Autowired
 	private ProxyService proxyService;
 	
-    @Value("${spring.proxy.FLOWS.urlOrdineMissione}")
-    private String urlFlowOrdineMissione;
-	
-    @Value("${spring.proxy.FLOWS.urlAnnullamentoOrdineMissione}")
-    private String urlFlowAnnullamentoOrdineMissione;
-	
-    @Value("${spring.proxy.FLOWS.urlRimborsoMissione}")
-    private String urlFlowRimborsoMissione;
-
-	@Value("${spring.proxy.FLOWS.urlStatusFlows}")
-	private String urlStatusFlows;
-
-	@Value("${spring.proxy.STORAGE.urlForPerson}")
-    private String urlForPerson;
-	
 	public static final String ASPECT_TITLED = "P:cm:titled";
 	public static final String PROPERTY_LAST_MODIFICATION_DATE = "cmis:lastModificationDate";
 	public static final String ASPECT_FLUSSO = "P:wfcnr:parametriFlusso";
