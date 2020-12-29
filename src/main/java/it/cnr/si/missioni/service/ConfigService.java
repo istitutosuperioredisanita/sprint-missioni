@@ -203,6 +203,7 @@ public class ConfigService {
 				}
 
 				missioniAceService.associaRuoloPersona(ruoloPersonaDto);
+				missioniAceService.associaRuoloPersona(ruoloPersonaDtoEstera);
 			}
 
 		}

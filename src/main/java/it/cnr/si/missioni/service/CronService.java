@@ -4,12 +4,14 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +37,11 @@ public class CronService {
 
     @Value("${cron.comunicaDati.name}")
     private String lockKeyComunicaDati;
-    
-    @Value("${cron.evictCache.name}")
+
+	@Value("${cron.comunicaDatiVecchiaScrivania.name}")
+	private String lockKeyComunicaDatiVecchiaScrivania;
+
+	@Value("${cron.evictCache.name}")
     private String lockKeyEvictCache;
     
     @Value("${cron.loadCache.name}")
@@ -201,40 +206,6 @@ public class CronService {
 			}
     }
     
-	public void ribaltaMissione(Principal principal) throws ComponentException {
-		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
-		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
-		filtroRimborso.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
-		filtroRimborso.setDaCron("S");
-		List<RimborsoMissione> listaRimborsiMissione = null;
-		try {
-			listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
-		} catch (ComponentException e2) {
-			String error = Utility.getMessageException(e2);
-			LOGGER.error(error+" "+e2);
-			try {
-				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
-			} catch (Exception e1) {
-				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
-			}
-		}
-		if (listaRimborsiMissione != null){
-			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
-				LocalDate data = LocalDate.now();
-				if (data.getYear() > rimborsoMissione.getAnno()){
-					try {
-						flowsMissioniService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione.getId());
-					} catch (Exception e) {
-						String error = Utility.getMessageException(e);
-						String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
-						LOGGER.error(testoErrore+" "+e);
-					}
-				}
-			}
-		}
-		
-	}
-
 	public void aggiornaRimborsiMissioneFlows(Principal principal) throws ComponentException {
 		LOGGER.info("Cron per Aggiornamenti Rimborso Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
@@ -243,7 +214,11 @@ public class CronService {
 		filtroRimborso.setDaCron("S");
 		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
 		if (listaRimborsiMissione != null){
-			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
+			List<RimborsoMissione> listaRimborsiMissioneVecchiaScrivania = listaRimborsiMissione.stream()
+					.filter(rimborsoMissione -> rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+					.collect(Collectors.toList());
+
+			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneVecchiaScrivania){
 				try {
 					flowsMissioniService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione.getId());
 				} catch (Exception e) {
@@ -305,12 +280,35 @@ public class CronService {
 	}
 
 	private void aggiornaOrdiniMissioneFlows(Principal principal) {
+		RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
+		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+		filtro.setValidato("S");
+		filtro.setDaCron("S");
+		aggiornaOrdini(principal, filtro);
+		aggiornaAnnullamentoOrdini(principal, filtro);
 	}
 
 	private void aggiornaOrdini(Principal principal, MissioneFilter filtro) {
 		List<OrdineMissione> listaOrdiniMissione = null;
+		try {
+			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+		} catch (ComponentException e2) {
+			String error = Utility.getMessageException(e2);
+			LOGGER.error(error + " "+e2);
+			try {
+				mailService.sendEmailError(subjectGenericError + this.toString(), error, false, true);
+			} catch (Exception e1) {
+				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
+			}
+		}
 		if (listaOrdiniMissione != null){
-			for (OrdineMissione ordineMissione : listaOrdiniMissione){
+
+			List<OrdineMissione> listaOrdiniMissioneVecchiaScrivania = listaOrdiniMissione.stream()
+					.filter(ordineMissione -> ordineMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+					.collect(Collectors.toList());
+
+
+			for (OrdineMissione ordineMissione : listaOrdiniMissioneVecchiaScrivania){
 				try {
 					flowsMissioniService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione.getId());
 				} catch (Exception e) {
@@ -341,7 +339,10 @@ public class CronService {
 			}
 		}
 		if (listaAnnullamenti != null){
-			for (AnnullamentoOrdineMissione annullamento : listaAnnullamenti){
+			List<AnnullamentoOrdineMissione> listaAnnullamentiVecchiaScrivania = listaAnnullamenti.stream()
+					.filter(annullamentoOrdineMissione -> annullamentoOrdineMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+					.collect(Collectors.toList());
+			for (AnnullamentoOrdineMissione annullamento : listaAnnullamentiVecchiaScrivania){
 				try {
 					flowsMissioniService.aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(principal,annullamento.getId());
 				} catch (Exception e) {
@@ -496,4 +497,43 @@ public class CronService {
 			}
 		}
 	}
+
+	@Transactional
+	public void verificaFlussoEComunicaDatiRimborsoSigla(Principal principal) throws ComponentException {
+		ILock lock = hazelcastInstance.getLock(lockKeyComunicaDatiVecchiaScrivania);
+		LOGGER.info("requested lock: " + lock.getPartitionKey());
+
+		try {
+			if ( lock.tryLock ( 2, TimeUnit.SECONDS ) ) {
+
+				LOGGER.info("got lock {}", lockKeyComunicaDatiVecchiaScrivania);
+
+				try {
+					LOGGER.info("Cron per Aggiornamenti Ordine Missione Da Vecchia Scrivania");
+
+					aggiornaOrdiniMissioneFlows(principal);
+
+					LOGGER.info("Cron per Aggiornamenti Rimborso Missione Da Vecchia Scrivania");
+
+					aggiornaRimborsiMissioneFlows(principal);
+
+//						ribaltaMissione(principal);
+
+					comunicaRimborsoSigla(principal);
+
+					LOGGER.info("work done.");
+				} finally {
+					LOGGER.info("unlocking {}", lockKeyComunicaDatiVecchiaScrivania);
+					lock.unlock();
+				}
+
+			} else {
+				LOGGER.warn("unable to get lock {}", lockKeyComunicaDatiVecchiaScrivania);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Errore", e);
+			throw new ComponentException(e);
+		}
+	}
+
 }

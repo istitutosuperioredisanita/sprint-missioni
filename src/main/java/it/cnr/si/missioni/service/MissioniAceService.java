@@ -110,7 +110,6 @@ public class MissioniAceService {
         }
 
         authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
         return authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList());
     }
 

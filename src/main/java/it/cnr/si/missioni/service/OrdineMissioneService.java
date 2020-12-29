@@ -1740,4 +1740,31 @@ public class OrdineMissioneService {
 		OrdineMissione missione = (OrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), OrdineMissione.class, new Long(id));
 		popolaCoda(missione);
 	}
+	public void aggiornaOrdineMissioneApprovato(Principal principal, OrdineMissione ordineMissioneDaAggiornare) {
+		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+		ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
+		gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
+		OrdineMissioneAnticipo anticipo = getAnticipo(principal, ordineMissioneDaAggiornare);
+		if (anticipo != null) {
+			anticipo.setStato(Costanti.STATO_DEFINITIVO);
+			ordineMissioneAnticipoService.updateAnticipo(principal, anticipo, false);
+			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
+					ordineMissioneDaAggiornare.getAnno());
+			if (dati != null && dati.getMailNotifiche() != null) {
+				if (!dati.getMailNotifiche().equals("N")){
+					mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
+							true, dati.getMailNotifiche());
+				}
+			} else {
+				List<UsersSpecial> lista = accountService
+						.getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
+				if (lista != null && lista.size() > 0) {
+					mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo),
+							false, true, mailService.prepareTo(lista));
+				}
+			}
+		}
+		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
+		popolaCoda(ordineMissioneDaAggiornare);
+	}
 }

@@ -1390,6 +1390,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                             $scope.rimborsoMissioneModel = value;
                             $scope.viewAttachments($scope.rimborsoMissioneModel.id);
                             $rootScope.salvataggio = false;
+                            $scope.disabilitaRimborsoMissione = impostadisabilitaRimborsoMissione();
                         },
                         function (httpResponse) {
                                 $rootScope.salvataggio = false;
