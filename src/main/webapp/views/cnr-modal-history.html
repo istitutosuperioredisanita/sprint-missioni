@@ -1,0 +1,44 @@
+<li class="next"><a  type="button" ng-click="getHistory()" translate="missione.form.history-respingi">Cronologia</a></li>
+
+<div class="modal fade" id="modalHistory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+
+  <div class="modal-dialog mdl-large" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">{{'missione.form.history-respingi' | translate}}</h4>
+      </div>
+      <div class="modal-body col-md-12">
+
+
+    <div class="col-md-12 text-center" ng-hide="histories">
+      <h5 translate="missione.form.no-history-respingi">Nessun Risultato</h5>
+    </div>
+    <table ng-show="histories" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+      <thead>
+        <tr>
+            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+            <th style="text-align: center">{{'missione.form.fase-respingi' | translate}}</th>
+            <th style="text-align: center">{{'main.userid' | translate}}</th>
+            <th style="text-align: center">{{'main.comment' | translate}}</th>
+        </tr>
+      </thead>
+
+      <tbody id ="missioni">
+        <tr ng-repeat="history in histories" data-method="get">
+              <td class="col-md-2" style="text-align: center">{{history.dataInserimento | date:'dd/MM/yyyy HH:mm:ss'}}</td>
+              <td class="col-md-2" style="text-align: center">{{history.decodeFase}}</td>
+              <td class="col-md-2" style="text-align: center">{{history.uidInsert}}</td>
+              <td class="col-md-6" style="text-align: center">{{history.motivoRespingi}}</td>
+        </tr>
+      </tbody>  
+    </table>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" title="{{'global.button.close' | translate}}">{{'global.button.close' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
