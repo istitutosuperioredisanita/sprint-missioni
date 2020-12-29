@@ -164,6 +164,14 @@ public class AnnullamentoOrdineMissioneService {
 		missioneRespintaService.inserisciMissioneRespinta(principal, result);
 	}
 
+	public void aggiornaAnnullamentoOrdineMissioneAnnullato(Principal principal, ResultFlows result,
+														   AnnullamentoOrdineMissione annullamentoDaAggiornare) throws ComponentException{
+		annullamentoDaAggiornare.setCommentoFlusso(result.getComment() == null ? null : (result.getComment().length() > 1000 ? result.getComment().substring(0, 1000) : result.getComment()));
+		annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+		annullamentoDaAggiornare.setStato(Costanti.STATO_ANNULLATO);
+		updateAnnullamentoOrdineMissione(principal, annullamentoDaAggiornare, true, null);
+	}
+
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void aggiornaAnnullamentoOrdineMissione(Principal principal, AnnullamentoOrdineMissione annullamentoDaAggiornare, FlowResult flowResult) {
 		try {

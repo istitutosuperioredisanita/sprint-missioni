@@ -34,14 +34,14 @@ public class CronConfigurationMissioni {
 	@Scheduled(cron = "${cron.comunicaDati.cronExpression}")
     public void cronComunicaDati() throws Exception {
     	if (cronComunicaDatiActive){
-            cronService.comunicaDatiRimborsoSigla(new GenericPrincipal(Costanti.USER_MISSIONI));
+            cronService.comunicaDatiRimborsoSigla(new GenericPrincipal(Costanti.USER_CRON_MISSIONI));
         }
     }
 
     @Scheduled(cron = "${cron.comunicaDatiVecchiaScrivania.cronExpression}")
     public void cronComunicaDatiVecchiaScrivania() throws Exception {
         if (cronComunicaDatiVecchiaScrivaniaActive){
-            cronService.verificaFlussoEComunicaDatiRimborsoSigla(new GenericPrincipal(Costanti.USER_MISSIONI));
+            cronService.verificaFlussoEComunicaDatiRimborsoSigla(new GenericPrincipal(Costanti.USER_CRON_MISSIONI));
         }
     }
 

@@ -342,6 +342,7 @@ public class OrdineMissioneService {
 
 	public void aggiornaOrdineMissioneAnnullato(Principal principal, OrdineMissione ordineMissioneDaAggiornare) {
 		ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+		ordineMissioneDaAggiornare.setStato(Costanti.STATO_ANNULLATO);
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 	}
 

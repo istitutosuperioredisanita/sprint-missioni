@@ -244,6 +244,7 @@ public class RimborsoMissioneService {
 	public void aggiornaRimborsoMissioneAnnullato(Principal principal, RimborsoMissione rimborsoMissioneDaAggiornare)
 			throws ComponentException {
 		rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
+		rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_ANNULLATO);
 		updateRimborsoMissione(principal, rimborsoMissioneDaAggiornare, true, null);
 	}
 
