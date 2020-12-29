@@ -56,7 +56,7 @@ public class Costanti {
 	public final static Long INQUADRAMENTO_ASSEGNISTA = new Long(43);
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 
-    public final static String USER_MISSIONI = "cronMissioni";
+    public final static String USER_CRON_MISSIONI = "cronMissioni";
     public final static String ACE_SIGLA_CUG = "CUG";
     public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
 
