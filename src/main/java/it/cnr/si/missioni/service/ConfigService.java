@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -19,9 +20,12 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
@@ -35,6 +39,8 @@ import it.cnr.si.missioni.util.proxy.cache.json.Services;
 
 @Service
 public class ConfigService {
+
+	private static final Log logger = LogFactory.getLog(ConfigService.class);
 
 	@Autowired
     private LoadFilesService loadFilesService;
@@ -163,10 +169,22 @@ public class ConfigService {
 		SimpleRuoloWebDto ruoloMissioni = missioniAceService.recuperoRuolo(Costanti.RUOLO_FIRMA);
 		SimpleRuoloWebDto ruoloMissioniEstere = missioniAceService.recuperoRuolo(Costanti.RUOLO_FIRMA_ESTERE);
 		for (DatiIstituto datiIstituto : list){
+			try{
 
-			List<SimpleEntitaOrganizzativaWebDto> listaSedi = missioniAceService.recuperoSediDaUo(Utility.replace(datiIstituto.getIstituto(),".",""));
+			List<SimpleEntitaOrganizzativaWebDto> listaSediEO = missioniAceService.recuperoSediDaUo(Utility.replace(datiIstituto.getIstituto(),".",""));
 
-			for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativa : listaSedi){
+			List<SimpleEntitaOrganizzativaWebDto> listaSedi = listaSediEO.stream()
+					.filter(entitaOrganizzativaWebDto -> entitaOrganizzativaWebDto.getIdnsip() != null && entitaOrganizzativaWebDto.getTipo() != null && entitaOrganizzativaWebDto.getTipo().getSigla() != null &&
+							(entitaOrganizzativaWebDto.getTipo().getSigla().equals("UFF") ||
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("SPRINC") ||
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("AREA") ||
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("DIP") ||
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("UFFNODIR") ||
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("SL") ||
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("SSEC")))
+					.collect(Collectors.toList());
+
+				for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativa : listaSedi){
 				RuoloPersonaDto ruoloPersonaDto = preparePersonaDto(entitaOrganizzativa);
 				RuoloPersonaDto ruoloPersonaDtoEstera = preparePersonaDto(entitaOrganizzativa);
 				ruoloPersonaDto.setRuolo(ruoloMissioni.getId());
@@ -206,6 +224,9 @@ public class ConfigService {
 				missioniAceService.associaRuoloPersona(ruoloPersonaDtoEstera);
 			}
 
+			} catch (Exception e){
+				logger.info(e.getMessage() + " for : "  + datiIstituto.getIstituto());
+			}
 		}
 	}
 	private RuoloPersonaDto preparePersonaDto(SimpleEntitaOrganizzativaWebDto sede){
