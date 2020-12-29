@@ -10,6 +10,7 @@ import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.ResultProxy;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import it.cnr.si.spring.storage.StorageObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,8 +93,7 @@ public class FlowsMissioniService {
 		if (idOrdineMissione != null){
 			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
 			if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
-				ResultFlows result = null;
-						//TODO retrieveDataFromFlows(ordineMissione);
+				ResultFlows result = retrieveDataFromFlows(ordineMissione);
 				if (result == null){
 					return null;
 				}
@@ -120,21 +120,23 @@ public class FlowsMissioniService {
 		return null;
 	}
 
-	private ResultFlows retrieveDataFromFlows(String idFlusso)
+	private ResultFlows retrieveDataFromFlows(OrdineMissione ordineMissione)
 			throws ComponentException {
 		ResultFlows result = null;
-		String idFlussoNumerico = idFlusso.substring(Costanti.INITIAL_NAME_OLD_FLOWS.length());
-		ResultProxy resultProxy = proxyService.process(HttpMethod.GET, new String (""), Costanti.APP_VECCHIA_SCRIVANIA,  "rest/processinstances/"+ idFlussoNumerico+"?includeTasks=true", null, null, false);
 
-		if (resultProxy.getBody() != null){
-			JsonObject resp = (JsonObject) new JsonParser().parse(resultProxy.getBody());
-			JsonObject data = (JsonObject) resp.get("data");
-			JsonArray tasks = (JsonArray) resp.get("tasks");
-			JsonObject task = tasks.get(0).getAsJsonObject();
-			String stato =task.get("title").getAsString();
-			result.setState(stato);
-			result.setComment("");
+		StorageObject storage = null;
+		try {
+			storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
+		} catch (ComponentException e1) {
+			throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
+					+ Utility.getMessageException(e1) + ")", e1);
 		}
+		if (storage != null) {
+			StorageObject so = null;
+
+		}
+
+
 		return result;
 	}
 
@@ -148,7 +150,17 @@ public class FlowsMissioniService {
 	private ResultFlows retrieveDataFromFlows(RimborsoMissione rimborsoMissione)
 			throws ComponentException {
 		ResultFlows result = null;
-//				cmisRimborsoMissioneService.getFlowsRimborsoMissione(rimborsoMissione.getIdFlusso());
+		StorageObject storage = null;
+		try {
+			storage = cmisRimborsoMissioneService.getStorageRimborsoMissione(rimborsoMissione);
+		} catch (ComponentException e1) {
+			throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
+					+ Utility.getMessageException(e1) + ")", e1);
+		}
+		if (storage != null) {
+			result.setState(storage.getPropertyValue("wfcnr:statoFlusso"));
+			result.setComment(storage.getPropertyValue("wfcnr:commentoFirma"));
+		}
 		return result;
 	}
 
@@ -195,7 +207,7 @@ public class FlowsMissioniService {
 		if (idRimborsoMissione != null){
 			RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
 	    	if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
-	    		ResultFlows result = null;
+	    		ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
 				if (result == null){
 					return null;
 				}
