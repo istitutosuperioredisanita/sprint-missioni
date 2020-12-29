@@ -56,6 +56,7 @@ public class Costanti {
 	public final static Long INQUADRAMENTO_ASSEGNISTA = new Long(43);
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 
+    public final static String USER_MISSIONI = "cronMissioni";
     public final static String ACE_SIGLA_CUG = "CUG";
     public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
 
@@ -69,6 +70,7 @@ public class Costanti {
 	public final static String APP_SIPER = "SIPER";
 	public final static String APP_STORAGE = "STORAGE";
 	public final static String APP_FLOWS = "FLOWS";
+    public final static String APP_VECCHIA_SCRIVANIA = "vecchiaScrivania";
 	public final static String HEADER_FOR_PROXY_AUTHORIZATION = "x-proxy-authorization";
 	public final static String STATO_ANNULLATO = "ANN";
 	public final static String STATO_ANNULLATO_DOPO_APPROVAZIONE = "ANA";
@@ -146,6 +148,7 @@ public class Costanti {
     public final static String NOME_PROCESSO_FLOWS_MISSIONI = "missioni";
     public final static String RUOLO_FIRMA = "firma-missioni";
     public final static String RUOLO_FIRMA_ESTERE = RUOLO_FIRMA+"-estere";
+    public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
     static {

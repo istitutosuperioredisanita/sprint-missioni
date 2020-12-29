@@ -799,6 +799,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 	                    ui.ok_message("Ordine di Missione confermato e inviato all'approvazione.");
                         ElencoOrdiniMissioneService.findById($scope.ordineMissioneModel.id).then(function(data){
                             $scope.ordineMissioneModel = data;
+                            $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
                             $scope.viewAttachments($scope.ordineMissioneModel.id);
                         });
                     },
@@ -1023,6 +1024,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $scope.ordineMissioneModel.utilizzoAutoPropria = autoPropria;
                         $scope.ordineMissioneModel.richiestaAnticipo = anticipo;
                         $scope.viewAttachments($scope.ordineMissioneModel.id);
+                        $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;

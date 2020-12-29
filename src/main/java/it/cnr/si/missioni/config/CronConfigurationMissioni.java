@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.config;
 
+import it.cnr.si.missioni.util.Costanti;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,9 @@ public class CronConfigurationMissioni {
     @Value("${cron.comunicaDati.active}")
     private boolean cronComunicaDatiActive;
 
+    @Value("${cron.comunicaDatiVecchiaScrivania.active}")
+    private boolean cronComunicaDatiVecchiaScrivaniaActive;
+
     @Value("${cron.evictCache.active}")
     private boolean cronEvictCacheActive;
 
@@ -29,11 +33,19 @@ public class CronConfigurationMissioni {
     
 	@Scheduled(cron = "${cron.comunicaDati.cronExpression}")
     public void cronComunicaDati() throws Exception {
-    	if (cronComunicaDatiActive)
-    		cronService.comunicaDatiRimborsoSigla(new GenericPrincipal("cronMissioni"));
+    	if (cronComunicaDatiActive){
+            cronService.comunicaDatiRimborsoSigla(new GenericPrincipal(Costanti.USER_MISSIONI));
+        }
     }
 
-	@Scheduled(cron = "${cron.verifyStep.cronExpression}")
+    @Scheduled(cron = "${cron.comunicaDatiVecchiaScrivania.cronExpression}")
+    public void cronComunicaDatiVecchiaScrivania() throws Exception {
+        if (cronComunicaDatiVecchiaScrivaniaActive){
+            cronService.verificaFlussoEComunicaDatiRimborsoSigla(new GenericPrincipal(Costanti.USER_MISSIONI));
+        }
+    }
+
+    @Scheduled(cron = "${cron.verifyStep.cronExpression}")
     public void cronVerifyStep() throws Exception {
     	if (cronVerifyStepActive)
     		cronService.verifyStep(new GenericPrincipal("app.missioni"));
