@@ -1,5 +1,4 @@
 package it.cnr.si.missioni.config;
-
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import org.slf4j.Logger;
@@ -17,36 +16,36 @@ import java.security.Principal;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-    public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
+public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
 
     private final Logger log = LoggerFactory.getLogger("Log Request");
-        @Autowired
-        HttpServletRequest httpServletRequest;
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
-        @Override
-        public boolean supports(MethodParameter methodParameter, Type type,
-                                Class<? extends HttpMessageConverter<?>> aClass) {
-            return true;
-        }
-
-        @Override
-        public Object afterBodyRead(Object body, HttpInputMessage inputMessage,
-                                    MethodParameter parameter, Type targetType,
-                                    Class<? extends HttpMessageConverter<?>> converterType) {
-
-            String uri = httpServletRequest.getRequestURI();
-            if (!uri.startsWith("/styles") && !uri.startsWith("/scripts") && !uri.startsWith("/fonts") && !uri.startsWith("/images") && !uri.contains("authentication_check.gif")  && SecurityUtils.getCurrentUser() != null &&
-                    !uri.startsWith("/api/rest/terzoPerCompenso")){
-                String payload = "";
-                if (body instanceof JSONBody){
-                    JSONBody jb = (JSONBody)body;
-                    payload = jb.getClauses().stream().map(Object::toString).collect(Collectors.joining(","));
-                } else {
-                    payload = body.toString();
-                }
-                log.info(((Principal) SecurityUtils.getCurrentUser()).getName()+" "+httpServletRequest.getMethod()+" "+httpServletRequest.getRequestURI()+" "+httpServletRequest.getQueryString()+" "+payload+" "+httpServletRequest.getRemoteAddr());
-            }
-
-            return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
-        }
+    @Override
+    public boolean supports(MethodParameter methodParameter, Type type,
+                            Class<? extends HttpMessageConverter<?>> aClass) {
+        return true;
     }
+
+    @Override
+    public Object afterBodyRead(Object body, HttpInputMessage inputMessage,
+                                MethodParameter parameter, Type targetType,
+                                Class<? extends HttpMessageConverter<?>> converterType) {
+
+        String uri = httpServletRequest.getRequestURI();
+        if (!uri.startsWith("/styles") && !uri.startsWith("/scripts") && !uri.startsWith("/fonts") && !uri.startsWith("/images") && !uri.contains("authentication_check.gif")  && SecurityUtils.getCurrentUser() != null &&
+                !uri.startsWith("/api/rest/terzoPerCompenso")){
+            String payload = "";
+            if (body instanceof JSONBody){
+                JSONBody jb = (JSONBody)body;
+                payload = jb.getClauses().stream().map(Object::toString).collect(Collectors.joining(","));
+            } else {
+                payload = body.toString();
+            }
+            log.info(((Principal) SecurityUtils.getCurrentUser()).getName()+" "+httpServletRequest.getMethod()+" "+httpServletRequest.getRequestURI()+" "+httpServletRequest.getQueryString()+" "+payload+" "+httpServletRequest.getRemoteAddr());
+        }
+
+        return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
+    }
+}

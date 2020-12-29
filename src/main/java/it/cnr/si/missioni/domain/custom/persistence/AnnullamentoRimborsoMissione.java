@@ -340,7 +340,7 @@ public class AnnullamentoRimborsoMissione extends OggettoBulkXmlTransient {
 		this.motivoAnnullamento = motivoAnnullamento;
 	}
 
-	public String getCodice_fiscale() {
+	public String getCodiceFiscale() {
 		return codiceFiscale;
 	}
 
