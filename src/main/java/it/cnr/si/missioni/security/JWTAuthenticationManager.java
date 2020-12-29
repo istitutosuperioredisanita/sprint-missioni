@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.security;
 
 import feign.FeignException;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.AuthService;
@@ -57,12 +58,11 @@ public class JWTAuthenticationManager implements AuthenticationManager {
             log.info(e.getMessage() + " for user: "+ "\"" +  principal + "\"");
         }
 
-        if (authorities.stream().filter(auth -> auth.getAuthority().equals("supervisore@missioni")).count() > 0){
+        if (authorities.stream().filter(auth -> auth.getAuthority().equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
             authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
         }
 
         authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
 
         User utente = new User(principal.toLowerCase(), credentials, authorities);
 

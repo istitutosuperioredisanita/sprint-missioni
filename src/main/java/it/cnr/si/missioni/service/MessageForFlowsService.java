@@ -288,7 +288,7 @@ public class MessageForFlowsService {
         if (allegati != null && !allegati.isEmpty()){
             int i = 0;
             for (StorageObject so : allegati){
-                caricaDocumento(params, tipoDocumento, so, tipoDocumento+i);
+                caricaDocumento(params, tipoDocumento, so, null,tipoDocumento+i);
                 i++;
             }
         }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.SiperService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
@@ -19,6 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -193,20 +195,33 @@ public class AccountService {
 
 	public Account loadAccountFromRest(String currentLogin, Boolean loadSpecialUserData){
 		String risposta = getAccount(currentLogin, loadSpecialUserData);
-		return getAccount(risposta);
+		if (risposta != null) {
+			return getAccount(risposta);
+		}
+		return null;
 	}
 
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
 		UserInfoDto userInfoDto = missioniAceService.getAccountFromSiper(currentLogin);
-		Account account = new Account(userInfoDto);
-		if (loadSpecialUserData){
-			account.setRoles(missioniAceService.getRoles(currentLogin));
+		if (userInfoDto != null){
+			Account account = new Account(userInfoDto);
+			if (loadSpecialUserData){
+				List<String> ruoli = missioniAceService.getRoles(currentLogin);
+				if (ruoli != null && ruoli.size() > 0){
+					if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
+						ruoli.add(AuthoritiesConstants.ADMIN);
+					}
+
+					account.setRoles(ruoli);
+				}
+			}
+			String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
+			if (resp != null){
+				return resp;
+			}
+			return "";
 		}
-		String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
-		if (resp != null){
-			return resp;
-		}
-		return "";
+		return null;
 	}
 
 	// TODO Da eliminare-
@@ -295,7 +310,10 @@ public class AccountService {
 
     public String getEmail(String user){
 		Account utente = loadAccountFromRest(user);
-		return utente.getEmail_comunicazioni();
+		if (utente != null){
+			return utente.getEmail_comunicazioni();
+		}
+		return null;
     }
 
 	// TODO Da eliminare-
