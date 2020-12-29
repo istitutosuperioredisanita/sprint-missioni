@@ -253,8 +253,11 @@ public class CronService {
 				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 			}
 		}
-		if (listaRimborsiMissione != null){
-			for (RimborsoMissione rimborsoMissione : listaRimborsiMissione){
+		List<RimborsoMissione> listaRimborsiMissioneNuovaScrivania = listaRimborsiMissione.stream()
+				.filter(rimborsoMissione -> !rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+				.collect(Collectors.toList());
+		if (listaRimborsiMissioneNuovaScrivania != null){
+			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneNuovaScrivania){
 				comunicaRimborsoSigla(principal, rimborsoMissione);
 			}
 		}
