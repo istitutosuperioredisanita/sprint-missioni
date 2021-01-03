@@ -149,10 +149,12 @@ public class FlowsMissioniService {
 	}
 
 	private ResultFlows getResultFlows(StorageObject storage) {
-		ResultFlows result = null;
+		ResultFlows result = new ResultFlows();
 		if (storage != null) {
 			result.setState(storage.getPropertyValue("wfcnr:statoFlusso"));
 			result.setComment(storage.getPropertyValue("wfcnr:commentoFirma"));
+		} else {
+			return null;
 		}
 		return result;
 	}
