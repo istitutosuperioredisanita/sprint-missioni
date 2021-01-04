@@ -121,9 +121,27 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         onChangeDataDettaglio();
     });
 
-    $scope.onChangeKm= function (kmPercorsi) {
-        if (kmPercorsi && $scope.rimborsoKm && $scope.rimborsoKm.indennita_chilometrica){
-            $scope.newDettaglioSpesa.importoEuro = Math.round((kmPercorsi * $scope.rimborsoKm.indennita_chilometrica) * 100) / 100;
+    $scope.onChangeKm= function (kmPercorsi, idDettaglioSpesa, dettaglioSpesa) {
+        if (kmPercorsi ){
+            if (idDettaglioSpesa){
+                var dataFormatted = $filter('date')(dettaglioSpesa.dataSpesa, "dd/MM/yyyy");
+                var tipi = ProxyService.getRimborsoKm("P", dataFormatted, 1).then(function(result){
+                    if (result && result.data && result.data.elements && result.data.elements.length > 0){
+                        var importo = Math.round((kmPercorsi * result.data.elements[0].indennita_chilometrica) * 100) / 100;
+                        dettaglioSpesa.importo = importo;
+                        if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
+                            for (var i=0; i<$scope.dettagliSpese.length; i++) {
+                                var dettaglio = $scope.dettagliSpese[i];
+                                if (dettaglio.id === idDettaglioSpesa){
+                                    dettaglio.importoEuro = importo;
+                                }
+                            }
+                        }
+                    }
+                });
+            } else if ($scope.rimborsoKm && $scope.rimborsoKm.indennita_chilometrica){
+                $scope.newDettaglioSpesa.importoEuro = Math.round((kmPercorsi * $scope.rimborsoKm.indennita_chilometrica) * 100) / 100;
+            }
         }
     }
 
