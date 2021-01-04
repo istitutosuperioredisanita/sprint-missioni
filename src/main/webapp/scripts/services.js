@@ -487,7 +487,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 $rootScope.account = Session;
                                                 $sessionStorage.account = Session;
 
-                                                if (!$rootScope.isAuthorized(authorizedRoles)) {
+                                                if (!$rootScope.isAuthorized(authorizedRoles) && (token == undefined || AccessToken.expired())) {
                                                     // user is not allowed
                                                     $rootScope.$broadcast("event:auth-notAuthorized");
                                                 } else {
