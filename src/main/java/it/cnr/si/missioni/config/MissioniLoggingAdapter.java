@@ -39,7 +39,11 @@ public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
             String payload = "";
             if (body instanceof JSONBody){
                 JSONBody jb = (JSONBody)body;
-                payload = jb.getClauses().stream().map(Object::toString).collect(Collectors.joining(","));
+                if (jb.getClauses() != null){
+                    payload = jb.getClauses().stream().map(Object::toString).collect(Collectors.joining(","));
+                } else {
+                    payload = body.toString();
+                }
             } else {
                 payload = body.toString();
             }
