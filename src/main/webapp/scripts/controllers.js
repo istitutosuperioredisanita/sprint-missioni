@@ -196,7 +196,13 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     }
 
     $scope.selectUo = function (uo) {
-        recuperoMissioni(uo);
+        if (uo){
+            if (uo.cd_unita_organizzativa){
+                recuperoMissioni(uo.cd_unita_organizzativa);
+            } else {
+                recuperoMissioni(uo);                
+            }
+        }
     };
 
     $scope.doSelectRimborsoMissioneValidazione = function (rimborsoMissione) {
