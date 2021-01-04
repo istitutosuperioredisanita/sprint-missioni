@@ -896,13 +896,16 @@ public class CMISOrdineMissioneService {
 			return objs.get(0);
 		}
 	}
-	
+
 	public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException{
+		return getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria, true);
+	}
+	public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, Boolean erroreSeNonTrovato) throws ComponentException{
 		OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
 		StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
 		List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
 
-		if (objs.size() == 0){
+		if (objs.size() == 0 && erroreSeNonTrovato){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta di auto propria per l'ordine di missione con ID :"+ ordineMissione.getId()+", Anno:"+ordineMissione.getAnno()+", Numero:"+ordineMissione.getNumero());
 		}
 		else if (objs.size() > 1){
