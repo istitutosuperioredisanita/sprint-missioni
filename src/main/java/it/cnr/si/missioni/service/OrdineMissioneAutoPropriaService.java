@@ -213,7 +213,7 @@ public class OrdineMissioneAutoPropriaService {
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria)crudServiceBean.findById(principal, OrdineMissioneAutoPropria.class, idAutoPropriaOrdineMissione);
 
 		if (ordineMissioneAutoPropria != null){
-			String nodeRef = cmisOrdineMissioneService.getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+			String nodeRef = cmisOrdineMissioneService.getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria, false);
 			if (nodeRef != null){
 				missioniCMISService.deleteNode(nodeRef);
 			}

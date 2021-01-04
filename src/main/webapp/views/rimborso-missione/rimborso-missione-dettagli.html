@@ -131,7 +131,7 @@ fine commento multi impegno-->
                                     <p class="col-md-3">
                                         <span class="input-group">
                                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.km">km</span>
-                                            <input type="text" only-numbers class="form-control align-right" ng-model="dettaglioSpesa.kmPercorsi" ng-change="onChangeKm(dettaglioSpesa.kmPercorsi)" maxlength="20"</input>
+                                            <input type="text" only-numbers class="form-control align-right" ng-model="dettaglioSpesa.kmPercorsi" ng-change="onChangeKm(dettaglioSpesa.kmPercorsi, dettaglioSpesa.id, dettaglioSpesa)" maxlength="20"</input>
                                         </span>
                                     </p>
                                     <p class="col-md-6">
@@ -233,7 +233,7 @@ fine commento multi impegno-->
                     <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.km">km</span>
-                            <input type="text" only-numbers class="form-control align-right" ng-model="newDettaglioSpesa.kmPercorsi" ng-change="onChangeKm(newDettaglioSpesa.kmPercorsi)" maxlength="20">
+                            <input type="text" only-numbers class="form-control align-right" ng-model="newDettaglioSpesa.kmPercorsi" ng-change="onChangeKm(newDettaglioSpesa.kmPercorsi, newDettaglioSpesa.id)" maxlength="20">
                         </span>
                     </p>
                     <p class="col-md-6">
