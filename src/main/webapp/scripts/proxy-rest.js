@@ -167,7 +167,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
             var x = $http.get('api/rest/personForUo', {params: {uo: uoSiper}});
         }
         var y = x.then(function (result) {
-            if (result.data){
+            if (result.data && result.data.length > 0){
                 var listaPersons = result.data;
                 var listaPersone = [];
                 var listaDuplicati = [];
