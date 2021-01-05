@@ -68,7 +68,7 @@ public class AccountLDAPResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<String> getSiperAccount() {
-        String resp = accountService.getAccount(SecurityUtils.getCurrentUserLogin(), true);
+        String resp = accountService.getAccount("sonia.vivona", true);
         return new ResponseEntity<String>(resp, HttpStatus.OK);
     }
 
