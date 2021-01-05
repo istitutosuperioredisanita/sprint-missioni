@@ -1,11 +1,10 @@
 package it.cnr.si.missioni.security;
 
 import feign.FeignException;
+import it.cnr.si.missioni.service.MissioniAceService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.AceService;
 import it.cnr.si.service.AuthService;
-import it.cnr.si.service.SiperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,10 +33,7 @@ public class JWTAuthenticationManager implements AuthenticationManager {
     private AuthService authService;
 
     @Autowired
-    private AceService aceService;
-
-    @Autowired
-    private SiperService siperService;
+    private MissioniAceService missioniAceService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -48,15 +43,7 @@ public class JWTAuthenticationManager implements AuthenticationManager {
 
         authService.getToken(principal, credentials);
 
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        try {
-            authorities = aceService.ruoliAttivi(principal).stream()
-                    .filter(ruolo -> ruolo.getContesto().getSigla().equals("missioni-app"))
-                    .map(a -> new SimpleGrantedAuthority(a.getSigla()))
-                    .collect(Collectors.toList());
-        } catch (FeignException e) {
-            log.info(e.getMessage() + " for user: "+ "\"" +  principal + "\"");
-        }
+        List<GrantedAuthority> authorities = missioniAceService.getGrantedAuthorities(principal);
 
         if (authorities.stream().filter(auth -> auth.getAuthority().equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
             authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
