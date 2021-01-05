@@ -145,6 +145,16 @@ public class CronService {
 		LOGGER.info("Cron per Svuotare la Cache Persone");
 	}
 
+	@CacheEvict(value = Costanti.NOME_CACHE_RUOLI, allEntries = true)
+	public void evictCacheRuoli() throws ComponentException {
+		LOGGER.info("Cron per Svuotare la Cache Ruoli");
+	}
+
+	@CacheEvict(value = Costanti.NOME_CACHE_GRANT, allEntries = true)
+	public void evictCacheGrant() throws ComponentException {
+		LOGGER.info("Cron per Svuotare la Cache Grant");
+	}
+
 	@CacheEvict(value = Costanti.NOME_CACHE_DATI_ACCOUNT, allEntries = true)
 	public void evictCacheAccount() throws ComponentException {
 		LOGGER.info("Cron per Svuotare la Cache Account");

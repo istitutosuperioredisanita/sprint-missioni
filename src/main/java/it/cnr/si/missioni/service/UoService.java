@@ -19,11 +19,6 @@ import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.SiperService;
-import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +40,7 @@ public class UoService {
     AccountService accountService;
 
 	@Autowired
-	AceService aceService;
+	MissioniAceService missioniAceService;
 
 	@Autowired
     private Environment env;
@@ -114,9 +109,9 @@ public class UoService {
 	public String getPersone(String uo, String cds) {
 		List<SimpleUtenteWebDto> list = null;
 		if (cds != null){
-			list = aceService.findUtentiIstituto(cds, LocalDate.now(), TipoAppartenenza.AFFERENZA_UO);
+			list = missioniAceService.findUtentiIstituto(cds, LocalDate.now());
 		} else {
-			list = aceService.findUtentiCdsuo(uo, LocalDate.now(), TipoAppartenenza.AFFERENZA_UO);
+			list = missioniAceService.findUtentiCdsuo(uo, LocalDate.now());
 		}
 		List<Account> listaAccount = new ArrayList<>();
     	if (list != null){

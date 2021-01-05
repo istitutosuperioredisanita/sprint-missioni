@@ -9,18 +9,12 @@ import java.util.List;
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.SiperService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

@@ -19,7 +19,6 @@ import it.cnr.si.flows.model.StartWorkflowResponse;
 import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.service.*;
-import it.cnr.si.service.AceService;
 import it.cnr.si.service.application.FlowsService;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
@@ -142,9 +141,6 @@ public class CMISOrdineMissioneService {
 
 	@Autowired
 	private AccountService accountService;
-
-	@Autowired
-	private AceService aceService;
 
 	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione) throws ComponentException{
 		return create(principal, ordineMissione,ordineMissione.getAnno());
