@@ -97,7 +97,7 @@ public class MailService {
                 message.setText(content, isHtml);
                 if (multipartFile!=null && !multipartFile.isEmpty())
                 	message.addAttachment(multipartFile.getOriginalFilename(), new ByteArrayResource(multipartFile.getBytes()), multipartFile.getContentType());
-//                javaMailSender.send(mimeMessage);
+                javaMailSender.send(mimeMessage);
                 log.debug("Sent e-mail to User '{}'", to);
             } catch (Exception e) {
                 log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
