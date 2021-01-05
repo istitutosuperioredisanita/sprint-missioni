@@ -42,6 +42,8 @@ public class Costanti {
 	public final static String NOME_CACHE_TICKET_ALFRESCO = "cacheTicketAlfresco";
     public final static String NOME_CACHE_RUOLI = "cacheRuoli";
     public final static String NOME_CACHE_DATI_PERSONE = "cachePersone";
+    public final static String NOME_CACHE_DATI_DIRETTORE = "cacheDirettore";
+    public final static String NOME_CACHE_DATI_ACCOUNT = "cacheAccount";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_DATI_UTENTI_PRESIDENTE_SPECIALI = "cacheDatiUtentiPresidenteSpeciali";
 	public final static String NOME_CACHE_FAQ = "cacheFaq";

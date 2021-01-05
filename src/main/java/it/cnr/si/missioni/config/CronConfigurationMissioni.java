@@ -57,6 +57,8 @@ public class CronConfigurationMissioni {
     		cronService.evictCache();
     		cronService.evictCacheTerzoCompenso();
             cronService.evictCachePersone();
+            cronService.evictCacheAccount();
+            cronService.evictCacheDirettore();
     	}
     }
 
