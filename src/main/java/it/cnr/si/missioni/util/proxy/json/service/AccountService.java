@@ -281,7 +281,7 @@ public class AccountService {
 		return uo.getCodice_uo().substring(0,3)+"."+uo.getCodice_uo().substring(3,6);
 	}
 
-	public Account getAccount(String risposta) {
+	private Account getAccount(String risposta) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.registerModule(new ParanamerModule());
