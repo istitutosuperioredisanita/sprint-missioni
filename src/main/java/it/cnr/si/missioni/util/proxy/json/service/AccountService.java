@@ -408,6 +408,7 @@ public class AccountService {
 		if (utenti != null && utenti.size() > 0){
 			return missioniAceService.getDirettore(utenti.get(0).getUsername());
 		}
+		return "";
 	}
 	public Boolean isUserEnableToWorkUo(Principal principal, String uo){
 		UsersSpecial userSpecial = getUoForUsersSpecial(principal.getName());
