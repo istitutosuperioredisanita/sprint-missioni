@@ -585,7 +585,7 @@ public class CMISOrdineMissioneService {
 			messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
 			messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
 			messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
-			messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().getIdFlusso());
+			messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().isOrdineMissioneVecchiaScrivania() ? "" : annullamento.getOrdineMissione().getIdFlusso());
 			messageForFlows.setValidazioneSpesaFlag("si");
 
 		} catch (Exception e) {
