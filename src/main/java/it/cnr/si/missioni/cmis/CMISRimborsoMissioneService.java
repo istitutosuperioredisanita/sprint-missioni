@@ -281,7 +281,7 @@ public class CMISRimborsoMissioneService {
 			cmisRimborsoMissione.setDataFineEstero(DateUtils.getDateAsString(rimborsoMissione.getDataFineEstero(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 		}
 		cmisRimborsoMissione.setIdOrdineMissione(rimborsoMissione.getOrdineMissione() == null ? "" :rimborsoMissione.getOrdineMissione().getId().toString());
-		cmisRimborsoMissione.setWfOrdineMissione(rimborsoMissione.getOrdineMissione() == null || rimborsoMissione.getOrdineMissione().getIdFlusso() == null ? "" : rimborsoMissione.getOrdineMissione().getIdFlusso());
+		cmisRimborsoMissione.setWfOrdineMissione(rimborsoMissione.getOrdineMissione() == null || rimborsoMissione.getOrdineMissione().getIdFlusso() == null || rimborsoMissione.getOrdineMissione().isOrdineMissioneVecchiaScrivania() ? "" : rimborsoMissione.getOrdineMissione().getIdFlusso());
 		cmisRimborsoMissione.setTotaleRimborsoMissione(rimborsoMissione.getTotaleRimborso());
 		cmisRimborsoMissione.setNomeFile(rimborsoMissione.getFileName());
 		return cmisRimborsoMissione;
