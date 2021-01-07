@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +11,8 @@ import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -401,7 +404,10 @@ public class AccountService {
 	// TODO Fine da eliminare-
 
 	public String getDirettore(String uo){
-		return missioniAceService.getDirettore(uo);
+		List<SimpleUtenteWebDto> utenti = missioniAceService.findUtentiCdsuo(uo, LocalDate.now());
+		if (utenti != null && utenti.size() > 0){
+			return missioniAceService.getDirettore(utenti.get(0).getUsername());
+		}
 	}
 	public Boolean isUserEnableToWorkUo(Principal principal, String uo){
 		UsersSpecial userSpecial = getUoForUsersSpecial(principal.getName());
