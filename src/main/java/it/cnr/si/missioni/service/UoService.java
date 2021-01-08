@@ -62,6 +62,16 @@ public class UoService {
 		return null;
     }
 
+	@Transactional(propagation = Propagation.REQUIRED)
+	public Account getDirettoreFromUsername(String username) {
+		String direttore = null;
+		direttore = missioniAceService.getDirettore(username);
+		if (direttore != null){
+			return accountService.loadAccountFromRest(direttore);
+		}
+		return null;
+	}
+
 	private boolean isDevProfile(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return true;
