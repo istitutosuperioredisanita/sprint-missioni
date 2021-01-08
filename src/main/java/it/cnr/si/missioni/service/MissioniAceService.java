@@ -60,7 +60,7 @@ public class MissioniAceService {
     SiperService siperService;
 
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term){
-        return aceService.entitaOrganizzativaFindByTerm(term);
+        return aceService.entitaOrganizzativaFind((Integer)null, term, LocalDate.now(), (Integer)null);
     }
 
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo){
