@@ -660,7 +660,9 @@ public class CMISRimborsoMissioneService {
 			messageForFlow.setAnnoMandato( cmisRimborsoMissione.getAnnoMandato());
 			messageForFlow.setNumeroMandatoOk( cmisRimborsoMissione.getNumeroMandato());
 			messageForFlow.setImportoMandato( cmisRimborsoMissione.getImportoMandato());
-			messageForFlow.setLinkToOtherWorkflows( cmisRimborsoMissione.getWfOrdineMissione());
+			if (cmisRimborsoMissione.getWfOrdineMissione() != null) {
+				messageForFlow.setLinkToOtherWorkflows( cmisRimborsoMissione.getWfOrdineMissione());
+			}
 			messageForFlow.setDifferenzeOrdineRimborso( cmisRimborsoMissione.getDifferenzeOrdineRimborso());
 			messageForFlow.setTotaleRimborsoMissione( cmisRimborsoMissione.getTotaleRimborsoMissione() == null ? "": cmisRimborsoMissione.getTotaleRimborsoMissione().toString());
 
