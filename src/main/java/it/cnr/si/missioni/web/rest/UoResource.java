@@ -41,7 +41,7 @@ public class UoResource {
     public ResponseEntity getDirettore(@RequestParam(value = "username") String username) {
         log.debug("REST request per recuperare i dati del direttore");
         
-        Account direttore = uoService.getDirettore(username);
+        Account direttore = uoService.getDirettoreFromUsername(username);
         return JSONResponseEntity.ok(direttore);
     }
 
