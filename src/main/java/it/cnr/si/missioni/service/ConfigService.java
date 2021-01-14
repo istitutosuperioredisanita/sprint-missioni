@@ -178,7 +178,8 @@ public class ConfigService {
 							entitaOrganizzativaWebDto.getTipo().getSigla().equals("DIP") ||
 							entitaOrganizzativaWebDto.getTipo().getSigla().equals("UFFNODIR") ||
 							entitaOrganizzativaWebDto.getTipo().getSigla().equals("SL") ||
-							entitaOrganizzativaWebDto.getTipo().getSigla().equals("SSEC")))
+							entitaOrganizzativaWebDto.getTipo().getSigla().equals("SSEC") ||
+									entitaOrganizzativaWebDto.getTipo().getSigla().equals("un")))
 					.collect(Collectors.toList());
 
 				for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativa : listaSedi){
