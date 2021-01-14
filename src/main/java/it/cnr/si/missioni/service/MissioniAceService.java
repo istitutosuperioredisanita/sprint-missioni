@@ -78,7 +78,8 @@ public class MissioniAceService {
             if (tipoEntitaOrganizzativa.equals("UFF") ||
                     tipoEntitaOrganizzativa.equals("SPRINC")||
                     tipoEntitaOrganizzativa.equals("AREA")||
-                    tipoEntitaOrganizzativa.equals("DIP")){
+                    tipoEntitaOrganizzativa.equals("DIP")||
+                    tipoEntitaOrganizzativa.equals("un")){
                 return entitaOrganizzativaWebDto;
             }
         }
