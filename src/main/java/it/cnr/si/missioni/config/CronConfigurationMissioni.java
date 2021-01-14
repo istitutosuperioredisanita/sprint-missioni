@@ -56,15 +56,20 @@ public class CronConfigurationMissioni {
     	if (cronEvictCacheActive){
     		cronService.evictCache();
     		cronService.evictCacheTerzoCompenso();
-            cronService.evictCachePersone();
-            cronService.evictCacheRuoli();
-            cronService.evictCacheGrant();
-            cronService.evictCacheAccount();
-            cronService.evictCacheDirettore();
-    	}
+            evictCacheAce();
+        }
     }
 
-	@Scheduled(cron = "${cron.loadCache.cronExpression}")
+    public void evictCacheAce() {
+        cronService.evictCachePersone();
+        cronService.evictCacheRuoli();
+        cronService.evictCacheGrant();
+        cronService.evictCacheAccount();
+        cronService.evictCacheDirettore();
+        cronService.evictCacheIdSede();
+    }
+
+    @Scheduled(cron = "${cron.loadCache.cronExpression}")
     public void loadCache() throws Exception {
     	if (cronLoadCacheActive)
     		cronService.loadCache();

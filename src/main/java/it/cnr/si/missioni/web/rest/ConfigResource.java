@@ -103,6 +103,12 @@ public class ConfigResource {
 	public void refreshCache() {
 		log.debug("REST request per ricaricare la configurazione da Alfresco");
 		cronService.evictCache();
+		cronService.evictCachePersone();
+		cronService.evictCacheRuoli();
+		cronService.evictCacheGrant();
+		cronService.evictCacheAccount();
+		cronService.evictCacheDirettore();
+		cronService.evictCacheIdSede();
 		cronService.loadCache();
 	}
 

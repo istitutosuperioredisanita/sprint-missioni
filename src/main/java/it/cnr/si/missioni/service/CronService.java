@@ -165,6 +165,11 @@ public class CronService {
 		LOGGER.info("Cron per Svuotare la Cache Direttore");
 	}
 
+	@CacheEvict(value = Costanti.NOME_CACHE_ID_SEDE, allEntries = true)
+	public void evictCacheIdSede() throws ComponentException {
+		LOGGER.info("Cron per Svuotare la Cache Id Sede");
+	}
+
 	@Transactional
 	public void loadCache() throws ComponentException {
 		ILock lock = hazelcastInstance.getLock(lockKeyLoadCache);
