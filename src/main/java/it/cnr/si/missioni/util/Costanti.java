@@ -44,6 +44,7 @@ public class Costanti {
     public final static String NOME_CACHE_GRANT = "cacheGrant";
     public final static String NOME_CACHE_DATI_PERSONE = "cachePersone";
     public final static String NOME_CACHE_DATI_DIRETTORE = "cacheDirettore";
+    public final static String NOME_CACHE_ID_SEDE = "cacheIdSede";
     public final static String NOME_CACHE_DATI_ACCOUNT = "cacheAccount";
 	public final static String NOME_CACHE_DATI_UO = "cacheDatiUo";
 	public final static String NOME_CACHE_DATI_UTENTI_PRESIDENTE_SPECIALI = "cacheDatiUtentiPresidenteSpeciali";

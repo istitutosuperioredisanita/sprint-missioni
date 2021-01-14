@@ -6,6 +6,7 @@ import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.*;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
+import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +43,9 @@ public class MessageForFlowsService {
 
     @Autowired
     DatiIstitutoService datiIstitutoService;
+
+    @Autowired
+    DatiSedeService datiSedeService;
 
     @Autowired
     private FlowsService flowsService;
@@ -122,7 +127,20 @@ public class MessageForFlowsService {
                         }
                     } else {
                         gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-                        gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede);
+                        boolean stessoGruppo = false;
+                        if (uoSpesa.equals(uoRich)){
+                            SimpleEntitaOrganizzativaWebDto sede = missioniAceService.getSede(idSede);
+                            if (sede.getIdnsip() != null) {
+                                DatiSede datiSede = datiSedeService.getDatiSede(sede.getIdnsip(), LocalDate.now());
+                                if (datiSede != null && datiSede.isDelegaSpesa()){
+                                    gruppoSecondoFirmatario = gruppoPrimoFirmatario;
+                                    stessoGruppo = true;
+                                }
+                            }
+                        }
+                        if (!stessoGruppo){
+                            gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede);
+                        }
                     }
                 } else {
                     gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
