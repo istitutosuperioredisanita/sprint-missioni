@@ -107,4 +107,7 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
 	public boolean isResponsabileEstero(){
 		return Utility.nvl(getResponsabileSoloItalia(),"N").equals("N");
 	}
+	public boolean isDelegaSpesa(){
+		return Utility.nvl(getDelegaSpesa(),"N").equals("S");
+	}
 }

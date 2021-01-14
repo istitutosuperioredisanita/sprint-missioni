@@ -156,4 +156,9 @@ public class MissioniAceService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Sede responsabile utente non trovata per "+user);
         }
     }
+
+    @Cacheable(value = Costanti.NOME_CACHE_ID_SEDE)
+    public SimpleEntitaOrganizzativaWebDto getSede(Integer idEntitaOrganizzativa){
+        return aceService.entitaOrganizzativaById(idEntitaOrganizzativa);
+    }
 }
