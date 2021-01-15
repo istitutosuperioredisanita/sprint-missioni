@@ -157,7 +157,6 @@ public class MissioniAceService {
         }
     }
 
-    @Cacheable(value = Costanti.NOME_CACHE_ID_SEDE)
     public SimpleEntitaOrganizzativaWebDto getSede(Integer idEntitaOrganizzativa){
         return aceService.entitaOrganizzativaById(idEntitaOrganizzativa);
     }
