@@ -1713,6 +1713,7 @@ public class RimborsoMissioneService {
 							if (isMissioneComunicabileSigla(principal, rimborsoMissione)){
 								return rimborsoMissione;
 							}
+							break;
 						case FlowResult.ESITO_FLUSSO_FIRMA_UO:
 							aggiornaRimborsoMissionePrimaFirma(principal, rimborsoMissioneDaAggiornare);
 							break;
