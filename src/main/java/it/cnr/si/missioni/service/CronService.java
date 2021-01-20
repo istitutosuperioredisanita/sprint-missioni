@@ -279,7 +279,7 @@ public class CronService {
 			}
 		}
 		List<RimborsoMissione> listaRimborsiMissioneNuovaScrivania = listaRimborsiMissione.stream()
-				.filter(rimborsoMissione -> !rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+				.filter(rimborsoMissione -> rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
 				.collect(Collectors.toList());
 		if (listaRimborsiMissioneNuovaScrivania != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneNuovaScrivania){
