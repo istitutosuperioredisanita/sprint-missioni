@@ -21,17 +21,21 @@ import it.cnr.si.service.SiperService;
 import it.cnr.si.service.application.FlowsService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
+import it.cnr.si.service.dto.anagrafica.enums.TipoContratto;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloPersonaWebDto;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.scritture.RuoloDto;
-import it.cnr.si.service.dto.anagrafica.scritture.RuoloPersonaDto;
+import it.cnr.si.service.dto.anagrafica.letture.UtenteWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.*;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +44,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +66,16 @@ public class MissioniAceService {
 
     @Autowired
     SiperService siperService;
+
+    private static Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>(){
+        {
+            put("BOR", TipoContratto.BORSISTA);
+            put("ASS", TipoContratto.ASSEGNISTA);
+            put("COLL", TipoContratto.COLLABORATORE_PROFESSIONALE);
+            put("PROF", TipoContratto.COLLABORATORE_PROFESSIONALE);
+            put("OCCA", TipoContratto.COLLABORATORE_PROFESSIONALE);
+        }
+    };
 
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term){
         return aceService.entitaOrganizzativaFind((Integer)null, term, LocalDate.now(), (Integer)null);
@@ -160,4 +178,137 @@ public class MissioniAceService {
     public SimpleEntitaOrganizzativaWebDto getSede(Integer idEntitaOrganizzativa){
         return aceService.entitaOrganizzativaById(idEntitaOrganizzativa);
     }
+
+
+    public void testImportPersonaleEsterno() throws IOException {
+        String utente = "MIGESTERNI";
+        try (
+                Reader reader = Files.newBufferedReader(Paths.get("src","test","resources", "esterni.csv"));
+                CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
+                        .withHeader("NOME", "COGNOME", "CODICE_FISCALE", "USERNAME","UO","IDNSIP","TI_SESSO","DT_NASCITA",
+                                "CD_TIPO_RAPPORTO","DT_INI_VALIDITA","DT_FIN_VALIDITA", "EMAIL")
+                        .withFirstRecordAsHeader()
+                        .withIgnoreHeaderCase()
+                        .withTrim());
+        ) {
+            for (CSVRecord csvRecord : csvParser) {
+                String nome = csvRecord.get("NOME");
+                String cognome = csvRecord.get("COGNOME");
+                String codiceFiscale = csvRecord.get("CODICE_FISCALE");
+                String username = csvRecord.get("USERNAME");
+                String uo = csvRecord.get("UO");
+                String idnsip = csvRecord.get("IDNSIP");
+                String tiSesso = csvRecord.get("TI_SESSO");
+                String dtNascita = csvRecord.get("DT_NASCITA");
+                String cdTipoRapporto = csvRecord.get("CD_TIPO_RAPPORTO");
+                String dtIniValidita = csvRecord.get("DT_INI_VALIDITA");
+                String dtFinValidita = csvRecord.get("DT_FIN_VALIDITA");
+                String email = csvRecord.get("EMAIL");
+                String sedeIdByIdNsip = null;
+                logger.info("Elaboro riga: "+ csvRecord.getRecordNumber());
+                try {
+                    sedeIdByIdNsip =
+                            Optional.ofNullable(aceService.getSedeIdByIdNsip(idnsip))
+                                    .orElseGet(() -> aceService.getSedeIdByCdsUo(uo));
+                } catch (FeignException _ex) {
+                }
+                if (!Optional.ofNullable(sedeIdByIdNsip).isPresent()) {
+                    continue;
+                }
+                Optional<String> personaId = Optional.empty();
+                try {
+                    personaId = Optional.ofNullable(aceService.getPersonaId(codiceFiscale));
+                } catch (FeignException _ex) {
+                }
+/*                if (!personaId.isPresent()) {
+                    PersonaDto personaDto = new PersonaDto();
+                    personaDto.setNome(nome);
+                    personaDto.setCognome(cognome);
+                    personaDto.setSesso(tiSesso);
+                    personaDto.setDataNascita(LocalDate.parse(dtNascita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                    personaDto.setCodiceFiscale(codiceFiscale);
+                    personaDto.setUtenteUva(utente);
+                    personaDto.setTipoContratto(
+                            Optional.ofNullable(cdTipoRapporto)
+                                    .filter(s -> TIPOCONTRATTO.containsKey(cdTipoRapporto))
+                                    .map(s -> TIPOCONTRATTO.get(cdTipoRapporto))
+                                    .orElse(null)
+                    );
+                    logger.info(personaDto.toString());
+                    final PersonaWebDto personaWebDto = aceService.savePersona(personaDto);
+
+
+                    Assert.assertNotNull(personaWebDto);
+
+                    UtenteDto utenteDto = new UtenteDto();
+                    utenteDto.setPersona(personaWebDto.getId());
+                    utenteDto.setUsername(username);
+                    utenteDto.setEmail(email);
+                    utenteDto.setUtenteUva(utente);
+                    log.info(utenteDto.toString());
+
+                    final UtenteWebDto utente = aceService.createUtente(utenteDto);
+
+                    Assert.assertNotNull(utente);
+
+                    PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
+                    personaEntitaOrganizzativaDto.setPersona(personaWebDto.getId());
+                    personaEntitaOrganizzativaDto.setTipoAppartenenza(TipoAppartenenza.AFFERENZA_UO);
+                    personaEntitaOrganizzativaDto.setEntitaOrganizzativa(Integer.valueOf(sedeIdByIdNsip));
+                    personaEntitaOrganizzativaDto.setInizioValidita(
+                            LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    );
+                    personaEntitaOrganizzativaDto.setFineValidita(
+                            LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    );
+                    logger.info(personaEntitaOrganizzativaDto.toString());
+                    final PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaWebDto =
+                            aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
+
+                    Assert.assertNotNull(personaEntitaOrganizzativaWebDto);
+
+                } else {
+                    Optional<PersonaEntitaOrganizzativaWebDto> personaEO = aceService.personaEntitaOrganizzativaFind(Collections.singletonMap("persona", personaId.get()))
+                            .stream().findFirst();
+                    if (personaEO.isPresent()){
+                        PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
+                        personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
+                        personaEntitaOrganizzativaDto.setTipoAppartenenza(TipoAppartenenza.AFFERENZA_UO);
+                        personaEntitaOrganizzativaDto.setEntitaOrganizzativa(Integer.valueOf(sedeIdByIdNsip));
+                        personaEntitaOrganizzativaDto.setInizioValidita(
+                                LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        );
+                        personaEntitaOrganizzativaDto.setFineValidita(
+                                LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        );
+                        logger.info(personaEntitaOrganizzativaDto.toString());
+                        final PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaWebDto =
+                                aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
+                    } else {
+                        PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO.get();
+                        PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
+                        personaEntitaOrganizzativaDto.setId(personaEOWebDto.getId());
+                        personaEntitaOrganizzativaDto.setNote(personaEOWebDto.getNote());
+                        personaEntitaOrganizzativaDto.setPermissions(personaEOWebDto.getPermissions());
+                        personaEntitaOrganizzativaDto.setUtenteUva(utente);
+                        personaEntitaOrganizzativaDto.setProvvedimento(personaEOWebDto.getProvvedimento());
+                        personaEntitaOrganizzativaDto.setPersona(personaEOWebDto.getPersona().getId());
+                        personaEntitaOrganizzativaDto.setTipoAppartenenza(personaEOWebDto.getTipoAppartenenza());
+                        personaEntitaOrganizzativaDto.setEntitaOrganizzativa(personaEOWebDto.getEntitaOrganizzativa().getId());
+                        personaEntitaOrganizzativaDto.setInizioValidita(
+                                personaEOWebDto.getInizioValidita()
+                        );
+                        personaEntitaOrganizzativaDto.setFineValidita(
+                                LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        );
+                        logger.info(personaEntitaOrganizzativaDto.toString());
+
+                        aceService.updatePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
+
+                    }
+                }*/
+            }
+        }
+    }
 }
+
