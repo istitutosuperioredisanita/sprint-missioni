@@ -680,7 +680,7 @@ public class CMISRimborsoMissioneService {
 			if (rimborsoMissione.isStatoNonInviatoAlFlusso()){
 				parameters.add("commento", "");
 			} else {
-				if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+				if ((rimborsoMissione.isStatoInviatoAlFlusso() || rimborsoMissione.isStatoRespintoFlusso())  && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
 					parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, rimborsoMissione.getIdFlusso());
 				} else {
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido.");
