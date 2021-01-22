@@ -813,6 +813,7 @@
         "ribalta-dati-istituti.button": "Ribalta Dati per UO",
         "rimanda-coda.button": "Reinvia Coda",
         "populate-signer.button": "Popola Firmatari Missioni",
+        "update-freelance.button": "Aggiorna Rapporto Personale Non Dipendente",
         "refreshCache.button": "Aggiorna Cache Servizi REST",
         "refreshCacheTerzoCompenso.button": "Aggiorna Cache Terzo Compenso",
         "sendMessage.button": "Invia Messaggio"

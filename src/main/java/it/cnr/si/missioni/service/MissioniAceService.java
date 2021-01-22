@@ -180,7 +180,7 @@ public class MissioniAceService {
     }
 
 
-    public void testImportPersonaleEsterno() throws IOException {
+    public void importPersonaleEsterno() throws IOException {
         String utente = "MIGESTERNI";
         try (
                 Reader reader = Files.newBufferedReader(Paths.get("src","test","resources", "esterni.csv"));
@@ -220,7 +220,7 @@ public class MissioniAceService {
                     personaId = Optional.ofNullable(aceService.getPersonaId(codiceFiscale));
                 } catch (FeignException _ex) {
                 }
-/*                if (!personaId.isPresent()) {
+                if (!personaId.isPresent()) {
                     PersonaDto personaDto = new PersonaDto();
                     personaDto.setNome(nome);
                     personaDto.setCognome(cognome);
@@ -238,18 +238,18 @@ public class MissioniAceService {
                     final PersonaWebDto personaWebDto = aceService.savePersona(personaDto);
 
 
-                    Assert.assertNotNull(personaWebDto);
+//                    Assert.assertNotNull(personaWebDto);
 
                     UtenteDto utenteDto = new UtenteDto();
                     utenteDto.setPersona(personaWebDto.getId());
                     utenteDto.setUsername(username);
                     utenteDto.setEmail(email);
                     utenteDto.setUtenteUva(utente);
-                    log.info(utenteDto.toString());
+                    logger.info(utenteDto.toString());
 
-                    final UtenteWebDto utente = aceService.createUtente(utenteDto);
+                    final UtenteWebDto utenteWebDto = aceService.createUtente(utenteDto);
 
-                    Assert.assertNotNull(utente);
+//                    Assert.assertNotNull(utenteWebDto);
 
                     PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
                     personaEntitaOrganizzativaDto.setPersona(personaWebDto.getId());
@@ -265,48 +265,52 @@ public class MissioniAceService {
                     final PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaWebDto =
                             aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
 
-                    Assert.assertNotNull(personaEntitaOrganizzativaWebDto);
+//                    Assert.assertNotNull(personaEntitaOrganizzativaWebDto);
 
                 } else {
-                    Optional<PersonaEntitaOrganizzativaWebDto> personaEO = aceService.personaEntitaOrganizzativaFind(Collections.singletonMap("persona", personaId.get()))
-                            .stream().findFirst();
-                    if (personaEO.isPresent()){
-                        PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
-                        personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
-                        personaEntitaOrganizzativaDto.setTipoAppartenenza(TipoAppartenenza.AFFERENZA_UO);
-                        personaEntitaOrganizzativaDto.setEntitaOrganizzativa(Integer.valueOf(sedeIdByIdNsip));
-                        personaEntitaOrganizzativaDto.setInizioValidita(
-                                LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        );
-                        personaEntitaOrganizzativaDto.setFineValidita(
-                                LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        );
-                        logger.info(personaEntitaOrganizzativaDto.toString());
-                        final PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaWebDto =
-                                aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
-                    } else {
-                        PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO.get();
-                        PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
-                        personaEntitaOrganizzativaDto.setId(personaEOWebDto.getId());
-                        personaEntitaOrganizzativaDto.setNote(personaEOWebDto.getNote());
-                        personaEntitaOrganizzativaDto.setPermissions(personaEOWebDto.getPermissions());
-                        personaEntitaOrganizzativaDto.setUtenteUva(utente);
-                        personaEntitaOrganizzativaDto.setProvvedimento(personaEOWebDto.getProvvedimento());
-                        personaEntitaOrganizzativaDto.setPersona(personaEOWebDto.getPersona().getId());
-                        personaEntitaOrganizzativaDto.setTipoAppartenenza(personaEOWebDto.getTipoAppartenenza());
-                        personaEntitaOrganizzativaDto.setEntitaOrganizzativa(personaEOWebDto.getEntitaOrganizzativa().getId());
-                        personaEntitaOrganizzativaDto.setInizioValidita(
-                                personaEOWebDto.getInizioValidita()
-                        );
-                        personaEntitaOrganizzativaDto.setFineValidita(
-                                LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        );
-                        logger.info(personaEntitaOrganizzativaDto.toString());
+                    try {
+                        personaId = Optional.ofNullable(aceService.getPersonaId(codiceFiscale));
+                        Optional<PersonaEntitaOrganizzativaWebDto> personaEO = aceService.personaEntitaOrganizzativaFind(Collections.singletonMap("persona", personaId.get()))
+                                .stream().findFirst();
+                        if (!personaEO.isPresent()){
+                            PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
+                            personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
+                            personaEntitaOrganizzativaDto.setTipoAppartenenza(TipoAppartenenza.AFFERENZA_UO);
+                            personaEntitaOrganizzativaDto.setEntitaOrganizzativa(Integer.valueOf(sedeIdByIdNsip));
+                            personaEntitaOrganizzativaDto.setInizioValidita(
+                                    LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            );
+                            personaEntitaOrganizzativaDto.setFineValidita(
+                                    LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            );
+                            logger.info(personaEntitaOrganizzativaDto.toString());
+                            final PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaWebDto =
+                                    aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
+                        } else {
+                            PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO.get();
+                            PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
+                            personaEntitaOrganizzativaDto.setId(personaEOWebDto.getId());
+                            personaEntitaOrganizzativaDto.setNote(personaEOWebDto.getNote());
+                            personaEntitaOrganizzativaDto.setPermissions(personaEOWebDto.getPermissions());
+                            personaEntitaOrganizzativaDto.setUtenteUva(utente);
+                            personaEntitaOrganizzativaDto.setProvvedimento(personaEOWebDto.getProvvedimento());
+                            personaEntitaOrganizzativaDto.setPersona(personaEOWebDto.getPersona().getId());
+                            personaEntitaOrganizzativaDto.setTipoAppartenenza(personaEOWebDto.getTipoAppartenenza());
+                            personaEntitaOrganizzativaDto.setEntitaOrganizzativa(personaEOWebDto.getEntitaOrganizzativa().getId());
+                            personaEntitaOrganizzativaDto.setInizioValidita(
+                                    LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            );
+                            personaEntitaOrganizzativaDto.setFineValidita(
+                                    LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            );
+                            logger.info(personaEntitaOrganizzativaDto.toString());
 
-                        aceService.updatePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
+                            aceService.updatePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
 
+                        }
+                    } catch (FeignException _ex) {
                     }
-                }*/
+                }
             }
         }
     }
