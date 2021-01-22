@@ -214,7 +214,7 @@ public class CronService {
 				    try {
 						LOGGER.info("Cron per Aggiornamenti Ordine Missione");
 
-						comunicaRimborsoSigla(principal);
+						comunicaRimborsoSigla(principal, false);
 
 				        LOGGER.info("work done.");
 				    } finally {
@@ -260,7 +260,7 @@ public class CronService {
 		}
 	}
 
-	public void comunicaRimborsoSigla(Principal principal) {
+	public void comunicaRimborsoSigla(Principal principal, Boolean isVecchiaScrivania) {
 		LOGGER.info("Cron per Comunicazioni Rimborsi Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
@@ -278,11 +278,18 @@ public class CronService {
 				LOGGER.error("Errore durante l'invio dell'e-mail: "+e1);
 			}
 		}
-		List<RimborsoMissione> listaRimborsiMissioneNuovaScrivania = listaRimborsiMissione.stream()
-				.filter(rimborsoMissione -> rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
-				.collect(Collectors.toList());
-		if (listaRimborsiMissioneNuovaScrivania != null){
-			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneNuovaScrivania){
+		List<RimborsoMissione> listaRimborsiMissioneDaComunicare = null;
+		if (isVecchiaScrivania) {
+			listaRimborsiMissioneDaComunicare = listaRimborsiMissione.stream()
+					.filter(rimborsoMissione -> rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+					.collect(Collectors.toList());
+		} else {
+			listaRimborsiMissioneDaComunicare = listaRimborsiMissione.stream()
+					.filter(rimborsoMissione -> !rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
+					.collect(Collectors.toList());
+		}
+		if (listaRimborsiMissioneDaComunicare  != null){
+			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneDaComunicare ){
 				comunicaRimborsoSigla(principal, rimborsoMissione);
 			}
 		}
@@ -547,7 +554,7 @@ public class CronService {
 
 //						ribaltaMissione(principal);
 
-					comunicaRimborsoSigla(principal);
+					comunicaRimborsoSigla(principal, true);
 
 					LOGGER.info("work done.");
 				} finally {

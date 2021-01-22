@@ -176,4 +176,14 @@ public class ConfigResource {
 		log.info("REST request per popolare i dati su ACE");
 		configService.populateSignerMissioni();
 	}
+	/**
+	 * GET  /rest/config/datiUo -> rechargeDatiUo.
+	 */
+	@RequestMapping(value = "/rest/config/aggiornaPersonaleNonDipendente",
+			method = RequestMethod.GET)
+	@Timed
+	public void aggiornaPersonaleNonDipendente() {
+		log.info("REST request per aggiornare i dati su ACE");
+		configService.aggiornaRapportoPersonaleEsterno();
+	}
 }

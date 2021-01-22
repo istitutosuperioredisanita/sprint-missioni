@@ -64,4 +64,9 @@ missioniApp.factory('ConfigService', function ($http, ui) {
             $scope.successRefresh = true;
         });
      }
+     $scope.aggiornaDatiPersonaleNonDipendente = function() {
+        $http.get('api/rest/config/aggiornaPersonaleNonDipendente').success(function(result){
+            $scope.successRefresh = true;
+        });
+     }
  });

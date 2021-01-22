@@ -161,6 +161,14 @@ public class ConfigService {
 					"File degli aggiornamenti di versione non trovato");
 		}
     }
+	public void aggiornaRapportoPersonaleEsterno () {
+		try {
+			missioniAceService.importPersonaleEsterno();
+		} catch (IOException e) {
+			throw new AwesomeException(CodiciErrore.ERRGEN,
+					"Aggiornamenti personale esterno");
+		}
+	}
 	public void populateSignerMissioni() {
 		List<DatiIstituto> list = datiIstitutoService.getDatiIstituti();
 		SimpleRuoloWebDto ruoloMissioni = missioniAceService.recuperoRuolo(Costanti.RUOLO_FIRMA);
