@@ -164,7 +164,8 @@ public class FlowsMissioniService {
 		if (idAnnullamento != null){
 			AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById(principal, AnnullamentoOrdineMissione.class, idAnnullamento);
 			if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneDaValidare()){
-				ResultFlows result = null;
+				log.info("Trovato un annullamento ordine di missione da approvare con id {}.", annullamento.getId());
+				ResultFlows result = retrieveDataFromFlows(annullamento);
 				if (result == null){
 					return null;
 				}
