@@ -270,8 +270,13 @@ public class MissioniAceService {
                 } else {
                     try {
                         personaId = Optional.ofNullable(aceService.getPersonaId(codiceFiscale));
-                        Optional<PersonaEntitaOrganizzativaWebDto> personaEO = aceService.personaEntitaOrganizzativaFind(Collections.singletonMap("persona", personaId.get()))
-                                .stream().findFirst();
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("persona", personaId.get());
+                        params.put("tipoAppartenenza", personaId.get());
+                        List<PersonaEntitaOrganizzativaWebDto> personeEO;
+                        personeEO = aceService.personaEntitaOrganizzativaFind(params)
+                                .stream().sorted(Comparator.comparing(PersonaEntitaOrganizzativaWebDto::getInizioValidita)).collect(Collectors.toList());
+// quì
                         if (!personaEO.isPresent()){
                             PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
                             personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
