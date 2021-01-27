@@ -277,6 +277,7 @@ public class MissioniAceService {
                         personeEO = aceService.personaEntitaOrganizzativaFind(params)
                                 .stream().sorted(Comparator.comparing(PersonaEntitaOrganizzativaWebDto::getInizioValidita)).collect(Collectors.toList());
 // quì
+/*
                         if (!personaEO.isPresent()){
                             PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
                             personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
@@ -312,7 +313,7 @@ public class MissioniAceService {
 
                             aceService.updatePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
 
-                        }
+                        }*/
                     } catch (FeignException _ex) {
                     }
                 }
