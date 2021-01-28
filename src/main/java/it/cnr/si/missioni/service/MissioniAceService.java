@@ -85,7 +85,7 @@ public class MissioniAceService {
         List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo);
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
                 .filter(entita -> {
-                    return uo.equals(entita.getCdsuo()) ;
+                    return uo.equals(entita.getCdsuo()) && entita.getIdnsip() != null && !"IST".equals(entita.getTipo().getSigla());
                 }).collect(Collectors.toList())).orElse(new ArrayList<SimpleEntitaOrganizzativaWebDto>());
         return listaEntitaUo;
     }
