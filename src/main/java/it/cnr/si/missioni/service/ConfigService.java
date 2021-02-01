@@ -176,7 +176,7 @@ public class ConfigService {
 		for (DatiIstituto datiIstituto : list){
 			try{
 
-			List<SimpleEntitaOrganizzativaWebDto> listaSediEO = missioniAceService.recuperoSediDaUo(Utility.replace(datiIstituto.getIstituto(),".",""));
+			List<SimpleEntitaOrganizzativaWebDto> listaSediEO = missioniAceService.recuperoSediDaUo(Utility.replace(datiIstituto.getIstituto(),".",""), LocalDate.now());
 
 			List<SimpleEntitaOrganizzativaWebDto> listaSedi = listaSediEO.stream()
 					.filter(entitaOrganizzativaWebDto -> entitaOrganizzativaWebDto.getIdnsip() != null && entitaOrganizzativaWebDto.getTipo() != null && entitaOrganizzativaWebDto.getTipo().getSigla() != null &&
