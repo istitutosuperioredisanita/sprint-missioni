@@ -77,12 +77,22 @@ public class MissioniAceService {
         }
     };
 
-    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term){
-        return aceService.entitaOrganizzativaFind((Integer)null, term, LocalDate.now(), (Integer)null);
+    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data){
+        try {
+            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer)null, term, LocalDate.now(), (Integer)null);
+            if (list.isEmpty()){
+                return aceService.entitaOrganizzativaFind((Integer)null, term, data, (Integer)null);
+            }
+            return list;
+
+        } catch (FeignException fe){
+            logger.info(fe.getMessage());
+            return aceService.entitaOrganizzativaFind((Integer)null, term, data, (Integer)null);
+        }
     }
 
-    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo){
-        List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo);
+    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo, LocalDate data){
+        List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo, data);
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
                 .filter(entita -> {
                     return uo.equals(entita.getCdsuo()) && entita.getIdnsip() != null && !"IST".equals(entita.getTipo().getSigla());
@@ -160,11 +170,15 @@ public class MissioniAceService {
     }
     public List<SimpleUtenteWebDto> findUtentiIstituto(String cds, LocalDate data) {
         logger.info("findUtentiIstituto: "+ cds );
-        return  aceService.findUtentiIstituto(cds, data, TipoAppartenenza.AFFERENZA_UO);
+        return aceService.findUtentiIstituto(cds, data, TipoAppartenenza.SEDE);
     }
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
         logger.info("findUtentiCdsuo: "+ uo );
-        return  aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.AFFERENZA_UO);
+        List<SimpleUtenteWebDto> lista = aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.SEDE);
+        List<SimpleUtenteWebDto> listaCessati = aceService.findUtentiCessatiCdsuo(uo, null, TipoAppartenenza.SEDE);
+        lista.addAll(listaCessati);
+
+        return lista;
     }
     public Integer getSedeResponsabileUtente(String user){
         BossDto boss = aceService.findResponsabileUtente(user);
@@ -269,16 +283,13 @@ public class MissioniAceService {
 
                 } else {
                     try {
-                        personaId = Optional.ofNullable(aceService.getPersonaId(codiceFiscale));
                         Map<String, Object> params = new HashMap<>();
                         params.put("persona", personaId.get());
-                        params.put("tipoAppartenenza", personaId.get());
+                        params.put("tipoAppartenenza", TipoAppartenenza.AFFERENZA_UO);
                         List<PersonaEntitaOrganizzativaWebDto> personeEO;
                         personeEO = aceService.personaEntitaOrganizzativaFind(params)
                                 .stream().sorted(Comparator.comparing(PersonaEntitaOrganizzativaWebDto::getInizioValidita)).collect(Collectors.toList());
-// quì
-/*
-                        if (!personaEO.isPresent()){
+                        if (personeEO == null || personeEO.isEmpty()){
                             PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
                             personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
                             personaEntitaOrganizzativaDto.setTipoAppartenenza(TipoAppartenenza.AFFERENZA_UO);
@@ -293,32 +304,42 @@ public class MissioniAceService {
                             final PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaWebDto =
                                     aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
                         } else {
-                            PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO.get();
-                            PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
-                            personaEntitaOrganizzativaDto.setId(personaEOWebDto.getId());
-                            personaEntitaOrganizzativaDto.setNote(personaEOWebDto.getNote());
-                            personaEntitaOrganizzativaDto.setPermissions(personaEOWebDto.getPermissions());
-                            personaEntitaOrganizzativaDto.setUtenteUva(utente);
-                            personaEntitaOrganizzativaDto.setProvvedimento(personaEOWebDto.getProvvedimento());
-                            personaEntitaOrganizzativaDto.setPersona(personaEOWebDto.getPersona().getId());
-                            personaEntitaOrganizzativaDto.setTipoAppartenenza(personaEOWebDto.getTipoAppartenenza());
-                            personaEntitaOrganizzativaDto.setEntitaOrganizzativa(personaEOWebDto.getEntitaOrganizzativa().getId());
-                            personaEntitaOrganizzativaDto.setInizioValidita(
-                                    LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                            );
-                            personaEntitaOrganizzativaDto.setFineValidita(
-                                    LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                            );
-                            logger.info(personaEntitaOrganizzativaDto.toString());
+                            boolean trovataPersonaSenzaDataFine = false;
+                            for (PersonaEntitaOrganizzativaWebDto personaEO : personeEO){
+                              if (personaEO.getFineValidita() == null){
+                                  aggiornaPersonaEO(utente, dtIniValidita, dtFinValidita, personaEO);
+                                  PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO;
+                                  aggiornaPersonaEO(utente, dtIniValidita, dtFinValidita, personaEOWebDto);
+                              }
+                            }
 
-                            aceService.updatePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
-
-                        }*/
+                        }
                     } catch (FeignException _ex) {
                     }
                 }
             }
         }
+    }
+
+    private void aggiornaPersonaEO(String utente, String dtIniValidita, String dtFinValidita, PersonaEntitaOrganizzativaWebDto personaEOWebDto) {
+        PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
+        personaEntitaOrganizzativaDto.setId(personaEOWebDto.getId());
+        personaEntitaOrganizzativaDto.setNote(personaEOWebDto.getNote());
+        personaEntitaOrganizzativaDto.setPermissions(personaEOWebDto.getPermissions());
+        personaEntitaOrganizzativaDto.setUtenteUva(utente);
+        personaEntitaOrganizzativaDto.setProvvedimento(personaEOWebDto.getProvvedimento());
+        personaEntitaOrganizzativaDto.setPersona(personaEOWebDto.getPersona().getId());
+        personaEntitaOrganizzativaDto.setTipoAppartenenza(personaEOWebDto.getTipoAppartenenza());
+        personaEntitaOrganizzativaDto.setEntitaOrganizzativa(personaEOWebDto.getEntitaOrganizzativa().getId());
+        personaEntitaOrganizzativaDto.setInizioValidita(
+                LocalDate.parse(dtIniValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        );
+        personaEntitaOrganizzativaDto.setFineValidita(
+                LocalDate.parse(dtFinValidita, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        );
+        logger.info(personaEntitaOrganizzativaDto.toString());
+
+        aceService.updatePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
     }
 }
 

@@ -9,6 +9,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
@@ -19,6 +20,7 @@ import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -78,6 +81,7 @@ public class MessageForFlowsService {
         DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(uoSpesaSigla, new Integer(cmisMissione.getAnno()));
         DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(uoRichSigla, new Integer(cmisMissione.getAnno()));
 
+        LocalDate dataInizioMissione = DateUtils.parseLocalDate(cmisMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
         SimplePersonaWebDto persona = missioniAceService.getPersona(cmisMissione.getUsernameUtenteOrdine());
         Integer idSede = persona.getSede().getId();
         String ruolo = Costanti.RUOLO_FIRMA;
@@ -97,10 +101,10 @@ public class MessageForFlowsService {
         } else {
             if (cmisMissione.isMissioneCug()){
                 gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
-                SimpleEntitaOrganizzativaWebDto sedeCug = recuperoSedeCug();
+                SimpleEntitaOrganizzativaWebDto sedeCug = recuperoSedeCug(dataInizioMissione);
                 gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedeCug.getId());
             } else if (cmisMissione.isMissionePresidente()){
-                SimpleEntitaOrganizzativaWebDto sedePresidente = recuperoSedePresidenza();
+                SimpleEntitaOrganizzativaWebDto sedePresidente = recuperoSedePresidenza(dataInizioMissione);
 
                 if (messageForFlows instanceof MessageForFlowRimborso){
                     gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
@@ -110,7 +114,7 @@ public class MessageForFlowsService {
                     gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
                 }
             } else {
-                List<SimpleEntitaOrganizzativaWebDto> listaSediSpesa = missioniAceService.recuperoSediDaUo(uoSpesa);
+                List<SimpleEntitaOrganizzativaWebDto> listaSediSpesa = missioniAceService.recuperoSediDaUo(uoSpesa, dataInizioMissione);
                 if (cmisMissione.getCdsRich().equals(cmisMissione.getCdsSpesa()) ){
                     if (Utility.nvl(datiIstitutoUoSpesa.getSaltaFirmaUosUoCds(),"N").equals("S") ){
                         SimpleEntitaOrganizzativaWebDto sedePrincipale = recuperoSedePrincipale(listaSediSpesa);
@@ -119,7 +123,7 @@ public class MessageForFlowsService {
                             gruppoSecondoFirmatario = gruppoPrimoFirmatario;
                         }
                     } else if (Utility.nvl(datiIstitutoUoRich.getSaltaFirmaUosUoCds(),"N").equals("S")){
-                        List<SimpleEntitaOrganizzativaWebDto> listaSediRich = missioniAceService.recuperoSediDaUo(uoRich);
+                        List<SimpleEntitaOrganizzativaWebDto> listaSediRich = missioniAceService.recuperoSediDaUo(uoRich, dataInizioMissione);
                         SimpleEntitaOrganizzativaWebDto sedePrincipale = recuperoSedePrincipale(listaSediRich);
                         if (sedePrincipale != null){
                             gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePrincipale.getId());
@@ -139,7 +143,7 @@ public class MessageForFlowsService {
                             }
                         }
                         if (!stessoGruppo){
-                            gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede);
+                            gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede, dataInizioMissione);
                         }
                     }
                 } else {
@@ -147,7 +151,7 @@ public class MessageForFlowsService {
                     if (uoSpesa.equals(uoRich)){
                         gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
                     } else {
-                        gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede);
+                        gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede, dataInizioMissione);
                     }
                 }
             }
@@ -165,8 +169,8 @@ public class MessageForFlowsService {
 
         return messageForFlows;
     }
-    public String recuperoGruppoSecondoFirmatarioStandard(String uo, String ruolo, Integer idSedePrimoGruppoFirmatario){
-        List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediDaUo(uo);
+    public String recuperoGruppoSecondoFirmatarioStandard(String uo, String ruolo, Integer idSedePrimoGruppoFirmatario, LocalDate dataInizioMissione){
+        List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediDaUo(uo, dataInizioMissione);
         if (lista.size() == 0){
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non sono state recuperate sedi per la uo "+uo);
         }
@@ -183,8 +187,8 @@ public class MessageForFlowsService {
         }
     }
 
-    private SimpleEntitaOrganizzativaWebDto recuperoSedeCug(){
-        List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediByTerm(Costanti.ACE_SIGLA_CUG);
+    private SimpleEntitaOrganizzativaWebDto recuperoSedeCug(LocalDate data){
+        List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediByTerm(Costanti.ACE_SIGLA_CUG, data);
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
                 .filter(entita -> {
                     return Costanti.ACE_SIGLA_CUG.equals(entita.getSigla());
@@ -198,8 +202,8 @@ public class MessageForFlowsService {
         }
     }
 
-    private SimpleEntitaOrganizzativaWebDto recuperoSedePresidenza(){
-        List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediByTerm(Costanti.ACE_SIGLA_PRESIDENTE);
+    private SimpleEntitaOrganizzativaWebDto recuperoSedePresidenza(LocalDate data){
+        List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediByTerm(Costanti.ACE_SIGLA_PRESIDENTE, data);
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
                 .filter(entita -> {
                     return Costanti.ACE_SIGLA_PRESIDENTE.equals(entita.getSigla());

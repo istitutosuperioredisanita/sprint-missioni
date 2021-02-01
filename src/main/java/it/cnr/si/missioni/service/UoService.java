@@ -129,11 +129,11 @@ public class UoService {
 				listaAccount.add(new Account(persona));
 			}
 		}
-		List<Account> listaOrdineta = listaAccount.stream().sorted(Comparator.comparing(Account::getCognome)).collect(Collectors.toList());
+		List<Account> listaOrdinata = listaAccount.stream().sorted(Comparator.comparing(Account::getCognome)).collect(Collectors.toList());
 		ObjectMapper mapper = new ObjectMapper();
 		String risposta = null;
 		try {
-			risposta = mapper.writeValueAsString(listaOrdineta);
+			risposta = mapper.writeValueAsString(listaOrdinata);
 		} catch (JsonProcessingException e) {
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella conversione del JSON della listaAccount ("+ Utility.getMessageException(e)+").");
 		}
