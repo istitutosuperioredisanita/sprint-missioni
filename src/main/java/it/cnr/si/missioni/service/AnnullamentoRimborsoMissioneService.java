@@ -237,11 +237,6 @@ public class AnnullamentoRimborsoMissioneService {
 
 		List<String> listaMail = new ArrayList<>();
 		listaMail.add(account.getEmail_comunicazioni());
-		DatiFlusso datiFlusso = cmisRimborsoMissioneService.recuperoDatiFlusso(annullamento.getRimborsoMissione(), anno, account);
-		listaMail.add(accountService.getEmail(datiFlusso.getUsernamePrimoFirmatario()));
-		if (!datiFlusso.getUsernameFirmatarioSpesa().equals(datiFlusso.getUsernamePrimoFirmatario())){
-			listaMail.add(accountService.getEmail(datiFlusso.getUsernameFirmatarioSpesa()));
-		}
 		if (dati != null && dati.getMailNotificheRimborso() != null && !dati.getMailNotificheRimborso().equals("N")){
 			listaMail.add(dati.getMailNotificheRimborso());
 		} else {
