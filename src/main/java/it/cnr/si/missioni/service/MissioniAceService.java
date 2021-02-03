@@ -78,21 +78,22 @@ public class MissioniAceService {
     };
 
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data){
-        try {
-            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer)null, term, LocalDate.now(), (Integer)null);
-            if (list.isEmpty()){
-                return aceService.entitaOrganizzativaFind((Integer)null, term, data, (Integer)null);
-            }
+            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer)null, term, data, (Integer)null);
             return list;
-
-        } catch (FeignException fe){
-            logger.info(fe.getMessage());
-            return aceService.entitaOrganizzativaFind((Integer)null, term, data, (Integer)null);
-        }
     }
 
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo, LocalDate data){
-        List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo, data);
+        List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo, LocalDate.now());
+        List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = getSimpleEntitaOrganizzativaWebDtoValid(uo, lista);
+        if (listaEntitaUo.isEmpty()){
+            List<SimpleEntitaOrganizzativaWebDto> listaAllaData = recuperoSediByTerm(uo, data);
+            List<SimpleEntitaOrganizzativaWebDto> listaEOAllaData = getSimpleEntitaOrganizzativaWebDtoValid(uo, listaAllaData);
+            return listaEOAllaData;
+        }
+        return listaEntitaUo;
+    }
+
+    private List<SimpleEntitaOrganizzativaWebDto> getSimpleEntitaOrganizzativaWebDtoValid(String uo, List<SimpleEntitaOrganizzativaWebDto> lista) {
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = Optional.ofNullable(lista.stream()
                 .filter(entita -> {
                     return uo.equals(entita.getCdsuo()) && entita.getIdnsip() != null && !"IST".equals(entita.getTipo().getSigla());
