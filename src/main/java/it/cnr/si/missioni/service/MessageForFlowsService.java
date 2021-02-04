@@ -83,7 +83,7 @@ public class MessageForFlowsService {
 
         LocalDate dataInizioMissione = DateUtils.parseLocalDate(cmisMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
         SimplePersonaWebDto persona = missioniAceService.getPersona(cmisMissione.getUsernameUtenteOrdine());
-        Integer idSede = persona.getSede().getId();
+        Integer idSede = persona.getLastSede().getId();
         String ruolo = Costanti.RUOLO_FIRMA;
         if (cmisMissione.isMissioneEstera() && !cmisMissione.isMissionePresidente()){
             ruolo = Costanti.RUOLO_FIRMA_ESTERE;
