@@ -188,7 +188,6 @@ public class MissioniAceService {
                 lista.add(utenteCessato);
             }
         }
-        lista.addAll(listaCessati);
 
         return lista;
     }
