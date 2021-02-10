@@ -177,6 +177,17 @@ public class MissioniAceService {
         logger.info("findUtentiCdsuo: "+ uo );
         List<SimpleUtenteWebDto> lista = aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.SEDE);
         List<SimpleUtenteWebDto> listaCessati = aceService.findUtentiCessatiCdsuo(uo, null, TipoAppartenenza.SEDE);
+        for (SimpleUtenteWebDto utenteCessato : listaCessati){
+            boolean utenteDuplicato = false;
+            for (SimpleUtenteWebDto utente : lista){
+                if (utenteCessato.getUsername().equals(utente.getUsername())){
+                    utenteDuplicato = true;
+                }
+            }
+            if (!utenteDuplicato){
+                lista.add(utenteCessato);
+            }
+        }
         lista.addAll(listaCessati);
 
         return lista;
