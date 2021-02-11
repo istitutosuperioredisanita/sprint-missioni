@@ -54,6 +54,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,12 +83,27 @@ public class MissioniAceService {
             return list;
     }
 
+    private List<SimpleEntitaOrganizzativaWebDto> recuperoSediStoricheByTerm(String term, LocalDate data){
+        for (int i = 1; i < 5; i++){
+            LocalDate dataSottratta = data.minus(i, ChronoUnit.YEARS);
+            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer)null, term, dataSottratta, (Integer)null);
+            List<SimpleEntitaOrganizzativaWebDto> listaEOAllaData = getSimpleEntitaOrganizzativaWebDtoValid(term, list);
+            if (!listaEOAllaData.isEmpty()){
+                return list;
+            }
+        }
+        return new ArrayList<>();
+    }
+
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo, LocalDate data){
         List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo, LocalDate.now());
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = getSimpleEntitaOrganizzativaWebDtoValid(uo, lista);
         if (listaEntitaUo.isEmpty()){
             List<SimpleEntitaOrganizzativaWebDto> listaAllaData = recuperoSediByTerm(uo, data);
             List<SimpleEntitaOrganizzativaWebDto> listaEOAllaData = getSimpleEntitaOrganizzativaWebDtoValid(uo, listaAllaData);
+            if (listaEOAllaData.isEmpty()){
+                return recuperoSediStoricheByTerm(uo, data);
+            }
             return listaEOAllaData;
         }
         return listaEntitaUo;
