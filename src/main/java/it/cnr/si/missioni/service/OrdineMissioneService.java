@@ -1347,7 +1347,7 @@ public class OrdineMissioneService {
 			// effettuo controlli di validazione operazione CRUD
 			ordineMissione.setStato(Costanti.STATO_ANNULLATO);
 			ordineMissione.setToBeUpdated();
-			if (ordineMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
+			if (ordineMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
 				cmisOrdineMissioneService.annullaFlusso(ordineMissione);
 			}
 			crudServiceBean.modificaConBulk(principal, ordineMissione);

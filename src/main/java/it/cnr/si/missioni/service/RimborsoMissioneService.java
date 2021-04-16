@@ -691,7 +691,7 @@ public class RimborsoMissioneService {
 			rimborsoImpegniService.cancellaRimborsoImpegni(principal, rimborsoMissione);
 			rimborsoMissione.setStato(Costanti.STATO_ANNULLATO);
 			rimborsoMissione.setToBeUpdated();
-			if (rimborsoMissione.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
+			if (rimborsoMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
 				cmisRimborsoMissioneService.annullaFlusso(rimborsoMissione);
 			}
 			crudServiceBean.modificaConBulk(principal, rimborsoMissione);
