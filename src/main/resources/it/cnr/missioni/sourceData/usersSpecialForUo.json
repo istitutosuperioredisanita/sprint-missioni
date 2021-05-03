@@ -2771,7 +2771,7 @@
 {"uid":"silvia.schiavon", "uoForUsersSpecial":[{"codice_uo":"031000", "ordine_da_validare":"S"},{"codice_uo":"031002", "ordine_da_validare":"S"}]},
 {"uid":"davide.giberti", "uoForUsersSpecial":[{"codice_uo":"031000", "ordine_da_validare":"S"}]},
 {"uid":"elena.parodi", "uoForUsersSpecial":[{"codice_uo":"031001", "ordine_da_validare":"S"}]},
-{"uid":"francescoitalo.bruzzone", "uoForUsersSpecial":[{"codice_uo":"031001", "ordine_da_validare":"S"}]},
+{"uid":"francescoitalo.bruzzone", "uoForUsersSpecial":[{"codice_uo":"031001", "ordine_da_validare":"S"}, {"codice_uo":"118001", "ordine_da_validare":"S"}]},
 {"uid":"annamaria.tirloni", "uoForUsersSpecial":[{"codice_uo":"031002", "ordine_da_validare":"S"}]},
 {"uid":"enio.fantin", "uoForUsersSpecial":[{"codice_uo":"031002", "ordine_da_validare":"S"}]},
 {"uid":"tamara.locatelli", "uoForUsersSpecial":[{"codice_uo":"031004", "ordine_da_validare":"S"}]},
@@ -3083,7 +3083,6 @@
 
 
 {"uid":"marco.grasso", "uoForUsersSpecial":[{"codice_uo":"063001", "ordine_da_validare":"S"}]},
-{"uid":"massimo.didio", "uoForUsersSpecial":[{"codice_uo":"063001", "ordine_da_validare":"S"}]},
 {"uid":"annalisa.delre", "uoForUsersSpecial":[{"codice_uo":"063002", "ordine_da_validare":"S"}]},
 {"uid":"mariateresa.molfetta", "uoForUsersSpecial":[{"codice_uo":"063002", "ordine_da_validare":"S"}, {"codice_uo":"063001", "ordine_da_validare":"S"}, {"codice_uo":"063005", "ordine_da_validare":"S"}]},
 {"uid":"federica.talpo", "uoForUsersSpecial":[{"codice_uo":"063002", "ordine_da_validare":"S"}, {"codice_uo":"063001", "ordine_da_validare":"S"}, {"codice_uo":"063005", "ordine_da_validare":"S"}]},
@@ -3463,7 +3462,7 @@
 
 {"uid":"teresa.donato", "uoForUsersSpecial":[{"codice_uo":"318000", "ordine_da_validare":"S"},{"codice_uo":"032000"}]},
 
-{"uid":"elisabetta.desalvia", "uoForUsersSpecial":[{"codice_uo":"303000", "ordine_da_validare":"S"},{"codice_uo":"096000"}]},
+{"uid":"luciasimona.lombardo", "uoForUsersSpecial":[{"codice_uo":"303000", "ordine_da_validare":"S"}]},
 
 {"uid":"marco.lupi", "uoForUsersSpecial":[{"codice_uo":"311000", "ordine_da_validare":"S"},{"codice_uo":"008001"}]},
 

@@ -175,7 +175,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
 
                 var dipendenteUo = null;
                     for (var i=0; i<listaPersons.length; i++) {
-                        if (listaPersons[i].matricola){
+                        if (listaPersons[i].matricola && !listaPersons[i].data_cessazione){
                             dipendenteUo = listaPersons[i].uid;
                         }
                     }
