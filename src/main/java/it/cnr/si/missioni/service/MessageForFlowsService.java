@@ -213,7 +213,7 @@ public class MessageForFlowsService {
         } else if (listaEntitaUo.size() > 1){
             throw new AwesomeException(CodiciErrore.ERRGEN, "Esistono più entità organizzativa Presidenza.");
         } else {
-            return lista.get(0);
+            return listaEntitaUo.get(0);
         }
     }
 
