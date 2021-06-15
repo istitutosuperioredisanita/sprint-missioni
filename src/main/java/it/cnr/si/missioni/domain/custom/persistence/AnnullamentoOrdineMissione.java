@@ -479,7 +479,7 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 	}
 
 	public Boolean isMissioneDipendente(){
-		if (StringUtils.isEmpty(getMatricola())){
+		if (StringUtils.isEmpty(getMatricola()) || getMatricola().equals("0")){
 			return false;
 		}
 		return true;
