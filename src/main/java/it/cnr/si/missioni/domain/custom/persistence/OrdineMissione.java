@@ -1210,7 +1210,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 	}
 
 	public Boolean isMissioneDipendente(){
-		if (StringUtils.isEmpty(getMatricola())){
+		if (StringUtils.isEmpty(getMatricola()) || getMatricola().equals("0")){
 			return false;
 		}
 		return true;
