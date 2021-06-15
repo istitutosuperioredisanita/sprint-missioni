@@ -1351,7 +1351,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 		this.statoInvioSigla = statoInvioSigla;
 	}
 	public Boolean isMissioneDipendente(){
-		if (!StringUtils.hasLength(getMatricola())){
+		if (!StringUtils.hasLength(getMatricola()) || getMatricola().equals("0")){
 			return false;
 		}
 		return true;
