@@ -230,6 +230,7 @@
         {
             "app": "SIGLA",
             "url": "ConsProgettiAction.json",
+            "skipLoadStartup": "S",
             "classeJson": "it.cnr.si.missioni.util.proxy.json.object.ProgettoJson",
             "classe": "it.cnr.si.missioni.util.proxy.json.object.Progetto",
             "clauseVariable": [
@@ -252,23 +253,6 @@
                     "fieldName": "fl_utilizzabile",
                     "operator": "=",
                     "fieldValue": true
-                }
-            ],
-            "clauseToIterate": [
-                {
-                    "type": "calculateValues",
-                    "condition": "AND",
-                    "fieldName": "esercizio",
-                    "fromValue": 2018,
-                    "toSpecialValue": "ANNO_CORRENTE"
-                },
-                {	
-                    "type": "callRestForGetValuesForFilter",
-                    "condition": "AND",
-                    "fieldName": "cd_unita_organizzativa",
-                    "operator": "=",
-                    "urlInCache": "ConsUnitaOrganizzativaAction.json",
-                    "fieldGetForSpecialValue": "cd_unita_organizzativa"
                 }
             ],
             "order": [
