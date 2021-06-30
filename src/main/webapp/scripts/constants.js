@@ -68,7 +68,7 @@ missioniApp.constant('COSTANTI', {
         'FORMATO_DATA': 'dd/MM/yyyy',
         'CDS_SAC': 'ASR',
         'ANNO_PARTENZA': 2017,
-        'UO_STANDARD_SAC': '000.000',
+        'UO_STANDARD_SAC': 'ASR.000',
         'DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST':4999,
         'DEFAULT_MAX_FILE_SIZE':10240000
     });
