@@ -177,11 +177,11 @@ public class LoadFilesService {
 		return "utentiPresidenteSpeciali.json";
 	}
 		private String getFileNameFromRestServices(){
-   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+//   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
    			return "restServicesDev.json";
-   		} else {
-   			return "restServices.json";
-   		}
+//   		} else {
+//   			return "restServices.json";
+//   		}
 	}
 	
 	private String getFileNameFromUsersSpecial(){
@@ -194,10 +194,10 @@ public class LoadFilesService {
 	private InputStream getServicesForCache() {
 		InputStream is = null;
 
-    	if (env != null && Boolean.valueOf(env.getProperty("cache."+"init_cache")).equals(true)) {
+//    	if (env != null && Boolean.valueOf(env.getProperty("cache."+"init_cache")).equals(true)) {
     		String fileName = getFileNameFromRestServices();
     		is = recuperoFile(fileName);
-    	}	
+//    	}
 		return is;
 	}
 
