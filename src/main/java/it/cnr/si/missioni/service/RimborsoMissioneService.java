@@ -1730,7 +1730,7 @@ public class RimborsoMissioneService {
 			}
 		return null;
 		} catch (Exception e ){
-			mailService.sendEmailError(subjectErrorFlowsRimborso, "Errore in aggiornaRimborsoMissione: "+e.getMessage(), false, true);
+//			mailService.sendEmailError(subjectErrorFlowsRimborso, "Errore in aggiornaRimborsoMissione: "+e.getMessage(), false, true);
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in aggiornaRimborsoMissione:" + Utility.getMessageException(e));
 		}
 	}

@@ -107,7 +107,7 @@ public class FlowService {
         } catch (Exception e){
                 errore = e.getMessage();
                 log.info(errore);
-                mailService.sendEmailError(subjectGenericError, errore,  false, true);
+//                mailService.sendEmailError(subjectGenericError, errore,  false, true);
                 throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
         }
     }

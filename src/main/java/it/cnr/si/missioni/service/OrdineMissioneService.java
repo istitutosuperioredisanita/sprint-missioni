@@ -379,7 +379,7 @@ public class OrdineMissioneService {
 				}
 			}
 		} catch (Exception e){
-			mailService.sendEmailError(subjectErrorFlowsOrdine, "Errore in aggiornaOrdineMissione: "+e.getMessage(), false, true);
+//			mailService.sendEmailError(subjectErrorFlowsOrdine, "Errore in aggiornaOrdineMissione: "+e.getMessage(), false, true);
 			throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
 		}
 	}
