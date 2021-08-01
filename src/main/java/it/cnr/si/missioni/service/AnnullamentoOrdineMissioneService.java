@@ -197,7 +197,7 @@ public class AnnullamentoOrdineMissioneService {
 				}
 			}
 		} catch (Exception e){
-			mailService.sendEmailError(subjectErrorFlowsAnnullamento, "Errore in aggiornaAnnullamentoOrdineMissione: "+e.getMessage(), false, true);
+//			mailService.sendEmailError(subjectErrorFlowsAnnullamento, "Errore in aggiornaAnnullamentoOrdineMissione: "+e.getMessage(), false, true);
 			throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
 		}
 	}
