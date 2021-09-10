@@ -1,18 +1,31 @@
 package it.cnr.si.missioni.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.rmi.RemoteException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipOutputStream;
 
 import javax.persistence.OptimisticLockException;
+import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.jada.DetailedRuntimeException;
 import it.cnr.si.missioni.domain.custom.FlowResult;
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 import it.cnr.si.missioni.util.proxy.json.service.*;
+import it.cnr.si.spring.storage.StorageDriver;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1749,6 +1762,33 @@ public class RimborsoMissioneService {
 	private String getTextErrorRimborsoMissione(RimborsoMissione rimborsoMissione, FlowResult flow, String error){
 		return " con id "+rimborsoMissione.getId()+ " "+ rimborsoMissione.getAnno()+"-"+rimborsoMissione.getNumero()+ " di "+ rimborsoMissione.getDatoreLavoroRich()+" collegato al flusso "+flow.getProcessInstanceId()+" con esito "+flow.getStato()+" è andata in errore per il seguente motivo: " + error;
 	}
+/*
+	private void addToZip(DocumentiContabiliService documentiContabiliService, ZipOutputStream zos, String path, StatoTrasmissione statoTrasmissione) {
+		documentiContabiliService.getChildren(documentiContabiliService.getStorageObjectByPath(path).getKey())
+				.stream()
+				.forEach(storageObject -> {
+					try {
+						if (!Optional.ofNullable(storageObject.getPropertyValue(StoragePropertyNames.BASE_TYPE_ID.value()))
+								.map(String.class::cast)
+								.filter(s -> s.equals(StoragePropertyNames.CMIS_FOLDER.value()))
+								.isPresent()) {
+							ZipEntry zipEntryChild = new ZipEntry(statoTrasmissione.getCMISFolderName()
+									.concat(
+											Optional.ofNullable(storageObject.getPath())
+													.map(s -> s.substring(statoTrasmissione.getStorePath().length()))
+													.orElse(StorageDriver.SUFFIX)
+									));
+							zos.putNextEntry(zipEntryChild);
+							IOUtils.copyLarge(documentiContabiliService.getResource(storageObject), zos);
+						} else {
+							addToZip(documentiContabiliService, zos, storageObject.getPath(), statoTrasmissione);
+						}
+					} catch (IOException e) {
+						throw new DetailedRuntimeException(e);
+					}
+				});
+	}
 
+*/
 }
 

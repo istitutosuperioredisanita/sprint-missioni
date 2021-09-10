@@ -95,6 +95,8 @@ public class MessageForFlowsService {
             }
         }
 
+        LocalDate oggi = LocalDate.now();
+
         if (cmisMissione.isMissioneGratuita()){
             gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
             gruppoSecondoFirmatario = gruppoPrimoFirmatario;
@@ -104,7 +106,7 @@ public class MessageForFlowsService {
                 SimpleEntitaOrganizzativaWebDto sedeCug = recuperoSedeCug(dataInizioMissione);
                 gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedeCug.getId());
             } else if (cmisMissione.isMissionePresidente()){
-                SimpleEntitaOrganizzativaWebDto sedePresidente = recuperoSedePresidenza(dataInizioMissione);
+                SimpleEntitaOrganizzativaWebDto sedePresidente = recuperoSedePresidenza(oggi);
 
                 if (messageForFlows instanceof MessageForFlowRimborso){
                     gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
