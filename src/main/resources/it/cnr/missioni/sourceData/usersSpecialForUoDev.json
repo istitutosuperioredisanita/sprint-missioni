@@ -1197,6 +1197,9 @@
                 }, {
                     "codice_uo" : "ASR108",
                     "ordine_da_validare" : "S"
+                }, {
+                    "codice_uo" : "ASR105",
+                    "ordine_da_validare" : "S"
                 }
             ]
         }, {
