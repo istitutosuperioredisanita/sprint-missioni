@@ -4,16 +4,23 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.rmi.RemoteException;
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.jada.DetailedRuntimeException;
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
+import it.cnr.si.spring.storage.StorageDriver;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -384,4 +391,150 @@ public class RimborsoMissioneResource {
     		return JSONResponseEntity.badRequest(error);
     	}
     }
+
+/*
+
+	@RequestMapping(value = "/rest/public/zipDocumentiRimborsoMissione",
+			method = RequestMethod.GET)
+	@Timed
+	@ExceptionHandler(RuntimeException.class)
+	@SuppressWarnings("unchecked")
+	public @ResponseBody void scaricaZip(HttpServletRequest request,
+										 @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
+		if (selectelElements == null || selectelElements.isEmpty()) {
+			response.setStatus(org.apache.http.HttpStatus.SC_NO_CONTENT);
+			return JSONResponseEntity.notFound();
+		}
+		Authentication auth = tokenProvider.getAuthentication(token);
+		Long idMissioneLong = new Long (idMissione);
+		if (auth != null){
+			final ZipOutputStream zos;
+			try {
+				zos = new ZipOutputStream(res.getOutputStream());
+			} catch (IOException e) {
+				throw new AwesomeException(Utility.getMessageException(e));
+			}
+			res.setContentType("application/zip");
+			res.setDateHeader("Expires", 0);
+			RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione(auth, idMissioneLong, false, false);
+			res.setHeader("Content-disposition", "attachment; filename=DocumentiRimborsoMissione"+Utility.getUoSiper(rimborsoMissione.getUoSpesa())+"_"+rimborsoMissione.getAnno()+"_"+rimborsoMissione.getNumero()+".zip");
+			Map<String, byte[]> mapRimborsoMissione = rimborsoMissioneService.printRimborsoMissione(auth, idMissioneLong);
+			if (mapRimborsoMissione != null){
+				try {
+					String headerValue = "attachment";
+					for (String key : mapRimborsoMissione.keySet()) {
+
+							ZipEntry zipEntryChild = new ZipEntry(key);
+							zos.putNextEntry(zipEntryChild);
+							IOUtils.copyLarge(new ByteArrayInputStream(mapRimborsoMissione.get(key)), zos);
+					}
+				} catch (IOException e) {
+					log.error("ERRORE scaricaZip",e);
+					throw new AwesomeException(Utility.getMessageException(e));
+				}
+			}
+		}
+		selectelElements.stream()
+				.forEach(statoTrasmissione -> {
+					addToZip(documentiContabiliService, zos, statoTrasmissione.getStorePath(), statoTrasmissione);
+					if (statoTrasmissione.getCd_tipo_documento_cont().equals(Numerazione_doc_contBulk.TIPO_MAN)) {
+						try {
+							MandatoBulk mandatoBulk = (MandatoBulk) getComponentSession().findByPrimaryKey(actioncontext.getUserContext(),
+									new MandatoIBulk(statoTrasmissione.getCd_cds(), statoTrasmissione.getEsercizio(), statoTrasmissione.getPg_documento_cont()));
+							Tipo_documento_ammBulk tipo_documento_ammBulk = new Tipo_documento_ammBulk();
+							tipo_documento_ammBulk.setTi_entrata_spesa("S");
+							final List<Tipo_documento_ammBulk> tipoDocAmms = Optional.ofNullable(getComponentSession().find(
+									actioncontext.getUserContext(), tipo_documento_ammBulk.getClass(),
+									"find", tipo_documento_ammBulk))
+									.filter(List.class::isInstance)
+									.map(List.class::cast)
+									.orElse(null);
+							mandatoBulk.setTipoDocumentoKeys(
+									Optional.ofNullable(tipoDocAmms.stream()
+											.collect(Collectors.toMap(
+													Tipo_documento_ammBulk::getCd_tipo_documento_amm,
+													Tipo_documento_ammBulk::getDs_tipo_documento_amm,
+													(u, v) -> {
+														throw new IllegalStateException(
+																String.format("Cannot have 2 values (%s, %s) for the same key", u, v)
+														);
+													}, Hashtable::new)))
+											.orElse(null)
+							);
+							contabiliService.getNodeRefContabile(mandatoBulk)
+									.stream()
+									.forEach(key -> {
+										try {
+											final StorageObject storageObject = contabiliService.getStorageObjectBykey(key);
+											ZipEntry zipEntryChild = new ZipEntry(statoTrasmissione.getCMISFolderName()
+													.concat(StorageDriver.SUFFIX)
+													.concat(storageObject.getPropertyValue(StoragePropertyNames.NAME.value())));
+											zos.putNextEntry(zipEntryChild);
+											IOUtils.copyLarge(contabiliService.getResource(key), zos);
+										} catch (IOException e) {
+											throw new DetailedRuntimeException(e);
+										}
+									});
+
+							getComponentSession().find(actioncontext.getUserContext(), MandatoIBulk.class,
+									"findMandato_riga", actioncontext.getUserContext(), mandatoBulk)
+									.stream()
+									.filter(Mandato_rigaBulk.class::isInstance)
+									.map(Mandato_rigaBulk.class::cast)
+									.map(mandato_rigaBulk -> {
+										mandato_rigaBulk.setMandato(mandatoBulk);
+										return Optional.ofNullable(mandato_rigaBulk.getCd_tipo_documento_amm())
+												.filter(cdTipoDocumentoAmm -> cdTipoDocumentoAmm.equals(Numerazione_doc_ammBulk.TIPO_FATTURA_PASSIVA))
+												.map(s -> {
+													try {
+														return Utility.createMandatoComponentSession().inizializzaTi_fattura(actioncontext.getUserContext(), mandato_rigaBulk);
+													} catch (ComponentException | RemoteException e) {
+														throw new DetailedRuntimeException(e);
+													}
+												}).orElseGet(() -> mandato_rigaBulk);
+									})
+									.filter(Utility.distinctByKey(mandato_rigaBulk ->
+											mandato_rigaBulk.getCd_tipo_documento_amm().concat(
+													mandato_rigaBulk.getCd_cds_doc_amm().concat(
+															String.valueOf(mandato_rigaBulk.getEsercizio_doc_amm()).concat(
+																	String.valueOf(mandato_rigaBulk.getPg_doc_amm())
+															)
+													))
+									))
+									.collect(Collectors.toList())
+									.forEach(mandato_rigaBulk -> {
+										documentiCollegatiDocAmmService
+												.getAllegatiDocumentiAmministrativi(mandato_rigaBulk).stream()
+												.forEach(allegatoGenericoBulk -> {
+													try {
+														ZipEntry zipEntryChild = new ZipEntry(statoTrasmissione.getCMISFolderName()
+																.concat(StorageDriver.SUFFIX)
+																.concat(mandato_rigaBulk.getDs_tipo_documento_amm())
+																.concat(" ")
+																.concat(String.valueOf(mandato_rigaBulk.getEsercizio_doc_amm()))
+																.concat("-")
+																.concat(String.valueOf(mandato_rigaBulk.getPg_doc_amm()))
+																.concat(StorageDriver.SUFFIX)
+																.concat(allegatoGenericoBulk.getNome()));
+														zos.putNextEntry(zipEntryChild);
+														IOUtils.copyLarge(documentiContabiliService.getResource(allegatoGenericoBulk.getStorageKey()), zos);
+													} catch (ZipException e) {
+														log.warn("Cannot add entry to zip file", e);
+													} catch (IOException e) {
+														throw new DetailedRuntimeException(e);
+													}
+												});
+									});
+						} catch (ComponentException | RemoteException e) {
+							throw new DetailedRuntimeException(e);
+						}
+					}
+				});
+		zos.close();
+		response.getOutputStream().flush();
+	}
+
+*/
+
+
 }
