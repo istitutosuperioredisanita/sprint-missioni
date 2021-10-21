@@ -56,14 +56,12 @@ angular.module('missioniApp')
           });
           $scope.$on('fileuploadfail', function (e, data) {
             $rootScope.salvataggio = false;
-            if (data.jqXHR.responseText){
+            if (data.total > COSTANTI.DEFAULT_MAX_FILE_SIZE){
+              ui.error("Errore nel caricamento del file. Il file ha dimensioni di "+ data.total+" byte ed è più grande del limite previsto "+COSTANTI.DEFAULT_MAX_FILE_SIZE);
+            } else if (data.jqXHR.responseText){
               ui.error("Errore nel caricamento del file. "+ data.jqXHR.responseText);
             } else {
-              if (data.total > COSTANTI.DEFAULT_MAX_FILE_SIZE){
-                ui.error("Errore nel caricamento del file. Il file ha dimensioni di "+ data.total+" ed è più grande del limite previsto "+COSTANTI.DEFAULT_MAX_FILE_SIZE);
-              } else {
-                ui.error("Errore generico nel caricamento del file.");
-              }
+              ui.error("Errore generico nel caricamento del file.");
             }
           });
 
