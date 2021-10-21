@@ -70,7 +70,7 @@ missioniApp.constant('COSTANTI', {
         'ANNO_PARTENZA': 2017,
         'UO_STANDARD_SAC': 'ASR.000',
         'DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST':4999,
-        'DEFAULT_MAX_FILE_SIZE':10240000
+        'DEFAULT_MAX_FILE_SIZE':1024000
     });
 
 /*
