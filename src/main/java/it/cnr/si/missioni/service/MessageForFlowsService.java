@@ -110,10 +110,12 @@ public class MessageForFlowsService {
 
                 if (messageForFlows instanceof MessageForFlowRimborso){
                     gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                    ruolo = Costanti.RUOLO_FIRMA_PRESIDENTE;
                     gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
                 } else {
-                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
                     gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                    ruolo = Costanti.RUOLO_FIRMA_PRESIDENTE;
+                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
                 }
             } else {
                 List<SimpleEntitaOrganizzativaWebDto> listaSediSpesa = missioniAceService.recuperoSediDaUo(uoSpesa, dataInizioMissione);
