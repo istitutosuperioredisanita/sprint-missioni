@@ -152,6 +152,7 @@ public class Costanti {
     public final static String NOME_PROCESSO_FLOWS_MISSIONI = "missioni";
     public final static String RUOLO_FIRMA = "firma-missioni";
     public final static String RUOLO_FIRMA_ESTERE = RUOLO_FIRMA+"-estere";
+    public final static String RUOLO_FIRMA_PRESIDENTE = RUOLO_FIRMA+"-presidente";
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
