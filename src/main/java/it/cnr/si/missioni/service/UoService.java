@@ -118,10 +118,11 @@ public class UoService {
 	@Cacheable(value = Costanti.NOME_CACHE_DATI_PERSONE)
 	public String getPersone(String uo, String cds) {
 		List<SimpleUtenteWebDto> list = null;
+		LocalDate data = LocalDate.now().minusDays(365);
 		if (cds != null){
-			list = missioniAceService.findUtentiIstituto(cds, LocalDate.now());
+			list = missioniAceService.findUtentiIstituto(cds, data);
 		} else {
-			list = missioniAceService.findUtentiCdsuo(uo, LocalDate.now());
+			list = missioniAceService.findUtentiCdsuo(uo, data);
 		}
 		List<Account> listaAccount = new ArrayList<>();
     	if (list != null){

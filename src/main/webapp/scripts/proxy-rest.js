@@ -10,7 +10,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
         } else if (meseAttuale == 1){
              return new Date(today.getFullYear() - 1 , 8, 1);
         } else {
-             return new Date(today.getFullYear(), meseAttuale - 5, 1);
+//             return new Date(today.getFullYear(), meseAttuale - 5, 1);
+             return new Date(today.getFullYear() - 1, meseAttuale, 1);
         }
         return today;
     }
