@@ -118,7 +118,7 @@ public class UoService {
 	@Cacheable(value = Costanti.NOME_CACHE_DATI_PERSONE)
 	public String getPersone(String uo, String cds) {
 		List<SimpleUtenteWebDto> list = null;
-		LocalDate data = LocalDate.now().minusDays(365);
+		LocalDate data = LocalDate.now();
 		if (cds != null){
 			list = missioniAceService.findUtentiIstituto(cds, data);
 		} else {
