@@ -1180,6 +1180,9 @@
                     "codice_uo" : "314000",
                     "ordine_da_validare" : "S"
                 }, {
+                "codice_uo" : "123002",
+                "ordine_da_validare" : "S"
+                }, {
                     "codice_uo" : "072000",
                     "ordine_da_validare" : "S"
                 }, {

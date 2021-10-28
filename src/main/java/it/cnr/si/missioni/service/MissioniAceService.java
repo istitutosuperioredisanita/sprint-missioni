@@ -192,6 +192,19 @@ public class MissioniAceService {
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
         logger.info("findUtentiCdsuo: "+ uo );
         List<SimpleUtenteWebDto> lista = aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.SEDE);
+        data = data.minusDays(365);
+        List<SimpleUtenteWebDto> listaAnnoPrecedente = aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.SEDE);
+        for (SimpleUtenteWebDto utenteAnnoPrecedente : listaAnnoPrecedente){
+            boolean utenteDuplicato = false;
+            for (SimpleUtenteWebDto utente : lista){
+                if (utenteAnnoPrecedente.getUsername().equals(utente.getUsername())){
+                    utenteDuplicato = true;
+                }
+            }
+            if (!utenteDuplicato){
+                lista.add(utenteAnnoPrecedente);
+            }
+        }
         List<SimpleUtenteWebDto> listaCessati = aceService.findUtentiCessatiCdsuo(uo, null, TipoAppartenenza.SEDE);
         for (SimpleUtenteWebDto utenteCessato : listaCessati){
             boolean utenteDuplicato = false;
