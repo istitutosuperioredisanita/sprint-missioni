@@ -90,7 +90,11 @@ public class MessageForFlowsService {
             if (uoRich.startsWith(Costanti.CDS_SAC)){
                 Account direttore = uoService.getDirettore(uoRich);
                 if (direttore.getUid().equals(cmisMissione.getUsernameUtenteOrdine())){
-                    idSede = missioniAceService.getSedeResponsabileUtente(direttore.getUid());
+                    SimpleEntitaOrganizzativaWebDto sedeAce = missioniAceService.getSede(idSede);
+                    logger.info("Sigla Sede ACE "+sedeAce.getSigla());
+                    if (!sedeAce.getSigla().equals(Costanti.SIGLA_ACE_DIREZIONE_GENERALE)){
+                        idSede = missioniAceService.getSedeResponsabileUtente(direttore.getUid());
+                    }
                 }
             }
         }

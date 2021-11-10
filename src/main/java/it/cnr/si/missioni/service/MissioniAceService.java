@@ -95,6 +95,10 @@ public class MissioniAceService {
         return new ArrayList<>();
     }
 
+    public SimpleEntitaOrganizzativaWebDto getSede(int sede){
+        return aceService.entitaOrganizzativaById(sede);
+    }
+
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo, LocalDate data){
         List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo, LocalDate.now());
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = getSimpleEntitaOrganizzativaWebDtoValid(uo, lista);
