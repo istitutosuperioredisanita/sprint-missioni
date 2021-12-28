@@ -62,7 +62,8 @@
             "simpleUndo": "Annulla",
             "validate": "Valida",
             "close": "Chiudi",
-            "print": "Stampa"
+            "print": "Stampa",
+            "download": "Scarica"
         },
         "messages": {
             "info": {
@@ -104,7 +105,7 @@
         "gae":"Codice GAE"
     },
     "main": {
-        "release": "Aggiornamento versione 30/12/2020. Clicca per le News di versione",
+        "release": "Aggiornamento versione 28/12/2021. Clicca per le News di versione",
         "wait": "Controllo Flussi Missioni in corso",
         "subtitle_da_confermare": "Ordini di Missione da Confermare",
         "subtitle_da_confermare_annullamenti": "Annullamenti Ordini di Missione da Confermare",
@@ -520,6 +521,7 @@
         "button": {
             "addImpegno": "Aggiungi impegno",
             "print": "Stampa Rimborso",
+            "download": "Scarica ZIP Documenti",
             "sendToFinal": "Rendi Definitivo il Rimborso Missione",
             "confirm": "Conferma il Rimborso Missione",
             "dettagli": "Dettagli Spesa"

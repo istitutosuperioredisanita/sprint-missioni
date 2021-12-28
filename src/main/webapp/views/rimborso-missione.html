@@ -762,6 +762,11 @@ fine commento multi impegno-->
                       <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(rimborsoMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
 -->
             </form>
+            <form name="form-inline" role="form" ng-submit="confirm()">
+                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato != 'INS' && rimborsoMissioneModel.stato != 'ANN'">
+                      <a target="_blank" href="api/rest/public/zipDocumentiRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.download' | translate}}"><span class="glyphicon glyphicon-download" style="color:black"></span>&nbsp;{{'global.button.download' | translate}}</a>
+                    </div>
+            </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-xs-1" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato == 'INS' && !disabilitaRimborsoMissione && validazione != 'S'">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>

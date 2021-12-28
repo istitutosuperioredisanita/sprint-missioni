@@ -1281,5 +1281,11 @@ public class CMISOrdineMissioneService {
 		}
 		throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
 	}
+	public List<StorageObject> getAllDocumentsOrdineMissione(OrdineMissione missione) throws ComponentException{
+		StorageObject node = recuperoFolderOrdineMissione(missione);
+		return Optional.ofNullable(node)
+				.map(storageObject -> missioniCMISService.getChildren(storageObject.getKey()))
+				.orElse(null);
+	}
 
 }

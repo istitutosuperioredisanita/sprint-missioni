@@ -8,10 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.OptimisticLockException;
 
@@ -1767,5 +1764,8 @@ public class OrdineMissioneService {
 		}
 		updateOrdineMissione(principal, ordineMissioneDaAggiornare, true);
 		popolaCoda(ordineMissioneDaAggiornare);
+	}
+	public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione missione) throws ComponentException{
+		return cmisOrdineMissioneService.getAllDocumentsOrdineMissione(missione);
 	}
 }

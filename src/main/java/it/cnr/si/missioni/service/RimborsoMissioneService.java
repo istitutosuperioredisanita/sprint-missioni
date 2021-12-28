@@ -1790,5 +1790,17 @@ public class RimborsoMissioneService {
 	}
 
 */
+	public List<StorageObject> getAllDocumentsMissione(Principal principal, RimborsoMissione rimborsoMissione){
+		List<StorageObject> listaDocumentiRimborso = cmisRimborsoMissioneService.getDocumentsRimborsoMissione(rimborsoMissione);
+		if (listaDocumentiRimborso != null && !listaDocumentiRimborso.isEmpty()){
+			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+			listaDocumentiRimborso.addAll(ordineMissioneService.getDocumentsOrdineMissione(ordineMissione));
+			return listaDocumentiRimborso;
+		}
+		return null;
+	}
+	public InputStream getResource(StorageObject so){
+		return cmisRimborsoMissioneService.getResource(so);
+	}
 }
 
