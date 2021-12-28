@@ -1011,4 +1011,13 @@ public class CMISRimborsoMissioneService {
 			return objs.get(0);
 		}
 	}
+	public List<StorageObject> getDocumentsRimborsoMissione(RimborsoMissione missione) throws ComponentException{
+		StorageObject node = recuperoFolderRimborsoMissione(missione);
+		return Optional.ofNullable(node)
+				.map(storageObject -> missioniCMISService.getChildren(storageObject.getKey(), -1))
+				.orElse(null);
+	}
+	public InputStream getResource(StorageObject so){
+		return missioniCMISService.getResource(so.getKey());
+	}
 }
