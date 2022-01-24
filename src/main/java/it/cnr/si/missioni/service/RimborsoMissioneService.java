@@ -812,7 +812,7 @@ public class RimborsoMissioneService {
 				criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and ord.stato != 'ANN' and ord.numero >= "+filter.getDaNumeroOrdine()));
 			}
 			if (filter.getaNumeroOrdine() != null){
-				criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and ord.stato != 'ANN' and ord.numero >= "+filter.getaNumeroOrdine()));
+				criterionList.add(Subqueries.exists("select ord.id from OrdineMissione AS ord where ord.id = this.ordineMissione.id and ord.stato != 'ANN' and ord.numero <= "+filter.getaNumeroOrdine()));
 			}
 			if (filter.getStatoInvioSigla() != null){
 				criterionList.add(Restrictions.eq("statoInvioSigla", filter.getStatoInvioSigla()));
