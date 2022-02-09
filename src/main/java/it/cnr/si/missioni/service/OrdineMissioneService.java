@@ -188,6 +188,14 @@ public class OrdineMissioneService {
 	private String subjectGenericError;
 
 
+	public Boolean isUserEnabledToViewMissione(Principal principal, OrdineMissione ordineMissione){
+		if (ordineMissione.getUid().equals(principal.getName()) || (ordineMissione.getResponsabileGruppo() != null && ordineMissione.getResponsabileGruppo().equals(principal.getName()))
+				|| accountService.isUserEnableToWorkUo(principal, ordineMissione.getUoRich()) || accountService.isUserEnableToWorkUo(principal, ordineMissione.getUoSpesa())){
+			return true;
+		}
+		return false;
+	}
+
 	public OrdineMissione getOrdineMissione(Principal principal, Long idMissione, Boolean retrieveDataFromFlows)
 			throws ComponentException {
 		MissioneFilter filter = new MissioneFilter();
@@ -220,51 +228,54 @@ public class OrdineMissioneService {
 		String username = SecurityUtils.getCurrentUserLogin();
 		Principal principal = (Principal) auth;
 		OrdineMissione ordineMissione = getOrdineMissione(principal, idMissione);
-		Map<String, byte[]> map = new HashMap<String, byte[]>();
-		byte[] printOrdineMissione = null;
-		String fileName = null;
-		if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
-				&& !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
-			StorageObject storage = null;
-			try {
-				storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
-			} catch (ComponentException e1) {
-				throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
-						+ Utility.getMessageException(e1) + ")", e1);
-			}
-			if (storage != null) {
-				fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
-				InputStream is = null;
+		if (ordineMissione != null){
+			Map<String, byte[]> map = new HashMap<String, byte[]>();
+			byte[] printOrdineMissione = null;
+			String fileName = null;
+			if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
+					&& !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
+				StorageObject storage = null;
 				try {
-					is = missioniCMISService.getResource(storage);
-				} catch (Exception e) {
-					throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
-							+ Utility.getMessageException(e) + ")", e);
+					storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
+				} catch (ComponentException e1) {
+					throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
+							+ Utility.getMessageException(e1) + ")", e1);
 				}
-				if (is != null) {
+				if (storage != null) {
+					fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+					InputStream is = null;
 					try {
-						printOrdineMissione = IOUtils.toByteArray(is);
-						is.close();
-					} catch (IOException e) {
-						throw new ComponentException("Errore nella conversione dello stream in byte del file ("
+						is = missioniCMISService.getResource(storage);
+					} catch (Exception e) {
+						throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
 								+ Utility.getMessageException(e) + ")", e);
 					}
+					if (is != null) {
+						try {
+							printOrdineMissione = IOUtils.toByteArray(is);
+							is.close();
+						} catch (IOException e) {
+							throw new ComponentException("Errore nella conversione dello stream in byte del file ("
+									+ Utility.getMessageException(e) + ")", e);
+						}
+					}
+				} else {
+					throw new AwesomeException(CodiciErrore.ERRGEN,
+							"Errore nel recupero del contenuto del file sul documentale");
 				}
+				map.put(fileName, printOrdineMissione);
 			} else {
-				throw new AwesomeException(CodiciErrore.ERRGEN,
-						"Errore nel recupero del contenuto del file sul documentale");
+				fileName = "OrdineMissione" + idMissione + ".pdf";
+				printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
+				if (ordineMissione.isMissioneInserita()) {
+					cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, printOrdineMissione,
+							ordineMissione);
+				}
+				map.put(fileName, printOrdineMissione);
 			}
-			map.put(fileName, printOrdineMissione);
-		} else {
-			fileName = "OrdineMissione" + idMissione + ".pdf";
-			printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-			if (ordineMissione.isMissioneInserita()) {
-				cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(principal, printOrdineMissione,
-						ordineMissione);
-			}
-			map.put(fileName, printOrdineMissione);
+			return map;
 		}
-		return map;
+		return null;
 	}
 
 	private boolean isDevProfile() {
@@ -959,6 +970,10 @@ public class OrdineMissioneService {
 	public OrdineMissione updateOrdineMissione(Principal principal, OrdineMissione ordineMissione, Boolean fromFlows,
 			Boolean confirm, String basePath) {
 		ZonedDateTime oggi = ZonedDateTime.now();
+		if (!fromFlows && !isUserEnabledToViewMissione(principal, ordineMissione)){
+			throw new AwesomeException(CodiciErrore.ERRGEN,
+					"Non Autorizzato");
+		}
 		OrdineMissione ordineMissioneDB = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 				ordineMissione.getId());
 		try {
@@ -1337,7 +1352,7 @@ public class OrdineMissioneService {
 	public void deleteOrdineMissione(Principal principal, Long idOrdineMissione) {
 		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 				idOrdineMissione);
-		if (ordineMissione != null) {
+		if (ordineMissione != null && isUserEnabledToViewMissione(principal, ordineMissione)) {
 			controlloOperazioniCRUDDaGui(ordineMissione);
 			ordineMissioneAnticipoService.deleteAnticipo(principal, ordineMissione);
 			ordineMissioneAutoPropriaService.deleteAutoPropria(principal, ordineMissione);
@@ -1702,7 +1717,7 @@ public class OrdineMissioneService {
 		if (idOrdineMissione != null) {
 			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 					idOrdineMissione);
-			if (ordineMissione != null) {
+			if (ordineMissione != null && isUserEnabledToViewMissione(principal, ordineMissione)) {
 				List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsOrdineMissione(ordineMissione,
 						idOrdineMissione);
 				return lista;
@@ -1715,7 +1730,7 @@ public class OrdineMissioneService {
 			String name, MimeTypes mimeTypes) throws ComponentException {
 		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 				idOrdineMissione);
-		if (ordineMissione != null) {
+		if (ordineMissione != null && isUserEnabledToViewMissione(principal, ordineMissione)) {
 			return cmisOrdineMissioneService.uploadAttachmentOrdineMissione(principal, ordineMissione, idOrdineMissione,
 					inputStream, name, mimeTypes);
 		}
@@ -1726,7 +1741,7 @@ public class OrdineMissioneService {
 		if (idOrdineMissione != null) {
 			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
 					idOrdineMissione);
-			if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso())) {
+			if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso()) && isUserEnabledToViewMissione(principal, ordineMissione)) {
 				StorageObject folderOrdineMissione = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
 				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo, folderOrdineMissione);
 			} else {
