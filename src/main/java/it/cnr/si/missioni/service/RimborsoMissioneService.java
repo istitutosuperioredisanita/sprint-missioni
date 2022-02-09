@@ -191,6 +191,13 @@ public class RimborsoMissioneService {
 	@Autowired
     private MissioniCMISService missioniCMISService;
 
+	public Boolean isUserEnabledToViewMissione(Principal principal, RimborsoMissione rimborsoMissione){
+		if (rimborsoMissione.getUid().equals(principal.getName()) || accountService.isUserEnableToWorkUo(principal, rimborsoMissione.getUoRich()) || accountService.isUserEnableToWorkUo(principal, rimborsoMissione.getUoSpesa())){
+			return true;
+		}
+		return false;
+	}
+
     public RimborsoMissione getRimborsoMissione(Principal principal, Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws ComponentException {
     	RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
     	filter.setDaId(idMissione);
@@ -203,6 +210,7 @@ public class RimborsoMissioneService {
 				retrieveDetails(principal, rimborsoMissione);
 			}
 		}
+
 		return rimborsoMissione;
     }
 
@@ -370,7 +378,9 @@ public class RimborsoMissioneService {
     
     @Transactional(propagation = Propagation.REQUIRED)
     public RimborsoMissione updateRimborsoMissione (Principal principal, RimborsoMissione rimborsoMissione, Boolean fromFlows, Boolean confirm, String basePath)  throws ComponentException{
-
+		if (!fromFlows && !isUserEnabledToViewMissione(principal, rimborsoMissione)){
+			throw new AwesomeException(CodiciErrore.ERRGEN, "Non Autorizzato.");
+		}
     	RimborsoMissione rimborsoMissioneDB = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoMissione.getId());
        	boolean isRitornoMissioneMittente = false;
        	boolean isRitornoMissioneAmministrativi = false;
@@ -698,7 +708,7 @@ public class RimborsoMissioneService {
     @Transactional(propagation = Propagation.REQUIRED)
 	public void deleteRimborsoMissione(Principal principal, Long idRimborsoMissione) throws ComponentException{
     	RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
-		if (rimborsoMissione != null){
+		if (rimborsoMissione != null && isUserEnabledToViewMissione(principal, rimborsoMissione)){
 			controlloOperazioniCRUDDaGui(rimborsoMissione);
 			rimborsoMissioneDettagliService.cancellaRimborsoMissioneDettagli(principal, rimborsoMissione, false);
 			rimborsoImpegniService.cancellaRimborsoImpegni(principal, rimborsoMissione);
@@ -1420,7 +1430,7 @@ public class RimborsoMissioneService {
 			throws ComponentException {
 		if (idRimborsoMissione != null) {
 			RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
-			if (rimborsoMissione != null){
+			if (rimborsoMissione != null && isUserEnabledToViewMissione(principal, rimborsoMissione)){
 				List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsRimborsoMissione(rimborsoMissione, idRimborsoMissione);
 				return lista;
 			}
@@ -1431,7 +1441,7 @@ public class RimborsoMissioneService {
 	public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissione,
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
 		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
-		if (rimborsoMissione != null) {
+		if (rimborsoMissione != null && isUserEnabledToViewMissione(principal, rimborsoMissione)) {
 			return cmisRimborsoMissioneService.uploadAttachmentRimborsoMissione(principal, rimborsoMissione,idRimborsoMissione,
 					inputStream, name, mimeTypes);
 		}
@@ -1693,7 +1703,7 @@ public class RimborsoMissioneService {
 		if (idRimborsoMissione != null) {
 			RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
 			controlloAllegatoDettaglioModificabile(rimborsoMissione);
-			if (rimborsoMissione != null && StringUtils.hasLength(rimborsoMissione.getIdFlusso())){
+			if (rimborsoMissione != null && isUserEnabledToViewMissione(principal, rimborsoMissione) && StringUtils.hasLength(rimborsoMissione.getIdFlusso())){
 				StorageObject storage = cmisRimborsoMissioneService.recuperoFolderRimborsoMissione(rimborsoMissione);
 				missioniCMISService.eliminaFilePresenteNelFlusso(principal, idNodo, storage);
 			} else {
