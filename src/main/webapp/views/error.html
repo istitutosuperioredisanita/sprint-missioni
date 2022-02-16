@@ -12,7 +12,20 @@
                     You are logged in as user "Admin".
                 </div>
             </div>
-            <h1> <a class="a-verde" href="#/logout"><span translate="global.menu.account.login"></span></a> </h1>
+        </div>
+        <div class="col-md-8 col-md-offset-2 m-auto pt-3" ng-if="account">
+            <div class="panel panel-default home-panel">
+                <div class="panel-heading"><h2><span class="glyphicon glyphicon-warning-sign text-warning" aria-hidden="true"></span> Sistema non disponibile per l'utente {{account.login}}</h2></div>
+                <div class="panel-body">
+                    <div class="col text-monospace">
+                        <p class="h3">Ciao {{account.firstName}}, siamo spiacenti ma la tua utenza <span  class="badge badge-pill badge-warning">{{account.login}}</span> non ha accesso a questo sistema.</p>
+                        <div>login: <strong class="font-weight-bold">{{account.login}}</strong></div>
+                        <div>nome: <strong class="font-weight-bold">{{account.firstName}}</strong></div>
+                        <div>cognome: <strong class="font-weight-bold">{{account.lastName}}</strong></div>
+                        <div>email: <strong class="font-weight-bold">{{account.email}}</strong></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

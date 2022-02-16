@@ -289,3 +289,19 @@ input:-webkit-autofill {
   }
 
 }
+iframe {
+    z-index: 1;
+}
+.navbar-nav > button {
+    float: left;
+}
+.navbar-header > button:not(.navbar-toggle) {
+    float: right;
+}
+.sso-cnr-menu {
+    display: flex;
+    border: none;
+    margin-top: unset;
+    margin-bottom: unset;
+    background-color: unset !important;
+}

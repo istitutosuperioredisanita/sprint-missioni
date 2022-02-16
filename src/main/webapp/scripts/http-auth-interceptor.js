@@ -42,7 +42,7 @@
      * On 401 response (without 'ignoreAuthModule' option) stores the request
      * and broadcasts 'event:auth-loginRequired'.
      */
-        .config(function($httpProvider) {
+        .config(function($httpProvider, $cookies, AuthServerProvider) {
 
             var interceptor = ['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
                 function success(response) {
@@ -51,6 +51,12 @@
 
                 function error(response) {
                     if (response.status === 401 && !response.config.ignoreAuthModule) {
+                        AuthServerProvider.profileInfo().then(function (profile) {
+                           if (profile.data.keycloakEnabled) {
+                             $cookies.put('KC_REDIRECT', '/#' + $location.url());
+                             location.href = '/sso/login';
+                           }
+                        });
                         var deferred = $q.defer();
                         httpBuffer.append(response.config, deferred);
                         $rootScope.$broadcast('event:auth-loginRequired', response);

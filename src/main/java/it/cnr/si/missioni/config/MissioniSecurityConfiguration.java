@@ -6,6 +6,7 @@ import it.cnr.si.missioni.security.jwt.TokenProvider;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 
 @Configuration
 @EnableWebSecurity
+@Profile("!keycloak")
 @Order(1)
 public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -40,6 +42,7 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter 
         	.antMatchers("/views/**")
             .antMatchers("/api/rest/public/**")
             .antMatchers("/SIGLA/**")
+                .antMatchers("/api/profile/info")
                 .antMatchers("/api/rest/flows")
         ;
         web.httpFirewall(allowUrlEncodedSlashHttpFirewall());

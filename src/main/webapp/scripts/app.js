@@ -146,6 +146,7 @@ missioniApp
                 })
                 .when('/error', {
                     templateUrl: 'views/error.html',
+                    controller: 'MainController'
                     access: {
                         authorizedRoles: [USER_ROLES.all]
                     }

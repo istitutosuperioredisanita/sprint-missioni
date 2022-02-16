@@ -244,7 +244,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider) {
     var today = new Date();
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
@@ -293,13 +293,11 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
 
         return {
             login: function (param) {
-//                var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
-//                var data = "username=" + param.username.toLowerCase() + "&password=" + param.password;
-        var data = {
-            username: param.username.toLowerCase(),
-            password: param.password,
-            rememberMe: "true"
-        };
+                var data = {
+                    username: param.username.toLowerCase(),
+                    password: param.password,
+                    rememberMe: "true"
+                };
                 $http.post('api/authenticate', data, {
                     headers: {
                         "Content-Type": "application/json",
@@ -307,6 +305,12 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     },
                     ignoreAuthModule: 'ignoreAuthModule'
                 }).success(function (data, status, headers, config) {
+                    $scope.isLoadedUser = false;
+                    AuthServerProvider.profileInfo().then(function (profile) {
+                        if (!profile.data.keycloakEnabled) {
+                            $scope.isLoadedUser = true;
+                        }
+                    });
                     httpHeaders.common['Authorization'] = 'Bearer ' + data.id_token;
                     AccessToken.set(data);
                     AccountLDAP.get(function(data) {
@@ -538,12 +542,21 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                 $rootScope.authenticated = false;
                 $rootScope.account = null;
                 $sessionStorage.account = null;
-                AccessToken.remove();
-
-                $http.get('api/logout');
+                var token = AccessToken.get();
+                if(token !== null) {
+                    AccessToken.remove();
+                    $http.get('api/logout');
+                } else {
+                    location.href = '/sso/logout';
+                }
                 Session.invalidate();
                 delete httpHeaders.common['Authorization'];
                 authService.loginCancelled();
+            }
+            profileInfo: function() {
+                return $http.get('api/profile/info').success(function(response) {
+                    return response;
+                });
             }
         };
     });
