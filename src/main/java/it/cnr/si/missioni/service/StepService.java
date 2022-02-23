@@ -1,7 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.io.Serializable;
-import java.security.Principal;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,29 +33,29 @@ public class StepService {
 	}
 	
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void verifyStepAmministrativoNewTransaction(Principal principal, Serializable idOrdineMissione) throws Exception {
-    	verifyStepAmministrativo(principal, idOrdineMissione);
+    public void verifyStepAmministrativoNewTransaction(Serializable idOrdineMissione) throws Exception {
+    	verifyStepAmministrativo(idOrdineMissione);
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void verifyStepRespGruppoNewTransaction(Principal principal, Serializable idOrdineMissione) throws Exception {
-    	verifyStepRespGruppo(principal, idOrdineMissione);
+    public void verifyStepRespGruppoNewTransaction(Serializable idOrdineMissione) throws Exception {
+    	verifyStepRespGruppo(idOrdineMissione);
     }
 
 
-	public void verifyStepAmministrativo(Principal principal, Serializable idOrdineMissione)
+	public void verifyStepAmministrativo(Serializable idOrdineMissione)
 			throws ComponentException, Exception {
 		if (idOrdineMissione != null){
-			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
-			ordineMissioneService.verifyStepAmministrativo(principal, ordineMissione);
+			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, idOrdineMissione);
+			ordineMissioneService.verifyStepAmministrativo(ordineMissione);
 		}
 	}
 
-	public void verifyStepRespGruppo(Principal principal, Serializable idOrdineMissione)
+	public void verifyStepRespGruppo(Serializable idOrdineMissione)
 			throws ComponentException, Exception {
 		if (idOrdineMissione != null){
-			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
-			ordineMissioneService.verifyStepRespGruppo(principal, ordineMissione);
+			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, idOrdineMissione);
+			ordineMissioneService.verifyStepRespGruppo(ordineMissione);
 		}
 	}
 

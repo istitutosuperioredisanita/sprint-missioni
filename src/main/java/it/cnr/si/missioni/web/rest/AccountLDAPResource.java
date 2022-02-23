@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.web.rest;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
@@ -9,6 +10,7 @@ import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
+
 
 /**
  * REST controller for current ldap user's account.
@@ -34,6 +36,11 @@ public class AccountLDAPResource {
 
 	@Autowired
     private AccountService accountService;
+
+    @Autowired
+    private SecurityService securityService;
+
+
     
 /*    @RequestMapping(value = "/rest/ldap",
             method = RequestMethod.GET,
@@ -68,7 +75,7 @@ public class AccountLDAPResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<String> getSiperAccount() {
-        String resp = accountService.getAccount(SecurityUtils.getCurrentUserLogin(), true);
+        String resp = accountService.getAccount(securityService.getCurrentUserLogin(), true);
         return new ResponseEntity<String>(resp, HttpStatus.OK);
     }
 

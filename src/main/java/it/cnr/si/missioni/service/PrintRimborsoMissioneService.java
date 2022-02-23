@@ -1,7 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
-import java.security.Principal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -125,9 +125,8 @@ public class PrintRimborsoMissioneService {
     	}
     	printRimborsoMissione.setUoSpesa(caricaUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()));
     	printRimborsoMissione.setCdrSpesa(caricaCdr(rimborsoMissione.getCdrSpesa()));
-    	Principal principal = new GenericPrincipal(currentLogin);
 /* INIZIO REM PER MULTI IMPEGNO
-    	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(principal, new Long(rimborsoMissione.getId().toString()));
+    	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(new Long(rimborsoMissione.getId().toString()));
     	if (lista != null && !lista.isEmpty()){
     		String impegni = null;
     		for (RimborsoImpegni rimborsoImpegni : lista){

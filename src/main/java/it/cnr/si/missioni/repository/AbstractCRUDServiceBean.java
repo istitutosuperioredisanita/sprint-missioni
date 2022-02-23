@@ -22,6 +22,7 @@
  ******************************************************************************/
 package it.cnr.si.missioni.repository;
 
+import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.bulk.BulkHome;
 import it.cnr.jada.bulk.OggettoBulk;
 import it.cnr.jada.bulk.annotation.JadaOneToMany;
@@ -32,53 +33,61 @@ import it.cnr.jada.ejb.session.CRUDComponentSessionBean;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.service.SecurityService;
+import net.bzdyl.ejb3.criteria.Criterion;
+import net.bzdyl.ejb3.criteria.Order;
+import net.bzdyl.ejb3.criteria.Projection;
 import net.bzdyl.ejb3.criteria.projections.Projections;
 import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractCRUDServiceBean<T extends OggettoBulk> extends
 		CRUDComponentSessionBean<T> implements CRUDComponentSession<T> {
+	@Autowired
+	SecurityService securityService;
+
 	@Transactional(propagation = Propagation.REQUIRED)
-	@Override
-	public T persist(Principal principal, T model)
+	public T persist(T model)
 			throws ComponentException {
-		return super.persist(principal, model);
+		return super.persist(new GenericPrincipal(securityService.getCurrentUserLogin()), model);
 	};
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	@Override
-	public T creaConBulk(Principal principal, T model)
+	public T creaConBulk(T model)
 			throws ComponentException {
-		return super.creaConBulk(principal, model);
+		return super.creaConBulk(new GenericPrincipal(securityService.getCurrentUserLogin()), model);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	@Override
-	public T modificaConBulk(Principal principal, T model)
+	public T modificaConBulk(T model)
 			throws ComponentException {
-		return super.modificaConBulk(principal, model);
+		return super.modificaConBulk(new GenericPrincipal(securityService.getCurrentUserLogin()),  model);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	@Override
-	public void eliminaConBulk(Principal principal, T model)
+	public void eliminaConBulk(T model)
 			throws ComponentException {
-		model = findByPrimaryKey(principal, model);
+		Principal principal = new GenericPrincipal(securityService.getCurrentUserLogin());
+		model = super.findByPrimaryKey(principal, model);
 		model.setToBeDeleted();
 		super.eliminaConBulk(principal, model);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public boolean hasForeignKey(Principal principal, T oggettobulk, String...attributes) throws ComponentException {
+	public boolean hasForeignKey(T oggettobulk, String...attributes) throws ComponentException {
+		 Principal principal = new GenericPrincipal(securityService.getCurrentUserLogin());
     	List<Field> attributi = Arrays.asList(oggettobulk.getClass().getDeclaredFields());
 		for (Field attributo : attributi) {
 			if (attributes != null && !Arrays.asList(attributes).isEmpty() &&
@@ -96,8 +105,17 @@ public abstract class AbstractCRUDServiceBean<T extends OggettoBulk> extends
 		return false;
 	}
 	
-	public void lockBulk(Principal principal, T oggettobulk) throws PersistencyException, ComponentException, BusyResourceException, OptimisticLockException {
-		super.lockBulk(principal, oggettobulk);
+	public void lockBulk(T oggettobulk) throws PersistencyException, ComponentException, BusyResourceException, OptimisticLockException {
+		super.lockBulk(new GenericPrincipal(securityService.getCurrentUserLogin()), oggettobulk);
 	}
-
+	public T findById(Class<T> bulkClass, Serializable id) throws ComponentException{
+		return super.findById(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, id);
+	}
+	public List<T> findByCriterion(Class<T> bulkClass, Criterion criterion, Order... order) throws ComponentException {
+		return super.findByCriterion(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, criterion,order);
+	}
+	public List<Object> findByProjection(Class<T> bulkClass,
+										 Projection projection, Criterion criterion, boolean useBeanResultTransformer, Order... order) throws ComponentException {
+		return super.findByProjection(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, projection, criterion, useBeanResultTransformer,order);
+	}
 }

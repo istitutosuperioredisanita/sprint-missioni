@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Principal;
+
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +71,7 @@ public class OrdineMissioneAutoPropriaResource {
     		@RequestParam(value = "idMissione") Long idMissione) {
         log.debug("REST request per visualizzare i dati dell'auto propria dell'Ordine di Missione" );
         try {
-            OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.getAutoPropria((Principal) SecurityUtils.getCurrentUser(), idMissione);
+            OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.getAutoPropria( idMissione);
             return JSONResponseEntity.ok(ordineMissioneAutoPropria);
 		} catch (ComponentException e) {
 			log.error("ERRORE getAutoPropria",e);
@@ -90,7 +90,7 @@ public class OrdineMissioneAutoPropriaResource {
     		@RequestParam(value = "idAutoPropriaOrdineMissione") Long idAutoPropriaOrdineMissione) {
         log.debug("REST request per visualizzare i dati degli spostamenti con l'auto propria dell'Ordine di Missione" );
         try {
-            List<SpostamentiAutoPropria> spostamentiAutoPropria = ordineMissioneAutoPropriaService.getSpostamentiAutoPropria((Principal) SecurityUtils.getCurrentUser(), idAutoPropriaOrdineMissione);
+            List<SpostamentiAutoPropria> spostamentiAutoPropria = ordineMissioneAutoPropriaService.getSpostamentiAutoPropria( idAutoPropriaOrdineMissione);
             return JSONResponseEntity.ok(spostamentiAutoPropria);
 		} catch (ComponentException e) {
 			log.error("ERRORE getSpostamenti",e);
@@ -106,7 +106,7 @@ public class OrdineMissioneAutoPropriaResource {
                                              HttpServletResponse response) {
     	if (ordineMissioneAutoPropria.getId() == null){
             try {
-                ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.createAutoPropria((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAutoPropria);
+                ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.createAutoPropria( ordineMissioneAutoPropria);
     		} catch (AwesomeException e) {
     			log.error("ERRORE createAutoPropriaOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -130,7 +130,7 @@ public class OrdineMissioneAutoPropriaResource {
                                              HttpServletResponse response) {
     	if (ordineMissioneAutoPropria.getId() != null){
             try {
-            	ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAutoPropria);
+            	ordineMissioneAutoPropria = ordineMissioneAutoPropriaService.updateAutoPropria( ordineMissioneAutoPropria);
     		} catch (Exception e) {
         		log.error("ERRORE modifyAutoPropriaOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -151,7 +151,7 @@ public class OrdineMissioneAutoPropriaResource {
                                              HttpServletResponse response) {
     	if (spostamentiAutoPropria.getId() != null){
             try {
-            	spostamentiAutoPropria = ordineMissioneAutoPropriaService.updateSpostamenti((Principal) SecurityUtils.getCurrentUser(), spostamentiAutoPropria);
+            	spostamentiAutoPropria = ordineMissioneAutoPropriaService.updateSpostamenti( spostamentiAutoPropria);
     		} catch (Exception e) {
         		log.error("ERRORE modifySpostamento",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -172,7 +172,7 @@ public class OrdineMissioneAutoPropriaResource {
                                              HttpServletResponse response) {
     	if (spostamentoAutoPropria.getId() == null){
             try {
-            	spostamentoAutoPropria = ordineMissioneAutoPropriaService.createSpostamentoAutoPropria((Principal) SecurityUtils.getCurrentUser(), spostamentoAutoPropria);
+            	spostamentoAutoPropria = ordineMissioneAutoPropriaService.createSpostamentoAutoPropria( spostamentoAutoPropria);
     		} catch (AwesomeException e) {
         		log.error("ERRORE createSpostamentoAutoPropria",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -195,7 +195,7 @@ public class OrdineMissioneAutoPropriaResource {
     @Timed
     public ResponseEntity<?> deleteAutoPropria(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			ordineMissioneAutoPropriaService.deleteAutoPropria((Principal) SecurityUtils.getCurrentUser(), ids);
+			ordineMissioneAutoPropriaService.deleteAutoPropria( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
     		log.error("ERRORE deleteAutoPropria",e);
@@ -212,7 +212,7 @@ public class OrdineMissioneAutoPropriaResource {
     @Timed
     public ResponseEntity<?> deleteSpostamento(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			ordineMissioneAutoPropriaService.deleteSpostamenti((Principal) SecurityUtils.getCurrentUser(), ids);
+			ordineMissioneAutoPropriaService.deleteSpostamenti( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
     		log.error("ERRORE deleteSpostamento",e);

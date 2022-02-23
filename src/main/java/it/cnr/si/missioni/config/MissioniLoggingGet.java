@@ -11,7 +11,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
+
 
 @Component
 public class MissioniLoggingGet  extends HandlerInterceptorAdapter {
@@ -27,7 +27,7 @@ public class MissioniLoggingGet  extends HandlerInterceptorAdapter {
                 && request.getMethod().equals(HttpMethod.GET.name()) && SecurityUtils.getCurrentUser() != null) {
             String uri = request.getRequestURI();
             if (!uri.startsWith("/styles") && !uri.startsWith("/scripts") && !uri.startsWith("/fonts") && !uri.startsWith("/images") && !uri.contains("authentication_check.gif")  && !uri.endsWith("ico") && !uri.endsWith("png") && SecurityUtils.getCurrentUser() != null ){
-                log.info(((Principal) SecurityUtils.getCurrentUser()).getName()+" "+request.getMethod()+" "+request.getRequestURI()+" "+request.getQueryString()+" "+request.getRemoteAddr());
+                log.info( SecurityUtils.getCurrentUser()+" "+request.getMethod()+" "+request.getRequestURI()+" "+request.getQueryString()+" "+request.getRemoteAddr());
             }
         }
         return true;

@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.security.Principal;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -112,9 +113,12 @@ public class CMISRimborsoMissioneService {
 
 	@Autowired
 	NazioneService nazioneService;
-	
-	public List<CMISFileAttachment> getAttachmentsDetail(Principal principal, Long idDettagliorimborso) throws ComponentException{
-		RimborsoMissioneDettagli dettaglio = rimborsoMissioneDettagliService.getRimborsoMissioneDettaglio(principal, idDettagliorimborso);
+
+	@Autowired
+	SecurityService securityService;
+
+	public List<CMISFileAttachment> getAttachmentsDetail(Long idDettagliorimborso) throws ComponentException{
+		RimborsoMissioneDettagli dettaglio = rimborsoMissioneDettagliService.getRimborsoMissioneDettaglio(idDettagliorimborso);
 		List<StorageObject> children = getChildrenDettaglio(dettaglio);
 		if (children != null){
 	        List<CMISFileAttachment> lista = new ArrayList<CMISFileAttachment>();
@@ -173,20 +177,20 @@ public class CMISRimborsoMissioneService {
 		return datiFlusso;
 	}
 	
-	public CMISRimborsoMissione create(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException{
+	public CMISRimborsoMissione create(RimborsoMissione rimborsoMissione) throws ComponentException{
 		CMISRimborsoMissione cmisRimborsoMissione = new CMISRimborsoMissione();
 		cmisRimborsoMissione.setIdMissioneRimborso(new Long(rimborsoMissione.getId().toString()));
-		caricaDatiDerivati(principal, rimborsoMissione);
+		caricaDatiDerivati(rimborsoMissione);
 
 		if (rimborsoMissione != null && rimborsoMissione.getOrdineMissione() != null){
 			OrdineMissione ordineMissione = rimborsoMissione.getOrdineMissione();
-	    	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, ordineMissione.getId());
+	    	OrdineMissione ordineMissioneDB = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, ordineMissione.getId());
 	    	if (ordineMissioneDB != null){
 	    		ordineMissione = ordineMissioneDB;
 	    	}
 		}
 
-		String username = principal.getName();
+		String username = securityService.getCurrentUserLogin();
 		
 		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
 		account.setUid(rimborsoMissione.getUid());
@@ -270,7 +274,7 @@ public class CMISRimborsoMissioneService {
 		cmisRimborsoMissione.setWfDueDate(DateUtils.getDateAsString(dataScadenzaFlusso.getTime(), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDestinazione(rimborsoMissione.getDestinazione());
 		cmisRimborsoMissione.setTrattamento(rimborsoMissione.decodeTrattamento());
-		cmisRimborsoMissione.setDifferenzeOrdineRimborso(rimborsoMissioneService.getDifferenzeRimborsoOrdine(principal, rimborsoMissione));
+		cmisRimborsoMissione.setDifferenzeOrdineRimborso(rimborsoMissioneService.getDifferenzeRimborsoOrdine(rimborsoMissione));
 		cmisRimborsoMissione.setMissioneEsteraFlag(rimborsoMissione.getTipoMissione().equals("E") ? "si" : "no");
 		cmisRimborsoMissione.setDataInizioMissione(DateUtils.getDateAsString(rimborsoMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
 		cmisRimborsoMissione.setDataFineMissione(DateUtils.getDateAsString(rimborsoMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE));
@@ -311,7 +315,7 @@ public class CMISRimborsoMissioneService {
 		return "si";
 	}
 	
-	private void caricaDatiDerivati(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
+	private void caricaDatiDerivati(RimborsoMissione rimborsoMissione) throws ComponentException {
 		if (rimborsoMissione != null){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
 			if (dati == null){
@@ -325,9 +329,9 @@ public class CMISRimborsoMissioneService {
 	}
 
 	@Transactional(readOnly = true)
-	public StorageObject salvaStampaRimborsoMissioneSuCMIS(Principal principal, byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
-		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
-		return salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
+	public StorageObject salvaStampaRimborsoMissioneSuCMIS(byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
+		CMISRimborsoMissione cmisRimborsoMissione = create(rimborsoMissione);
+		return salvaStampaRimborsoMissioneSuCMIS(stampa, rimborsoMissione, cmisRimborsoMissione);
 	}
 	
 	private List<String> getBasePathStorage(RimborsoMissione rimborsoMissione) {
@@ -406,13 +410,13 @@ public class CMISRimborsoMissioneService {
 		return metadataProperties;
 	}
 	
-	private StorageObject salvaStampaRimborsoMissioneSuCMIS(Principal principal,
+	private StorageObject salvaStampaRimborsoMissioneSuCMIS(
 			byte[] stampa, RimborsoMissione rimborsoMissione,
 			CMISRimborsoMissione cmisRimborsoMissione) {
 		InputStream streamStampa = new ByteArrayInputStream(stampa);
 		String path = createFolderRimborsoMissione(rimborsoMissione);
 		rimborsoMissione.setStringBasePath(path);
-		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissione(principal.getName(), cmisRimborsoMissione);
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissione(securityService.getCurrentUserLogin(), cmisRimborsoMissione);
 		try{
 			StorageObject node = null;
 			if (!rimborsoMissione.isStatoInviatoAlFlusso()){
@@ -457,8 +461,8 @@ public class CMISRimborsoMissioneService {
 		}
 		return null;
 	}
-	public CMISFileAttachment uploadAttachmentDetail(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes){
-		StorageObject doc = salvaAllegatoRimborsoMissioneDettaglioCMIS(principal, rimborsoMissioneDettagli, inputStream, name, mimeTypes);
+	public CMISFileAttachment uploadAttachmentDetail(RimborsoMissioneDettagli rimborsoMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes){
+		StorageObject doc = salvaAllegatoRimborsoMissioneDettaglioCMIS(rimborsoMissioneDettagli, inputStream, name, mimeTypes);
 		if (doc != null){
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 			cmisFileAttachment.setId(doc.getKey());
@@ -469,7 +473,7 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 	
-	private StorageObject salvaAllegatoRimborsoMissioneDettaglioCMIS(Principal principal,
+	private StorageObject salvaAllegatoRimborsoMissioneDettaglioCMIS(
 			RimborsoMissioneDettagli dettaglio, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
 		StorageObject folder = (StorageObject) recuperoFolderRimborsoMissione(dettaglio.getRimborsoMissione());
@@ -482,7 +486,7 @@ public class CMISRimborsoMissioneService {
 
 		path = createFolderRimborsoMissioneDettaglio(dettaglio, path);
 
-		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
 		try{
 			StorageObject node = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,
@@ -580,11 +584,11 @@ public class CMISRimborsoMissioneService {
 
 	
 	@Transactional(readOnly = true)
-	public void avviaFlusso(Principal principal, RimborsoMissione rimborsoMissione) throws ComponentException {
-		String username = principal.getName();
+	public void avviaFlusso(RimborsoMissione rimborsoMissione) throws ComponentException {
+		String username = securityService.getCurrentUserLogin();
 		byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
-		CMISRimborsoMissione cmisRimborsoMissione = create(principal, rimborsoMissione);
-		StorageObject documento = salvaStampaRimborsoMissioneSuCMIS(principal, stampa, rimborsoMissione, cmisRimborsoMissione);
+		CMISRimborsoMissione cmisRimborsoMissione = create(rimborsoMissione);
+		StorageObject documento = salvaStampaRimborsoMissioneSuCMIS(stampa, rimborsoMissione, cmisRimborsoMissione);
 		StringBuilder nodeRefs = new StringBuilder();
 		MessageForFlowRimborso messageForFlow = new MessageForFlowRimborso();
 		try {
@@ -857,8 +861,8 @@ public class CMISRimborsoMissioneService {
 		return StoragePath.construct(path);
 	}
 
-	public CMISFileAttachment uploadAttachmentRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Long idRimborsoMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
-		StorageObject doc = salvaAllegatoRimborsoMissioneCMIS(principal, rimborsoMissione, inputStream, name, mimeTypes);
+	public CMISFileAttachment uploadAttachmentRimborsoMissione(RimborsoMissione rimborsoMissione, Long idRimborsoMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
+		StorageObject doc = salvaAllegatoRimborsoMissioneCMIS(rimborsoMissione, inputStream, name, mimeTypes);
 		if (doc != null){
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 			cmisFileAttachment.setId(doc.getKey());
@@ -869,8 +873,8 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 
-	public CMISFileAttachment uploadAttachmentAnnullamentoRimborsoMissione(Principal principal, RimborsoMissione rimborsoMissione, Long idAnnullamentoRimborsoMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
-		StorageObject doc = salvaAllegatoAnnullamentoRimborsoMissioneCMIS(principal, rimborsoMissione, inputStream, name, mimeTypes);
+	public CMISFileAttachment uploadAttachmentAnnullamentoRimborsoMissione(RimborsoMissione rimborsoMissione, Long idAnnullamentoRimborsoMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
+		StorageObject doc = salvaAllegatoAnnullamentoRimborsoMissioneCMIS(rimborsoMissione, inputStream, name, mimeTypes);
 		if (doc != null){
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 			cmisFileAttachment.setId(doc.getKey());
@@ -881,12 +885,12 @@ public class CMISRimborsoMissioneService {
 		return null;
 	}
 
-	private StorageObject salvaAllegatoRimborsoMissioneCMIS(Principal principal,
+	private StorageObject salvaAllegatoRimborsoMissioneCMIS(
 			RimborsoMissione rimborsoMissione, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
 		StoragePath cmisPath = buildFolderRimborsoMissione(rimborsoMissione);
 
-		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
 		try{
 			StorageObject node = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,
@@ -903,7 +907,7 @@ public class CMISRimborsoMissioneService {
 		}
 	}
 
-	private StorageObject salvaAllegatoAnnullamentoRimborsoMissioneCMIS(Principal principal,
+	private StorageObject salvaAllegatoAnnullamentoRimborsoMissioneCMIS(
 			RimborsoMissione rimborsoMissione, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
 		StoragePath cmisPath = searchFolderRimborsoMissione(rimborsoMissione);
@@ -911,7 +915,7 @@ public class CMISRimborsoMissioneService {
 			throw new ComponentException("Errore nel salvataggio del file sul Documentale. Cartella del rimborso non trovata");
 		}
 
-		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(principal.getName(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANNULLAMENTO);
+		Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANNULLAMENTO);
 		try{
 			StorageObject node = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,

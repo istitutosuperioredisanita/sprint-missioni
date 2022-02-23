@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
+
 import java.util.stream.Collectors;
 
 public class LoggableDispatcherServlet extends DispatcherServlet {
@@ -53,7 +53,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
                 String payload =  "";
                 payload= new String(cachedContent, StandardCharsets.UTF_8);
                 BufferedReader buffer = requestToCache.getReader();
-                logger.info(((Principal) SecurityUtils.getCurrentUser()).getName()+" "+requestToCache.getMethod()+" "+requestToCache.getRequestURI()+" "+requestToCache.getQueryString()+" "+payload+" "+requestToCache.getRemoteAddr());
+                logger.info( SecurityUtils.getCurrentUser()+" "+requestToCache.getMethod()+" "+requestToCache.getRequestURI()+" "+requestToCache.getQueryString()+" "+payload+" "+requestToCache.getRemoteAddr());
             } catch (IOException e) {
                 logger.info(e.getMessage() );
             }

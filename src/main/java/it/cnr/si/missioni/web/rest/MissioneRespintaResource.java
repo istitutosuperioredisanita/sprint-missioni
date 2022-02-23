@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
+
 import java.util.List;
 
 /**
@@ -42,7 +42,7 @@ public class MissioneRespintaResource {
     public ResponseEntity<?> getMissioniRespinte(@RequestParam(value = "tipoMissione") String tipoMissione,
 											@RequestParam (value="idMissione") Long idMissione) {
         log.debug("REST request per visualizzare la cronologia dei respingimenti delle missioni");
-        List<MissioneRespinta> cronologia = missioneRespintaService.getCronologiaRespingimentiMissione(SecurityUtils.getCurrentUser(), tipoMissione, idMissione);
+        List<MissioneRespinta> cronologia = missioneRespintaService.getCronologiaRespingimentiMissione(tipoMissione, idMissione);
         return JSONResponseEntity.ok(cronologia);
     }
 }

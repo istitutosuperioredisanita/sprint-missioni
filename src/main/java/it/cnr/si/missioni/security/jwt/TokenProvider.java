@@ -92,7 +92,7 @@ public class TokenProvider {
 
         User principal = new User(claims.getSubject(), "", authorities);
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(token, authorities);
     }
 
     public boolean validateToken(String authToken) {

@@ -22,12 +22,16 @@
  ******************************************************************************/
 package it.cnr.si.missioni.repository;
 
-import java.security.Principal;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import it.cnr.jada.GenericPrincipal;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.service.SecurityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,14 +48,17 @@ public class CRUDServiceBean<T extends OggettoBulk> extends AbstractCRUDServiceB
 	@PersistenceContext
 	private EntityManager em;
 
+	@Autowired
+	SecurityService securityService;
+
 	public EntityManager getManager() {
 		return em;
 	}
 	public List eseguiQuery(Criteria criteria){
 		return criteria.prepareQuery(getManager()).getResultList();
 	}
-	public Criteria preparaCriteria(Principal principal, Class<T> bulkClass,
+	public Criteria preparaCriteria(Class<T> bulkClass,
 			Criterion criterionList, Projection projection, Order... order){
-		return select(principal, bulkClass, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
+		return select(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
 	}
 }

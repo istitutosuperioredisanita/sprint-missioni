@@ -1,7 +1,7 @@
 package it.cnr.si.missioni.cmis;
 
 import java.io.InputStream;
-import java.security.Principal;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,10 @@ public class MissioniCMISService extends StoreService {
 	
 	@Autowired
 	private ProxyService proxyService;
-	
+
+	@Autowired
+	private SecurityService securityService;
+
 	public static final String ASPECT_TITLED = "P:cm:titled";
 	public static final String PROPERTY_LAST_MODIFICATION_DATE = "cmis:lastModificationDate";
 	public static final String ASPECT_FLUSSO = "P:wfcnr:parametriFlusso";
@@ -298,7 +302,7 @@ public class MissioniCMISService extends StoreService {
 		return super.getChildren(fo.getKey());
 	}
 	
-	public void eliminaFilePresenteNelFlusso(Principal principal, String idNodo, StorageObject storageFolderRimborso) {
+	public void eliminaFilePresenteNelFlusso(String idNodo, StorageObject storageFolderRimborso) {
 		List<StorageObject> listaStorageObject = super.getChildren(storageFolderRimborso.getKey(), -1);
 		StorageObject node = (StorageObject)getStorageObjectBykey(idNodo);
 		String oldNomeFile = node.getPropertyValue(StoragePropertyNames.NAME.value());
@@ -325,7 +329,7 @@ public class MissioniCMISService extends StoreService {
 		metadataProperties.put(StoragePropertyNames.NAME.value(), nomeFile);
 		metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, nomeFile);
 		metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, nomeFile);
-		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, principal.getName());
+		metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, securityService.getCurrentUserLogin());
 		updateProperties(metadataProperties, node);
 		addAspect(node, CMISMissioniAspect.FILE_ELIMINATO.value());
 	}
