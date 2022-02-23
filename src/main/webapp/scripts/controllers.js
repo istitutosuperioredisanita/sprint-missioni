@@ -172,7 +172,6 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
             $scope.endSearchCmisAnnullamentiRimborso = true;
         });        
     }
-
     $scope.uoWorkForSpecialUser = null;
     $scope.endSearchCmisAnnullamenti = false;
     $scope.endSearchCmisAnnullamentiRimborso = false;
@@ -279,7 +278,8 @@ missioniApp.controller('LanguageController', function ($scope, $translate, Langu
 missioniApp.controller('MenuController', function ($scope) {
     });
 
-missioniApp.controller('LoginController', function ($scope, $location, AuthenticationSharedService) {
+missioniApp.controller('LoginController', function ($scope, $location, AuthenticationSharedService, Account) {
+        $scope.settingsAccount = Account.get();
         $scope.login = function () {
             AuthenticationSharedService.login({
                 username: $scope.username,
