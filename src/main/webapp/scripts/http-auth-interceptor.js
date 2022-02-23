@@ -44,19 +44,16 @@
      */
         .config(function($httpProvider) {
 
-            var interceptor = ['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
+            var interceptor = ['$rootScope', '$q', 'httpBuffer', '$cookies','$location', function($rootScope, $q, httpBuffer, $cookies, $location) {
                 function success(response) {
                     return response;
                 }
 
                 function error(response) {
                     if (response.status === 401 && !response.config.ignoreAuthModule) {
-/*                        AuthServerProvider.profileInfo().then(function (profile) {
-                           if (profile.data.keycloakEnabled) {
-                             $cookies['KC_REDIRECT'] = '/#' + $location.url();
-                             location.href = '/sso/login';
-                           }
-                        });*/
+                         $cookies['KC_REDIRECT'] = '/#' + $location.url();
+                         location.href = '/sso/login';
+
                         var deferred = $q.defer();
                         httpBuffer.append(response.config, deferred);
                         $rootScope.$broadcast('event:auth-loginRequired', response);

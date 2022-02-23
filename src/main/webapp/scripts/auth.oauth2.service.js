@@ -1,7 +1,7 @@
 'use strict';
 
 missioniApp
-    .factory('AuthServerProvider', function loginService($http, AccessToken, Base64) {
+    .factory('AuthServerProvider', function loginService($http, AccessToken, Base64Service) {
         return {
             login: function(credentials) {
                 var data = "username=" + credentials.username + "&password="
@@ -11,7 +11,7 @@ missioniApp
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                         "Accept": "application/json",
-                        "Authorization": "Basic " + Base64.encode("sprintapp" + ':' + "mySecretOAuthSecret")
+                        "Authorization": "Basic " + Base64Service.encode("sprintapp" + ':' + "mySecretOAuthSecret")
                     }
                 }).success(function (response) {
                     var expiredAt = new Date();
