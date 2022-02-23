@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
-import java.security.Principal;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -84,10 +84,10 @@ public class RimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
         List<RimborsoMissione> rimborsiMissione;
 		try {
-			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
+			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filter, true);
 			if (Utility.nvl(filter.getRecuperoTotali(),"N").equals("S")){
 				for (RimborsoMissione rimborso : rimborsiMissione){
-					rimborsoMissioneService.retrieveDetails((Principal) SecurityUtils.getCurrentUser(), rimborso);
+					rimborsoMissioneService.retrieveDetails( rimborso);
 					impostaTotaliRimborso(rimborso);
 				}
 			}
@@ -111,7 +111,7 @@ public class RimborsoMissioneResource {
         filter.setToFinal("S");
         List<RimborsoMissione> rimborsiMissione = null;
         		try {
-					rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, true);
+					rimborsoMissioneService.getRimborsiMissione(filter, true);
 				} catch (ComponentException e) {
 					log.error("ERRORE getRimborsoMissioneToFinal",e);
 		            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -133,7 +133,7 @@ public class RimborsoMissioneResource {
         filter.setStatoFlusso("APP");
         filter.setStato("DEF");
 		try {
-			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(SecurityUtils.getCurrentUser(), filter, false);
+			rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filter, false);
 		} catch (ComponentException e) {
 			log.error("ERRORE getRimborsoMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -153,7 +153,7 @@ public class RimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<RimborsoMissione> rimborsiMissione;
 		try {
-			rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+			rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
 		} catch (Exception e) {
 			log.error("ERRORE getRimborsoMissioneDaValidare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -172,7 +172,7 @@ public class RimborsoMissioneResource {
     		@RequestParam(value = "id") Long idMissione) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
-        	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true, true);
+        	RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione( idMissione, true, true);
         	impostaTotaliRimborso(rimborsoMissione);
         	return JSONResponseEntity.ok(rimborsoMissione);
         } catch (AwesomeException e) {
@@ -200,7 +200,7 @@ public class RimborsoMissioneResource {
                                              HttpServletResponse response) {
     	if (rimborsoMissione.getId() == null){
             try {
-                rimborsoMissione =  rimborsoMissioneService.createRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione);
+                rimborsoMissione =  rimborsoMissioneService.createRimborsoMissione( rimborsoMissione);
     		} catch (AwesomeException e) {
     			log.error("ERRORE createRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -223,9 +223,8 @@ public class RimborsoMissioneResource {
     public ResponseEntity<?> modifyRimborsoMissione(@RequestBody RimborsoMissione rimborsoMissione, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (rimborsoMissione.getId() != null){
-    		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
-				rimborsoMissione =  rimborsoMissioneService.updateRimborsoMissione(principal, rimborsoMissione, null);
+				rimborsoMissione =  rimborsoMissioneService.updateRimborsoMissione(rimborsoMissione, null);
     		} catch (AwesomeException e) {
     			log.error("ERRORE modifyRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -252,7 +251,7 @@ public class RimborsoMissioneResource {
     	if (rimborsoMissione.getId() != null){
     		rimborsoMissione.setDaValidazione(daValidazione);
             try {
-				rimborsoMissione = rimborsoMissioneService.updateRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), rimborsoMissione, false, confirm, basePath);
+				rimborsoMissione = rimborsoMissioneService.updateRimborsoMissione( rimborsoMissione, false, confirm, basePath);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -274,7 +273,7 @@ public class RimborsoMissioneResource {
     @Timed
     public ResponseEntity deleteRimborsoMissione(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			rimborsoMissioneService.deleteRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), ids);
+			rimborsoMissioneService.deleteRimborsoMissione( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
 			log.error("ERRORE deleteRimborsoMissione",e);
@@ -296,9 +295,7 @@ public class RimborsoMissioneResource {
         if (!StringUtils.isEmpty(idMissione)){
             try {
             	Long idMissioneLong = new Long (idMissione);
-				Authentication auth = tokenProvider.getAuthentication(token);
-            	if (auth != null){
-            		Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(auth, idMissioneLong);
+            		Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(idMissioneLong);
             		if (map != null){
             			res.setContentType("application/pdf");
                     	try {
@@ -318,8 +315,7 @@ public class RimborsoMissioneResource {
             			} catch (IOException e) {
             				log.error("ERRORE deleteRimborsoMissione",e);
                 			throw new AwesomeException(Utility.getMessageException(e));
-                		} 
-            		}
+                		}
             	}
     		} catch (ComponentException e) {
     			log.error("ERRORE printRimborsoMissione",e);
@@ -335,7 +331,7 @@ public class RimborsoMissioneResource {
     		@PathVariable Long idRimborsoMissione) {
         log.debug("REST request per visualizzare gli allegati dell'ordine di missione" );
         try {
-            List<CMISFileAttachment> lista = rimborsoMissioneService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idRimborsoMissione);
+            List<CMISFileAttachment> lista = rimborsoMissioneService.getAttachments( idRimborsoMissione);
             return JSONResponseEntity.ok(lista);
 		} catch (ComponentException e) {
 			log.error("getAttachments", e);
@@ -352,17 +348,13 @@ public class RimborsoMissioneResource {
     	log.debug("REST request per l'upload di allegati dell'ordine di missione" );
     	if (idRimborsoMissione != null){
     		Long idRimborsoLong = new Long (idRimborsoMissione);
-			Authentication auth = tokenProvider.getAuthentication(token);
-
-    		if (auth != null){
-    			Principal principal = (Principal) auth;
     			try {
     				if (file != null && file.getContentType() != null){
     					MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
     					if (mimeTypes == null){
     						return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
     					} else {
-    						CMISFileAttachment cmisFileAttachment = rimborsoMissioneService.uploadAllegato(principal, idRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+    						CMISFileAttachment cmisFileAttachment = rimborsoMissioneService.uploadAllegato(idRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
     						if (cmisFileAttachment != null){
     							return JSONResponseEntity.ok(cmisFileAttachment);
     						} else {
@@ -380,11 +372,6 @@ public class RimborsoMissioneResource {
     				log.error("uploadAllegatiRimborsoMissione", e1);
     				return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
     			}
-    		} else {
-    			String error = "Utente non autorizzato.";
-    			log.error("uploadAllegatiRimborsoMissione", error);
-    			return JSONResponseEntity.badRequest(error);
-    		}
     	} else {
     		String error = "Id Dettaglio non valorizzato.";
     		log.error("uploadAllegatiRimborsoMissione", error);
@@ -412,11 +399,11 @@ public class RimborsoMissioneResource {
 			}
 			response.setContentType("application/zip");
 			response.setDateHeader("Expires", 0);
-			RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione(auth, idMissioneLong, false, false);
+			RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione(idMissioneLong, false, false);
 			response.setHeader("Content-disposition", "attachment; filename=DocumentiRimborsoMissione"+Utility.getUoSiper(rimborsoMissione.getUoSpesa())+"_"+rimborsoMissione.getAnno()+"_"+rimborsoMissione.getNumero()+".zip");
 				try {
 					String headerValue = "attachment";
-							List<StorageObject> documenti = rimborsoMissioneService.getAllDocumentsMissione(auth, rimborsoMissione);
+							List<StorageObject> documenti = rimborsoMissioneService.getAllDocumentsMissione(rimborsoMissione);
 
 
 								documenti.stream()

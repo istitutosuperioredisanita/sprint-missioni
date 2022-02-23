@@ -41,7 +41,7 @@ public class JWTAuthenticationManager implements AuthenticationManager {
         String principal = (String) authentication.getPrincipal();
         String credentials = (String) authentication.getCredentials();
 
-        authService.getToken(principal, credentials);
+//        authService.getToken(credentials);
 
         List<GrantedAuthority> authorities = missioniAceService.getGrantedAuthorities(principal);
 

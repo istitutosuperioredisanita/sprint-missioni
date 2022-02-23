@@ -552,7 +552,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                 Session.invalidate();
                 delete httpHeaders.common['Authorization'];
                 authService.loginCancelled();
-            }
+            },
             profileInfo: function() {
                 return $http.get('api/profile/info').success(function(response) {
                     return response;

@@ -1,11 +1,12 @@
 package it.cnr.si.missioni.service;
 
-import java.security.Principal;
+
 import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +63,13 @@ public class RimborsoImpegniService {
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
+	@Autowired
+	private SecurityService securityService;
 
-    @Transactional(readOnly = true)
-    public List<RimborsoImpegni> getRimborsoImpegni(Principal principal, Long idRimborso) throws ComponentException {
-    	RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborso);
+
+	@Transactional(readOnly = true)
+    public List<RimborsoImpegni> getRimborsoImpegni(Long idRimborso) throws ComponentException {
+    	RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, idRimborso);
 		
 		if (rimborsoMissione != null){
 			List<RimborsoImpegni> lista = rimborsoImpegniRepository.getRimborsoImpegni(rimborsoMissione);
@@ -74,7 +78,7 @@ public class RimborsoImpegniService {
 		return null;
     }
 
-    private void validaCRUD(Principal principal, RimborsoImpegni rimborsoImpegni) {
+    private void validaCRUD(RimborsoImpegni rimborsoImpegni) {
 		RimborsoMissione rimborsoMissione = rimborsoImpegni.getRimborsoMissione();
     	if (StringUtils.isEmpty(rimborsoImpegni.getEsercizioOriginaleObbligazione()) ||
     			StringUtils.isEmpty(rimborsoImpegni.pgObbligazione) ){
@@ -140,51 +144,51 @@ public class RimborsoImpegniService {
 				}
 			}
 			if (rimborsoMissione.isToBeUpdated()){
-				rimborsoMissione = (RimborsoMissione)crudServiceBean.modificaConBulk(principal, rimborsoMissione);
+				rimborsoMissione = (RimborsoMissione)crudServiceBean.modificaConBulk( rimborsoMissione);
 				rimborsoImpegni.setRimborsoMissione(rimborsoMissione);
 			}
     }
 
 	@Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoImpegni createRimborsoImpegni(Principal principal, RimborsoImpegni rimborsoImpegni)  throws ComponentException{
-    	rimborsoImpegni.setUser(principal.getName());
+    public RimborsoImpegni createRimborsoImpegni(RimborsoImpegni rimborsoImpegni)  throws ComponentException{
+    	rimborsoImpegni.setUser(securityService.getCurrentUserLogin());
     	rimborsoImpegni.setStato(Costanti.STATO_INSERITO);
-    	RimborsoMissione rimborso = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoImpegni.getRimborsoMissione().getId());
-    	controlloOperazione(principal, rimborso);
+    	RimborsoMissione rimborso = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, rimborsoImpegni.getRimborsoMissione().getId());
+    	controlloOperazione(rimborso);
 
     	rimborsoImpegni.setRimborsoMissione(rimborso);
     	rimborsoImpegni.setToBeCreated();
-		validaCRUD(principal, rimborsoImpegni);
-		rimborsoImpegni = (RimborsoImpegni)crudServiceBean.creaConBulk(principal, rimborsoImpegni);
+		validaCRUD(rimborsoImpegni);
+		rimborsoImpegni = (RimborsoImpegni)crudServiceBean.creaConBulk(rimborsoImpegni);
     	log.debug("Created Information for rimborsoImpegni: {}", rimborsoImpegni);
     	return rimborsoImpegni;
     }
 
-	protected void controlloOperazione(Principal principal, RimborsoMissione rimborso) {
-    	rimborso = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborso.getId());
+	protected void controlloOperazione(RimborsoMissione rimborso) {
+    	rimborso = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, rimborso.getId());
 		
 		if (rimborso != null && !rimborso.isMissioneDaValidare() && !rimborso.isMissioneInserita()){
     		throw new AwesomeException(CodiciErrore.ERRGEN, "La missione si trova in uno stato in cui non è possibile effettuare l'operazione.");
     	}
 	}
 
-	public void cancellaRimborsoImpegni(Principal principal,
+	public void cancellaRimborsoImpegni(
 			RimborsoMissione rimborsoMissione)
 			throws ComponentException {
 		List<RimborsoImpegni> listaRimborsoImpegni = rimborsoImpegniRepository.getRimborsoImpegni(rimborsoMissione);
 		if (listaRimborsoImpegni != null && !listaRimborsoImpegni.isEmpty()){
 			for (Iterator<RimborsoImpegni> iterator = listaRimborsoImpegni.iterator(); iterator.hasNext();){
 				RimborsoImpegni rimborsoImpegni = iterator.next();
-				cancellaRimborsoImpegni(principal, rimborsoImpegni);
+				cancellaRimborsoImpegni(rimborsoImpegni);
 		    }
 		}
 	}
 	
     @Transactional(propagation = Propagation.REQUIRED)
-	public void deleteRimborsoImpegni(Principal principal, Long idRimborsoImpegni) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
-    	RimborsoImpegni rimborsoImpegni = (RimborsoImpegni)crudServiceBean.findById(principal, RimborsoImpegni.class, idRimborsoImpegni);
+	public void deleteRimborsoImpegni(Long idRimborsoImpegni) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    	RimborsoImpegni rimborsoImpegni = (RimborsoImpegni)crudServiceBean.findById( RimborsoImpegni.class, idRimborsoImpegni);
     	if (rimborsoImpegni.getRimborsoMissione() != null){
-        	controlloOperazione(principal, rimborsoImpegni.getRimborsoMissione());
+        	controlloOperazione(rimborsoImpegni.getRimborsoMissione());
     	}
 
 		//effettuo controlli di validazione operazione CRUD
@@ -194,38 +198,38 @@ public class RimborsoImpegniService {
 				 throw new AwesomeException(CodiciErrore.ERRGEN, "Operazione non possibile. Esistono dettagli con l'impegno "+rimborsoImpegni.getEsercizioOriginaleObbligazione() + "-" + rimborsoImpegni.getPgObbligazione() +" valorizzato.");
 			}
 
-			cancellaRimborsoImpegni(principal, rimborsoImpegni);
+			cancellaRimborsoImpegni(rimborsoImpegni);
 		}
 	}
 
-	private void cancellaRimborsoImpegni(Principal principal, RimborsoImpegni rimborsoImpegni) throws ComponentException {
+	private void cancellaRimborsoImpegni(RimborsoImpegni rimborsoImpegni) throws ComponentException {
 		rimborsoImpegni.setToBeUpdated();
 		rimborsoImpegni.setStato(Costanti.STATO_ANNULLATO);
-		crudServiceBean.modificaConBulk(principal, rimborsoImpegni);
+		crudServiceBean.modificaConBulk( rimborsoImpegni);
 	}
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoImpegni updateRimborsoImpegni(Principal principal, RimborsoImpegni rimborsoImpegni)  throws AwesomeException, 
+    public RimborsoImpegni updateRimborsoImpegni(RimborsoImpegni rimborsoImpegni)  throws AwesomeException,
     ComponentException, OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
 
-    	RimborsoImpegni rimborsoImpegniDB = (RimborsoImpegni)crudServiceBean.findById(principal, RimborsoImpegni.class, rimborsoImpegni.getId());
+    	RimborsoImpegni rimborsoImpegniDB = (RimborsoImpegni)crudServiceBean.findById( RimborsoImpegni.class, rimborsoImpegni.getId());
 
 		if (rimborsoImpegniDB==null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Impegni da aggiornare inesistente.");
 		
     	if (rimborsoImpegniDB.getRimborsoMissione() != null){
-        	controlloOperazione(principal, rimborsoImpegniDB.getRimborsoMissione());
+        	controlloOperazione(rimborsoImpegniDB.getRimborsoMissione());
     	}
 		rimborsoImpegniDB.setCdCdsObbligazione(rimborsoImpegni.getCdCdsObbligazione());
 		rimborsoImpegniDB.setEsercizioObbligazione(rimborsoImpegni.getEsercizioObbligazione());
 		rimborsoImpegniDB.setEsercizioOriginaleObbligazione(rimborsoImpegni.getEsercizioOriginaleObbligazione());
 		rimborsoImpegniDB.setPgObbligazione(rimborsoImpegni.getPgObbligazione());
-		validaCRUD(principal, rimborsoImpegniDB);
+		validaCRUD(rimborsoImpegniDB);
 		
 		rimborsoImpegniDB.setToBeUpdated();
 
 
-		rimborsoImpegniDB = (RimborsoImpegni)crudServiceBean.modificaConBulk(principal, rimborsoImpegniDB);
+		rimborsoImpegniDB = (RimborsoImpegni)crudServiceBean.modificaConBulk( rimborsoImpegniDB);
     	
     	log.debug("Updated Information for RimborsoImpegni: {}", rimborsoImpegniDB);
     	return rimborsoImpegni;

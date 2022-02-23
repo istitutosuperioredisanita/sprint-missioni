@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
-import java.security.Principal;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.List;
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
@@ -66,6 +67,9 @@ public class AccountService {
 
 	@Autowired
 	MissioniAceService missioniAceService;
+
+	@Autowired
+	private SecurityService securityService;
 
 	public UsersSpecial getUoForUsersSpecial(String uid){
 		if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null ){
@@ -410,8 +414,8 @@ public class AccountService {
 		}
 		return "";
 	}
-	public Boolean isUserEnableToWorkUo(Principal principal, String uo){
-		UsersSpecial userSpecial = getUoForUsersSpecial(principal.getName());
+	public Boolean isUserEnableToWorkUo(String uo){
+		UsersSpecial userSpecial = getUoForUsersSpecial(securityService.getCurrentUserLogin());
 		boolean uoAbilitata = false;
 		if (userSpecial != null){
 			if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")){

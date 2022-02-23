@@ -6,12 +6,13 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.MissioneRespintaRepository;
+import it.cnr.si.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
+
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -27,8 +28,11 @@ public class MissioneRespintaService {
     @Autowired
     private MissioneRespintaRepository missioneRespintaRepository;
 
+    @Autowired
+    private SecurityService securityService;
+
     @Transactional(propagation = Propagation.REQUIRED)
-    public void inserisciMissioneRespinta(Principal principal, FlowResult flowResult){
+    public void inserisciMissioneRespinta(FlowResult flowResult){
         MissioneRespinta missioneRespinta = new MissioneRespinta();
         missioneRespinta.setIdMissione(new Long(flowResult.getIdMissione()));
         missioneRespinta.setDataInserimento(new Timestamp(new Date().getTime()));
@@ -37,37 +41,37 @@ public class MissioneRespintaService {
         missioneRespinta.setUidInsert(flowResult.getUser());
         missioneRespinta.setTipoOperazioneMissione(FlowResult.TIPO_FLUSSO_MISSIONE.get(flowResult.getTipologiaMissione()));
         missioneRespinta.setToBeCreated();
-        crudServiceBean.creaConBulk(principal, missioneRespinta);
+        crudServiceBean.creaConBulk(missioneRespinta);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void inserisciOrdineMissioneRespinto(Principal principal, OrdineMissione ordineMissione, String tipoFaseRespingi){
+    public void inserisciOrdineMissioneRespinto(OrdineMissione ordineMissione, String tipoFaseRespingi){
         MissioneRespinta missioneRespinta = new MissioneRespinta();
         missioneRespinta.setIdMissione(new Long(ordineMissione.getId().toString()));
         missioneRespinta.setDataInserimento(new Timestamp(new Date().getTime()));
         missioneRespinta.setTipoFaseRespingi(tipoFaseRespingi);
         missioneRespinta.setMotivoRespingi(ordineMissione.getNoteRespingi());
-        missioneRespinta.setUidInsert(principal.getName());
+        missioneRespinta.setUidInsert(securityService.getCurrentUserLogin());
         missioneRespinta.setTipoOperazioneMissione(MissioneRespinta.OPERAZIONE_MISSIONE_ORDINE);
         missioneRespinta.setToBeCreated();
-        crudServiceBean.creaConBulk(principal, missioneRespinta);
+        crudServiceBean.creaConBulk(missioneRespinta);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void inserisciRimborsoMissioneRespinto(Principal principal, RimborsoMissione rimborsoMissione){
+    public void inserisciRimborsoMissioneRespinto(RimborsoMissione rimborsoMissione){
         MissioneRespinta missioneRespinta = new MissioneRespinta();
         missioneRespinta.setIdMissione(new Long(rimborsoMissione.getId().toString()));
         missioneRespinta.setDataInserimento(new Timestamp(new Date().getTime()));
         missioneRespinta.setTipoFaseRespingi(MissioneRespinta.FASE_RESPINGI_AMMINISTRATIVI);
         missioneRespinta.setMotivoRespingi(rimborsoMissione.getNoteRespingi());
-        missioneRespinta.setUidInsert(principal.getName());
+        missioneRespinta.setUidInsert(securityService.getCurrentUserLogin());
         missioneRespinta.setTipoOperazioneMissione(MissioneRespinta.OPERAZIONE_MISSIONE_RIMBORSO);
         missioneRespinta.setToBeCreated();
-        crudServiceBean.creaConBulk(principal, missioneRespinta);
+        crudServiceBean.creaConBulk(missioneRespinta);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<MissioneRespinta> getCronologiaRespingimentiMissione(Principal principal, String tipoMissione, Long idMissione){
+    public List<MissioneRespinta> getCronologiaRespingimentiMissione(String tipoMissione, Long idMissione){
         return missioneRespintaRepository.getRespingimenti(idMissione, tipoMissione);
     }
 }

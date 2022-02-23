@@ -32,7 +32,7 @@ public class PrintOrdineMissioneAnticipoService {
     @Autowired
     private AccountService accountService;
     
-//    private PrintOrdineMissione getPrintOrdineMissione(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
+//    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     private PrintOrdineMissioneAnticipo getPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, ComponentException {
     	OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());

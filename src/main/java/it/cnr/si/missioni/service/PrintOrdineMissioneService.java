@@ -67,7 +67,7 @@ public class PrintOrdineMissioneService {
     @Autowired
     private VoceService voceService;
     
-//    private PrintOrdineMissione getPrintOrdineMissione(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
+//    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
 		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(ordineMissione);

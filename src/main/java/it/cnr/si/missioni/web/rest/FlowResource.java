@@ -16,7 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
+
 import java.util.Base64;
 
 /**
@@ -73,7 +73,7 @@ public class FlowResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity aggiornaFlusso(@RequestBody FlowResult flow) {
-        flowService.aggiornaMissioneFlows((Principal) SecurityUtils.getCurrentUser(), flow);
+        flowService.aggiornaMissioneFlows( flow);
         return JSONResponseEntity.ok(flow);
     }
 }
