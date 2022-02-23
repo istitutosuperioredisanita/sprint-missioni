@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.security.Principal;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -19,6 +19,7 @@ import it.cnr.si.flows.model.StartWorkflowResponse;
 import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.cmis.flows.FlowResubmitType;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.application.FlowsService;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
@@ -140,36 +141,38 @@ public class CMISOrdineMissioneService {
 	private MissioniCMISService missioniCMISService;
 
 	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
 	private AccountService accountService;
 
-	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione) throws ComponentException{
-		return create(principal, ordineMissione,ordineMissione.getAnno());
+	public CMISOrdineMissione create(OrdineMissione ordineMissione) throws ComponentException{
+		return create(ordineMissione,ordineMissione.getAnno());
 	}
-	public CMISOrdineMissione create(Principal principal, OrdineMissione ordineMissione, Integer annoGestione) throws ComponentException{
+	public CMISOrdineMissione create(OrdineMissione ordineMissione, Integer annoGestione) throws ComponentException{
 		if (ordineMissione != null){
 			CMISOrdineMissione cmisOrdineMissione = new CMISOrdineMissione();
 			cmisOrdineMissione.setIdMissioneOrdine(new Long(ordineMissione.getId().toString()));
 			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
 			account.setUid(ordineMissione.getUid());
-			caricaDatiDerivati(principal, ordineMissione);
+			caricaDatiDerivati(ordineMissione);
 			OrdineMissioneAnticipo anticipo = null;
 			OrdineMissioneAutoPropria autoPropria = null;
 			if (ordineMissione != null){
-				anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
+				anticipo = ordineMissioneAnticipoService.getAnticipo(new Long(ordineMissione.getId().toString()));
 				if (anticipo != null){
 					ordineMissione.setRichiestaAnticipo("S");
 				} else {
 					ordineMissione.setRichiestaAnticipo("N");
 				}
-				autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()));
+				autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(new Long(ordineMissione.getId().toString()));
 				if (autoPropria != null){
 					ordineMissione.setUtilizzoAutoPropria("S");
 				} else {
 					ordineMissione.setUtilizzoAutoPropria("N");
 				}
 			}
-			String username = "";
-				username = principal.getName();
+			String username = securityService.getCurrentUserLogin();
 			
 			LocalDate data = LocalDate.now();
 			int anno = data.getYear();
@@ -316,7 +319,7 @@ public class CMISOrdineMissioneService {
 		return "si";
 	}
 	
-	private void caricaDatiDerivati(Principal principal, OrdineMissione ordineMissione) {
+	private void caricaDatiDerivati(OrdineMissione ordineMissione) {
 		if (ordineMissione != null){
 			DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
 			if (dati == null){
@@ -330,9 +333,9 @@ public class CMISOrdineMissioneService {
 	}
 
 	@Transactional(readOnly = true)
-	public StorageObject salvaStampaOrdineMissioneSuCMIS(Principal principal, byte[] stampa, OrdineMissione ordineMissione) {
-		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
-		return salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
+	public StorageObject salvaStampaOrdineMissioneSuCMIS(byte[] stampa, OrdineMissione ordineMissione) {
+		CMISOrdineMissione cmisOrdineMissione = create(ordineMissione);
+		return salvaStampaOrdineMissioneSuCMIS(stampa, ordineMissione, cmisOrdineMissione);
 	}
 	
 	private List<String> getBasePathStorage(OrdineMissione ordineMissione) {
@@ -382,13 +385,13 @@ public class CMISOrdineMissioneService {
 	}
 	
 	
-	private StorageObject salvaStampaOrdineMissioneSuCMIS(Principal principal,
+	private StorageObject salvaStampaOrdineMissioneSuCMIS(
 			byte[] stampa, OrdineMissione ordineMissione,
 			CMISOrdineMissione cmisOrdineMissione) {
 		InputStream streamStampa = new ByteArrayInputStream(stampa);
 		String path = createFolderOrdineMissione(ordineMissione);
 		ordineMissione.setStringBasePath(path);
-		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissione(principal.getName(), cmisOrdineMissione);
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissione(securityService.getCurrentUserLogin(), cmisOrdineMissione);
 		try{
 			StorageObject so = null;
 			if (!ordineMissione.isStatoInviatoAlFlusso()){
@@ -413,11 +416,11 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
-	public StorageObject salvaStampaAnnullamentoOrdineMissioneSuCMIS(Principal principal,
+	public StorageObject salvaStampaAnnullamentoOrdineMissioneSuCMIS(
 			byte[] stampa, AnnullamentoOrdineMissione annullamento) {
 		InputStream streamStampa = new ByteArrayInputStream(stampa);
 		String path = createFolderOrdineMissione(annullamento.getOrdineMissione());
-		Map<String, Object> metadataProperties = createMetadataForFileAnnullamentoOrdineMissione(principal.getName(), annullamento);
+		Map<String, Object> metadataProperties = createMetadataForFileAnnullamentoOrdineMissione(securityService.getCurrentUserLogin(), annullamento);
 		
 		try {
 			StorageObject so = null;
@@ -514,11 +517,11 @@ public class CMISOrdineMissioneService {
 		return metadataProperties;
 	}
 
-	public void avviaFlusso(Principal principal, AnnullamentoOrdineMissione annullamento) {
-		String username = principal.getName();
+	public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
+		String username = securityService.getCurrentUserLogin();
 		byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
-		CMISOrdineMissione cmisOrdineMissione = create(principal, annullamento.getOrdineMissione(), annullamento.getAnno());
-		StorageObject so = salvaStampaAnnullamentoOrdineMissioneSuCMIS(principal, stampa, annullamento);
+		CMISOrdineMissione cmisOrdineMissione = create(annullamento.getOrdineMissione(), annullamento.getAnno());
+		StorageObject so = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
 
 		MessageForFlowAnnullamento messageForFlows = new MessageForFlowAnnullamento();
 		try {
@@ -625,21 +628,21 @@ public class CMISOrdineMissioneService {
 		}
 	}
 
-	public void avviaFlusso(Principal principal, OrdineMissione ordineMissione) {
+	public void avviaFlusso(OrdineMissione ordineMissione) {
 		if (ordineMissione.isOrdineMissioneVecchiaScrivania()){
-//			avviaFlussoVecchiaScrivania(principal, ordineMissione);
+//			avviaFlussoVecchiaScrivania(ordineMissione);
 		} else {
-			avviaFlussoNuovaScrivania(principal, ordineMissione);
+			avviaFlussoNuovaScrivania(ordineMissione);
 		}
 	}
 
-	public void avviaFlussoNuovaScrivania(Principal principal, OrdineMissione ordineMissione) {
-		String username = principal.getName();
+	public void avviaFlussoNuovaScrivania(OrdineMissione ordineMissione) {
+		String username = securityService.getCurrentUserLogin();
 		byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-		CMISOrdineMissione cmisOrdineMissione = create(principal, ordineMissione);
-		StorageObject documento = salvaStampaOrdineMissioneSuCMIS(principal, stampa, ordineMissione, cmisOrdineMissione);
-		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(principal, new Long(ordineMissione.getId().toString()));
-		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(principal, new Long(ordineMissione.getId().toString()), true);
+		CMISOrdineMissione cmisOrdineMissione = create(ordineMissione);
+		StorageObject documento = salvaStampaOrdineMissioneSuCMIS(stampa, ordineMissione, cmisOrdineMissione);
+		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(new Long(ordineMissione.getId().toString()));
+		OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(new Long(ordineMissione.getId().toString()), true);
 		StorageObject documentoAnticipo = null;
 		List<StorageObject> allegati = new ArrayList<>();
 		List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione, true);
@@ -1133,8 +1136,8 @@ public class CMISOrdineMissioneService {
 		return objs;
 	}
 
-	public CMISFileAttachment uploadAttachmentAnticipo(Principal principal, OrdineMissione ordineMissione, Long idAnticipo, InputStream inputStream, String name, MimeTypes mimeTypes){
-		StorageObject so = salvaAllegatoAnticipoCMIS(principal, ordineMissione, inputStream, name, mimeTypes);
+	public CMISFileAttachment uploadAttachmentAnticipo(OrdineMissione ordineMissione, Long idAnticipo, InputStream inputStream, String name, MimeTypes mimeTypes){
+		StorageObject so = salvaAllegatoAnticipoCMIS(ordineMissione, inputStream, name, mimeTypes);
 		if (so != null){
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 			cmisFileAttachment.setId(so.getKey());
@@ -1145,12 +1148,12 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 	
-	private StorageObject salvaAllegatoAnticipoCMIS(Principal principal,
+	private StorageObject salvaAllegatoAnticipoCMIS(
 			OrdineMissione ordineMissione, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
 		StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
 
-		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO);
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO);
 		try{
 			StorageObject so = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,
@@ -1178,8 +1181,8 @@ public class CMISOrdineMissioneService {
 		return StoragePath.construct(path);
 	}
 
-	public CMISFileAttachment uploadAttachmentOrdineMissione(Principal principal, OrdineMissione ordineMissione, Long idOrdineMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
-		StorageObject so = salvaAllegatoOrdineMissioneCMIS(principal, ordineMissione, inputStream, name, mimeTypes);
+	public CMISFileAttachment uploadAttachmentOrdineMissione(OrdineMissione ordineMissione, Long idOrdineMissione, InputStream inputStream, String name, MimeTypes mimeTypes){
+		StorageObject so = salvaAllegatoOrdineMissioneCMIS(ordineMissione, inputStream, name, mimeTypes);
 		if (so != null){
 			CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
 			cmisFileAttachment.setId(so.getKey());
@@ -1190,12 +1193,12 @@ public class CMISOrdineMissioneService {
 		return null;
 	}
 
-	private StorageObject salvaAllegatoOrdineMissioneCMIS(Principal principal,
+	private StorageObject salvaAllegatoOrdineMissioneCMIS(
 			OrdineMissione ordineMissione, InputStream stream, String fileName,MimeTypes mimeTypes) {
 		
 		StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
 
-		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(principal.getName(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
+		Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
 		try{
 			StorageObject so = missioniCMISService.restoreSimpleDocument(
 					metadataProperties,

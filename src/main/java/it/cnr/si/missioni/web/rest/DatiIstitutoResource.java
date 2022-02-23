@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
+
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
@@ -72,7 +72,7 @@ public class DatiIstitutoResource {
     		return JSONResponseEntity.badRequest(CodiciErrore.DATI_GIA_INSERITI);
     	}
     	try {
-    		datiIstituto = datiIstitutoService.creaDatiIstituto((Principal) SecurityUtils.getCurrentUser(), datiIstituto);
+    		datiIstituto = datiIstitutoService.creaDatiIstituto( datiIstituto);
     	} catch (Exception e) {
     		log.error("ERRORE createDatiIstituto ",e);
     		return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -95,7 +95,7 @@ public class DatiIstitutoResource {
         		}
         	}
             try {
-				datiIstituto = datiIstitutoService.updateDatiIstituto((Principal) SecurityUtils.getCurrentUser(), datiIstituto);
+				datiIstituto = datiIstitutoService.updateDatiIstituto( datiIstituto);
     		} catch (Exception e) {
     			log.error("ERRORE modifyDatiIstituto",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -114,7 +114,7 @@ public class DatiIstitutoResource {
     @Timed
     public ResponseEntity<?> deleteDatiIstituto(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			datiIstitutoService.deleteDatiIstituto((Principal) SecurityUtils.getCurrentUser(), ids);
+			datiIstitutoService.deleteDatiIstituto( ids);
             return JSONResponseEntity.ok();
 		} catch (Exception e) {
 			log.error("ERRORE deleteDatiIstituto",e);
@@ -127,7 +127,7 @@ public class DatiIstitutoResource {
 	@Timed
 	public void ribalta() {
 		log.debug("REST request per ribaltare i dati istituto");
-		datiIstitutoService.ribaltaDatiIstituti((Principal) SecurityUtils.getCurrentUser());
+		datiIstitutoService.ribaltaDatiIstituti();
 		log.debug("END REST request per ribaltare i dati istituto");
 	}
 

@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
+
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
@@ -72,7 +72,7 @@ public class AutoPropriaResource {
                 return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         	}
             try {
-                autoPropria = autoPropriaService.createAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria.getUid(), autoPropria);
+                autoPropria = autoPropriaService.createAutoPropria( autoPropria.getUid(), autoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
     			log.error("ERRORE createAutoPropria ",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -98,7 +98,7 @@ public class AutoPropriaResource {
         		return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         	}
             try {
-				autoPropria = autoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria);
+				autoPropria = autoPropriaService.updateAutoPropria( autoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
     			log.error("ERRORE modifyAutoPropria",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -117,7 +117,7 @@ public class AutoPropriaResource {
     @Timed
     public ResponseEntity<?> deleteAutoPropria(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			autoPropriaService.deleteAutoPropria((Principal) SecurityUtils.getCurrentUser(), ids);
+			autoPropriaService.deleteAutoPropria( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
 			log.error("ERRORE deleteAutoPropria",e);

@@ -3,6 +3,8 @@ package it.cnr.si.missioni.service;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 
+import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.service.SecurityService;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +42,13 @@ public class HelpdeskService {
 
 	@Autowired
 	private AccountService accountService;
-	
+
+	@Autowired
+	private SecurityService securityService;
+
 	public Long newProblem(ExternalProblem hd) throws ServiceException {
 
-		hd.setLogin(SecurityUtils.getCurrentUser().getName());
+		hd.setLogin(securityService.getCurrentUserLogin());
 		Account account = accountService.loadAccountFromRest(hd.getLogin(), true);
 		if (account.getUoForUsersSpecials() == null || account.getUoForUsersSpecials().isEmpty()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Helpdesk non autorizzato");

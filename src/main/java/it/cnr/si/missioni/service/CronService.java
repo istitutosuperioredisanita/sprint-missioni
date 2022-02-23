@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.service;
 
+
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
@@ -214,7 +215,7 @@ public class CronService {
 				    try {
 						LOGGER.info("Cron per Aggiornamenti Ordine Missione");
 
-						comunicaRimborsoSigla(principal, false);
+						comunicaRimborsoSigla(false);
 
 				        LOGGER.info("work done.");
 				    } finally {
@@ -231,13 +232,13 @@ public class CronService {
 			}
     }
     
-	public void aggiornaRimborsiMissioneFlows(Principal principal) throws ComponentException {
+	public void aggiornaRimborsiMissioneFlows() throws ComponentException {
 		LOGGER.info("Cron per Aggiornamenti Rimborso Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 		filtroRimborso.setValidato("S");
 		filtroRimborso.setDaCron("S");
-		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
+		List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filtroRimborso, false, true);
 		if (listaRimborsiMissione != null){
 			List<RimborsoMissione> listaRimborsiMissioneVecchiaScrivania = listaRimborsiMissione.stream()
 					.filter(rimborsoMissione -> rimborsoMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
@@ -245,7 +246,7 @@ public class CronService {
 
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneVecchiaScrivania){
 				try {
-					flowsMissioniService.aggiornaRimborsoMissioneFlowsNewTransaction(principal, rimborsoMissione.getId());
+					flowsMissioniService.aggiornaRimborsoMissioneFlowsNewTransaction(rimborsoMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorRimborso(rimborsoMissione, error);
@@ -260,7 +261,7 @@ public class CronService {
 		}
 	}
 
-	public void comunicaRimborsoSigla(Principal principal, Boolean isVecchiaScrivania) {
+	public void comunicaRimborsoSigla(Boolean isVecchiaScrivania) {
 		LOGGER.info("Cron per Comunicazioni Rimborsi Missione");
 		RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
 		filtroRimborso.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
@@ -268,7 +269,7 @@ public class CronService {
 		filtroRimborso.setDaCron("S");
 		List<RimborsoMissione> listaRimborsiMissione = null;
 		try {
-			listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(principal, filtroRimborso, false, true);
+			listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filtroRimborso, false, true);
 		} catch (ComponentException e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error+" "+e2);
@@ -290,17 +291,17 @@ public class CronService {
 		}
 		if (listaRimborsiMissioneDaComunicare  != null){
 			for (RimborsoMissione rimborsoMissione : listaRimborsiMissioneDaComunicare ){
-				comunicaRimborsoSigla(principal, rimborsoMissione);
+				comunicaRimborsoSigla(rimborsoMissione);
 			}
 		}
 	}
 
-	private void comunicaRimborsoSigla(Principal principal, RimborsoMissione rimborsoMissione) {
+	private void comunicaRimborsoSigla(RimborsoMissione rimborsoMissione) {
 		LOGGER.info("Comunica Missione: "+ rimborsoMissione.getId());
-		if (rimborsoMissioneService.isMissioneComunicabileSigla(principal, rimborsoMissione)){
+		if (rimborsoMissioneService.isMissioneComunicabileSigla(rimborsoMissione)){
 			LOGGER.info("Missione Comunicabile: "+ rimborsoMissione.getId());
 			try {
-				comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoMissione.getId());
+				comunicaRimborsoSiglaService.comunicaRimborsoSigla(rimborsoMissione.getId());
 			} catch (Exception e) {
 				String error = Utility.getMessageException(e);
 				String testoErrore = getTextErrorComunicaRimborso(rimborsoMissione, error);
@@ -314,19 +315,19 @@ public class CronService {
 		}
 	}
 
-	private void aggiornaOrdiniMissioneFlows(Principal principal) {
+	private void aggiornaOrdiniMissioneFlows() {
 		RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
 		filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 		filtro.setValidato("S");
 		filtro.setDaCron("S");
-		aggiornaOrdini(principal, filtro);
-		aggiornaAnnullamentoOrdini(principal, filtro);
+		aggiornaOrdini(filtro);
+		aggiornaAnnullamentoOrdini(filtro);
 	}
 
-	private void aggiornaOrdini(Principal principal, MissioneFilter filtro) {
+	private void aggiornaOrdini(MissioneFilter filtro) {
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
-			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, true);
 		} catch (ComponentException e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error + " "+e2);
@@ -345,7 +346,7 @@ public class CronService {
 
 			for (OrdineMissione ordineMissione : listaOrdiniMissioneVecchiaScrivania){
 				try {
-					flowsMissioniService.aggiornaOrdineMissioneFlowsNewTransaction(principal,ordineMissione.getId());
+					flowsMissioniService.aggiornaOrdineMissioneFlowsNewTransaction(ordineMissione.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorOrdine(ordineMissione, error);
@@ -360,10 +361,10 @@ public class CronService {
 		}
 	}
 
-	private void aggiornaAnnullamentoOrdini(Principal principal, RimborsoMissioneFilter filtro) {
+	private void aggiornaAnnullamentoOrdini(RimborsoMissioneFilter filtro) {
 		List<AnnullamentoOrdineMissione> listaAnnullamenti = null;
 		try {
-			listaAnnullamenti = annullamentoOrdineMissioneService.getAnnullamenti(principal, filtro, false, true);
+			listaAnnullamenti = annullamentoOrdineMissioneService.getAnnullamenti(filtro, false, true);
 		} catch (ComponentException e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error + " "+e2);
@@ -379,7 +380,7 @@ public class CronService {
 					.collect(Collectors.toList());
 			for (AnnullamentoOrdineMissione annullamento : listaAnnullamentiVecchiaScrivania){
 				try {
-					flowsMissioniService.aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(principal,annullamento.getId());
+					flowsMissioniService.aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(annullamento.getId());
 				} catch (Exception e) {
 					String error = Utility.getMessageException(e);
 					String testoErrore = getTextErrorAnnullamento(annullamento, error);
@@ -433,9 +434,9 @@ public class CronService {
 
 				try {
 					LOGGER.info("Cron per Verificare gli step da eseguire");
-					verifyStepRespGruppo(principal);
+					verifyStepRespGruppo();
 					LOGGER.info("Fine Cron Resp Gruppo");
-					verifyStepAmministrativo(principal);
+					verifyStepAmministrativo();
 					LOGGER.info("Cron per Verificare gli step da eseguire terminato");
 				} finally {
 					LOGGER.info("unlocking {}", lockKeyLoadCache);
@@ -450,13 +451,13 @@ public class CronService {
 			throw new ComponentException(e);
 		}
 	}
-	private void verifyStepRespGruppo(Principal principal) {
+	private void verifyStepRespGruppo() {
 		MissioneFilter filtro = new MissioneFilter();
 		filtro.setStato(Costanti.STATO_INVIATO_RESPONSABILE);
 		filtro.setDaCron("S");
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
-			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, true);
 		} catch (Exception e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error + " "+e2);
@@ -472,7 +473,7 @@ public class CronService {
 				if (istituto != null){
 					if ((istituto.getMinutiPrimaInizioResp() != null && istituto.getMinutiMinimiResp() != null) || (istituto.getMinutiPassatiResp() != null)){
 						try {
-							stepService.verifyStepRespGruppoNewTransaction(principal, ordineMissione.getId());						
+							stepService.verifyStepRespGruppoNewTransaction(ordineMissione.getId());
 						} catch (Exception e) {
 							String error = Utility.getMessageException(e);
 							String testoErrore = getTextErrorBypassResp(ordineMissione, error);
@@ -489,14 +490,14 @@ public class CronService {
 			}
 		}
 	}
-	private void verifyStepAmministrativo(Principal principal) {
+	private void verifyStepAmministrativo() {
 		MissioneFilter filtro = new MissioneFilter();
 		filtro.setStato(Costanti.STATO_CONFERMATO);
 		filtro.setValidato("N");
 		filtro.setDaCron("S");
 		List<OrdineMissione> listaOrdiniMissione = null;
 		try {
-			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(principal, filtro, false, true);
+			listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, true);
 		} catch (Exception e2) {
 			String error = Utility.getMessageException(e2);
 			LOGGER.error(error + " "+e2);
@@ -515,7 +516,7 @@ public class CronService {
 					if ((istituto.getMinutiPrimaInizioAmm() != null && istituto.getMinutiMinimiAmm() != null) || (istituto.getMinutiPassatiAmm() != null)){
 						try {
 							LOGGER.info("Start verify Amm");
-							stepService.verifyStepAmministrativoNewTransaction(principal, ordineMissione.getId());
+							stepService.verifyStepAmministrativoNewTransaction(ordineMissione.getId());
 						} catch (Exception e) {
 							String error = Utility.getMessageException(e);
 							String testoErrore = getTextErrorBypassAmm(ordineMissione, error);
@@ -546,15 +547,15 @@ public class CronService {
 				try {
 					LOGGER.info("Cron per Aggiornamenti Ordine Missione Da Vecchia Scrivania");
 
-					aggiornaOrdiniMissioneFlows(principal);
+					aggiornaOrdiniMissioneFlows();
 
 					LOGGER.info("Cron per Aggiornamenti Rimborso Missione Da Vecchia Scrivania");
 
-					aggiornaRimborsiMissioneFlows(principal);
+					aggiornaRimborsiMissioneFlows();
 
 //						ribaltaMissione(principal);
 
-					comunicaRimborsoSigla(principal, true);
+					comunicaRimborsoSigla(true);
 
 					LOGGER.info("work done.");
 				} finally {

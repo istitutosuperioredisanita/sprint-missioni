@@ -2,7 +2,7 @@ package it.cnr.si.missioni.service;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.security.Principal;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,10 +70,12 @@ public class RimborsoMissioneDettagliService {
 	@Autowired
 	private CMISRimborsoMissioneService cmisRimborsoMissioneService;
 
-
 	@Autowired
 	private RimborsoImpegniService rimborsoImpegniService;
-	 
+
+	@Autowired
+	private SecurityService securityService;
+
 	@Autowired
 	private TipoPastoService tipoPastoService;
 	 
@@ -80,12 +83,12 @@ public class RimborsoMissioneDettagliService {
 	private CRUDComponentSession crudServiceBean;
 
 	@Transactional(readOnly = true)
-	public CMISFileAttachment uploadAllegato(Principal principal, Long idRimborsoMissioneDettagli,
+	public CMISFileAttachment uploadAllegato(Long idRimborsoMissioneDettagli,
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
-		RimborsoMissioneDettagli dettaglio = getRimborsoMissioneDettaglio(principal, idRimborsoMissioneDettagli);
+		RimborsoMissioneDettagli dettaglio = getRimborsoMissioneDettaglio(idRimborsoMissioneDettagli);
 		if (dettaglio != null) {
 			rimborsoMissioneService.controlloAllegatoDettaglioModificabile(dettaglio.getRimborsoMissione());
-			CMISFileAttachment attachment = cmisRimborsoMissioneService.uploadAttachmentDetail(principal, dettaglio,
+			CMISFileAttachment attachment = cmisRimborsoMissioneService.uploadAttachmentDetail(dettaglio,
 					inputStream, name, mimeTypes);
 			return attachment;
 		}
@@ -93,19 +96,19 @@ public class RimborsoMissioneDettagliService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<CMISFileAttachment> getAttachments(Principal principal, Long idRimborsoMissioneDettagli)
+	public List<CMISFileAttachment> getAttachments(Long idRimborsoMissioneDettagli)
 			throws ComponentException {
 		if (idRimborsoMissioneDettagli != null) {
-			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(principal, idRimborsoMissioneDettagli);
+			List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsDetail(idRimborsoMissioneDettagli);
 			return lista;
 		}
 		return null;
 	}
 
 	@Transactional(readOnly = true)
-	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Principal principal, Long idRimborsoMissione)
+	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Long idRimborsoMissione)
 			throws ComponentException {
-		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(
 				RimborsoMissione.class, idRimborsoMissione);
 
 		if (rimborsoMissione != null) {
@@ -117,9 +120,9 @@ public class RimborsoMissioneDettagliService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Principal principal, Long idRimborsoMissione, LocalDate data)
+	public List<RimborsoMissioneDettagli> getRimborsoMissioneDettagli(Long idRimborsoMissione, LocalDate data)
 			throws ComponentException {
-		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(
 				RimborsoMissione.class, idRimborsoMissione);
 
 		if (rimborsoMissione != null) {
@@ -130,11 +133,11 @@ public class RimborsoMissioneDettagliService {
 		return null;
 	}
 
-	private void validaCRUD(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws ComponentException {
+	private void validaCRUD(RimborsoMissioneDettagli rimborsoMissioneDettagli)  throws ComponentException {
 		RimborsoMissione rimborsoMissione = rimborsoMissioneDettagli.getRimborsoMissione();
 		if (rimborsoMissioneDettagli.getKmPercorsi() != null){
 	    	if (rimborsoMissione.getOrdineMissione() != null){
-	        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
+	        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
 	        	if (ordineMissione != null){
 	    			OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
 	    			if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi,"N").equals("S")){
@@ -149,10 +152,10 @@ public class RimborsoMissioneDettagliService {
 		validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
 	}
 
-	private void controlliPasto(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli,
+	private void controlliPasto(RimborsoMissioneDettagli rimborsoMissioneDettagli,
 			RimborsoMissione rimborsoMissione) {
 		if (rimborsoMissioneDettagli.isDettaglioPasto()){
-			List<RimborsoMissioneDettagli> listaDettagliGiorno = getRimborsoMissioneDettagli(principal, new Long (rimborsoMissione.getId().toString()), rimborsoMissioneDettagli.getDataSpesa());
+			List<RimborsoMissioneDettagli> listaDettagliGiorno = getRimborsoMissioneDettagli(new Long (rimborsoMissione.getId().toString()), rimborsoMissioneDettagli.getDataSpesa());
 			for (RimborsoMissioneDettagli dett : listaDettagliGiorno){
 				if (dett.isDettaglioPasto() && dett.getRiga().compareTo(rimborsoMissioneDettagli.getRiga()) != 0){
 					throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile indicare più spese per il pasto nello stesso giorno");
@@ -168,7 +171,7 @@ public class RimborsoMissioneDettagliService {
 			} else {
 				livelloRich = recuperoLivelloEquivalente(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
 			}
-			controlloCongruenzaPasto(principal, rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
+			controlloCongruenzaPasto(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
 		}
 	}
 
@@ -194,11 +197,11 @@ public class RimborsoMissioneDettagliService {
 		return livelloRich;
 	}
 
-	protected void controlloCongruenzaPasto(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli,
+	protected void controlloCongruenzaPasto(RimborsoMissioneDettagli rimborsoMissioneDettagli,
 			RimborsoMissione rimborsoMissione, Integer livello) {
 		long oreDifferenza = ChronoUnit.HOURS.between(rimborsoMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), rimborsoMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
 		if (rimborsoMissione.getOrdineMissione().getId() != null){
-			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal,
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(
 					OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
 			if (ordineMissione != null && Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S") && (!rimborsoMissione.isAssociato() || (rimborsoMissione.getInquadramento() != null && rimborsoMissione.getInquadramento().compareTo(new Long(47)) < 0 ))){
 				livello = 3;
@@ -216,16 +219,16 @@ public class RimborsoMissioneDettagliService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public RimborsoMissioneDettagli createRimborsoMissioneDettagli(Principal principal,
+	public RimborsoMissioneDettagli createRimborsoMissioneDettagli(
 			RimborsoMissioneDettagli rimborsoMissioneDettagli) throws AwesomeException, ComponentException,
 			OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
-		rimborsoMissioneDettagli.setUid(principal.getName());
-		rimborsoMissioneDettagli.setUser(principal.getName());
+		rimborsoMissioneDettagli.setUid(securityService.getCurrentUserLogin());
+		rimborsoMissioneDettagli.setUser(securityService.getCurrentUserLogin());
 		rimborsoMissioneDettagli.setStato(Costanti.STATO_INSERITO);
 		if (rimborsoMissioneDettagli.getTiSpesaDiaria() == null) {
 			rimborsoMissioneDettagli.setTiSpesaDiaria("S");
 		}
-		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(
 				RimborsoMissione.class, rimborsoMissioneDettagli.getRimborsoMissione().getId());
 		if (rimborsoMissione != null) {
 			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissione);
@@ -240,20 +243,19 @@ public class RimborsoMissioneDettagliService {
 		rimborsoMissioneDettagli.setToBeCreated();
 		controlloDatiObbligatoriDaGui(rimborsoMissioneDettagli);
 		impostaImportoDivisa(rimborsoMissioneDettagli);
-		validaCRUD(principal, rimborsoMissioneDettagli);
-		controlliPasto(principal, rimborsoMissioneDettagli, rimborsoMissione);
+		validaCRUD(rimborsoMissioneDettagli);
+		controlliPasto(rimborsoMissioneDettagli, rimborsoMissione);
 
-		aggiornaDatiImpegni(principal, rimborsoMissioneDettagli);
+		aggiornaDatiImpegni(rimborsoMissioneDettagli);
 
-		rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean.creaConBulk(principal,
-				rimborsoMissioneDettagli);
+		rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean.creaConBulk(rimborsoMissioneDettagli);
 		log.debug("Created Information for RimborsoMissioneDettagli: {}", rimborsoMissioneDettagli);
 		return rimborsoMissioneDettagli;
 	}
 
-	public void aggiornaDatiImpegni(Principal principal, RimborsoMissioneDettagli rimborsoMissioneDettagli) {
+	public void aggiornaDatiImpegni(RimborsoMissioneDettagli rimborsoMissioneDettagli) {
 		if (rimborsoMissioneDettagli.getIdRimborsoImpegni() != null) {
-			RimborsoImpegni rimborsoImpegni = (RimborsoImpegni)crudServiceBean.findById(principal, RimborsoImpegni.class, rimborsoMissioneDettagli.getIdRimborsoImpegni());
+			RimborsoImpegni rimborsoImpegni = (RimborsoImpegni)crudServiceBean.findById( RimborsoImpegni.class, rimborsoMissioneDettagli.getIdRimborsoImpegni());
 			if (rimborsoMissioneDettagli.getIdRimborsoImpegni() != null) {
 				rimborsoMissioneDettagli.setCdCdsObbligazione(rimborsoImpegni.getCdCdsObbligazione());
 				rimborsoMissioneDettagli.setEsercizioObbligazione(rimborsoImpegni.getEsercizioObbligazione());
@@ -283,7 +285,7 @@ public class RimborsoMissioneDettagliService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void cancellaRimborsoMissioneDettagli(Principal principal, RimborsoMissione rimborsoMissione,
+	public void cancellaRimborsoMissioneDettagli(RimborsoMissione rimborsoMissione,
 			Boolean deleteDocument) throws ComponentException {
 		List<RimborsoMissioneDettagli> listaRimborsoMissioneDettagli = rimborsoMissioneDettagliRepository
 				.getRimborsoMissioneDettagli(rimborsoMissione);
@@ -291,41 +293,40 @@ public class RimborsoMissioneDettagliService {
 			for (Iterator<RimborsoMissioneDettagli> iterator = listaRimborsoMissioneDettagli.iterator(); iterator
 					.hasNext();) {
 				RimborsoMissioneDettagli dettaglio = iterator.next();
-				cancellaRimborsoMissioneDettagli(principal, dettaglio, deleteDocument);
+				cancellaRimborsoMissioneDettagli(dettaglio, deleteDocument);
 			}
 		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteRimborsoMissioneDettagli(Principal principal, Long idRimborsoMissioneDettagli)
+	public void deleteRimborsoMissioneDettagli(Long idRimborsoMissioneDettagli)
 			throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException,
 			BusyResourceException {
-		RimborsoMissioneDettagli rimborsoMissioneDettagli = getRimborsoMissioneDettaglio(principal,
-				idRimborsoMissioneDettagli);
+		RimborsoMissioneDettagli rimborsoMissioneDettagli = getRimborsoMissioneDettaglio(idRimborsoMissioneDettagli);
 
 		// effettuo controlli di validazione operazione CRUD
 		if (rimborsoMissioneDettagli != null) {
 			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissioneDettagli.getRimborsoMissione());
-			cancellaRimborsoMissioneDettagli(principal, rimborsoMissioneDettagli, true);
+			cancellaRimborsoMissioneDettagli(rimborsoMissioneDettagli, true);
 		}
 	}
 
-	public RimborsoMissioneDettagli getRimborsoMissioneDettaglio(Principal principal, Long idRimborsoMissioneDettagli) {
+	public RimborsoMissioneDettagli getRimborsoMissioneDettaglio(Long idRimborsoMissioneDettagli) {
 		RimborsoMissioneDettagli rimborsoMissioneDettagli = (RimborsoMissioneDettagli) crudServiceBean
-				.findById(principal, RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
+				.findById(RimborsoMissioneDettagli.class, idRimborsoMissioneDettagli);
 		return rimborsoMissioneDettagli;
 	}
 
-	private void cancellaRimborsoMissioneDettagli(Principal principal,
+	private void cancellaRimborsoMissioneDettagli(
 			RimborsoMissioneDettagli rimborsoMissioneDettagli, Boolean deleteDocument) throws ComponentException {
 		rimborsoMissioneDettagli.setToBeUpdated();
 		rimborsoMissioneDettagli.setStato(Costanti.STATO_ANNULLATO);
-		crudServiceBean.modificaConBulk(principal, rimborsoMissioneDettagli);
+		crudServiceBean.modificaConBulk( rimborsoMissioneDettagli);
 		if (deleteDocument) {
-			List<CMISFileAttachment> lista = getAttachments(principal, new Long( rimborsoMissioneDettagli.getId().toString()));
+			List<CMISFileAttachment> lista = getAttachments(new Long( rimborsoMissioneDettagli.getId().toString()));
 			if (lista != null && !lista.isEmpty()){
 				for (CMISFileAttachment attach : lista){
-					rimborsoMissioneService.gestioneCancellazioneAllegati(principal, attach.getId(), new Long(rimborsoMissioneDettagli.getRimborsoMissione().getId().toString()));
+					rimborsoMissioneService.gestioneCancellazioneAllegati(attach.getId(), new Long(rimborsoMissioneDettagli.getRimborsoMissione().getId().toString()));
 				}
 			}
 		}
@@ -338,15 +339,15 @@ public class RimborsoMissioneDettagliService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public RimborsoMissioneDettagli updateRimborsoMissioneDettagli(Principal principal,
+	public RimborsoMissioneDettagli updateRimborsoMissioneDettagli(
 			RimborsoMissioneDettagli rimborsoMissioneDettagli) throws AwesomeException, ComponentException,
 			OptimisticLockException, OptimisticLockException, PersistencyException, BusyResourceException {
 
 		RimborsoMissioneDettagli rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli) crudServiceBean
-				.findById(principal, RimborsoMissioneDettagli.class, rimborsoMissioneDettagli.getId());
+				.findById(RimborsoMissioneDettagli.class, rimborsoMissioneDettagli.getId());
 		if (rimborsoMissioneDettagliDB == null)
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Rimborso Missione da aggiornare inesistente.");
-		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(principal,
+		RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(
 				RimborsoMissione.class, rimborsoMissioneDettagli.getRimborsoMissione().getId());
 		if (rimborsoMissione != null && !rimborsoMissioneDettagli.isModificaSoloDatiFinanziari(rimborsoMissioneDettagliDB)) {
 			rimborsoMissioneService.controlloOperazioniCRUDDaGui(rimborsoMissione);
@@ -375,13 +376,12 @@ public class RimborsoMissioneDettagliService {
 
 		rimborsoMissioneDettagliDB.setToBeUpdated();
 
-		validaCRUD(principal, rimborsoMissioneDettagliDB);
-		controlliPasto(principal, rimborsoMissioneDettagli, rimborsoMissione);
+		validaCRUD(rimborsoMissioneDettagliDB);
+		controlliPasto(rimborsoMissioneDettagli, rimborsoMissione);
 
-		aggiornaDatiImpegni(principal, rimborsoMissioneDettagliDB);
+		aggiornaDatiImpegni(rimborsoMissioneDettagliDB);
 
-		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli) crudServiceBean.modificaConBulk(principal,
-				rimborsoMissioneDettagliDB);
+		rimborsoMissioneDettagliDB = (RimborsoMissioneDettagli) crudServiceBean.modificaConBulk(rimborsoMissioneDettagliDB);
 
 		log.debug("Updated Information for Dettaglio Rimborso Missione: {}", rimborsoMissioneDettagliDB);
 		return rimborsoMissioneDettagliDB;

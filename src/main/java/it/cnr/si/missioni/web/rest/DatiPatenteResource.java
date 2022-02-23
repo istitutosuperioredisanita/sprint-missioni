@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
+
 
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
@@ -72,7 +72,7 @@ public class DatiPatenteResource {
                 return JSONResponseEntity.badRequest(error);
         	}
             try {
-				datiPatente = datiPatenteService.createDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
+				datiPatente = datiPatenteService.createDatiPatente( datiPatente);
 			} catch (Exception e) {
             	log.error("registerDatiPatente", e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -82,7 +82,7 @@ public class DatiPatenteResource {
     		log.debug("id pieno");
     		log.debug("recupero USER");
     		try {
-        		datiPatente = datiPatenteService.updateDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
+        		datiPatente = datiPatenteService.updateDatiPatente( datiPatente);
         		log.debug("modificata patente");
                 return JSONResponseEntity.ok();
     		} catch (Exception e) {

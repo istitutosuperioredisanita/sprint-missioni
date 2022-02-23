@@ -7,14 +7,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.security.Principal;
+
 
 @Service
 public class ComunicaMissioneSiglaService {
     @Autowired
     ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
-    public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) {
-        return comunicaRimborsoSiglaService.comunicaRimborsoSigla(principal, rimborsoApprovatoId);
+    public MissioneBulk comunicaRimborsoSigla(Serializable rimborsoApprovatoId) {
+        return comunicaRimborsoSiglaService.comunicaRimborsoSigla(rimborsoApprovatoId);
     }
 }
