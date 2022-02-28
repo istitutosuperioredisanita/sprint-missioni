@@ -13,6 +13,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -40,8 +45,10 @@ public class AccountLDAPResource {
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    private Environment env;
 
-    
+
 /*    @RequestMapping(value = "/rest/ldap",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,4 +96,22 @@ public class AccountLDAPResource {
         return new ResponseEntity<String>(resp, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/profile/info",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> profileInfo() {
+        List<String> profiles = Arrays.asList(env.getActiveProfiles());
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("activeProfiles", profiles);
+        map.put("keycloakEnabled", Boolean.valueOf(env.getProperty("keycloak.enabled", "false")));
+
+        profiles
+                .stream()
+                .filter(profile -> profile.equalsIgnoreCase("dev"))
+                .findAny()
+                .ifPresent(profile -> map.put("ribbonEnv", profile));
+
+        return new ResponseEntity(map, HttpStatus.OK);
+    }
 }
