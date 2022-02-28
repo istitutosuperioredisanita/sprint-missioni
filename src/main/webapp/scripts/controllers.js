@@ -2,32 +2,7 @@
 
 /* Controllers */
 
-missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService, AuthServerProvider) {
-        $scope.keycloakEnabled = false;
-        if ($scope.authenticated) {
-            AuthServerProvider.profileInfo().then(function (profile) {
-                $scope.keycloakEnabled = profile.data.keycloakEnabled;
-                if ($scope.keycloakEnabled) {
-                    Principal.identity().then(function(account) {
-                        if (account) {
-                            var targetElement = '#navbar-collapse > ul';
-                            if (screen.width < 768) {
-                                targetElement = '.sso-cnr-menu';
-                            }
-                            CreateSsoCnrMenu.createAppsMenuAndButton(targetElement, {'placement': 'right'});
-                            CreateSsoCnrMenu.createUserMenuAndButton(targetElement, {
-                                'placement': 'right',
-                                'login': account.login,
-                                'name': account.firstName + ' ' + account.lastName,
-                                'logoutCallback': function (e) {
-                                    location.href = '/sso/logout';
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
+missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
 });
 
 missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService, DateService, ProxyService) {
@@ -279,13 +254,13 @@ missioniApp.controller('MenuController', function ($scope) {
     });
 
 missioniApp.controller('LoginController', function ($scope, $location, AuthenticationSharedService, Account) {
-        $scope.settingsAccount = Account.get();
-        $scope.login = function () {
-            AuthenticationSharedService.login({
-                username: $scope.username,
-                password: $scope.password
-            });
-        }
+        $scope.settingsAccount = Account.get(function (account){
+            if (account && account.uid){
+                AuthenticationSharedService.login({
+                    user: account
+                });
+            }
+        });
     });
 
 missioniApp.controller('LogoutController', function ($location, AuthenticationSharedService) {
