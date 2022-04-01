@@ -211,7 +211,7 @@ public class OrdineMissioneAnticipoService {
 	}
 
 	@Transactional(readOnly = true)
-	public Map<String, byte[]> printOrdineMissioneAnticipo(Authentication auth, Long idMissione)
+	public Map<String, byte[]> printOrdineMissioneAnticipo(Long idMissione)
 			throws AwesomeException, ComponentException {
 		String username = securityService.getCurrentUserLogin();
 		OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(idMissione, true);

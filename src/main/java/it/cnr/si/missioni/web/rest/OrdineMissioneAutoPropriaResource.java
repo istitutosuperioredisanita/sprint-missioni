@@ -8,11 +8,10 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,7 +53,7 @@ public class OrdineMissioneAutoPropriaResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
     
     @Autowired
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
@@ -234,9 +232,9 @@ public class OrdineMissioneAutoPropriaResource {
         if (!StringUtils.isEmpty(idMissione)){
             try {
             	Long idMissioneLong = new Long (idMissione);
-				Authentication auth = tokenProvider.getAuthentication(token);
-            	if (auth != null){
-            		Map<String, byte[]> map = ordineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(auth, idMissioneLong);
+				String user = securityService.getCurrentUserLogin();
+				if (user != null && idMissioneLong != null){
+            		Map<String, byte[]> map = ordineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(idMissioneLong);
             		if (map != null){
                   		res.setContentType("application/pdf");
                     	try {
