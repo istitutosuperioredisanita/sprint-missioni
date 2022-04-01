@@ -8,7 +8,6 @@ services:
     - /tmp
     - /logs
     network_mode: bridge
-    read_only: true
     command: java
       -Xmx512m
       -Xss512k
