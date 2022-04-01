@@ -668,7 +668,7 @@ public class AnnullamentoOrdineMissioneService {
 	}
 
 	@Transactional(readOnly = true)
-   	public Map<String, byte[]> printAnnullamentoMissione(Authentication auth, Long idMissione) throws ComponentException {
+   	public Map<String, byte[]> printAnnullamentoMissione(Long idMissione) throws ComponentException {
     	AnnullamentoOrdineMissione annullamento = getAnnullamentoOrdineMissione(idMissione, true);
     	if (!annullamento.isStatoNonInviatoAlFlusso()){
         	return cmisOrdineMissioneService.getFileAnnullamentoOrdineMissione(annullamento);

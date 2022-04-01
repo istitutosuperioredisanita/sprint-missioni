@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class AnnullamentoRimborsoMissioneResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
     
     @Autowired
@@ -249,9 +250,8 @@ public class AnnullamentoRimborsoMissioneResource {
     	log.debug("REST request per l'upload di allegati dell'ordine di missione" );
     	if (idAnnullamentoRimborsoMissione != null){
     		Long idAnnullamentoRimborsoLong = new Long (idAnnullamentoRimborsoMissione);
-			Authentication auth = tokenProvider.getAuthentication(token);
-
-    		if (auth != null){
+			String user = securityService.getCurrentUserLogin();
+			if (user != null ){
     			try {
     				if (file != null && file.getContentType() != null){
     					MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());

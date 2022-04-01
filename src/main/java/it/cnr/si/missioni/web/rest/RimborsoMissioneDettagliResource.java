@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.service.SecurityService;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class RimborsoMissioneDettagliResource {
     private MissioniCMISService missioniCMISService;
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
     @RequestMapping(value = "/rest/rimborsoMissione/dettagli/get",
             method = RequestMethod.GET,
@@ -207,8 +208,8 @@ public class RimborsoMissioneDettagliResource {
         
         if (!StringUtils.isEmpty(id)){
             try {
-                Authentication auth = tokenProvider.getAuthentication(token);
-            	if (auth != null){
+                String user = securityService.getCurrentUserLogin();
+                if (user != null ){
                     CMISFileContent cmisFileContent = missioniCMISService.getAttachment(id);
 
                     if (cmisFileContent != null){

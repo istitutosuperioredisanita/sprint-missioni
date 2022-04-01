@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class AnnullamentoOrdineMissioneResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
     
     @Autowired
@@ -225,9 +226,9 @@ public class AnnullamentoOrdineMissioneResource {
         if (!StringUtils.isEmpty(idMissione)){
             try {
             	Long idMissioneLong = new Long (idMissione);
-				Authentication auth = tokenProvider.getAuthentication(token);
-            	if (auth != null){
-            		Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(auth, idMissioneLong);
+				String user = securityService.getCurrentUserLogin();
+				if (user != null ){
+            		Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(idMissioneLong);
             		if (map != null){
             			res.setContentType("application/pdf");
                     	try {

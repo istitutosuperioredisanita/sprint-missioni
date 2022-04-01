@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class OrdineMissioneAnticipoResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
 	@Autowired
     private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
@@ -149,9 +150,9 @@ public class OrdineMissioneAnticipoResource {
         if (!StringUtils.isEmpty(idMissione)){
         	try {
         		Long idMissioneLong = new Long (idMissione);
-				Authentication auth = tokenProvider.getAuthentication(token);
-        		if (auth != null){
-        			Map<String, byte[]> map = ordineMissioneAnticipoService.printOrdineMissioneAnticipo(auth, idMissioneLong);
+				String user = securityService.getCurrentUserLogin();
+				if (user != null && idMissioneLong != null){
+        			Map<String, byte[]> map = ordineMissioneAnticipoService.printOrdineMissioneAnticipo(idMissioneLong);
         			if (map != null){
         				res.setContentType("application/pdf");
         				try {

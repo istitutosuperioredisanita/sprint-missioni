@@ -301,7 +301,7 @@ public class OrdineMissioneAutoPropriaService {
     }
 
     @Transactional(readOnly = true)
-   	public Map<String, byte[]>  printOrdineMissioneAutoPropria(Authentication auth, Long idMissione) throws AwesomeException, ComponentException {
+   	public Map<String, byte[]>  printOrdineMissioneAutoPropria(Long idMissione) throws AwesomeException, ComponentException {
     	String username = securityService.getCurrentUserLogin();
     	OrdineMissioneAutoPropria ordineMissioneAutoPropria = getAutoPropria(idMissione, true);
 		OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
