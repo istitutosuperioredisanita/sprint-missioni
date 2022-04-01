@@ -19,6 +19,7 @@ import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -66,6 +67,9 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
 public class OrdineMissioneResource {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneResource.class);
+
+	@Autowired
+	SecurityService securityService;
 
     @Autowired
     private OrdineMissioneService ordineMissioneService;
@@ -339,10 +343,10 @@ public class OrdineMissioneResource {
         
         if (!StringUtils.isEmpty(idMissione)){
             try {
+				String user = securityService.getCurrentUserLogin();
             	Long idMissioneLong = new Long (idMissione);
-				Authentication authentication = tokenProvider.getAuthentication(token);
-            	if (authentication != null){
-            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(authentication, idMissioneLong);
+            	if (user != null){
+            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(idMissioneLong);
             		if (map != null){
             			res.setContentType("application/pdf");
                     	try {
@@ -413,8 +417,8 @@ public class OrdineMissioneResource {
         log.debug("REST request per l'upload di allegati dell'ordine di missione" );
         if (idOrdineMissione != null){
         	Long idMissioneLong = new Long (idOrdineMissione);
-			Authentication principal = tokenProvider.getAuthentication(token);
-			if (principal != null){
+			String user = securityService.getCurrentUserLogin();
+			if (user != null){
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());

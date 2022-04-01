@@ -44,7 +44,7 @@ missioniApp.factory('MissioniRespinte', function ($http) {
     });
 
 missioniApp.factory('Account', function ($resource) {
-        return $resource('api/siper-account', {}, {
+        return $resource('api/current-account', {}, {
         });
     });
 
@@ -55,7 +55,7 @@ missioniApp.factory('AccountFromToken', function ($resource) {
     });
 
 missioniApp.factory('AccountLDAP', function ($resource) {
-        return $resource('api/siper-account', {}, {
+        return $resource('api/current-account', {}, {
         });
     });
 

@@ -77,11 +77,11 @@ public class AccountLDAPResource {
     	}
     }
 */
-    @RequestMapping(value = "/siper-account",
+    @RequestMapping(value = "/current-account",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<String> getSiperAccount() {
+    public ResponseEntity<String> getAccount() {
         String resp = accountService.getAccount(securityService.getCurrentUserLogin(), true);
         return new ResponseEntity<String>(resp, HttpStatus.OK);
     }

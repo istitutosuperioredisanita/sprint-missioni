@@ -16,9 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.jada.DetailedRuntimeException;
-import it.cnr.si.missioni.security.jwt.TokenProvider;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
-import it.cnr.si.spring.storage.StorageDriver;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.io.IOUtils;
@@ -66,7 +64,7 @@ public class RimborsoMissioneResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
     
     @Autowired
@@ -291,8 +289,9 @@ public class RimborsoMissioneResource {
     public @ResponseBody void printRimborsoMissione(HttpServletRequest request,
     		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'rimborso di Missione " );
-        
-        if (!StringUtils.isEmpty(idMissione)){
+
+		String user = securityService.getCurrentUserLogin();
+		if (user != null && !StringUtils.isEmpty(idMissione)){
             try {
             	Long idMissioneLong = new Long (idMissione);
             		Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(idMissioneLong);
@@ -346,7 +345,8 @@ public class RimborsoMissioneResource {
     @Timed
     public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idRimborso") String idRimborsoMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
     	log.debug("REST request per l'upload di allegati dell'ordine di missione" );
-    	if (idRimborsoMissione != null){
+		String user = securityService.getCurrentUserLogin();
+		if (user != null && idRimborsoMissione != null){
     		Long idRimborsoLong = new Long (idRimborsoMissione);
     			try {
     				if (file != null && file.getContentType() != null){
@@ -388,9 +388,9 @@ public class RimborsoMissioneResource {
 	@SuppressWarnings("unchecked")
 	public @ResponseBody void scaricaZip(HttpServletRequest request,
 										 @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse response) {
-		Authentication auth = tokenProvider.getAuthentication(token);
 		Long idMissioneLong = new Long (idMissione);
-		if (auth != null){
+		String user = securityService.getCurrentUserLogin();
+		if (user != null && idMissioneLong != null){
 			final ZipOutputStream zos;
 			try {
 				zos = new ZipOutputStream(response.getOutputStream());

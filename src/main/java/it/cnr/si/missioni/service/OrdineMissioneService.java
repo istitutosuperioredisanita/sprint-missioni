@@ -228,7 +228,7 @@ public class OrdineMissioneService {
 		return getOrdineMissione(idMissione, false);
 	}
 
-	public Map<String, byte[]> printOrdineMissione(Authentication auth, Long idMissione) throws ComponentException {
+	public Map<String, byte[]> printOrdineMissione(Long idMissione) throws ComponentException {
 		String username = securityService.getCurrentUserLogin();
 		OrdineMissione ordineMissione = getOrdineMissione(idMissione);
 		if (ordineMissione != null){
