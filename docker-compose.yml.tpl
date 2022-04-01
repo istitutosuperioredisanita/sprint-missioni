@@ -13,7 +13,7 @@ services:
       -Xss512k
       -Dserver.port=8080
       -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787
-      -Dkeycloak.credentials.secret=02aa1603-6660-4a9d-94ef-77a263e8985e
+      -Dkeycloak.credentials.secret=20ca9914-f235-412c-a80d-43ce30a97798
       -Djava.security.egd=file:/dev/./urandom -jar /opt/missioni.war --spring.profiles.active=dev,cnr,keycloak
     volumes:
     - ./application-prod.yml:/opt/application-prod.yml
