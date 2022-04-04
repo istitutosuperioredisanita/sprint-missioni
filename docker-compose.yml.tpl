@@ -14,6 +14,8 @@ services:
       -Dserver.port=8080
       -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787
       -Dkeycloak.credentials.secret=20ca9914-f235-412c-a80d-43ce30a97798
+      -Dmaven.wagon.http.ssl.insecure=true
+      -Dmaven.wagon.http.ssl.allowall=true
       -Djava.security.egd=file:/dev/./urandom -jar /opt/missioni.war --spring.profiles.active=dev,cnr,keycloak
     volumes:
     - ./application-prod.yml:/opt/application-prod.yml
