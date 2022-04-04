@@ -44,6 +44,7 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter 
             .antMatchers("/SIGLA/**")
                 .antMatchers("/api/profile/info")
                 .antMatchers("/api/rest/flows")
+                .antMatchers("/api/current-account")
         ;
         web.httpFirewall(allowUrlEncodedSlashHttpFirewall());
     }
