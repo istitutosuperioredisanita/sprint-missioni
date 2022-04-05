@@ -360,6 +360,21 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                             authService.loginConfirmed(data);
                                         });
                                     }
+                                    if (isFromKeycloak){
+                                        var targetElement = '#navbar-collapse > ul';
+                                        if (screen.width < 768) {
+                                            targetElement = '.sso-cnr-menu';
+                                        }
+                                        CreateSsoCnrMenu.createAppsMenuAndButton(targetElement, {'placement': 'right'});
+                                        CreateSsoCnrMenu.createUserMenuAndButton(targetElement, {
+                                            'placement': 'right',
+                                            'login': $sessionStorage.account.login,
+                                            'name': $sessionStorage.account.firstName + ' ' + $sessionStorage.account.lastName,
+                                            'logoutCallback': function (e) {
+                                                location.href = '/sso/logout';
+                                            }
+                                        });
+                                    }
                                 }).error(function (data, status, headers, config) {
                                     if (!isFromKeycloak){
                                         delete httpHeaders.common['X-Proxy-Authorization'];
@@ -374,21 +389,6 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 });
                             }
 
-                            if (isFromKeycloak){
-                                var targetElement = '#navbar-collapse > ul';
-                                if (screen.width < 768) {
-                                    targetElement = '.sso-cnr-menu';
-                                }
-                                CreateSsoCnrMenu.createAppsMenuAndButton(targetElement, {'placement': 'right'});
-                                CreateSsoCnrMenu.createUserMenuAndButton(targetElement, {
-                                    'placement': 'right',
-                                    'login': $sessionStorage.account.login,
-                                    'name': $sessionStorage.account.firstName + ' ' + $sessionStorage.account.lastName,
-                                    'logoutCallback': function (e) {
-                                        location.href = '/sso/logout';
-                                    }
-                                });
-                            }
     }
 
         return {
