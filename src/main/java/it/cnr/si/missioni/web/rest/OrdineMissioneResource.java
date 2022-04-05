@@ -335,7 +335,6 @@ public class OrdineMissioneResource {
 
     @RequestMapping(value = "/rest/public/printOrdineMissione",
             method = RequestMethod.GET)
-    @ExceptionHandler(Exception.class)
     @Timed
     public @ResponseBody void printOrdineMissione(HttpServletRequest request,
     		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
