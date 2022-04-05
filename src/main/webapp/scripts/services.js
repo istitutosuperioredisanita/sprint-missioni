@@ -291,6 +291,24 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
         }
     }
 
+    var menuSso = function(isFromKeycloak){
+        if (isFromKeycloak){
+          var targetElement = '#navbar-collapse > ul';
+          if (screen.width < 768) {
+             targetElement = '.sso-cnr-menu';
+          }
+          CreateSsoCnrMenu.createAppsMenuAndButton(targetElement, {'placement': 'right'});
+          CreateSsoCnrMenu.createUserMenuAndButton(targetElement, {
+                 'placement': 'right',
+                 'login': $sessionStorage.account.login,
+                 'name': $sessionStorage.account.firstName + ' ' + $sessionStorage.account.lastName,
+                 'logoutCallback': function (e) {
+                 location.href = '/sso/logout';
+              }
+          });
+        }
+    }
+
     var gestioneUtente = function(utente, isFromKeycloak){
                             if (utente.struttura_appartenenza || utente.uid=="app.missioni" || utente.profilo ) {
                                 if (!isFromKeycloak){
@@ -308,6 +326,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
                                         authService.loginConfirmed(data);
+                                        menuSso(isFromKeycloak);
                                     } else {
                                         recuperoDatiTerzo(data).then(function (result){
                                             if (data.struttura_appartenenza || data.sigla_sede) {
@@ -325,6 +344,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                     data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                     data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
                                                                     data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                        $rootScope.account = Session;
+                                                        $sessionStorage.account = Session;
+                                                        menuSso(isFromKeycloak);
                                                     } else {
                                                         var matr = null;
                                                         var profilo = null;
@@ -341,6 +363,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                 data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                 data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
                                                                 profilo, sede, data.codice_sede, data.codice_uo, null);
+                                                        $rootScope.account = Session;
+                                                        $sessionStorage.account = Session;
+                                                        menuSso(isFromKeycloak);
                                                     }
                                                 } else {
                                                     recuperoResidenza(data).then(function (result){
@@ -350,29 +375,18 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                                 data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
                                                                 data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
                                                                 data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                            $rootScope.account = Session;
+                                                            $sessionStorage.account = Session;
+                                                            menuSso(isFromKeycloak);
                                                     });
                                                 }
                                             } else {
                                                 Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                $rootScope.account = Session;
+                                                $sessionStorage.account = Session;
+                                                menuSso(isFromKeycloak);
                                             }
-                                            $rootScope.account = Session;
-                                            $sessionStorage.account = Session;
                                             authService.loginConfirmed(data);
-                                        });
-                                    }
-                                    if (isFromKeycloak){
-                                        var targetElement = '#navbar-collapse > ul';
-                                        if (screen.width < 768) {
-                                            targetElement = '.sso-cnr-menu';
-                                        }
-                                        CreateSsoCnrMenu.createAppsMenuAndButton(targetElement, {'placement': 'right'});
-                                        CreateSsoCnrMenu.createUserMenuAndButton(targetElement, {
-                                            'placement': 'right',
-                                            'login': $sessionStorage.account.login,
-                                            'name': $sessionStorage.account.firstName + ' ' + $sessionStorage.account.lastName,
-                                            'logoutCallback': function (e) {
-                                                location.href = '/sso/logout';
-                                            }
                                         });
                                     }
                                 }).error(function (data, status, headers, config) {
