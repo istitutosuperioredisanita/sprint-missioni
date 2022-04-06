@@ -39,9 +39,11 @@ import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.service.SecurityService;
 import net.bzdyl.ejb3.criteria.Criterion;
 import net.bzdyl.ejb3.criteria.Order;
@@ -61,25 +63,25 @@ public abstract class AbstractCRUDServiceBean<T extends OggettoBulk> extends
 	@Transactional(propagation = Propagation.REQUIRED)
 	public T persist(T model)
 			throws ComponentException {
-		return super.persist(new GenericPrincipal(securityService.getCurrentUserLogin()), model);
+		return super.persist(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)), model);
 	};
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public T creaConBulk(T model)
 			throws ComponentException {
-		return super.creaConBulk(new GenericPrincipal(securityService.getCurrentUserLogin()), model);
+		return super.creaConBulk(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)), model);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public T modificaConBulk(T model)
 			throws ComponentException {
-		return super.modificaConBulk(new GenericPrincipal(securityService.getCurrentUserLogin()),  model);
+		return super.modificaConBulk(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)),  model);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void eliminaConBulk(T model)
 			throws ComponentException {
-		Principal principal = new GenericPrincipal(securityService.getCurrentUserLogin());
+		Principal principal = new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI));
 		model = super.findByPrimaryKey(principal, model);
 		model.setToBeDeleted();
 		super.eliminaConBulk(principal, model);
@@ -87,7 +89,7 @@ public abstract class AbstractCRUDServiceBean<T extends OggettoBulk> extends
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean hasForeignKey(T oggettobulk, String...attributes) throws ComponentException {
-		 Principal principal = new GenericPrincipal(securityService.getCurrentUserLogin());
+		 Principal principal = new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI));
     	List<Field> attributi = Arrays.asList(oggettobulk.getClass().getDeclaredFields());
 		for (Field attributo : attributi) {
 			if (attributes != null && !Arrays.asList(attributes).isEmpty() &&
@@ -106,16 +108,16 @@ public abstract class AbstractCRUDServiceBean<T extends OggettoBulk> extends
 	}
 	
 	public void lockBulk(T oggettobulk) throws PersistencyException, ComponentException, BusyResourceException, OptimisticLockException {
-		super.lockBulk(new GenericPrincipal(securityService.getCurrentUserLogin()), oggettobulk);
+		super.lockBulk(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)), oggettobulk);
 	}
 	public T findById(Class<T> bulkClass, Serializable id) throws ComponentException{
-		return super.findById(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, id);
+		return super.findById(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)), bulkClass, id);
 	}
 	public List<T> findByCriterion(Class<T> bulkClass, Criterion criterion, Order... order) throws ComponentException {
-		return super.findByCriterion(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, criterion,order);
+		return super.findByCriterion(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)), bulkClass, criterion,order);
 	}
 	public List<Object> findByProjection(Class<T> bulkClass,
 										 Projection projection, Criterion criterion, boolean useBeanResultTransformer, Order... order) throws ComponentException {
-		return super.findByProjection(new GenericPrincipal(securityService.getCurrentUserLogin()), bulkClass, projection, criterion, useBeanResultTransformer,order);
+		return super.findByProjection(new GenericPrincipal(Optional.ofNullable(securityService.getCurrentUserLogin()).orElse(Costanti.USER_CRON_MISSIONI)), bulkClass, projection, criterion, useBeanResultTransformer,order);
 	}
 }

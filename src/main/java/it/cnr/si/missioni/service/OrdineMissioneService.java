@@ -1744,7 +1744,7 @@ public class OrdineMissioneService {
 		}
 	}
 	public void popolaCoda(String id){
-		OrdineMissione missione = (OrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), OrdineMissione.class, new Long(id));
+		OrdineMissione missione = (OrdineMissione)crudServiceBean.findById(OrdineMissione.class, new Long(id));
 		popolaCoda(missione);
 	}
 	public void aggiornaOrdineMissioneApprovato(OrdineMissione ordineMissioneDaAggiornare) {
