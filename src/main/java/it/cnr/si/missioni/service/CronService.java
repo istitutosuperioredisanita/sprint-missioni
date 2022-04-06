@@ -1,8 +1,6 @@
 package it.cnr.si.missioni.service;
 
 
-import java.security.Principal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -12,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -203,7 +200,7 @@ public class CronService {
 
     
     @Transactional
-	public void comunicaDatiRimborsoSigla(Principal principal) throws ComponentException {
+	public void comunicaDatiRimborsoSigla() throws ComponentException {
         ILock lock = hazelcastInstance.getLock(lockKeyComunicaDati);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
@@ -423,7 +420,7 @@ public class CronService {
 	}
 
 	@Transactional
-	public void verifyStep(Principal principal) throws ComponentException {
+	public void verifyStep() throws ComponentException {
 		ILock lock = hazelcastInstance.getLock(lockKeyLoadCache);
 		LOGGER.info("requested lock: " + lock.getPartitionKey());
 
@@ -535,7 +532,7 @@ public class CronService {
 	}
 
 	@Transactional
-	public void verificaFlussoEComunicaDatiRimborsoSigla(Principal principal) throws ComponentException {
+	public void verificaFlussoEComunicaDatiRimborsoSigla() throws ComponentException {
 		ILock lock = hazelcastInstance.getLock(lockKeyComunicaDatiVecchiaScrivania);
 		LOGGER.info("requested lock: " + lock.getPartitionKey());
 

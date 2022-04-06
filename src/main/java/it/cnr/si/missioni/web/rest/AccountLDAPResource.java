@@ -1,17 +1,14 @@
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
-import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.config.KeycloakRole;
+import it.cnr.si.domain.CNRUser;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -23,10 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -82,8 +77,34 @@ public class AccountLDAPResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<String> getAccount() {
-        String resp = accountService.getAccount(securityService.getCurrentUserLogin(), true);
+        boolean isUserWithRole = isUserWithRole();
+        String resp = "";
+        if (isUserWithRole){
+            resp = accountService.getAccount(securityService.getCurrentUserLogin(), true);
+        } else {
+            Account account = new Account();
+
+            account.setUid(securityService.getCurrentUserLogin());
+
+            Optional<CNRUser> user = securityService.getUser();
+            user.ifPresent(utente -> {
+                account.setEmail_comunicazioni(utente.getEmail());
+                account.setNome(utente.getFirstName());
+                account.setCognome(utente.getLastName());
+                account.setRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
+            });
+            resp = accountService.createResponseForAccountRest(account, null);
+
+        }
         return new ResponseEntity<String>(resp, HttpStatus.OK);
+    }
+
+    private boolean isUserWithRole() {
+        Collection<KeycloakRole> authorities = (Collection<KeycloakRole>)securityService.getUser()
+                .map(CNRUser::getAuthorities).orElse(Collections.emptyList());
+
+        return authorities.stream()
+                .anyMatch(el-> AuthoritiesConstants.USER.equals(el.getAuthority()));
     }
 
     @RequestMapping(value = "/account-info",

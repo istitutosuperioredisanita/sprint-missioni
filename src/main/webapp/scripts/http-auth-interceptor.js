@@ -50,6 +50,7 @@
                 }
 
                 function error(response) {
+                    $rootScope.salvataggio = false;
                     if (response.status === 401 && !response.config.ignoreAuthModule) {
                          $cookies['KC_REDIRECT'] = '/#' + $location.url();
                          location.href = '/sso/login';
