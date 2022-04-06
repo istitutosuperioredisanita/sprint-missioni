@@ -1723,7 +1723,7 @@ public class RimborsoMissioneService {
 	}
 
 	public void popolaCoda(String id){
-		RimborsoMissione missione = (RimborsoMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), RimborsoMissione.class, new Long(id));
+		RimborsoMissione missione = (RimborsoMissione)crudServiceBean.findById(RimborsoMissione.class, new Long(id));
 		popolaCoda(missione);
 	}
 	@Transactional(propagation = Propagation.REQUIRED)

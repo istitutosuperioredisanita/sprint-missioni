@@ -46,19 +46,19 @@
                 </div>
                 <div class="collapse navbar-collapse" id="navbar-collapse" ng-switch="authenticated">
                     <ul class="nav navbar-nav navbar-right">
-                        <li>
+                        <li ng-show="isAuthorizedApp">
                             <a href="#/">
                                 <span class="glyphicon glyphicon-home"></span>
                                 <span translate="global.menu.home">Home</span>
                             </a>
                         </li>
-                        <li>
+                        <li ng-show="isAuthorizedApp">
                             <a href="#/manual">
                                 <span class="glyphicon glyphicon-book"></span>
                                 <span translate="global.menu.manual">Manuali</span>
                             </a>
                         </li>
-                        <li>
+                        <li ng-show="isAuthorizedApp">
                             <a href="#/faq">
                                 <span class="glyphicon glyphicon-info-sign"></span>
                                 <span translate="global.menu.faq">FAQ</span>
@@ -70,7 +70,7 @@
                                 <span translate="global.menu.helpdesk">HelpDesk</span>
                             </a>
                         </li>
-                        <li ng-switch-when="true" class="dropdown pointer">
+                        <li ng-switch-when="true" class="dropdown pointer" ng-show="isAuthorizedApp">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
                                 <span>
                                     <span class="glyphicon glyphicon-th-list"></span>
@@ -87,7 +87,7 @@
                                     &nbsp;<span translate="global.menu.entities.datiPatente">Dati Patente</span></a></li>
                             </ul>
                         </li>
-                        <li class="dropdown pointer">
+                        <li class="dropdown pointer" ng-show="isAuthorizedApp">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
                                 <span>
                                     <span class="glyphicon glyphicon-user"></span>
@@ -97,15 +97,13 @@
                                     <b class="caret"></b>
                                 </span>
                             </a>
-                            <ul class="dropdown-menu" ng-controller="MenuController">
+                            <ul class="dropdown-menu" ng-controller="MenuController" ng-show="isAuthorizedApp">
                                 <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/config"><span class="glyphicon glyphicon-refresh"></span>
                                     &nbsp;<span translate="global.menu.account.config">Config</span></a></li>
                                 <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/settings"><span class="glyphicon glyphicon-wrench"></span>
                                     &nbsp;<span translate="global.menu.account.settings">Settings</span></a></li>
                                 <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)"><a href="#/password"><span class="glyphicon glyphicon-lock"></span>
                                     &nbsp;<span translate="global.menu.account.password">Password</span></a></li>
-                                <li ng-switch-when="true"><a href="#/logout"><span class="glyphicon glyphicon-log-out"></span>
-                                    &nbsp;<span translate="global.menu.account.logout">Log out</span></a></li>
                                 <li ng-switch-when="false"><a href="#/login"><span class="glyphicon glyphicon-log-in"></span>
                                     &nbsp;<span translate="global.menu.account.login">Authenticate</span></a></li>
                                 <li ng-switch-when="true"><a href="#/ordine-missione"><span class="fa fa-pencil-square-o"></span>
@@ -132,7 +130,7 @@
                                     <b class="caret"></b>
                                 </span>
                             </a>
-                            <ul class="dropdown-menu">
+                                <ul class="dropdown-menu">
                                 <li><a href="#/metrics"><span class="glyphicon glyphicon-dashboard"></span>
                                     &nbsp;<span translate="global.menu.account.metrics">Metrics</span></a></li>
                                 <li><a href="#/health"><span class="glyphicon glyphicon-heart"></span>
@@ -154,13 +152,15 @@
                                     <span class="hidden-tablet" translate="global.menu.language">Language</span>
                                     <b class="caret"></b>
                                 </span>
-                            </a>
+                        </a>
                             <ul class="dropdown-menu">
                                 <li active-menu="{{key}}" ng-repeat="(key, language) in languages">
                                     <a href="javascript:;" ng-click="changeLanguage(key)">{{language}}</a>
                                 </li>
                             </ul>
                         </li>
+                        <li ng-switch-when="true" ng-show="isAuthorizedApp"><a href="#/logout"><span class="glyphicon glyphicon-log-out"></span>
+                            &nbsp;<span translate="global.menu.account.logout">Log out</span></a></li>
                     </ul>
                 </div>
             </div>

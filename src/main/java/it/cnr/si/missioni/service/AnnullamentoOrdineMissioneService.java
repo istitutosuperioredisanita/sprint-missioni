@@ -692,9 +692,9 @@ public class AnnullamentoOrdineMissioneService {
 	}
 
 	public void popolaCoda(String id){
-		AnnullamentoOrdineMissione missione = (AnnullamentoOrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), AnnullamentoOrdineMissione.class, new Long(id));
+		AnnullamentoOrdineMissione missione = (AnnullamentoOrdineMissione)crudServiceBean.findById(AnnullamentoOrdineMissione.class, new Long(id));
     	if (missione.getOrdineMissione() != null){
-        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(new GenericPrincipal("app.missioni"), OrdineMissione.class, missione.getOrdineMissione().getId());
+        	OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, missione.getOrdineMissione().getId());
         	if (ordineMissione != null){
         		missione.setOrdineMissione(ordineMissione);
         	}

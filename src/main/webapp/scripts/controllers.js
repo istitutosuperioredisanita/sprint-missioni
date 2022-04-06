@@ -253,8 +253,10 @@ missioniApp.controller('LanguageController', function ($scope, $translate, Langu
 missioniApp.controller('MenuController', function ($scope) {
     });
 
-missioniApp.controller('LoginController', function ($scope, $location, AuthenticationSharedService, Account) {
+missioniApp.controller('LoginController', function ($rootScope, $scope, $location, AuthenticationSharedService, Account) {
+        $rootScope.salvataggio = true;
         $scope.settingsAccount = Account.get(function (account){
+            $rootScope.salvataggio = false;
             if (account && account.uid){
                 AuthenticationSharedService.login({
                     user: account
@@ -267,10 +269,12 @@ missioniApp.controller('LogoutController', function ($location, AuthenticationSh
         AuthenticationSharedService.logout();
     });
 
-missioniApp.controller('SettingsController', function ($scope, Account) {
+missioniApp.controller('SettingsController', function ($rootScope, $scope, Account) {
         $scope.success = null;
         $scope.error = null;
+        $rootScope.salvataggio = true;
         $scope.settingsAccount = Account.get();
+        $rootScope.salvataggio = false;
 
         $scope.save = function () {
             $scope.success = null;
@@ -280,7 +284,9 @@ missioniApp.controller('SettingsController', function ($scope, Account) {
                 function (value, responseHeaders) {
                     $scope.error = null;
                     $scope.success = 'OK';
+                    $rootScope.salvataggio = true;
                     $scope.settingsAccount = Account.get();
+                    $rootScope.salvataggio = false;
                 },
                 function (httpResponse) {
                     if (httpResponse.status === 400 && httpResponse.data === "e-mail address already in use") {

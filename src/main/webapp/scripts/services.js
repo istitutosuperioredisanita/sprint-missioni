@@ -244,7 +244,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider, $location) {
     var today = new Date();
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
@@ -381,7 +381,11 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                     });
                                                 }
                                             } else {
-                                                Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                if (isFromKeycloak){
+                                                    Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, data.roles, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                } else {
+                                                    Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                }
                                                 $rootScope.account = Session;
                                                 $sessionStorage.account = Session;
                                                 menuSso(isFromKeycloak);
@@ -395,22 +399,34 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                     }
                                 });
                             } else {
+                                $rootScope.salvataggio = true;
                                 Account.get(function(data) {
-                                    Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.authorities);
+                                    $rootScope.salvataggio = false;
+                                    if (isFromKeycloak){
+                                       Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, data.roles);
+                                    } else {
+                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles);
+                                    }
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
+                                    menuSso(isFromKeycloak);
                                     authService.loginConfirmed(data);
+                                    if (isFromKeycloak){
+                                        $location.path('/error').replace();
+                                    }
                                 });
                             }
-
     }
 
         return {
             login: function (param) {
+                $rootScope.isUserNotKeycloak = false;
                 $rootScope.isUserKeycloak = false;
                 AuthServerProvider.profileInfo().then(function (profile) {
                     if (profile.data.keycloakEnabled) {
                         $rootScope.isUserKeycloak = true;
+                    } else {
+                        $rootScope.isUserNotKeycloak = true;
                     }
                     if (!$rootScope.isUserKeycloak){
                         var data = {
@@ -427,7 +443,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                         }).success(function (data, status, headers, config) {
                             httpHeaders.common['Authorization'] = 'Bearer ' + data.id_token;
                             AccessToken.set(data);
+                            $rootScope.salvataggio = true;
                             AccountLDAP.get(function(data) {
+                                $rootScope.salvataggio = false;
                                 gestioneUtente(data, false);
                             });
                         }).error(function (data, status, headers, config) {
@@ -457,9 +475,13 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             $rootScope.$broadcast("event:auth-loginRequired");
                             return;
                         }
+                        $rootScope.salvataggio = true;
                         AccountLDAP.get(function(data) {
+                        $rootScope.salvataggio = false;
                             if (!data.struttura_appartenenza && data.uid != "app.missioni" && !data.profilo) {
+                                $rootScope.salvataggio = true;
                                 Account.get(function(data) {
+                                    $rootScope.salvataggio = false;
                                     Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.authorities);
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
@@ -581,6 +603,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
 
                 return isAuthorized;
             },
+                         isAuthorizedApp: function () {
+                             return Session.login && Session.userRoles && Session.userRoles.size > 0;
+                         },
             logout: function () {
                 $rootScope.authenticationError = false;
                 $rootScope.authenticated = false;
