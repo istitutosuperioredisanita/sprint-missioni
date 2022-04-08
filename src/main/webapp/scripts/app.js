@@ -397,6 +397,7 @@ missioniApp
                 $rootScope.authenticated = false;
                 $rootScope.$on('$routeChangeStart', function (event, next) {
                     $rootScope.isAuthorized = AuthenticationSharedService.isAuthorized;
+                    $rootScope.isAuthorizedApp = AuthenticationSharedService.isAuthorizedApp;
                     $rootScope.userRoles = USER_ROLES;
                     if (next.access){
                         if (!$location || !$location.$$absUrl || !$location.$$absUrl.endsWith("logout")){
