@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,6 +20,7 @@ import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -63,6 +65,7 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
  */
 @RestControllerAdvice
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class OrdineMissioneResource {
 

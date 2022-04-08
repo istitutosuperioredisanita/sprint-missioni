@@ -2,10 +2,12 @@ package it.cnr.si.missioni.web.rest;
 
 
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class DatiPatenteResource {
 
