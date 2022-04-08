@@ -12,10 +12,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.jada.DetailedRuntimeException;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
@@ -57,6 +59,7 @@ import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class RimborsoMissioneResource {
 
