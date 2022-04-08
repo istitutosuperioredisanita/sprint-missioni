@@ -604,7 +604,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                 return isAuthorized;
             },
                          isAuthorizedApp: function () {
-                             return Session.login && Session.userRoles && Session.userRoles.size > 0;
+                             return Session.login && Session.userRoles && Session.userRoles.length > 0;
                          },
             logout: function () {
                 $rootScope.authenticationError = false;
