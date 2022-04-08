@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.missioni.service.*;
@@ -203,6 +204,8 @@ public class AccountService {
 	}
 
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
+		final Optional<it.cnr.si.model.UserInfoDto> userInfo = securityService.getUserInfo();
+
 		UserInfoDto userInfoDto = missioniAceService.getAccountFromSiper(currentLogin);
 		if (userInfoDto != null){
 			Account account = new Account(userInfoDto);
