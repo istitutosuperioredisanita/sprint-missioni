@@ -43,6 +43,7 @@ import it.cnr.si.security.AuthoritiesConstants;
  * REST controller for proxy to different application.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("api/proxy/{app}")
 public class ProxyResource {
 
