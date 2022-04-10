@@ -10,10 +10,9 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.dto.anagrafica.UserInfoDto;
-import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -204,26 +203,28 @@ public class AccountService {
 	}
 
 	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
-		final Optional<it.cnr.si.model.UserInfoDto> userInfo = securityService.getUserInfo();
+		final Optional<UserInfoDto> userInfo = securityService.getUserInfo();
 
-		UserInfoDto userInfoDto = missioniAceService.getAccountFromSiper(currentLogin);
-		if (userInfoDto != null){
-			Account account = new Account(userInfoDto);
-			if (loadSpecialUserData){
-				List<String> ruoli = missioniAceService.getRoles(currentLogin);
-				if (ruoli != null && ruoli.size() > 0){
-					if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
-						ruoli.add(AuthoritiesConstants.ADMIN);
+		if (userInfo.isPresent()) {
+			UserInfoDto userInfoDto = userInfo.get();
+			if (userInfoDto != null){
+				Account account = new Account(userInfoDto);
+				if (loadSpecialUserData){
+					List<String> ruoli = missioniAceService.getRoles(currentLogin);
+					if (ruoli != null && ruoli.size() > 0){
+						if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
+							ruoli.add(AuthoritiesConstants.ADMIN);
+						}
+
+						account.setRoles(ruoli);
 					}
-
-					account.setRoles(ruoli);
 				}
+				String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
+				if (resp != null){
+					return resp;
+				}
+				return "";
 			}
-			String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
-			if (resp != null){
-				return resp;
-			}
-			return "";
 		}
 		return null;
 	}

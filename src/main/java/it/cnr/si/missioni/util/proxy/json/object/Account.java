@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import it.cnr.si.service.dto.anagrafica.UserInfoDto;
+import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 
@@ -75,7 +75,7 @@ public class Account extends UserInfoDto implements Serializable {
 		super();
 	}
 
-	public Account(UserInfoDto userInfoDto) {
+	public Account(it.cnr.si.model.UserInfoDto userInfoDto) {
 		setData_cessazione(userInfoDto.getData_cessazione());
 		setArea_scientifica(userInfoDto.getArea_scientifica());
 		setCap_comunicazioni(userInfoDto.getCap_comunicazioni());
