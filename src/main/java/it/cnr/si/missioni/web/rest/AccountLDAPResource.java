@@ -2,7 +2,6 @@ package it.cnr.si.missioni.web.rest;
 
 import it.cnr.si.config.KeycloakRole;
 import it.cnr.si.domain.CNRUser;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
 
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -80,23 +78,15 @@ public class AccountLDAPResource {
         boolean isUserWithRole = isUserWithRole();
         String resp = "";
         if (isUserWithRole){
-            resp = accountService.getAccount(securityService.getCurrentUserLogin(), true);
+            resp = accountService.getAccount(true);
         } else {
-            Account account = new Account();
-
-            account.setUid(securityService.getCurrentUserLogin());
-
-            Optional<CNRUser> user = securityService.getUser();
-            user.ifPresent(utente -> {
-                account.setEmail_comunicazioni(utente.getEmail());
-                account.setNome(utente.getFirstName());
-                account.setCognome(utente.getLastName());
-                account.setRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
-            });
-            resp = accountService.createResponseForAccountRest(account, null);
-
+            resp = accountService.getResponseAccountWithoutInfo(false);
         }
-        return new ResponseEntity<String>(resp, HttpStatus.OK);
+        if (resp != null){
+            return new ResponseEntity<String>(resp, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<String>("", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     private boolean isUserWithRole() {
@@ -113,7 +103,7 @@ public class AccountLDAPResource {
     @Timed
     public ResponseEntity<String> getAccountInfo(HttpServletRequest request,
                                                  @RequestParam(value = "username") String username) {
-        String resp = accountService.getAccount(username, true);
+        String resp = accountService.getAccountFromUsername(username, true);
         return new ResponseEntity<String>(resp, HttpStatus.OK);
     }
 

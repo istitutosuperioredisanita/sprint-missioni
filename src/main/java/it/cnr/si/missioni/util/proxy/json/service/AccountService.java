@@ -3,13 +3,14 @@ package it.cnr.si.missioni.util.proxy.json.service;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import it.cnr.si.domain.CNRUser;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
@@ -30,7 +31,6 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
@@ -146,34 +146,45 @@ public class AccountService {
 		return false;
 	}
 	
+	private String manageResponseForAccountRest(Account account, Boolean loadSpecialUserData) {
+		if (account != null){
+			return getResponseAccount(account, loadSpecialUserData);
+		}
+		return null;
+	}
+
 	public String manageResponseForAccountRest(String body) {
-		Account account = getAccount(body);
+		Account account = getAccountFromResp(body);
 		if (account != null){
-			return getResponseAccount(null, account, Boolean.FALSE);
+			return getResponseAccount(account, true);
 		}
 		return null;
 	}
 
-	private String manageResponseForAccountRest(String uid, Account account, Boolean loadSpecialUserData) {
-		if (account != null){
-			return getResponseAccount(uid, account, loadSpecialUserData);
-		}
-		return null;
+	private UsersSpecial loadUserSpecial(String uid) {
+		return getUoForUsersSpecial(uid);
 	}
 
-	public String manageResponseForAccountRest(String uid, 
-			String body) {
-		Account account = getAccount(body);
-		if (account != null){
-			return getResponseAccount(uid, account, true);
-		}
-		return null;
-	}
-
-	private String getResponseAccount(String uid, Account account, Boolean loadSpecialUserData) {
+	private String getResponseAccountFromUid(String uid, Account account, Boolean loadSpecialUserData) {
 		UsersSpecial user = null;
 		if (loadSpecialUserData){
-			user = getUoForUsersSpecial(uid);
+			user = loadUserSpecial(uid);
+		}
+		return createResponseForAccountRest(account, user);
+	}
+
+	private String getResponseAccount(Account account, Boolean loadSpecialUserData) {
+		UsersSpecial user = null;
+		if (loadSpecialUserData){
+			user = loadUserSpecial(account.getUid());
+		}
+		List<String> ruoli = account.getRoles();
+		if (ruoli != null && ruoli.size() > 0){
+			if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
+				ruoli.add(AuthoritiesConstants.ADMIN);
+			}
+
+			account.setRoles(ruoli);
 		}
 		return createResponseForAccountRest(account, user);
 	}
@@ -186,31 +197,67 @@ public class AccountService {
 		return getBodyAccount(account);
 	}
 
-	public Account loadAccountFromRest(String currentLogin){
-		return loadAccountFromRest(currentLogin, false);
-	}
-
-	public Account loadAccount(String currentLogin){
-		return loadAccountFromRest(currentLogin);
-	}
-
-	public Account loadAccountFromRest(String currentLogin, Boolean loadSpecialUserData){
-		String risposta = getAccount(currentLogin, loadSpecialUserData);
+	public Account loadAccountFromUsername(String currentLogin){
+		String risposta = getAccountFromUsername(currentLogin, false);
 		if (risposta != null) {
-			return getAccount(risposta);
+			return getAccountFromResp(risposta);
 		}
 		return null;
 	}
 
-	public String getAccount(String currentLogin, Boolean loadSpecialUserData) {
+	public Account loadAccount(Boolean loadSpecialUserData) {
 		final Optional<UserInfoDto> userInfo = securityService.getUserInfo();
 
 		if (userInfo.isPresent()) {
 			UserInfoDto userInfoDto = userInfo.get();
+			if (userInfoDto != null && userInfoDto.getCognome() != null){
+				return getAccountFromUserKeycloak(loadSpecialUserData, userInfoDto);
+			} else {
+				return getAccountWithoutInfo();
+			}
+		}
+		return null;
+	}
+
+	private Account getAccountFromUserKeycloak(Boolean loadSpecialUserData, UserInfoDto userInfoDto) {
+		Account account = new Account(userInfoDto);
+		if (loadSpecialUserData){
+			Optional<CNRUser> user = securityService.getUser();
+			user.ifPresent(utente -> {
+				account.setRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
+				account.getRoles().add(new String(AuthoritiesConstants.USER));
+			});
+
+		}
+		return account;
+	}
+
+	public String getAccount(Boolean loadSpecialUserData) {
+		final Optional<UserInfoDto> userInfo = securityService.getUserInfo();
+
+		if (userInfo.isPresent()) {
+			UserInfoDto userInfoDto = userInfo.get();
+			if (userInfoDto != null && userInfoDto.getCognome() != null){
+				Account account = getAccountFromUserKeycloak(loadSpecialUserData, userInfoDto);
+				String resp = manageResponseForAccountRest(account, loadSpecialUserData);
+				if (resp != null){
+					return resp;
+				}
+				return "";
+			} else {
+				return getResponseAccountWithoutInfo(loadSpecialUserData);
+			}
+		}
+		return null;
+	}
+
+	public String getAccountFromUsername(String username, Boolean loadSpecialUserData) {
+		it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = missioniAceService.getAccountFromSiper(username);
 			if (userInfoDto != null){
 				Account account = new Account(userInfoDto);
+/*
 				if (loadSpecialUserData){
-					List<String> ruoli = missioniAceService.getRoles(currentLogin);
+					List<String> ruoli = missioniAceService.getRoles(username);
 					if (ruoli != null && ruoli.size() > 0){
 						if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
 							ruoli.add(AuthoritiesConstants.ADMIN);
@@ -218,13 +265,51 @@ public class AccountService {
 
 						account.setRoles(ruoli);
 					}
-				}
-				String resp = manageResponseForAccountRest(currentLogin, account, loadSpecialUserData);
+				}*/
+				String resp = manageResponseForAccountRest(username, account, loadSpecialUserData);
 				if (resp != null){
 					return resp;
 				}
 				return "";
 			}
+			return null;
+		}
+
+	private String manageResponseForAccountRest(String uid, Account account, Boolean loadSpecialUserData) {
+		if (account != null){
+			return getResponseAccountFromUid(uid, account, loadSpecialUserData);
+		}
+		return null;
+	}
+
+	private Account getAccountWithoutInfo() {
+		String currentUser = securityService.getCurrentUserLogin()== null ? SecurityUtils.getCurrentUser() == null ? null : SecurityUtils.getCurrentUser().getName() : securityService.getCurrentUserLogin();
+		if (currentUser != null) {
+			Account account = new Account();
+
+			account.setUid(securityService.getCurrentUserLogin());
+
+			Optional<CNRUser> user = securityService.getUser();
+			user.ifPresent(utente -> {
+				account.setEmail_comunicazioni(utente.getEmail());
+				account.setNome(utente.getFirstName());
+				account.setCognome(utente.getLastName());
+				account.setRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
+			});
+
+			return account;
+		}
+		return null;
+	}
+
+	public String getResponseAccountWithoutInfo(){
+		return getResponseAccountWithoutInfo(false);
+	}
+
+	public String getResponseAccountWithoutInfo(Boolean loadDataFromUserSpecial){
+		Account account = getAccountWithoutInfo();
+		if (account != null) {
+			return getResponseAccount(account, loadDataFromUserSpecial);
 		}
 		return null;
 	}
@@ -292,7 +377,7 @@ public class AccountService {
 		return uo.getCodice_uo().substring(0,3)+"."+uo.getCodice_uo().substring(3,6);
 	}
 
-	private Account getAccount(String risposta) {
+	private Account getAccountFromResp(String risposta) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.registerModule(new ParanamerModule());
@@ -314,7 +399,7 @@ public class AccountService {
 	}
 
     public String getEmail(String user){
-		Account utente = loadAccountFromRest(user);
+		Account utente = loadAccountFromUsername(user);
 		if (utente != null){
 			return utente.getEmail_comunicazioni();
 		}
