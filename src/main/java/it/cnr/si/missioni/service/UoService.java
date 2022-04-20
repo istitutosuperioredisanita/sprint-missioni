@@ -57,7 +57,7 @@ public class UoService {
 			direttore = accountService.getDirettore(uo);
 //		}
     	if (direttore != null){
-			return accountService.loadAccountFromRest(direttore);
+			return accountService.loadAccountFromUsername(direttore);
 		}
 		return null;
     }
@@ -67,7 +67,7 @@ public class UoService {
 		String direttore = null;
 		direttore = missioniAceService.getDirettore(username);
 		if (direttore != null){
-			return accountService.loadAccountFromRest(direttore);
+			return accountService.loadAccountFromUsername(direttore);
 		}
 		return null;
 	}

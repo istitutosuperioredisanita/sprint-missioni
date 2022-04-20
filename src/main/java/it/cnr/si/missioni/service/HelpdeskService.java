@@ -48,8 +48,7 @@ public class HelpdeskService {
 
 	public Long newProblem(ExternalProblem hd) throws ServiceException {
 
-		hd.setLogin(securityService.getCurrentUserLogin());
-		Account account = accountService.loadAccountFromRest(hd.getLogin(), true);
+		Account account = accountService.loadAccount(true);
 		if (account.getUoForUsersSpecials() == null || account.getUoForUsersSpecials().isEmpty()){
 			throw new AwesomeException(CodiciErrore.ERRGEN, "Errore. Helpdesk non autorizzato");
 		}

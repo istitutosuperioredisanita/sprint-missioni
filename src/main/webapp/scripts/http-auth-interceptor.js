@@ -52,8 +52,10 @@
                 function error(response) {
                     $rootScope.salvataggio = false;
                     if (response.status === 401 && !response.config.ignoreAuthModule) {
-                         $cookies['KC_REDIRECT'] = '/#' + $location.url();
-                         location.href = '/sso/login';
+                        if ($rootScope.isUserKeycloak){
+                             $cookies['KC_REDIRECT'] = '/#' + $location.url();
+                             location.href = '/sso/login';
+                        }
 
                         var deferred = $q.defer();
                         httpBuffer.append(response.config, deferred);

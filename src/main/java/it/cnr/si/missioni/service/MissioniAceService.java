@@ -154,14 +154,6 @@ public class MissioniAceService {
         return userInfoDto;
     }
 
-    @Cacheable(value = Costanti.NOME_CACHE_RUOLI)
-    public List<String> getRoles(String principal){
-        List<GrantedAuthority> authorities = getGrantedAuthorities(principal);
-
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-        return authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList());
-    }
-
     @Cacheable(value = Costanti.NOME_CACHE_GRANT)
     public List<GrantedAuthority> getGrantedAuthorities(String principal) {
         List<GrantedAuthority> authorities = new ArrayList<>();

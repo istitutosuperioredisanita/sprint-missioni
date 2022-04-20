@@ -27,7 +27,6 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.DatiFlusso;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.Parametri;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
@@ -192,7 +191,7 @@ public class CMISRimborsoMissioneService {
 
 		String username = securityService.getCurrentUserLogin();
 		
-		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+		Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
 		account.setUid(rimborsoMissione.getUid());
 		Voce voce = voceService.loadVoce(rimborsoMissione);
 		Gae gae = gaeService.loadGae(rimborsoMissione);

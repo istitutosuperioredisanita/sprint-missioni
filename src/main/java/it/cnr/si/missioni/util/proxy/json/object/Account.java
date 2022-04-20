@@ -75,6 +75,46 @@ public class Account extends UserInfoDto implements Serializable {
 		super();
 	}
 
+	public Account(it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto) {
+		setData_cessazione(userInfoDto.getData_cessazione());
+		setArea_scientifica(userInfoDto.getArea_scientifica());
+		setCap_comunicazioni(userInfoDto.getCap_comunicazioni());
+		setCap_residenza(userInfoDto.getCap_residenza());
+		setCitta_sede(userInfoDto.getCitta_sede());
+		setCodice_fiscale(userInfoDto.getCodice_fiscale());
+		setCodice_sede(userInfoDto.getCodice_sede());
+		setCodice_uo(userInfoDto.getCodice_uo());
+		setCognome(userInfoDto.getCognome());
+		setNome(userInfoDto.getNome());
+		setComune_comunicazioni(userInfoDto.getComune_comunicazioni());
+		setComune_nascita(userInfoDto.getComune_nascita());
+		setComune_residenza(userInfoDto.getComune_residenza());
+		setData_nascita(userInfoDto.getData_nascita());
+		setEmail_comunicazioni(userInfoDto.getEmail_comunicazioni());
+		setFl_cittadino_italiano(userInfoDto.getFl_cittadino_italiano());
+		setSettore_scientifico_tecnologico(userInfoDto.getSettore_scientifico_tecnologico());
+		setTelefono_comunicazioni(userInfoDto.getTelefono_comunicazioni());
+		setIndirizzo_comunicazioni(userInfoDto.getIndirizzo_comunicazioni());
+		setIndirizzo_residenza(userInfoDto.getIndirizzo_residenza());
+		setLivello_profilo(userInfoDto.getLivello_profilo());
+		setMatricola(userInfoDto.getMatricola());
+		setNazione_comunicazioni(userInfoDto.getNazione_comunicazioni());
+		setNazione_nascita(userInfoDto.getNazione_nascita());
+		setNazione_residenza(userInfoDto.getNazione_residenza());
+		setNum_civico_comunicazioni(userInfoDto.getNum_civico_comunicazioni());
+		setNum_civico_residenza(userInfoDto.getNum_civico_residenza());
+		setProfilo(userInfoDto.getProfilo());
+		setProvincia_comunicazioni(userInfoDto.getProvincia_comunicazioni());
+		setProvincia_nascita(userInfoDto.getProvincia_nascita());
+		setProvincia_residenza(userInfoDto.getProvincia_residenza());
+		setScadenza_account(userInfoDto.getScadenza_account());
+		setSesso(userInfoDto.getSesso());
+		setSigla_sede(userInfoDto.getSigla_sede());
+		setStruttura_appartenenza(userInfoDto.getStruttura_appartenenza());
+		setUid(userInfoDto.getUid());
+
+	}
+
 	public Account(it.cnr.si.model.UserInfoDto userInfoDto) {
 		setData_cessazione(userInfoDto.getData_cessazione());
 		setArea_scientifica(userInfoDto.getArea_scientifica());

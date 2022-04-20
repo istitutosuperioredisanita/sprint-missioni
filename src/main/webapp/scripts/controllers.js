@@ -253,16 +253,31 @@ missioniApp.controller('LanguageController', function ($scope, $translate, Langu
 missioniApp.controller('MenuController', function ($scope) {
     });
 
-missioniApp.controller('LoginController', function ($rootScope, $scope, $location, AuthenticationSharedService, Account) {
+missioniApp.controller('LoginController', function ($rootScope, $scope, $location, AuthenticationSharedService, AuthServerProvider, Account) {
         $rootScope.salvataggio = true;
-        $scope.settingsAccount = Account.get(function (account){
-            $rootScope.salvataggio = false;
-            if (account && account.uid){
-                AuthenticationSharedService.login({
-                    user: account
-                });
-            }
+        $rootScope.isUserNotKeycloak = false;
+        $rootScope.isUserKeycloak = false;
+        AuthServerProvider.profileInfo().then(function (profile) {
+                    if (profile.data.keycloakEnabled) {
+                        $rootScope.isUserKeycloak = true;
+                    } else {
+                        $rootScope.isUserNotKeycloak = true;
+                    }
+            $scope.settingsAccount = Account.get(function (account){
+                $rootScope.salvataggio = false;
+                if (account && account.uid){
+                    AuthenticationSharedService.login({
+                        user: account
+                    });
+                }
+            });
         });
+        $scope.login = function () {
+            AuthenticationSharedService.login({
+                username: $scope.username,
+                password: $scope.password
+            });
+        }
     });
 
 missioniApp.controller('LogoutController', function ($location, AuthenticationSharedService) {

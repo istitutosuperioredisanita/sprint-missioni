@@ -35,7 +35,7 @@ public class PrintOrdineMissioneAnticipoService {
 //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     private PrintOrdineMissioneAnticipo getPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, ComponentException {
     	OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
-		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+		Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
     	PrintOrdineMissioneAnticipo printOrdineMissioneAnticipo = new PrintOrdineMissioneAnticipo();
     	printOrdineMissioneAnticipo.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAnticipo.setNumero(ordineMissione.getNumero());

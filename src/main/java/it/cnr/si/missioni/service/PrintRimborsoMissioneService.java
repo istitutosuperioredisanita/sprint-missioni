@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissione;
@@ -75,7 +73,7 @@ public class PrintRimborsoMissioneService {
     private VoceService voceService;
     
     private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
-		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+		Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
 		LocalDate data = LocalDate.now();
 		int anno = data.getYear();

@@ -26,7 +26,6 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.domain.custom.DatiFlusso;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -235,7 +234,7 @@ public class AnnullamentoRimborsoMissioneService {
 		String subjectMail = subjectUndo + " "+ getNominativo(annullamento.getUid());
 		String testoMail = getTextMail(annullamento);
 
-		Account account = accountService.loadAccountFromRest(annullamento.getRimborsoMissione().getUid());
+		Account account = accountService.loadAccountFromUsername(annullamento.getRimborsoMissione().getUid());
 		LocalDate data = LocalDate.now();
 		int anno = data.getYear();
 
@@ -267,7 +266,7 @@ public class AnnullamentoRimborsoMissioneService {
 	}
 
     private String getNominativo(String user){
-		Account utente = accountService.loadAccountFromRest(user);
+		Account utente = accountService.loadAccountFromUsername(user);
 		return utente.getCognome()+ " "+ utente.getNome();
     }
 

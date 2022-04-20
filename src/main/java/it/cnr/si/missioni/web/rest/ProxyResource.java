@@ -165,7 +165,7 @@ public class ProxyResource {
 			String risposta) {
 		String uid = securityService.getCurrentUserLogin();
 		if (isAccountRest(url, uid)){
-			String resp = accountService.manageResponseForAccountRest(uid, result.getBody());
+			String resp = accountService.manageResponseForAccountRest(result.getBody());
 			if (resp != null){
 				log.info("Response for Account. Url: "+url+" - Resp: "+resp);
 				return resp;
