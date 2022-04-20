@@ -1,44 +1,29 @@
 package it.cnr.si.missioni.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.rmi.RemoteException;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipOutputStream;
 
 import javax.persistence.OptimisticLockException;
-import javax.servlet.http.HttpServletResponse;
 
-import it.cnr.jada.DetailedRuntimeException;
 import it.cnr.si.missioni.domain.custom.FlowResult;
-import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 import it.cnr.si.missioni.util.proxy.json.service.*;
 import it.cnr.si.service.SecurityService;
-import it.cnr.si.spring.storage.StorageDriver;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.BusyResourceException;
@@ -53,7 +38,6 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.cmis.ResultFlows;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
@@ -65,7 +49,6 @@ import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
@@ -346,7 +329,7 @@ public class RimborsoMissioneService {
 	public void popolaCoda(RimborsoMissione rimborsoMissione) {
     	if (!isDevProfile()){
 			if (rimborsoMissione.getMatricola() != null){
-				Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+				Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
 				String idSede = null;
 				if (account != null){
 					idSede = account.getCodice_sede();
@@ -665,12 +648,12 @@ public class RimborsoMissioneService {
 	}
 
     private String getEmail(String user){
-		Account utente = accountService.loadAccountFromRest(user);
+		Account utente = accountService.loadAccountFromUsername(user);
 		return utente.getEmail_comunicazioni();
     }
 
     private String getNominativo(String user){
-		Account utente = accountService.loadAccountFromRest(user);
+		Account utente = accountService.loadAccountFromUsername(user);
 		return utente.getCognome()+ " "+ utente.getNome();
     }
 
@@ -1006,7 +989,7 @@ public class RimborsoMissioneService {
         	}
     	}
 		if (StringUtils.isEmpty(rimborsoMissione.getMatricola()) && StringUtils.isEmpty(rimborsoMissione.getQualificaRich())) {
-			Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+			Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
 			if (account != null && account.getCodice_fiscale() != null) {
 				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodice_fiscale(),
 						rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione());

@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +47,6 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
 
 @Service
 public class ComunicaRimborsoSiglaService {
@@ -170,7 +168,7 @@ public class ComunicaRimborsoSiglaService {
 			}
 			oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
 			oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
-			Account account = accountService.loadAccountFromRest(rimborsoApprovato.getUid());
+			Account account = accountService.loadAccountFromUsername(rimborsoApprovato.getUid());
 			oggettoBulk.setCognome(account.getCognome());
 			oggettoBulk.setNome(account.getNome());
 			impostaDescrizioneMissione(rimborsoApprovato, oggettoBulk);

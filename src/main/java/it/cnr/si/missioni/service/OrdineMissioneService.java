@@ -21,13 +21,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.criterion.CriterionList;
 import it.cnr.jada.criterion.Subqueries;
 import it.cnr.jada.ejb.session.BusyResourceException;
@@ -48,7 +46,6 @@ import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
@@ -487,7 +484,7 @@ public class OrdineMissioneService {
 
 	public void popolaCoda(OrdineMissione ordineMissione) {
 		if (ordineMissione.getMatricola() != null && !isDevProfile()) {
-			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+			Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
 			String idSede = null;
 			if (account != null) {
 				idSede = account.getCodice_sede();
@@ -920,7 +917,7 @@ public class OrdineMissioneService {
 		ordineMissione.setStato(Costanti.STATO_INSERITO);
 		ordineMissione.setStatoFlusso(Costanti.STATO_INSERITO);
 		if (StringUtils.isEmpty(ordineMissione.getMatricola()) && StringUtils.isEmpty(ordineMissione.getQualificaRich())) {
-			Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+			Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
 			if (account != null && account.getCodice_fiscale() != null) {
 				TerzoPerCompensoJson terzoJson = terzoPerCompensoService.getTerzi(account.getCodice_fiscale(),
 						ordineMissione.getDataInizioMissione(), ordineMissione.getDataFineMissione());
@@ -1268,16 +1265,16 @@ public class OrdineMissioneService {
 	}
 
 	private String getNominativo(String user) {
-		Account utente = accountService.loadAccountFromRest(user);
+		Account utente = accountService.loadAccountFromUsername(user);
 		return utente.getCognome() + " " + utente.getNome();
 	}
 
 	private List<String> getTosMail(OrdineMissione ordineMissione) {
 		List<String> mails = new ArrayList<>();
-		Account utenteMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
+		Account utenteMissione = accountService.loadAccountFromUsername(ordineMissione.getUid());
 		mails.add(utenteMissione.getEmail_comunicazioni());
 		if (!ordineMissione.getUid().equals(ordineMissione.getUidInsert())) {
-			Account utenteInserimentoMissione = accountService.loadAccountFromRest(ordineMissione.getUid());
+			Account utenteInserimentoMissione = accountService.loadAccountFromUsername(ordineMissione.getUid());
 			mails.add(utenteInserimentoMissione.getEmail_comunicazioni());
 		}
 		return mails;
