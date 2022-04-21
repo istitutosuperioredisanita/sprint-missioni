@@ -429,19 +429,15 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                         $rootScope.isUserNotKeycloak = true;
                     }
                     if (!$rootScope.isUserKeycloak){
-                        var data = {
-                            username: param.username.toLowerCase(),
-                            password: param.password,
-                            rememberMe: "true"
-                        };
-                        $http.post('api/authenticate', data, {
+                        var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
+                        $http.post('oauth/token', data, {
                             headers: {
-                                "Content-Type": "application/json",
+                                "Content-Type": "application/x-www-form-urlencoded",
                                 "Accept": "application/json"
                             },
                             ignoreAuthModule: 'ignoreAuthModule'
                         }).success(function (data, status, headers, config) {
-                            httpHeaders.common['Authorization'] = 'Bearer ' + data.id_token;
+                            httpHeaders.common['Authorization'] = 'Bearer ' + data.access_token;
                             AccessToken.set(data);
                             $rootScope.salvataggio = true;
                             AccountLDAP.get(function(data) {
