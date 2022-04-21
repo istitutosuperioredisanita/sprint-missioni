@@ -31,43 +31,10 @@ import java.util.Base64;
 public class FlowResource {
 
 
-    private final AuthenticationManager authenticationManager;
-
     @Autowired
     private FlowService flowService;
 
     private final Logger log = LoggerFactory.getLogger(FlowResource.class);
-
-    public FlowResource(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-    /**
-     * POST  /rest/flows/aggiornaFlusso -> update flows.
-     */
-    @RequestMapping(value = "/rest/flows/aggiornaFlussoConAutenticazione",
-            method = RequestMethod.GET,
-            params = {"id"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity aggiorna(@RequestHeader(value="authorization") String auth, @RequestParam(value = "id") String id) {
-        log.debug("REST request per il ritorno del flusso");
-        if (auth != null && auth.toLowerCase().startsWith("basic")) {
-            // Authorization: Basic base64credentials
-            String base64Credentials = auth.substring("Basic".length()).trim();
-            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
-            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
-            // credentials = username:password
-            final String[] values = credentials.split(":", 2);
-            String username = values[0]; //Key
-            String password = values[1]; //Key
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-            Authentication authentication = this.authenticationManager.authenticate(authenticationToken);
-
-            return JSONResponseEntity.ok("1");
-        }
-        return JSONResponseEntity.badRequest("Credenziali di accesso non inserite");
-    }
 
     /**
      * POST  /rest/flows/aggiornaFlusso -> update flows.
