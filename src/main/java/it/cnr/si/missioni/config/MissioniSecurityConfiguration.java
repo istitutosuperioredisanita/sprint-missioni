@@ -1,19 +1,16 @@
 package it.cnr.si.missioni.config;
 
-import it.cnr.si.missioni.security.JWTAuthenticationManager;
-import it.cnr.si.missioni.security.jwt.JWTConfigurer;
-import it.cnr.si.missioni.security.jwt.TokenProvider;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
@@ -24,9 +21,6 @@ import javax.inject.Inject;
 @Profile("!keycloak")
 @Order(1)
 public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Inject
-    private TokenProvider tokenProvider;
 
     @Bean
     public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
@@ -72,18 +66,8 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter 
                 .antMatchers("/api/**").authenticated()
                 .antMatchers("/management/health").permitAll()
                 .antMatchers("/management/info").permitAll()
-                .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                .and()
-                .apply(securityConfigurerAdapter());
+                .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
 
     }
 
-    private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider);
-    }
-
-    @Override
-    public AuthenticationManager authenticationManagerBean() {
-        return new JWTAuthenticationManager();
-    }
 }
