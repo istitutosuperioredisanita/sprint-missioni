@@ -311,39 +311,30 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
 
     var gestioneUtente = function(utente, isFromKeycloak){
                             if (utente.struttura_appartenenza || utente.uid=="app.missioni" || utente.profilo ) {
-                                if (!isFromKeycloak){
-                                    httpHeaders.common['X-Proxy-Authorization'] = 'Basic ' + Base64Service.encode(utente.uid.toLowerCase() + ':' + param.password);
-                                }
-                                $http.get(
-                                    'api/account-info?username=' + utente.uid.toLowerCase()
-                                ).success(function (data, status, headers, config) {
-                                    if (!isFromKeycloak){
-                                        delete httpHeaders.common['X-Proxy-Authorization'];
-                                    }
                                     var comune_residenza = null;
                                     if (utente.uid.toLowerCase() == "app.missioni"){
-                                        Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, data.roles, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                        Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
-                                        authService.loginConfirmed(data);
+                                        authService.loginConfirmed(utente);
                                         menuSso(isFromKeycloak);
                                     } else {
-                                        recuperoDatiTerzo(data).then(function (result){
-                                            if (data.struttura_appartenenza || data.sigla_sede) {
+                                        recuperoDatiTerzo(utente).then(function (result){
+                                            if (utente.struttura_appartenenza || utente.sigla_sede) {
                                                 var sede = "";
-                                                if (data.struttura_appartenenza){
-                                                    sede = data.struttura_appartenenza;
+                                                if (utente.struttura_appartenenza){
+                                                    sede = utente.struttura_appartenenza;
                                                 } else {
-                                                    sede = data.sigla_sede;
+                                                    sede = utente.sigla_sede;
                                                 }
-                                                if (data.comune_residenza){
-                                                    comune_residenza = data.comune_residenza;
-                                                    if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
-                                                        Session.create(utente.uid.toLowerCase(), data.matricola, data.nome, data.cognome, data.email_comunicazioni, data.roles,
-                                                                    data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                                    data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                                    data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                    data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                if (utente.comune_residenza){
+                                                    comune_residenza = utente.comune_residenza;
+                                                    if (result && utente.matricola && result.ti_dipendente_altro == 'D' && ((utente.data_cessazione && DateUtils.convertDateTimeFromServer(utente.data_cessazione) >= today) || (!utente.data_cessazione))){
+                                                        Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
+                                                                    utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
+                                                                    utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                                    utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza, utente.codice_fiscale,
+                                                                    utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
                                                         $rootScope.account = Session;
                                                         $sessionStorage.account = Session;
                                                         menuSso(isFromKeycloak);
@@ -355,26 +346,26 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                             comune_residenza = result.ds_comune_fiscale;
                                                             profilo = result.ds_tipo_rapporto;
                                                         } else {
-                                                            matr = data.matricola;
-                                                            profilo = data.profilo;
+                                                            matr = utente.matricola;
+                                                            profilo = utente.profilo;
                                                         }
-                                                        Session.create(utente.uid.toLowerCase(), matr, data.nome, data.cognome, data.email_comunicazioni, data.roles,
-                                                                data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                profilo, sede, data.codice_sede, data.codice_uo, null);
+                                                        Session.create(utente.uid.toLowerCase(), matr, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
+                                                                utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
+                                                                utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza, utente.codice_fiscale,
+                                                                profilo, sede, utente.codice_sede, utente.codice_uo, null);
                                                         $rootScope.account = Session;
                                                         $sessionStorage.account = Session;
                                                         menuSso(isFromKeycloak);
                                                     }
                                                 } else {
-                                                    recuperoResidenza(data).then(function (result){
+                                                    recuperoResidenza(utente).then(function (result){
                                                             comune_residenza = result;
-                                                            Session.create(utente.uid.toLowerCase(), data.matricola, data.nome, data.cognome, data.email_comunicazioni, data.roles,
-                                                                    data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
-                                                                data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
+                                                            Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
+                                                                    utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
+                                                                utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza, utente.codice_fiscale,
+                                                                utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
                                                             $rootScope.account = Session;
                                                             $sessionStorage.account = Session;
                                                             menuSso(isFromKeycloak);
@@ -382,22 +373,17 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 }
                                             } else {
                                                 if (isFromKeycloak){
-                                                    Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, data.roles, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
                                                 } else {
-                                                    Session.create(utente.uid.toLowerCase(), null, data.nome, data.cognome, data.email_comunicazioni, ['ROLE_USER'], data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
+                                                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, ['ROLE_USER'], utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
                                                 }
                                                 $rootScope.account = Session;
                                                 $sessionStorage.account = Session;
                                                 menuSso(isFromKeycloak);
                                             }
-                                            authService.loginConfirmed(data);
+                                            authService.loginConfirmed(utente);
                                         });
                                     }
-                                }).error(function (data, status, headers, config) {
-                                    if (!isFromKeycloak){
-                                        delete httpHeaders.common['X-Proxy-Authorization'];
-                                    }
-                                });
                             } else {
                                 $rootScope.salvataggio = true;
                                 Account.get(function(data) {
