@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import it.cnr.si.domain.CNRUser;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.missioni.util.SecurityUtils;
