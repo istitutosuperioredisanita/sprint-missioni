@@ -532,6 +532,9 @@ public class AnnullamentoOrdineMissioneService {
 					    	}
 							if (!subQuery.isEmpty()){
 			    				subQuery += " )";
+	if (principal.getName().equals("lucia.sollima")){
+		log.info("SubQuery: "+subQuery);
+	}
 								criterionList.add(Subqueries.exists(subQuery));
 							}
 						} else {
@@ -562,6 +565,9 @@ public class AnnullamentoOrdineMissioneService {
 			} else{
 				Criteria criteria = crudServiceBean.preparaCriteria(principal, AnnullamentoOrdineMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
 				annullamentiList = crudServiceBean.eseguiQuery(criteria);
+			}
+			if (principal.getName().equals("lucia.sollima")){
+				log.info("Size: "+new Integer(annullamentiList.size()).toString());
 			}
 			return annullamentiList;
 		}
