@@ -1,6 +1,5 @@
 package it.cnr.si.missioni.security;
 
-import feign.FeignException;
 import it.cnr.si.missioni.service.MissioniAceService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.security.AuthoritiesConstants;
