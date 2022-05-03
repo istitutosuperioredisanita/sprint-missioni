@@ -62,7 +62,11 @@
                         $rootScope.$broadcast('event:auth-loginRequired', response);
                         return deferred.promise;
                     } else if (response.status === 403 && !response.config.ignoreAuthModule) {
-                        $rootScope.$broadcast('event:auth-notAuthorized', response);
+                        if ($rootScope.isUserNotKeycloak){
+                             location.href = '/#/login';
+                        } else {
+                            $rootScope.$broadcast('event:auth-notAuthorized', response);
+                        }
                     }
                     // otherwise, default behaviour
                     return $q.reject(response);
