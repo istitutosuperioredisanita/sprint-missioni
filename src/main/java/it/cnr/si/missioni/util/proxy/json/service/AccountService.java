@@ -285,7 +285,9 @@ public class AccountService {
 		String currentUser = securityService.getCurrentUserLogin()== null ? SecurityUtils.getCurrentUser() == null ? null : SecurityUtils.getCurrentUser().getName() : securityService.getCurrentUserLogin();
 		if (currentUser != null) {
 			Account account = new Account();
-
+			List ruolo = new ArrayList<String>();
+			ruolo.add(AuthoritiesConstants.USER);
+			account.setRoles(ruolo);
 			account.setUid(securityService.getCurrentUserLogin());
 
 			Optional<CNRUser> user = securityService.getUser();
