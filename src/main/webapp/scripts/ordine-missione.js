@@ -93,6 +93,8 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     var caricaCds = function(cds, listaCds){
         if (listaCds){
             if (listaCds.length === 1){
+                $scope.elencoCds = listaCds;
+                $scope.elencoCds[0].testo = listaCds[0].cd_proprio_unita+" "+listaCds[0].ds_unita_organizzativa;
                 $scope.ordineMissioneModel.cdsSpesa = listaCds[0].cd_proprio_unita;
             } else {
                 if (cds){

@@ -163,8 +163,16 @@ missioniApp.factory('Session', function (ProxyService) {
         this.create = function (login, matricola, firstName, lastName, email, userRoles, allUoForUsersSpecial, uoForUsersSpecial, isAccountLDAP, comune_nascita, data_nascita, comune_residenza, indirizzo_residenza, num_civico_residenza, cap_residenza, provincia_residenza, codice_fiscale, profilo, struttura_appartenenza, codice_sede, codice_uo, livello) {
             this.login = login;
             this.matricola = matricola;
-            this.firstName = firstName;
-            this.lastName = lastName;
+            if (firstName){
+                this.firstName = firstName;
+            } else {
+                this.firstName = "NOME";
+            }
+            if (lastName){
+                this.lastName = lastName;
+            } else {
+                this.lastName = "COGNOME";
+            }
             this.email = email;
             this.userRoles = userRoles;
             this.comune_nascita = comune_nascita;
@@ -472,7 +480,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                     $rootScope.salvataggio = true;
                                     Account.get(function(data) {
                                         $rootScope.salvataggio = false;
-                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.authorities);
+                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles);
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
                                         if (!$rootScope.isAuthorized(authorizedRoles)) {
