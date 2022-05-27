@@ -54,7 +54,7 @@ public class ComunicaRimborsoSiglaService {
 	@Autowired
     private CommonService commonService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MailService mailService;
 
 	@Autowired

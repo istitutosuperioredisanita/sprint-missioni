@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpointHa
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 

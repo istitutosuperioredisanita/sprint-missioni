@@ -39,7 +39,7 @@ public class UoService {
     @Autowired
     AccountService accountService;
 
-	@Autowired
+	@Autowired(required = false)
 	MissioniAceService missioniAceService;
 
 	@Autowired

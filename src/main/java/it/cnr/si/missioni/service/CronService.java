@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
+@Profile("!showcase")
 @Service
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CronService {
@@ -92,8 +94,8 @@ public class CronService {
 
 	@Autowired
 	private StepService stepService;
-	
-	@Autowired
+
+	@Autowired(required = false)
 	private MailService mailService;
 	
 	@Autowired

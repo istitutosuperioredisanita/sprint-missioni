@@ -137,13 +137,13 @@ public class OrdineMissioneService {
 	@Autowired
 	private ConfigService configService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MailService mailService;
 
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
-	@Autowired
+	@Autowired(required = false)
 	private RabbitMQService rabbitMQService;
 
 	@Autowired

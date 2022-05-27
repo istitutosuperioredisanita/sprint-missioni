@@ -32,7 +32,7 @@ public class ConfigResource {
 
 	private final Logger log = LoggerFactory.getLogger(ConfigResource.class);
 
-	@Autowired
+	@Autowired(required = false)
 	private CronService cronService;
 
 	@Autowired

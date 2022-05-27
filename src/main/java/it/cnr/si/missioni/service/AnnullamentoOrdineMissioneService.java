@@ -72,7 +72,7 @@ public class AnnullamentoOrdineMissioneService {
 	@Autowired
 	private PrintAnnullamentoOrdineMissioneService printAnnullamentoMissioneService;
 
-	@Autowired
+	@Autowired(required = false)
 	CronService cronService;
 	
 	@Autowired
@@ -84,10 +84,10 @@ public class AnnullamentoOrdineMissioneService {
     @Autowired
     private DatiSedeService datiSedeService;
 
-    @Autowired
+	@Autowired(required = false)
     private RabbitMQService rabbitMQService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MailService mailService;
     
 	@Autowired
