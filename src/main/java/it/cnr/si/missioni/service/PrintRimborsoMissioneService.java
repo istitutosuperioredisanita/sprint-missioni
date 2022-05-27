@@ -1,7 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.math.BigDecimal;
-import java.security.Principal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import it.cnr.jada.GenericPrincipal;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoImpegni;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.print.PrintRimborsoMissione;
@@ -75,7 +73,7 @@ public class PrintRimborsoMissioneService {
     private VoceService voceService;
     
     private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
-		Account account = accountService.loadAccountFromRest(rimborsoMissione.getUid());
+		Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
 		Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
 		LocalDate data = LocalDate.now();
 		int anno = data.getYear();
@@ -125,9 +123,8 @@ public class PrintRimborsoMissioneService {
     	}
     	printRimborsoMissione.setUoSpesa(caricaUo(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()));
     	printRimborsoMissione.setCdrSpesa(caricaCdr(rimborsoMissione.getCdrSpesa()));
-    	Principal principal = new GenericPrincipal(currentLogin);
 /* INIZIO REM PER MULTI IMPEGNO
-    	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(principal, new Long(rimborsoMissione.getId().toString()));
+    	List<RimborsoImpegni> lista = rimborsoImpegniService.getRimborsoImpegni(new Long(rimborsoMissione.getId().toString()));
     	if (lista != null && !lista.isEmpty()){
     		String impegni = null;
     		for (RimborsoImpegni rimborsoImpegni : lista){

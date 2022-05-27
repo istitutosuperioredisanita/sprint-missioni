@@ -4,14 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Principal;
+
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,13 +41,13 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.service.OrdineMissioneAnticipoService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class OrdineMissioneAnticipoResource {
 
@@ -54,7 +55,7 @@ public class OrdineMissioneAnticipoResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
 	@Autowired
     private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
@@ -70,7 +71,7 @@ public class OrdineMissioneAnticipoResource {
     		@RequestParam(value = "idMissione") Long idMissione) {
         log.debug("REST request per visualizzare i dati dell'auto propria dell'Ordine di Missione" );
         try {
-            OrdineMissioneAnticipo ordineMissioneAnticipo = ordineMissioneAnticipoService.getAnticipo((Principal) SecurityUtils.getCurrentUser(), idMissione, true);
+            OrdineMissioneAnticipo ordineMissioneAnticipo = ordineMissioneAnticipoService.getAnticipo( idMissione, true);
             return JSONResponseEntity.ok(ordineMissioneAnticipo);
         } catch (ComponentException e) {
 			log.error("ERRORE getAnticipo",e);
@@ -86,7 +87,7 @@ public class OrdineMissioneAnticipoResource {
                                              HttpServletResponse response) {
     	if (ordineMissioneAnticipo.getId() == null){
             try {
-                ordineMissioneAnticipo = ordineMissioneAnticipoService.createAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo);
+                ordineMissioneAnticipo = ordineMissioneAnticipoService.createAnticipo( ordineMissioneAnticipo);
     		} catch (Exception e) {
     			log.error("ERRORE createAnticipoOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -107,7 +108,7 @@ public class OrdineMissioneAnticipoResource {
                                              HttpServletResponse response) {
     	if (ordineMissioneAnticipo.getId() != null){
             try {
-            	ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo);
+            	ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo( ordineMissioneAnticipo);
     		} catch (Exception e) {
     			log.error("ERRORE modifyAnticipoOrdineMissione",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -127,7 +128,7 @@ public class OrdineMissioneAnticipoResource {
     @Timed
     public ResponseEntity<?> deleteAnticipo(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			ordineMissioneAnticipoService.deleteAnticipo((Principal) SecurityUtils.getCurrentUser(), ids);
+			ordineMissioneAnticipoService.deleteAnticipo( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
 			log.error("ERRORE deleteAnticipo",e);
@@ -143,15 +144,15 @@ public class OrdineMissioneAnticipoResource {
     @ExceptionHandler(RuntimeException.class)
     @Timed
     public @ResponseBody void printOrdineMissioneAnticipo(HttpServletRequest request,
-    		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
+    		@RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'Ordine di Missione " );
         
         if (!StringUtils.isEmpty(idMissione)){
         	try {
         		Long idMissioneLong = new Long (idMissione);
-				Authentication auth = tokenProvider.getAuthentication(token);
-        		if (auth != null){
-        			Map<String, byte[]> map = ordineMissioneAnticipoService.printOrdineMissioneAnticipo(auth, idMissioneLong);
+				String user = securityService.getCurrentUserLogin();
+				if (user != null && idMissioneLong != null){
+        			Map<String, byte[]> map = ordineMissioneAnticipoService.printOrdineMissioneAnticipo(idMissioneLong);
         			if (map != null){
         				res.setContentType("application/pdf");
         				try {
@@ -193,7 +194,7 @@ public class OrdineMissioneAnticipoResource {
     		@RequestParam(value = "idMissione") Long idMissione) {
         log.debug("REST request per il json della stampa dell'anticipo dell'Ordine di Missione " );
         try {
-        	String json = ordineMissioneAnticipoService.jsonForPrintOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idMissione);
+        	String json = ordineMissioneAnticipoService.jsonForPrintOrdineMissione( idMissione);
         	return JSONResponseEntity.ok(json);
         } catch (ComponentException e) {
 			log.error("ERRORE jsonForPrintOrdineMissioneAnticipo",e);
@@ -210,7 +211,7 @@ public class OrdineMissioneAnticipoResource {
     		HttpServletRequest request, HttpServletResponse response) {
     	if (ordineMissioneAnticipo.getId() != null){
             try {
-				ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipo, confirm);
+				ordineMissioneAnticipo = ordineMissioneAnticipoService.updateAnticipo( ordineMissioneAnticipo, confirm);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmOrdineMissioneAnticipo",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -234,7 +235,7 @@ public class OrdineMissioneAnticipoResource {
     		@PathVariable Long idAnticipo) {
         log.debug("REST request per visualizzare gli allegati dell'anticipo" );
         try {
-            List<CMISFileAttachment> lista = ordineMissioneAnticipoService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idAnticipo);
+            List<CMISFileAttachment> lista = ordineMissioneAnticipoService.getAttachments( idAnticipo);
             return JSONResponseEntity.ok(lista);
 		} catch (ComponentException e) {
 			log.error("getAttachments", e);
@@ -251,17 +252,13 @@ public class OrdineMissioneAnticipoResource {
         log.debug("REST request per l'upload di allegati dell'anticipo" );
         if (idAnticipo != null){
         	Long idAnticipoLong = new Long (idAnticipo);
-			Authentication auth = tokenProvider.getAuthentication(token);
-
-        	if (auth != null){
-        		Principal principal = (Principal) auth;
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
             			if (mimeTypes == null){
                 			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
             			} else {
-        					CMISFileAttachment cmisFileAttachment = ordineMissioneAnticipoService.uploadAllegato(principal, idAnticipoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+        					CMISFileAttachment cmisFileAttachment = ordineMissioneAnticipoService.uploadAllegato(idAnticipoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
         	                if (cmisFileAttachment != null){
         	                    return JSONResponseEntity.ok(cmisFileAttachment);
         	                } else {
@@ -279,11 +276,6 @@ public class OrdineMissioneAnticipoResource {
         			log.error("uploadAllegatiAnticipo", e1);
                     return JSONResponseEntity.badRequest(Utility.getMessageException(e1));
 				}
-        	} else {
-            	String error = "Utente non Autorizzato.";
-    			log.error("uploadAllegatiAnticipo", error);
-                return JSONResponseEntity.badRequest(error);
-        	}
     	} else {
         	String error = "Id Dettaglio non valorizzato.";
 			log.error("uploadAllegatiAnticipo", error);

@@ -40,6 +40,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -58,14 +59,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Profile("!showcase")
 @Service
 public class MissioniAceService {
     private static final Log logger = LogFactory.getLog(MissioniAceService.class);
 
-    @Autowired
+    @Autowired(required = false)
     AceService aceService;
 
-    @Autowired
+    @Autowired(required = false)
     SiperService siperService;
 
     private static Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>(){
@@ -152,14 +154,6 @@ public class MissioniAceService {
         logger.info("getAccountFromSiper: "+ currentLogin);
         UserInfoDto userInfoDto = siperService.getUserInfoByUsername(currentLogin);
         return userInfoDto;
-    }
-
-    @Cacheable(value = Costanti.NOME_CACHE_RUOLI)
-    public List<String> getRoles(String principal){
-        List<GrantedAuthority> authorities = getGrantedAuthorities(principal);
-
-        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-        return authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList());
     }
 
     @Cacheable(value = Costanti.NOME_CACHE_GRANT)

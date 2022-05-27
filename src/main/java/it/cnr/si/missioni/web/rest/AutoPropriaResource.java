@@ -1,12 +1,14 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
+
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class AutoPropriaResource {
 
@@ -72,7 +75,7 @@ public class AutoPropriaResource {
                 return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         	}
             try {
-                autoPropria = autoPropriaService.createAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria.getUid(), autoPropria);
+                autoPropria = autoPropriaService.createAutoPropria( autoPropria.getUid(), autoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
     			log.error("ERRORE createAutoPropria ",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -98,7 +101,7 @@ public class AutoPropriaResource {
         		return JSONResponseEntity.badRequest(CodiciErrore.TARGA_GIA_INSERITA);
         	}
             try {
-				autoPropria = autoPropriaService.updateAutoPropria((Principal) SecurityUtils.getCurrentUser(), autoPropria);
+				autoPropria = autoPropriaService.updateAutoPropria( autoPropria);
     		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
     			log.error("ERRORE modifyAutoPropria",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -117,7 +120,7 @@ public class AutoPropriaResource {
     @Timed
     public ResponseEntity<?> deleteAutoPropria(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			autoPropriaService.deleteAutoPropria((Principal) SecurityUtils.getCurrentUser(), ids);
+			autoPropriaService.deleteAutoPropria( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException|ComponentException|OptimisticLockException|PersistencyException|BusyResourceException e) {
 			log.error("ERRORE deleteAutoPropria",e);

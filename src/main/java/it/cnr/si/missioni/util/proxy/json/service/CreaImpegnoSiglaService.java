@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
-import java.security.Principal;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class CreaImpegnoSiglaService {
 	private AccountService accountService;
 	
 	@Transactional(propagation = Propagation.REQUIRED)
-	public ObbligazioneBulk creaImpegnoSigla(Principal principal, OrdineMissione ordine, DatiIstituto datiIstituto) throws Exception {
+	public ObbligazioneBulk creaImpegnoSigla(OrdineMissione ordine, DatiIstituto datiIstituto) throws Exception {
 //		if (!ordine.isTrattamentoAlternativoMissione() && Utility.nvl(ordine.getImportoPresunto()).compareTo(BigDecimal.ZERO) > 0){
 //			ObbligazioneBulk obbligazione = new ObbligazioneBulk();
 //			obbligazione.setCds(ordine.getCdsSpesa());
@@ -121,7 +121,7 @@ public class CreaImpegnoSiglaService {
 //				oggettoBulk.setIdFolderRimborsoMissione(folder.getPropertyValue(PropertyIds.OBJECT_ID));
 //			}
 //			if (rimborsoApprovato.getOrdineMissione() != null && rimborsoApprovato.getOrdineMissione().getId() != null){
-//				OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
+//				OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
 //				if (ordineMissione != null){
 //					if (ordineMissione.getIdFlusso() != null){
 //						oggettoBulk.setIdFlussoOrdineMissione(ordineMissione.getIdFlusso());
@@ -252,7 +252,7 @@ public class CreaImpegnoSiglaService {
 //			missioneSigla.setOggettoBulk(oggettoBulk);
 //			MissioneBulk missioneBulk = comunica(oggettoBulk);
 //			if (missioneBulk != null){
-//				rimborsoMissioneService.aggiornaRimborsoMissioneComunicata(principal, rimborsoApprovato, missioneBulk);
+//				rimborsoMissioneService.aggiornaRimborsoMissioneComunicata(rimborsoApprovato, missioneBulk);
 //			}
 //			return missioneBulk;
 //		}
@@ -478,11 +478,11 @@ public class CreaImpegnoSiglaService {
 		oggettoBulk.setBanca(banca);
 	}
 
-	private void impostaUserContext(Principal principal, RimborsoMissione rimborsoApprovato,
+	private void impostaUserContext(RimborsoMissione rimborsoApprovato,
 			MissioneSigla missioneSigla) {
 		UserContext userContext = new UserContext();
 		userContext.setCdCds(rimborsoApprovato.getCdsSpesa());
-		userContext.setUser(principal.getName());
+//f		userContext.setUser(principal.getName());
 		missioneSigla.setUserContext(userContext);
 	}
 }

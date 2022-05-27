@@ -2,18 +2,18 @@ package it.cnr.si.missioni.util.proxy.json.service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.security.Principal;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import it.cnr.si.missioni.service.MailService;
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,6 @@ import it.cnr.si.missioni.util.proxy.json.object.rimborso.TappeMissioneColl;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.TipoRapporto;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.UserContext;
 import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
 
 @Service
 public class ComunicaRimborsoSiglaService {
@@ -55,7 +54,7 @@ public class ComunicaRimborsoSiglaService {
 	@Autowired
     private CommonService commonService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MailService mailService;
 
 	@Autowired
@@ -82,14 +81,17 @@ public class ComunicaRimborsoSiglaService {
 	@Value("${spring.mail.messages.erroreGenerico.oggetto}")
 	private String subjectGenericError;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public MissioneBulk comunicaRimborsoSigla(Principal principal, Serializable rimborsoApprovatoId) {
+	@Autowired
+	private SecurityService securityService;
 
-		RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, rimborsoApprovatoId);
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public MissioneBulk comunicaRimborsoSigla(Serializable rimborsoApprovatoId) {
+
+		RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, rimborsoApprovatoId);
 		try {
-			rimborsoMissioneService.retrieveDetails(principal, rimborsoApprovato);
+			rimborsoMissioneService.retrieveDetails(rimborsoApprovato);
 			if (rimborsoApprovato.isTrattamentoAlternativoMissione() || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
-				comunicaRimborso(principal, rimborsoApprovato);
+				comunicaRimborso(rimborsoApprovato);
 			}
 			return null;
 		} catch (Exception e) {
@@ -110,9 +112,9 @@ public class ComunicaRimborsoSiglaService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public MissioneBulk comunicaRimborso(Principal principal, RimborsoMissione rimborsoApprovato) throws Exception {
+	public MissioneBulk comunicaRimborso(RimborsoMissione rimborsoApprovato) throws Exception {
 			MissioneSigla missioneSigla = new MissioneSigla();
-			impostaUserContext(principal, rimborsoApprovato, missioneSigla);
+			impostaUserContext(rimborsoApprovato, missioneSigla);
 			MissioneBulk oggettoBulk = new MissioneBulk();
 			oggettoBulk.setCdCds(rimborsoApprovato.getCdsSpesa());
 			oggettoBulk.setEsercizio(rimborsoApprovato.getAnno());
@@ -166,7 +168,7 @@ public class ComunicaRimborsoSiglaService {
 			}
 			oggettoBulk.setIdRimborsoMissione(new Long (rimborsoApprovato.getId().toString()));
 			oggettoBulk.setIdFlusso(rimborsoApprovato.getIdFlusso());
-			Account account = accountService.loadAccountFromRest(rimborsoApprovato.getUid());
+			Account account = accountService.loadAccountFromUsername(rimborsoApprovato.getUid());
 			oggettoBulk.setCognome(account.getCognome());
 			oggettoBulk.setNome(account.getNome());
 			impostaDescrizioneMissione(rimborsoApprovato, oggettoBulk);
@@ -176,7 +178,7 @@ public class ComunicaRimborsoSiglaService {
 				oggettoBulk.setIdFolderRimborsoMissione(folder.getKey());
 			}
 			if (rimborsoApprovato.getOrdineMissione() != null && rimborsoApprovato.getOrdineMissione().getId() != null){
-				OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
+				OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
 				if (ordineMissione != null){
 					if (ordineMissione.getIdFlusso() != null){
 						oggettoBulk.setIdFlussoOrdineMissione(ordineMissione.getIdFlusso());
@@ -315,7 +317,7 @@ public class ComunicaRimborsoSiglaService {
 			missioneSigla.setOggettoBulk(oggettoBulk);
 			MissioneBulk missioneBulk = comunica(oggettoBulk);
 			if (missioneBulk != null){
-				rimborsoMissioneService.aggiornaRimborsoMissioneComunicata(principal, rimborsoApprovato, missioneBulk);
+				rimborsoMissioneService.aggiornaRimborsoMissioneComunicata(rimborsoApprovato, missioneBulk);
 			}
 			return missioneBulk;
 	}
@@ -567,11 +569,11 @@ public class ComunicaRimborsoSiglaService {
 		oggettoBulk.setBanca(banca);
 	}
 
-	private void impostaUserContext(Principal principal, RimborsoMissione rimborsoApprovato,
+	private void impostaUserContext(RimborsoMissione rimborsoApprovato,
 			MissioneSigla missioneSigla) {
 		UserContext userContext = new UserContext();
 		userContext.setCdCds(rimborsoApprovato.getCdsSpesa());
-		userContext.setUser(principal.getName());
+		userContext.setUser(securityService.getCurrentUserLogin());
 		missioneSigla.setUserContext(userContext);
 	}
 }

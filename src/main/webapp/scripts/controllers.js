@@ -147,7 +147,6 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
             $scope.endSearchCmisAnnullamentiRimborso = true;
         });        
     }
-
     $scope.uoWorkForSpecialUser = null;
     $scope.endSearchCmisAnnullamenti = false;
     $scope.endSearchCmisAnnullamentiRimborso = false;
@@ -254,7 +253,25 @@ missioniApp.controller('LanguageController', function ($scope, $translate, Langu
 missioniApp.controller('MenuController', function ($scope) {
     });
 
-missioniApp.controller('LoginController', function ($scope, $location, AuthenticationSharedService) {
+missioniApp.controller('LoginController', function ($rootScope, $scope, $location, AuthenticationSharedService, AuthServerProvider, Account) {
+        $rootScope.salvataggio = true;
+        $rootScope.isUserNotKeycloak = false;
+        $rootScope.isUserKeycloak = false;
+        AuthServerProvider.profileInfo().then(function (profile) {
+                    if (profile.data.keycloakEnabled) {
+                        $rootScope.isUserKeycloak = true;
+                    } else {
+                        $rootScope.isUserNotKeycloak = true;
+                    }
+            $scope.settingsAccount = Account.get(function (account){
+                $rootScope.salvataggio = false;
+                if (account && account.uid){
+                    AuthenticationSharedService.login({
+                        user: account
+                    });
+                }
+            });
+        });
         $scope.login = function () {
             AuthenticationSharedService.login({
                 username: $scope.username,
@@ -267,10 +284,12 @@ missioniApp.controller('LogoutController', function ($location, AuthenticationSh
         AuthenticationSharedService.logout();
     });
 
-missioniApp.controller('SettingsController', function ($scope, Account) {
+missioniApp.controller('SettingsController', function ($rootScope, $scope, Account) {
         $scope.success = null;
         $scope.error = null;
+        $rootScope.salvataggio = true;
         $scope.settingsAccount = Account.get();
+        $rootScope.salvataggio = false;
 
         $scope.save = function () {
             $scope.success = null;
@@ -280,7 +299,9 @@ missioniApp.controller('SettingsController', function ($scope, Account) {
                 function (value, responseHeaders) {
                     $scope.error = null;
                     $scope.success = 'OK';
+                    $rootScope.salvataggio = true;
                     $scope.settingsAccount = Account.get();
+                    $rootScope.salvataggio = false;
                 },
                 function (httpResponse) {
                     if (httpResponse.status === 400 && httpResponse.data === "e-mail address already in use") {

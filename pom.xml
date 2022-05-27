@@ -38,7 +38,7 @@
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
-        <sprint.version>3.0.1</sprint.version>
+        <sprint.version>3.1.12</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
         <storage.cloud.version>2.0.9</storage.cloud.version>
     </properties>
@@ -158,6 +158,16 @@
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
+            <artifactId>sprint-keycloak</artifactId>
+            <version>${sprint.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si.sprint</groupId>
+            <artifactId>sprint-ldap</artifactId>
+            <version>${sprint.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-logging</artifactId>
             <version>2.0.12</version>
             <exclusions>
@@ -228,6 +238,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring-boot.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>android-json</artifactId>
+                    <groupId>com.vaadin.external.google</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -406,7 +422,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx256m ${argLine}</argLine>
+                    <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx256m</argLine>
                     <!-- Force alphabetical order to have a reproducible build -->
                     <runOrder>alphabetical</runOrder>
                 </configuration>
