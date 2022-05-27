@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class FlowService {
     private final Logger log = LoggerFactory.getLogger(FlowService.class);
 
-    @Autowired
+    @Autowired(required = false)
     private MailService mailService;
 
     @Autowired

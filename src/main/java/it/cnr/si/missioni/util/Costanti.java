@@ -120,6 +120,7 @@ public class Costanti {
 	public final static String STATO_INVIO_SIGLA_COMUNICATA = "COM";
 	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 4999;
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
+    public static final String SPRING_PROFILE_SHOWCASE = "showcase";
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
     public static final String SYSTEM_ACCOUNT = "system";
 	public final static String STATO_APPROVATO_PER_HOME = "A";

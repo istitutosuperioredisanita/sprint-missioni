@@ -2,6 +2,7 @@ package it.cnr.si.missioni.web.rest;
 
 import it.cnr.si.config.KeycloakRole;
 import it.cnr.si.domain.CNRUser;
+import it.cnr.si.missioni.service.showcase.ACEService;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
 
@@ -37,6 +38,9 @@ public class AccountLDAPResource {
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired(required = false)
+    private ACEService aceServiceShowcase;
 
     @Autowired
     private Environment env;

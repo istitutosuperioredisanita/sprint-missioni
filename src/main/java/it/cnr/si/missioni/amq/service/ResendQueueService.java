@@ -17,7 +17,7 @@ import it.cnr.si.missioni.util.data.Queue;
 @Profile("!showcase")
 @Component
 public class ResendQueueService {
-	private static final Logger LOGGER  = LoggerFactory.getLogger(RabbitMQService.class);
+	private static final Logger LOGGER  = LoggerFactory.getLogger(ResendQueueService.class);
 
 	@Autowired
     private OrdineMissioneService ordineMissioneService;
