@@ -596,7 +596,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
             },
             isAuthorized: function (authorizedRoles) {
                 if (!angular.isArray(authorizedRoles)) {
-                    if (authorizedRoles == 'ROLE_ADMIN' || authorizedRoles == '*') {
+                    if (authorizedRoles == '*') {
                         return true;
                     }
 
@@ -608,7 +608,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     var authorized = (!!Session.login &&
                         Session.userRoles.indexOf(authorizedRole) !== -1);
 
-                    if (authorized || authorizedRole == 'ROLE_ADMIN' || authorizedRole == '*') {
+                    if (authorized || authorizedRole == '*') {
                         isAuthorized = true;
                     }
                 });
