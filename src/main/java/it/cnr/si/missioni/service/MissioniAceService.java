@@ -64,10 +64,10 @@ import java.util.stream.Collectors;
 public class MissioniAceService {
     private static final Log logger = LogFactory.getLog(MissioniAceService.class);
 
-    @Autowired
+    @Autowired(required = false)
     AceService aceService;
 
-    @Autowired
+    @Autowired(required = false)
     SiperService siperService;
 
     private static Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>(){

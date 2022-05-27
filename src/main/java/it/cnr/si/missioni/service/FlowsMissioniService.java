@@ -57,7 +57,7 @@ public class FlowsMissioniService {
 	@Autowired
 	AccountService accountService;
 
-	@Autowired
+	@Autowired(required = false)
 	MailService mailService;
 
 	@Autowired

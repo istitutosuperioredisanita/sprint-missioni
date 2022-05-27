@@ -113,8 +113,8 @@ public class RimborsoMissioneService {
 	
 	@Autowired
 	TerzoService terzoService;
-	
-	@Autowired
+
+	@Autowired(required = false)
 	CronService cronService;
 	
 	@Autowired
@@ -144,10 +144,10 @@ public class RimborsoMissioneService {
     @Autowired
     private DatiSedeService datiSedeService;
 
-    @Autowired
+	@Autowired(required = false)
     private RabbitMQService rabbitMQService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MailService mailService;
 
 	@Autowired

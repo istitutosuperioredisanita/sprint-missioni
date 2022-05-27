@@ -48,7 +48,7 @@ public class ConfigService {
 	@Autowired
 	private DatiSedeService datiSedeService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MissioniAceService missioniAceService;
 
 	@Autowired

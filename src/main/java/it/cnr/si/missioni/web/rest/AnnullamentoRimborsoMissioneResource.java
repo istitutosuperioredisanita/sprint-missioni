@@ -245,7 +245,7 @@ public class AnnullamentoRimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idAnnullamentoRimborsoMissione") String idAnnullamentoRimborsoMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idAnnullamentoRimborsoMissione") String idAnnullamentoRimborsoMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
     	log.debug("REST request per l'upload di allegati dell'ordine di missione" );
     	if (idAnnullamentoRimborsoMissione != null){
     		Long idAnnullamentoRimborsoLong = new Long (idAnnullamentoRimborsoMissione);

@@ -144,7 +144,7 @@ public class OrdineMissioneAnticipoResource {
     @ExceptionHandler(RuntimeException.class)
     @Timed
     public @ResponseBody void printOrdineMissioneAnticipo(HttpServletRequest request,
-    		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
+    		@RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'Ordine di Missione " );
         
         if (!StringUtils.isEmpty(idMissione)){

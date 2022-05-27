@@ -21,7 +21,7 @@ missioniApp.factory('LanguageService', function ($http, $translate, LANGUAGES) {
     });
 
 missioniApp.factory('Register', function ($resource) {
-        return $resource('app/rest/register', {}, {
+        return $resource('api/register', {}, {
         });
     });
 
@@ -160,7 +160,7 @@ missioniApp.factory('AuditsService', function ($http) {
     });
 
 missioniApp.factory('Session', function (ProxyService) {
-        this.create = function (login, matricola, firstName, lastName, email, userRoles, allUoForUsersSpecial, uoForUsersSpecial, isAccountLDAP, comune_nascita, data_nascita, comune_residenza, indirizzo_residenza, num_civico_residenza, cap_residenza, provincia_residenza, codice_fiscale, profilo, struttura_appartenenza, codice_sede, codice_uo, livello) {
+        this.create = function (login, matricola, firstName, lastName, email, userRoles, allUoForUsersSpecial, uoForUsersSpecial, isAccountLDAP, codice_fiscale, comune_nascita, data_nascita, comune_residenza, indirizzo_residenza, num_civico_residenza, cap_residenza, provincia_residenza, profilo, struttura_appartenenza, codice_sede, codice_uo, livello) {
             this.login = login;
             this.matricola = matricola;
             if (firstName){
@@ -252,7 +252,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider, $location) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider, $location, COSTANTI) {
     var today = new Date();
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
@@ -318,9 +318,9 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
     }
 
     var gestioneUtente = function(utente, isFromKeycloak){
-                            if (utente.struttura_appartenenza || utente.uid=="app.missioni" || utente.profilo ) {
+                            if (utente.struttura_appartenenza || utente.uid==COSTANTI.UTENTE_SPECIALE || utente.profilo ) {
                                     var comune_residenza = null;
-                                    if (utente.uid.toLowerCase() == "app.missioni"){
+                                    if (utente.uid.toLowerCase() == COSTANTI.UTENTE_SPECIALE){
                                         Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
@@ -340,8 +340,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                     if (result && utente.matricola && result.ti_dipendente_altro == 'D' && ((utente.data_cessazione && DateUtils.convertDateTimeFromServer(utente.data_cessazione) >= today) || (!utente.data_cessazione))){
                                                         Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
                                                                     utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
-                                                                    utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
-                                                                    utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza, utente.codice_fiscale,
+                                                                    utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                                    utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
                                                                     utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
                                                         $rootScope.account = Session;
                                                         $sessionStorage.account = Session;
@@ -359,8 +359,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                         }
                                                         Session.create(utente.uid.toLowerCase(), matr, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
                                                                 utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
-                                                                utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
-                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza, utente.codice_fiscale,
+                                                                utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
                                                                 profilo, sede, utente.codice_sede, utente.codice_uo, null);
                                                         $rootScope.account = Session;
                                                         $sessionStorage.account = Session;
@@ -371,8 +371,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                             comune_residenza = result;
                                                             Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
                                                                     utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
-                                                                utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
-                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza, utente.codice_fiscale,
+                                                                utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
                                                                 utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
                                                             $rootScope.account = Session;
                                                             $sessionStorage.account = Session;
@@ -383,7 +383,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 if (isFromKeycloak){
                                                     Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
                                                 } else {
-                                                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, ['ROLE_USER'], utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
+                                                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, ['ROLE_USER'], utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true, utente.codice_fiscale);
                                                 }
                                                 $rootScope.account = Session;
                                                 $sessionStorage.account = Session;
@@ -399,7 +399,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                     if (isFromKeycloak){
                                        Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, data.roles);
                                     } else {
-                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles);
+                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles, null, null, null, data.codice_fiscale);
                                     }
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
@@ -423,6 +423,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                         $rootScope.isUserNotKeycloak = true;
                     }
                     if (!$rootScope.isUserKeycloak){
+                      if (param && param.username){
                         var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
                         $http.post('oauth/token', data, {
                             headers: {
@@ -446,6 +447,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             delete httpHeaders.common['Authorization'];
                             $rootScope.$broadcast('event:auth-loginRequired', data);
                         });
+                      }
                     } else {
                         gestioneUtente(param.user, true);
                     }
@@ -476,11 +478,23 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                             }
                             AccountLDAP.get(function(data) {
                             $rootScope.salvataggio = false;
-                                if (!data.struttura_appartenenza && data.uid != "app.missioni" && !data.profilo) {
+                                if (!data.struttura_appartenenza && data.uid != COSTANTI.UTENTE_SPECIALE && !data.profilo) {
                                     $rootScope.salvataggio = true;
                                     Account.get(function(data) {
                                         $rootScope.salvataggio = false;
-                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles);
+                                        var cognome;
+                                        var nome;
+                                        if (data.firstName) {
+                                            nome = data.firstName;
+                                        } else {
+                                            nome = data.nome;
+                                        }
+                                        if (data.lastName) {
+                                            cognome = data.lastName;
+                                        } else {
+                                            cognome = data.cognome;
+                                        }
+                                        Session.create(data.uid, null, nome, cognome, data.email, data.roles, null, null, null,data.codice_fiscale);
                                         $rootScope.account = Session;
                                         $sessionStorage.account = Session;
                                         if (!$rootScope.isAuthorized(authorizedRoles)) {
@@ -493,7 +507,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                 } else {
 
                                     var comune_residenza = null;
-                                    if (data.uid == "app.missioni"){
+                                    if (data.uid == COSTANTI.UTENTE_SPECIALE){
                                        Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, data.roles, data.allUoForUsersSpecial, data.uoForUsersSpecial, true);
                                        $rootScope.account = Session;
                                        $sessionStorage.account = Session;
@@ -518,8 +532,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                             if (result && data.matricola && result.ti_dipendente_altro == 'D' && ((data.data_cessazione && DateUtils.convertDateTimeFromServer(data.data_cessazione) >= today) || (!data.data_cessazione))){
                                                 Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, data.roles,
                                                 data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                data.codice_fiscale, data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                data.num_civico_residenza, data.cap_residenza, data.provincia_residenza,
                                                 data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
 
                                             } else {
@@ -535,8 +549,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                 }
                                                 Session.create(data.uid, matr, data.nome, data.cognome, data.email_comunicazioni, data.roles,
                                                     data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                    data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                    data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                    data.codice_fiscale, data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                    data.num_civico_residenza, data.cap_residenza, data.provincia_residenza,
                                                     profilo, sede, data.codice_sede, data.codice_uo, null);
                                                 }
                                             } else {
@@ -544,8 +558,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                                                     comune_residenza = result;
                                                     Session.create(data.uid, data.matricola, data.nome, data.cognome, data.email_comunicazioni, data.roles,
                                                         data.allUoForUsersSpecial, data.uoForUsersSpecial, true,
-                                                        data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
-                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza, data.codice_fiscale,
+                                                        data.codice_fiscale, data.comune_nascita, data.data_nascita, comune_residenza, data.indirizzo_residenza,
+                                                        data.num_civico_residenza, data.cap_residenza, data.provincia_residenza,
                                                         data.profilo, sede, data.codice_sede, data.codice_uo, data.livello_profilo);
                                                     });
                                                 }
@@ -582,7 +596,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
             },
             isAuthorized: function (authorizedRoles) {
                 if (!angular.isArray(authorizedRoles)) {
-                    if (authorizedRoles == '*') {
+                    if (authorizedRoles == 'ROLE_ADMIN' || authorizedRoles == '*') {
                         return true;
                     }
 
@@ -594,7 +608,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     var authorized = (!!Session.login &&
                         Session.userRoles.indexOf(authorizedRole) !== -1);
 
-                    if (authorized || authorizedRole == '*') {
+                    if (authorized || authorizedRole == 'ROLE_ADMIN' || authorizedRole == '*') {
                         isAuthorized = true;
                     }
                 });

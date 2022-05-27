@@ -219,7 +219,7 @@ public class AnnullamentoOrdineMissioneResource {
     @Timed
     @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printAnnullamentoMissione(HttpServletRequest request,
-    		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
+    		@RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'rimborso di Missione " );
         
         if (!StringUtils.isEmpty(idMissione)){

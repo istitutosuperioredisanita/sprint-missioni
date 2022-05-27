@@ -31,10 +31,10 @@ import it.cnr.si.spring.storage.config.StoragePropertyNames;
 @Service
 public class LoadFilesService {
     private final Logger log = LoggerFactory.getLogger(LoadFilesService.class);
-	@Autowired
+	@Autowired(required = false)
     private MissioniCMISService missioniCMISService;
 
-	@Autowired
+	@Autowired(required = false)
     private ResendQueueService resendQueueService;
 
 	@Autowired

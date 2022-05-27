@@ -66,7 +66,7 @@ public class CMISOrdineMissioneService {
 	@Autowired
 	private DatiIstitutoService datiIstitutoService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MessageForFlowsService messageForFlowsService;
 
 	@Autowired

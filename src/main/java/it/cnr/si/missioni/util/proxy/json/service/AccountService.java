@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import it.cnr.si.domain.CNRUser;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.service.showcase.ACEService;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -64,7 +65,10 @@ public class AccountService {
 	@Autowired
     private UoService uoService;
 
-	@Autowired
+	@Autowired(required = false)
+	private ACEService aceServiceShowcase;
+
+	@Autowired(required = false)
 	MissioniAceService missioniAceService;
 
 	@Autowired
@@ -251,20 +255,14 @@ public class AccountService {
 	}
 
 	public String getAccountFromUsername(String username, Boolean loadSpecialUserData) {
-		it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = missioniAceService.getAccountFromSiper(username);
+		it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = null;
+		if (missioniAceService != null){
+			userInfoDto = missioniAceService.getAccountFromSiper(username);
+		} else if (aceServiceShowcase != null){
+			userInfoDto = aceServiceShowcase.getUtenteAdmin(username);
+		}
 			if (userInfoDto != null){
 				Account account = new Account(userInfoDto);
-/*
-				if (loadSpecialUserData){
-					List<String> ruoli = missioniAceService.getRoles(username);
-					if (ruoli != null && ruoli.size() > 0){
-						if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
-							ruoli.add(AuthoritiesConstants.ADMIN);
-						}
-
-						account.setRoles(ruoli);
-					}
-				}*/
 				String resp = manageResponseForAccountRest(username, account, loadSpecialUserData);
 				if (resp != null){
 					return resp;
@@ -289,6 +287,13 @@ public class AccountService {
 			ruolo.add(AuthoritiesConstants.USER);
 			account.setRoles(ruolo);
 			account.setUid(securityService.getCurrentUserLogin());
+
+			if (aceServiceShowcase != null) {
+				it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = aceServiceShowcase.getUtenteAdmin(account.getUid());
+				account.setCognome(userInfoDto.getCognome());
+				account.setNome(userInfoDto.getNome());
+				account.setCodice_fiscale(userInfoDto.getCodice_fiscale());
+			}
 
 			Optional<CNRUser> user = securityService.getUser();
 			user.ifPresent(utente -> {

@@ -75,7 +75,7 @@ public class AnnullamentoRimborsoMissioneService {
 //	@Autowired
 //	private PrintAnnullamentoOrdineMissioneService printAnnullamentoMissioneService;
 //
-	@Autowired
+	@Autowired(required = false)
 	CronService cronService;
 	
 	@Autowired
@@ -90,7 +90,7 @@ public class AnnullamentoRimborsoMissioneService {
     @Autowired
     private DatiSedeService datiSedeService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MailService mailService;
 
 	@Autowired
@@ -145,20 +145,6 @@ public class AnnullamentoRimborsoMissioneService {
     	return lista;
     }
 
-//	public void popolaCoda(AnnullamentoOrdineMissione annullamento) {
-//		if (annullamento.getMatricola() != null){
-//			Account account = accountService.loadAccountFromRest(annullamento.getUid());
-//			String idSede = null;
-//			if (account != null){
-//				idSede = account.getCodice_sede();
-//			}
-//			Missione missione = new Missione(TypeMissione.ANNULLAMENTO, new Long(annullamento.getId().toString()), idSede, 
-//					annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(), 
-//					annullamento.getOrdineMissione().getDataFineMissione(), new Long(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA);
-//			rabbitMQService.send(missione);
-//		}
-//	}
-//
 	@Transactional(propagation = Propagation.REQUIRED)
     public AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, String basePath)  throws ComponentException{
     	return updateAnnullamentoRimborsoMissione(annullamento, false, basePath);

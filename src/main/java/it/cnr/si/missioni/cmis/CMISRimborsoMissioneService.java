@@ -107,7 +107,7 @@ public class CMISRimborsoMissioneService {
 	@Autowired
 	private RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
 
-	@Autowired
+	@Autowired(required = false)
 	private MessageForFlowsService messageForFlowsService;
 
 	@Autowired
