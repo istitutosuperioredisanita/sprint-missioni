@@ -41,6 +41,7 @@
         <sprint.version>3.1.12</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
         <storage.cloud.version>2.0.9</storage.cloud.version>
+        <spring.session.version>2.6.2</spring.session.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -161,6 +162,18 @@
             <artifactId>sprint-keycloak</artifactId>
             <version>${sprint.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-hazelcast</artifactId>
+            <version>${spring.session.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-core</artifactId>
+            <version>${spring.session.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-ldap</artifactId>
