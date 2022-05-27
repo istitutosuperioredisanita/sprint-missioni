@@ -1,7 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import java.io.Serializable;
-import java.security.Principal;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class FlowsMissioniService {
 	@Autowired
 	AccountService accountService;
 
-	@Autowired
+	@Autowired(required = false)
 	MailService mailService;
 
 	@Autowired
@@ -67,24 +67,24 @@ public class FlowsMissioniService {
 	private String urlVecchiaScrivania;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ResultFlows aggiornaOrdineMissioneFlowsNewTransaction(Principal principal, Serializable idOrdineMissione) throws Exception {
-    	return aggiornaOrdineMissioneFlows(principal, idOrdineMissione);
+    public ResultFlows aggiornaOrdineMissioneFlowsNewTransaction(Serializable idOrdineMissione) throws Exception {
+    	return aggiornaOrdineMissioneFlows(idOrdineMissione);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ResultFlows aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(Principal principal, Serializable idAnnullamentoMissione) throws Exception {
-    	return aggiornaAnnullamentoOrdineMissioneFlows(principal, idAnnullamentoMissione);
+    public ResultFlows aggiornaAnnullamentoOrdineMissioneFlowsNewTransaction(Serializable idAnnullamentoMissione) throws Exception {
+    	return aggiornaAnnullamentoOrdineMissioneFlows(idAnnullamentoMissione);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ResultFlows aggiornaRimborsoMissioneFlowsNewTransaction(Principal principal, Serializable idRimborsoMissione) throws Exception {
-    	return aggiornaRimborsoMissioneFlows(principal, idRimborsoMissione);
+    public ResultFlows aggiornaRimborsoMissioneFlowsNewTransaction(Serializable idRimborsoMissione) throws Exception {
+    	return aggiornaRimborsoMissioneFlows(idRimborsoMissione);
     }
 
-	public ResultFlows aggiornaOrdineMissioneFlows(Principal principal, Serializable idOrdineMissione)
+	public ResultFlows aggiornaOrdineMissioneFlows(Serializable idOrdineMissione)
 			throws ComponentException, Exception {
 		if (idOrdineMissione != null){
-			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, idOrdineMissione);
+			OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, idOrdineMissione);
 			if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()){
 				ResultFlows result = retrieveDataFromFlows(ordineMissione);
 				if (result == null){
@@ -92,16 +92,16 @@ public class FlowsMissioniService {
 				}
 				if (result.isApprovato()){
 					log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					ordineMissioneService.aggiornaOrdineMissioneApprovato(principal, ordineMissione);
+					ordineMissioneService.aggiornaOrdineMissioneApprovato(ordineMissione);
 					return result;
 				} else if (result.isAnnullato()){
 					log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} annullato.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					ordineMissioneService.aggiornaOrdineMissioneAnnullato(principal, ordineMissione);
+					ordineMissioneService.aggiornaOrdineMissioneAnnullato(ordineMissione);
 					return result;
 				} else if (result.isStateReject()){
 					log.info("Trovato in Scrivania Digitale un ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", ordineMissione.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					ordineMissioneService.aggiornaOrdineMissioneAnnullato(principal, ordineMissione);
-					Account account = accountService.loadAccount(ordineMissione.getUid());
+					ordineMissioneService.aggiornaOrdineMissioneAnnullato(ordineMissione);
+					Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
 					String subject = "Ordine di missione respinto ed annullato.";
 					String text = "L'ordine di missione "+ordineMissione.getAnno()+"/"+ordineMissione.getNumero()+" di "+account.getCognome()+" "+account.getNome()+" a "+ordineMissione.getDestinazione()+" per "+ ordineMissione.getOggetto()+" è stato respinto ed annullato con la seguente motivazione: "+result.getComment()+". Nel caso la richiesta di missione fosse ancora valida sarà necessario inserirla nuovamente.";
 					sendMailFlussoRespintoVecchiaScrivania(ordineMissione.getUid(), ordineMissione.getUidInsert(), ordineMissione.getUtuv(), subject, text);
@@ -159,10 +159,10 @@ public class FlowsMissioniService {
 		return result;
 	}
 
-	public ResultFlows aggiornaAnnullamentoOrdineMissioneFlows(Principal principal, Serializable idAnnullamento)
+	public ResultFlows aggiornaAnnullamentoOrdineMissioneFlows(Serializable idAnnullamento)
 			throws ComponentException, Exception {
 		if (idAnnullamento != null){
-			AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById(principal, AnnullamentoOrdineMissione.class, idAnnullamento);
+			AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById( AnnullamentoOrdineMissione.class, idAnnullamento);
 			if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneDaValidare()){
 				log.info("Trovato un annullamento ordine di missione da approvare con id {}.", annullamento.getId());
 				ResultFlows result = retrieveDataFromFlows(annullamento);
@@ -170,20 +170,20 @@ public class FlowsMissioniService {
 					return null;
 				}
 				if (result.isApprovato()){
-					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
+					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, annullamento.getOrdineMissione().getId());
 					log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneFirmato(principal, annullamento);
+					annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneFirmato(annullamento);
 					return result;
 				} else if (result.isAnnullato()){
-					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
+					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, annullamento.getOrdineMissione().getId());
 	    			log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} annullato.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-	    			annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneAnnullato(principal, result, annullamento);
+	    			annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneAnnullato(result, annullamento);
 					return result;
 				} else if (result.isStateReject()){
-					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, annullamento.getOrdineMissione().getId());
+					OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, annullamento.getOrdineMissione().getId());
 	    			log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} respinto.", annullamento.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
-					annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneAnnullato(principal, result, annullamento);
-					Account account = accountService.loadAccount(ordineMissione.getUid());
+					annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissioneAnnullato(result, annullamento);
+					Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
 					String subject = "Annullamento Ordine di missione respinto ed annullato.";
 					String text = "L'Annullamento ordine di missione "+ordineMissione.getAnno()+"/"+ordineMissione.getNumero()+" di "+account.getCognome()+" "+account.getNome()+" a "+ordineMissione.getDestinazione()+" per "+ ordineMissione.getOggetto()+" è stato respinto ed annullato con la seguente motivazione: "+result.getComment()+". Nel caso la richiesta di annullamento missione fosse ancora valida sarà necessario inserirla nuovamente.";
 					sendMailFlussoRespintoVecchiaScrivania(annullamento.getUid(), annullamento.getUidInsert(), annullamento.getUtuv(), subject, text);
@@ -202,9 +202,9 @@ public class FlowsMissioniService {
 	}
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ResultFlows aggiornaRimborsoMissioneFlows(Principal principal, Serializable idRimborsoMissione) throws ComponentException, Exception {
+    public ResultFlows aggiornaRimborsoMissioneFlows(Serializable idRimborsoMissione) throws ComponentException, Exception {
 		if (idRimborsoMissione != null){
-			RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, idRimborsoMissione);
+			RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, idRimborsoMissione);
 	    	if (rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneDaValidare()){
 	    		ResultFlows result = retrieveDataFromFlows(rimborsoMissione);
 				if (result == null){
@@ -212,16 +212,16 @@ public class FlowsMissioniService {
 				}
 	    		if (result.isApprovato()){
 	    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} approvato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-	    			rimborsoMissioneService.aggiornaRimborsoMissioneFirmato(principal, rimborsoMissione);
+	    			rimborsoMissioneService.aggiornaRimborsoMissioneFirmato(rimborsoMissione);
 					return result;
 	    		} else if (result.isAnnullato()){
 	    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} annullato.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-					rimborsoMissioneService.aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissione);
+					rimborsoMissioneService.aggiornaRimborsoMissioneAnnullato(rimborsoMissione);
 					return result;
 				} else if (result.isStateReject()){
 	    			log.info("Trovato in Scrivania Digitale un rimborso missione con id {} della uo {}, anno {}, numero {} respinto.", rimborsoMissione.getId(), rimborsoMissione.getUoRich(), rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-					rimborsoMissioneService.aggiornaRimborsoMissioneAnnullato(principal, rimborsoMissione);
-					Account account = accountService.loadAccount(rimborsoMissione.getUid());
+					rimborsoMissioneService.aggiornaRimborsoMissioneAnnullato(rimborsoMissione);
+					Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
 					String subject = "Rimborso missione respinto ed annullato.";
 					String text = "Il rimborso missione "+rimborsoMissione.getAnno()+"/"+rimborsoMissione.getNumero()+" di "+account.getCognome()+" "+account.getNome()+" a "+rimborsoMissione.getDestinazione()+" per "+ rimborsoMissione.getOggetto()+" è stato respinto ed annullato con la seguente motivazione: "+result.getComment()+". Nel caso la richiesta di rimborso missione fosse ancora valida sarà necessario inserirla nuovamente.";
 					sendMailFlussoRespintoVecchiaScrivania(rimborsoMissione.getUid(), rimborsoMissione.getUidInsert(), rimborsoMissione.getUtuv(), subject, text);

@@ -5,6 +5,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import it.cnr.si.security.AuthoritiesConstants;
  * REST controller for proxy to different application.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("api/proxy/{app}")
 public class ProxyResource {
 
@@ -51,8 +53,11 @@ public class ProxyResource {
     
     @Autowired
     private AccountService accountService;
-    
-    @Autowired
+
+	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
     private ProxyService proxyService;
     
     @Autowired
@@ -158,9 +163,9 @@ public class ProxyResource {
 
 	private String manageResponseForAccountRest(String url, ResultProxy result,
 			String risposta) {
-		String uid = SecurityUtils.getCurrentUserLogin();
+		String uid = securityService.getCurrentUserLogin();
 		if (isAccountRest(url, uid)){
-			String resp = accountService.manageResponseForAccountRest(uid, result.getBody());
+			String resp = accountService.manageResponseForAccountRest(result.getBody());
 			if (resp != null){
 				log.info("Response for Account. Url: "+url+" - Resp: "+resp);
 				return resp;

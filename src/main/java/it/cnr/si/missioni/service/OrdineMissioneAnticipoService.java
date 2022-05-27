@@ -1,13 +1,14 @@
 package it.cnr.si.missioni.service;
 
 import java.io.InputStream;
-import java.security.Principal;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
 
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,15 +59,13 @@ public class OrdineMissioneAnticipoService {
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
 
-	@Transactional(readOnly = true)
-	public OrdineMissioneAnticipo getAnticipo(Principal principal, Long idMissione) throws ComponentException {
-		return getAnticipo(principal, idMissione, false);
-	}
+	@Autowired
+	private SecurityService securityService;
 
 	@Transactional(readOnly = true)
-	public OrdineMissioneAnticipo getAnticipo(Principal principal, Long idMissione, Boolean valorizzaOrdineMissione)
+	public OrdineMissioneAnticipo getAnticipo(Long idMissione, Boolean valorizzaOrdineMissione)
 			throws ComponentException {
-		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
+		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById( OrdineMissione.class,
 				idMissione);
 
 		if (ordineMissione != null) {
@@ -96,36 +95,35 @@ public class OrdineMissioneAnticipoService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public OrdineMissioneAnticipo createAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
+	public OrdineMissioneAnticipo createAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws AwesomeException, ComponentException, OptimisticLockException, OptimisticLockException,
 			PersistencyException, BusyResourceException {
-		ordineMissioneAnticipo.setUid(principal.getName());
-		ordineMissioneAnticipo.setUser(principal.getName());
-		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
+		ordineMissioneAnticipo.setUid(securityService.getCurrentUserLogin());
+		ordineMissioneAnticipo.setUser(securityService.getCurrentUserLogin());
+		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById( OrdineMissione.class,
 				ordineMissioneAnticipo.getOrdineMissione().getId());
 		ordineMissioneAnticipo.setOrdineMissione(ordineMissione);
 		ordineMissioneAnticipo.setStato(Costanti.STATO_INSERITO);
 		ordineMissioneAnticipo.setStatoFlusso(Costanti.STATO_INSERITO);
 		ordineMissioneAnticipo.setDataRichiesta(DateUtils.getCurrentTime());
 		ordineMissioneAnticipo.setToBeCreated();
-		ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.creaConBulk(principal,
-				ordineMissioneAnticipo);
+		ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.creaConBulk(ordineMissioneAnticipo);
 		log.debug("Created Information for OrdineMissioneAutoPropria: {}", ordineMissioneAnticipo);
 		return ordineMissioneAnticipo;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public OrdineMissioneAnticipo updateAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
+	public OrdineMissioneAnticipo updateAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws AwesomeException, ComponentException, OptimisticLockException, OptimisticLockException,
 			PersistencyException, BusyResourceException {
-		return updateAnticipo(principal, ordineMissioneAnticipo, false);
+		return updateAnticipo(ordineMissioneAnticipo, false);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public OrdineMissioneAnticipo updateAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo,
+	public OrdineMissioneAnticipo updateAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo,
 			Boolean confirm) throws AwesomeException, ComponentException {
 
-		OrdineMissioneAnticipo ordineMissioneAnticipoDB = (OrdineMissioneAnticipo) crudServiceBean.findById(principal,
+		OrdineMissioneAnticipo ordineMissioneAnticipoDB = (OrdineMissioneAnticipo) crudServiceBean.findById(
 				OrdineMissioneAnticipo.class, ordineMissioneAnticipo.getId());
 
 		if (ordineMissioneAnticipoDB == null)
@@ -152,55 +150,54 @@ public class OrdineMissioneAnticipoService {
 		ordineMissioneAnticipoDB.setToBeUpdated();
 
 		if (confirm) {
-			avviaFlusso((Principal) SecurityUtils.getCurrentUser(), ordineMissioneAnticipoDB);
+			avviaFlusso( ordineMissioneAnticipoDB);
 		}
 
-		ordineMissioneAnticipoDB = (OrdineMissioneAnticipo) crudServiceBean.modificaConBulk(principal,
-				ordineMissioneAnticipoDB);
+		ordineMissioneAnticipoDB = (OrdineMissioneAnticipo) crudServiceBean.modificaConBulk(ordineMissioneAnticipoDB);
 		log.debug("Updated Information for Anticipo Ordine di Missione: {}", ordineMissioneAnticipoDB);
 
 		return ordineMissioneAnticipo;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void avviaFlusso(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
+	public void avviaFlusso(OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws AwesomeException, ComponentException {
 
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteAnticipo(Principal principal, OrdineMissione ordineMissione)
+	public void deleteAnticipo(OrdineMissione ordineMissione)
 			throws AwesomeException, ComponentException {
 		OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoRepository.getAnticipo(ordineMissione);
 		if (anticipo != null && anticipo.getId() != null) {
-			cancellaOrdineMissioneAnticipo(principal, anticipo);
+			cancellaOrdineMissioneAnticipo(anticipo);
 		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteAnticipo(Principal principal, Long idAnticipoOrdineMissione) throws AwesomeException,
+	public void deleteAnticipo(Long idAnticipoOrdineMissione) throws AwesomeException,
 			ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
-		OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(principal,
+		OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(
 				OrdineMissioneAnticipo.class, idAnticipoOrdineMissione);
 		if (ordineMissioneAnticipo != null) {
-			cancellaOrdineMissioneAnticipo(principal, ordineMissioneAnticipo);
+			cancellaOrdineMissioneAnticipo(ordineMissioneAnticipo);
 		}
 	}
 
-	private void cancellaOrdineMissioneAnticipo(Principal principal, OrdineMissioneAnticipo ordineMissioneAnticipo)
+	private void cancellaOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo)
 			throws ComponentException {
 		if (ordineMissioneAnticipo.isStatoNonInviatoAlFlusso()){
 			ordineMissioneAnticipo.setToBeUpdated();
 			ordineMissioneAnticipo.setStato(Costanti.STATO_ANNULLATO);
-			crudServiceBean.modificaConBulk(principal, ordineMissioneAnticipo);
-			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class, ordineMissioneAnticipo.getOrdineMissione().getId());
+			crudServiceBean.modificaConBulk( ordineMissioneAnticipo);
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById( OrdineMissione.class, ordineMissioneAnticipo.getOrdineMissione().getId());
 
 			List<StorageObject> listaAllegati = cmisOrdineMissioneService.getAttachmentsAnticipo(ordineMissione);
 			if (listaAllegati != null){
 				for (StorageObject object : listaAllegati){
 					if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso())){
 						StorageObject folderOrdineMissione = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
-						missioniCMISService.eliminaFilePresenteNelFlusso(principal, object.getKey(), folderOrdineMissione);
+						missioniCMISService.eliminaFilePresenteNelFlusso(object.getKey(), folderOrdineMissione);
 					} else {
 		        		missioniCMISService.deleteNode(object.getKey());
 					}
@@ -214,11 +211,10 @@ public class OrdineMissioneAnticipoService {
 	}
 
 	@Transactional(readOnly = true)
-	public Map<String, byte[]> printOrdineMissioneAnticipo(Authentication auth, Long idMissione)
+	public Map<String, byte[]> printOrdineMissioneAnticipo(Long idMissione)
 			throws AwesomeException, ComponentException {
-		String username = SecurityUtils.getCurrentUserLogin();
-		Principal principal = (Principal) auth;
-		OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(principal, idMissione, true);
+		String username = securityService.getCurrentUserLogin();
+		OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(idMissione, true);
 		OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
 		byte[] printOrdineMissione = null;
@@ -244,20 +240,20 @@ public class OrdineMissioneAnticipoService {
 	}
 
 	@Transactional(readOnly = true)
-	public String jsonForPrintOrdineMissione(Principal principal, Long idMissione)
+	public String jsonForPrintOrdineMissione(Long idMissione)
 			throws AwesomeException, ComponentException {
-		OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(principal, idMissione, true);
+		OrdineMissioneAnticipo ordineMissioneAnticipo = getAnticipo(idMissione, true);
 		return printOrdineMissioneAnticipoService.createJsonPrintOrdineMissioneAnticipo(ordineMissioneAnticipo,
-				principal.getName());
+				securityService.getCurrentUserLogin());
 	}
 
 	@Transactional(readOnly = true)
-	public List<CMISFileAttachment> getAttachments(Principal principal, Long idAnticipo)
+	public List<CMISFileAttachment> getAttachments(Long idAnticipo)
 			throws ComponentException {
 		if (idAnticipo != null) {
-			OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(principal,
+			OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(
 					OrdineMissioneAnticipo.class, idAnticipo);
-			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
+			OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById( OrdineMissione.class,
 					ordineMissioneAnticipo.getOrdineMissione().getId());
 			List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsAnticipo(ordineMissione, idAnticipo);
 			return lista;
@@ -266,14 +262,14 @@ public class OrdineMissioneAnticipoService {
 	}
 
 	@Transactional(readOnly = true)
-	public CMISFileAttachment uploadAllegato(Principal principal, Long idAnticipo,
+	public CMISFileAttachment uploadAllegato(Long idAnticipo,
 			InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
-		OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(principal,
+		OrdineMissioneAnticipo ordineMissioneAnticipo = (OrdineMissioneAnticipo) crudServiceBean.findById(
 				OrdineMissioneAnticipo.class, idAnticipo);
-		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(principal, OrdineMissione.class,
+		OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById( OrdineMissione.class,
 				ordineMissioneAnticipo.getOrdineMissione().getId());
 		if (ordineMissione != null) {
-			return cmisOrdineMissioneService.uploadAttachmentAnticipo(principal, ordineMissione,idAnticipo,
+			return cmisOrdineMissioneService.uploadAttachmentAnticipo(ordineMissione,idAnticipo,
 					inputStream, name, mimeTypes);
 		}
 		return null;

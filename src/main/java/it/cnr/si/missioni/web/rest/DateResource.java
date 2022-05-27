@@ -2,6 +2,7 @@ package it.cnr.si.missioni.web.rest;
 
 import java.time.ZonedDateTime;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -15,10 +16,13 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 
+import javax.annotation.security.RolesAllowed;
+
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class DateResource {
 

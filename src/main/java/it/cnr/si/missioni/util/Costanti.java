@@ -60,7 +60,7 @@ public class Costanti {
 	public final static Long INQUADRAMENTO_ASSEGNISTA = new Long(43);
 	public final static String TIPO_DOCUMENTO_OBBLIGAZIONI_SIGLA = "OBB";
 
-    public final static String USER_CRON_MISSIONI = "cronMissioni";
+    public final static String USER_CRON_MISSIONI = "app.missioni";
     public final static String ACE_SIGLA_CUG = "CUG";
     public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
 
@@ -120,6 +120,7 @@ public class Costanti {
 	public final static String STATO_INVIO_SIGLA_COMUNICATA = "COM";
 	public final static int DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_CACHE = 4999;
     public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
+    public static final String SPRING_PROFILE_SHOWCASE = "showcase";
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
     public static final String SYSTEM_ACCOUNT = "system";
 	public final static String STATO_APPROVATO_PER_HOME = "A";
@@ -155,6 +156,8 @@ public class Costanti {
     public final static String RUOLO_FIRMA_PRESIDENTE = RUOLO_FIRMA+"-presidente";
     public final static String SIGLA_ACE_DIREZIONE_GENERALE = "DG";
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
+    public static final String ROLE_FLOWS = "flows#missioni";
+
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
     static {

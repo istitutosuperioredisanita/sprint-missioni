@@ -4,21 +4,19 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Principal;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -27,12 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,7 +46,6 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 
@@ -62,16 +54,17 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
  */
 @RestControllerAdvice
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class OrdineMissioneResource {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneResource.class);
 
+	@Autowired
+	SecurityService securityService;
+
     @Autowired
     private OrdineMissioneService ordineMissioneService;
-
-	@Autowired
-	private TokenProvider tokenProvider;
 
 	/**
      * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
@@ -85,7 +78,7 @@ public class OrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<OrdineMissione> ordiniMissione;
 		try {
-			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, true);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdiniMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -113,7 +106,7 @@ public class OrdineMissioneResource {
         filter.setListaStatiMissione(listaStati);
         List<OrdineMissione> ordiniMissione;
 		try {
-			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdiniMissioneDaRimborsare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -140,7 +133,7 @@ public class OrdineMissioneResource {
         filter.setListaStatiMissione(listaStati);
         List<OrdineMissione> ordiniMissione;
 		try {
-			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdiniMissioneDaRimborsare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -167,7 +160,7 @@ public class OrdineMissioneResource {
         filter.setListaStatiMissione(listaStati);
         List<OrdineMissione> ordiniMissione;
 		try {
-			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, false);
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdiniMissioneDaDuplicare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -188,7 +181,7 @@ public class OrdineMissioneResource {
         filter.setToFinal("S");
         List<OrdineMissione> ordiniMissione;
 		try {
-			ordiniMissione = ordineMissioneService.getOrdiniMissione(SecurityUtils.getCurrentUser(), filter, true);
+			ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, true);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdiniMissioneToFinal",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -208,7 +201,7 @@ public class OrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<OrdineMissione> ordiniMissione;
 		try {
-			ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+			ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
 		} catch (Exception e) {
 			log.error("ERRORE getOrdiniMissioneDaValidare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -227,7 +220,7 @@ public class OrdineMissioneResource {
     		@RequestParam(value = "id") Long idMissione) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         try {
-            OrdineMissione ordineMissione = ordineMissioneService.getOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true);
+            OrdineMissione ordineMissione = ordineMissioneService.getOrdineMissione( idMissione, true);
             return JSONResponseEntity.ok(ordineMissione);
 		} catch (ComponentException e) {
 			log.error("ERRORE getOrdineMissione",e);
@@ -243,7 +236,7 @@ public class OrdineMissioneResource {
                                              HttpServletResponse response) {
     	if (ordineMissione.getId() == null){
             try {
-                ordineMissione = ordineMissioneService.createOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ordineMissione);
+                ordineMissione = ordineMissioneService.createOrdineMissione( ordineMissione);
     		} catch (AwesomeException e) {
     			log.error("ERRORE createOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -266,9 +259,8 @@ public class OrdineMissioneResource {
     public ResponseEntity<?> modifyOrdineMissione(@RequestBody OrdineMissione ordineMissione, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (ordineMissione.getId() != null){
-    		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
-				ordineMissione = ordineMissioneService.updateOrdineMissione(principal, ordineMissione);
+				ordineMissione = ordineMissioneService.updateOrdineMissione(ordineMissione);
     		} catch (AwesomeException e) {
     			log.error("ERRORE modifyOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -297,7 +289,7 @@ public class OrdineMissioneResource {
     	if (ordineMissione.getId() != null){
     		ordineMissione.setDaValidazione(daValidazione);
             try {
-				ordineMissione = ordineMissioneService.updateOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ordineMissione, false, confirm, basePath);
+				ordineMissione = ordineMissioneService.updateOrdineMissione( ordineMissione, false, confirm, basePath);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -319,7 +311,7 @@ public class OrdineMissioneResource {
     @Timed
     public ResponseEntity<?> deleteOrdineMissione(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			ordineMissioneService.deleteOrdineMissione((Principal) SecurityUtils.getCurrentUser(), ids);
+			ordineMissioneService.deleteOrdineMissione( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
 			log.error("ERRORE deleteOrdineMissione",e);
@@ -332,7 +324,6 @@ public class OrdineMissioneResource {
 
     @RequestMapping(value = "/rest/public/printOrdineMissione",
             method = RequestMethod.GET)
-    @ExceptionHandler(Exception.class)
     @Timed
     public @ResponseBody void printOrdineMissione(HttpServletRequest request,
     		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
@@ -340,10 +331,10 @@ public class OrdineMissioneResource {
         
         if (!StringUtils.isEmpty(idMissione)){
             try {
+				String user = securityService.getCurrentUserLogin();
             	Long idMissioneLong = new Long (idMissione);
-				Authentication authentication = tokenProvider.getAuthentication(token);
-            	if (authentication != null){
-            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(authentication, idMissioneLong);
+            	if (user != null){
+            		Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(idMissioneLong);
             		if (map != null){
             			res.setContentType("application/pdf");
                     	try {
@@ -381,7 +372,7 @@ public class OrdineMissioneResource {
     		@RequestParam(value = "idMissione") Long idMissione) {
         log.debug("REST request per il json della stampa dell'Ordine di Missione " );
         try {
-        	String json = ordineMissioneService.jsonForPrintOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idMissione);
+        	String json = ordineMissioneService.jsonForPrintOrdineMissione( idMissione);
             return JSONResponseEntity.ok(json);
 		} catch (ComponentException e) {
 			log.error("ERRORE jsonForPrintOrdineMissione",e);
@@ -397,7 +388,7 @@ public class OrdineMissioneResource {
     		@PathVariable Long idOrdineMissione) {
         log.debug("REST request per visualizzare gli allegati dell'ordine di missione" );
         try {
-            List<CMISFileAttachment> lista = ordineMissioneService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idOrdineMissione);
+            List<CMISFileAttachment> lista = ordineMissioneService.getAttachments( idOrdineMissione);
             return JSONResponseEntity.ok(lista);
 		} catch (ComponentException e) {
 			log.error("getAttachments", e);
@@ -414,15 +405,15 @@ public class OrdineMissioneResource {
         log.debug("REST request per l'upload di allegati dell'ordine di missione" );
         if (idOrdineMissione != null){
         	Long idMissioneLong = new Long (idOrdineMissione);
-			Authentication principal = tokenProvider.getAuthentication(token);
-			if (principal != null){
+			String user = securityService.getCurrentUserLogin();
+			if (user != null){
             	try {
             		if (file != null && file.getContentType() != null){
             			MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
             			if (mimeTypes == null){
                 			return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
             			} else {
-        					CMISFileAttachment cmisFileAttachment = ordineMissioneService.uploadAllegato(principal, idMissioneLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+        					CMISFileAttachment cmisFileAttachment = ordineMissioneService.uploadAllegato(idMissioneLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
         	                if (cmisFileAttachment != null){
         	                    return JSONResponseEntity.ok(cmisFileAttachment);
         	                } else {
@@ -460,7 +451,7 @@ public class OrdineMissioneResource {
         
         if (!StringUtils.isEmpty(id)){
             try {
-            		ordineMissioneService.gestioneCancellazioneAllegati((Principal) SecurityUtils.getCurrentUser(), id, idOrdine);
+            		ordineMissioneService.gestioneCancellazioneAllegati( id, idOrdine);
                     return JSONResponseEntity.ok();
             } catch (AwesomeException e) {
             	log.error("deleteAttachment", e);

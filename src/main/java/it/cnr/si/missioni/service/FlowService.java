@@ -15,13 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
+
 
 @Service
 public class FlowService {
     private final Logger log = LoggerFactory.getLogger(FlowService.class);
 
-    @Autowired
+    @Autowired(required = false)
     private MailService mailService;
 
     @Autowired
@@ -54,16 +54,16 @@ public class FlowService {
     @Autowired
     private CRUDComponentSession crudServiceBean;
 
-    public void aggiornaMissioneFlows(Principal principal, FlowResult flowResult) {
+    public void aggiornaMissioneFlows(FlowResult flowResult) {
         log.info(flowResult.toString());
         String errore = "";
         try {
             if (flowResult.getIdMissione() != null){
                 switch (flowResult.getTipologiaMissione() ) {
                     case FlowResult.TIPO_FLUSSO_ORDINE:
-                        OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById(principal, OrdineMissione.class, new Long(flowResult.getIdMissione()));
+                        OrdineMissione ordineMissione = (OrdineMissione)crudServiceBean.findById( OrdineMissione.class, new Long(flowResult.getIdMissione()));
                         if (ordineMissione != null){
-                            ordineMissioneService.aggiornaOrdineMissione(principal, ordineMissione, flowResult);
+                            ordineMissioneService.aggiornaOrdineMissione(ordineMissione, flowResult);
                         } else {
                             errore = "L'ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);
@@ -71,13 +71,13 @@ public class FlowService {
                         }
                         break;
                     case FlowResult.TIPO_FLUSSO_RIMBORSO:
-                        RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById(principal, RimborsoMissione.class, new Long(flowResult.getIdMissione()));
+                        RimborsoMissione rimborsoMissione = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, new Long(flowResult.getIdMissione()));
                         if (rimborsoMissione != null){
-                            final RimborsoMissione rimborsoMissioneDaComunicare = rimborsoMissioneService.aggiornaRimborsoMissione(principal, rimborsoMissione, flowResult);
+                            final RimborsoMissione rimborsoMissioneDaComunicare = rimborsoMissioneService.aggiornaRimborsoMissione(rimborsoMissione, flowResult);
                             if (rimborsoMissioneDaComunicare != null){
                                 taskExecutor.execute( new Runnable() {
                                     public void run() {
-                                        comunicaMissioneSiglaService.comunicaRimborsoSigla(principal, rimborsoMissioneDaComunicare.getId());
+                                        comunicaMissioneSiglaService.comunicaRimborsoSigla(rimborsoMissioneDaComunicare.getId());
                                     }
                                 });
                             }
@@ -88,9 +88,9 @@ public class FlowService {
                         }
                         break;
                     case FlowResult.TIPO_FLUSSO_REVOCA:
-                        AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById(principal, AnnullamentoOrdineMissione.class, new Long(flowResult.getIdMissione()));
+                        AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione)crudServiceBean.findById( AnnullamentoOrdineMissione.class, new Long(flowResult.getIdMissione()));
                         if (annullamento != null){
-                            annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissione(principal, annullamento, flowResult);
+                            annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissione(annullamento, flowResult);
                         } else {
                             errore = "L'annullamento ordine di missione con ID "+flowResult.getIdMissione()+" indicato dal flusso con ID "+flowResult.getProcessInstanceId()+" non è presente";
                             log.info(errore);

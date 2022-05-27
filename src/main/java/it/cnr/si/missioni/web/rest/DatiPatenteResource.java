@@ -1,11 +1,13 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
 
+
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class DatiPatenteResource {
 
@@ -72,7 +75,7 @@ public class DatiPatenteResource {
                 return JSONResponseEntity.badRequest(error);
         	}
             try {
-				datiPatente = datiPatenteService.createDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
+				datiPatente = datiPatenteService.createDatiPatente( datiPatente);
 			} catch (Exception e) {
             	log.error("registerDatiPatente", e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -82,7 +85,7 @@ public class DatiPatenteResource {
     		log.debug("id pieno");
     		log.debug("recupero USER");
     		try {
-        		datiPatente = datiPatenteService.updateDatiPatente((Principal) SecurityUtils.getCurrentUser(), datiPatente);
+        		datiPatente = datiPatenteService.updateDatiPatente( datiPatente);
         		log.debug("modificata patente");
                 return JSONResponseEntity.ok();
     		} catch (Exception e) {

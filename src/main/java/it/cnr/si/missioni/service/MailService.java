@@ -11,6 +11,7 @@ import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -26,6 +27,7 @@ import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 
+@Profile("!showcase")
 @Service("MailService")
 public class MailService {
     private final Logger log = LoggerFactory.getLogger(MailService.class);
@@ -33,7 +35,7 @@ public class MailService {
     @Autowired
     private Environment env;
 
-    @Autowired
+	@Autowired(required = false)
     private JavaMailSenderImpl javaMailSender;
 
     /**
@@ -124,7 +126,7 @@ public class MailService {
     	}
     }
 	private boolean isDevProfile(){
-   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT) || env.acceptsProfiles(Costanti.SPRING_PROFILE_SHOWCASE)) {
    			return true;
    		}
    		return false;

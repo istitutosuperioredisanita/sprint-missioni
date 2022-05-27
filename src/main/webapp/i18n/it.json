@@ -44,6 +44,10 @@
         "form": {
             "username": "Login",
             "username.placeholder": "User",
+            "firstName": "Nome",
+            "firstName.placeholder": "Nome",
+            "lastName": "Cognome",
+            "lastName.placeholder": "Cognome",
             "newpassword": "New password",
             "newpassword.placeholder": "New password",
             "confirmpassword": "New password confirmation",
@@ -611,6 +615,12 @@
                     "required": "Your login is required.",
                     "minlength": "Your login is required to be at least 1 character",
                     "maxlength": "Your login cannot be longer than 50 characters"
+                },
+                "firstName": {
+                    "required": "Nome Obbligatorio."
+                },
+                "lastName": {
+                    "required": "Cognome Obbligatorio."
                 }
             },
             "success": "<strong>Registration saved!</strong> Please check your email for confirmation.",

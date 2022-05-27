@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
-import java.security.Principal;
+
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -47,7 +47,7 @@ public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
             } else {
                 payload = body.toString();
             }
-            log.info(((Principal) SecurityUtils.getCurrentUser()).getName()+" "+httpServletRequest.getMethod()+" "+httpServletRequest.getRequestURI()+" "+httpServletRequest.getQueryString()+" "+payload+" "+httpServletRequest.getRemoteAddr());
+            log.info(SecurityUtils.getCurrentUser()+" "+httpServletRequest.getMethod()+" "+httpServletRequest.getRequestURI()+" "+httpServletRequest.getQueryString()+" "+payload+" "+httpServletRequest.getRemoteAddr());
         }
 
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);

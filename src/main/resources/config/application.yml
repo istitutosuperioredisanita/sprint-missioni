@@ -18,6 +18,8 @@ management:
       enabled: false # When using the MailService, configure an SMTP server and set this to true
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: sprint
   liquibase:

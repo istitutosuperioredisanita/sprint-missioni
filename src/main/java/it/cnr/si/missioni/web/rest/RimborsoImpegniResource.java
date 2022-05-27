@@ -4,13 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Principal;
+
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class RimborsoImpegniResource {
 
@@ -63,7 +66,7 @@ public class RimborsoImpegniResource {
     		@RequestParam(value = "idRimborsoMissione") Long idRimborsoMissione) {
         log.debug("REST request per visualizzare i dati degli impegni per Rimborso Missione" );
         try {
-            List<RimborsoImpegni> rimborsoImpegni = rimborsoImpegniService.getRimborsoImpegni((Principal) SecurityUtils.getCurrentUser(), idRimborsoMissione);
+            List<RimborsoImpegni> rimborsoImpegni = rimborsoImpegniService.getRimborsoImpegni( idRimborsoMissione);
             return JSONResponseEntity.ok(rimborsoImpegni);
 		} catch (ComponentException e) {
 			log.error("ERRORE getimpegni",e);
@@ -80,7 +83,7 @@ public class RimborsoImpegniResource {
                                              HttpServletResponse response) {
     	if (rimborsoImpegni.getId() != null){
             try {
-            	rimborsoImpegni = rimborsoImpegniService.updateRimborsoImpegni((Principal) SecurityUtils.getCurrentUser(), rimborsoImpegni);
+            	rimborsoImpegni = rimborsoImpegniService.updateRimborsoImpegni( rimborsoImpegni);
     		} catch (Exception e) {
         		log.error("ERRORE modifyRimborsoImpegni",e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -101,7 +104,7 @@ public class RimborsoImpegniResource {
                                              HttpServletResponse response) {
     	if (rimborsoImpegni.getId() == null){
             try {
-            	rimborsoImpegni = rimborsoImpegniService.createRimborsoImpegni((Principal) SecurityUtils.getCurrentUser(), rimborsoImpegni);
+            	rimborsoImpegni = rimborsoImpegniService.createRimborsoImpegni( rimborsoImpegni);
     		} catch (AwesomeException e) {
         		log.error("ERRORE createRimborsoImpegni",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -123,7 +126,7 @@ public class RimborsoImpegniResource {
     @Timed
     public ResponseEntity<?> deleteRimborsoImpegni(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			rimborsoImpegniService.deleteRimborsoImpegni((Principal) SecurityUtils.getCurrentUser(), ids);
+			rimborsoImpegniService.deleteRimborsoImpegni( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
     		log.error("ERRORE deleteRimborsoImpegni",e);

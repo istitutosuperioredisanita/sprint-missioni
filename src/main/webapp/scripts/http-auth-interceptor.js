@@ -44,19 +44,29 @@
      */
         .config(function($httpProvider) {
 
-            var interceptor = ['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
+            var interceptor = ['$rootScope', '$q', 'httpBuffer', '$cookies','$location', function($rootScope, $q, httpBuffer, $cookies, $location) {
                 function success(response) {
                     return response;
                 }
 
                 function error(response) {
+                    $rootScope.salvataggio = false;
                     if (response.status === 401 && !response.config.ignoreAuthModule) {
+                        if ($rootScope.isUserKeycloak){
+                             $cookies['KC_REDIRECT'] = '/#' + $location.url();
+                             location.href = '/sso/login';
+                        }
+
                         var deferred = $q.defer();
                         httpBuffer.append(response.config, deferred);
                         $rootScope.$broadcast('event:auth-loginRequired', response);
                         return deferred.promise;
                     } else if (response.status === 403 && !response.config.ignoreAuthModule) {
-                        $rootScope.$broadcast('event:auth-notAuthorized', response);
+                        if ($rootScope.isUserNotKeycloak){
+                             location.href = '/#/login';
+                        } else {
+                            $rootScope.$broadcast('event:auth-notAuthorized', response);
+                        }
                     }
                     // otherwise, default behaviour
                     return $q.reject(response);
@@ -67,7 +77,9 @@
                 };
 
             }];
-            $httpProvider.responseInterceptors.push(interceptor);
+            if ($httpProvider.responseInterceptors){
+                $httpProvider.responseInterceptors.push(interceptor);
+            }
         });
 
     /**

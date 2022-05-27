@@ -112,7 +112,7 @@ angular.module('missioniAppUtils', [])
 
             service.set = function(oauthResponse) {
                 token = {};
-                token.access_token = oauthResponse.id_token;
+                token.access_token = oauthResponse.access_token;
                 setExpiresAt(oauthResponse);
                 StorageService.save(TOKEN, token);
                 return token

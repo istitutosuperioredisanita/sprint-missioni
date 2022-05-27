@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.web.rest;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,14 @@ import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class UoResource {
 

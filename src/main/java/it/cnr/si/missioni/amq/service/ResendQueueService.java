@@ -3,6 +3,7 @@ package it.cnr.si.missioni.amq.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.missioni.amq.domain.TypeMissione;
@@ -13,9 +14,10 @@ import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.data.DataQueue;
 import it.cnr.si.missioni.util.data.Queue;
 
+@Profile("!showcase")
 @Component
 public class ResendQueueService {
-	private static final Logger LOGGER  = LoggerFactory.getLogger(RabbitMQService.class);
+	private static final Logger LOGGER  = LoggerFactory.getLogger(ResendQueueService.class);
 
 	@Autowired
     private OrdineMissioneService ordineMissioneService;

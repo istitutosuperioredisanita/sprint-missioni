@@ -2,10 +2,8 @@ package it.cnr.si.missioni.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +37,10 @@ public class PrintOrdineMissioneAutoPropriaService {
     @Autowired
     private AccountService accountService;
     
-//    private PrintOrdineMissione getPrintOrdineMissione(Principal principal, OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
+//    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     private PrintOrdineMissioneAutoPropria getPrintOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, String currentLogin) throws AwesomeException, ComponentException {
     	OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
-		Account account = accountService.loadAccountFromRest(ordineMissione.getUid());
+		Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
     	PrintOrdineMissioneAutoPropria printOrdineMissioneAutoPropria = new PrintOrdineMissioneAutoPropria();
     	printOrdineMissioneAutoPropria.setAnno(ordineMissione.getAnno());
     	printOrdineMissioneAutoPropria.setNumero(ordineMissione.getNumero());

@@ -8,6 +8,7 @@ import it.cnr.si.missioni.service.MissioneRespintaService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
+
 import java.util.List;
 
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class MissioneRespintaResource {
 
@@ -42,7 +45,7 @@ public class MissioneRespintaResource {
     public ResponseEntity<?> getMissioniRespinte(@RequestParam(value = "tipoMissione") String tipoMissione,
 											@RequestParam (value="idMissione") Long idMissione) {
         log.debug("REST request per visualizzare la cronologia dei respingimenti delle missioni");
-        List<MissioneRespinta> cronologia = missioneRespintaService.getCronologiaRespingimentiMissione(SecurityUtils.getCurrentUser(), tipoMissione, idMissione);
+        List<MissioneRespinta> cronologia = missioneRespintaService.getCronologiaRespingimentiMissione(tipoMissione, idMissione);
         return JSONResponseEntity.ok(cronologia);
     }
 }
