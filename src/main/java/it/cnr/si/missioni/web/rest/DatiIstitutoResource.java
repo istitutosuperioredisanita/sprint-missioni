@@ -1,12 +1,14 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
+
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ import it.cnr.si.missioni.util.Utility;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class DatiIstitutoResource {
 
@@ -72,7 +75,7 @@ public class DatiIstitutoResource {
     		return JSONResponseEntity.badRequest(CodiciErrore.DATI_GIA_INSERITI);
     	}
     	try {
-    		datiIstituto = datiIstitutoService.creaDatiIstituto((Principal) SecurityUtils.getCurrentUser(), datiIstituto);
+    		datiIstituto = datiIstitutoService.creaDatiIstituto( datiIstituto);
     	} catch (Exception e) {
     		log.error("ERRORE createDatiIstituto ",e);
     		return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -95,7 +98,7 @@ public class DatiIstitutoResource {
         		}
         	}
             try {
-				datiIstituto = datiIstitutoService.updateDatiIstituto((Principal) SecurityUtils.getCurrentUser(), datiIstituto);
+				datiIstituto = datiIstitutoService.updateDatiIstituto( datiIstituto);
     		} catch (Exception e) {
     			log.error("ERRORE modifyDatiIstituto",e);
     			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -114,7 +117,7 @@ public class DatiIstitutoResource {
     @Timed
     public ResponseEntity<?> deleteDatiIstituto(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			datiIstitutoService.deleteDatiIstituto((Principal) SecurityUtils.getCurrentUser(), ids);
+			datiIstitutoService.deleteDatiIstituto( ids);
             return JSONResponseEntity.ok();
 		} catch (Exception e) {
 			log.error("ERRORE deleteDatiIstituto",e);
@@ -127,7 +130,7 @@ public class DatiIstitutoResource {
 	@Timed
 	public void ribalta() {
 		log.debug("REST request per ribaltare i dati istituto");
-		datiIstitutoService.ribaltaDatiIstituti((Principal) SecurityUtils.getCurrentUser());
+		datiIstitutoService.ribaltaDatiIstituti();
 		log.debug("END REST request per ribaltare i dati istituto");
 	}
 

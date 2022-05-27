@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -35,13 +36,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Profile("!showcase")
 public class MessageForFlowsService {
     private static final Log logger = LogFactory.getLog(MessageForFlowsService.class);
 
     @Autowired
     UoService uoService;
 
-    @Autowired
+    @Autowired(required = false)
     MissioniAceService missioniAceService;
 
     @Autowired

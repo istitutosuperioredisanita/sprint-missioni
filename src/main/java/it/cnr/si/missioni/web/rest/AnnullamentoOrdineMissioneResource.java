@@ -4,16 +4,17 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +39,6 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
@@ -48,6 +46,7 @@ import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class AnnullamentoOrdineMissioneResource {
 
@@ -55,7 +54,7 @@ public class AnnullamentoOrdineMissioneResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
     
     @Autowired
@@ -73,7 +72,7 @@ public class AnnullamentoOrdineMissioneResource {
         log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
         List<AnnullamentoOrdineMissione> annullamenti;
 		try {
-			annullamenti = annullamentoOrdineMissioneService.getAnnullamenti(SecurityUtils.getCurrentUser(), filter, true);
+			annullamenti = annullamentoOrdineMissioneService.getAnnullamenti( filter, true);
 		} catch (ComponentException e) {
 			log.error("ERRORE getRimborsoMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -93,7 +92,7 @@ public class AnnullamentoOrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<AnnullamentoOrdineMissione> annullamenti;
 		try {
-			annullamenti = annullamentoOrdineMissioneService.getAnnullamentiForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+			annullamenti = annullamentoOrdineMissioneService.getAnnullamentiForValidateFlows(filter, true);
 		} catch (Exception e) {
 			log.error("ERRORE getRimborsoMissioneDaValidare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -112,7 +111,7 @@ public class AnnullamentoOrdineMissioneResource {
     		@RequestParam(value = "id") Long idMissione) {
         log.debug("REST request per visualizzare i dati dell' annullamento dell'Ordine di Missione " );
         try {
-        	AnnullamentoOrdineMissione annullamento = annullamentoOrdineMissioneService.getAnnullamentoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), idMissione, true);
+        	AnnullamentoOrdineMissione annullamento = annullamentoOrdineMissioneService.getAnnullamentoOrdineMissione( idMissione, true);
         	return JSONResponseEntity.ok(annullamento);
         } catch (AwesomeException e) {
 			log.error("ERRORE getRimborsoMissione",e);
@@ -131,7 +130,7 @@ public class AnnullamentoOrdineMissioneResource {
                                              HttpServletResponse response) {
     	if (annullamento.getId() == null){
             try {
-            	annullamento =  annullamentoOrdineMissioneService.createAnnullamentoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), annullamento);
+            	annullamento =  annullamentoOrdineMissioneService.createAnnullamentoOrdineMissione( annullamento);
     		} catch (AwesomeException e) {
     			log.error("ERRORE createAnnullamentoOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -154,9 +153,8 @@ public class AnnullamentoOrdineMissioneResource {
     public ResponseEntity<?> modifyAnnullamentoOrdineMissione(@RequestBody AnnullamentoOrdineMissione annullamento, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (annullamento.getId() != null){
-    		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
-            	annullamento =  annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione(principal, annullamento, null);
+            	annullamento =  annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione(annullamento, null);
     		} catch (AwesomeException e) {
     			log.error("ERRORE modifyAnnullamentoOrdineMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -183,7 +181,7 @@ public class AnnullamentoOrdineMissioneResource {
     	if (annullamento.getId() != null){
     		annullamento.setDaValidazione(daValidazione);
             try {
-            	annullamento = annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione((Principal) SecurityUtils.getCurrentUser(), annullamento, false, confirm, basePath);
+            	annullamento = annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione( annullamento, false, confirm, basePath);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmAnnullamentoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -205,7 +203,7 @@ public class AnnullamentoOrdineMissioneResource {
     @Timed
     public ResponseEntity deleteAnnullamento(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			annullamentoOrdineMissioneService.deleteAnnullamento((Principal) SecurityUtils.getCurrentUser(), ids);
+			annullamentoOrdineMissioneService.deleteAnnullamento( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
 			log.error("ERRORE deleteAnnullamentoMissione",e);
@@ -221,15 +219,15 @@ public class AnnullamentoOrdineMissioneResource {
     @Timed
     @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printAnnullamentoMissione(HttpServletRequest request,
-    		@RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
+    		@RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'rimborso di Missione " );
         
         if (!StringUtils.isEmpty(idMissione)){
             try {
             	Long idMissioneLong = new Long (idMissione);
-				Authentication auth = tokenProvider.getAuthentication(token);
-            	if (auth != null){
-            		Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(auth, idMissioneLong);
+				String user = securityService.getCurrentUserLogin();
+				if (user != null ){
+            		Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(idMissioneLong);
             		if (map != null){
             			res.setContentType("application/pdf");
                     	try {

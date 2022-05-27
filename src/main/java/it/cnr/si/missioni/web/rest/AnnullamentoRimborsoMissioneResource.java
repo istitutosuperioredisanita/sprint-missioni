@@ -1,22 +1,22 @@
 package it.cnr.si.missioni.web.rest;
 
-import java.security.Principal;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.cnr.si.missioni.security.jwt.TokenProvider;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +35,6 @@ import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
 import it.cnr.si.missioni.service.AnnullamentoRimborsoMissioneService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 
@@ -43,6 +42,7 @@ import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RolesAllowed({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class AnnullamentoRimborsoMissioneResource {
 
@@ -50,7 +50,7 @@ public class AnnullamentoRimborsoMissioneResource {
 
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private SecurityService securityService;
 
     
     @Autowired
@@ -68,7 +68,7 @@ public class AnnullamentoRimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
         List<AnnullamentoRimborsoMissione> annullamenti;
 		try {
-			annullamenti = annullamentoRimborsoMissioneService.getAnnullamenti(SecurityUtils.getCurrentUser(), filter, true);
+			annullamenti = annullamentoRimborsoMissioneService.getAnnullamenti(filter, true);
 		} catch (ComponentException e) {
 			log.error("ERRORE getRimborsoMissione",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -88,7 +88,7 @@ public class AnnullamentoRimborsoMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
         List<AnnullamentoRimborsoMissione> annullamenti;
 		try {
-			annullamenti = annullamentoRimborsoMissioneService.getAnnullamentiForValidateFlows(SecurityUtils.getCurrentUser(), filter, true);
+			annullamenti = annullamentoRimborsoMissioneService.getAnnullamentiForValidateFlows(filter, true);
 		} catch (Exception e) {
 			log.error("ERRORE getRimborsoMissioneDaValidare",e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -107,7 +107,7 @@ public class AnnullamentoRimborsoMissioneResource {
     		@RequestParam(value = "id") Long idMissione) {
         log.debug("REST request per visualizzare i dati dell' annullamento dell'Ordine di Missione " );
         try {
-        	AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneService.getAnnullamentoRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), idMissione);
+        	AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneService.getAnnullamentoRimborsoMissione( idMissione);
         	return JSONResponseEntity.ok(annullamento);
         } catch (AwesomeException e) {
 			log.error("ERRORE getRimborsoMissione",e);
@@ -126,7 +126,7 @@ public class AnnullamentoRimborsoMissioneResource {
                                              HttpServletResponse response) {
     	if (annullamento.getId() == null){
             try {
-            	annullamento =  annullamentoRimborsoMissioneService.createAnnullamentoRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), annullamento);
+            	annullamento =  annullamentoRimborsoMissioneService.createAnnullamentoRimborsoMissione( annullamento);
     		} catch (AwesomeException e) {
     			log.error("ERRORE createAnnullamentoRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -149,9 +149,8 @@ public class AnnullamentoRimborsoMissioneResource {
     public ResponseEntity<?> modifyAnnullamentoRimborsoMissione(@RequestBody AnnullamentoRimborsoMissione annullamento, HttpServletRequest request,
                                              HttpServletResponse response) {
     	if (annullamento.getId() != null){
-    		Principal principal = SecurityContextHolder.getContext().getAuthentication();
             try {
-            	annullamento =  annullamentoRimborsoMissioneService.updateAnnullamentoRimborsoMissione(principal, annullamento, null);
+            	annullamento =  annullamentoRimborsoMissioneService.updateAnnullamentoRimborsoMissione(annullamento, null);
     		} catch (AwesomeException e) {
     			log.error("ERRORE modifyAnnullamentoRimborsoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -177,7 +176,7 @@ public class AnnullamentoRimborsoMissioneResource {
     	String basePath = Arrays.stream(request.getRequestURL().toString().split("/")).limit(3).collect(Collectors.joining("/"));
     	if (annullamento.getId() != null){
             try {
-            	annullamento = annullamentoRimborsoMissioneService.updateAnnullamentoRimborsoMissione((Principal) SecurityUtils.getCurrentUser(), annullamento, false, confirm, basePath);
+            	annullamento = annullamentoRimborsoMissioneService.updateAnnullamentoRimborsoMissione( annullamento, false, confirm, basePath);
     		} catch (AwesomeException e) {
     			log.error("ERRORE confirmAnnullamentoMissione",e);
     			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
@@ -199,7 +198,7 @@ public class AnnullamentoRimborsoMissioneResource {
     @Timed
     public ResponseEntity deleteAnnullamento(@PathVariable Long ids, HttpServletRequest request) {
 		try {
-			annullamentoRimborsoMissioneService.deleteAnnullamento((Principal) SecurityUtils.getCurrentUser(), ids);
+			annullamentoRimborsoMissioneService.deleteAnnullamento( ids);
             return JSONResponseEntity.ok();
 		} catch (AwesomeException e) {
 			log.error("ERRORE deleteAnnullamentoMissione",e);
@@ -217,7 +216,7 @@ public class AnnullamentoRimborsoMissioneResource {
     		@PathVariable Long idAnnullamentoRimborsoMissione) {
         log.debug("REST request per visualizzare gli allegati dell'annullamento rimborso missione" );
         try {
-            List<CMISFileAttachment> lista = annullamentoRimborsoMissioneService.getAttachments((Principal) SecurityUtils.getCurrentUser(), idAnnullamentoRimborsoMissione);
+            List<CMISFileAttachment> lista = annullamentoRimborsoMissioneService.getAttachments( idAnnullamentoRimborsoMissione);
             return JSONResponseEntity.ok(lista);
 		} catch (ComponentException e) {
 			log.error("getAttachments", e);
@@ -233,7 +232,7 @@ public class AnnullamentoRimborsoMissioneResource {
     		@PathVariable Long idRimborsoMissione) {
         log.debug("REST request per visualizzare gli allegati dell'annullamento rimborso missione" );
         try {
-            List<CMISFileAttachment> lista = annullamentoRimborsoMissioneService.getAttachmentsFromRimborso((Principal) SecurityUtils.getCurrentUser(), idRimborsoMissione);
+            List<CMISFileAttachment> lista = annullamentoRimborsoMissioneService.getAttachmentsFromRimborso( idRimborsoMissione);
             return JSONResponseEntity.ok(lista);
 		} catch (ComponentException e) {
 			log.error("getAttachments", e);
@@ -246,21 +245,19 @@ public class AnnullamentoRimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Timed
-    public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idAnnullamentoRimborsoMissione") String idAnnullamentoRimborsoMissione, @RequestParam(value = "token") String token, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadAllegati(@RequestParam(value = "idAnnullamentoRimborsoMissione") String idAnnullamentoRimborsoMissione, HttpServletRequest req, @RequestParam("file") MultipartFile file) {
     	log.debug("REST request per l'upload di allegati dell'ordine di missione" );
     	if (idAnnullamentoRimborsoMissione != null){
     		Long idAnnullamentoRimborsoLong = new Long (idAnnullamentoRimborsoMissione);
-			Authentication auth = tokenProvider.getAuthentication(token);
-
-    		if (auth != null){
-    			Principal principal = (Principal) auth;
+			String user = securityService.getCurrentUserLogin();
+			if (user != null ){
     			try {
     				if (file != null && file.getContentType() != null){
     					MimeTypes mimeTypes = Utility.getMimeType(file.getContentType());
     					if (mimeTypes == null){
     						return new ResponseEntity<String>("Il tipo di file selezionato: "+file.getContentType()+ " non è valido.", HttpStatus.BAD_REQUEST);
     					} else {
-    						CMISFileAttachment cmisFileAttachment = annullamentoRimborsoMissioneService.uploadAllegato(principal, idAnnullamentoRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
+    						CMISFileAttachment cmisFileAttachment = annullamentoRimborsoMissioneService.uploadAllegato(idAnnullamentoRimborsoLong, file.getInputStream(), file.getOriginalFilename(), mimeTypes);
     						if (cmisFileAttachment != null){
     							return JSONResponseEntity.ok(cmisFileAttachment);
     						} else {
@@ -299,7 +296,7 @@ public class AnnullamentoRimborsoMissioneResource {
         
         if (!StringUtils.isEmpty(id)){
             try {
-            		annullamentoRimborsoMissioneService.gestioneCancellazioneAllegati((Principal) SecurityUtils.getCurrentUser(), id, idAnnullamento);
+            		annullamentoRimborsoMissioneService.gestioneCancellazioneAllegati( id, idAnnullamento);
                     return JSONResponseEntity.ok();
             } catch (AwesomeException e) {
             	log.error("deleteAttachment", e);
