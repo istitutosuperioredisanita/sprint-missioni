@@ -1,5 +1,7 @@
 package it.cnr.si.missioni.cmis;
 
+import java.util.Optional;
+
 public class CMISFileAttachment {
 	private Long idMissione;
 	private String id;
@@ -16,7 +18,10 @@ public class CMISFileAttachment {
 		return id;
 	}
 	public void setId(String id) {
-		this.id = id;
+		this.id = Optional.ofNullable(id)
+				.filter(s -> s.indexOf(";") != -1)
+				.map(s -> s.substring(0, s.indexOf(";")))
+				.orElse(id);
 	}
 	public String getNomeFile() {
 		return nomeFile;
