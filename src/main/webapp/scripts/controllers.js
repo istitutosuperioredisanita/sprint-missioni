@@ -2,7 +2,8 @@
 
 /* Controllers */
 
-missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
+missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService, AccessToken) {
+    AccessToken.remove();
 });
 
 missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService, DateService, ProxyService) {
