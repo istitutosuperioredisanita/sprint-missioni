@@ -5,7 +5,8 @@
 missioniApp.controller('MainController', function ($scope, $sessionStorage, $location, ElencoOrdiniMissioneService) {
 });
 
-missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService, DateService, ProxyService) {
+missioniApp.controller('HomeController', function ($scope, $sessionStorage, $location, ui, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, ConfigService, DateService, ProxyService, AccessToken) {
+    AccessToken.remove();
     $scope.reloadUoWork = function(uo){
         if (uo){
             $scope.uoWorkForSpecialUser = uo;
