@@ -55,8 +55,8 @@ public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
                 String username = "";
                 if (kPrincipal != null && kPrincipal.getKeycloakSecurityContext() != null && kPrincipal.getKeycloakSecurityContext().getIdToken() != null ){
                     username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
-                    log.info( "{} {} {} {} {} {} ", username,httpServletRequest.getMethod(),httpServletRequest.getRequestURI(),httpServletRequest.getQueryString(),payload, httpServletRequest.getRemoteAddr());
                 }
+                log.info( "{} {} {} {} {} {} ", username,httpServletRequest.getMethod(),httpServletRequest.getRequestURI(),httpServletRequest.getQueryString(),payload, httpServletRequest.getRemoteAddr());
             }
         }
 
