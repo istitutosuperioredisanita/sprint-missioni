@@ -52,8 +52,11 @@ public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
             Object principal = (Object)SecurityUtils.getCurrentUser().getPrincipal();
             if (principal instanceof KeycloakPrincipal) {
                 KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
-                String username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
-                log.info( "{} {} {} {} {} {} ", username,httpServletRequest.getMethod(),httpServletRequest.getRequestURI(),httpServletRequest.getQueryString(),payload, httpServletRequest.getRemoteAddr());
+                String username = "";
+                if (kPrincipal != null && kPrincipal.getKeycloakSecurityContext() != null && kPrincipal.getKeycloakSecurityContext().getIdToken() != null ){
+                    username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
+                    log.info( "{} {} {} {} {} {} ", username,httpServletRequest.getMethod(),httpServletRequest.getRequestURI(),httpServletRequest.getQueryString(),payload, httpServletRequest.getRemoteAddr());
+                }
             }
         }
 
