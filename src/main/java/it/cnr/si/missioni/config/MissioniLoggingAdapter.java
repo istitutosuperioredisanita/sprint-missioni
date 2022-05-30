@@ -1,6 +1,8 @@
 package it.cnr.si.missioni.config;
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,12 @@ public class MissioniLoggingAdapter extends RequestBodyAdviceAdapter {
             } else {
                 payload = body.toString();
             }
-            log.info(SecurityUtils.getCurrentUser()+" "+httpServletRequest.getMethod()+" "+httpServletRequest.getRequestURI()+" "+httpServletRequest.getQueryString()+" "+payload+" "+httpServletRequest.getRemoteAddr());
+            Object principal = (Object)SecurityUtils.getCurrentUser().getPrincipal();
+            if (principal instanceof KeycloakPrincipal) {
+                KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
+                String username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
+                log.info( "{} {} {} {} {} {} ", username,httpServletRequest.getMethod(),httpServletRequest.getRequestURI(),httpServletRequest.getQueryString(),payload, httpServletRequest.getRemoteAddr());
+            }
         }
 
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
