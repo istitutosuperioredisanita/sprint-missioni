@@ -840,6 +840,7 @@ public class OrdineMissioneService {
 	private void bypassRespGruppo(OrdineMissione ordineMissione) {
 		ZonedDateTime oggi = ZonedDateTime.now();
 		ordineMissione.setBypassRespGruppo("S");
+		ordineMissione.setDaChron("S");
 		updateOrdineMissione(ordineMissione, false, true, null);
 	}
 
@@ -881,6 +882,7 @@ public class OrdineMissioneService {
 	private void bypassVerificaAmministrativo(OrdineMissione ordineMissione) {
 		ordineMissione.setBypassAmministrativo("S");
 		ordineMissione.setDaValidazione("S");
+		ordineMissione.setDaChron("S");
 		ordineMissione.setToBeUpdated();
 		updateOrdineMissione(ordineMissione, false, true);
 	}
@@ -962,7 +964,7 @@ public class OrdineMissioneService {
 	public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows,
 			Boolean confirm, String basePath) {
 		ZonedDateTime oggi = ZonedDateTime.now();
-		if (!fromFlows && !isUserEnabledToViewMissione(ordineMissione)){
+		if (!fromFlows && !isUserEnabledToViewMissione(ordineMissione) && Utility.nvl(ordineMissione.getDaChron(),"N").equals("N")){
 			throw new AwesomeException(CodiciErrore.ERRGEN,
 					"Non Autorizzato");
 		}

@@ -367,7 +367,18 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
     @Transient
     private String daValidazione;
-	
+
+	public String getDaChron() {
+		return daChron;
+	}
+
+	public void setDaChron(String daChron) {
+		this.daChron = daChron;
+	}
+
+	@Transient
+	private String daChron;
+
 	@Transient
     private String utilizzoAutoPropria;
 	
