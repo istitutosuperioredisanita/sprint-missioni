@@ -34,8 +34,11 @@ public class MissioniLoggingGet  extends HandlerInterceptorAdapter {
                 Object principal = (Object)SecurityUtils.getCurrentUser().getPrincipal();
                 if (principal instanceof KeycloakPrincipal) {
                     KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
-                    String username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
-                    log.info( "{} {} {} {} {} ", username,request.getMethod(),request.getRequestURI(),request.getQueryString(),request.getRemoteAddr());
+                    String username = "";
+                    if (kPrincipal != null && kPrincipal.getKeycloakSecurityContext() != null && kPrincipal.getKeycloakSecurityContext().getIdToken() != null ){
+                        username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
+                        log.info( "{} {} {} {} {} ", username,request.getMethod(),request.getRequestURI(),request.getQueryString(),request.getRemoteAddr());
+                    }
                 }
             }
         }
