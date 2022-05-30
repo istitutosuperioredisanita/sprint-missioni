@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -79,16 +80,20 @@ public class AccountLDAPResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<String> getAccount() {
-        boolean isUserWithRole = isUserWithRole();
-        String resp = "";
-        if (isUserWithRole){
-            resp = accountService.getAccount(true);
-        } else {
-            resp = accountService.getResponseAccountWithoutInfo(false);
-        }
-        if (resp != null){
-            return new ResponseEntity<String>(resp, HttpStatus.OK);
-        } else {
+        try {
+            boolean isUserWithRole = isUserWithRole();
+            String resp = "";
+            if (isUserWithRole){
+                resp = accountService.getAccount(true);
+            } else {
+                resp = accountService.getResponseAccountWithoutInfo(false);
+            }
+            if (resp != null){
+                return new ResponseEntity<String>(resp, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<String>("", HttpStatus.UNAUTHORIZED);
+            }
+        } catch (HttpClientErrorException.Unauthorized _ex) {
             return new ResponseEntity<String>("", HttpStatus.UNAUTHORIZED);
         }
     }
