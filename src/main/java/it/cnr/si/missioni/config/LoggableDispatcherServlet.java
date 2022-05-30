@@ -61,8 +61,8 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
                     String username = "";
                     if (kPrincipal != null && kPrincipal.getKeycloakSecurityContext() != null && kPrincipal.getKeycloakSecurityContext().getIdToken() != null ){
                         username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
-                        log.info( "{} {} {} {} {} {} ", username,requestToCache.getMethod(),requestToCache.getRequestURI(),requestToCache.getQueryString(),payload, requestToCache.getRemoteAddr());
                     }
+                    log.info( "{} {} {} {} {} {} ", username,requestToCache.getMethod(),requestToCache.getRequestURI(),requestToCache.getQueryString(),payload, requestToCache.getRemoteAddr());
                 }
             } catch (IOException e) {
                 logger.info(e.getMessage() );
