@@ -57,7 +57,6 @@ public class FlowService {
     public void aggiornaMissioneFlows(FlowResult flowResult) {
         log.info(flowResult.toString());
         String errore = "";
-        try {
             if (flowResult.getIdMissione() != null){
                 switch (flowResult.getTipologiaMissione() ) {
                     case FlowResult.TIPO_FLUSSO_ORDINE:
@@ -104,11 +103,5 @@ public class FlowService {
                     log.info(errore);
                     throw new AwesomeException(CodiciErrore.ERRGEN, errore);
             }
-        } catch (Exception e){
-                errore = e.getMessage();
-                log.info(errore);
-//                mailService.sendEmailError(subjectGenericError, errore,  false, true);
-                throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
-        }
     }
 }
