@@ -1,24 +1,10 @@
 package it.cnr.si.missioni.service;
 
 import feign.FeignException;
-import it.cnr.si.flows.model.ProcessDefinitions;
-import it.cnr.si.flows.model.StartWorkflowResponse;
-import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.CMISMissione;
-import it.cnr.si.missioni.cmis.MessageForFlow;
-import it.cnr.si.missioni.cmis.MessageForFlowRimborso;
-import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
-import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.SiperService;
-import it.cnr.si.service.application.FlowsService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.enums.TipoContratto;
@@ -31,8 +17,6 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -41,13 +25,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -67,10 +47,7 @@ public class MissioniAceService {
     @Autowired(required = false)
     AceService aceService;
 
-    @Autowired(required = false)
-    SiperService siperService;
-
-    private static Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>(){
+    private static Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>() {
         {
             put("BOR", TipoContratto.BORSISTA);
             put("ASS", TipoContratto.ASSEGNISTA);
@@ -80,34 +57,34 @@ public class MissioniAceService {
         }
     };
 
-    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data){
-            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer)null, term, data, (Integer)null);
-            return list;
+    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data) {
+        List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer) null, term, data, (Integer) null);
+        return list;
     }
 
-    private List<SimpleEntitaOrganizzativaWebDto> recuperoSediStoricheByTerm(String term, LocalDate data){
-        for (int i = 1; i < 5; i++){
+    private List<SimpleEntitaOrganizzativaWebDto> recuperoSediStoricheByTerm(String term, LocalDate data) {
+        for (int i = 1; i < 5; i++) {
             LocalDate dataSottratta = data.minus(i, ChronoUnit.YEARS);
-            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer)null, term, dataSottratta, (Integer)null);
+            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer) null, term, dataSottratta, (Integer) null);
             List<SimpleEntitaOrganizzativaWebDto> listaEOAllaData = getSimpleEntitaOrganizzativaWebDtoValid(term, list);
-            if (!listaEOAllaData.isEmpty()){
+            if (!listaEOAllaData.isEmpty()) {
                 return list;
             }
         }
         return new ArrayList<>();
     }
 
-    public SimpleEntitaOrganizzativaWebDto getSede(int sede){
+    public SimpleEntitaOrganizzativaWebDto getSede(int sede) {
         return aceService.entitaOrganizzativaById(sede);
     }
 
-    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo, LocalDate data){
+    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediDaUo(String uo, LocalDate data) {
         List<SimpleEntitaOrganizzativaWebDto> lista = recuperoSediByTerm(uo, LocalDate.now());
         List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo = getSimpleEntitaOrganizzativaWebDtoValid(uo, lista);
-        if (listaEntitaUo.isEmpty()){
+        if (listaEntitaUo.isEmpty()) {
             List<SimpleEntitaOrganizzativaWebDto> listaAllaData = recuperoSediByTerm(uo, data);
             List<SimpleEntitaOrganizzativaWebDto> listaEOAllaData = getSimpleEntitaOrganizzativaWebDtoValid(uo, listaAllaData);
-            if (listaEOAllaData.isEmpty()){
+            if (listaEOAllaData.isEmpty()) {
                 return recuperoSediStoricheByTerm(uo, data);
             }
             return listaEOAllaData;
@@ -123,36 +100,38 @@ public class MissioniAceService {
         return listaEntitaUo;
     }
 
-    private SimpleEntitaOrganizzativaWebDto recuperoSedePrincipale(List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo ){
-        for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativaWebDto : listaEntitaUo){
+    private SimpleEntitaOrganizzativaWebDto recuperoSedePrincipale(List<SimpleEntitaOrganizzativaWebDto> listaEntitaUo) {
+        for (SimpleEntitaOrganizzativaWebDto entitaOrganizzativaWebDto : listaEntitaUo) {
             String tipoEntitaOrganizzativa = entitaOrganizzativaWebDto.getTipo().getSigla();
             if (tipoEntitaOrganizzativa.equals("UFF") ||
-                    tipoEntitaOrganizzativa.equals("SPRINC")||
-                    tipoEntitaOrganizzativa.equals("AREA")||
-                    tipoEntitaOrganizzativa.equals("DIP")||
-                    tipoEntitaOrganizzativa.equals("un")){
+                    tipoEntitaOrganizzativa.equals("SPRINC") ||
+                    tipoEntitaOrganizzativa.equals("AREA") ||
+                    tipoEntitaOrganizzativa.equals("DIP") ||
+                    tipoEntitaOrganizzativa.equals("un")) {
                 return entitaOrganizzativaWebDto;
             }
         }
         return null;
     }
-    public SimpleRuoloWebDto recuperoRuolo(String tipoRuolo){
+
+    public SimpleRuoloWebDto recuperoRuolo(String tipoRuolo) {
         return aceService.getRuoloBySigla(tipoRuolo);
     }
-    public RuoloPersonaWebDto associaRuoloPersona(RuoloPersonaDto ruoloPersona){
-        try{
+
+    public RuoloPersonaWebDto associaRuoloPersona(RuoloPersonaDto ruoloPersona) {
+        try {
             RuoloPersonaWebDto ruolo = aceService.associaRuoloPersona(ruoloPersona);
             return ruolo;
         } catch (FeignException e) {
-            logger.info(e.getMessage() + " for Ruolo: idPersona: "  + ruoloPersona.getPersona() + " idRuolo: "+ ruoloPersona.getRuolo()+" Id Entita Organizzativa "+ruoloPersona.getEntitaOrganizzativa());
+            logger.info(e.getMessage() + " for Ruolo: idPersona: " + ruoloPersona.getPersona() + " idRuolo: " + ruoloPersona.getRuolo() + " Id Entita Organizzativa " + ruoloPersona.getEntitaOrganizzativa());
         }
         return null;
     }
 
     @Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
-        logger.info("getAccountFromSiper: "+ currentLogin);
-        UserInfoDto userInfoDto = siperService.getUserInfoByUsername(currentLogin);
+        logger.info("getAccountFromSiper: " + currentLogin);
+        UserInfoDto userInfoDto = aceService.getUserInfoDto(currentLogin);
         return userInfoDto;
     }
 
@@ -165,7 +144,7 @@ public class MissioniAceService {
                     .map(a -> new SimpleGrantedAuthority(a.getSigla()))
                     .collect(Collectors.toList());
         } catch (FeignException e) {
-            logger.info(e.getMessage() + " for user: "+ "\"" + principal + "\"");
+            logger.info(e.getMessage() + " for user: " + "\"" + principal + "\"");
         }
         return authorities;
     }
@@ -173,61 +152,64 @@ public class MissioniAceService {
     @Cacheable(value = Costanti.NOME_CACHE_DATI_DIRETTORE)
     public String getDirettore(String username) {
         BossDto direttore = aceService.findResponsabileStruttura(username);
-        if (direttore != null){
+        if (direttore != null) {
             return direttore.getUtente().getUsername();
         }
         return "";
     }
 
     public SimplePersonaWebDto getPersona(String user) {
-        logger.info("getAccountFromSiper: "+ user);
-        return  aceService.getPersonaByUsername(user);
+        logger.info("getAccountFromSiper: " + user);
+        return aceService.getPersonaByUsername(user);
     }
+
     public List<SimpleUtenteWebDto> findUtentiIstituto(String cds, LocalDate data) {
-        logger.info("findUtentiIstituto: "+ cds );
+        logger.info("findUtentiIstituto: " + cds);
         return aceService.findUtentiIstituto(cds, data, TipoAppartenenza.SEDE);
     }
+
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
-        logger.info("findUtentiCdsuo: "+ uo );
+        logger.info("findUtentiCdsuo: " + uo);
         List<SimpleUtenteWebDto> lista = aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.SEDE);
         data = data.minusDays(365);
         List<SimpleUtenteWebDto> listaAnnoPrecedente = aceService.findUtentiCdsuo(uo, data, TipoAppartenenza.SEDE);
-        for (SimpleUtenteWebDto utenteAnnoPrecedente : listaAnnoPrecedente){
+        for (SimpleUtenteWebDto utenteAnnoPrecedente : listaAnnoPrecedente) {
             boolean utenteDuplicato = false;
-            for (SimpleUtenteWebDto utente : lista){
-                if (utenteAnnoPrecedente.getUsername().equals(utente.getUsername())){
+            for (SimpleUtenteWebDto utente : lista) {
+                if (utenteAnnoPrecedente.getUsername().equals(utente.getUsername())) {
                     utenteDuplicato = true;
                 }
             }
-            if (!utenteDuplicato){
+            if (!utenteDuplicato) {
                 lista.add(utenteAnnoPrecedente);
             }
         }
         List<SimpleUtenteWebDto> listaCessati = aceService.findUtentiCessatiCdsuo(uo, null, TipoAppartenenza.SEDE);
-        for (SimpleUtenteWebDto utenteCessato : listaCessati){
+        for (SimpleUtenteWebDto utenteCessato : listaCessati) {
             boolean utenteDuplicato = false;
-            for (SimpleUtenteWebDto utente : lista){
-                if (utenteCessato.getUsername().equals(utente.getUsername())){
+            for (SimpleUtenteWebDto utente : lista) {
+                if (utenteCessato.getUsername().equals(utente.getUsername())) {
                     utenteDuplicato = true;
                 }
             }
-            if (!utenteDuplicato){
+            if (!utenteDuplicato) {
                 lista.add(utenteCessato);
             }
         }
 
         return lista;
     }
-    public Integer getSedeResponsabileUtente(String user){
+
+    public Integer getSedeResponsabileUtente(String user) {
         BossDto boss = aceService.findResponsabileUtente(user);
-        if (boss != null && boss.getEntitaOrganizzativa() != null){
+        if (boss != null && boss.getEntitaOrganizzativa() != null) {
             return boss.getEntitaOrganizzativa().getId();
         } else {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Sede responsabile utente non trovata per "+user);
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Sede responsabile utente non trovata per " + user);
         }
     }
 
-    public SimpleEntitaOrganizzativaWebDto getSede(Integer idEntitaOrganizzativa){
+    public SimpleEntitaOrganizzativaWebDto getSede(Integer idEntitaOrganizzativa) {
         return aceService.entitaOrganizzativaById(idEntitaOrganizzativa);
     }
 
@@ -235,10 +217,10 @@ public class MissioniAceService {
     public void importPersonaleEsterno() throws IOException {
         String utente = "MIGESTERNI";
         try (
-                Reader reader = Files.newBufferedReader(Paths.get("src","test","resources", "esterni.csv"));
+                Reader reader = Files.newBufferedReader(Paths.get("src", "test", "resources", "esterni.csv"));
                 CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
-                        .withHeader("NOME", "COGNOME", "CODICE_FISCALE", "USERNAME","UO","IDNSIP","TI_SESSO","DT_NASCITA",
-                                "CD_TIPO_RAPPORTO","DT_INI_VALIDITA","DT_FIN_VALIDITA", "EMAIL")
+                        .withHeader("NOME", "COGNOME", "CODICE_FISCALE", "USERNAME", "UO", "IDNSIP", "TI_SESSO", "DT_NASCITA",
+                                "CD_TIPO_RAPPORTO", "DT_INI_VALIDITA", "DT_FIN_VALIDITA", "EMAIL")
                         .withFirstRecordAsHeader()
                         .withIgnoreHeaderCase()
                         .withTrim());
@@ -257,7 +239,7 @@ public class MissioniAceService {
                 String dtFinValidita = csvRecord.get("DT_FIN_VALIDITA");
                 String email = csvRecord.get("EMAIL");
                 String sedeIdByIdNsip = null;
-                logger.info("Elaboro riga: "+ csvRecord.getRecordNumber());
+                logger.info("Elaboro riga: " + csvRecord.getRecordNumber());
                 try {
                     sedeIdByIdNsip =
                             Optional.ofNullable(aceService.getSedeIdByIdNsip(idnsip))
@@ -327,7 +309,7 @@ public class MissioniAceService {
                         List<PersonaEntitaOrganizzativaWebDto> personeEO;
                         personeEO = aceService.personaEntitaOrganizzativaFind(params)
                                 .stream().sorted(Comparator.comparing(PersonaEntitaOrganizzativaWebDto::getInizioValidita)).collect(Collectors.toList());
-                        if (personeEO == null || personeEO.isEmpty()){
+                        if (personeEO == null || personeEO.isEmpty()) {
                             PersonaEntitaOrganizzativaDto personaEntitaOrganizzativaDto = new PersonaEntitaOrganizzativaDto();
                             personaEntitaOrganizzativaDto.setPersona(Integer.valueOf(personaId.get()));
                             personaEntitaOrganizzativaDto.setTipoAppartenenza(TipoAppartenenza.AFFERENZA_UO);
@@ -343,12 +325,12 @@ public class MissioniAceService {
                                     aceService.savePersonaEntitaOrganizzativa(personaEntitaOrganizzativaDto);
                         } else {
                             boolean trovataPersonaSenzaDataFine = false;
-                            for (PersonaEntitaOrganizzativaWebDto personaEO : personeEO){
-                              if (personaEO.getFineValidita() == null){
-                                  aggiornaPersonaEO(utente, dtIniValidita, dtFinValidita, personaEO);
-                                  PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO;
-                                  aggiornaPersonaEO(utente, dtIniValidita, dtFinValidita, personaEOWebDto);
-                              }
+                            for (PersonaEntitaOrganizzativaWebDto personaEO : personeEO) {
+                                if (personaEO.getFineValidita() == null) {
+                                    aggiornaPersonaEO(utente, dtIniValidita, dtFinValidita, personaEO);
+                                    PersonaEntitaOrganizzativaWebDto personaEOWebDto = personaEO;
+                                    aggiornaPersonaEO(utente, dtIniValidita, dtFinValidita, personaEOWebDto);
+                                }
                             }
 
                         }
