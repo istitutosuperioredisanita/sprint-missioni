@@ -3,6 +3,8 @@ package it.cnr.si.missioni.config;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.SecurityUtils;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -53,7 +55,12 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
                 String payload =  "";
                 payload= new String(cachedContent, StandardCharsets.UTF_8);
                 BufferedReader buffer = requestToCache.getReader();
-                logger.info( SecurityUtils.getCurrentUser()+" "+requestToCache.getMethod()+" "+requestToCache.getRequestURI()+" "+requestToCache.getQueryString()+" "+payload+" "+requestToCache.getRemoteAddr());
+                Object principal = (Object)SecurityUtils.getCurrentUser().getPrincipal();
+                if (principal instanceof KeycloakPrincipal) {
+                    KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
+                    String username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
+                    log.info( "{} {} {} {} {} {} ", username,requestToCache.getMethod(),requestToCache.getRequestURI(),requestToCache.getQueryString(),payload, requestToCache.getRemoteAddr());
+                }
             } catch (IOException e) {
                 logger.info(e.getMessage() );
             }

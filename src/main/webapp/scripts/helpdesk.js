@@ -117,10 +117,7 @@ missioniApp.controller('HelpdeskController', function ($scope, $rootScope, $loca
               ui.error("Errore nell'invio della segnalazione. Riprovare successivamente.")
             initMapHelpDesk();
             $scope.$apply();
-        },
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer "+$scope.accessToken);
-        }   
+        }
     })
     .prop('disabled', !$.support.fileInput)
     .parent().addClass($.support.fileInput ? undefined : 'disabled');
