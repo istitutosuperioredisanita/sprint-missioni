@@ -1014,7 +1014,7 @@ public class OrdineMissioneService {
 			if (!ordineMissioneDB.isMissioneDaValidare()) {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
 			}
-			if (!accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissioneDB.getUoSpesa())) {
+			if (!accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissioneDB.getUoSpesa())  && Utility.nvl(ordineMissione.getDaChron(),"N").equals("N")) {
 				throw new AwesomeException(CodiciErrore.ERRGEN,
 						"Utente non abilitato a validare gli ordini di missione per la uo "
 								+ ordineMissioneDB.getUoSpesa() + ".");
