@@ -131,7 +131,7 @@ public class MissioniAceService {
     @Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
         logger.info("getAccountFromSiper: " + currentLogin);
-        UserInfoDto userInfoDto = aceService.getUserInfoDto(currentLogin);
+        UserInfoDto userInfoDto = aceService.getUserInfoDto(currentLogin, false);
         return userInfoDto;
     }
 
