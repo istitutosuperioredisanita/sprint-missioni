@@ -4,6 +4,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import it.cnr.si.missioni.util.Costanti;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import it.cnr.si.security.AuthoritiesConstants;
 /**
  * REST controller for managing config.
  */
-@RolesAllowed({AuthoritiesConstants.ADMIN})
+@RolesAllowed({Costanti.ROLE_ADMIN})
 @RestController
 @RequestMapping("/api")
 public class ConfigResource {
