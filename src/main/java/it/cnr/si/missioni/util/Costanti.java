@@ -157,6 +157,8 @@ public class Costanti {
     public final static String SIGLA_ACE_DIREZIONE_GENERALE = "DG";
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
     public static final String ROLE_FLOWS = "USER_flows#missioni";
+    public static final String ROLE_ADMIN = "ADMIN#missioni";
+    public static final String ROLE_USER = "USER#missioni";
 
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;

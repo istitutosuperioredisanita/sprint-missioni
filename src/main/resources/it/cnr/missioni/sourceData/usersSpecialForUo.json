@@ -3199,6 +3199,7 @@
 {"uid" : "marianovella.manciani","uoForUsersSpecial" : [{"codice_uo" : "106001","ordine_da_validare" : "S"},{"codice_uo" : "131001","ordine_da_validare" : "S"}]}, 
 {"uid" : "maria.litrenta","uoForUsersSpecial" : [{"codice_uo" : "106001","ordine_da_validare" : "S"},{"codice_uo" : "131001","ordine_da_validare" : "S"}]}, 
 {"uid" : "alfio.fallica","uoForUsersSpecial" : [{"codice_uo" : "106002","ordine_da_validare" : "S"},{"codice_uo" : "131004","ordine_da_validare" : "S"},{"codice_uo" : "088000","ordine_da_validare" : "S"}]}, 
+{"uid" : "ennio.bebber","uoForUsersSpecial" : [{"codice_uo" : "131001","ordine_da_validare" : "S"}]}, 
 
 {"uid" : "eduardo.civitelli","uoForUsersSpecial" : [{"codice_uo" : "071000","ordine_da_validare" : "S"}]}, 
 {"uid" : "angelina.ditota","uoForUsersSpecial" : [{"codice_uo" : "071000","ordine_da_validare" : "S"}]}, 
