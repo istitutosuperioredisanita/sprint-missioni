@@ -90,7 +90,7 @@ public class ComunicaRimborsoSiglaService {
 		RimborsoMissione rimborsoApprovato = (RimborsoMissione)crudServiceBean.findById( RimborsoMissione.class, rimborsoApprovatoId);
 		try {
 			rimborsoMissioneService.retrieveDetails(rimborsoApprovato);
-			if (rimborsoApprovato.isTrattamentoAlternativoMissione() || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
+			if ((rimborsoApprovato.isTrattamentoAlternativoMissione() && !Utility.nvl(rimborsoApprovato.getRimborso0(),"N").equals("S")) || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0){
 				comunicaRimborso(rimborsoApprovato);
 			}
 			return null;
