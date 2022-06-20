@@ -159,7 +159,6 @@ public class MissioniAceService {
     }
 
     public SimplePersonaWebDto getPersona(String user) {
-        logger.info("getAccountFromSiper: " + user);
         return aceService.getPersonaByUsername(user);
     }
 
