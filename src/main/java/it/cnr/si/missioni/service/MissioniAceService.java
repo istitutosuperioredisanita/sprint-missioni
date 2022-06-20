@@ -128,12 +128,14 @@ public class MissioniAceService {
         return null;
     }
 
+    @Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
         logger.info("getAccountFromSiper: " + currentLogin);
         UserInfoDto userInfoDto = aceService.getUserInfoDto(currentLogin, false);
         return userInfoDto;
     }
 
+    @Cacheable(value = Costanti.NOME_CACHE_GRANT)
     public List<GrantedAuthority> getGrantedAuthorities(String principal) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         try {
@@ -147,6 +149,7 @@ public class MissioniAceService {
         return authorities;
     }
 
+    @Cacheable(value = Costanti.NOME_CACHE_DATI_DIRETTORE)
     public String getDirettore(String username) {
         BossDto direttore = aceService.findResponsabileStruttura(username);
         if (direttore != null) {
