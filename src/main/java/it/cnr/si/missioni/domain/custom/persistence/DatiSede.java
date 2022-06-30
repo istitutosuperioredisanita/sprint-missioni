@@ -55,6 +55,30 @@ public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
     @Column(name = "DELEGA_SPESA", length = 1, nullable = true)
     private String delegaSpesa;
 
+	@Size(min = 0, max = 1)
+	@Column(name = "TIPO_MAIL_DOPO_ORDINE", length = 1, nullable = true)
+	private String tipoMailDopoOrdine;
+
+	@Size(min = 0, max = 200)
+	@Column(name = "MAIL_DOPO_ORDINE", length = 200, nullable = true)
+	private String mailDopoOrdine;
+
+	public String getTipoMailDopoOrdine() {
+		return tipoMailDopoOrdine;
+	}
+
+	public void setTipoMailDopoOrdine(String tipoMailDopoOrdine) {
+		this.tipoMailDopoOrdine = tipoMailDopoOrdine;
+	}
+
+	public String getMailDopoOrdine() {
+		return mailDopoOrdine;
+	}
+
+	public void setMailDopoOrdine(String mailDopoOrdine) {
+		this.mailDopoOrdine = mailDopoOrdine;
+	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
