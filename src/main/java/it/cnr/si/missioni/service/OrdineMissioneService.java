@@ -431,6 +431,12 @@ public class OrdineMissioneService {
 
 	public void gestioneEmailDopoApprovazione(OrdineMissione ordineMissioneDaAggiornare, Boolean isAnnullamento) {
 		List<UsersSpecial> listaUtenti = new ArrayList<>();
+		DatiSede datiSede = null;
+		Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
+		if (account != null && account.getCodice_sede() != null) {
+			datiSede = datiSedeService.getDatiSede(account.getCodice_sede(),LocalDate.now());
+		}
+
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoRich(),
 				ordineMissioneDaAggiornare.getAnno());
 		DatiIstituto datiIstitutoSpesa = null;
@@ -465,6 +471,10 @@ public class OrdineMissioneService {
 		if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("E")
 				&& !StringUtils.isEmpty(datiIstituto.getMailNotifiche()) && !datiIstituto.getMailNotifiche().equals("N")) {
 			mailService.sendEmail(oggetto, testo, false, true, datiIstituto.getMailNotifiche());
+		}
+		if (datiSede != null && Utility.nvl(datiSede.getTipoMailDopoOrdine(), "N").equals("A")
+				&& !StringUtils.isEmpty(datiSede.getMailDopoOrdine())) {
+			mailService.sendEmail(oggetto, testo, false, true, datiSede.getMailDopoOrdine());
 		}
 		if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("A")
 				&& !StringUtils.isEmpty(datiIstituto.getMailDopoOrdine())) {
