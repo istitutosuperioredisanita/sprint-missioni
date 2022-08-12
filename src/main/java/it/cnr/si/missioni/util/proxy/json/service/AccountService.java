@@ -209,6 +209,7 @@ public class AccountService {
 	}
 
 	public Account loadAccount(Boolean loadSpecialUserData) {
+		logger.info("CHIAMATA 1 securityService.getUserInfo()");
 		final Optional<UserInfoDto> userInfo = securityService.getUserInfo();
 
 		if (userInfo.isPresent()) {
@@ -236,6 +237,7 @@ public class AccountService {
 	}
 
 	public String getAccount(Boolean loadSpecialUserData) {
+		logger.info("CHIAMATA 2 securityService.getUserInfo()");
 		final Optional<UserInfoDto> userInfo = securityService.getUserInfo();
 
 		if (userInfo.isPresent()) {
