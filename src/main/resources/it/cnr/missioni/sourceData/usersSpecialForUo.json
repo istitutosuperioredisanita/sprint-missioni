@@ -2935,7 +2935,7 @@
 {"uid":"laura.innocenti", "uoForUsersSpecial":[{"codice_uo":"109001", "ordine_da_validare":"S"}]},
 
 {"uid":"barbara.ciani", "uoForUsersSpecial":[{"codice_uo":"073000", "ordine_da_validare":"S"}]},
-{"uid":"laura.mengozzi", "uoForUsersSpecial":[{"codice_uo":"073000"}]},
+{"uid":"laura.mengozzi", "uoForUsersSpecial":[{"codice_uo":"073000", "ordine_da_validare":"S"}]},
 {"uid":"francesco.montaleone", "uoForUsersSpecial":[{"codice_uo":"073000", "ordine_da_validare":"S"}]},
 {"uid":"manuel.nisi", "uoForUsersSpecial":[{"codice_uo":"309000", "ordine_da_validare":"S"}]},
 {"uid":"anika.manzari", "uoForUsersSpecial":[{"codice_uo":"073000"}]},
