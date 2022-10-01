@@ -11,6 +11,7 @@ import it.cnr.si.domain.CNRUser;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.missioni.service.showcase.ACEService;
 import it.cnr.si.missioni.util.SecurityUtils;
+import it.cnr.si.model.SsoModelWebDto;
 import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
@@ -70,6 +71,9 @@ public class AccountService {
 
 	@Autowired(required = false)
 	MissioniAceService missioniAceService;
+
+	@Autowired(required = false)
+	private TerzoService terzoService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -181,14 +185,13 @@ public class AccountService {
 		if (loadSpecialUserData){
 			user = loadUserSpecial(account.getUid());
 		}
-		List<String> ruoli = account.getRoles();
-		if (ruoli != null && ruoli.size() > 0){
-			if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
-				ruoli.add(AuthoritiesConstants.ADMIN);
-			}
-
-			account.setRoles(ruoli);
+		List<String> ruoli = account.getInternalRoles();
+		if (ruoli.size() == 0)
+			ruoli = Arrays.asList(AuthoritiesConstants.USER);
+		if (ruoli.stream().filter(role -> role.equals(Costanti.AMMINISTRATORE_MISSIONI)).count() > 0){
+			ruoli.add(AuthoritiesConstants.ADMIN);
 		}
+		account.setInternalRoles(ruoli);
 		return createResponseForAccountRest(account, user);
 	}
 
@@ -228,8 +231,9 @@ public class AccountService {
 		if (loadSpecialUserData){
 			Optional<CNRUser> user = securityService.getUser();
 			user.ifPresent(utente -> {
-				account.setRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
-				account.getRoles().add(new String(AuthoritiesConstants.USER));
+				final List<String> roles = utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList());
+				roles.add(new String(AuthoritiesConstants.USER));
+				account.setInternalRoles(roles);
 			});
 
 		}
@@ -243,6 +247,19 @@ public class AccountService {
 		if (userInfo.isPresent()) {
 			UserInfoDto userInfoDto = userInfo.get();
 			if (userInfoDto != null && userInfoDto.getCognome() != null){
+				if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
+					final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+					if (userInfoDtoSIGLA != null) {
+						userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
+						userInfoDto.setComune_nascita(userInfoDtoSIGLA.getComune_nascita());
+						userInfoDto.setProvincia_nascita(userInfoDtoSIGLA.getProvincia_nascita());
+						userInfoDto.setFl_cittadino_italiano(userInfoDtoSIGLA.getFl_cittadino_italiano());
+						userInfoDto.setIndirizzo_residenza(userInfoDtoSIGLA.getIndirizzo_residenza());
+						userInfoDto.setCap_residenza(userInfoDtoSIGLA.getCap_residenza());
+						userInfoDto.setComune_residenza(userInfoDtoSIGLA.getComune_residenza());
+						userInfoDto.setProvincia_residenza(userInfoDtoSIGLA.getProvincia_residenza());
+					}
+				}
 				Account account = getAccountFromUserKeycloak(loadSpecialUserData, userInfoDto);
 				String resp = manageResponseForAccountRest(account, loadSpecialUserData);
 				if (resp != null){
@@ -260,6 +277,19 @@ public class AccountService {
 		it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = null;
 		if (missioniAceService != null){
 			userInfoDto = missioniAceService.getAccountFromSiper(username);
+			if (!userInfoDto.getDipendente()) {
+				final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+				if (userInfoDtoSIGLA != null) {
+					userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
+					userInfoDto.setComune_nascita(userInfoDtoSIGLA.getComune_nascita());
+					userInfoDto.setProvincia_nascita(userInfoDtoSIGLA.getProvincia_nascita());
+					userInfoDto.setFl_cittadino_italiano(userInfoDtoSIGLA.getFl_cittadino_italiano());
+					userInfoDto.setIndirizzo_residenza(userInfoDtoSIGLA.getIndirizzo_residenza());
+					userInfoDto.setCap_residenza(userInfoDtoSIGLA.getCap_residenza());
+					userInfoDto.setComune_residenza(userInfoDtoSIGLA.getComune_residenza());
+					userInfoDto.setProvincia_residenza(userInfoDtoSIGLA.getProvincia_residenza());
+				}
+			}
 		} else if (aceServiceShowcase != null){
 			userInfoDto = aceServiceShowcase.getUtenteAdmin(username);
 		}
@@ -287,7 +317,7 @@ public class AccountService {
 			Account account = new Account();
 			List ruolo = new ArrayList<String>();
 			ruolo.add(AuthoritiesConstants.USER);
-			account.setRoles(ruolo);
+			account.setInternalRoles(ruolo);
 			account.setUid(securityService.getCurrentUserLogin());
 
 			if (aceServiceShowcase != null) {
@@ -302,7 +332,7 @@ public class AccountService {
 				account.setEmail_comunicazioni(utente.getEmail());
 				account.setNome(utente.getFirstName());
 				account.setCognome(utente.getLastName());
-				account.setRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
+				account.setInternalRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
 			});
 
 			return account;
