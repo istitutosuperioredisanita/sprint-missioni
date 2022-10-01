@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import it.cnr.si.model.UserInfoDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -65,8 +64,8 @@ public class Account extends UserInfoDto implements Serializable {
 	private String cdTerzoSigla;
 	@JsonProperty("inquadramenti")
 	private List<Inquadramento> inquadramenti;
-	@JsonProperty("")
-	private List<String> roles;
+	@JsonProperty("roles")
+	private List<String> internalRoles;
 
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -256,12 +255,12 @@ public class Account extends UserInfoDto implements Serializable {
 		this.inquadramenti = inquadramenti;
 	}
 
-	public List<String> getRoles() {
-		return roles;
+	public void setInternalRoles(List<String> internalRoles) {
+		this.internalRoles = internalRoles;
 	}
 
-	public void setRoles(List<String> roles) {
-		this.roles = roles;
+	public List<String> getInternalRoles() {
+		return internalRoles;
 	}
 }
 
