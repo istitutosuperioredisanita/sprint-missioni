@@ -277,7 +277,7 @@ public class AccountService {
 		it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = null;
 		if (missioniAceService != null){
 			userInfoDto = missioniAceService.getAccountFromSiper(username);
-			if (!userInfoDto.getDipendente()) {
+			if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
 				final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
 				if (userInfoDtoSIGLA != null) {
 					userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
