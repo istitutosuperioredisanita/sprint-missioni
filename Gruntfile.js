@@ -3,7 +3,7 @@
 
 var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
@@ -121,7 +121,7 @@ module.exports = function (grunt) {
                         '.tmp',
                         'src/main/webapp'
                     ],
-                    middleware: function (connect) {
+                    middleware: function(connect) {
                         return [
                             proxySnippet,
                             connect.static('.tmp'),
@@ -132,7 +132,7 @@ module.exports = function (grunt) {
             },
             test: {
                 options: {
-                 port: 9001,
+                    port: 9001,
                     base: [
                         '.tmp',
                         'test',
@@ -228,7 +228,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: 'src/main/webapp/images',
-                src: '**/*.{jpg,jpeg}', // we don't optimize PNG files as it doesn't work on Linux. If you are not on Linux, feel free to use '{,*/}*.{png,jpg,jpeg}'
+                    src: '**/*.{jpg,jpeg}', // we don't optimize PNG files as it doesn't work on Linux. If you are not on Linux, feel free to use '{,*/}*.{png,jpg,jpeg}'
                     dest: '<%= yeoman.dist %>/images'
                 }]
             }
@@ -279,30 +279,31 @@ module.exports = function (grunt) {
         },
         // Put files not handled in other tasks here
         copy: {
-i18n: {
+            i18n: {
 
 
-files: [{
-expand: true,
-cwd: 'src/main/webapp',
-dest: '<%= yeoman.dist %>/',
-src: [
-'i18n/**'
-]
-}]
-},
-bower: {
+                files: [{
+                    expand: true,
+                    cwd: 'src/main/webapp',
+                    dest: '<%= yeoman.dist %>/',
+                    src: [
+                        'i18n/**'
+                    ]
+                }]
+            },
+            bower: {
 
 
-files: [{
-expand: true,
-cwd: 'src/main/webapp',
-dest: '<%= yeoman.dist %>/',
-src: [
-'bower_components/angular-i18n/**'
-]
-}]
-},
+                files: [{
+                    expand: true,
+                    cwd: 'src/main/webapp',
+                    dest: '<%= yeoman.dist %>/',
+                    src: [
+                        'bower_components/angular-i18n/**',
+                        'bower_components/swagger-ui/**',
+                    ]
+                }]
+            },
             dist: {
                 files: [{
                     expand: true,
@@ -315,7 +316,8 @@ src: [
                         'views/**/*.html',
                         'images/**/*.{png,gif,webp}',
                         'protected/**/*.gif',
-                        'fonts/*'
+                        'fonts/*',
+                        'swagger-ui/*'
                     ]
                 }, {
                     expand: true,
@@ -333,19 +335,19 @@ src: [
                 src: '{,*/}*.css'
             },
             generateHerokuDirectory: {
-                    expand: true,
-                    dest: 'deploy/heroku',
-                    src: [
-                        'pom.xml',
-                        'src/main/**'
+                expand: true,
+                dest: 'deploy/heroku',
+                src: [
+                    'pom.xml',
+                    'src/main/**'
                 ]
             },
             generateOpenshiftDirectory: {
-                    expand: true,
-                    dest: 'deploy/openshift',
-                    src: [
-                        'pom.xml',
-                        'src/main/**'
+                expand: true,
+                dest: 'deploy/openshift',
+                src: [
+                    'pom.xml',
+                    'src/main/**'
                 ]
             }
         },
@@ -385,13 +387,13 @@ src: [
         replace: {
             dist: {
                 src: ['<%= yeoman.dist %>/index.html'],
-                    overwrite: true,                                 // overwrite matched source files
-                    replacements: [{
-                        from: '<div class="development"></div>',
-                        to: ''
-                    }]
-                }
-            },
+                overwrite: true,                                 // overwrite matched source files
+                replacements: [{
+                    from: '<div class="development"></div>',
+                    to: ''
+                }]
+            }
+        },
         uglify: {
             dist: {
                 files: {
@@ -425,7 +427,7 @@ src: [
         }
     });
 
-    grunt.registerTask('server', function (target) {
+    grunt.registerTask('server', function(target) {
         if (target === 'dist') {
             return grunt.task.run(['build', 'connect:dist:keepalive']);
         }
@@ -441,7 +443,7 @@ src: [
     });
 
     grunt.registerTask('test', [
-        
+
     ]);
 
     grunt.registerTask('build', [
