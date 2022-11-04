@@ -17,7 +17,7 @@ services:
       -Dmaven.wagon.http.ssl.insecure=true
       -Dmaven.wagon.http.ssl.allowall=true
       -Dace.signing.key='NDh5dm5vcTQ2Nm41b2tud3ZqcDU='
-      -Djava.security.egd=file:/dev/./urandom -jar /opt/missioni.war --spring.profiles.active=dev,cnr,keycloak
+      -Djava.security.egd=file:/dev/./urandom -jar /opt/missioni.war --spring.profiles.active=dev,cnr,keycloak,swagger
     volumes:
     - ./application-prod.yml:/opt/application-prod.yml
     labels:
