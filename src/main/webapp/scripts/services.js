@@ -252,7 +252,7 @@ missioniApp.factory('Session', function (ProxyService) {
         return this;
     });
 
-missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider, $location, COSTANTI) {
+missioniApp.factory('AuthenticationSharedService', function (ProxyService, $rootScope, $http, authService, Session, Account, AccountLDAP, Base64Service, AccessToken, AccountFromToken, $sessionStorage, DateUtils, AuthServerProvider, $location, COSTANTI, ui) {
     var today = new Date();
     var recuperoResidenza = function(data){
         if (data.comune_residenza){
@@ -287,6 +287,8 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     var terziPerCompenso = result.data.elements;
                     var terzoPerCompenso = terziPerCompenso[0];
                     return terzoPerCompenso;
+                } else {
+                    ui.error("Errore recupero dati per il codice fiscale "+ data.codice_fiscale);
                 }
                 return null;
             });
