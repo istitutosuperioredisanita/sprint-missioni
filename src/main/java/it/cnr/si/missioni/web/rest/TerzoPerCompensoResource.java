@@ -74,6 +74,9 @@ public class TerzoPerCompensoResource {
     		}
     		
         	TerzoPerCompensoJson terzi = terzoPerCompensoService.getTerzi(key, body, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
+            if (terzi.getElements().size() == 0) {
+                log.warn("TerzoPerCompenso ha restituito un array vuoto per {} {} {} {}", key, body, url, request.getQueryString());
+            }
             return JSONResponseEntity.ok(terzi);
 		} catch (AwesomeException e) {
 			log.error("ERRORE recuperoTerzoPerCompenso",e);

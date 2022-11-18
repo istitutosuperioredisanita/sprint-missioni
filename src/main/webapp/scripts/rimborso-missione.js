@@ -143,10 +143,12 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     $scope.recuperoDatiTerzoSigla = function(userWork){
         if (userWork.codice_fiscale){
             ProxyService.getTerzo(userWork.codice_fiscale).then(function(ret){
-                if (ret && ret.data && ret.data.elements){
+                if (ret && ret.data && ret.data.elements && ret.data.elements[0]){
                     $scope.terzoSigla = ret.data.elements[0];
                     $scope.recuperoDatiInquadramento(userWork, $scope.terzoSigla);
                     $scope.recuperoDatiModalitaPagamento(userWork, $scope.terzoSigla);
+                } else {
+                    ui.error("Errore recupero dati per il codice fiscale "+ userWork.codice_fiscale);
                 }
             });
         } else {
