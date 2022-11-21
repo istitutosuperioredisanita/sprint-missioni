@@ -39,7 +39,7 @@
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-boot.version>2.2.7.RELEASE</spring-boot.version>
         <spring.session.version>2.6.2</spring.session.version>
-        <sprint.version>3.2.8</sprint.version>
+        <sprint.version>3.2.9</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
         <storage.cloud.version>2.0.9</storage.cloud.version>
     </properties>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>2.9.4</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
