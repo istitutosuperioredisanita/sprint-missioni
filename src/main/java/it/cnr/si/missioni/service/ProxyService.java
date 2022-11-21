@@ -44,6 +44,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
 import it.cnr.si.missioni.web.rest.ProxyResource;
+import org.keycloak.admin.client.Keycloak;
 
 /**
  * Service for proxy to other application.
@@ -61,7 +62,10 @@ public class ProxyService implements EnvironmentAware{
 
     @Autowired
     CacheManager cacheManager;
-    
+
+	@Autowired(required = false)
+	private Keycloak keycloak;
+
     @Cacheable(value=Costanti.NOME_CACHE_PROXY)
     public ResultProxy processInCache(CallCache callCache)  throws AwesomeException{
     	log.info("Process in Cache 2: "+callCache.toString());
@@ -214,14 +218,21 @@ public class ProxyService implements EnvironmentAware{
 		HttpHeaders headers = new HttpHeaders();
 		String username = environment.getProperty("spring.proxy."+app + ".username"),
 				password = environment.getProperty("spring.proxy."+app + ".password");
-		if (username != null && password != null) {
-			String plainCreds = username.concat(":").concat(password);
-			byte[] plainCredsBytes = plainCreds.getBytes();
-			byte[] base64CredsBytes = Base64.encode(plainCredsBytes);
-			String base64Creds = new String(base64CredsBytes);
-			headers.add("Authorization", "Basic " + base64Creds);
+		final Boolean clientCredentials = environment.getProperty("spring.proxy." + app + ".client_credentials", Boolean.class, Boolean.FALSE);
+		if (clientCredentials) {
+			final String token = keycloak.tokenManager().getAccessToken().getToken();
+			log.info("Token: {}", token);
+			headers.add("Authorization", "Bearer " + token);
 		} else {
-			headers.add("Authorization", authorization);
+			if (username != null && password != null) {
+				String plainCreds = username.concat(":").concat(password);
+				byte[] plainCredsBytes = plainCreds.getBytes();
+				byte[] base64CredsBytes = Base64.encode(plainCredsBytes);
+				String base64Creds = new String(base64CredsBytes);
+				headers.add("Authorization", "Basic " + base64Creds);
+			} else {
+				headers.add("Authorization", authorization);
+			}
 		}
 		return headers;
 	}
