@@ -32,6 +32,8 @@ spring:
   jackson:
     serialization.write_dates_as_timestamps: false
   jpa:
+    properties:
+      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
     open-in-view: false
     hibernate:
       ddl-auto: none
