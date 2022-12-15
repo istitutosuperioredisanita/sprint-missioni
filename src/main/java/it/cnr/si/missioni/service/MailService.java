@@ -57,7 +57,7 @@ public class MailService {
     	String s = env.getProperty("spring.mail.send.error.to");
         if (s==null) 
         	s="gianfranco.gasparro@cnr.it";
-       	this.mailToError = Arrays.asList(s);
+       	this.mailToError = Arrays.asList(s.split(","));
     }
     
 	public String[] prepareTo(List<UsersSpecial> lista) {
