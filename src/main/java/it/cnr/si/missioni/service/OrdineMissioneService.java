@@ -1108,9 +1108,10 @@ public class OrdineMissioneService {
 					throw new AwesomeException(CodiciErrore.ERRGEN,
 							"Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
 				}
-				if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
-					throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-				}
+// CODICE DA REINSERIRE DOPO IL RIBALTAMENTO
+//				if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
+//					throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
+//				}
 				if (ordineMissioneDB.isMissioneInserita()
 						&& !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())) {
 					throw new AwesomeException(CodiciErrore.ERRGEN,
