@@ -1090,9 +1090,10 @@ public class OrdineMissioneService {
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "E' obbligatorio indicare il responsabile del gruppo.");
 			}
-			if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
-				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-			}
+// CODICE DA REINSERIRE DOPO IL RIBALTAMENTO
+//			if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
+//				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
+//			}
 
 		} else {
 			aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
