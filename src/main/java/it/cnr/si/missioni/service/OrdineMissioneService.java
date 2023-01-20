@@ -1090,10 +1090,10 @@ public class OrdineMissioneService {
 			} else {
 				throw new AwesomeException(CodiciErrore.ERRGEN, "E' obbligatorio indicare il responsabile del gruppo.");
 			}
-// CODICE DA REINSERIRE DOPO IL RIBALTAMENTO
-//			if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
-//				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-//			}
+// CODICE DA TOGLIERE DA INIZIO ANNO FINO  AL RIBALTAMENTO EFFETTUATO
+			if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
+				throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
+			}
 
 		} else {
 			aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
@@ -1108,10 +1108,10 @@ public class OrdineMissioneService {
 					throw new AwesomeException(CodiciErrore.ERRGEN,
 							"Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
 				}
-// CODICE DA REINSERIRE DOPO IL RIBALTAMENTO
-//				if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
-//					throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-//				}
+				// CODICE DA TOGLIERE DA INIZIO ANNO FINO  AL RIBALTAMENTO EFFETTUATO
+				if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
+					throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
+				}
 				if (ordineMissioneDB.isMissioneInserita()
 						&& !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())) {
 					throw new AwesomeException(CodiciErrore.ERRGEN,
