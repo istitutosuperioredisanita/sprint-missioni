@@ -319,99 +319,102 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
         }
     }
 
-    var gestioneUtente = function(utente, isFromKeycloak){
-                            if (utente.struttura_appartenenza || utente.uid==COSTANTI.UTENTE_SPECIALE || utente.profilo ) {
-                                    var comune_residenza = null;
-                                    if (utente.uid.toLowerCase() == COSTANTI.UTENTE_SPECIALE){
-                                        Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
-                                        $rootScope.account = Session;
-                                        $sessionStorage.account = Session;
-                                        authService.loginConfirmed(utente);
-                                        menuSso(isFromKeycloak);
-                                    } else {
-                                        recuperoDatiTerzo(utente).then(function (result){
-                                            if (utente.struttura_appartenenza || utente.sigla_sede) {
-                                                var sede = "";
-                                                if (utente.struttura_appartenenza){
-                                                    sede = utente.struttura_appartenenza;
-                                                } else {
-                                                    sede = utente.sigla_sede;
-                                                }
-                                                if (utente.comune_residenza){
-                                                    comune_residenza = utente.comune_residenza;
-                                                    if (result && utente.matricola && result.ti_dipendente_altro == 'D' && ((utente.data_cessazione && DateUtils.convertDateTimeFromServer(utente.data_cessazione) >= today) || (!utente.data_cessazione))){
-                                                        Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
-                                                                    utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
-                                                                    utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
-                                                                    utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
-                                                                    utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
-                                                        $rootScope.account = Session;
-                                                        $sessionStorage.account = Session;
-                                                        menuSso(isFromKeycloak);
-                                                    } else {
-                                                        var matr = null;
-                                                        var profilo = null;
-                                                        if (result && result.ti_dipendente_altro == 'A'){
-                                                            matr = "";
-                                                            comune_residenza = result.ds_comune_fiscale;
-                                                            profilo = result.ds_tipo_rapporto;
-                                                        } else {
-                                                            matr = utente.matricola;
-                                                            profilo = utente.profilo;
-                                                        }
-                                                        Session.create(utente.uid.toLowerCase(), matr, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
-                                                                utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
-                                                                utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
-                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
-                                                                profilo, sede, utente.codice_sede, utente.codice_uo, null);
-                                                        $rootScope.account = Session;
-                                                        $sessionStorage.account = Session;
-                                                        menuSso(isFromKeycloak);
-                                                    }
-                                                } else {
-                                                    recuperoResidenza(utente).then(function (result){
-                                                            comune_residenza = result;
-                                                            Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
-                                                                    utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
-                                                                utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
-                                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
-                                                                utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
-                                                            $rootScope.account = Session;
-                                                            $sessionStorage.account = Session;
-                                                            menuSso(isFromKeycloak);
-                                                    });
-                                                }
-                                            } else {
-                                                if (isFromKeycloak){
-                                                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
-                                                } else {
-                                                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, ['ROLE_USER'], utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true, utente.codice_fiscale);
-                                                }
-                                                $rootScope.account = Session;
-                                                $sessionStorage.account = Session;
-                                                menuSso(isFromKeycloak);
-                                            }
-                                            authService.loginConfirmed(utente);
-                                        });
-                                    }
+    var gestioneUtente = function(utente, isFromKeycloak){        
+        if (utente.struttura_appartenenza || utente.uid==COSTANTI.UTENTE_SPECIALE || utente.profilo ) {
+                var comune_residenza = null;
+                if (utente.uid.toLowerCase() == COSTANTI.UTENTE_SPECIALE){
+                    Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true);
+                    $rootScope.account = Session;
+                    $sessionStorage.account = Session;
+                    authService.loginConfirmed(utente);
+                    menuSso(isFromKeycloak);
+                } else {
+                    recuperoDatiTerzo(utente).then(function (result){
+                        if (utente.struttura_appartenenza || utente.sigla_sede) {
+                            var sede = "";
+                            if (utente.struttura_appartenenza){
+                                sede = utente.struttura_appartenenza;
                             } else {
-                                $rootScope.salvataggio = true;
-                                Account.get(function(data) {
-                                    $rootScope.salvataggio = false;
-                                    if (isFromKeycloak){
-                                       Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, data.roles);
-                                    } else {
-                                        Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles, null, null, null, data.codice_fiscale);
-                                    }
+                                sede = utente.sigla_sede;
+                            }
+                            if (utente.comune_residenza){
+                                comune_residenza = utente.comune_residenza;
+                                if (result && utente.matricola && result.ti_dipendente_altro == 'D' && ((utente.data_cessazione && DateUtils.convertDateTimeFromServer(utente.data_cessazione) >= today) || (!utente.data_cessazione))){
+                                    Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
+                                                utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
+                                                utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
+                                                utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
                                     $rootScope.account = Session;
                                     $sessionStorage.account = Session;
                                     menuSso(isFromKeycloak);
-                                    authService.loginConfirmed(data);
-                                    if (isFromKeycloak){
-                                        $location.path('/error').replace();
+                                } else {
+                                    var matr = null;
+                                    var profilo = null;
+                                    if (result && result.ti_dipendente_altro == 'A'){
+                                        matr = "";
+                                        comune_residenza = result.ds_comune_fiscale;
+                                        profilo = result.ds_tipo_rapporto;
+                                    } else {
+                                        matr = utente.matricola;
+                                        profilo = utente.profilo;
                                     }
+                                    Session.create(utente.uid.toLowerCase(), matr, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
+                                            utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
+                                            utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                            utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
+                                            profilo, sede, utente.codice_sede, utente.codice_uo, null);
+                                    $rootScope.account = Session;
+                                    $sessionStorage.account = Session;
+                                    menuSso(isFromKeycloak);
+                                }
+                            } else {
+                                recuperoResidenza(utente).then(function (result){
+                                        comune_residenza = result;
+                                        Session.create(utente.uid.toLowerCase(), utente.matricola, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles,
+                                                utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true,
+                                            utente.codice_fiscale, utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                            utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
+                                            utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
+                                        $rootScope.account = Session;
+                                        $sessionStorage.account = Session;
+                                        menuSso(isFromKeycloak);
                                 });
                             }
+                        } else {
+                            if (isFromKeycloak){
+                                Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, utente.roles, utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true, utente.codice_fiscale,
+                                                utente.comune_nascita, utente.data_nascita, comune_residenza, utente.indirizzo_residenza,
+                                                            utente.num_civico_residenza, utente.cap_residenza, utente.provincia_residenza,
+                                                            utente.profilo, sede, utente.codice_sede, utente.codice_uo, utente.livello_profilo);
+                            } else {
+                                Session.create(utente.uid.toLowerCase(), null, utente.nome, utente.cognome, utente.email_comunicazioni, ['ROLE_USER'], utente.allUoForUsersSpecial, utente.uoForUsersSpecial, true, utente.codice_fiscale);
+                            }
+                            $rootScope.account = Session;
+                            $sessionStorage.account = Session;
+                            menuSso(isFromKeycloak);
+                        }
+                        authService.loginConfirmed(utente);
+                    });
+                }
+        } else {
+            $rootScope.salvataggio = true;
+            Account.get(function(data) {
+                $rootScope.salvataggio = false;
+                if (isFromKeycloak){
+                    Session.create(data.uid, null, data.nome, data.cognome, data.email_comunicazioni, data.roles);
+                } else {
+                    Session.create(data.uid, null, data.firstName, data.lastName, data.email, data.roles, null, null, null, data.codice_fiscale);
+                }
+                $rootScope.account = Session;
+                $sessionStorage.account = Session;
+                menuSso(isFromKeycloak);
+                authService.loginConfirmed(data);
+                if (isFromKeycloak){
+                    $location.path('/error').replace();
+                }
+            });
+        }
     }
 
         return {
