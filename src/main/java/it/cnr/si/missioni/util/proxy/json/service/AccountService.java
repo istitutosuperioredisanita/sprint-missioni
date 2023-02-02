@@ -258,6 +258,7 @@ public class AccountService {
 						userInfoDto.setCap_residenza(userInfoDtoSIGLA.getCap_residenza());
 						userInfoDto.setComune_residenza(userInfoDtoSIGLA.getComune_residenza());
 						userInfoDto.setProvincia_residenza(userInfoDtoSIGLA.getProvincia_residenza());
+						userInfoDto.setProfilo("EXT");
 					}
 				}
 				Account account = getAccountFromUserKeycloak(loadSpecialUserData, userInfoDto);
