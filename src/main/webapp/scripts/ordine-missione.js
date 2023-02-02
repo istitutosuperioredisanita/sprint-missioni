@@ -741,6 +741,11 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
             $scope.ordineMissioneModel.indirizzoResidenzaRich = account.indirizzo_completo_residenza; 
         }
 
+        if (account.codice_uo === 'ZZZZZZ') {
+            ui.message("Non è possibile creare un nuovo Ordine di Missione, in quanto non risulta nessuna afferenza valida!");
+            $location.path('');
+        }
+
         $scope.missioneEstera = null;
         $scope.ordineMissioneModel.uid = account.login;
             var today = DateService.today().then(function(result){
