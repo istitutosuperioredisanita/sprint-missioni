@@ -274,7 +274,12 @@ public class RimborsoMissioneService {
 
 		gestioneMailResponsabileGruppo(rimborsoMissioneDaAggiornare);
 		List<UsersSpecial> listaUtenti = new ArrayList<>();
-		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoRich(), rimborsoMissioneDaAggiornare.getAnno());
+		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(
+				Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoRich())
+						.filter(s -> !s.equalsIgnoreCase("ZZZ.ZZZ"))
+						.orElse(rimborsoMissioneDaAggiornare.getUoCompetenza()),
+				rimborsoMissioneDaAggiornare.getAnno()
+		);
 		DatiIstituto datiIstitutoSpesa = null;
 		if (!rimborsoMissioneDaAggiornare.getUoRich().equals(rimborsoMissioneDaAggiornare.getUoSpesa())){
 			datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoSpesa(), rimborsoMissioneDaAggiornare.getAnno());
