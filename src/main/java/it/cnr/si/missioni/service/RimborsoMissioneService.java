@@ -277,7 +277,7 @@ public class RimborsoMissioneService {
 		DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(
 				Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoRich())
 						.filter(s -> !s.equalsIgnoreCase("ZZZ.ZZZ"))
-						.orElse(rimborsoMissioneDaAggiornare.getUoCompetenza()),
+						.orElseGet(() -> Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoCompetenza()).orElse(rimborsoMissioneDaAggiornare.getUoSpesa())),
 				rimborsoMissioneDaAggiornare.getAnno()
 		);
 		DatiIstituto datiIstitutoSpesa = null;
