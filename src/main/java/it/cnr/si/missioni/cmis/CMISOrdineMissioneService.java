@@ -949,7 +949,10 @@ public class CMISOrdineMissioneService {
     	try {
     		abortFlowOrdineMissione(ordineMissione);
     	} catch (AwesomeException e) {
-    		throw e;
+    	    if (e.getMessage() != null && e.getMessage().contains("Nessun task attivo")) {
+    	        logger.warn(e.getMessage(), e);    	        
+    	    } else
+    	        throw e;
     	}
 		ordineMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }
