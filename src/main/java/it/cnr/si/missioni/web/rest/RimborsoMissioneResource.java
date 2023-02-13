@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.cnr.jada.DetailedRuntimeException;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
+import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
@@ -69,11 +72,13 @@ public class RimborsoMissioneResource {
     @Autowired
     private SecurityService securityService;
 
-    
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
 
-    /**
+	@Autowired
+	private ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
+
+	/**
      * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
      */
     @RequestMapping(value = "/rest/rimborsoMissione/list",
@@ -382,8 +387,6 @@ public class RimborsoMissioneResource {
     	}
     }
 
-
-
 	@RequestMapping(value = "/rest/public/zipDocumentiRimborsoMissione",
 			method = RequestMethod.GET)
 	@Timed
@@ -432,6 +435,23 @@ public class RimborsoMissioneResource {
 					log.error("ERRORE scaricaZip",e);
 					throw new AwesomeException(Utility.getMessageException(e));
 				}
+		}
+	}
+
+	@RolesAllowed(Costanti.ROLE_ADMIN)
+	@RequestMapping(value = "/rest/rimborsoMissione/comunica/sigla/{idRimborsoMissione}",
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<?> comunicaRimborsoSigla(HttpServletRequest request,
+											@PathVariable Long idRimborsoMissione) {
+		log.debug("REST request per comunicare il rimborso della Missione a SIGLA" );
+		try {
+			final MissioneBulk missioneBulk = comunicaRimborsoSiglaService.comunicaRimborsoSigla(idRimborsoMissione);
+			return JSONResponseEntity.ok(missioneBulk);
+		} catch (ComponentException e) {
+			log.error("Comunica rimborso SIGLA", e);
+			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
 		}
 	}
 }

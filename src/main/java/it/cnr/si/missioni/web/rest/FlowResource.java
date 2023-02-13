@@ -27,9 +27,7 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/api")
 @RolesAllowed(Costanti.ROLE_FLOWS)
-
 public class FlowResource {
-
 
     @Autowired
     private FlowService flowService;
@@ -39,9 +37,9 @@ public class FlowResource {
     /**
      * POST  /rest/flows/aggiornaFlusso -> update flows.
      */
-        @RequestMapping(value = "/cambioStatoDomanda",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/cambioStatoDomanda",
+        method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity aggiornaFlusso(@RequestBody FlowResult flow) {
         flowService.aggiornaMissioneFlows( flow);
