@@ -34,6 +34,7 @@ import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
 import it.cnr.si.missioni.amq.service.RabbitMQService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.cmis.MimeTypes;
@@ -706,7 +707,12 @@ public class RimborsoMissioneService {
 			rimborsoMissione.setStato(Costanti.STATO_ANNULLATO);
 			rimborsoMissione.setToBeUpdated();
 			if (rimborsoMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(rimborsoMissione.getIdFlusso())){
-				cmisRimborsoMissioneService.annullaFlusso(rimborsoMissione);
+			    try {
+			        cmisRimborsoMissioneService.annullaFlusso(rimborsoMissione);
+		        } catch (TaskIdNonTrovatoException e) {
+		            log.error("Nessun task attivo da annullare trovato per il rimborso "+rimborsoMissione.getUid()+" - elimino comunque");
+		            // no throw
+		        }
 			}
 			crudServiceBean.modificaConBulk( rimborsoMissione);
 		}
