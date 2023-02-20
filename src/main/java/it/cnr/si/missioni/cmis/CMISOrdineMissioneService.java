@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -948,11 +949,9 @@ public class CMISOrdineMissioneService {
     public void annullaFlusso(OrdineMissione ordineMissione)  {
     	try {
     		abortFlowOrdineMissione(ordineMissione);
-    	} catch (AwesomeException e) {
-    	    if (e.getMessage() != null && e.getMessage().contains("Nessun task attivo")) {
-    	        logger.warn(e.getMessage(), e);    	        
-    	    } else
-    	        throw e;
+    	} catch (TaskIdNonTrovatoException e) {
+    	    logger.error("Nessun task attivo da annullare trovato per l'ordine "+ordineMissione.getUid()+" - elimino comunque");
+    	    // no throw
     	}
 		ordineMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }

@@ -4,6 +4,7 @@ import it.cnr.si.flows.model.ProcessDefinitions;
 import it.cnr.si.flows.model.StartWorkflowResponse;
 import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.cmis.*;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -251,10 +253,16 @@ public class MessageForFlowsService {
     }
 
     private void preparaParametriPerRiavvioFlusso(MultiValueMap<String, Object> parameters, String idFlusso) {
-        ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
-        String taskId = taskIdResponse.getBody().getId();
-        parameters.add("taskId", taskId);
-        parameters.add("commento", "");
+        try {
+            ResponseEntity<TaskResponse> taskIdResponse = flowsService.getTaskId(idFlusso);
+            String taskId = taskIdResponse.getBody().getId();
+            parameters.add("taskId", taskId);
+            parameters.add("commento", "");
+        } catch (HttpServerErrorException e) {
+            logger.error("Non e' stato possibile recuperare il task attivo per il flusso "+idFlusso+". Probabilmente il flusso e' terminato", e);
+            throw new TaskIdNonTrovatoException(e);
+        }
+
     }
 
     public void annullaFlusso(MultiValueMap<String, Object> parameters , String idFlusso){
