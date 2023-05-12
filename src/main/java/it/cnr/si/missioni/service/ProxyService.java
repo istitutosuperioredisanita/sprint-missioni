@@ -106,7 +106,7 @@ public class ProxyService implements EnvironmentAware{
     	return process(httpMethod, jsonBody, app, url, queryString, authorization, false);
     }
     public ResultProxy process(HttpMethod httpMethod, JSONBody jsonBody, String app, String url, String queryString, String authorization, Boolean restContextHeader) {
-        log.debug("REST request from app ", app);
+        log.debug("REST request from app {}", app);
 		String body = null;
     	try {
     		ObjectMapper mapper = new ObjectMapper();
