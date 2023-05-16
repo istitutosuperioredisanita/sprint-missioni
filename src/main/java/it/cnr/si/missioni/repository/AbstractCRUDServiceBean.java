@@ -45,11 +45,11 @@ import javax.persistence.OptimisticLockException;
 
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.service.SecurityService;
-import net.bzdyl.ejb3.criteria.Criterion;
-import net.bzdyl.ejb3.criteria.Order;
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
-import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
+import it.cnr.jada.criteria.Criterion;
+import it.cnr.jada.criteria.Order;
+import it.cnr.jada.criteria.Projection;
+import it.cnr.jada.criteria.projections.Projections;
+import it.cnr.jada.criteria.restrictions.Restrictions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;

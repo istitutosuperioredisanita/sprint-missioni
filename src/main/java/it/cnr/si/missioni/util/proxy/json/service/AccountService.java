@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -326,6 +327,15 @@ public class AccountService {
 				account.setCognome(userInfoDto.getCognome());
 				account.setNome(userInfoDto.getNome());
 				account.setCodice_fiscale(userInfoDto.getCodice_fiscale());
+				account.setCodice_uo(userInfoDto.getCodice_uo());
+				account.setStruttura_appartenenza(userInfoDto.getCodice_uo());
+				account.setInternalRoles(
+						SecurityUtils.getCurrentUser()
+								.getAuthorities()
+								.stream()
+								.map(GrantedAuthority::getAuthority)
+								.collect(Collectors.toList())
+				);
 			}
 
 			Optional<CNRUser> user = securityService.getUser();

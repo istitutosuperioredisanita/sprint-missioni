@@ -52,7 +52,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     @JsonProperty("ds_nazione")
     private String dsNazione;
     @JsonProperty("dt_inizio_validita")
-    private Integer dtInizioValidita;
+    private Object dtInizioValidita;
     @JsonProperty("dataFineValidita")
     private Object dataFineValidita;
     @JsonProperty("fl_giustificativo_richiesto")
@@ -206,7 +206,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
      *     The dtInizioValidita
      */
     @JsonProperty("dt_inizio_validita")
-    public Integer getDtInizioValidita() {
+    public Object getDtInizioValidita() {
         return dtInizioValidita;
     }
 
@@ -216,7 +216,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
      *     The dt_inizio_validita
      */
     @JsonProperty("dt_inizio_validita")
-    public void setDtInizioValidita(Integer dtInizioValidita) {
+    public void setDtInizioValidita(Object dtInizioValidita) {
         this.dtInizioValidita = dtInizioValidita;
     }
 

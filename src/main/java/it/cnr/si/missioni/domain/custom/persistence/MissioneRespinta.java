@@ -3,8 +3,8 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
+import it.cnr.jada.criteria.Projection;
+import it.cnr.jada.criteria.projections.Projections;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
