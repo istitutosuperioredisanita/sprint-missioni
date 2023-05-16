@@ -148,4 +148,13 @@ public class SIGLAService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle StatoPagamento per lo showcase." + Utility.getMessageException(e));
         }
     }
+
+    public TipoPastoJson getTipoPasto(){
+        InputStream is = this.getClass().getResourceAsStream("/it/cnr/missioni/showcase/TipoPasto.json");
+        try {
+            return new ObjectMapper().readValue(is, TipoPastoJson.class);
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di lettura del file JSON delle TipoPasto per lo showcase." + Utility.getMessageException(e));
+        }
+    }
 }

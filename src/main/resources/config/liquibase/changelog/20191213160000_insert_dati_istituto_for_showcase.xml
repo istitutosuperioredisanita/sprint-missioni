@@ -18,4 +18,38 @@
             <column name="pg_ver_rec" type="NUMERIC" value="0"/>
         </insert>
     </changeSet>
+    <changeSet author="missioni" id="20230512160000">
+        <insert tableName="DATI_ISTITUTO">
+            <column name="id" type="NUMERIC" value="-1"/>
+            <column name="anno" type="STRING" value="2023"/>
+            <column name="istituto" type="STRING" value="000.000"/>
+            <column name="descr_istituto" type="STRING" value="000"/>
+            <column name="progressivo_ordine" type="NUMERIC" value="0"/>
+            <column name="progressivo_rimborso" type="NUMERIC" value="0"/>
+            <column name="progressivo_annullamento" type="NUMERIC" value="0"/>
+            <column name="progr_annull_rimborso" type="NUMERIC" value="0"/>
+            <column name="gestione_resp_modulo" type="STRING" value="N"/>
+            <column name="dacr" type="${date.type}" valueDate="${now}"/>
+            <column name="utcr" type="STRING" value="SYSTEM"/>
+            <column name="duva" type="${date.type}" valueDate="${now}"/>
+            <column name="utuv" type="STRING" value="SYSTEM"/>
+            <column name="pg_ver_rec" type="NUMERIC" value="0"/>
+        </insert>
+        <insert tableName="DATI_ISTITUTO">
+            <column name="id" type="NUMERIC" value="-2"/>
+            <column name="anno" type="STRING" value="2023"/>
+            <column name="istituto" type="STRING" value="ZZZ.ZZZ"/>
+            <column name="descr_istituto" type="STRING" value="ZZZ"/>
+            <column name="progressivo_ordine" type="NUMERIC" value="0"/>
+            <column name="progressivo_rimborso" type="NUMERIC" value="0"/>
+            <column name="progressivo_annullamento" type="NUMERIC" value="0"/>
+            <column name="progr_annull_rimborso" type="NUMERIC" value="0"/>
+            <column name="gestione_resp_modulo" type="STRING" value="N"/>
+            <column name="dacr" type="${date.type}" valueDate="${now}"/>
+            <column name="utcr" type="STRING" value="SYSTEM"/>
+            <column name="duva" type="${date.type}" valueDate="${now}"/>
+            <column name="utuv" type="STRING" value="SYSTEM"/>
+            <column name="pg_ver_rec" type="NUMERIC" value="0"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

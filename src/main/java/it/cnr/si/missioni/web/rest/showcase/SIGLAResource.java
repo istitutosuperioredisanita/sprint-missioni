@@ -291,4 +291,20 @@ public class SIGLAResource {
         }
     }
 
+
+    @RequestMapping(value = "/ConsMissioneTipoPastoAction.json",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getTipoPasto(@RequestBody JSONBody body, HttpServletRequest request,
+                                               HttpServletResponse response) {
+        log.debug("REST request di showcase per il mandato." );
+        try {
+            TipoPastoJson dati= siglaService.getTipoPasto();
+            return JSONResponseEntity.ok(dati);
+        } catch (ComponentException e) {
+            log.error("getTipoPastoShowcase", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+    }
 }

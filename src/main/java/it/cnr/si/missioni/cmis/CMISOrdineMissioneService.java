@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
@@ -651,7 +652,15 @@ public class CMISOrdineMissioneService {
 			autoPropria.setOrdineMissione(ordineMissione);
 			documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
 		}
-
+		if (!Optional.ofNullable(messageForFlowsService).isPresent()) {
+			ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+			FlowResult flowResult = new FlowResult();
+			flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMA_UO);
+			ordineMissioneService.aggiornaOrdineMissione(ordineMissione, flowResult);
+			flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
+			ordineMissioneService.aggiornaOrdineMissione(ordineMissione, flowResult);
+			return;
+		}
 
 		MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
 		try {

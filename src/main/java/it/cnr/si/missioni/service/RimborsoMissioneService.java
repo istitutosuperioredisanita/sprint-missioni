@@ -66,9 +66,9 @@ import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.cnr.si.spring.storage.StorageObject;
-import net.bzdyl.ejb3.criteria.Order;
-import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
-import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
+import it.cnr.jada.criteria.Order;
+import it.cnr.jada.criteria.restrictions.Disjunction;
+import it.cnr.jada.criteria.restrictions.Restrictions;
 
 
 /**

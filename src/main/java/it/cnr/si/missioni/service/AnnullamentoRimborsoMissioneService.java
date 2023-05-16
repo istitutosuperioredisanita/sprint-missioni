@@ -43,10 +43,10 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.CommonService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import net.bzdyl.ejb3.criteria.Criteria;
-import net.bzdyl.ejb3.criteria.Order;
-import net.bzdyl.ejb3.criteria.restrictions.Disjunction;
-import net.bzdyl.ejb3.criteria.restrictions.Restrictions;
+import it.cnr.jada.criteria.Criteria;
+import it.cnr.jada.criteria.Order;
+import it.cnr.jada.criteria.restrictions.Disjunction;
+import it.cnr.jada.criteria.restrictions.Restrictions;
 
 
 /**

@@ -30,8 +30,8 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Cds;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
+import it.cnr.jada.criteria.Projection;
+import it.cnr.jada.criteria.projections.Projections;
 
 /**
  * A user.

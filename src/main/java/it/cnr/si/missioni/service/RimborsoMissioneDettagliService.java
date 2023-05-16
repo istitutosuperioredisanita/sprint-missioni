@@ -14,6 +14,7 @@ import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,8 @@ public class RimborsoMissioneDettagliService {
 	 
 	@Autowired
 	private CRUDComponentSession crudServiceBean;
+	@Autowired
+	private Environment env;
 
 	@Transactional(readOnly = true)
 	public CMISFileAttachment uploadAllegato(Long idRimborsoMissioneDettagli,
@@ -149,7 +152,8 @@ public class RimborsoMissioneDettagliService {
 		if (StringUtils.isEmpty(rimborsoMissioneDettagli.getDsSpesa())){
 				throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare una descrizione per la spesa.");
 		}
-		validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
+		if (!env.acceptsProfiles(Costanti.SPRING_PROFILE_SHOWCASE))
+			validaDettaglioRimborsoService.valida(rimborsoMissioneDettagli);
 	}
 
 	private void controlliPasto(RimborsoMissioneDettagli rimborsoMissioneDettagli,
