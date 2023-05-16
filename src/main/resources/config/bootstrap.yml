@@ -1,0 +1,14 @@
+#spring:
+#  application:
+#    name: missioni
+#  cloud:
+#    config:
+#      server:
+#        bootstrap: true
+#        git:
+#          uri: http://git.si.cnr.it/devops/configuration-repo.git
+#          searchPaths: '{application}'
+#          username: missioni
+#          password: Abnsfn-4o22CXwVCcvoP
+#  main:
+#    allow-bean-definition-overriding: true
