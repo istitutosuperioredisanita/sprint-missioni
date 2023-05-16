@@ -167,7 +167,7 @@ public class LoadFilesService {
 	
 	private String getFileNameFromDatiUo(){
    		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
-   			return "datiUoDev.json";
+   			return "datiUo.json";
    		} else {
    			return "datiUo.json";
    		}

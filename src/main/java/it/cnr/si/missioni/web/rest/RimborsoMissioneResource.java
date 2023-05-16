@@ -390,7 +390,7 @@ public class RimborsoMissioneResource {
 	@RequestMapping(value = "/rest/public/zipDocumentiRimborsoMissione",
 			method = RequestMethod.GET)
 	@Timed
-	@ExceptionHandler(RuntimeException.class)
+	@ExceptionHandler(Exception.class)
 	@SuppressWarnings("unchecked")
 	public @ResponseBody void scaricaZip(HttpServletRequest request,
 										 @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse response) {

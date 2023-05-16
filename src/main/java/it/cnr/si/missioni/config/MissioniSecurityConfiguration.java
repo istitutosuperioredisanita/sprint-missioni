@@ -64,11 +64,9 @@ public class MissioniSecurityConfiguration extends WebSecurityConfigurerAdapter 
 
         web.ignoring()
         	.antMatchers("/views/**")
-            .antMatchers("/api/rest/public/**")
             .antMatchers("/SIGLA/**")
-                .antMatchers("/api/profile/info")
-                .antMatchers("/api/rest/flows")
-        ;
+            .antMatchers("/api/profile/info")
+            .antMatchers("/api/rest/flows");
         web.httpFirewall(allowUrlEncodedSlashHttpFirewall());
     }
 

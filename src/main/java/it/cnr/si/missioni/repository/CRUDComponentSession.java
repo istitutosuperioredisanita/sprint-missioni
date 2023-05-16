@@ -4,10 +4,10 @@ import it.cnr.jada.bulk.OggettoBulk;
 import it.cnr.jada.ejb.session.BusyResourceException;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.jada.ejb.session.PersistencyException;
-import net.bzdyl.ejb3.criteria.Criteria;
-import net.bzdyl.ejb3.criteria.Criterion;
-import net.bzdyl.ejb3.criteria.Order;
-import net.bzdyl.ejb3.criteria.Projection;
+import it.cnr.jada.criteria.Criteria;
+import it.cnr.jada.criteria.Criterion;
+import it.cnr.jada.criteria.Order;
+import it.cnr.jada.criteria.Projection;
 
 import java.io.Serializable;
 

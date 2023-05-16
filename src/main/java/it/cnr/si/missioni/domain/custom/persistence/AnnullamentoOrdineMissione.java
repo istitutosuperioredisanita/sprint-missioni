@@ -21,8 +21,8 @@ import org.springframework.util.StringUtils;
 
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
-import net.bzdyl.ejb3.criteria.Projection;
-import net.bzdyl.ejb3.criteria.projections.Projections;
+import it.cnr.jada.criteria.Projection;
+import it.cnr.jada.criteria.projections.Projections;
 
 /**
  * A user.
