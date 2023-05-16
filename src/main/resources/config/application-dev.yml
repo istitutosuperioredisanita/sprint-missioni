@@ -1,0 +1,207 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://as4dock.si.cnr.it:54321/missioni
+    name: missioni
+    username: missioni
+    password: 
+
+  jpa:
+    database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
+    database: POSTGRESQL
+    show-sql: true
+    properties:
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+      hibernate.cache.use_minimal_puts: true
+      hibernate.cache.hazelcast.use_lite_member: true
+
+  proxy:
+    SIGLA:
+      url: http://sigla-main-sso.test.si.cnr.it/SIGLA/
+      username: app.missioni
+      password: 
+      context:
+        cd_unita_organizzativa: "999.000"
+        cd_cds: "999"
+        cd_cdr: "999.000.000"
+    STORAGE:
+      url: http://as1dock.si.cnr.it:8080/alfresco/
+      username: missioni.missioni
+      password: 
+      urlForPerson: service/cnr/person/person/
+    vecchiaScrivania:
+      url: https://scrivaniadigitale.cnr.it/
+      username: app.missioni
+      password: 
+    OIL:
+      username: ${spring.proxy.vecchiaScrivania.username}
+      password: ${spring.proxy.vecchiaScrivania.password}
+      url: https://helpdesk.amministrazione.cnr.it/hd/rest/
+      newProblem: pest
+      instance: /HDSiper
+    FLOWS:
+      url: https://scrivaniadigitale.cnr.it/rest/
+      username: app.selezioni
+      password: 
+      urlStatusFlows: processinstances/
+      urlOrdineMissione: service/api/workflow/activiti$flussoMissioniOrdine/formprocessor
+      urlAnnullamentoOrdineMissione: service/api/workflow/activiti$flussoMissioniRevoca/formprocessor
+      urlRimborsoMissione: service/api/workflow/activiti$flussoMissioniRimborso/formprocessor
+
+  mail:
+    host: smtp.cnr.it
+    protocol: smtp
+    port: 25
+    from: missioni@cnr.it
+    tls: false
+    auth: false
+    send.error.to: gianfranco.gasparro@cnr.it
+
+  rabbitmq:
+    #        host: rabbitmq.cedrc.cnr.it
+    host: missioni-rabbit.test.si.cnr.it
+    username: cnr
+    password: 
+    virtualHost: missioni
+    exchange: missioni
+    routing-key:
+    consumer:
+      name: loopback
+
+  print:
+    endpoint: http://sigla-print.test.si.cnr.it/api/v1/get/print
+
+audit: false
+
+management:
+  auditevents:
+    enabled: false
+
+siper:
+  url: https://siper.cnr.it/siper/
+  username: ${spring.proxy.vecchiaScrivania.username}
+  password: ${spring.proxy.vecchiaScrivania.password}
+
+ace:
+  url: http://ace-webapp.test.si.cnr.it:5555/api
+  username: ${spring.proxy.vecchiaScrivania.username}
+  password: ${spring.proxy.vecchiaScrivania.password}
+
+authJWT:
+  username: ace
+  password: 
+
+user:
+  admin:
+    username: ${spring.proxy.vecchiaScrivania.username}
+    password: ${spring.proxy.vecchiaScrivania.password}
+
+flows:
+  resource: http://as3dock.si.cnr.it:9200
+  enable: false
+  activeByProcessInstanceId: ${flows.resource}/api/tasks/activeByProcessInstanceId
+  token: ${flows.resource}/oauth/token
+  authorize: ${flows.resource}/oauth/authorize
+  taskComplete: ${flows.resource}/api/tasks/complete
+  processInstance: ${flows.resource}/api/processInstances
+  processDefinitions: ${flows.resource}/api/processDefinitions
+  processDefinitionId: missioni
+  currentTask: ${flows.processInstance}/currentTask
+  username: ${spring.proxy.vecchiaScrivania.username}
+  password: ${spring.proxy.vecchiaScrivania.password}
+  clientId: sprintapp
+  clientSecret: my-secret-token-to-change-in-production
+
+storage:
+  maxItemsPerPage: 10
+  folder_path: /Comunicazioni al CNR/Missioni
+  folder_path_config: /Config
+  folder_path_manual: /Config/Manuali
+
+cmis:
+  # Serve solo per la parte master che gira ancora con cmis
+  #    alfresco: http://gestdoc.cnr.it:90/alfresco/
+  alfresco: http://as1dock.si.cnr.it:8080/alfresco/
+  url: ${cmis.alfresco}api/-default-/public/cmis/versions/1.1/atom
+  username: app.missioni
+  password: 
+  maxItemsPerPage: 10
+  folder_path: /Comunicazioni al CNR/Missioni
+  folder_path_config: /Config
+  folder_path_manual: /Config/Manuali
+
+org.apache.chemistry.opencmis.session.repository.id: -default-
+org.apache.chemistry.opencmis.binding.atompub.url: ${spring.proxy.STORAGE.url}api/-default-/public/cmis/versions/1.1/atom
+repository.base.url: ${spring.proxy.STORAGE.url}
+org.apache.chemistry.opencmis.binding.browser.url: ${spring.proxy.STORAGE.url}api/-default-/public/cmis/versions/1.1/browser
+org.apache.chemistry.opencmis.binding.spi.type: atompub
+org.apache.chemistry.opencmis.binding.connecttimeout: 40000
+org.apache.chemistry.opencmis.binding.readtimeout: 3000000
+org.apache.chemistry.opencmis.user: admin
+org.apache.chemistry.opencmis.password: admin
+org.apache.chemistry.opencmis.binding.httpinvoker.classname: org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker
+
+cache:
+  init_cache: true
+
+logging.config: classpath:logback-local.xml
+
+cron:
+  comunicaDati:
+    name: comunicaDati
+    active: true
+    cronExpression: "0 0 4 * * MON-SAT"
+
+  comunicaDatiVecchiaScrivania:
+    name: comunicaDatiVecchiaScrivania
+    active: true
+    cronExpression: "0 0 5 * * MON-SAT"
+
+  evictCache:
+    name: evictCache
+    active: false
+    cronExpression: "0 0 2 * * MON-SAT"
+
+  loadCache:
+    name: loadCache
+    active: false
+    cronExpression: "0 0 3 * * MON-SAT"
+
+  verifyStep:
+    name: verifyStep
+    active: false
+    cronExpression: "0 */1 * * * MON-SAT"
+
+jhipster:
+  mail:
+    from: missioni@cnr.it
+  security:
+    authentication:
+      oauth:
+        clientid: sprintapp
+        secret: mySecretOAuthSecret
+        # Token is valid 30 minutes
+        tokenValidityInSeconds: 1800
+
+cache.hazelcast:
+  name: sprint-missioni
+  members: 127.0.0.1
+
+server:
+  port: 8080
+
+cnr:
+  ajp:
+    port: 8009
+    timeout: 120000
+  cache:
+    hazelcast:
+      packages: it.cnr.si.missioni
+  storage:
+    driver: CMIS
+
+keycloak:
+  enabled: false
