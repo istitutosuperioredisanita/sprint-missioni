@@ -1,31 +1,44 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
+
+import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "pg_nazione"
+        "pg_nazione"
 })
-public class Nazione implements Serializable{
+public class Nazione implements Serializable {
 
     @JsonProperty("pg_nazione")
     private Integer pgNazione;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The pgNazione
+     * @return The pgNazione
      */
     @JsonProperty("pg_nazione")
     public Integer getPgNazione() {
@@ -33,9 +46,7 @@ public class Nazione implements Serializable{
     }
 
     /**
-     * 
-     * @param pgNazione
-     *     The pg_nazione
+     * @param pgNazione The pg_nazione
      */
     @JsonProperty("pg_nazione")
     public void setPgNazione(Integer pgNazione) {

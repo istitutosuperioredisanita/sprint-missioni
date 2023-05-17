@@ -1,115 +1,130 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.cmis.flows.json.object.flowsStatus;
+
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "bpm_assignee",
-    "cnrmissioni_dataFineMissione",
-    "wfcnr_wfCounterAnno",
-    "cnrmissioni_userNameResponsabileModulo",
-    "cnrmissioni_descrizioneModulo",
-    "cnrmissioni_autoPropriaTerzoMotivo",
-    "wfcnr_reviewOutcome",
-    "cnrmissioni_autoPropriaSecondoMotivo",
-    "bpm_hiddenTransitions",
-    "cnrmissioni_destinazione",
-    "cnrmissioni_validazioneSpesaFlag",
-    "cm_owner",
-    "cnrmissioni_descrizioneCapitolo",
-    "cnrmissioni_autoPropriaFlag",
-    "cnrmissioni_note",
-    "cnrmissioni_trattamento",
-    "cnrmissioni_uoOrdine",
-    "wfcnr_wfNodeRefCartellaFlusso",
-    "bpm_package",
-    "cnrmissioni_competenzaResiduo",
-    "bpm_packageItemActionGroup",
-    "cnrmissioni_descrizioneOrdine",
-    "cnrmissioni_capitolo",
-    "cnrmissioni_descrizioneGae",
-    "cnrmissioni_descrizioneUoOrdine",
-    "cnrmissioni_autoPropriaPrimoMotivo",
-    "cnrmissioni_missioneEsteraFlag",
-    "cnrmissioni_noteAutorizzazioniAggiuntive",
-    "bpm_outcomePropertyName",
-    "cnrmissioni_wfOrdineDaRevoca",
-    "cm_name",
-    "cnrmissioni_missioneGratuita",
-    "cnrmissioni_userNameAmministrativo3",
-    "cnrmissioni_userNameAmministrativo2",
-    "bpm_taskId",
-    "wfcnr_wfCounterId",
-    "bpm_startDate",
-    "bpm_packageActionGroup",
-    "bpm_reassignable",
-    "cnrmissioni_userNameAmministrativo1",
-    "bpm_dueDate",
-    "cnrmissioni_userNameRichiedente",
-    "bpm_priority",
-    "cnrmissioni_servizioFlagOk",
-    "cnrmissioni_validazioneModuloFlag",
-    "bpm_percentComplete",
-    "cnrmissioni_dataInizioMissione",
-    "bpm_pooledActors",
-    "cnrmissioni_noleggioFlag",
-    "cnrmissioni_gae",
-    "cnrmissioni_missioneConAnticipoFlag",
-    "cnrmissioni_taxiFlag",
-    "cnrmissioni_modulo",
-    "cnrmissioni_autoPropriaAltriMotivi",
-    "cnrmissioni_userNameFirmatarioSpesa",
-    "wfcnr_groupName",
-    "cnrmissioni_noteSegreteria",
-    "bpm_description",
-    "cnrmissioni_userNamePrimoFirmatario",
-    "cnrmissioni_descrizioneImpegno",
-    "cnrmissioni_uoSpesa",
-    "cnrmissioni_personaSeguitoFlagOk",
-    "cnrmissioni_userNameUtenteOrdineMissione",
-    "cnrmissioni_disponibilita",
-    "cnrmissioni_descrizioneUoCompetenza",
-    "bpm_status",
-    "bpm_comment",
-    "cnrmissioni_uoCompetenza",
-    "cm_created",
-    "wfcnr_wfCounterIndex",
-    "cnrmissioni_descrizioneUoSpesa",
-    "bpm_completionDate",
-    "bpm_outcome",
-    "initiator",
-    "bpm_sendEMailNotifications",
-    "wfvarGruppoStrutturaSpesaSUPERVISORI",
-    "workflowinstanceid",
-    "bpm_workflowPriority",
-    "wfcnr_linkToOtherWorkflows",
-    "wfvarNomeFlusso",
-    "bpm_workflowDueDate",
-    "wfvarUtenteOrdineMissione",
-    "wfvarUtenteRichiedente",
-    "initiatorhome",
-    "wfvarGruppoStrutturaSpesaRESPONSABILI",
-    "wfvarWorkflowInstanceId",
-    "cancelled",
-    "wfvarGruppoRESPONSABILI",
-    "wfvarGruppoStrutturaUoSUPERVISORI",
-    "wfvarValidazioneSpesa",
-    "wfvarGruppoSUPERVISORI",
-    "bpm_workflowDescription",
-    "companyhome",
-    "wfvarUtentePrimoFirmatario",
-    "wfvarUtenteFirmatarioSpesa",
-    "wfvarGruppoStrutturaUoRESPONSABILI",
-    "wfvarTitoloFlusso"
+        "bpm_assignee",
+        "cnrmissioni_dataFineMissione",
+        "wfcnr_wfCounterAnno",
+        "cnrmissioni_userNameResponsabileModulo",
+        "cnrmissioni_descrizioneModulo",
+        "cnrmissioni_autoPropriaTerzoMotivo",
+        "wfcnr_reviewOutcome",
+        "cnrmissioni_autoPropriaSecondoMotivo",
+        "bpm_hiddenTransitions",
+        "cnrmissioni_destinazione",
+        "cnrmissioni_validazioneSpesaFlag",
+        "cm_owner",
+        "cnrmissioni_descrizioneCapitolo",
+        "cnrmissioni_autoPropriaFlag",
+        "cnrmissioni_note",
+        "cnrmissioni_trattamento",
+        "cnrmissioni_uoOrdine",
+        "wfcnr_wfNodeRefCartellaFlusso",
+        "bpm_package",
+        "cnrmissioni_competenzaResiduo",
+        "bpm_packageItemActionGroup",
+        "cnrmissioni_descrizioneOrdine",
+        "cnrmissioni_capitolo",
+        "cnrmissioni_descrizioneGae",
+        "cnrmissioni_descrizioneUoOrdine",
+        "cnrmissioni_autoPropriaPrimoMotivo",
+        "cnrmissioni_missioneEsteraFlag",
+        "cnrmissioni_noteAutorizzazioniAggiuntive",
+        "bpm_outcomePropertyName",
+        "cnrmissioni_wfOrdineDaRevoca",
+        "cm_name",
+        "cnrmissioni_missioneGratuita",
+        "cnrmissioni_userNameAmministrativo3",
+        "cnrmissioni_userNameAmministrativo2",
+        "bpm_taskId",
+        "wfcnr_wfCounterId",
+        "bpm_startDate",
+        "bpm_packageActionGroup",
+        "bpm_reassignable",
+        "cnrmissioni_userNameAmministrativo1",
+        "bpm_dueDate",
+        "cnrmissioni_userNameRichiedente",
+        "bpm_priority",
+        "cnrmissioni_servizioFlagOk",
+        "cnrmissioni_validazioneModuloFlag",
+        "bpm_percentComplete",
+        "cnrmissioni_dataInizioMissione",
+        "bpm_pooledActors",
+        "cnrmissioni_noleggioFlag",
+        "cnrmissioni_gae",
+        "cnrmissioni_missioneConAnticipoFlag",
+        "cnrmissioni_taxiFlag",
+        "cnrmissioni_modulo",
+        "cnrmissioni_autoPropriaAltriMotivi",
+        "cnrmissioni_userNameFirmatarioSpesa",
+        "wfcnr_groupName",
+        "cnrmissioni_noteSegreteria",
+        "bpm_description",
+        "cnrmissioni_userNamePrimoFirmatario",
+        "cnrmissioni_descrizioneImpegno",
+        "cnrmissioni_uoSpesa",
+        "cnrmissioni_personaSeguitoFlagOk",
+        "cnrmissioni_userNameUtenteOrdineMissione",
+        "cnrmissioni_disponibilita",
+        "cnrmissioni_descrizioneUoCompetenza",
+        "bpm_status",
+        "bpm_comment",
+        "cnrmissioni_uoCompetenza",
+        "cm_created",
+        "wfcnr_wfCounterIndex",
+        "cnrmissioni_descrizioneUoSpesa",
+        "bpm_completionDate",
+        "bpm_outcome",
+        "initiator",
+        "bpm_sendEMailNotifications",
+        "wfvarGruppoStrutturaSpesaSUPERVISORI",
+        "workflowinstanceid",
+        "bpm_workflowPriority",
+        "wfcnr_linkToOtherWorkflows",
+        "wfvarNomeFlusso",
+        "bpm_workflowDueDate",
+        "wfvarUtenteOrdineMissione",
+        "wfvarUtenteRichiedente",
+        "initiatorhome",
+        "wfvarGruppoStrutturaSpesaRESPONSABILI",
+        "wfvarWorkflowInstanceId",
+        "cancelled",
+        "wfvarGruppoRESPONSABILI",
+        "wfvarGruppoStrutturaUoSUPERVISORI",
+        "wfvarValidazioneSpesa",
+        "wfvarGruppoSUPERVISORI",
+        "bpm_workflowDescription",
+        "companyhome",
+        "wfvarUtentePrimoFirmatario",
+        "wfvarUtenteFirmatarioSpesa",
+        "wfvarGruppoStrutturaUoRESPONSABILI",
+        "wfvarTitoloFlusso"
 })
 public class Properties {
 
@@ -308,7 +323,7 @@ public class Properties {
     @JsonProperty("wfvarTitoloFlusso")
     private String wfvarTitoloFlusso;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("bpm_assignee")
     public String getBpmAssignee() {

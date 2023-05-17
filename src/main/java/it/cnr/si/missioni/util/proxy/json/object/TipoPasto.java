@@ -1,34 +1,47 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "cd_ti_pasto",
-    "inquadramento",
-    "ti_area_geografica",
-    "pg_nazione",
-    "ds_nazione",
-    "cd_divisa",
-    "limite_max_pasto",
-    "dt_inizio_validita",
-    "dt_fine_validita",
-    "dt_cancellazione",
-    "cd_area_estera",
-    "ds_area_estera"
+        "cd_ti_pasto",
+        "inquadramento",
+        "ti_area_geografica",
+        "pg_nazione",
+        "ds_nazione",
+        "cd_divisa",
+        "limite_max_pasto",
+        "dt_inizio_validita",
+        "dt_fine_validita",
+        "dt_cancellazione",
+        "cd_area_estera",
+        "ds_area_estera"
 })
 public class TipoPasto extends RestServiceBean implements Serializable {
 
@@ -60,9 +73,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The cdTiPasto
+     * @return The cdTiPasto
      */
     @JsonProperty("cd_ti_pasto")
     public String getCdTiPasto() {
@@ -70,9 +81,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdTiPasto
-     *     The cd_ti_pasto
+     * @param cdTiPasto The cd_ti_pasto
      */
     @JsonProperty("cd_ti_pasto")
     public void setCdTiPasto(String cdTiPasto) {
@@ -80,9 +89,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The inquadramento
+     * @return The inquadramento
      */
     @JsonProperty("inquadramento")
     public Integer getInquadramento() {
@@ -90,9 +97,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param inquadramento
-     *     The inquadramento
+     * @param inquadramento The inquadramento
      */
     @JsonProperty("inquadramento")
     public void setInquadramento(Integer inquadramento) {
@@ -100,9 +105,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The tiAreaGeografica
+     * @return The tiAreaGeografica
      */
     @JsonProperty("ti_area_geografica")
     public String getTiAreaGeografica() {
@@ -110,9 +113,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param tiAreaGeografica
-     *     The ti_area_geografica
+     * @param tiAreaGeografica The ti_area_geografica
      */
     @JsonProperty("ti_area_geografica")
     public void setTiAreaGeografica(String tiAreaGeografica) {
@@ -120,9 +121,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The pgNazione
+     * @return The pgNazione
      */
     @JsonProperty("pg_nazione")
     public Integer getPgNazione() {
@@ -130,9 +129,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param pgNazione
-     *     The pg_nazione
+     * @param pgNazione The pg_nazione
      */
     @JsonProperty("pg_nazione")
     public void setPgNazione(Integer pgNazione) {
@@ -140,9 +137,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsNazione
+     * @return The dsNazione
      */
     @JsonProperty("ds_nazione")
     public String getDsNazione() {
@@ -150,9 +145,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsNazione
-     *     The ds_nazione
+     * @param dsNazione The ds_nazione
      */
     @JsonProperty("ds_nazione")
     public void setDsNazione(String dsNazione) {
@@ -160,9 +153,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdDivisa
+     * @return The cdDivisa
      */
     @JsonProperty("cd_divisa")
     public String getCdDivisa() {
@@ -170,9 +161,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdDivisa
-     *     The cd_divisa
+     * @param cdDivisa The cd_divisa
      */
     @JsonProperty("cd_divisa")
     public void setCdDivisa(String cdDivisa) {
@@ -180,9 +169,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The limiteMaxPasto
+     * @return The limiteMaxPasto
      */
     @JsonProperty("limite_max_pasto")
     public Double getLimiteMaxPasto() {
@@ -190,9 +177,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param limiteMaxPasto
-     *     The limite_max_pasto
+     * @param limiteMaxPasto The limite_max_pasto
      */
     @JsonProperty("limite_max_pasto")
     public void setLimiteMaxPasto(Double limiteMaxPasto) {
@@ -200,9 +185,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtInizioValidita
+     * @return The dtInizioValidita
      */
     @JsonProperty("dt_inizio_validita")
     public Object getDtInizioValidita() {
@@ -210,9 +193,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtInizioValidita
-     *     The dt_inizio_validita
+     * @param dtInizioValidita The dt_inizio_validita
      */
     @JsonProperty("dt_inizio_validita")
     public void setDtInizioValidita(Object dtInizioValidita) {
@@ -220,9 +201,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtFineValidita
+     * @return The dtFineValidita
      */
     @JsonProperty("dt_fine_validita")
     public Object getDtFineValidita() {
@@ -230,9 +209,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtFineValidita
-     *     The dt_fine_validita
+     * @param dtFineValidita The dt_fine_validita
      */
     @JsonProperty("dt_fine_validita")
     public void setDtFineValidita(Object dtFineValidita) {
@@ -240,9 +217,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtCancellazione
+     * @return The dtCancellazione
      */
     @JsonProperty("dt_cancellazione")
     public Object getDtCancellazione() {
@@ -250,9 +225,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtCancellazione
-     *     The dt_cancellazione
+     * @param dtCancellazione The dt_cancellazione
      */
     @JsonProperty("dt_cancellazione")
     public void setDtCancellazione(Object dtCancellazione) {
@@ -260,9 +233,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdAreaEstera
+     * @return The cdAreaEstera
      */
     @JsonProperty("cd_area_estera")
     public String getCdAreaEstera() {
@@ -270,9 +241,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdAreaEstera
-     *     The cd_area_estera
+     * @param cdAreaEstera The cd_area_estera
      */
     @JsonProperty("cd_area_estera")
     public void setCdAreaEstera(String cdAreaEstera) {
@@ -280,9 +249,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsAreaEstera
+     * @return The dsAreaEstera
      */
     @JsonProperty("ds_area_estera")
     public String getDsAreaEstera() {
@@ -290,9 +257,7 @@ public class TipoPasto extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsAreaEstera
-     *     The ds_area_estera
+     * @param dsAreaEstera The ds_area_estera
      */
     @JsonProperty("ds_area_estera")
     public void setDsAreaEstera(String dsAreaEstera) {

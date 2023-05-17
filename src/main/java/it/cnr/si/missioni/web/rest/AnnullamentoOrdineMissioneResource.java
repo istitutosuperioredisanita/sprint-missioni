@@ -1,18 +1,32 @@
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.web.rest;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
+import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
@@ -23,24 +37,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
-import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
-import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing the current user's account.
@@ -56,7 +65,7 @@ public class AnnullamentoOrdineMissioneResource {
     @Autowired
     private SecurityService securityService;
 
-    
+
     @Autowired
     private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
@@ -68,35 +77,36 @@ public class AnnullamentoOrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getAnnullamento(HttpServletRequest request,
-    		RimborsoMissioneFilter filter) {
-        log.debug("REST request per visualizzare i dati dei Rimborsi di Missione " );
+                                             RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati dei Rimborsi di Missione ");
         List<AnnullamentoOrdineMissione> annullamenti;
-		try {
-			annullamenti = annullamentoOrdineMissioneService.getAnnullamenti( filter, true);
-		} catch (ComponentException e) {
-			log.error("ERRORE getRimborsoMissione",e);
+        try {
+            annullamenti = annullamentoOrdineMissioneService.getAnnullamenti(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getRimborsoMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		}
+        }
         return JSONResponseEntity.ok(annullamenti);
     }
 
     /**
      * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @RequestMapping(value = "/rest/annullamentoOrdineMissione/listToValidate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getAnnullamentiDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) {
-        log.debug("REST request per visualizzare i dati degli Ordini di Missione " );
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione ");
         List<AnnullamentoOrdineMissione> annullamenti;
-		try {
-			annullamenti = annullamentoOrdineMissioneService.getAnnullamentiForValidateFlows(filter, true);
-		} catch (Exception e) {
-			log.error("ERRORE getRimborsoMissioneDaValidare",e);
+        try {
+            annullamenti = annullamentoOrdineMissioneService.getAnnullamentiForValidateFlows(filter, true);
+        } catch (Exception e) {
+            log.error("ERRORE getRimborsoMissioneDaValidare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		}
+        }
         return JSONResponseEntity.ok(annullamenti);
     }
 
@@ -108,18 +118,18 @@ public class AnnullamentoOrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getAnnullamentoOrdineMissione(HttpServletRequest request,
-    		@RequestParam(value = "id") Long idMissione) {
-        log.debug("REST request per visualizzare i dati dell' annullamento dell'Ordine di Missione " );
+                                                           @RequestParam(value = "id") Long idMissione) {
+        log.debug("REST request per visualizzare i dati dell' annullamento dell'Ordine di Missione ");
         try {
-        	AnnullamentoOrdineMissione annullamento = annullamentoOrdineMissioneService.getAnnullamentoOrdineMissione( idMissione, true);
-        	return JSONResponseEntity.ok(annullamento);
+            AnnullamentoOrdineMissione annullamento = annullamentoOrdineMissioneService.getAnnullamentoOrdineMissione(idMissione, true);
+            return JSONResponseEntity.ok(annullamento);
         } catch (AwesomeException e) {
-			log.error("ERRORE getRimborsoMissione",e);
-			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-		} catch (Exception e) {
-			log.error("ERRORE getRimborsoMissione",e);
-			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		}
+            log.error("ERRORE getRimborsoMissione", e);
+            return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+        } catch (Exception e) {
+            log.error("ERRORE getRimborsoMissione", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
     }
 
     @RequestMapping(value = "/rest/annullamentoOrdineMissione",
@@ -127,23 +137,23 @@ public class AnnullamentoOrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> createAnnullamentoOrdineMissione(@RequestBody AnnullamentoOrdineMissione annullamento, HttpServletRequest request,
-                                             HttpServletResponse response) {
-    	if (annullamento.getId() == null){
+                                                              HttpServletResponse response) {
+        if (annullamento.getId() == null) {
             try {
-            	annullamento =  annullamentoOrdineMissioneService.createAnnullamentoOrdineMissione( annullamento);
-    		} catch (AwesomeException e) {
-    			log.error("ERRORE createAnnullamentoOrdineMissione",e);
-    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (Exception e) {
-    			log.error("ERRORE createAnnullamentoOrdineMissione",e);
-    			return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		}
+                annullamento = annullamentoOrdineMissioneService.createAnnullamentoOrdineMissione(annullamento);
+            } catch (AwesomeException e) {
+                log.error("ERRORE createAnnullamentoOrdineMissione", e);
+                return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+            } catch (Exception e) {
+                log.error("ERRORE createAnnullamentoOrdineMissione", e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+            }
             return JSONResponseEntity.ok(annullamento);
-    	} else {
-    		String error = "Id Annullamento Ordine Missione non valorizzato";
-			log.error("ERRORE createAnnullamentoOrdineMissione",error);
-    	    return JSONResponseEntity.badRequest(error);
-    	}
+        } else {
+            String error = "Id Annullamento Ordine Missione non valorizzato";
+            log.error("ERRORE createAnnullamentoOrdineMissione", error);
+            return JSONResponseEntity.badRequest(error);
+        }
     }
 
     @RequestMapping(value = "/rest/annullamentoOrdineMissione",
@@ -151,50 +161,50 @@ public class AnnullamentoOrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> modifyAnnullamentoOrdineMissione(@RequestBody AnnullamentoOrdineMissione annullamento, HttpServletRequest request,
-                                             HttpServletResponse response) {
-    	if (annullamento.getId() != null){
+                                                              HttpServletResponse response) {
+        if (annullamento.getId() != null) {
             try {
-            	annullamento =  annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione(annullamento, null);
-    		} catch (AwesomeException e) {
-    			log.error("ERRORE modifyAnnullamentoOrdineMissione",e);
-    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (Exception e) {
-    			log.error("ERRORE modifyAnnullamentoOrdineMissione",e);
+                annullamento = annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione(annullamento, null);
+            } catch (AwesomeException e) {
+                log.error("ERRORE modifyAnnullamentoOrdineMissione", e);
+                return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+            } catch (Exception e) {
+                log.error("ERRORE modifyAnnullamentoOrdineMissione", e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		}
+            }
             return JSONResponseEntity.ok(annullamento);
-    	} else {
-    		String error = "Id Annullamento Ordine Missione non valorizzato";
-			log.error("ERRORE modifyAnnullamentoOrdineMissione",error);
-    	    return JSONResponseEntity.badRequest(error);
-    	}
+        } else {
+            String error = "Id Annullamento Ordine Missione non valorizzato";
+            log.error("ERRORE modifyAnnullamentoOrdineMissione", error);
+            return JSONResponseEntity.badRequest(error);
+        }
     }
 
     @RequestMapping(value = "/rest/annullamentoOrdineMissione",
             method = RequestMethod.PUT,
-            params = {"confirm"}, 
+            params = {"confirm"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> confirmAnnullamento(@RequestBody AnnullamentoOrdineMissione annullamento, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,  
-    		HttpServletRequest request, HttpServletResponse response) {
-    	String basePath = Arrays.stream(request.getRequestURL().toString().split("/")).limit(3).collect(Collectors.joining("/"));
-    	if (annullamento.getId() != null){
-    		annullamento.setDaValidazione(daValidazione);
+    public ResponseEntity<?> confirmAnnullamento(@RequestBody AnnullamentoOrdineMissione annullamento, @RequestParam(value = "confirm") Boolean confirm, @RequestParam(value = "daValidazione") String daValidazione,
+                                                 HttpServletRequest request, HttpServletResponse response) {
+        String basePath = Arrays.stream(request.getRequestURL().toString().split("/")).limit(3).collect(Collectors.joining("/"));
+        if (annullamento.getId() != null) {
+            annullamento.setDaValidazione(daValidazione);
             try {
-            	annullamento = annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione( annullamento, false, confirm, basePath);
-    		} catch (AwesomeException e) {
-    			log.error("ERRORE confirmAnnullamentoMissione",e);
-    			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-    		} catch (Exception e) {
-    			log.error("ERRORE confirmAnnullamentoMissione",e);
+                annullamento = annullamentoOrdineMissioneService.updateAnnullamentoOrdineMissione(annullamento, false, confirm, basePath);
+            } catch (AwesomeException e) {
+                log.error("ERRORE confirmAnnullamentoMissione", e);
+                return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+            } catch (Exception e) {
+                log.error("ERRORE confirmAnnullamentoMissione", e);
                 return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-    		}
+            }
             return JSONResponseEntity.ok(annullamento);
-    	} else {
-    		String error = "Id Annullamento Missione non valorizzato";
-			log.error("ERRORE confirmAnnullamentoMissione",error);
-    	    return JSONResponseEntity.badRequest("Id Rimborso Missione non valorizzato");
-    	}
+        } else {
+            String error = "Id Annullamento Missione non valorizzato";
+            log.error("ERRORE confirmAnnullamentoMissione", error);
+            return JSONResponseEntity.badRequest("Id Rimborso Missione non valorizzato");
+        }
     }
 
     @RequestMapping(value = "/rest/annullamentoOrdineMissione/{ids}",
@@ -202,58 +212,58 @@ public class AnnullamentoOrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity deleteAnnullamento(@PathVariable Long ids, HttpServletRequest request) {
-		try {
-			annullamentoOrdineMissioneService.deleteAnnullamento( ids);
+        try {
+            annullamentoOrdineMissioneService.deleteAnnullamento(ids);
             return JSONResponseEntity.ok();
-		} catch (AwesomeException e) {
-			log.error("ERRORE deleteAnnullamentoMissione",e);
-			return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
-		} catch (Exception e) {
-			log.error("ERRORE deleteAnnullamentoMissione",e);
+        } catch (AwesomeException e) {
+            log.error("ERRORE deleteAnnullamentoMissione", e);
+            return JSONResponseEntity.getResponse(HttpStatus.BAD_REQUEST, Utility.getMessageException(e));
+        } catch (Exception e) {
+            log.error("ERRORE deleteAnnullamentoMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
-		}
-	}
+        }
+    }
 
     @RequestMapping(value = "/rest/public/printAnnullamentoMissione",
             method = RequestMethod.GET)
     @Timed
     @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printAnnullamentoMissione(HttpServletRequest request,
-    		@RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
-        log.debug("REST request per la stampa dell'rimborso di Missione " );
-        
-        if (!StringUtils.isEmpty(idMissione)){
+                                                        @RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
+        log.debug("REST request per la stampa dell'rimborso di Missione ");
+
+        if (!StringUtils.isEmpty(idMissione)) {
             try {
-            	Long idMissioneLong = new Long (idMissione);
-				String user = securityService.getCurrentUserLogin();
-				if (user != null ){
-            		Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(idMissioneLong);
-            		if (map != null){
-            			res.setContentType("application/pdf");
-                    	try {
-                    		String headerValue = "attachment";
-                    		for (String key : map.keySet()) {
-                    			System.out.println(map.get(key).length);
-                    			log.debug("Lunghezza "+map.get(key).length);
-                       			headerValue += "; filename=\"" + key + "\"";
-                        		OutputStream outputStream = res.getOutputStream();
-                        		res.setHeader("Content-Disposition", headerValue);
-                        		InputStream inputStream = new ByteArrayInputStream(map.get(key));
-                        		IOUtils.copy(inputStream, outputStream);
-                        		outputStream.flush();
-                        		inputStream.close();
-                        		outputStream.close();       	
-                    		}
-            			} catch (IOException e) {
-            				log.error("ERRORE deleteRimborsoMissione",e);
-                			throw new AwesomeException(Utility.getMessageException(e));
-                		} 
-            		}
-            	}
-    		} catch (ComponentException e) {
-    			log.error("ERRORE printRimborsoMissione",e);
-    			throw new AwesomeException(Utility.getMessageException(e));
-    		} 
+                Long idMissioneLong = Long.valueOf(idMissione);
+                String user = securityService.getCurrentUserLogin();
+                if (user != null) {
+                    Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(idMissioneLong);
+                    if (map != null) {
+                        res.setContentType("application/pdf");
+                        try {
+                            String headerValue = "attachment";
+                            for (String key : map.keySet()) {
+                                System.out.println(map.get(key).length);
+                                log.debug("Lunghezza " + map.get(key).length);
+                                headerValue += "; filename=\"" + key + "\"";
+                                OutputStream outputStream = res.getOutputStream();
+                                res.setHeader("Content-Disposition", headerValue);
+                                InputStream inputStream = new ByteArrayInputStream(map.get(key));
+                                IOUtils.copy(inputStream, outputStream);
+                                outputStream.flush();
+                                inputStream.close();
+                                outputStream.close();
+                            }
+                        } catch (IOException e) {
+                            log.error("ERRORE deleteRimborsoMissione", e);
+                            throw new AwesomeException(Utility.getMessageException(e));
+                        }
+                    }
+                }
+            } catch (ComponentException e) {
+                log.error("ERRORE printRimborsoMissione", e);
+                throw new AwesomeException(Utility.getMessageException(e));
+            }
         }
     }
 }

@@ -1,5 +1,28 @@
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.web.rest;
 
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.missioni.service.UoService;
+import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,14 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.missioni.service.UoService;
-import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
-
 import javax.annotation.security.RolesAllowed;
-import java.util.List;
 
 /**
  * REST controller for managing the current user's account.
@@ -32,7 +48,7 @@ public class UoResource {
 
     @Autowired
     UoService uoService;
-    
+
     /**
      * GET  /rest/direttore -> get the director.
      */
@@ -43,7 +59,7 @@ public class UoResource {
     @Timed
     public ResponseEntity getDirettore(@RequestParam(value = "username") String username) {
         log.debug("REST request per recuperare i dati del direttore");
-        
+
         Account direttore = uoService.getDirettoreFromUsername(username);
         return JSONResponseEntity.ok(direttore);
     }
@@ -62,6 +78,7 @@ public class UoResource {
         String rest = uoService.getPersone(null, cds);
         return JSONResponseEntity.ok(rest);
     }
+
     /**
      * GET  /rest/account -> get the current user.
      */

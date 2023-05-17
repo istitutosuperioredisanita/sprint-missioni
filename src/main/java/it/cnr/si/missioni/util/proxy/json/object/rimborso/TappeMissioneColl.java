@@ -1,34 +1,49 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
+
+import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "cambio_tappa",
-    "divisa_tappa",
-    "fl_rimborso",
-    "fl_comune_estero",
-    "fl_alloggio_gratuito",
-    "fl_navigazione",
-    "fl_vitto_gratuito",
-    "fl_vitto_alloggio_gratuito",
-    "fl_comune_proprio",
-    "fl_comune_altro",
-    "fl_no_diaria",
-    "dt_inizio_tappa",
-    "dt_fine_tappa",
-    "nazione"
+        "cambio_tappa",
+        "divisa_tappa",
+        "fl_rimborso",
+        "fl_comune_estero",
+        "fl_alloggio_gratuito",
+        "fl_navigazione",
+        "fl_vitto_gratuito",
+        "fl_vitto_alloggio_gratuito",
+        "fl_comune_proprio",
+        "fl_comune_altro",
+        "fl_no_diaria",
+        "dt_inizio_tappa",
+        "dt_fine_tappa",
+        "nazione"
 })
-public class TappeMissioneColl implements Cloneable, Serializable{
+public class TappeMissioneColl implements Cloneable, Serializable {
 
     @JsonProperty("cambio_tappa")
     private Integer cambioTappa;
@@ -59,12 +74,10 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     @JsonProperty("nazione")
     private Nazione nazione;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The cambioTappa
+     * @return The cambioTappa
      */
     @JsonProperty("cambio_tappa")
     public Integer getCambioTappa() {
@@ -72,9 +85,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param cambioTappa
-     *     The cambio_tappa
+     * @param cambioTappa The cambio_tappa
      */
     @JsonProperty("cambio_tappa")
     public void setCambioTappa(Integer cambioTappa) {
@@ -82,9 +93,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The divisaTappa
+     * @return The divisaTappa
      */
     @JsonProperty("divisa_tappa")
     public DivisaTappa getDivisaTappa() {
@@ -92,9 +101,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param divisaTappa
-     *     The divisa_tappa
+     * @param divisaTappa The divisa_tappa
      */
     @JsonProperty("divisa_tappa")
     public void setDivisaTappa(DivisaTappa divisaTappa) {
@@ -102,9 +109,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flRimborso
+     * @return The flRimborso
      */
     @JsonProperty("fl_rimborso")
     public Boolean getFlRimborso() {
@@ -112,9 +117,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flRimborso
-     *     The fl_rimborso
+     * @param flRimborso The fl_rimborso
      */
     @JsonProperty("fl_rimborso")
     public void setFlRimborso(Boolean flRimborso) {
@@ -122,9 +125,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flComuneEstero
+     * @return The flComuneEstero
      */
     @JsonProperty("fl_comune_estero")
     public Boolean getFlComuneEstero() {
@@ -132,9 +133,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flComuneEstero
-     *     The fl_comune_estero
+     * @param flComuneEstero The fl_comune_estero
      */
     @JsonProperty("fl_comune_estero")
     public void setFlComuneEstero(Boolean flComuneEstero) {
@@ -142,9 +141,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flAlloggioGratuito
+     * @return The flAlloggioGratuito
      */
     @JsonProperty("fl_alloggio_gratuito")
     public Boolean getFlAlloggioGratuito() {
@@ -152,9 +149,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flAlloggioGratuito
-     *     The fl_alloggio_gratuito
+     * @param flAlloggioGratuito The fl_alloggio_gratuito
      */
     @JsonProperty("fl_alloggio_gratuito")
     public void setFlAlloggioGratuito(Boolean flAlloggioGratuito) {
@@ -162,9 +157,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flNavigazione
+     * @return The flNavigazione
      */
     @JsonProperty("fl_navigazione")
     public Boolean getFlNavigazione() {
@@ -172,9 +165,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flNavigazione
-     *     The fl_navigazione
+     * @param flNavigazione The fl_navigazione
      */
     @JsonProperty("fl_navigazione")
     public void setFlNavigazione(Boolean flNavigazione) {
@@ -182,9 +173,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flVittoGratuito
+     * @return The flVittoGratuito
      */
     @JsonProperty("fl_vitto_gratuito")
     public Boolean getFlVittoGratuito() {
@@ -192,9 +181,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flVittoGratuito
-     *     The fl_vitto_gratuito
+     * @param flVittoGratuito The fl_vitto_gratuito
      */
     @JsonProperty("fl_vitto_gratuito")
     public void setFlVittoGratuito(Boolean flVittoGratuito) {
@@ -202,9 +189,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flVittoAlloggioGratuito
+     * @return The flVittoAlloggioGratuito
      */
     @JsonProperty("fl_vitto_alloggio_gratuito")
     public Boolean getFlVittoAlloggioGratuito() {
@@ -212,9 +197,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flVittoAlloggioGratuito
-     *     The fl_vitto_alloggio_gratuito
+     * @param flVittoAlloggioGratuito The fl_vitto_alloggio_gratuito
      */
     @JsonProperty("fl_vitto_alloggio_gratuito")
     public void setFlVittoAlloggioGratuito(Boolean flVittoAlloggioGratuito) {
@@ -222,9 +205,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flComuneProprio
+     * @return The flComuneProprio
      */
     @JsonProperty("fl_comune_proprio")
     public Boolean getFlComuneProprio() {
@@ -232,9 +213,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flComuneProprio
-     *     The fl_comune_proprio
+     * @param flComuneProprio The fl_comune_proprio
      */
     @JsonProperty("fl_comune_proprio")
     public void setFlComuneProprio(Boolean flComuneProprio) {
@@ -242,9 +221,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flComuneAltro
+     * @return The flComuneAltro
      */
     @JsonProperty("fl_comune_altro")
     public Boolean getFlComuneAltro() {
@@ -252,9 +229,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flComuneAltro
-     *     The fl_comune_altro
+     * @param flComuneAltro The fl_comune_altro
      */
     @JsonProperty("fl_comune_altro")
     public void setFlComuneAltro(Boolean flComuneAltro) {
@@ -262,9 +237,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flNoDiaria
+     * @return The flNoDiaria
      */
     @JsonProperty("fl_no_diaria")
     public Boolean getFlNoDiaria() {
@@ -272,9 +245,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param flNoDiaria
-     *     The fl_no_diaria
+     * @param flNoDiaria The fl_no_diaria
      */
     @JsonProperty("fl_no_diaria")
     public void setFlNoDiaria(Boolean flNoDiaria) {
@@ -282,9 +253,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The dtInizioTappa
+     * @return The dtInizioTappa
      */
     @JsonProperty("dt_inizio_tappa")
     public String getDtInizioTappa() {
@@ -292,9 +261,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param dtInizioTappa
-     *     The dt_inizio_tappa
+     * @param dtInizioTappa The dt_inizio_tappa
      */
     @JsonProperty("dt_inizio_tappa")
     public void setDtInizioTappa(String dtInizioTappa) {
@@ -302,9 +269,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The dtFineTappa
+     * @return The dtFineTappa
      */
     @JsonProperty("dt_fine_tappa")
     public String getDtFineTappa() {
@@ -312,9 +277,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param dtFineTappa
-     *     The dt_fine_tappa
+     * @param dtFineTappa The dt_fine_tappa
      */
     @JsonProperty("dt_fine_tappa")
     public void setDtFineTappa(String dtFineTappa) {
@@ -322,9 +285,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The nazione
+     * @return The nazione
      */
     @JsonProperty("nazione")
     public Nazione getNazione() {
@@ -332,9 +293,7 @@ public class TappeMissioneColl implements Cloneable, Serializable{
     }
 
     /**
-     * 
-     * @param nazione
-     *     The nazione
+     * @param nazione The nazione
      */
     @JsonProperty("nazione")
     public void setNazione(Nazione nazione) {
@@ -351,9 +310,9 @@ public class TappeMissioneColl implements Cloneable, Serializable{
         this.additionalProperties.put(name, value);
     }
 
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
 }

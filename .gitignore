@@ -27,3 +27,4 @@ bower_components/
 /node/
 /DB-H2/*.*
 /package-lock.json
+/.run/*.*

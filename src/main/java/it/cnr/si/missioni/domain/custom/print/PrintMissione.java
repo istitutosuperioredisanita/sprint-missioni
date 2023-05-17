@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.domain.custom.print;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -76,332 +95,332 @@ public class PrintMissione {
 
     private String utilizzoTaxi;
 
-	private String utilizzoAutoNoleggio;
+    private String utilizzoAutoNoleggio;
 
-	private String utilizzoAutoServizio;
+    private String utilizzoAutoServizio;
 
-	private String personaleAlSeguito;
+    private String personaleAlSeguito;
 
-	private String noteUtilizzoTaxiNoleggio;
-			
-	public Integer getAnno() {
-		return anno;
-	}
+    private String noteUtilizzoTaxiNoleggio;
 
-	public void setAnno(Integer anno) {
-		this.anno = anno;
-	}
+    public Integer getAnno() {
+        return anno;
+    }
 
-	public Long getNumero() {
-		return numero;
-	}
+    public void setAnno(Integer anno) {
+        this.anno = anno;
+    }
 
-	public void setNumero(Long numero) {
-		this.numero = numero;
-	}
+    public Long getNumero() {
+        return numero;
+    }
 
-	public String getDataInserimento() {
-		return dataInserimento;
-	}
+    public void setNumero(Long numero) {
+        this.numero = numero;
+    }
 
-	public void setDataInserimento(String dataInserimento) {
-		this.dataInserimento = dataInserimento;
-	}
+    public String getDataInserimento() {
+        return dataInserimento;
+    }
 
-	public String getMatricolaRich() {
-		return matricolaRich;
-	}
+    public void setDataInserimento(String dataInserimento) {
+        this.dataInserimento = dataInserimento;
+    }
 
-	public void setMatricolaRich(String matricolaRich) {
-		this.matricolaRich = matricolaRich;
-	}
+    public String getMatricolaRich() {
+        return matricolaRich;
+    }
 
-	public String getCodiceFiscaleRich() {
-		return codiceFiscaleRich;
-	}
+    public void setMatricolaRich(String matricolaRich) {
+        this.matricolaRich = matricolaRich;
+    }
 
-	public void setCodiceFiscaleRich(String codiceFiscaleRich) {
-		this.codiceFiscaleRich = codiceFiscaleRich;
-	}
+    public String getCodiceFiscaleRich() {
+        return codiceFiscaleRich;
+    }
 
-	public String getLuogoDiNascitaRich() {
-		return luogoDiNascitaRich;
-	}
+    public void setCodiceFiscaleRich(String codiceFiscaleRich) {
+        this.codiceFiscaleRich = codiceFiscaleRich;
+    }
 
-	public void setLuogoDiNascitaRich(String luogoDiNascitaRich) {
-		this.luogoDiNascitaRich = luogoDiNascitaRich;
-	}
+    public String getLuogoDiNascitaRich() {
+        return luogoDiNascitaRich;
+    }
 
-	public String getDataDiNascitaRich() {
-		return dataDiNascitaRich;
-	}
+    public void setLuogoDiNascitaRich(String luogoDiNascitaRich) {
+        this.luogoDiNascitaRich = luogoDiNascitaRich;
+    }
 
-	public void setDataDiNascitaRich(String dataDiNascitaRich) {
-		this.dataDiNascitaRich = dataDiNascitaRich;
-	}
+    public String getDataDiNascitaRich() {
+        return dataDiNascitaRich;
+    }
 
-	public String getComuneResidenzaRich() {
-		return comuneResidenzaRich;
-	}
+    public void setDataDiNascitaRich(String dataDiNascitaRich) {
+        this.dataDiNascitaRich = dataDiNascitaRich;
+    }
 
-	public void setComuneResidenzaRich(String comuneResidenzaRich) {
-		this.comuneResidenzaRich = comuneResidenzaRich;
-	}
+    public String getComuneResidenzaRich() {
+        return comuneResidenzaRich;
+    }
 
-	public String getIndirizzoResidenzaRich() {
-		return indirizzoResidenzaRich;
-	}
+    public void setComuneResidenzaRich(String comuneResidenzaRich) {
+        this.comuneResidenzaRich = comuneResidenzaRich;
+    }
 
-	public void setIndirizzoResidenzaRich(String indirizzoResidenzaRich) {
-		this.indirizzoResidenzaRich = indirizzoResidenzaRich;
-	}
+    public String getIndirizzoResidenzaRich() {
+        return indirizzoResidenzaRich;
+    }
 
-	public String getDomicilioFiscaleRich() {
-		return domicilioFiscaleRich;
-	}
+    public void setIndirizzoResidenzaRich(String indirizzoResidenzaRich) {
+        this.indirizzoResidenzaRich = indirizzoResidenzaRich;
+    }
 
-	public void setDomicilioFiscaleRich(String domicilioFiscaleRich) {
-		this.domicilioFiscaleRich = domicilioFiscaleRich;
-	}
+    public String getDomicilioFiscaleRich() {
+        return domicilioFiscaleRich;
+    }
 
-	public String getDatoreLavoroRich() {
-		return datoreLavoroRich;
-	}
+    public void setDomicilioFiscaleRich(String domicilioFiscaleRich) {
+        this.domicilioFiscaleRich = domicilioFiscaleRich;
+    }
 
-	public void setDatoreLavoroRich(String datoreLavoroRich) {
-		this.datoreLavoroRich = datoreLavoroRich;
-	}
+    public String getDatoreLavoroRich() {
+        return datoreLavoroRich;
+    }
 
-	public String getQualificaRich() {
-		return qualificaRich;
-	}
+    public void setDatoreLavoroRich(String datoreLavoroRich) {
+        this.datoreLavoroRich = datoreLavoroRich;
+    }
 
-	public void setQualificaRich(String qualificaRich) {
-		this.qualificaRich = qualificaRich;
-	}
-
-	public String getLivelloRich() {
-		return livelloRich;
-	}
-
-	public void setLivelloRich(String livelloRich) {
-		this.livelloRich = livelloRich;
-	}
-
-	public String getOggetto() {
-		return oggetto;
-	}
-
-	public void setOggetto(String oggetto) {
-		this.oggetto = oggetto;
-	}
-
-	public String getDestinazione() {
-		return destinazione;
-	}
-
-	public void setDestinazione(String destinazione) {
-		this.destinazione = destinazione;
-	}
-
-	public String getNazione() {
-		return nazione;
-	}
-
-	public void setNazione(String nazione) {
-		this.nazione = nazione;
-	}
-
-	public String getTipoMissione() {
-		return tipoMissione;
-	}
-
-	public void setTipoMissione(String tipoMissione) {
-		this.tipoMissione = tipoMissione;
-	}
-
-	public String getTrattamento() {
-		return trattamento;
-	}
-
-	public void setTrattamento(String trattamento) {
-		this.trattamento = trattamento;
-	}
-
-	public String getDataInizioMissione() {
-		return dataInizioMissione;
-	}
-
-	public void setDataInizioMissione(String dataInizioMissione) {
-		this.dataInizioMissione = dataInizioMissione;
-	}
-
-	public String getDataFineMissione() {
-		return dataFineMissione;
-	}
-
-	public void setDataFineMissione(String dataFineMissione) {
-		this.dataFineMissione = dataFineMissione;
-	}
-
-	public String getVoce() {
-		return voce;
-	}
-
-	public void setVoce(String voce) {
-		this.voce = voce;
-	}
-
-	public String getGae() {
-		return gae;
-	}
-
-	public void setGae(String gae) {
-		this.gae = gae;
-	}
-
-	public String getCdrRich() {
-		return cdrRich;
-	}
-
-	public void setCdrRich(String cdrRich) {
-		this.cdrRich = cdrRich;
-	}
-
-	public String getUoRich() {
-		return uoRich;
-	}
-
-	public void setUoRich(String uoRich) {
-		this.uoRich = uoRich;
-	}
-
-	public String getCdrSpesa() {
-		return cdrSpesa;
-	}
-
-	public void setCdrSpesa(String cdrSpesa) {
-		this.cdrSpesa = cdrSpesa;
-	}
-
-	public String getUoSpesa() {
-		return uoSpesa;
-	}
-
-	public void setUoSpesa(String uoSpesa) {
-		this.uoSpesa = uoSpesa;
-	}
-
-	public String getModulo() {
-		return modulo;
-	}
-
-	public void setModulo(String modulo) {
-		this.modulo = modulo;
-	}
-
-	public String getCdsRich() {
-		return cdsRich;
-	}
-
-	public void setCdsRich(String cdsRich) {
-		this.cdsRich = cdsRich;
-	}
-
-	public String getCdsSpesa() {
-		return cdsSpesa;
-	}
-
-	public void setCdsSpesa(String cdsSpesa) {
-		this.cdsSpesa = cdsSpesa;
-	}
-
-	public String getCognomeRich() {
-		return cognomeRich;
-	}
-
-	public void setCognomeRich(String cognomeRich) {
-		this.cognomeRich = cognomeRich;
-	}
-
-	public String getNomeRich() {
-		return nomeRich;
-	}
-
-	public void setNomeRich(String nomeRich) {
-		this.nomeRich = nomeRich;
-	}
-
-	public String getItaliaEstero() {
-		return italiaEstero;
-	}
-
-	public void setItaliaEstero(String italiaEstero) {
-		this.italiaEstero = italiaEstero;
-	}
-
-	public String getCup() {
-		return cup;
-	}
-
-	public void setCup(String cup) {
-		this.cup = cup;
-	}
+    public String getQualificaRich() {
+        return qualificaRich;
+    }
+
+    public void setQualificaRich(String qualificaRich) {
+        this.qualificaRich = qualificaRich;
+    }
+
+    public String getLivelloRich() {
+        return livelloRich;
+    }
+
+    public void setLivelloRich(String livelloRich) {
+        this.livelloRich = livelloRich;
+    }
+
+    public String getOggetto() {
+        return oggetto;
+    }
+
+    public void setOggetto(String oggetto) {
+        this.oggetto = oggetto;
+    }
+
+    public String getDestinazione() {
+        return destinazione;
+    }
+
+    public void setDestinazione(String destinazione) {
+        this.destinazione = destinazione;
+    }
+
+    public String getNazione() {
+        return nazione;
+    }
+
+    public void setNazione(String nazione) {
+        this.nazione = nazione;
+    }
+
+    public String getTipoMissione() {
+        return tipoMissione;
+    }
+
+    public void setTipoMissione(String tipoMissione) {
+        this.tipoMissione = tipoMissione;
+    }
+
+    public String getTrattamento() {
+        return trattamento;
+    }
+
+    public void setTrattamento(String trattamento) {
+        this.trattamento = trattamento;
+    }
+
+    public String getDataInizioMissione() {
+        return dataInizioMissione;
+    }
+
+    public void setDataInizioMissione(String dataInizioMissione) {
+        this.dataInizioMissione = dataInizioMissione;
+    }
+
+    public String getDataFineMissione() {
+        return dataFineMissione;
+    }
+
+    public void setDataFineMissione(String dataFineMissione) {
+        this.dataFineMissione = dataFineMissione;
+    }
+
+    public String getVoce() {
+        return voce;
+    }
+
+    public void setVoce(String voce) {
+        this.voce = voce;
+    }
+
+    public String getGae() {
+        return gae;
+    }
+
+    public void setGae(String gae) {
+        this.gae = gae;
+    }
+
+    public String getCdrRich() {
+        return cdrRich;
+    }
+
+    public void setCdrRich(String cdrRich) {
+        this.cdrRich = cdrRich;
+    }
+
+    public String getUoRich() {
+        return uoRich;
+    }
+
+    public void setUoRich(String uoRich) {
+        this.uoRich = uoRich;
+    }
+
+    public String getCdrSpesa() {
+        return cdrSpesa;
+    }
+
+    public void setCdrSpesa(String cdrSpesa) {
+        this.cdrSpesa = cdrSpesa;
+    }
+
+    public String getUoSpesa() {
+        return uoSpesa;
+    }
+
+    public void setUoSpesa(String uoSpesa) {
+        this.uoSpesa = uoSpesa;
+    }
+
+    public String getModulo() {
+        return modulo;
+    }
+
+    public void setModulo(String modulo) {
+        this.modulo = modulo;
+    }
+
+    public String getCdsRich() {
+        return cdsRich;
+    }
+
+    public void setCdsRich(String cdsRich) {
+        this.cdsRich = cdsRich;
+    }
+
+    public String getCdsSpesa() {
+        return cdsSpesa;
+    }
+
+    public void setCdsSpesa(String cdsSpesa) {
+        this.cdsSpesa = cdsSpesa;
+    }
+
+    public String getCognomeRich() {
+        return cognomeRich;
+    }
+
+    public void setCognomeRich(String cognomeRich) {
+        this.cognomeRich = cognomeRich;
+    }
+
+    public String getNomeRich() {
+        return nomeRich;
+    }
+
+    public void setNomeRich(String nomeRich) {
+        this.nomeRich = nomeRich;
+    }
+
+    public String getItaliaEstero() {
+        return italiaEstero;
+    }
+
+    public void setItaliaEstero(String italiaEstero) {
+        this.italiaEstero = italiaEstero;
+    }
+
+    public String getCup() {
+        return cup;
+    }
+
+    public void setCup(String cup) {
+        this.cup = cup;
+    }
 
     public String getPgObbligazione() {
-		return pgObbligazione;
-	}
+        return pgObbligazione;
+    }
 
-	public void setPgObbligazione(String pgObbligazione) {
-		this.pgObbligazione = pgObbligazione;
-	}
+    public void setPgObbligazione(String pgObbligazione) {
+        this.pgObbligazione = pgObbligazione;
+    }
 
-	public String getEsercizioOriginaleObbligazione() {
-		return esercizioOriginaleObbligazione;
-	}
+    public String getEsercizioOriginaleObbligazione() {
+        return esercizioOriginaleObbligazione;
+    }
 
-	public void setEsercizioOriginaleObbligazione(String esercizioOriginaleObbligazione) {
-		this.esercizioOriginaleObbligazione = esercizioOriginaleObbligazione;
-	}
+    public void setEsercizioOriginaleObbligazione(String esercizioOriginaleObbligazione) {
+        this.esercizioOriginaleObbligazione = esercizioOriginaleObbligazione;
+    }
 
-	public String getUtilizzoTaxi() {
-		return utilizzoTaxi;
-	}
+    public String getUtilizzoTaxi() {
+        return utilizzoTaxi;
+    }
 
-	public void setUtilizzoTaxi(String utilizzoTaxi) {
-		this.utilizzoTaxi = utilizzoTaxi;
-	}
+    public void setUtilizzoTaxi(String utilizzoTaxi) {
+        this.utilizzoTaxi = utilizzoTaxi;
+    }
 
-	public String getUtilizzoAutoNoleggio() {
-		return utilizzoAutoNoleggio;
-	}
+    public String getUtilizzoAutoNoleggio() {
+        return utilizzoAutoNoleggio;
+    }
 
-	public void setUtilizzoAutoNoleggio(String utilizzoAutoNoleggio) {
-		this.utilizzoAutoNoleggio = utilizzoAutoNoleggio;
-	}
+    public void setUtilizzoAutoNoleggio(String utilizzoAutoNoleggio) {
+        this.utilizzoAutoNoleggio = utilizzoAutoNoleggio;
+    }
 
-	public String getUtilizzoAutoServizio() {
-		return utilizzoAutoServizio;
-	}
+    public String getUtilizzoAutoServizio() {
+        return utilizzoAutoServizio;
+    }
 
-	public void setUtilizzoAutoServizio(String utilizzoAutoServizio) {
-		this.utilizzoAutoServizio = utilizzoAutoServizio;
-	}
+    public void setUtilizzoAutoServizio(String utilizzoAutoServizio) {
+        this.utilizzoAutoServizio = utilizzoAutoServizio;
+    }
 
-	public String getPersonaleAlSeguito() {
-		return personaleAlSeguito;
-	}
+    public String getPersonaleAlSeguito() {
+        return personaleAlSeguito;
+    }
 
-	public void setPersonaleAlSeguito(String personaleAlSeguito) {
-		this.personaleAlSeguito = personaleAlSeguito;
-	}
+    public void setPersonaleAlSeguito(String personaleAlSeguito) {
+        this.personaleAlSeguito = personaleAlSeguito;
+    }
 
-	public String getNoteUtilizzoTaxiNoleggio() {
-		return noteUtilizzoTaxiNoleggio;
-	}
+    public String getNoteUtilizzoTaxiNoleggio() {
+        return noteUtilizzoTaxiNoleggio;
+    }
 
-	public void setNoteUtilizzoTaxiNoleggio(String noteUtilizzoTaxiNoleggio) {
-		this.noteUtilizzoTaxiNoleggio = noteUtilizzoTaxiNoleggio;
-	}
+    public void setNoteUtilizzoTaxiNoleggio(String noteUtilizzoTaxiNoleggio) {
+        this.noteUtilizzoTaxiNoleggio = noteUtilizzoTaxiNoleggio;
+    }
 
 }
