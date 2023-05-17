@@ -1,35 +1,48 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "ti_pagamento",
-    "abi",
-    "cab",
-    "numero_conto",
-    "intestazione",
-    "codice_iban",
-    "codice_swift",
-    "fl_cancellato",
-    "fl_cc_cds",
-    "cin",
-    "quietanza",
-    "cd_terzo_delegato",
-    "ds_terzo_delegato"
+        "ti_pagamento",
+        "abi",
+        "cab",
+        "numero_conto",
+        "intestazione",
+        "codice_iban",
+        "codice_swift",
+        "fl_cancellato",
+        "fl_cc_cds",
+        "cin",
+        "quietanza",
+        "cd_terzo_delegato",
+        "ds_terzo_delegato"
 })
 public class Banca extends RestServiceBean implements Serializable {
 
@@ -63,9 +76,7 @@ public class Banca extends RestServiceBean implements Serializable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The tiPagamento
+     * @return The tiPagamento
      */
     @JsonProperty("ti_pagamento")
     public String getTiPagamento() {
@@ -73,9 +84,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param tiPagamento
-     *     The ti_pagamento
+     * @param tiPagamento The ti_pagamento
      */
     @JsonProperty("ti_pagamento")
     public void setTiPagamento(String tiPagamento) {
@@ -83,9 +92,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The abi
+     * @return The abi
      */
     @JsonProperty("abi")
     public String getAbi() {
@@ -93,9 +100,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param abi
-     *     The abi
+     * @param abi The abi
      */
     @JsonProperty("abi")
     public void setAbi(String abi) {
@@ -103,9 +108,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cab
+     * @return The cab
      */
     @JsonProperty("cab")
     public String getCab() {
@@ -113,9 +116,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cab
-     *     The cab
+     * @param cab The cab
      */
     @JsonProperty("cab")
     public void setCab(String cab) {
@@ -123,9 +124,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The numeroConto
+     * @return The numeroConto
      */
     @JsonProperty("numero_conto")
     public String getNumeroConto() {
@@ -133,9 +132,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param numeroConto
-     *     The numero_conto
+     * @param numeroConto The numero_conto
      */
     @JsonProperty("numero_conto")
     public void setNumeroConto(String numeroConto) {
@@ -143,9 +140,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The intestazione
+     * @return The intestazione
      */
     @JsonProperty("intestazione")
     public String getIntestazione() {
@@ -153,9 +148,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param intestazione
-     *     The intestazione
+     * @param intestazione The intestazione
      */
     @JsonProperty("intestazione")
     public void setIntestazione(String intestazione) {
@@ -163,9 +156,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The codiceIban
+     * @return The codiceIban
      */
     @JsonProperty("codice_iban")
     public String getCodiceIban() {
@@ -173,9 +164,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param codiceIban
-     *     The codice_iban
+     * @param codiceIban The codice_iban
      */
     @JsonProperty("codice_iban")
     public void setCodiceIban(String codiceIban) {
@@ -183,9 +172,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The codiceSwift
+     * @return The codiceSwift
      */
     @JsonProperty("codice_swift")
     public String getCodiceSwift() {
@@ -193,9 +180,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param codiceSwift
-     *     The codice_swift
+     * @param codiceSwift The codice_swift
      */
     @JsonProperty("codice_swift")
     public void setCodiceSwift(String codiceSwift) {
@@ -203,9 +188,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flCancellato
+     * @return The flCancellato
      */
     @JsonProperty("fl_cancellato")
     public Boolean getFlCancellato() {
@@ -213,9 +196,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flCancellato
-     *     The fl_cancellato
+     * @param flCancellato The fl_cancellato
      */
     @JsonProperty("fl_cancellato")
     public void setFlCancellato(Boolean flCancellato) {
@@ -223,9 +204,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flCcCds
+     * @return The flCcCds
      */
     @JsonProperty("fl_cc_cds")
     public Boolean getFlCcCds() {
@@ -233,9 +212,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flCcCds
-     *     The fl_cc_cds
+     * @param flCcCds The fl_cc_cds
      */
     @JsonProperty("fl_cc_cds")
     public void setFlCcCds(Boolean flCcCds) {
@@ -243,9 +220,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cin
+     * @return The cin
      */
     @JsonProperty("cin")
     public String getCin() {
@@ -253,9 +228,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cin
-     *     The cin
+     * @param cin The cin
      */
     @JsonProperty("cin")
     public void setCin(String cin) {
@@ -263,9 +236,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The quietanza
+     * @return The quietanza
      */
     @JsonProperty("quietanza")
     public String getQuietanza() {
@@ -273,9 +244,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param quietanza
-     *     The quietanza
+     * @param quietanza The quietanza
      */
     @JsonProperty("quietanza")
     public void setQuietanza(String quietanza) {
@@ -283,9 +252,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdTerzoDelegato
+     * @return The cdTerzoDelegato
      */
     @JsonProperty("cd_terzo_delegato")
     public String getCdTerzoDelegato() {
@@ -293,9 +260,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdTerzoDelegato
-     *     The cd_terzo_delegato
+     * @param cdTerzoDelegato The cd_terzo_delegato
      */
     @JsonProperty("cd_terzo_delegato")
     public void setCdTerzoDelegato(String cdTerzoDelegato) {
@@ -303,9 +268,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsTerzoDelegato
+     * @return The dsTerzoDelegato
      */
     @JsonProperty("ds_terzo_delegato")
     public String getDsTerzoDelegato() {
@@ -313,9 +276,7 @@ public class Banca extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsTerzoDelegato
-     *     The ds_terzo_delegato
+     * @param dsTerzoDelegato The ds_terzo_delegato
      */
     @JsonProperty("ds_terzo_delegato")
     public void setDsTerzoDelegato(String dsTerzoDelegato) {

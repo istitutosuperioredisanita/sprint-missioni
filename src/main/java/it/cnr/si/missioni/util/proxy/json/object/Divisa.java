@@ -1,28 +1,41 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "cd_divisa",
-    "ds_divisa",
-    "precisione",
-    "fl_calcola_con_diviso"
+        "cd_divisa",
+        "ds_divisa",
+        "precisione",
+        "fl_calcola_con_diviso"
 })
-public class Divisa extends RestServiceBean implements Serializable{
+public class Divisa extends RestServiceBean implements Serializable {
 
     @JsonProperty("cd_divisa")
     private String cdDivisa;
@@ -36,9 +49,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The cdDivisa
+     * @return The cdDivisa
      */
     @JsonProperty("cd_divisa")
     public String getCdDivisa() {
@@ -46,9 +57,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @param cdDivisa
-     *     The cd_divisa
+     * @param cdDivisa The cd_divisa
      */
     @JsonProperty("cd_divisa")
     public void setCdDivisa(String cdDivisa) {
@@ -56,9 +65,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The dsDivisa
+     * @return The dsDivisa
      */
     @JsonProperty("ds_divisa")
     public String getDsDivisa() {
@@ -66,9 +73,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @param dsDivisa
-     *     The ds_divisa
+     * @param dsDivisa The ds_divisa
      */
     @JsonProperty("ds_divisa")
     public void setDsDivisa(String dsDivisa) {
@@ -76,9 +81,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The precisione
+     * @return The precisione
      */
     @JsonProperty("precisione")
     public Integer getPrecisione() {
@@ -86,9 +89,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @param precisione
-     *     The precisione
+     * @param precisione The precisione
      */
     @JsonProperty("precisione")
     public void setPrecisione(Integer precisione) {
@@ -96,9 +97,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @return
-     *     The flCalcolaConDiviso
+     * @return The flCalcolaConDiviso
      */
     @JsonProperty("fl_calcola_con_diviso")
     public Boolean getFlCalcolaConDiviso() {
@@ -106,9 +105,7 @@ public class Divisa extends RestServiceBean implements Serializable{
     }
 
     /**
-     * 
-     * @param flCalcolaConDiviso
-     *     The fl_calcola_con_diviso
+     * @param flCalcolaConDiviso The fl_calcola_con_diviso
      */
     @JsonProperty("fl_calcola_con_diviso")
     public void setFlCalcolaConDiviso(Boolean flCalcolaConDiviso) {

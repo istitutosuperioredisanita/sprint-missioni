@@ -1,58 +1,72 @@
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object;
+
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-"data",
-"paging"
+        "data",
+        "paging"
 })
 public class GruppoSAC {
-	@JsonProperty("data")
-	private List<DatiGruppoSAC> data = null;
-	@JsonProperty("paging")
-	private PagingGruppoSAC paging;
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @JsonProperty("data")
+    private List<DatiGruppoSAC> data = null;
+    @JsonProperty("paging")
+    private PagingGruppoSAC paging;
+    @JsonIgnore
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-	@JsonProperty("data")
-	public List<DatiGruppoSAC> getData() {
-	return data;
-	}
+    @JsonProperty("data")
+    public List<DatiGruppoSAC> getData() {
+        return data;
+    }
 
-	@JsonProperty("data")
-	public void setData(List<DatiGruppoSAC> data) {
-	this.data = data;
-	}
+    @JsonProperty("data")
+    public void setData(List<DatiGruppoSAC> data) {
+        this.data = data;
+    }
 
-	@JsonProperty("paging")
-	public PagingGruppoSAC getPaging() {
-	return paging;
-	}
+    @JsonProperty("paging")
+    public PagingGruppoSAC getPaging() {
+        return paging;
+    }
 
-	@JsonProperty("paging")
-	public void setPaging(PagingGruppoSAC paging) {
-	this.paging = paging;
-	}
+    @JsonProperty("paging")
+    public void setPaging(PagingGruppoSAC paging) {
+        this.paging = paging;
+    }
 
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-	return this.additionalProperties;
-	}
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
 
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-	this.additionalProperties.put(name, value);
-	}
+    @JsonAnySetter
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
 
 
 }

@@ -1,37 +1,50 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "cd_tipo_documento_cont",
-    "pg_documento_cont",
-    "ti_documento_cont",
-    "im_documento_cont",
-    "ds_documento_cont",
-    "dt_trasmissione",
-    "dt_pagamento_incasso",
-    "cd_terzo",
-    "cd_anag",
-    "cd_cds",
-    "esercizio",
-    "im_pagato_incassato",
-    "cd_unita_organizzativa",
-    "cd_cds_origine",
-    "cd_uo_origine"
+        "cd_tipo_documento_cont",
+        "pg_documento_cont",
+        "ti_documento_cont",
+        "im_documento_cont",
+        "ds_documento_cont",
+        "dt_trasmissione",
+        "dt_pagamento_incasso",
+        "cd_terzo",
+        "cd_anag",
+        "cd_cds",
+        "esercizio",
+        "im_pagato_incassato",
+        "cd_unita_organizzativa",
+        "cd_cds_origine",
+        "cd_uo_origine"
 })
 public class Mandato extends RestServiceBean implements Serializable {
 
@@ -69,9 +82,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The cdTipoDocumentoCont
+     * @return The cdTipoDocumentoCont
      */
     @JsonProperty("cd_tipo_documento_cont")
     public String getCdTipoDocumentoCont() {
@@ -79,9 +90,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdTipoDocumentoCont
-     *     The cd_tipo_documento_cont
+     * @param cdTipoDocumentoCont The cd_tipo_documento_cont
      */
     @JsonProperty("cd_tipo_documento_cont")
     public void setCdTipoDocumentoCont(String cdTipoDocumentoCont) {
@@ -89,9 +98,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The pgDocumentoCont
+     * @return The pgDocumentoCont
      */
     @JsonProperty("pg_documento_cont")
     public Integer getPgDocumentoCont() {
@@ -99,9 +106,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param pgDocumentoCont
-     *     The pg_documento_cont
+     * @param pgDocumentoCont The pg_documento_cont
      */
     @JsonProperty("pg_documento_cont")
     public void setPgDocumentoCont(Integer pgDocumentoCont) {
@@ -109,9 +114,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The tiDocumentoCont
+     * @return The tiDocumentoCont
      */
     @JsonProperty("ti_documento_cont")
     public String getTiDocumentoCont() {
@@ -119,9 +122,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param tiDocumentoCont
-     *     The ti_documento_cont
+     * @param tiDocumentoCont The ti_documento_cont
      */
     @JsonProperty("ti_documento_cont")
     public void setTiDocumentoCont(String tiDocumentoCont) {
@@ -129,9 +130,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imDocumentoCont
+     * @return The imDocumentoCont
      */
     @JsonProperty("im_documento_cont")
     public Double getImDocumentoCont() {
@@ -139,9 +138,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param imDocumentoCont
-     *     The im_documento_cont
+     * @param imDocumentoCont The im_documento_cont
      */
     @JsonProperty("im_documento_cont")
     public void setImDocumentoCont(Double imDocumentoCont) {
@@ -149,9 +146,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsDocumentoCont
+     * @return The dsDocumentoCont
      */
     @JsonProperty("ds_documento_cont")
     public String getDsDocumentoCont() {
@@ -159,9 +154,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsDocumentoCont
-     *     The ds_documento_cont
+     * @param dsDocumentoCont The ds_documento_cont
      */
     @JsonProperty("ds_documento_cont")
     public void setDsDocumentoCont(String dsDocumentoCont) {
@@ -169,9 +162,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtTrasmissione
+     * @return The dtTrasmissione
      */
     @JsonProperty("dt_trasmissione")
     public Integer getDtTrasmissione() {
@@ -179,9 +170,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtTrasmissione
-     *     The dt_trasmissione
+     * @param dtTrasmissione The dt_trasmissione
      */
     @JsonProperty("dt_trasmissione")
     public void setDtTrasmissione(Integer dtTrasmissione) {
@@ -189,9 +178,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtPagamentoIncasso
+     * @return The dtPagamentoIncasso
      */
     @JsonProperty("dt_pagamento_incasso")
     public Integer getDtPagamentoIncasso() {
@@ -199,9 +186,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtPagamentoIncasso
-     *     The dt_pagamento_incasso
+     * @param dtPagamentoIncasso The dt_pagamento_incasso
      */
     @JsonProperty("dt_pagamento_incasso")
     public void setDtPagamentoIncasso(Integer dtPagamentoIncasso) {
@@ -209,9 +194,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdTerzo
+     * @return The cdTerzo
      */
     @JsonProperty("cd_terzo")
     public Integer getCdTerzo() {
@@ -219,9 +202,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdTerzo
-     *     The cd_terzo
+     * @param cdTerzo The cd_terzo
      */
     @JsonProperty("cd_terzo")
     public void setCdTerzo(Integer cdTerzo) {
@@ -229,9 +210,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdAnag
+     * @return The cdAnag
      */
     @JsonProperty("cd_anag")
     public Integer getCdAnag() {
@@ -239,9 +218,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdAnag
-     *     The cd_anag
+     * @param cdAnag The cd_anag
      */
     @JsonProperty("cd_anag")
     public void setCdAnag(Integer cdAnag) {
@@ -249,9 +226,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdCds
+     * @return The cdCds
      */
     @JsonProperty("cd_cds")
     public String getCdCds() {
@@ -259,9 +234,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdCds
-     *     The cd_cds
+     * @param cdCds The cd_cds
      */
     @JsonProperty("cd_cds")
     public void setCdCds(String cdCds) {
@@ -269,9 +242,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The esercizio
+     * @return The esercizio
      */
     @JsonProperty("esercizio")
     public Integer getEsercizio() {
@@ -279,9 +250,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param esercizio
-     *     The esercizio
+     * @param esercizio The esercizio
      */
     @JsonProperty("esercizio")
     public void setEsercizio(Integer esercizio) {
@@ -289,9 +258,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imPagatoIncassato
+     * @return The imPagatoIncassato
      */
     @JsonProperty("im_pagato_incassato")
     public Double getImPagatoIncassato() {
@@ -299,9 +266,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param imPagatoIncassato
-     *     The im_pagato_incassato
+     * @param imPagatoIncassato The im_pagato_incassato
      */
     @JsonProperty("im_pagato_incassato")
     public void setImPagatoIncassato(Double imPagatoIncassato) {
@@ -309,9 +274,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdUnitaOrganizzativa
+     * @return The cdUnitaOrganizzativa
      */
     @JsonProperty("cd_unita_organizzativa")
     public String getCdUnitaOrganizzativa() {
@@ -319,9 +282,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdUnitaOrganizzativa
-     *     The cd_unita_organizzativa
+     * @param cdUnitaOrganizzativa The cd_unita_organizzativa
      */
     @JsonProperty("cd_unita_organizzativa")
     public void setCdUnitaOrganizzativa(String cdUnitaOrganizzativa) {
@@ -329,9 +290,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdCdsOrigine
+     * @return The cdCdsOrigine
      */
     @JsonProperty("cd_cds_origine")
     public String getCdCdsOrigine() {
@@ -339,9 +298,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdCdsOrigine
-     *     The cd_cds_origine
+     * @param cdCdsOrigine The cd_cds_origine
      */
     @JsonProperty("cd_cds_origine")
     public void setCdCdsOrigine(String cdCdsOrigine) {
@@ -349,9 +306,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdUoOrigine
+     * @return The cdUoOrigine
      */
     @JsonProperty("cd_uo_origine")
     public String getCdUoOrigine() {
@@ -359,9 +314,7 @@ public class Mandato extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdUoOrigine
-     *     The cd_uo_origine
+     * @param cdUoOrigine The cd_uo_origine
      */
     @JsonProperty("cd_uo_origine")
     public void setCdUoOrigine(String cdUoOrigine) {
