@@ -71,3 +71,11 @@ previste:
 
 ![Architettura](docs/images/architettura_4.png)
 
+# _Per avviare una istanza di MISSIONI tramite docker e con h2 in memoria_
+```
+docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=showcase,swagger consiglionazionalericerche/sprint-missioni:latest
+```
+![Startup](docs/screenshot/startup_showcase.png)
+
+Collegarsi a http://localhost:8080 username: **_user_** password: **_user_**, oppure come amministratore del sistema, username: **_admin_** password: **_admin_** 
+
