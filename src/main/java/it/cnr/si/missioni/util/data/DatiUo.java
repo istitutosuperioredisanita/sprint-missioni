@@ -1,68 +1,76 @@
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.data;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import javax.annotation.Generated;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-	"title",
-	"uo"
+        "title",
+        "uo"
 })
-public class DatiUo implements Serializable{
+public class DatiUo implements Serializable {
 
-	@JsonProperty("title")
-	private String title;
-	@JsonProperty("uo")
-	private List<Uo> uo = new ArrayList<Uo>();
-	/**
-	 *
-	 * @return
-	 * The title
-	 */
-	@JsonProperty("title")
-	public String getTitle() {
-		return title;
-	}
+    @JsonProperty("title")
+    private String title;
+    @JsonProperty("uo")
+    private List<Uo> uo = new ArrayList<Uo>();
 
-	/**
-	 *
-	 * @param title
-	 * The title
-	 */
-	@JsonProperty("title")
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    /**
+     * @return The title
+     */
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
 
-	/**
-	 *
-	 * @return
-	 * The uo
-	 */
-	@JsonProperty("uo")
-	public List<Uo> getUo() {
-		return uo;
-	}
+    /**
+     * @param title The title
+     */
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	/**
-	 *
-	 * @param uo
-	 * The uo
-	 */
-	@JsonProperty("uo")
-	public void setUo(List<Uo> uo) {
-		this.uo = uo;
-	}
+    /**
+     * @return The uo
+     */
+    @JsonProperty("uo")
+    public List<Uo> getUo() {
+        return uo;
+    }
+
+    /**
+     * @param uo The uo
+     */
+    @JsonProperty("uo")
+    public void setUo(List<Uo> uo) {
+        this.uo = uo;
+    }
 
 }

@@ -1,43 +1,56 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object;
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "pg_rif_inquadramento",
-    "cd_ti_spesa",
-    "ds_ti_spesa",
-    "ti_area_geografica",
-    "pg_nazione",
-    "ds_nazione",
-    "dt_inizio_validita",
-    "dataFineValidita",
-    "fl_giustificativo_richiesto",
-    "fl_pasto",
-    "fl_trasporto",
-    "fl_rimborso_km",
-    "fl_alloggio",
-    "cd_divisa",
-    "ds_divisa",
-    "percentuale_maggiorazione",
-    "limite_max_spesa",
-    "dt_cancellazione",
-    "fl_ammissibile_con_rimborso"
+        "pg_rif_inquadramento",
+        "cd_ti_spesa",
+        "ds_ti_spesa",
+        "ti_area_geografica",
+        "pg_nazione",
+        "ds_nazione",
+        "dt_inizio_validita",
+        "dataFineValidita",
+        "fl_giustificativo_richiesto",
+        "fl_pasto",
+        "fl_trasporto",
+        "fl_rimborso_km",
+        "fl_alloggio",
+        "cd_divisa",
+        "ds_divisa",
+        "percentuale_maggiorazione",
+        "limite_max_spesa",
+        "dt_cancellazione",
+        "fl_ammissibile_con_rimborso"
 })
-public class TipoSpesa  extends RestServiceBean implements Serializable {
+public class TipoSpesa extends RestServiceBean implements Serializable {
 
     @JsonProperty("pg_rif_inquadramento")
     private Integer pgRifInquadramento;
@@ -81,9 +94,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The pgRifInquadramento
+     * @return The pgRifInquadramento
      */
     @JsonProperty("pg_rif_inquadramento")
     public Integer getPgRifInquadramento() {
@@ -91,9 +102,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param pgRifInquadramento
-     *     The pg_rif_inquadramento
+     * @param pgRifInquadramento The pg_rif_inquadramento
      */
     @JsonProperty("pg_rif_inquadramento")
     public void setPgRifInquadramento(Integer pgRifInquadramento) {
@@ -101,9 +110,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdTiSpesa
+     * @return The cdTiSpesa
      */
     @JsonProperty("cd_ti_spesa")
     public String getCdTiSpesa() {
@@ -111,9 +118,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdTiSpesa
-     *     The cd_ti_spesa
+     * @param cdTiSpesa The cd_ti_spesa
      */
     @JsonProperty("cd_ti_spesa")
     public void setCdTiSpesa(String cdTiSpesa) {
@@ -121,9 +126,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsTiSpesa
+     * @return The dsTiSpesa
      */
     @JsonProperty("ds_ti_spesa")
     public String getDsTiSpesa() {
@@ -131,9 +134,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsTiSpesa
-     *     The ds_ti_spesa
+     * @param dsTiSpesa The ds_ti_spesa
      */
     @JsonProperty("ds_ti_spesa")
     public void setDsTiSpesa(String dsTiSpesa) {
@@ -141,9 +142,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The tiAreaGeografica
+     * @return The tiAreaGeografica
      */
     @JsonProperty("ti_area_geografica")
     public String getTiAreaGeografica() {
@@ -151,9 +150,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param tiAreaGeografica
-     *     The ti_area_geografica
+     * @param tiAreaGeografica The ti_area_geografica
      */
     @JsonProperty("ti_area_geografica")
     public void setTiAreaGeografica(String tiAreaGeografica) {
@@ -161,9 +158,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The pgNazione
+     * @return The pgNazione
      */
     @JsonProperty("pg_nazione")
     public Integer getPgNazione() {
@@ -171,9 +166,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param pgNazione
-     *     The pg_nazione
+     * @param pgNazione The pg_nazione
      */
     @JsonProperty("pg_nazione")
     public void setPgNazione(Integer pgNazione) {
@@ -181,9 +174,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsNazione
+     * @return The dsNazione
      */
     @JsonProperty("ds_nazione")
     public String getDsNazione() {
@@ -191,9 +182,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsNazione
-     *     The ds_nazione
+     * @param dsNazione The ds_nazione
      */
     @JsonProperty("ds_nazione")
     public void setDsNazione(String dsNazione) {
@@ -201,9 +190,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtInizioValidita
+     * @return The dtInizioValidita
      */
     @JsonProperty("dt_inizio_validita")
     public Object getDtInizioValidita() {
@@ -211,9 +198,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtInizioValidita
-     *     The dt_inizio_validita
+     * @param dtInizioValidita The dt_inizio_validita
      */
     @JsonProperty("dt_inizio_validita")
     public void setDtInizioValidita(Object dtInizioValidita) {
@@ -221,9 +206,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dataFineValidita
+     * @return The dataFineValidita
      */
     @JsonProperty("dataFineValidita")
     public Object getDataFineValidita() {
@@ -231,9 +214,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dataFineValidita
-     *     The dataFineValidita
+     * @param dataFineValidita The dataFineValidita
      */
     @JsonProperty("dataFineValidita")
     public void setDataFineValidita(Object dataFineValidita) {
@@ -241,9 +222,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flGiustificativoRichiesto
+     * @return The flGiustificativoRichiesto
      */
     @JsonProperty("fl_giustificativo_richiesto")
     public Boolean getFlGiustificativoRichiesto() {
@@ -251,9 +230,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flGiustificativoRichiesto
-     *     The fl_giustificativo_richiesto
+     * @param flGiustificativoRichiesto The fl_giustificativo_richiesto
      */
     @JsonProperty("fl_giustificativo_richiesto")
     public void setFlGiustificativoRichiesto(Boolean flGiustificativoRichiesto) {
@@ -261,9 +238,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flPasto
+     * @return The flPasto
      */
     @JsonProperty("fl_pasto")
     public Boolean getFlPasto() {
@@ -271,9 +246,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flPasto
-     *     The fl_pasto
+     * @param flPasto The fl_pasto
      */
     @JsonProperty("fl_pasto")
     public void setFlPasto(Boolean flPasto) {
@@ -281,9 +254,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flTrasporto
+     * @return The flTrasporto
      */
     @JsonProperty("fl_trasporto")
     public Boolean getFlTrasporto() {
@@ -291,9 +262,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flTrasporto
-     *     The fl_trasporto
+     * @param flTrasporto The fl_trasporto
      */
     @JsonProperty("fl_trasporto")
     public void setFlTrasporto(Boolean flTrasporto) {
@@ -301,9 +270,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flRimborsoKm
+     * @return The flRimborsoKm
      */
     @JsonProperty("fl_rimborso_km")
     public Boolean getFlRimborsoKm() {
@@ -311,9 +278,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flRimborsoKm
-     *     The fl_rimborso_km
+     * @param flRimborsoKm The fl_rimborso_km
      */
     @JsonProperty("fl_rimborso_km")
     public void setFlRimborsoKm(Boolean flRimborsoKm) {
@@ -321,9 +286,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flAlloggio
+     * @return The flAlloggio
      */
     @JsonProperty("fl_alloggio")
     public Boolean getFlAlloggio() {
@@ -331,9 +294,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flAlloggio
-     *     The fl_alloggio
+     * @param flAlloggio The fl_alloggio
      */
     @JsonProperty("fl_alloggio")
     public void setFlAlloggio(Boolean flAlloggio) {
@@ -341,9 +302,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdDivisa
+     * @return The cdDivisa
      */
     @JsonProperty("cd_divisa")
     public String getCdDivisa() {
@@ -351,9 +310,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param cdDivisa
-     *     The cd_divisa
+     * @param cdDivisa The cd_divisa
      */
     @JsonProperty("cd_divisa")
     public void setCdDivisa(String cdDivisa) {
@@ -361,9 +318,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsDivisa
+     * @return The dsDivisa
      */
     @JsonProperty("ds_divisa")
     public String getDsDivisa() {
@@ -371,9 +326,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dsDivisa
-     *     The ds_divisa
+     * @param dsDivisa The ds_divisa
      */
     @JsonProperty("ds_divisa")
     public void setDsDivisa(String dsDivisa) {
@@ -381,9 +334,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The percentualeMaggiorazione
+     * @return The percentualeMaggiorazione
      */
     @JsonProperty("percentuale_maggiorazione")
     public Integer getPercentualeMaggiorazione() {
@@ -391,9 +342,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param percentualeMaggiorazione
-     *     The percentuale_maggiorazione
+     * @param percentualeMaggiorazione The percentuale_maggiorazione
      */
     @JsonProperty("percentuale_maggiorazione")
     public void setPercentualeMaggiorazione(Integer percentualeMaggiorazione) {
@@ -401,9 +350,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The limiteMaxSpesa
+     * @return The limiteMaxSpesa
      */
     @JsonProperty("limite_max_spesa")
     public Integer getLimiteMaxSpesa() {
@@ -411,9 +358,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param limiteMaxSpesa
-     *     The limite_max_spesa
+     * @param limiteMaxSpesa The limite_max_spesa
      */
     @JsonProperty("limite_max_spesa")
     public void setLimiteMaxSpesa(Integer limiteMaxSpesa) {
@@ -421,9 +366,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtCancellazione
+     * @return The dtCancellazione
      */
     @JsonProperty("dt_cancellazione")
     public Object getDtCancellazione() {
@@ -431,9 +374,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param dtCancellazione
-     *     The dt_cancellazione
+     * @param dtCancellazione The dt_cancellazione
      */
     @JsonProperty("dt_cancellazione")
     public void setDtCancellazione(Object dtCancellazione) {
@@ -441,9 +382,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flAmmissibileConRimborso
+     * @return The flAmmissibileConRimborso
      */
     @JsonProperty("fl_ammissibile_con_rimborso")
     public Boolean getFlAmmissibileConRimborso() {
@@ -451,9 +390,7 @@ public class TipoSpesa  extends RestServiceBean implements Serializable {
     }
 
     /**
-     * 
-     * @param flAmmissibileConRimborso
-     *     The fl_ammissibile_con_rimborso
+     * @param flAmmissibileConRimborso The fl_ammissibile_con_rimborso
      */
     @JsonProperty("fl_ammissibile_con_rimborso")
     public void setFlAmmissibileConRimborso(Boolean flAmmissibileConRimborso) {

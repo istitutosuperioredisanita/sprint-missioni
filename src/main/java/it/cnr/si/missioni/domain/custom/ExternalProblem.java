@@ -1,136 +1,151 @@
-package it.cnr.si.missioni.domain.custom;
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
 
-import java.io.Serializable;
+package it.cnr.si.missioni.domain.custom;
 
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 
+import java.io.Serializable;
+
 public class ExternalProblem extends JSONBody implements Serializable {
-	private static final long serialVersionUID = 1L;
-	public static final int PRIORITY = 2;
+    public static final int PRIORITY = 2;
+    public static final String ALLEGATO = "allegato";
+    private static final long serialVersionUID = 1L;
     private String firstName;
     private String familyName;
     private String email;
     private String login;
-
     // problem
-	private Long idSegnalazione;
+    private Long idSegnalazione;
     private String titolo;
     private String descrizione;
     private Integer categoria;
     private String categoriaDescrizione;
     private String confirmRequested;
-
-	public String getConfirmRequested() {
-		return confirmRequested;
-	}
-
-	public void setConfirmRequested(String confirmRequested) {
-		this.confirmRequested = confirmRequested;
-	}
-
-	// note
+    // note
     private String nota;
     private Integer stato;
-    
-	public static final String ALLEGATO = "allegato";
-
     // allegato bas64
     private String allegato;
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public String getConfirmRequested() {
+        return confirmRequested;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setConfirmRequested(String confirmRequested) {
+        this.confirmRequested = confirmRequested;
+    }
 
-	public String getFamilyName() {
-		return familyName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setFamilyName(String familyName) {
-		this.familyName = familyName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getFamilyName() {
+        return familyName;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
+    }
 
-	public String getLogin() {
-		return login;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setLogin(String login) {
-		this.login = login;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public Long getIdSegnalazione() {
-		return idSegnalazione;
-	}
+    public String getLogin() {
+        return login;
+    }
 
-	public void setIdSegnalazione(Long idSegnalazione) {
-		this.idSegnalazione = idSegnalazione;
-	}
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
-	public String getTitolo() {
-		return titolo;
-	}
+    public Long getIdSegnalazione() {
+        return idSegnalazione;
+    }
 
-	public void setTitolo(String titolo) {
-		this.titolo = titolo;
-	}
+    public void setIdSegnalazione(Long idSegnalazione) {
+        this.idSegnalazione = idSegnalazione;
+    }
 
-	public String getDescrizione() {
-		return descrizione;
-	}
+    public String getTitolo() {
+        return titolo;
+    }
 
-	public void setDescrizione(String descrizione) {
-		this.descrizione = descrizione;
-	}
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
+    }
 
-	public Integer getCategoria() {
-		return categoria;
-	}
+    public String getDescrizione() {
+        return descrizione;
+    }
 
-	public void setCategoria(Integer categoria) {
-		this.categoria = categoria;
-	}
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
 
-	public String getCategoriaDescrizione() {
-		return categoriaDescrizione;
-	}
+    public Integer getCategoria() {
+        return categoria;
+    }
 
-	public void setCategoriaDescrizione(String categoriaDescrizione) {
-		this.categoriaDescrizione = categoriaDescrizione;
-	}
+    public void setCategoria(Integer categoria) {
+        this.categoria = categoria;
+    }
 
-	public String getNota() {
-		return nota;
-	}
+    public String getCategoriaDescrizione() {
+        return categoriaDescrizione;
+    }
 
-	public void setNota(String nota) {
-		this.nota = nota;
-	}
+    public void setCategoriaDescrizione(String categoriaDescrizione) {
+        this.categoriaDescrizione = categoriaDescrizione;
+    }
 
-	public Integer getStato() {
-		return stato;
-	}
+    public String getNota() {
+        return nota;
+    }
 
-	public void setStato(Integer stato) {
-		this.stato = stato;
-	}
+    public void setNota(String nota) {
+        this.nota = nota;
+    }
 
-	public String getAllegato() {
-		return allegato;
-	}
+    public Integer getStato() {
+        return stato;
+    }
 
-	public void setAllegato(String allegato) {
-		this.allegato = allegato;
-	}
+    public void setStato(Integer stato) {
+        this.stato = stato;
+    }
+
+    public String getAllegato() {
+        return allegato;
+    }
+
+    public void setAllegato(String allegato) {
+        this.allegato = allegato;
+    }
 
 }

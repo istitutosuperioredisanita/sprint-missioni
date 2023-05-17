@@ -1,51 +1,66 @@
 
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.util.proxy.json.object.rimborso;
+
+import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "pg_riga",
-    "dt_inizio_tappa",
-    "ti_spesa_diaria",
-    "cd_ti_spesa",
-    "ds_ti_spesa",
-    "fl_spesa_anticipata",
-    "fl_diaria_manuale",
-    "percentuale_maggiorazione",
-    "im_totale_spesa",
-    "im_maggiorazione",
-    "im_spesa_euro",
-    "im_base_maggiorazione",
-    "im_spesa_divisa",
-    "im_diaria_lorda",
-    "im_diaria_netto",
-    "im_rimborso",
-    "im_spesa_max",
-    "im_maggiorazione_euro",
-    "im_spesa_max_divisa",
-    "im_quota_esente",
-    "cd_ti_pasto",
-    "chilometri",
-    "ti_auto",
-    "ds_spesa",
-    "localita_spostamento",
-    "indennita_chilometrica",
-    "ds_giustificativo",
-    "id_giustificativo",
-    "ds_no_giustificativo",
-    "cd_divisa_spesa",
-    "cambio_spesa",
-    "ti_cd_ti_spesa"
+        "pg_riga",
+        "dt_inizio_tappa",
+        "ti_spesa_diaria",
+        "cd_ti_spesa",
+        "ds_ti_spesa",
+        "fl_spesa_anticipata",
+        "fl_diaria_manuale",
+        "percentuale_maggiorazione",
+        "im_totale_spesa",
+        "im_maggiorazione",
+        "im_spesa_euro",
+        "im_base_maggiorazione",
+        "im_spesa_divisa",
+        "im_diaria_lorda",
+        "im_diaria_netto",
+        "im_rimborso",
+        "im_spesa_max",
+        "im_maggiorazione_euro",
+        "im_spesa_max_divisa",
+        "im_quota_esente",
+        "cd_ti_pasto",
+        "chilometri",
+        "ti_auto",
+        "ds_spesa",
+        "localita_spostamento",
+        "indennita_chilometrica",
+        "ds_giustificativo",
+        "id_giustificativo",
+        "ds_no_giustificativo",
+        "cd_divisa_spesa",
+        "cambio_spesa",
+        "ti_cd_ti_spesa"
 })
 public class SpeseMissioneColl implements Serializable {
 
@@ -116,12 +131,10 @@ public class SpeseMissioneColl implements Serializable {
     @JsonProperty("ti_cd_ti_spesa")
     private String tiCdTiSpesa;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The pgRiga
+     * @return The pgRiga
      */
     @JsonProperty("pg_riga")
     public Integer getPgRiga() {
@@ -129,9 +142,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param pgRiga
-     *     The pg_riga
+     * @param pgRiga The pg_riga
      */
     @JsonProperty("pg_riga")
     public void setPgRiga(Integer pgRiga) {
@@ -139,9 +150,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dtInizioTappa
+     * @return The dtInizioTappa
      */
     @JsonProperty("dt_inizio_tappa")
     public String getDtInizioTappa() {
@@ -149,9 +158,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param dtInizioTappa
-     *     The dt_inizio_tappa
+     * @param dtInizioTappa The dt_inizio_tappa
      */
     @JsonProperty("dt_inizio_tappa")
     public void setDtInizioTappa(String dtInizioTappa) {
@@ -159,9 +166,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The tiSpesaDiaria
+     * @return The tiSpesaDiaria
      */
     @JsonProperty("ti_spesa_diaria")
     public String getTiSpesaDiaria() {
@@ -169,9 +174,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param tiSpesaDiaria
-     *     The ti_spesa_diaria
+     * @param tiSpesaDiaria The ti_spesa_diaria
      */
     @JsonProperty("ti_spesa_diaria")
     public void setTiSpesaDiaria(String tiSpesaDiaria) {
@@ -179,9 +182,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The cdTiSpesa
+     * @return The cdTiSpesa
      */
     @JsonProperty("cd_ti_spesa")
     public String getCdTiSpesa() {
@@ -189,9 +190,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param cdTiSpesa
-     *     The cd_ti_spesa
+     * @param cdTiSpesa The cd_ti_spesa
      */
     @JsonProperty("cd_ti_spesa")
     public void setCdTiSpesa(String cdTiSpesa) {
@@ -199,9 +198,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The dsTiSpesa
+     * @return The dsTiSpesa
      */
     @JsonProperty("ds_ti_spesa")
     public String getDsTiSpesa() {
@@ -209,9 +206,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param dsTiSpesa
-     *     The ds_ti_spesa
+     * @param dsTiSpesa The ds_ti_spesa
      */
     @JsonProperty("ds_ti_spesa")
     public void setDsTiSpesa(String dsTiSpesa) {
@@ -219,9 +214,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flSpesaAnticipata
+     * @return The flSpesaAnticipata
      */
     @JsonProperty("fl_spesa_anticipata")
     public Boolean getFlSpesaAnticipata() {
@@ -229,9 +222,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param flSpesaAnticipata
-     *     The fl_spesa_anticipata
+     * @param flSpesaAnticipata The fl_spesa_anticipata
      */
     @JsonProperty("fl_spesa_anticipata")
     public void setFlSpesaAnticipata(Boolean flSpesaAnticipata) {
@@ -239,9 +230,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The flDiariaManuale
+     * @return The flDiariaManuale
      */
     @JsonProperty("fl_diaria_manuale")
     public Boolean getFlDiariaManuale() {
@@ -249,9 +238,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param flDiariaManuale
-     *     The fl_diaria_manuale
+     * @param flDiariaManuale The fl_diaria_manuale
      */
     @JsonProperty("fl_diaria_manuale")
     public void setFlDiariaManuale(Boolean flDiariaManuale) {
@@ -259,9 +246,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The percentualeMaggiorazione
+     * @return The percentualeMaggiorazione
      */
     @JsonProperty("percentuale_maggiorazione")
     public BigDecimal getPercentualeMaggiorazione() {
@@ -269,9 +254,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param percentualeMaggiorazione
-     *     The percentuale_maggiorazione
+     * @param percentualeMaggiorazione The percentuale_maggiorazione
      */
     @JsonProperty("percentuale_maggiorazione")
     public void setPercentualeMaggiorazione(BigDecimal percentualeMaggiorazione) {
@@ -279,9 +262,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imTotaleSpesa
+     * @return The imTotaleSpesa
      */
     @JsonProperty("im_totale_spesa")
     public BigDecimal getImTotaleSpesa() {
@@ -289,9 +270,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imTotaleSpesa
-     *     The im_totale_spesa
+     * @param imTotaleSpesa The im_totale_spesa
      */
     @JsonProperty("im_totale_spesa")
     public void setImTotaleSpesa(BigDecimal imTotaleSpesa) {
@@ -299,9 +278,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imMaggiorazione
+     * @return The imMaggiorazione
      */
     @JsonProperty("im_maggiorazione")
     public BigDecimal getImMaggiorazione() {
@@ -309,9 +286,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imMaggiorazione
-     *     The im_maggiorazione
+     * @param imMaggiorazione The im_maggiorazione
      */
     @JsonProperty("im_maggiorazione")
     public void setImMaggiorazione(BigDecimal imMaggiorazione) {
@@ -319,9 +294,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imSpesaEuro
+     * @return The imSpesaEuro
      */
     @JsonProperty("im_spesa_euro")
     public BigDecimal getImSpesaEuro() {
@@ -329,9 +302,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imSpesaEuro
-     *     The im_spesa_euro
+     * @param imSpesaEuro The im_spesa_euro
      */
     @JsonProperty("im_spesa_euro")
     public void setImSpesaEuro(BigDecimal imSpesaEuro) {
@@ -339,9 +310,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imBaseMaggiorazione
+     * @return The imBaseMaggiorazione
      */
     @JsonProperty("im_base_maggiorazione")
     public BigDecimal getImBaseMaggiorazione() {
@@ -349,9 +318,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imBaseMaggiorazione
-     *     The im_base_maggiorazione
+     * @param imBaseMaggiorazione The im_base_maggiorazione
      */
     @JsonProperty("im_base_maggiorazione")
     public void setImBaseMaggiorazione(BigDecimal imBaseMaggiorazione) {
@@ -359,9 +326,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imSpesaDivisa
+     * @return The imSpesaDivisa
      */
     @JsonProperty("im_spesa_divisa")
     public BigDecimal getImSpesaDivisa() {
@@ -369,9 +334,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imSpesaDivisa
-     *     The im_spesa_divisa
+     * @param imSpesaDivisa The im_spesa_divisa
      */
     @JsonProperty("im_spesa_divisa")
     public void setImSpesaDivisa(BigDecimal imSpesaDivisa) {
@@ -379,9 +342,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imDiariaLorda
+     * @return The imDiariaLorda
      */
     @JsonProperty("im_diaria_lorda")
     public BigDecimal getImDiariaLorda() {
@@ -389,9 +350,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imDiariaLorda
-     *     The im_diaria_lorda
+     * @param imDiariaLorda The im_diaria_lorda
      */
     @JsonProperty("im_diaria_lorda")
     public void setImDiariaLorda(BigDecimal imDiariaLorda) {
@@ -399,9 +358,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imDiariaNetto
+     * @return The imDiariaNetto
      */
     @JsonProperty("im_diaria_netto")
     public BigDecimal getImDiariaNetto() {
@@ -409,9 +366,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imDiariaNetto
-     *     The im_diaria_netto
+     * @param imDiariaNetto The im_diaria_netto
      */
     @JsonProperty("im_diaria_netto")
     public void setImDiariaNetto(BigDecimal imDiariaNetto) {
@@ -419,9 +374,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imRimborso
+     * @return The imRimborso
      */
     @JsonProperty("im_rimborso")
     public BigDecimal getImRimborso() {
@@ -429,9 +382,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imRimborso
-     *     The im_rimborso
+     * @param imRimborso The im_rimborso
      */
     @JsonProperty("im_rimborso")
     public void setImRimborso(BigDecimal imRimborso) {
@@ -439,9 +390,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imSpesaMax
+     * @return The imSpesaMax
      */
     @JsonProperty("im_spesa_max")
     public BigDecimal getImSpesaMax() {
@@ -449,9 +398,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imSpesaMax
-     *     The im_spesa_max
+     * @param imSpesaMax The im_spesa_max
      */
     @JsonProperty("im_spesa_max")
     public void setImSpesaMax(BigDecimal imSpesaMax) {
@@ -459,9 +406,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imMaggiorazioneEuro
+     * @return The imMaggiorazioneEuro
      */
     @JsonProperty("im_maggiorazione_euro")
     public BigDecimal getImMaggiorazioneEuro() {
@@ -469,9 +414,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imMaggiorazioneEuro
-     *     The im_maggiorazione_euro
+     * @param imMaggiorazioneEuro The im_maggiorazione_euro
      */
     @JsonProperty("im_maggiorazione_euro")
     public void setImMaggiorazioneEuro(BigDecimal imMaggiorazioneEuro) {
@@ -479,9 +422,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imSpesaMaxDivisa
+     * @return The imSpesaMaxDivisa
      */
     @JsonProperty("im_spesa_max_divisa")
     public BigDecimal getImSpesaMaxDivisa() {
@@ -489,9 +430,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imSpesaMaxDivisa
-     *     The im_spesa_max_divisa
+     * @param imSpesaMaxDivisa The im_spesa_max_divisa
      */
     @JsonProperty("im_spesa_max_divisa")
     public void setImSpesaMaxDivisa(BigDecimal imSpesaMaxDivisa) {
@@ -499,9 +438,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @return
-     *     The imQuotaEsente
+     * @return The imQuotaEsente
      */
     @JsonProperty("im_quota_esente")
     public BigDecimal getImQuotaEsente() {
@@ -509,9 +446,7 @@ public class SpeseMissioneColl implements Serializable {
     }
 
     /**
-     * 
-     * @param imQuotaEsente
-     *     The im_quota_esente
+     * @param imQuotaEsente The im_quota_esente
      */
     @JsonProperty("im_quota_esente")
     public void setImQuotaEsente(BigDecimal imQuotaEsente) {
@@ -528,108 +463,108 @@ public class SpeseMissioneColl implements Serializable {
         this.additionalProperties.put(name, value);
     }
 
-	public Long getChilometri() {
-		return chilometri;
-	}
+    public Long getChilometri() {
+        return chilometri;
+    }
 
-	public void setChilometri(Long chilometri) {
-		this.chilometri = chilometri;
-	}
+    public void setChilometri(Long chilometri) {
+        this.chilometri = chilometri;
+    }
 
-	public BigDecimal getIndennitaChilometrica() {
-		return indennitaChilometrica;
-	}
+    public BigDecimal getIndennitaChilometrica() {
+        return indennitaChilometrica;
+    }
 
-	public void setIndennitaChilometrica(BigDecimal indennitaChilometrica) {
-		this.indennitaChilometrica = indennitaChilometrica;
-	}
+    public void setIndennitaChilometrica(BigDecimal indennitaChilometrica) {
+        this.indennitaChilometrica = indennitaChilometrica;
+    }
 
-	public String getDsSpesa() {
-		return dsSpesa;
-	}
+    public String getDsSpesa() {
+        return dsSpesa;
+    }
 
-	public void setDsSpesa(String dsSpesa) {
-		this.dsSpesa = dsSpesa;
-	}
+    public void setDsSpesa(String dsSpesa) {
+        this.dsSpesa = dsSpesa;
+    }
 
-	public String getTiAuto() {
-		return tiAuto;
-	}
+    public String getTiAuto() {
+        return tiAuto;
+    }
 
-	public void setTiAuto(String tiAuto) {
-		this.tiAuto = tiAuto;
-	}
+    public void setTiAuto(String tiAuto) {
+        this.tiAuto = tiAuto;
+    }
 
-	public String getCdTiPasto() {
-		return cdTiPasto;
-	}
+    public String getCdTiPasto() {
+        return cdTiPasto;
+    }
 
-	public void setCdTiPasto(String cdTiPasto) {
-		this.cdTiPasto = cdTiPasto;
-	}
+    public void setCdTiPasto(String cdTiPasto) {
+        this.cdTiPasto = cdTiPasto;
+    }
 
-	public String getLocalitaSpostamento() {
-		return localitaSpostamento;
-	}
+    public String getLocalitaSpostamento() {
+        return localitaSpostamento;
+    }
 
-	public void setLocalitaSpostamento(String localitaSpostamento) {
-		this.localitaSpostamento = localitaSpostamento;
-	}
+    public void setLocalitaSpostamento(String localitaSpostamento) {
+        this.localitaSpostamento = localitaSpostamento;
+    }
 
-	public String getDsGiustificativo() {
-		return dsGiustificativo;
-	}
+    public String getDsGiustificativo() {
+        return dsGiustificativo;
+    }
 
-	public void setDsGiustificativo(String dsGiustificativo) {
-		this.dsGiustificativo = dsGiustificativo;
-	}
+    public void setDsGiustificativo(String dsGiustificativo) {
+        this.dsGiustificativo = dsGiustificativo;
+    }
 
-	public String getDsNoGiustificativo() {
-		return dsNoGiustificativo;
-	}
+    public String getDsNoGiustificativo() {
+        return dsNoGiustificativo;
+    }
 
-	public void setDsNoGiustificativo(String dsNoGiustificativo) {
-		this.dsNoGiustificativo = dsNoGiustificativo;
-	}
+    public void setDsNoGiustificativo(String dsNoGiustificativo) {
+        this.dsNoGiustificativo = dsNoGiustificativo;
+    }
 
-	public String getIdGiustificativo() {
-		return idGiustificativo;
-	}
+    public String getIdGiustificativo() {
+        return idGiustificativo;
+    }
 
-	public void setIdGiustificativo(String idGiustificativo) {
-		this.idGiustificativo = idGiustificativo;
-	}
+    public void setIdGiustificativo(String idGiustificativo) {
+        this.idGiustificativo = idGiustificativo;
+    }
 
-	public BigDecimal getCambioSpesa() {
-		return cambioSpesa;
-	}
+    public BigDecimal getCambioSpesa() {
+        return cambioSpesa;
+    }
 
-	public void setCambioSpesa(BigDecimal cambioSpesa) {
-		this.cambioSpesa = cambioSpesa;
-	}
+    public void setCambioSpesa(BigDecimal cambioSpesa) {
+        this.cambioSpesa = cambioSpesa;
+    }
 
-	public String getCdDivisaSpesa() {
-		return cdDivisaSpesa;
-	}
+    public String getCdDivisaSpesa() {
+        return cdDivisaSpesa;
+    }
 
-	public void setCdDivisaSpesa(String cdDivisaSpesa) {
-		this.cdDivisaSpesa = cdDivisaSpesa;
-	}
+    public void setCdDivisaSpesa(String cdDivisaSpesa) {
+        this.cdDivisaSpesa = cdDivisaSpesa;
+    }
 
-	public String getTiCdTiSpesa() {
-		return tiCdTiSpesa;
-	}
+    public String getTiCdTiSpesa() {
+        return tiCdTiSpesa;
+    }
 
-	public void setTiCdTiSpesa(String tiCdTiSpesa) {
-		this.tiCdTiSpesa = tiCdTiSpesa;
-	}
+    public void setTiCdTiSpesa(String tiCdTiSpesa) {
+        this.tiCdTiSpesa = tiCdTiSpesa;
+    }
 
-	public String getIdFolderDettagliGemis() {
-		return idFolderDettagliGemis;
-	}
+    public String getIdFolderDettagliGemis() {
+        return idFolderDettagliGemis;
+    }
 
-	public void setIdFolderDettagliGemis(String idFolderDettagliGemis) {
-		this.idFolderDettagliGemis = idFolderDettagliGemis;
-	}
+    public void setIdFolderDettagliGemis(String idFolderDettagliGemis) {
+        this.idFolderDettagliGemis = idFolderDettagliGemis;
+    }
 
 }

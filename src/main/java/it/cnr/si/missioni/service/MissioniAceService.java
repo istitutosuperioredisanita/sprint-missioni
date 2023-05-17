@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ *
+ *      This program is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Affero General Public License as
+ *      published by the Free Software Foundation, either version 3 of the
+ *      License, or (at your option) any later version.
+ *
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU Affero General Public License for more details.
+ *
+ *      You should have received a copy of the GNU Affero General Public License
+ *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ */
+
 package it.cnr.si.missioni.service;
 
 import feign.FeignException;
@@ -43,11 +62,7 @@ import java.util.stream.Collectors;
 @Service
 public class MissioniAceService {
     private static final Log logger = LogFactory.getLog(MissioniAceService.class);
-
-    @Autowired(required = false)
-    AceService aceService;
-
-    private static Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>() {
+    private static final Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>() {
         {
             put("BOR", TipoContratto.BORSISTA);
             put("ASS", TipoContratto.ASSEGNISTA);
@@ -56,16 +71,18 @@ public class MissioniAceService {
             put("OCCA", TipoContratto.COLLABORATORE_PROFESSIONALE);
         }
     };
+    @Autowired(required = false)
+    AceService aceService;
 
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data) {
-        List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer) null, term, data, (Integer) null);
+        List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind(null, term, data, null);
         return list;
     }
 
     private List<SimpleEntitaOrganizzativaWebDto> recuperoSediStoricheByTerm(String term, LocalDate data) {
         for (int i = 1; i < 5; i++) {
             LocalDate dataSottratta = data.minus(i, ChronoUnit.YEARS);
-            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind((Integer) null, term, dataSottratta, (Integer) null);
+            List<SimpleEntitaOrganizzativaWebDto> list = aceService.entitaOrganizzativaFind(null, term, dataSottratta, null);
             List<SimpleEntitaOrganizzativaWebDto> listaEOAllaData = getSimpleEntitaOrganizzativaWebDtoValid(term, list);
             if (!listaEOAllaData.isEmpty()) {
                 return list;
@@ -222,7 +239,7 @@ public class MissioniAceService {
                                 "CD_TIPO_RAPPORTO", "DT_INI_VALIDITA", "DT_FIN_VALIDITA", "EMAIL")
                         .withFirstRecordAsHeader()
                         .withIgnoreHeaderCase()
-                        .withTrim());
+                        .withTrim())
         ) {
             for (CSVRecord csvRecord : csvParser) {
                 String nome = csvRecord.get("NOME");
