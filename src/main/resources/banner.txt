@@ -15,3 +15,6 @@
     M::::::M               M::::::Mi::::::is::::::::::::::s s::::::::::::::s i::::::io:::::::::::::::o  n::::n    n::::ni::::::i
     M::::::M               M::::::Mi::::::i s:::::::::::ss   s:::::::::::ss  i::::::i oo:::::::::::oo   n::::n    n::::ni::::::i
     MMMMMMMM               MMMMMMMMiiiiiiii  sssssssssss      sssssssssss    iiiiiiii   ooooooooooo     nnnnnn    nnnnnniiiiiiii
+
+${AnsiColor.BRIGHT_BLUE}:: Missioni in Memoria di Gianfranco Gasparro :: Running Spring Boot ${spring-boot.version} ::
+:: https://www.cnr.it ::${AnsiColor.DEFAULT}

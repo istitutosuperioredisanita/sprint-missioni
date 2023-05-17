@@ -44,6 +44,16 @@ maven-install:
     - master
     - tags
 
+maven-deploy-tag:
+  stage: deploy
+  image: maven:3-jdk-8
+  script: "mvn clean install $MAVEN_CLI_OPTS"
+  artifacts:
+    paths:
+      - target/*.war
+  only:
+    - tags
+
 #Ad ogni nuovo tag viene fatta la push sul docker hub.
 docker-build-push-hub:
   stage: build
