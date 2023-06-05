@@ -39,7 +39,7 @@
         <assertj-core.version>3.5.2</assertj-core.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
-        <flows.version>1.6.1</flows.version>
+        <flows.version>2.3.1</flows.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jada.version>3.0</jada.version>
         <!-- upgrade -->
