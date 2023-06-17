@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 
-@Profile("!showcase")
+@Profile("amq")
 @RabbitListener(queues = "${spring.rabbitmq.consumer.name}")
 @Configuration
 public class ConsumerService {

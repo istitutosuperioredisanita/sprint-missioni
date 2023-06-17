@@ -58,7 +58,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Profile("!showcase")
+@Profile("ace")
 @Service
 public class MissioniAceService {
     private static final Log logger = LogFactory.getLog(MissioniAceService.class);
