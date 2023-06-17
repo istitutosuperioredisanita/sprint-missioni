@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Profile("!showcase")
+@Profile("amq")
 @Component
 public class ResendQueueService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResendQueueService.class);
