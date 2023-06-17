@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-@Profile("!showcase")
+@Profile("amq")
 @Component
 public class RabbitMQService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQService.class);
