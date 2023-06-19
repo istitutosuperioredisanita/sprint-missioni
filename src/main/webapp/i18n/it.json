@@ -632,7 +632,7 @@
         }
     },
     "login": {
-        "title": "Log in Missioni CNR",
+        "title": "Log in Missioni ISS",
         "form": {
             "userid": "Utente",
             "userid.placeholder": "Utente",
