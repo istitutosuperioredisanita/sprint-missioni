@@ -31,7 +31,7 @@
 			    <column name="CODICE_FISCALE" type="varchar(16)">
 			        <constraints nullable="false"/>
 			    </column>
-			    <column name="UID" type="varchar(256)">
+			    <column name="USER_NAME" type="varchar(256)">
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="ANNO" type="integer">

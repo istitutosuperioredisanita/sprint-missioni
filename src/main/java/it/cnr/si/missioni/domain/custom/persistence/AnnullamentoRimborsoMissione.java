@@ -54,7 +54,7 @@ public class AnnullamentoRimborsoMissione extends OggettoBulkXmlTransient {
     @Column(name = "UID_INSERT", length = 256, nullable = false)
     public String uidInsert;
     @Size(min = 0, max = 256)
-    @Column(name = "UID", length = 256, nullable = false)
+    @Column(name = "USER_NAME", length = 256, nullable = false)
     public String uid;
     @Size(min = 0, max = 16)
     @Column(name = "CODICE_FISCALE", length = 16, nullable = false)

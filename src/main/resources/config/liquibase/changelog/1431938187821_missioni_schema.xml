@@ -47,7 +47,7 @@
             <column name="MODELLO" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="UID" type="varchar(256)">
+            <column name="USER_NAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="UTCR" type="varchar(256)">
@@ -82,7 +82,7 @@
             <column name="ENTE" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="UID" type="varchar(256)">
+            <column name="USER_NAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="UTCR" type="varchar(256)">
@@ -105,7 +105,7 @@
             <column name="ID" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="UID" type="varchar(256)">
+            <column name="USER_NAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="ANNO" type="integer">
@@ -301,7 +301,7 @@
             <column name="ID_ORDINE_MISSIONE" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="UID" type="varchar(256)">
+            <column name="USER_NAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="TARGA" type="varchar(50)">
@@ -360,7 +360,7 @@
             <column name="RIGA" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="UID" type="varchar(256)">
+            <column name="USER_NAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="PERCORSO_DA" type="varchar(256)">
@@ -395,7 +395,7 @@
             <column name="ID_ORDINE_MISSIONE" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="UID" type="varchar(256)">
+            <column name="USER_MAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="DATA_RICHIESTA" type="timestamp">
