@@ -23,8 +23,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <include file="classpath:config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
-    
+    <include file="classpath:config/liquibase/changelog/00000000000000_initial_schema_missioni.xml" relativeToChangelogFile="false"/>
+
     <include file="classpath:config/liquibase/changelog/1431938187821_missioni_schema.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160219131400_add_column_competenza.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20160219152200_add_column_validato.xml" relativeToChangelogFile="false"/>
@@ -70,6 +70,7 @@
     <include file="classpath:config/liquibase/changelog/20180115113000_add_column_cug.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180126122400_add_column_dati_istituto_uos_cds.xml" relativeToChangelogFile="false"/>
 <!--    <include file="classpath:config/liquibase/changelog/20180201162400_add_column_dati_istituto_uo_firma.xml" relativeToChangelogFile="false"/>-->
+
     <include file="classpath:config/liquibase/changelog/20180323132300_add_sequences.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180411113500_modify_column_note_respingi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20180411115500_add_column_delega_spesa.xml" relativeToChangelogFile="false"/>

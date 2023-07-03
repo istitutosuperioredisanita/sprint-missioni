@@ -41,7 +41,7 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
     @Column(name = "UID_INSERT", length = 256, nullable = false)
     public String uidInsert;
     @Size(min = 0, max = 256)
-    @Column(name = "UID", length = 256, nullable = false)
+    @Column(name = "USER_NAME", length = 256, nullable = false)
     public String uid;
     @Column(name = "ANNO", length = 4, nullable = false)
     public Integer anno;

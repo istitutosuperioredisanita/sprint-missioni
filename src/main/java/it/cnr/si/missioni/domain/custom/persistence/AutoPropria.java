@@ -51,7 +51,7 @@ public class AutoPropria extends OggettoBulkXmlTransient implements Serializable
     private String polizzaAssicurativa;
 
     @Size(min = 0, max = 256)
-    @Column(name = "UID", length = 256, nullable = false)
+    @Column(name = "USER_NAME", length = 256, nullable = false)
     private String uid;
 
     @Size(min = 0, max = 50)

@@ -58,7 +58,7 @@ public class DatiPatente extends OggettoBulkXmlTransient implements Serializable
     private String ente;
 
     @Size(min = 0, max = 256)
-    @Column(name = "UID", length = 256, nullable = false)
+    @Column(name = "USER_NAME", length = 256, nullable = false)
     private String uid;
 
     //	@Override

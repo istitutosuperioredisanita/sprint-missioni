@@ -28,7 +28,7 @@
 			    <column name="ID" type="bigint">
 			        <constraints primaryKey="true" nullable="false"/>
 			    </column>
-			    <column name="UID" type="varchar(256)">
+			    <column name="USER_NAME" type="varchar(256)">
 			        <constraints nullable="false"/>
 			    </column>
 			    <column name="ANNO" type="integer">

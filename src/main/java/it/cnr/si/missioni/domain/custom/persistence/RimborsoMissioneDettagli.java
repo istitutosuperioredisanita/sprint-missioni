@@ -64,7 +64,7 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENZA")
     private Long id;
     @Size(min = 0, max = 256)
-    @Column(name = "UID", length = 256, nullable = false)
+    @Column(name = "USER_NAME", length = 256, nullable = false)
     private String uid;
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE", length = 1000, nullable = true)
