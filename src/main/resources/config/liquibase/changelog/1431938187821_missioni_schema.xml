@@ -395,7 +395,7 @@
             <column name="ID_ORDINE_MISSIONE" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="USER_MAME" type="varchar(256)">
+            <column name="USER_NAME" type="varchar(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="DATA_RICHIESTA" type="timestamp">
