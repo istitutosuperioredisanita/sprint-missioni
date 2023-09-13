@@ -69,8 +69,6 @@ public class FlowsMissioniService {
     private Environment env;
     @Autowired
     private CRUDComponentSession crudServiceBean;
-    @Value("${spring.proxy.vecchiaScrivania.url}")
-    private String urlVecchiaScrivania;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResultFlows aggiornaOrdineMissioneFlowsNewTransaction(Serializable idOrdineMissione) throws Exception {
