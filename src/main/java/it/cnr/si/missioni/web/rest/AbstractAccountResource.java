@@ -101,7 +101,7 @@ abstract public class AbstractAccountResource {
             if (isUserWithRole) {
                 resp = accountService.getAccount(true);
             } else {
-                resp = accountService.getResponseAccountWithoutInfo(false);
+                resp = accountService.getResponseAccountWithoutRole(false);
             }
             if (resp != null) {
                 return new ResponseEntity<String>(resp, HttpStatus.OK);

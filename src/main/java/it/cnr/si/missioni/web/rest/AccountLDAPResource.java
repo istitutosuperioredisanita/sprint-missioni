@@ -47,7 +47,6 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api")
-@Profile("!keycloak")
 public class AccountLDAPResource extends  AbstractAccountResource{
 
     protected boolean isUserWithRole() {

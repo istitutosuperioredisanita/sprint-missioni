@@ -22,7 +22,10 @@ package it.cnr.si.missioni.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.missioni.amq.service.ResendQueueService;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
+import it.cnr.si.missioni.cmis.StoragePath;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
@@ -33,13 +36,23 @@ import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class LoadFilesService {
@@ -140,18 +153,46 @@ public class LoadFilesService {
             return null;
         }
     }
+    private InputStream getInputStream(String fileName){
+        StorageObject node = missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathConfig() + "/" + missioniCMISService.sanitizeFilename(fileName));
+        if (node == null || (node.<BigInteger>getPropertyValue(StoragePropertyNames.CONTENT_STREAM_LENGTH.value())).compareTo(BigInteger.ZERO) == 0) {
+            InputStream is = getConfiguratioFile(fileName);
+            if ( !Optional.ofNullable(is).isPresent())
+                return null;
+            Map<String, Object> metadataProperties = new HashMap<String, Object>();
+            metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
+            metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("File Configurazione " + fileName));
+            metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Ordine di Missione"));
+            metadataProperties.put(MissioniCMISService.PROPERTY_NAME, fileName);
+            node = missioniCMISService.restoreSimpleDocument(
+                    metadataProperties,
+                    is,
+                    MimeTypes.JSON.toString(),
+                    fileName,
+                    StoragePath.construct(missioniCMISService.getBasePath().getPathConfig()));
 
+        }
+        return missioniCMISService.getResource(node);
+    }
+    private InputStream getConfiguratioFile(String fileName){
+        if ( Optional.ofNullable(pathFileConfigJson).isPresent()) {
+            File f = new File(pathFileConfigJson.concat(fileName));
+            if (f.exists()) {
+                try {
+                    return new FileInputStream(f);
+                } catch (FileNotFoundException e) {
+                    return this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/" + fileName);
+                }
+            }
+        }
+        return this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/" + fileName);
+    }
     private InputStream getUsersSpecial() {
         InputStream is = null;
         String fileName = getFileNameFromUsersSpecial();
-        StorageObject node = missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathConfig() + "/" + missioniCMISService.sanitizeFilename(fileName));
+        return getInputStream(fileName);
 
-        if (node == null || (node.<BigInteger>getPropertyValue(StoragePropertyNames.CONTENT_STREAM_LENGTH.value())).compareTo(BigInteger.ZERO) == 0) {
-            is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/" + fileName);
-        } else {
-            is = missioniCMISService.getResource(node);
-        }
-        return is;
+
     }
 
     private InputStream getUo() {
@@ -165,14 +206,7 @@ public class LoadFilesService {
     }
 
     protected InputStream recuperoFile(String fileName) {
-        InputStream is;
-        StorageObject node = missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathConfig() + "/" + missioniCMISService.sanitizeFilename(fileName));
-        if (node == null || (node.<BigInteger>getPropertyValue(StoragePropertyNames.CONTENT_STREAM_LENGTH.value())).compareTo(BigInteger.ZERO) == 0) {
-            is = this.getClass().getResourceAsStream("/it/cnr/missioni/sourceData/" + fileName);
-        } else {
-            is = missioniCMISService.getResource(node);
-        }
-        return is;
+        return getInputStream(fileName);
     }
 
     private InputStream getFaq() {
@@ -204,6 +238,8 @@ public class LoadFilesService {
 //   		}
     }
 
+    @Value("${spring.config.file.pathFileConfigJson}")
+    private String pathFileConfigJson;
     private String getFileNameFromUsersSpecial() {
         if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
             return "usersSpecialForUoDev.json";
