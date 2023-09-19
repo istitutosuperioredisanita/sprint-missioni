@@ -20,6 +20,10 @@
 package it.cnr.si.missioni.service;
 
 import it.cnr.si.missioni.util.Costanti;
+
+
+import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloPersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.RuoloPersonaDto;
@@ -27,30 +31,44 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
+import it.iss.si.service.AceService;
+import it.iss.si.web.dto.EmployeeDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-
+@SpringBootApplication(scanBasePackages = {
+        "it.iss.si.*"})
 @Profile("iss")
 @Service
 public class MissioniAceServiceIss implements MissioniAceService{
     private static final Log logger = LogFactory.getLog(MissioniAceServiceIss.class);
 
+    @Autowired
+    private UnitaOrganizzativaService unitaOrganizzativaService;
 
+
+    @Autowired(required = false)
+    AceService aceService;
     public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data){
         logger.info("MissioniAceServiceIss->recuperoSediByTerm");
         return Collections.emptyList();
     }
-
-
 
     public SimpleEntitaOrganizzativaWebDto getSede(int sede) {
         logger.info("MissioniAceServiceIss->SimpleEntitaOrganizzativaWebDto");
@@ -74,19 +92,18 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return null;
     }
 
-    @Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
+    //@Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
+        EmployeeDetails detail =aceService.getPersonaByUsername(currentLogin);
         logger.info("MissioniAceServiceIss->getAccountFromSiper");
         UserInfoDto userInfoDto = new UserInfoDto();
-        userInfoDto.setCognome("SALVIO");
-        userInfoDto.setNome("CIRO");
-        userInfoDto.setCap_residenza("84014");
-        userInfoDto.setCodice_fiscale("SLVCRI71D02F912J");
-        userInfoDto.setCodice_uo("000000");
+        userInfoDto.setCognome(detail.getCognome());
+        userInfoDto.setNome(detail.getNome());
+        userInfoDto.setCodice_fiscale(detail.getCodiceFiscale());
+        userInfoDto.setCodice_uo(detail.getDestinazione().getSigla());
         userInfoDto.setStruttura_appartenenza("000");
-        userInfoDto.setComune_residenza("ROMA");
-        userInfoDto.setComune_nascita("NOCERA INFERIORE");
-        userInfoDto.setData_nascita("02/04/1971");
+        userInfoDto.setComune_nascita(detail.getLuogoNascita());
+        userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(detail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
         return userInfoDto;
     }
 

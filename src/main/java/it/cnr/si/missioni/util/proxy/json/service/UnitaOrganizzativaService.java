@@ -32,12 +32,37 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UnitaOrganizzativaService {
 
     @Autowired
     private CommonService commonService;
+
+    public UnitaOrganizzativa loadUoBySiglaEnteInt(String siglaEnteInt,Integer anno) throws ComponentException {
+        if (Optional.ofNullable(siglaEnteInt).isPresent()) {
+            List<JSONClause> clauses = prepareJSONClause(siglaEnteInt, anno);
+            String app = Costanti.APP_SIGLA;
+            String url = Costanti.REST_UO;
+            String risposta = commonService.process(clauses, app, url);
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                UnitaOrganizzativaJson uoJson = mapper.readValue(risposta, UnitaOrganizzativaJson.class);
+                if (uoJson != null) {
+                    List<UnitaOrganizzativa> lista = uoJson.getElements();
+                    if (lista != null && !lista.isEmpty()) {
+                        return lista.get(0);
+                    }
+                }
+            } catch (Exception ex) {
+                throw new ComponentException("Errore nella lettura del file JSON per le Unità Organizzative (" + Utility.getMessageException(ex) + ").", ex);
+            }
+        }
+        return null;
+    }
+
+
 
     public UnitaOrganizzativa loadUo(String uo, String cds, Integer anno) throws ComponentException {
         if (uo != null) {
@@ -59,6 +84,26 @@ public class UnitaOrganizzativaService {
             }
         }
         return null;
+    }
+
+    private List<JSONClause> prepareJSONClause(String siglaEnteInt,
+                                               Integer anno) {
+        JSONClause clause = new JSONClause();
+        clause.setFieldName("sigla_int_ente");
+        clause.setFieldValue(siglaEnteInt);
+        clause.setCondition("AND");
+        clause.setOperator("=");
+        List<JSONClause> clauses = new ArrayList<JSONClause>();
+        clauses.add(clause);
+
+
+        clause = new JSONClause();
+        clause.setFieldName("esercizio_fine");
+        clause.setFieldValue(anno);
+        clause.setCondition("AND");
+        clause.setOperator(">=");
+        clauses.add(clause);
+        return clauses;
     }
 
     private List<JSONClause> prepareJSONClause(String uo, String cds,

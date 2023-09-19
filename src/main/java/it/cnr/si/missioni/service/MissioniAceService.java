@@ -19,45 +19,21 @@
 
 package it.cnr.si.missioni.service;
 
-import feign.FeignException;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
-import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
-import it.cnr.si.service.dto.anagrafica.enums.TipoContratto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloPersonaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.UtenteWebDto;
-import it.cnr.si.service.dto.anagrafica.scritture.*;
+import it.cnr.si.service.dto.anagrafica.scritture.RuoloPersonaDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import java.util.List;
 
 
 public interface MissioniAceService {

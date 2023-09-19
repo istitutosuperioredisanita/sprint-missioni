@@ -34,6 +34,7 @@
         <tag>3.1.124</tag>
     </scm>
     <properties>
+        <ace-iss.version>1.0-SNAPSHOT</ace-iss.version>
         <ace.version>4.1.17</ace.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <commons-io.version>2.4</commons-io.version>
@@ -195,6 +196,12 @@
             <artifactId>storage-cloud-filesystem</artifactId>
             <version>${storage.cloud.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>it.iss.si</groupId>
+            <artifactId>ace-client-iss</artifactId>
+            <version>${ace-iss.version}</version>
+        </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
@@ -271,6 +278,7 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.27</version>
         </dependency>
+
     </dependencies>
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
