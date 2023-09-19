@@ -66,8 +66,6 @@ import java.util.stream.Collectors;
 @Profile("!keyclock")
 public class AccountServiceLdap extends AbstractAccountService{
     private static final Log logger = LogFactory.getLog(AccountServiceLdap.class);
-    @Autowired(required = false)
-    MissioniAceService missioniAceService;
     @Autowired
     private ProxyService proxyService;
     @Autowired

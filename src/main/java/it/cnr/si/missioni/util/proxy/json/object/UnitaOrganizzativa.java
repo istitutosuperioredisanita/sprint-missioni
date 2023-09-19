@@ -30,6 +30,8 @@ public class UnitaOrganizzativa extends RestServiceBean implements Serializable 
     private String fl_uo_cds;
     private Integer esercizio_fine;
 
+    private String sigla_int_ente;
+
     public String getCd_responsabile() {
         return cd_responsabile;
     }
@@ -84,5 +86,13 @@ public class UnitaOrganizzativa extends RestServiceBean implements Serializable 
 
     public void setEsercizio_fine(Integer esercizio_fine) {
         this.esercizio_fine = esercizio_fine;
+    }
+
+    public String getSigla_int_ente() {
+        return sigla_int_ente;
+    }
+
+    public void setSigla_int_ente(String sigla_int_ente) {
+        this.sigla_int_ente = sigla_int_ente;
     }
 }
