@@ -20,9 +20,8 @@
 package it.cnr.si.missioni.service;
 
 import it.cnr.si.missioni.util.Costanti;
-
-
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloPersonaWebDto;
@@ -32,10 +31,10 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.iss.si.service.AceService;
+import it.iss.si.web.dto.Destinazione;
 import it.iss.si.web.dto.EmployeeDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,14 +43,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 @SpringBootApplication(scanBasePackages = {
         "it.iss.si.*"})
 @Profile("iss")
@@ -92,19 +90,48 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return null;
     }
 
+    protected UnitaOrganizzativa findUnitaOrganizzativaBySigla(String siglaUo){
+         return unitaOrganizzativaService.loadUoBySiglaEnteInt(siglaUo,DateUtils.getCurrentYear());
+    }
+    protected  String getCodiceUo( UnitaOrganizzativa uo){
+        return Optional.ofNullable(uo).map(unitaOrganizzativa -> uo.getCd_unita_organizzativa()).orElse("");
+    }
+    protected  String getCdUnitaPadre( UnitaOrganizzativa uo ){
+        return Optional.ofNullable(uo).map(unitaOrganizzativa -> uo.getCd_unita_padre()).orElse("");
+    }
+
+    private Destinazione getUbicazione (EmployeeDetails userDetail){
+        if ( Optional.ofNullable(userDetail.getDestinazione()).isPresent()){
+            return userDetail.getDestinazione();
+        }
+        return new Destinazione();
+
+    }
+    protected UserInfoDto getUserInfo(EmployeeDetails userDetail){
+        if ( Optional.ofNullable(userDetail).isPresent()){
+            UserInfoDto userInfoDto = new UserInfoDto();
+            userInfoDto.setUid(userDetail.getIdAnagrafe().toString());
+            userInfoDto.setMatricola(userDetail.getMatricola());
+            userInfoDto.setCognome(userDetail.getCognome());
+            userInfoDto.setNome(userDetail.getNome());
+            userInfoDto.setEmail_comunicazioni(aceService.getEmail(userDetail.getContatti()));
+            userInfoDto.setSesso(userDetail.getSesso());
+            userInfoDto.setSigla_sede(userDetail.getDestinazione().getSigla());
+            userInfoDto.setCodice_fiscale(userDetail.getCodiceFiscale());
+            UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaBySigla(getUbicazione( userDetail).getSigla());
+            userInfoDto.setCodice_uo(getCodiceUo( unitaOrganizzativa));
+            userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
+            userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
+            userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+            return userInfoDto;
+        }
+        return null;
+    }
     //@Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
-        EmployeeDetails detail =aceService.getPersonaByUsername(currentLogin);
+        EmployeeDetails userDetail =aceService.getPersonaByUsername(currentLogin);
         logger.info("MissioniAceServiceIss->getAccountFromSiper");
-        UserInfoDto userInfoDto = new UserInfoDto();
-        userInfoDto.setCognome(detail.getCognome());
-        userInfoDto.setNome(detail.getNome());
-        userInfoDto.setCodice_fiscale(detail.getCodiceFiscale());
-        userInfoDto.setCodice_uo(detail.getDestinazione().getSigla());
-        userInfoDto.setStruttura_appartenenza("000");
-        userInfoDto.setComune_nascita(detail.getLuogoNascita());
-        userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(detail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
-        return userInfoDto;
+        return getUserInfo(userDetail);
     }
 
     @Cacheable(value = Costanti.NOME_CACHE_GRANT)
