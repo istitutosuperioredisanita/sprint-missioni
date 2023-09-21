@@ -276,25 +276,7 @@ public class AccountServiceOauth extends AbstractAccountService{
             }
         }
 
-        List<String> roles = new ArrayList<>();
-        roles.add ( AuthoritiesConstants.USER);
-        UserInfoDto userInfoDto = new UserInfoDto();
-        userInfoDto.setDipendente(Boolean.TRUE);
-        userInfoDto.setCognome("SALVIO");
-        userInfoDto.setNome("CIRO");
-        userInfoDto.setCap_residenza("84014");
-        userInfoDto.setCodice_fiscale("SLVCRI71D02F912J");
-        userInfoDto.setCodice_uo("000000");
-        userInfoDto.setStruttura_appartenenza("000");
-        userInfoDto.setComune_residenza("ROMA");
-        userInfoDto.setComune_nascita("NOCERA INFERIORE");
-        userInfoDto.setData_nascita("02/04/1971");
-       // userInfoDto.setProfilo("DIP");
-
-        Account account = new Account(userInfoDto);
-        account.setUid("ciro.salvio@iss.it");
-        account.setInternalRoles( roles);
-        return manageResponseForAccountRest(account,loadSpecialUserData);
+        return null;
     }
 
     public String getAccountFromUsername(String username, Boolean loadSpecialUserData) {
