@@ -21,7 +21,8 @@ package it.cnr.si.missioni.service;
 
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ILock;
+
+import com.hazelcast.cp.lock.FencedLock;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
@@ -135,7 +136,7 @@ public class CronService {
 
     @CacheEvict(value = Costanti.NOME_CACHE_PROXY, allEntries = true)
     public void evictCache() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyEvictCache);
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyEvictCache);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
@@ -189,7 +190,7 @@ public class CronService {
 
     @Transactional
     public void loadCache() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyLoadCache);
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyLoadCache);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
@@ -220,7 +221,7 @@ public class CronService {
 
     @Transactional
     public void comunicaDatiRimborsoSigla() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDati);
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyComunicaDati);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
@@ -441,7 +442,7 @@ public class CronService {
 
     @Transactional
     public void verifyStep() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyLoadCache);
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyLoadCache);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
@@ -555,7 +556,7 @@ public class CronService {
 
     @Transactional
     public void verificaFlussoEComunicaDatiRimborsoSigla() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDatiVecchiaScrivania);
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyComunicaDatiVecchiaScrivania);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
