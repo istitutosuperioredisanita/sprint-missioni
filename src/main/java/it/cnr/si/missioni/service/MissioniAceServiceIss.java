@@ -30,9 +30,9 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
+import it.iss.si.dto.anagrafica.Destinazione;
+import it.iss.si.dto.anagrafica.EmployeeDetails;
 import it.iss.si.service.AceService;
-import it.iss.si.web.dto.Destinazione;
-import it.iss.si.web.dto.EmployeeDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
