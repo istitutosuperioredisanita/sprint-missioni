@@ -793,7 +793,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     $scope.cambioPresidenza = function (presidenza) {
         if (presidenza == "S"){
-            ui.message("Questa opzione selezionata indica che la missione è per conto della presidenza del CNR");
+            ui.message("Questa opzione selezionata indica che la missione è per conto della presidenza del ISS");
         }
     }
 
