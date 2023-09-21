@@ -324,6 +324,8 @@ public class AccountServiceLdap extends AbstractAccountService{
             Account account = new Account(getUserInfo(currentUser));
             List ruolo = new ArrayList<String>();
             ruolo.add(AuthoritiesConstants.USER);
+            if ( "ciro.salvio@iss.it".equalsIgnoreCase(currentUser))
+                ruolo.add(AuthoritiesConstants.ADMIN);
             account.setInternalRoles(ruolo);
             account.setUid(securityService.getCurrentUserLogin());
 
@@ -342,7 +344,7 @@ public class AccountServiceLdap extends AbstractAccountService{
                                 .collect(Collectors.toList())
                 );
             }
-
+/*
             Optional<CNRUser> user = securityService.getUser();
             user.ifPresent(utente -> {
                 account.setEmail_comunicazioni(utente.getEmail());
@@ -350,7 +352,7 @@ public class AccountServiceLdap extends AbstractAccountService{
                 account.setCognome(utente.getLastName());
                 account.setInternalRoles(utente.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
             });
-
+*/
             return account;
         }
         return null;

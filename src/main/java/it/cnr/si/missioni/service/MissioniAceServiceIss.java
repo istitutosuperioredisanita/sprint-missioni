@@ -109,7 +109,9 @@ public class MissioniAceServiceIss implements MissioniAceService{
     }
     protected UserInfoDto getUserInfo(EmployeeDetails userDetail){
         if ( Optional.ofNullable(userDetail).isPresent()){
+
             UserInfoDto userInfoDto = new UserInfoDto();
+            userInfoDto.setDipendente(Boolean.TRUE);
             userInfoDto.setUid(userDetail.getIdAnagrafe().toString());
             userInfoDto.setMatricola(userDetail.getMatricola());
             userInfoDto.setCognome(userDetail.getCognome());
@@ -146,9 +148,23 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return null;
     }
 
-    public SimplePersonaWebDto getPersona(String user) {
-        logger.info("MissioniAceServiceIss->getPersona");
+    protected SimplePersonaWebDto getSimplePersonaWebDto(EmployeeDetails userDetail){
+        if ( Optional.ofNullable(userDetail).isPresent()){
+
+            SimplePersonaWebDto simplePersonaWebDto = new SimplePersonaWebDto();
+
+            simplePersonaWebDto.setId(userDetail.getIdAnagrafe());
+            simplePersonaWebDto.setMatricola(userDetail.getMatricola());
+            simplePersonaWebDto.setCognome(userDetail.getCognome());
+            simplePersonaWebDto.setNome(userDetail.getNome());
+
+            return simplePersonaWebDto;
+        }
         return null;
+    }
+    public SimplePersonaWebDto getPersona(String user) {
+        EmployeeDetails userDetail =aceService.getPersonaByUsername(user);
+        return getSimplePersonaWebDto( userDetail);
     }
 
     public List<SimpleUtenteWebDto> findUtentiIstituto(String cds, LocalDate data) {
@@ -162,12 +178,12 @@ public class MissioniAceServiceIss implements MissioniAceService{
     }
 
     public Integer getSedeResponsabileUtente(String user) {
-        logger.info("MissioniAceServiceIss->getSedeResponsabileUtente");
+        logger.info("Da implmentare: MissioniAceServiceIss->getSedeResponsabileUtente");
         return Integer.valueOf(0);
     }
 
     public SimpleEntitaOrganizzativaWebDto getSede(Integer idEntitaOrganizzativa) {
-        logger.info("MissioniAceServiceIss->findUtentiIstituto");
+        logger.info("Da implmentare:MissioniAceServiceIss->findUtentiIstituto");
         return null;
     }
 
