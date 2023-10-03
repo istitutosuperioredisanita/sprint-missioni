@@ -24,6 +24,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.AceURLCondition;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.enums.TipoContratto;
@@ -43,6 +44,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -58,8 +60,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Profile("ace")
+//@Profile("ace")
 @Service
+@Conditional({AceURLCondition.class})
 public class MissioniAceServiceCnr implements MissioniAceService{
     private static final Log logger = LogFactory.getLog(MissioniAceServiceCnr.class);
     private static final Map<String, TipoContratto> TIPOCONTRATTO = new HashMap<String, TipoContratto>() {

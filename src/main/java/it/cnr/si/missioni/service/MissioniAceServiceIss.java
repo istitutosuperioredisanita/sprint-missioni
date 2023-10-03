@@ -21,6 +21,7 @@ package it.cnr.si.missioni.service;
 
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
@@ -30,8 +31,10 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
+import it.iss.si.dto.anagrafica.Contatto;
 import it.iss.si.dto.anagrafica.Destinazione;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
+import it.iss.si.dto.uo.UoDetails;
 import it.iss.si.service.AceService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -107,6 +110,14 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return new Destinazione();
 
     }
+    private String getEmail(List<Contatto> userContatti){
+        if ( Optional.ofNullable(userContatti).isPresent()){
+            return userContatti.stream().
+                    filter(t->t.getTipoContatto().equalsIgnoreCase("mail")).
+                    findFirst().orElse(new Contatto()).getValore();
+        }
+        return "";
+    }
     protected UserInfoDto getUserInfo(EmployeeDetails userDetail){
         if ( Optional.ofNullable(userDetail).isPresent()){
 
@@ -116,15 +127,19 @@ public class MissioniAceServiceIss implements MissioniAceService{
             userInfoDto.setMatricola(userDetail.getMatricola());
             userInfoDto.setCognome(userDetail.getCognome());
             userInfoDto.setNome(userDetail.getNome());
-            userInfoDto.setEmail_comunicazioni(aceService.getEmail(userDetail.getContatti()));
+            userInfoDto.setEmail_comunicazioni(getEmail(userDetail.getContatti()));
             userInfoDto.setSesso(userDetail.getSesso());
             userInfoDto.setSigla_sede(userDetail.getDestinazione().getSigla());
             userInfoDto.setCodice_fiscale(userDetail.getCodiceFiscale());
             UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaBySigla(getUbicazione( userDetail).getSigla());
-            userInfoDto.setCodice_uo(getCodiceUo( unitaOrganizzativa));
+            userInfoDto.setCodice_uo(Utility.getUoSiper(getCodiceUo(unitaOrganizzativa )));
             userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
             userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
             userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+            userInfoDto.setComune_residenza("NOCERA INFERIORE");
+            userInfoDto.setIndirizzo_residenza("Via Marco Levi Bianchini");
+            userInfoDto.setNum_civico_residenza("73");
+
             return userInfoDto;
         }
         return null;
@@ -148,6 +163,19 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return null;
     }
 
+    protected SimpleEntitaOrganizzativaWebDto getSimpleEntitaOrganizzativaWebDto( Integer idUo) {
+        UoDetails uoDetails = aceService.getUo(idUo);
+        if ( Optional.ofNullable(uoDetails).isPresent()){
+            SimpleEntitaOrganizzativaWebDto simpleEntitaOrganizzativaWebDto = new SimpleEntitaOrganizzativaWebDto();
+
+            simpleEntitaOrganizzativaWebDto.setId(uoDetails.getId());
+            simpleEntitaOrganizzativaWebDto.setSigla( uoDetails.getSigla());
+            simpleEntitaOrganizzativaWebDto.setDenominazione( uoDetails.getNome());
+            simpleEntitaOrganizzativaWebDto.setCdsuo( findUnitaOrganizzativaBySigla( uoDetails.getSigla()).getCd_unita_organizzativa());
+            return simpleEntitaOrganizzativaWebDto;
+        }
+        return null;
+    }
     protected SimplePersonaWebDto getSimplePersonaWebDto(EmployeeDetails userDetail){
         if ( Optional.ofNullable(userDetail).isPresent()){
 
@@ -157,6 +185,8 @@ public class MissioniAceServiceIss implements MissioniAceService{
             simplePersonaWebDto.setMatricola(userDetail.getMatricola());
             simplePersonaWebDto.setCognome(userDetail.getCognome());
             simplePersonaWebDto.setNome(userDetail.getNome());
+            simplePersonaWebDto.setSede( getSimpleEntitaOrganizzativaWebDto(userDetail.getDestinazione().getIdUo()));
+            simplePersonaWebDto.setLastSede(simplePersonaWebDto.getSede());
 
             return simplePersonaWebDto;
         }
@@ -174,10 +204,12 @@ public class MissioniAceServiceIss implements MissioniAceService{
 
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
         logger.info("MissioniAceServiceIss->findUtentiCdsuo");
+
         return Collections.emptyList();
     }
 
     public Integer getSedeResponsabileUtente(String user) {
+        //sede responsabile Utente
         logger.info("Da implmentare: MissioniAceServiceIss->getSedeResponsabileUtente");
         return Integer.valueOf(0);
     }
