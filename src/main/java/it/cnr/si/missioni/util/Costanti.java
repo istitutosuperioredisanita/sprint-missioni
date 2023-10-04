@@ -43,6 +43,8 @@ public class Costanti {
     public final static String REST_TIPI_SPESA = "ConsTipiSpesaAction.json";
     public final static String REST_VALIDA_MASSIMALE_SPESA = "restapi/missioni/validaMassimaleSpesa";
     public final static String REST_COMUNICA_RIMBORSO_SIGLA = "restapi/missioni";
+
+    public final static String REST_TERZO_INFO_SIGLA = "restapi/terzo/info/";
     public final static String REST_USERINFO_SIGLA = "restapi/terzo/info/";
     public final static String REST_ACCOUNT = "json/userinfo/";
     public final static String REST_UO_DIRECTOR = "json/sedi";
@@ -57,6 +59,8 @@ public class Costanti {
     public final static String NOME_CACHE_MESSAGGIO = "cacheMessaggio";
     public final static String NOME_CACHE_PROXY = "cacheProxy";
     public final static String NOME_CACHE_TERZO_COMPENSO_SERVICE = "cacheTerzoCompensoService";
+
+    public final static String NOME_CACHE_TERZO_INFO_SERVICE = "cacheTerzoInfoService";
     public final static String NOME_CACHE_TICKET_ALFRESCO = "cacheTicketAlfresco";
     public final static String NOME_CACHE_RUOLI = "cacheRuoli";
     public final static String NOME_CACHE_GRANT = "cacheGrant";

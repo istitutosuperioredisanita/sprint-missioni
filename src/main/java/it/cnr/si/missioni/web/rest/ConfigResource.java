@@ -142,6 +142,14 @@ public class ConfigResource {
         cronService.evictCacheTerzoCompenso();
     }
 
+    @RequestMapping(value = "/rest/config/refreshCacheTerzoInfo",
+            method = RequestMethod.GET)
+    @Timed
+    public void refreshCacheTerzoInfo() {
+        log.debug("REST request per svuotare la cache di terzo info");
+        cronService.evictCacheTerzoInfo();
+    }
+
     /**
      * GET  /rest/config/specialUsers -> rechargeSpecialUser.
      */
