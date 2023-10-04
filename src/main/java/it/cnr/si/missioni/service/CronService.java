@@ -158,6 +158,12 @@ public class CronService {
         LOGGER.info("Cron per Svuotare la Cache Terzo Compenso");
     }
 
+    @CacheEvict(value = Costanti.NOME_CACHE_TERZO_INFO_SERVICE, allEntries = true)
+    public void evictCacheTerzoInfo() throws ComponentException {
+        LOGGER.info("Cron per Svuotare la Cache Terzo Compenso");
+    }
+
+
     @CacheEvict(value = Costanti.NOME_CACHE_DATI_PERSONE, allEntries = true)
     public void evictCachePersone() throws ComponentException {
         LOGGER.info("Cron per Svuotare la Cache Persone");

@@ -22,6 +22,7 @@ package it.cnr.si.missioni.service;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
@@ -62,6 +63,9 @@ public class MissioniAceServiceIss implements MissioniAceService{
 
     @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
+
+    @Autowired
+    private TerzoInfoService terzoInfoService;
 
 
     @Autowired(required = false)
@@ -118,6 +122,10 @@ public class MissioniAceServiceIss implements MissioniAceService{
         }
         return "";
     }
+
+    private TerzoInfo getTerzoInfoSigla(String codiceFiscale){
+        return terzoInfoService.getTerzo(codiceFiscale);
+    }
     protected UserInfoDto getUserInfo(EmployeeDetails userDetail){
         if ( Optional.ofNullable(userDetail).isPresent()){
 
@@ -136,9 +144,11 @@ public class MissioniAceServiceIss implements MissioniAceService{
             userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
             userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
             userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
-            userInfoDto.setComune_residenza("NOCERA INFERIORE");
-            userInfoDto.setIndirizzo_residenza("Via Marco Levi Bianchini");
-            userInfoDto.setNum_civico_residenza("73");
+            TerzoInfo terzoInfoSigla = getTerzoInfoSigla(userInfoDto.getCodice_fiscale());
+            userInfoDto.setComune_residenza(terzoInfoSigla.getComune_residenza());
+            userInfoDto.setIndirizzo_residenza(terzoInfoSigla.getIndirizzo_residenza());
+
+
 
             return userInfoDto;
         }
