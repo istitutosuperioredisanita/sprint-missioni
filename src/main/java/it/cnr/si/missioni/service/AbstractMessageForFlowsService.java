@@ -49,7 +49,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-public abstract class AbstractMessageForFlowsService implements MessageForFlowsService{
+public abstract class AbstractMessageForFlowsService implements MessageForFlowsService {
     private static final Log logger = LogFactory.getLog(AbstractMessageForFlowsService.class);
 
     @Autowired
@@ -67,8 +67,134 @@ public abstract class AbstractMessageForFlowsService implements MessageForFlowsS
     @Autowired
     MissioniCMISService missioniCMISService;
 
-    abstract protected  String costruisciGruppoFirmatario(String ruolo, Integer idSede);
-/*verificare se riscriverlo*/
+    abstract protected String costruisciGruppoFirmatario(String ruolo, Integer idSede);
+
+    /*verificare se riscriverlo*/
+    public List<String> getGruppiFirmatari(CMISMissione cmisMissione,Boolean isRimborso) {
+        List<String> gruppiFirmatari = new ArrayList<>();
+        Uo uoDatiSpesa = uoService.recuperoUo(cmisMissione.getUoSpesa());
+        String uoRichSigla = cmisMissione.getUoRichSigla();
+        String uoSpesaSigla = null;
+        String uoRich = cmisMissione.getUoRich();
+        String uoSpesa = null;
+        if (uoDatiSpesa != null && uoDatiSpesa.getFirmaSpesa() != null && uoDatiSpesa.getFirmaSpesa().equals("N")) {
+            if (StringUtils.hasLength(cmisMissione.getUoCompetenza())) {
+                uoSpesa = cmisMissione.getUoCompetenza();
+                uoSpesaSigla = cmisMissione.getUoCompetenzaSigla();
+            } else {
+                uoSpesa = cmisMissione.getUoRich();
+                uoSpesaSigla = cmisMissione.getUoRichSigla();
+            }
+        } else {
+            uoSpesa = cmisMissione.getUoSpesa();
+            uoSpesaSigla = cmisMissione.getUoSpesaSigla();
+        }
+
+        String gruppoPrimoFirmatario = null;
+        String gruppoSecondoFirmatario = null;
+
+        DatiIstituto datiIstitutoUoSpesa = datiIstitutoService.getDatiIstituto(uoSpesaSigla, Integer.valueOf(cmisMissione.getAnno()));
+        DatiIstituto datiIstitutoUoRich = datiIstitutoService.getDatiIstituto(uoRichSigla, Integer.valueOf(cmisMissione.getAnno()));
+
+        LocalDate dataInizioMissione = DateUtils.parseLocalDate(cmisMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC_FOR_DOCUMENTALE);
+        SimplePersonaWebDto persona = missioniAceService.getPersona(cmisMissione.getUsernameUtenteOrdine());
+        Integer idSede = persona.getLastSede().getId();
+        String ruolo = Costanti.RUOLO_FIRMA;
+        if (cmisMissione.isMissioneEstera() && !cmisMissione.isMissionePresidente()) {
+            ruolo = Costanti.RUOLO_FIRMA_ESTERE;
+            if (uoRich.startsWith(Costanti.CDS_SAC)) {
+                Account direttore = uoService.getDirettore(uoRich);
+                if (direttore.getUid().equals(cmisMissione.getUsernameUtenteOrdine())) {
+                    SimpleEntitaOrganizzativaWebDto sedeAce = missioniAceService.getSede(idSede);
+                    logger.info("Sigla Sede ACE " + sedeAce.getSigla());
+                    if (!sedeAce.getSigla().equals(Costanti.SIGLA_ACE_DIREZIONE_GENERALE)) {
+                        idSede = missioniAceService.getSedeResponsabileUtente(direttore.getUid());
+                    }
+                }
+            }
+        }
+
+        LocalDate oggi = LocalDate.now();
+
+        if (cmisMissione.isMissioneGratuita()) {
+            gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+            gruppoSecondoFirmatario = gruppoPrimoFirmatario;
+        } else {
+            if (cmisMissione.isMissioneCug()) {
+                gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                SimpleEntitaOrganizzativaWebDto sedeCug = recuperoSedeCug(dataInizioMissione);
+                gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedeCug.getId());
+            } else if (cmisMissione.isMissionePresidente()) {
+                SimpleEntitaOrganizzativaWebDto sedePresidente = recuperoSedePresidenza(oggi);
+
+                if (isRimborso) {
+                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                    ruolo = Costanti.RUOLO_FIRMA_PRESIDENTE;
+                    gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
+                } else {
+                    gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                    ruolo = Costanti.RUOLO_FIRMA_PRESIDENTE;
+                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePresidente.getId());
+                }
+            } else {
+                List<SimpleEntitaOrganizzativaWebDto> listaSediSpesa = missioniAceService.recuperoSediDaUo(uoSpesa, dataInizioMissione);
+                if (cmisMissione.getCdsRich().equals(cmisMissione.getCdsSpesa())) {
+                    if (Utility.nvl(datiIstitutoUoSpesa.getSaltaFirmaUosUoCds(), "N").equals("S")) {
+                        SimpleEntitaOrganizzativaWebDto sedePrincipale = recuperoSedePrincipale(listaSediSpesa);
+                        if (sedePrincipale != null) {
+                            gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePrincipale.getId());
+                            gruppoSecondoFirmatario = gruppoPrimoFirmatario;
+                        }
+                    } else if (Utility.nvl(datiIstitutoUoRich.getSaltaFirmaUosUoCds(), "N").equals("S")) {
+                        List<SimpleEntitaOrganizzativaWebDto> listaSediRich = missioniAceService.recuperoSediDaUo(uoRich, dataInizioMissione);
+                        SimpleEntitaOrganizzativaWebDto sedePrincipale = recuperoSedePrincipale(listaSediRich);
+                        if (sedePrincipale != null) {
+                            gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, sedePrincipale.getId());
+                            gruppoSecondoFirmatario = gruppoPrimoFirmatario;
+                        }
+                    } else {
+                        gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                        boolean stessoGruppo = false;
+                        if (uoSpesa.equals(uoRich)) {
+                            SimpleEntitaOrganizzativaWebDto sede = missioniAceService.getSede(idSede);
+                            if (sede.getIdnsip() != null) {
+                                DatiSede datiSede = datiSedeService.getDatiSede(sede.getIdnsip(), LocalDate.now());
+                                if (datiSede != null && datiSede.isDelegaSpesa()) {
+                                    gruppoSecondoFirmatario = gruppoPrimoFirmatario;
+                                    stessoGruppo = true;
+                                }
+                            }
+                        }
+                        if (!stessoGruppo) {
+                            gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede, dataInizioMissione);
+                        }
+                    }
+                } else {
+                    gruppoPrimoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                    if (uoSpesa.equals(uoRich)) {
+                        gruppoSecondoFirmatario = costruisciGruppoFirmatario(ruolo, idSede);
+                    } else {
+                        gruppoSecondoFirmatario = recuperoGruppoSecondoFirmatarioStandard(uoSpesa, ruolo, idSede, dataInizioMissione);
+                    }
+                }
+            }
+        }
+        if (gruppoPrimoFirmatario == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è state recuperate un gruppo per il primo firmatario.");
+        }
+
+        if (gruppoSecondoFirmatario == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è state recuperate un gruppo per il secondo firmatario.");
+        }
+        gruppiFirmatari.add(gruppoPrimoFirmatario);
+        gruppiFirmatari.add(gruppoSecondoFirmatario);
+
+
+
+        return gruppiFirmatari;
+    }
+
+    /*
     public MessageForFlow impostaGruppiFirmatari(CMISMissione cmisMissione, MessageForFlow messageForFlows) {
         Uo uoDatiSpesa = uoService.recuperoUo(cmisMissione.getUoSpesa());
         String uoRichSigla = cmisMissione.getUoRichSigla();
@@ -189,7 +315,7 @@ public abstract class AbstractMessageForFlowsService implements MessageForFlowsS
         messageForFlows.setGruppoFirmatarioSpesa(gruppoSecondoFirmatario);
 
         return messageForFlows;
-    }
+    }*/
 
     public String recuperoGruppoSecondoFirmatarioStandard(String uo, String ruolo, Integer idSedePrimoGruppoFirmatario, LocalDate dataInizioMissione) {
         List<SimpleEntitaOrganizzativaWebDto> lista = missioniAceService.recuperoSediDaUo(uo, dataInizioMissione);
@@ -260,7 +386,6 @@ public abstract class AbstractMessageForFlowsService implements MessageForFlowsS
     }
 
     abstract protected void preparaParametriPerRiavvioFlusso(MultiValueMap<String, Object> parameters, String idFlusso);
-
 
 
     public void aggiungiDocumentiMultipli(List<StorageObject> allegati,

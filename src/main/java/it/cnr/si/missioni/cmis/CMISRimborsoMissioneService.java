@@ -586,7 +586,10 @@ public class CMISRimborsoMissioneService {
             messageForFlow.setIdMissioneRimborso(cmisRimborsoMissione.getIdMissioneRimborso().toString());
             messageForFlow.setTitolo(cmisRimborsoMissione.getWfDescription());
             messageForFlow.setDescrizione(cmisRimborsoMissione.getWfDescriptionComplete());
-            messageForFlow = (MessageForFlowRimborso) messageForFlowsService.impostaGruppiFirmatari(cmisRimborsoMissione, messageForFlow);
+            List<String> gruppiFirmatari = messageForFlowsService.getGruppiFirmatari(cmisRimborsoMissione, true);
+            messageForFlow.setGruppoFirmatarioUo(gruppiFirmatari.get(0));
+            messageForFlow.setGruppoFirmatarioSpesa(gruppiFirmatari.get(1));
+            //messageForFlow = (MessageForFlowRimborso) messageForFlowsService.impostaGruppiFirmatari(cmisRimborsoMissione, messageForFlow);
 
             messageForFlow.setPathFascicoloDocumenti(rimborsoMissione.getStringBasePath());
 
