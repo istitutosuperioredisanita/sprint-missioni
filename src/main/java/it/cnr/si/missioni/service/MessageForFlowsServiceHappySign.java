@@ -19,29 +19,21 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.si.flows.model.ProcessDefinitions;
-import it.cnr.si.flows.model.StartWorkflowResponse;
-import it.cnr.si.flows.model.TaskResponse;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.cmis.CMISMissione;
 import it.cnr.si.missioni.cmis.MessageForFlow;
-import it.cnr.si.missioni.config.FlowIsHappySign;
-import it.cnr.si.missioni.config.FlowIsScrivaniaDigitale;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.service.application.FlowsService;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
-import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
+import it.iss.si.service.HappySignService;
+import it.iss.si.service.HappySignURLCondition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,11 +42,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Conditional(FlowIsHappySign.class)
+@Conditional(HappySignURLCondition.class)
 public class MessageForFlowsServiceHappySign extends AbstractMessageForFlowsService{
     private static final Log logger = LogFactory.getLog(MessageForFlowsServiceHappySign.class);
     @Autowired
-    private FlowsService flowsService;
+    private HappySignService happySignService;
 
     public MessageForFlow impostaGruppiFirmatari(CMISMissione cmisMissione, MessageForFlow messageForFlows) {
         return messageForFlows;
@@ -126,6 +118,7 @@ public class MessageForFlowsServiceHappySign extends AbstractMessageForFlowsServ
 
     public void annullaFlusso(MultiValueMap<String, Object> parameters, String idFlusso) {
         logger.info("MessageForFlowsServiceHappySign::annullaFlusso" );
+
     }
 
     public String avviaFlusso(MultiValueMap<String, Object> parameters) {

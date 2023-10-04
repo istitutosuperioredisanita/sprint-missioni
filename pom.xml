@@ -41,6 +41,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <flows.version>2.3.1</flows.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
+        <happysign.version>1.0-SNAPSHOT</happysign.version>
         <jada.version>3.0</jada.version>
         <!-- upgrade -->
         <javax.inject.version>1</javax.inject.version>
@@ -201,6 +202,11 @@
             <groupId>it.iss.si</groupId>
             <artifactId>ace-client-iss</artifactId>
             <version>${ace-iss.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.iss.si</groupId>
+            <artifactId>happysign-client</artifactId>
+            <version>${happysign.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

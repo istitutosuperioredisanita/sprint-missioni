@@ -60,7 +60,9 @@ import java.util.stream.Collectors;
 
 public interface MessageForFlowsService {
 
-    public MessageForFlow impostaGruppiFirmatari(CMISMissione cmisMissione, MessageForFlow messageForFlows) ;
+    public List<String> getGruppiFirmatari(CMISMissione cmisMissione, Boolean isRimborso) ;
+
+   // public MessageForFlow impostaGruppiFirmatari(CMISMissione cmisMissione, MessageForFlow messageForFlows) ;
 
     public String recuperoGruppoSecondoFirmatarioStandard(String uo, String ruolo, Integer idSedePrimoGruppoFirmatario, LocalDate dataInizioMissione);
 
