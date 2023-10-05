@@ -19,38 +19,26 @@
 
 package it.cnr.si.missioni.cmis;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.config.FlowIsScrivaniaDigitale;
-import it.cnr.si.missioni.domain.custom.FlowResult;
+import it.cnr.si.missioni.cmis.flows.happySign.AutorizzazioneService;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.service.HappySignURLCondition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 
 @Service
-@Conditional(HappySignURLCondition.class)
+@Profile("iss")
 public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissioneService{
 
+    @Autowired
+    AutorizzazioneService autorizzazioneService;
     private static final Log logger = LogFactory.getLog(CMISOrdineMissioneServiceHappySign.class);
     public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
         String username = securityService.getCurrentUserLogin();
@@ -58,112 +46,14 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
         CMISOrdineMissione cmisOrdineMissione = create(annullamento.getOrdineMissione(), annullamento.getAnno());
         StorageObject so = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
 
-        MessageForFlowAnnullamento messageForFlows = new MessageForFlowAnnullamento();
-        try {
-
-            messageForFlows.setIdMissione(annullamento.getId().toString());
-            messageForFlows.setIdMissioneOrdine(annullamento.getOrdineMissione().getId().toString());
-
-            messageForFlows.setIdMissioneRevoca(annullamento.getId().toString());
-            messageForFlows.setTitolo("Annullamento " + cmisOrdineMissione.getWfDescription());
-            messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
-            messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_REVOCA);
-            List<String> gruppoFirmatari=messageForFlowsService.getGruppiFirmatari(cmisOrdineMissione, false);
-            //messageForFlows = (MessageForFlowAnnullamento) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
-
-            messageForFlows.setPathFascicoloDocumenti(createFolderOrdineMissione(annullamento.getOrdineMissione()));
-            messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
-            messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
-            messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
-            messageForFlows.setNote(cmisOrdineMissione.getNote());
-            messageForFlows.setNoteSegreteria(Utility.nvl(annullamento.getConsentiRimborso(), "N").equals("S") ? Costanti.TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO : cmisOrdineMissione.getNoteSegreteria());
-            messageForFlows.setBpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
-            messageForFlows.setBpm_workflowPriority(cmisOrdineMissione.getPriorita());
-            messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
-            messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
-            messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no" : "si");
-            messageForFlows.setUserNameUtenteMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
-            messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
-            messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
-            messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
-            messageForFlows.setUserNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
-            messageForFlows.setUserNameAmministrativo1("");
-            messageForFlows.setUserNameAmministrativo2("");
-            messageForFlows.setUserNameAmministrativo3("");
-            messageForFlows.setUoRich(cmisOrdineMissione.getUoRich());
-            messageForFlows.setDescrizioneUoRich(cmisOrdineMissione.getDescrizioneUoRich());
-            messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
-            messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
-            messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
-            messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
-            messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
-            messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
-            messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
-            messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
-            messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
-            messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
-            messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
-            messageForFlows.setProgetto(cmisOrdineMissione.getModulo());
-            messageForFlows.setDescrizioneProgetto(cmisOrdineMissione.getDescrizioneModulo());
-            messageForFlows.setGae(cmisOrdineMissione.getGae());
-            messageForFlows.setDescrizioneGae(cmisOrdineMissione.getDescrizioneGae());
-            messageForFlows.setImpegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "" : cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
-            messageForFlows.setImpegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "" : cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
-            messageForFlows.setImpegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "" : cmisOrdineMissione.getImpegnoNumero().toString());
-            messageForFlows.setDescrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
-            messageForFlows.setImportoMissione(cmisOrdineMissione.getImportoMissione() == null ? "" : cmisOrdineMissione.getImportoMissione().toString());
-            messageForFlows.setDisponibilita(cmisOrdineMissione.getDisponibilita() == null ? "" : cmisOrdineMissione.getDisponibilita().toString());
-            messageForFlows.setMissioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
-            messageForFlows.setDestinazione(cmisOrdineMissione.getDestinazione());
-            messageForFlows.setDataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
-            messageForFlows.setDataFineMissione(cmisOrdineMissione.getDataFineMissione());
-            messageForFlows.setTrattamento(cmisOrdineMissione.getTrattamento());
-            messageForFlows.setCompetenzaResiduo(cmisOrdineMissione.getFondi());
-            messageForFlows.setAutoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
-            messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
-            messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
-            messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
-            if (!annullamento.getOrdineMissione().isOrdineMissioneVecchiaScrivania()) {
-                messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().getIdFlusso());
-            }
-            messageForFlows.setValidazioneSpesaFlag("si");
-
-        } catch (Exception e) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
-        }
-        MultiValueMap parameters = new LinkedMultiValueMap<String, String>();
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {
-        });
-        parameters.setAll(maps);
-
-        messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, so, annullamento.getStatoFlusso());
-
-        if (annullamento.isStatoNonInviatoAlFlusso()) {
-            parameters.add("commento", "");
-        } else {
-            if ((annullamento.isStatoInviatoAlFlusso() || annullamento.isStatoRespintoFlusso()) && !StringUtils.isEmpty(annullamento.getIdFlusso())) {
-                parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, annullamento.getIdFlusso());
-            } else {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Annullamento " + annullamento.getId());
-            }
-        }
-
-
-        try {
-            String idFlusso = messageForFlowsService.avviaFlusso(parameters);
-            if (StringUtils.isEmpty(annullamento.getIdFlusso())) {
-                annullamento.setIdFlusso(idFlusso);
-            }
-            annullamento.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-
-        } catch (AwesomeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-        }
+        logger.info("da implementare Annullamento");
     }
 
+    @Override
+    public Boolean isActiveSignFlow() {
+        return true;
+    }
+/*
     public void avviaFlusso(OrdineMissione ordineMissione) {
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
@@ -192,6 +82,7 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
             autoPropria.setOrdineMissione(ordineMissione);
             documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
         }
+        /*
         if (!Optional.ofNullable(messageForFlowsService).isPresent()) {
             ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
             FlowResult flowResult = new FlowResult();
@@ -202,11 +93,19 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
             return;
         }
 
+
+
         sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, documento, anticipo, documentoAnticipo, allegati, documentoAutoPropria);
+
+    }*/
+
+    @Override
+    public void annullaFlusso(OrdineMissione ordineMissione) {
 
     }
 
     protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria) {
+        /*
         MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
         try {
 
@@ -320,6 +219,9 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
         } catch (Exception e) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }
+        */
+        logger.info("sendOrdineMissioneToSign");
+
     }
 
 }

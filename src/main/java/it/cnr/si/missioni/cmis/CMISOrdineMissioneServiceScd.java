@@ -45,6 +45,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,15 +63,36 @@ import java.util.stream.Collectors;
 
 
 @Service
-@Conditional(FlowIsScrivaniaDigitale.class)
+@Profile("cnr")
 public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneService{
+
+    @Autowired(required = false)
+    protected MessageForFlowsService messageForFlowsService;
+
 
     private static final Log logger = LogFactory.getLog(CMISOrdineMissioneServiceScd.class);
 
-    private void impostaGruppiFirmatari( MessageForFlow messageForFlow, List<String> gruppiFirmatari){
-        messageForFlow.setGruppoFirmatarioUo(gruppiFirmatari.get(0));
-        messageForFlow.setGruppoFirmatarioSpesa(gruppiFirmatari.get(1));
+    public void annullaFlusso(OrdineMissione ordineMissione) {
+        try {
+            abortFlowOrdineMissione(ordineMissione);
+        } catch (TaskIdNonTrovatoException e) {
+            logger.error("Nessun task attivo da annullare trovato per l'ordine " + ordineMissione.getUid() + " - elimino comunque");
+            // no throw
+        }
+        ordineMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
     }
+
+    private void abortFlowOrdineMissione(OrdineMissione ordineMissione) {
+        MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
+        ObjectMapper mapper = new ObjectMapper();
+        if (ordineMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
+            messageForFlowsService.annullaFlusso(parameters, ordineMissione.getIdFlusso());
+        } else {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Ordine " + ordineMissione.getId());
+        }
+    }
+
+
     public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
@@ -87,9 +109,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setTitolo("Annullamento " + cmisOrdineMissione.getWfDescription());
             messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
             messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_REVOCA);
-            //List<String> gruppoFirmatari=messageForFlowsService.getGruppiFirmatari(cmisOrdineMissione, false);
-            impostaGruppiFirmatari(messageForFlows,messageForFlowsService.getGruppiFirmatari(cmisOrdineMissione, false));
-            //messageForFlows = (MessageForFlowAnnullamento) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
+            messageForFlows = (MessageForFlowAnnullamento) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
 
             messageForFlows.setPathFascicoloDocumenti(createFolderOrdineMissione(annullamento.getOrdineMissione()));
             messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
@@ -185,6 +205,11 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
     }
 
     @Override
+    public Boolean isActiveSignFlow() {
+        return Optional.ofNullable(messageForFlowsService).isPresent();
+    }
+
+    @Override
     public void avviaFlusso(OrdineMissione ordineMissione) {
         if (ordineMissione.isOrdineMissioneVecchiaScrivania()) {
 //			avviaFlussoVecchiaScrivania(ordineMissione);
@@ -203,9 +228,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setTitolo(cmisOrdineMissione.getWfDescription());
             messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
             messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_ORDINE);
-
-            //messageForFlows = (MessageForFlowOrdine) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
-            impostaGruppiFirmatari(messageForFlows,messageForFlowsService.getGruppiFirmatari(cmisOrdineMissione, false));
+            messageForFlows = (MessageForFlowOrdine) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
             messageForFlows.setPathFascicoloDocumenti(ordineMissione.getStringBasePath());
             messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
             messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
