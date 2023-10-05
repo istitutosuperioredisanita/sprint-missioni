@@ -35,6 +35,7 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.iss.si.dto.anagrafica.Contatto;
 import it.iss.si.dto.anagrafica.Destinazione;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
+import it.iss.si.dto.anagrafica.ResidenzaDomicilio;
 import it.iss.si.dto.uo.UoDetails;
 import it.iss.si.service.AceService;
 import org.apache.commons.logging.Log;
@@ -63,10 +64,6 @@ public class MissioniAceServiceIss implements MissioniAceService{
 
     @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
-
-    @Autowired
-    private TerzoInfoService terzoInfoService;
-
 
     @Autowired(required = false)
     AceService aceService;
@@ -123,8 +120,8 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return "";
     }
 
-    private TerzoInfo getTerzoInfoSigla(String codiceFiscale){
-        return terzoInfoService.getTerzo(codiceFiscale);
+    private ResidenzaDomicilio getResidenza(Integer idAnagrafe){
+        return aceService.getResidenza(idAnagrafe);
     }
     protected UserInfoDto getUserInfo(EmployeeDetails userDetail){
         if ( Optional.ofNullable(userDetail).isPresent()){
@@ -144,9 +141,14 @@ public class MissioniAceServiceIss implements MissioniAceService{
             userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
             userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
             userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
-            TerzoInfo terzoInfoSigla = getTerzoInfoSigla(userInfoDto.getCodice_fiscale());
-            userInfoDto.setComune_residenza(terzoInfoSigla.getComune_residenza());
-            userInfoDto.setIndirizzo_residenza(terzoInfoSigla.getIndirizzo_residenza());
+            ResidenzaDomicilio residenzaDomicilio
+                    = getResidenza(userDetail.getIdAnagrafe());
+            if ( Optional.ofNullable(residenzaDomicilio).isPresent()) {
+                userInfoDto.setComune_residenza(residenzaDomicilio.getComune());
+                userInfoDto.setIndirizzo_residenza(residenzaDomicilio.getIndirizzo());
+                userInfoDto.setCap_residenza( residenzaDomicilio.getCap());
+                userInfoDto.setProvincia_residenza( residenzaDomicilio.getProvincia());
+            }
 
 
 
