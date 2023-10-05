@@ -19,11 +19,8 @@
 
 package it.cnr.si.missioni.cmis;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.missioni.service.*;
@@ -44,10 +41,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -67,8 +61,6 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     @Autowired
     protected DatiIstitutoService datiIstitutoService;
 
-    @Autowired(required = false)
-    protected MessageForFlowsService messageForFlowsService;
 
     @Autowired
     protected Environment env;
@@ -505,6 +497,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     public abstract void avviaFlusso(AnnullamentoOrdineMissione annullamento) ;
 
+    public abstract Boolean isActiveSignFlow();
     public void avviaFlusso(OrdineMissione ordineMissione) {
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
@@ -533,7 +526,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             autoPropria.setOrdineMissione(ordineMissione);
             documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
         }
-        if (!Optional.ofNullable(messageForFlowsService).isPresent()) {
+
+        if (!isActiveSignFlow()) {
             ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
             FlowResult flowResult = new FlowResult();
             flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMA_UO);
@@ -726,25 +720,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public void annullaFlusso(OrdineMissione ordineMissione) {
-        try {
-            abortFlowOrdineMissione(ordineMissione);
-        } catch (TaskIdNonTrovatoException e) {
-            logger.error("Nessun task attivo da annullare trovato per l'ordine " + ordineMissione.getUid() + " - elimino comunque");
-            // no throw
-        }
-        ordineMissione.setStatoFlusso(Costanti.STATO_ANNULLATO);
-    }
 
-    private void abortFlowOrdineMissione(OrdineMissione ordineMissione) {
-        MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
-        ObjectMapper mapper = new ObjectMapper();
-        if (ordineMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
-            messageForFlowsService.annullaFlusso(parameters, ordineMissione.getIdFlusso());
-        } else {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Ordine " + ordineMissione.getId());
-        }
-    }
+
+
 
     private MessageForFlowOrdine createJsonForAbortFlowOrdineMissione() {
         MessageForFlowOrdine message = new MessageForFlowOrdine();
