@@ -19,17 +19,25 @@
 
 package it.cnr.si.missioni.cmis;
 
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.flows.happySign.AutorizzazioneService;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.util.CodiciErrore;
+import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.spring.storage.StorageObject;
+import it.iss.si.dto.happysign.request.UploadToComplexRequest;
+import it.iss.si.dto.happysign.response.UploadToComplexResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -220,6 +228,34 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }
         */
+        try {
+            try {
+                if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                    ordineMissioneService.popolaCoda(ordineMissione);
+                } else {
+                    UploadToComplexResponse response = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione);
+                    if ( response.getStatus()!=0)
+                        throw  new Exception(response.getReason());
+                    String idFlusso = response.getListiddocument().get(0).getUuid();
+                    if (StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
+                        ordineMissione.setIdFlusso(idFlusso);
+                        if (anticipo != null) {
+                            anticipo.setIdFlusso(idFlusso);
+                        }
+                    }
+                    ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+                }
+            } catch (AwesomeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+            }
+
+
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
         logger.info("sendOrdineMissioneToSign");
 
     }

@@ -222,6 +222,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             cmisOrdineMissione.setImpegnoNumero(ordineMissione.getPgObbligazione());
             cmisOrdineMissione.setImportoMissione(ordineMissione.getImportoPresunto() == null ? null : Utility.nvl(ordineMissione.getImportoPresunto()));
             cmisOrdineMissione.setModulo(progetto == null ? "" : progetto.getCd_progetto());
+            cmisOrdineMissione.setTerzoRespModulo(progetto == null ? null : progetto.getCd_responsabile_terzo());
+            cmisOrdineMissione.setCodiceFiscaleRespModulo(progetto == null ? "" : progetto.getCodice_fiscale_responsabile());
+
             cmisOrdineMissione.setNoleggioFlag(ordineMissione.getUtilizzoAutoNoleggio().equals("S") ? "si" : "no");
             cmisOrdineMissione.setTrattamento(ordineMissione.decodeTrattamento());
             cmisOrdineMissione.setNote(ordineMissione.getNote() == null ? "" : ordineMissione.getNote());
