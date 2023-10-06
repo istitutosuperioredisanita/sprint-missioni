@@ -36,6 +36,11 @@ public class CMISOrdineMissione extends CMISMissione {
     private String anticipo;
     private String validazioneModulo;
     private String modulo;
+
+    private Integer terzoRespModulo;
+
+    private String codiceFiscaleRespModulo;
+
     private String descrizioneModulo;
     private String missioneGratuita;
 
@@ -157,5 +162,21 @@ public class CMISOrdineMissione extends CMISMissione {
 
     public void setUsernameFirmatarioSpesaAggiunto(String usernameFirmatarioSpesaAggiunto) {
         this.usernameFirmatarioSpesaAggiunto = usernameFirmatarioSpesaAggiunto;
+    }
+
+    public Integer getTerzoRespModulo() {
+        return terzoRespModulo;
+    }
+
+    public void setTerzoRespModulo(Integer terzoRespModulo) {
+        this.terzoRespModulo = terzoRespModulo;
+    }
+
+    public String getCodiceFiscaleRespModulo() {
+        return codiceFiscaleRespModulo;
+    }
+
+    public void setCodiceFiscaleRespModulo(String codiceFiscaleRespModulo) {
+        this.codiceFiscaleRespModulo = codiceFiscaleRespModulo;
     }
 }

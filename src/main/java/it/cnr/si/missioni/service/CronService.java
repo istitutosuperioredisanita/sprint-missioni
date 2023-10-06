@@ -24,16 +24,21 @@ import com.hazelcast.core.HazelcastInstance;
 
 import com.hazelcast.cp.lock.FencedLock;
 import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import it.iss.si.dto.happysign.request.GetStatusRequest;
+import it.iss.si.dto.happysign.response.GetStatusResponse;
+import it.iss.si.service.HappySignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +49,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -133,6 +139,14 @@ public class CronService {
 
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
+
+    @Autowired(required = false)
+    private HappySignService happySignService;
+
+    @Autowired
+    private FlowService flowService;
+
+
 
     @CacheEvict(value = Costanti.NOME_CACHE_PROXY, allEntries = true)
     public void evictCache() throws ComponentException {
@@ -596,6 +610,31 @@ public class CronService {
             LOGGER.error("Errore", e);
             throw new ComponentException(e);
         }
+    }
+    @Transactional
+    public void verificaFirmeHappySign() throws ComponentException {
+        LOGGER.info("verificaFlussoEComunicaDatiRimborsoSigla");if (Optional.ofNullable(happySignService).isPresent()){
+            MissioneFilter filtro = new MissioneFilter();
+            filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+            filtro.setStato(Costanti.STATO_CONFERMATO);
+            filtro.setDaCron("S");
+            List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, false);
+            if ( Optional.ofNullable(listaOrdiniMissione).isPresent()){
+                for ( OrdineMissione ordineMissione:listaOrdiniMissione) {
+                    GetStatusRequest request = new GetStatusRequest();
+                    request.setUuid(ordineMissione.getIdFlusso());
+                    GetStatusResponse getStatusResponse=happySignService.getDocumentStatus(request);
+                    if ( getStatusResponse.getStatus()==0 && getStatusResponse.getDocstatus()==4) {
+                        FlowResult flowResult = new FlowResult();
+                            flowResult.setIdMissione(ordineMissione.getId().toString());
+                            flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
+                            flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
+                        flowService.aggiornaMissioneFlows(flowResult);
+                    }
+                }
+            }
+        }
+
     }
 
 }
