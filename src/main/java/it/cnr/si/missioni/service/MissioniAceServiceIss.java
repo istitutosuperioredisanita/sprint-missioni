@@ -38,6 +38,7 @@ import it.iss.si.dto.anagrafica.EmployeeDetails;
 import it.iss.si.dto.anagrafica.ResidenzaDomicilio;
 import it.iss.si.dto.uo.UoDetails;
 import it.iss.si.service.AceService;
+import it.iss.si.service.UtilAce;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,14 +112,7 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return new Destinazione();
 
     }
-    private String getEmail(List<Contatto> userContatti){
-        if ( Optional.ofNullable(userContatti).isPresent()){
-            return userContatti.stream().
-                    filter(t->t.getTipoContatto().equalsIgnoreCase("mail")).
-                    findFirst().orElse(new Contatto()).getValore();
-        }
-        return "";
-    }
+
 
     private ResidenzaDomicilio getResidenza(Integer idAnagrafe){
         return aceService.getResidenza(idAnagrafe);
@@ -132,7 +126,7 @@ public class MissioniAceServiceIss implements MissioniAceService{
             userInfoDto.setMatricola(userDetail.getMatricola());
             userInfoDto.setCognome(userDetail.getCognome());
             userInfoDto.setNome(userDetail.getNome());
-            userInfoDto.setEmail_comunicazioni(getEmail(userDetail.getContatti()));
+            userInfoDto.setEmail_comunicazioni(UtilAce.getEmail(userDetail));
             userInfoDto.setSesso(userDetail.getSesso());
             userInfoDto.setSigla_sede(userDetail.getDestinazione().getSigla());
             userInfoDto.setCodice_fiscale(userDetail.getCodiceFiscale());

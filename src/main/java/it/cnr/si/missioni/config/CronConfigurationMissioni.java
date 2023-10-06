@@ -46,8 +46,13 @@ public class CronConfigurationMissioni {
     @Value("${cron.verifyStep.active}")
     private boolean cronVerifyStepActive;
 
+    @Value("${cron.happysign.active}")
+    private boolean cronHappySignActive;
+
     @Autowired(required = false)
     private CronService cronService;
+
+
 
     @Scheduled(cron = "${cron.comunicaDati.cronExpression}")
     public void cronComunicaDati() throws Exception {
@@ -92,5 +97,11 @@ public class CronConfigurationMissioni {
     public void loadCache() throws Exception {
         if (cronLoadCacheActive)
             cronService.loadCache();
+    }
+    @Scheduled(cron = "${cron.happysign.cronExpression}")
+    public void cronHappysign() throws Exception {
+        if (cronHappySignActive) {
+            cronService.verificaFirmeHappySign();
+        }
     }
 }

@@ -1,14 +1,16 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
-import it.iss.si.service.HappySign;
+import it.iss.si.dto.happysign.request.UploadToComplexRequest;
+import it.iss.si.dto.happysign.response.UploadToComplexResponse;
 import it.iss.si.service.HappySignService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FlussiToHappySignService implements FlussiToHappySign {
     @Autowired
     protected HappySignService happySignService;
@@ -32,11 +34,16 @@ public class FlussiToHappySignService implements FlussiToHappySign {
 
         return Boolean.FALSE;
     }
-    protected Boolean signResoUoAfferente(OrdineMissione ordineMissione) {
+    protected Boolean signRespUoAfferente(OrdineMissione ordineMissione) {
         if ( ordineMissione==null)
             return Boolean.FALSE;
         if ( !ordineMissione.getUoRich().equalsIgnoreCase(ordineMissione.getUoSpesa()))
             return Boolean.FALSE;
         return Boolean.FALSE;
+    }
+
+    @Override
+    public UploadToComplexResponse send(UploadToComplexRequest request) {
+        return null;
     }
 }
