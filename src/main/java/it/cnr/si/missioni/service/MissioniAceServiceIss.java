@@ -22,7 +22,6 @@ package it.cnr.si.missioni.service;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
@@ -32,7 +31,6 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-import it.iss.si.dto.anagrafica.Contatto;
 import it.iss.si.dto.anagrafica.Destinazione;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
 import it.iss.si.dto.anagrafica.ResidenzaDomicilio;
