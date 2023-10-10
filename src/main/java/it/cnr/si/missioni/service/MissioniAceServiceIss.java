@@ -49,10 +49,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @SpringBootApplication(scanBasePackages = {
         "it.iss.si.*"})
@@ -95,6 +92,9 @@ public class MissioniAceServiceIss implements MissioniAceService{
 
     protected UnitaOrganizzativa findUnitaOrganizzativaBySigla(String siglaUo){
          return unitaOrganizzativaService.loadUoBySiglaEnteInt(siglaUo,DateUtils.getCurrentYear());
+    }
+    protected UnitaOrganizzativa findUnitaOrganizzativaByUo(String uoSigla){
+        return unitaOrganizzativaService.loadUo(uoSigla,null,DateUtils.getCurrentYear());
     }
     protected  String getCodiceUo( UnitaOrganizzativa uo){
         return Optional.ofNullable(uo).map(unitaOrganizzativa -> uo.getCd_unita_organizzativa()).orElse("");
@@ -175,7 +175,8 @@ public class MissioniAceServiceIss implements MissioniAceService{
             simpleEntitaOrganizzativaWebDto.setId(uoDetails.getId());
             simpleEntitaOrganizzativaWebDto.setSigla( uoDetails.getSigla());
             simpleEntitaOrganizzativaWebDto.setDenominazione( uoDetails.getNome());
-            simpleEntitaOrganizzativaWebDto.setCdsuo( findUnitaOrganizzativaBySigla( uoDetails.getSigla()).getCd_unita_organizzativa());
+            Optional.ofNullable(findUnitaOrganizzativaBySigla( uoDetails.getSigla())).ifPresent(uorg->simpleEntitaOrganizzativaWebDto.setCdsuo(uorg.getCd_unita_organizzativa()));
+
             return simpleEntitaOrganizzativaWebDto;
         }
         return null;
@@ -196,6 +197,19 @@ public class MissioniAceServiceIss implements MissioniAceService{
         }
         return null;
     }
+
+    protected SimpleUtenteWebDto getSimpleUtenteWebDto(EmployeeDetails userDetail){
+        if ( Optional.ofNullable(userDetail).isPresent()){
+            SimpleUtenteWebDto simpleUtenteWebDto= new SimpleUtenteWebDto();
+            simpleUtenteWebDto.setId(userDetail.getIdAnagrafe());
+            simpleUtenteWebDto.setEmail(UtilAce.getEmail(userDetail));
+            simpleUtenteWebDto.setUsername(simpleUtenteWebDto.getEmail());
+            simpleUtenteWebDto.setPersona(getSimplePersonaWebDto(userDetail));
+
+            return simpleUtenteWebDto;
+        }
+        return null;
+    }
     public SimplePersonaWebDto getPersona(String user) {
         EmployeeDetails userDetail =aceService.getPersonaByUsername(user);
         return getSimplePersonaWebDto( userDetail);
@@ -206,10 +220,25 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return Collections.emptyList();
     }
 
+    private List<SimpleUtenteWebDto> getListSimpleUtenteWebDto(List<EmployeeDetails> employeeDetails ){
+        if ( Optional.ofNullable(employeeDetails).isPresent()
+                && Optional.ofNullable(employeeDetails).get().size()>0){
+            List<SimpleUtenteWebDto> s = new ArrayList<SimpleUtenteWebDto>();
+            for ( EmployeeDetails employeeDetail:employeeDetails) {
+                if ( Optional.ofNullable(UtilAce.getEmail(employeeDetail)).isPresent())
+                    s.add( getSimpleUtenteWebDto(employeeDetail));
+            }
+            return s;
+        }
+        return Collections.emptyList();
+    }
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
         logger.info("MissioniAceServiceIss->findUtentiCdsuo");
-
-        return Collections.emptyList();
+        String uoSigla=Utility.getUoSigla(uo);
+        UnitaOrganizzativa unitaOrganizzativa =findUnitaOrganizzativaByUo(uoSigla);
+        if ( !Optional.ofNullable(unitaOrganizzativa).isPresent())
+            return Collections.emptyList();
+        return getListSimpleUtenteWebDto(aceService.getPersoneDetailUo( uoSigla, true ));
     }
 
     public Integer getSedeResponsabileUtente(String user) {
