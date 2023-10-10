@@ -137,7 +137,7 @@ abstract public class AbstractAccountResource {
 
         profiles
                 .stream()
-                .filter(profile -> profile.equalsIgnoreCase("dev"))
+                .filter(profile -> profile.equalsIgnoreCase(env.getProperty("jhipster.ribbon.displayOnActiveProfiles","dev")))
                 .findAny()
                 .ifPresent(profile -> map.put("ribbonEnv", profile));
 
