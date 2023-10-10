@@ -206,7 +206,7 @@ public class AccountServiceLdap extends AbstractAccountService{
     }
 
     public Account loadAccountFromUsername(String currentLogin) {
-        String risposta = getAccountFromUsername(currentLogin, false);
+        String risposta = getAccountFromUsername(currentLogin, true);
         if (risposta != null) {
             return getAccountFromResp(risposta);
         }

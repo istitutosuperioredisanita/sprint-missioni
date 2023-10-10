@@ -4,6 +4,8 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.dto.happysign.request.UploadToComplexRequest;
 import it.iss.si.dto.happysign.response.UploadToComplexResponse;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AutorizzazioneService {
+
+    private static final Log logger = LogFactory.getLog(AutorizzazioneService.class);
 
     @Autowired
     UtilTestService utilTestService;
@@ -34,9 +38,7 @@ public class AutorizzazioneService {
     public UploadToComplexResponse sendAutorizzazione(OrdineMissione ordineMissione, StorageObject moduloOrdineMissione) throws IOException {
         AutorizzazioneMissione autorizzazione = Optional.ofNullable(getFlowAutorizzazione(ordineMissione)).
                 orElse(null).stream().findFirst().orElse(null);
-        if ( Optional.ofNullable(autorizzazione).isPresent()){
-           System.out.println("Ciao");
-        }
+        logger.info( "sendAutorizzazione");
         UploadToComplexRequest uploadToComplexRequest= null;
         if ( Optional.ofNullable(utilTestService).isPresent())
             uploadToComplexRequest = utilTestService.createUploadToComplexRequest(ordineMissione,moduloOrdineMissione);
