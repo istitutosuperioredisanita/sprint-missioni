@@ -38,7 +38,9 @@ public class AutorizzazioneService {
     public UploadToComplexResponse sendAutorizzazione(OrdineMissione ordineMissione, StorageObject moduloOrdineMissione) throws IOException {
         AutorizzazioneMissione autorizzazione = Optional.ofNullable(getFlowAutorizzazione(ordineMissione)).
                 orElse(null).stream().findFirst().orElse(null);
-        logger.info( "sendAutorizzazione");
+        if ( Optional.ofNullable(autorizzazione).isPresent()){
+           System.out.println("Ciao");
+        }
         UploadToComplexRequest uploadToComplexRequest= null;
         if ( Optional.ofNullable(utilTestService).isPresent())
             uploadToComplexRequest = utilTestService.createUploadToComplexRequest(ordineMissione,moduloOrdineMissione);
