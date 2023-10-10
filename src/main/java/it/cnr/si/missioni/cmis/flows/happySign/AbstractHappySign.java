@@ -6,6 +6,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.proxy.json.object.Progetto;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import it.cnr.si.missioni.util.proxy.json.service.AbstractAccountService;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 
@@ -20,11 +21,15 @@ import it.iss.si.service.AceService;
 import it.iss.si.service.HappySignService;
 import it.iss.si.service.UtilAce;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 public abstract  class AbstractHappySign implements FlussiToHappySign{
+
+    private static final Log logger = LogFactory.getLog(AbstractHappySign.class);
     @Autowired
     protected HappySignService happySignService;
     @Autowired
@@ -90,6 +95,7 @@ public abstract  class AbstractHappySign implements FlussiToHappySign{
 
     @Override
     public UploadToComplexResponse send(UploadToComplexRequest request) {
+        logger.info("UploadToComplexResponse send(UploadToComplexRequest request)");
         return happySignService.uploadToComplexTemplate(request);
     }
 
