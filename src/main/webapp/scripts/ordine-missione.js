@@ -554,7 +554,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
     }
 
     $scope.reloadUoWork = function(uo){
-        $scope.gestioneUtenteAbilitatoValidare(uo);
+        $scope.gestioneUtenteAbilitatoValidare(uo.cd_unita_organizzativa);
 
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
