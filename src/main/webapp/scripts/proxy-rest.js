@@ -127,9 +127,6 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     ];
 
     var recuperoDatiPerson = function(username){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.GET_PERSON;
         var x = $http.get('api/account-info?username='+ username);
         var y = x.then(function (result) {
             if (result.data){
@@ -159,9 +156,6 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     }
 
     var recuperoPersonsForCdsUo = function(cds, uo, soloDipendenti, dipendentiCessati){
-        var urlRestProxy = URL_REST.STANDARD;
-        var app = APP_FOR_REST.SIPER;
-        var url = SIPER_REST.PERSONS_FOR_UO;
         var persons = [];
         var uoSiper = uo.replace('.','');
         if (cds){
