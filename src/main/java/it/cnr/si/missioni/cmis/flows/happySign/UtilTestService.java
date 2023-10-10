@@ -8,21 +8,20 @@ import it.iss.si.dto.happysign.base.File;
 import it.iss.si.dto.happysign.base.Signer;
 import it.iss.si.dto.happysign.base.UserFea;
 import it.iss.si.dto.happysign.request.UploadToComplexRequest;
-import it.iss.si.dto.happysign.response.UploadToComplexResponse;
 import it.iss.si.service.HappySignService;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 @Service
 @ConditionalOnProperty(prefix = "flows", name = "test", havingValue = "true")
 public class UtilTestService {
-
+    private static final Log logger = LogFactory.getLog(UtilTestService.class);
     @Autowired
     protected HappySignService happySignService;
 
@@ -49,13 +48,11 @@ public class UtilTestService {
         signer.setOrder(1);
 
         uploadToComplexRequest.addSigner(signer);
-
-
-
         File f = new File();
         f.setFilename(moduloOtdineMissione.getKey());
         f.setPdf(getDocumento( moduloOtdineMissione));
         uploadToComplexRequest.addPdf(f);
+        logger.info("UtilTestService");
         return uploadToComplexRequest;
     }
 }
