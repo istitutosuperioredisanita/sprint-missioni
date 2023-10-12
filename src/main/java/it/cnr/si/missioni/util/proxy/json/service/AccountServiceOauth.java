@@ -41,6 +41,7 @@ import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
 import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
@@ -252,7 +253,7 @@ public class AccountServiceOauth extends AbstractAccountService{
             UserInfoDto userInfoDto = userInfo.get();
             if (userInfoDto != null && userInfoDto.getCognome() != null) {
                 if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
-                    final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+                    final TerzoInfo userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
                     if (userInfoDtoSIGLA != null) {
                         userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
                         userInfoDto.setComune_nascita(userInfoDtoSIGLA.getComune_nascita());
@@ -284,7 +285,7 @@ public class AccountServiceOauth extends AbstractAccountService{
         if (missioniAceService != null) {
             userInfoDto = missioniAceService.getAccountFromSiper(username);
             if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
-                final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+                final TerzoInfo userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
                 if (userInfoDtoSIGLA != null) {
                     userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
                     userInfoDto.setComune_nascita(userInfoDtoSIGLA.getComune_nascita());

@@ -27,6 +27,7 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.Terzo;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoJson;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +42,14 @@ public class TerzoService {
     @Autowired
     private CommonService commonService;
 
-    public UserInfoDto loadUserInfo(String cf) {
+    public TerzoInfo loadUserInfo(String cf) {
         String app = Costanti.APP_SIGLA;
         String url = Costanti.REST_USERINFO_SIGLA + cf;
         JSONBody body = new JSONBody();
         try {
             String risposta = commonService.process(body, app, url, false, HttpMethod.GET);
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(risposta, UserInfoDto.class);
+            return mapper.readValue(risposta, TerzoInfo.class);
         } catch (Exception ex) {
             return null;
         }
