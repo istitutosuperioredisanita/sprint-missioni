@@ -66,20 +66,14 @@ public class UoService {
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getDirettore(String uo) {
         String direttore = null;
-/*    	if (isDevProfile()){
-			Uo unitaOrg = recuperoUo(uo);
-			if (unitaOrg != null && unitaOrg.getCodiceUo() != null && unitaOrg.getCodiceUo().equals(uo)){
-				direttore = unitaOrg.getUidDirettore();
-			}
-		} else {*/
         direttore = accountService.getDirettore(uo);
-//		}
         if (direttore != null) {
             return accountService.loadAccountFromUsername(direttore);
         }
         return null;
     }
 
+    /*
     @Transactional(propagation = Propagation.REQUIRED)
     public Account getDirettoreFromUsername(String username) {
         String direttore = null;
@@ -88,7 +82,7 @@ public class UoService {
             return accountService.loadAccountFromUsername(direttore);
         }
         return null;
-    }
+    }*/
 
     private boolean isDevProfile() {
         return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT);
