@@ -59,7 +59,7 @@ public interface MissioniAceService {
     public List<GrantedAuthority> getGrantedAuthorities(String principal) ;
 
     @Cacheable(value = Costanti.NOME_CACHE_DATI_DIRETTORE)
-    public String getDirettore(String username) ;
+    public String getDirettore(String uo) ;
 
     public SimplePersonaWebDto getPersona(String user) ;
 

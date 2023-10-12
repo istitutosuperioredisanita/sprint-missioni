@@ -41,6 +41,7 @@ import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
+import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
 import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
@@ -254,7 +255,7 @@ public class AccountServiceLdap extends AbstractAccountService{
             UserInfoDto userInfoDto = userInfo.get();
             if (userInfoDto != null && userInfoDto.getCognome() != null) {
                 if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
-                    final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+                    final TerzoInfo userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
                     if (userInfoDtoSIGLA != null) {
                         userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
                         userInfoDto.setComune_nascita(userInfoDtoSIGLA.getComune_nascita());
@@ -285,7 +286,7 @@ public class AccountServiceLdap extends AbstractAccountService{
         if (missioniAceService != null) {
             userInfoDto = getUserInfo(username);
             if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
-                final it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+                final TerzoInfo userInfoDtoSIGLA = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
                 if (userInfoDtoSIGLA != null) {
                     userInfoDto.setSesso(userInfoDtoSIGLA.getSesso());
                     userInfoDto.setComune_nascita(userInfoDtoSIGLA.getComune_nascita());
@@ -556,12 +557,8 @@ public class AccountServiceLdap extends AbstractAccountService{
     // TODO Fine da eliminare-
 
     public String getDirettore(String uo) {
-        List<SimpleUtenteWebDto> utenti = missioniAceService.findUtentiCdsuo(uo, LocalDate.now());
-        if (utenti != null && utenti.size() > 0) {
-            return missioniAceService.getDirettore(utenti.get(0).getUsername());
-        }
-        return "";
-    }
+            return missioniAceService.getDirettore(uo);
+            }
 
     public Boolean isUserEnableToWorkUo(String uo) {
         UsersSpecial userSpecial = getUoForUsersSpecial(securityService.getCurrentUserLogin());

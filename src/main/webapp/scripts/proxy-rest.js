@@ -169,15 +169,15 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
                 var listaPersone = [];
                 var listaDuplicati = [];
                 var ind = -1;
-
+                /*
                 var dipendenteUo = null;
                     for (var i=0; i<listaPersons.length; i++) {
                         if (listaPersons[i].matricola && !listaPersons[i].data_cessazione){
                             dipendenteUo = listaPersons[i].uid;
                         }
                     }
-
-                    var personPromise = DirettoreUoService.getDirettore(dipendenteUo);
+                */
+                    var personPromise = DirettoreUoService.getDirettore(uo);
                     return personPromise.then(function(result1){
                         if (result1 && result1.data){
                             var direttore = result1.data;

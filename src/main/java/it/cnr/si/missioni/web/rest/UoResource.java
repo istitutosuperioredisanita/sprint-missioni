@@ -54,13 +54,13 @@ public class UoResource {
      */
     @RequestMapping(value = "/rest/direttore",
             method = RequestMethod.GET,
-            params = {"username"},
+            params = {"uo"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity getDirettore(@RequestParam(value = "username") String username) {
+    public ResponseEntity getDirettore(@RequestParam(value = "uo") String uo) {
         log.debug("REST request per recuperare i dati del direttore");
 
-        Account direttore = uoService.getDirettoreFromUsername(username);
+        Account direttore = uoService.getDirettore(uo);
         return JSONResponseEntity.ok(direttore);
     }
 
