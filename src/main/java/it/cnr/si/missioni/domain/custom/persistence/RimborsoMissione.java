@@ -432,6 +432,20 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     }
 
     @Transient
+    public String getTranslateStatoFlusso() {
+        if (!StringUtils.isEmpty(getStateFlows())) {
+            return "stato-rimborso-flows.".concat(getStateFlows());
+        } else {
+            if (!StringUtils.isEmpty(getStatoFlusso())) {
+                return "stato-flusso.".concat(getStatoFlusso());
+            }
+        }
+        return "";
+
+
+    }
+
+    @Transient
     public String getDecodeStatoFlusso() {
         if (!StringUtils.isEmpty(getStateFlows())) {
             return Costanti.STATO_FLUSSO_RIMBORSO_FROM_CMIS.get(getStateFlows());
