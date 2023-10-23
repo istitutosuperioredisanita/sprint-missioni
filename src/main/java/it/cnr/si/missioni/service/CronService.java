@@ -652,7 +652,7 @@ public class CronService {
                         flowResult.setIdMissione(ordineMissione.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento("Respinta da firma su HappySigna");
+                        flowResult.setCommento("Respinta da firma su HappySign");
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 

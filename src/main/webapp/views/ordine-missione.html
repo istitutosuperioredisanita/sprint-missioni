@@ -24,7 +24,7 @@
                 <b>{{'missione.form.numero' | translate}}:</b> {{ordineMissioneModel.anno+"/"+ordineMissioneModel.numero}}  -  
                 <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{ordineMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  -  
                 <b>  {{'missione.form.stato' | translate}}: </b>{{ordineMissioneModel.decodeStato}}  -  
-                <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{ordineMissioneModel.decodeStatoFlusso}}
+                <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{'missione.form.'+ordineMissioneModel.translateStatoFlusso | translate}}
   </div>
   <div  class="my-panel-body panel panel-success" ng-show="ordineMissioneModel.commentoFlusso && ordineMissioneModel.stato == 'INS'  && (ordineMissioneModel.statoFlusso == 'RUO' ||  ordineMissioneModel.statoFlusso == 'RUS')" align="center">
                 <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{ordineMissioneModel.commentoFlusso}}

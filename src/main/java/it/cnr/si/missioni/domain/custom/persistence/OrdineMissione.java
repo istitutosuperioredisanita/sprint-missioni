@@ -577,6 +577,19 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
                 '}';
     }
 
+
+    @Transient
+    public String getTranslateStatoFlusso() {
+        if (!StringUtils.isEmpty(getStateFlows())) {
+            return "stato-flows.".concat(getStateFlows());
+        } else {
+            if (!StringUtils.isEmpty(getStatoFlusso())) {
+                return "stato-flusso.".concat(getStatoFlusso());
+            }
+        }
+        return "";
+    }
+
     @Transient
     public String getDecodeStatoFlusso() {
         if (!StringUtils.isEmpty(getStateFlows())) {
