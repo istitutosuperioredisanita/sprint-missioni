@@ -72,7 +72,7 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
     protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria) {
 
         try {
-            try {
+
                 if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
                     ordineMissioneService.popolaCoda(ordineMissione);
                 } else {
@@ -89,13 +89,6 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
                     ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
 
                 }
-            } catch (AwesomeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
-            }
-
-
         } catch (Exception e) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }
