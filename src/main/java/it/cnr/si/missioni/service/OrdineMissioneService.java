@@ -478,18 +478,20 @@ public class OrdineMissioneService {
 
     public void popolaCoda(OrdineMissione ordineMissione) {
         if (Optional.ofNullable(rabbitMQService).isPresent()) {
-            if (ordineMissione.getMatricola() != null && !isDevProfile()) {
-                Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
-                String idSede = null;
-                if (account != null) {
-                    idSede = account.getCodice_sede();
+            if (Optional.ofNullable(rabbitMQService).isPresent()) {
+                if (ordineMissione.getMatricola() != null && !isDevProfile()) {
+                    Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
+                    String idSede = null;
+                    if (account != null) {
+                        idSede = account.getCodice_sede();
+                    }
+                    Missione missione = new Missione(TypeMissione.ORDINE, Long.valueOf(ordineMissione.getId().toString()), idSede,
+                            ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(),
+                            ordineMissione.getDataFineMissione(), null,
+                            ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+                            ordineMissione.getAnno(), ordineMissione.getNumero());
+                    rabbitMQService.send(missione);
                 }
-                Missione missione = new Missione(TypeMissione.ORDINE, Long.valueOf(ordineMissione.getId().toString()), idSede,
-                        ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(),
-                        ordineMissione.getDataFineMissione(), null,
-                        ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
-                        ordineMissione.getAnno(), ordineMissione.getNumero());
-                rabbitMQService.send(missione);
             }
         }
     }

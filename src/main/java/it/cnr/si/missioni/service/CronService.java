@@ -146,15 +146,15 @@ public class CronService {
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
 
-    @Autowired(required = false)
-    private HappySignService happySignService;
+
 
     @Autowired
     private FlowService flowService;
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
 
-
+    @Autowired
+    private CronHappySignService cronHappySignService;
 
 
 
@@ -617,48 +617,9 @@ public class CronService {
     }
     @Transactional
     public void verificaFirmeHappySign() throws ComponentException {
-        LOGGER.info("verificaFlussoEComunicaDatiRimborsoSigla");
-        if (Optional.ofNullable(happySignService).isPresent()){
-            MissioneFilter filtro = new MissioneFilter();
-            filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-            filtro.setStato(Costanti.STATO_CONFERMATO);
-            filtro.setDaCron("S");
-            List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, false);
-            if ( Optional.ofNullable(listaOrdiniMissione).isPresent()){
-                for ( OrdineMissione ordineMissione:listaOrdiniMissione) {
-                    GetStatusRequest request = new GetStatusRequest();
-                    request.setUuid(ordineMissione.getIdFlusso());
-                    GetStatusResponse getStatusResponse=happySignService.getDocumentStatus(request);
-
-                    if ( getStatusResponse.getStatus()==0
-                            && UtilHappySign.isDocumentApproved(getStatusResponse)) {
-                        GetDocumentResponse getDocumentResponse=happySignService.getDocument(ordineMissione.getIdFlusso());
-                        if ( getDocumentResponse.getDocument()!=null){
-                            StorageObject so=cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(
-                                    getDocumentResponse.getDocument(),
-                                    ordineMissione
-                            );
-                        }
-                        //aggiorna file missione on Azure Cloud
-                        FlowResult flowResult = new FlowResult();
-                            flowResult.setIdMissione(ordineMissione.getId().toString());
-                            flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
-                            flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
-                        flowService.aggiornaMissioneFlows(flowResult);
-                    }
-                   if ( getStatusResponse.getStatus()==0
-                            && UtilHappySign.isDocumentRefused(getStatusResponse)) {
-                        FlowResult flowResult = new FlowResult();
-                        flowResult.setIdMissione(ordineMissione.getId().toString());
-                        flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
-                        flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento("Respinta da firma su HappySign");
-                        flowResult.setUser("Utente Flusso Firma");
-                        flowService.aggiornaMissioneFlows(flowResult);
-
-                    }
-                }
-            }
+        LOGGER.info("verificaFirmeHappySign");
+        if (Optional.ofNullable(cronHappySignService).isPresent()){
+            cronHappySignService.aggiornaEsistiMissioni();
         }
 
     }
