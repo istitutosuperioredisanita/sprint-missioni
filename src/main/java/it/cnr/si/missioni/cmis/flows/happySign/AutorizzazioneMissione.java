@@ -1,5 +1,7 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-public interface AutorizzazioneMissione extends FlussiMissione {
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+
+public interface AutorizzazioneMissione extends FlussiMissione<OrdineMissione> {
 
 }

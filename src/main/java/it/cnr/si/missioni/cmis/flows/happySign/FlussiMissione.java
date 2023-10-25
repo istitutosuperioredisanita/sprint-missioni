@@ -7,11 +7,11 @@ import it.iss.si.dto.happysign.request.UploadToComplexRequest;
 
 import java.io.IOException;
 
-public interface FlussiMissione extends FlussiToHappySign{
+public interface FlussiMissione<T> extends FlussiToHappySign{
 
-    public Boolean isFlowToSend(OrdineMissione ordineMissione);
+    public Boolean isFlowToSend(T ordineMissione);
 
-    public UploadToComplexRequest createUploadComplexrequest(OrdineMissione ordineMissione, StorageObject moduloOrdineMissione) throws IOException;
+    public UploadToComplexRequest createUploadComplexrequest(T ordineMissione, StorageObject moduloOrdineMissione) throws IOException;
 
 
 }
