@@ -39,7 +39,7 @@ public class AutorizzazioneService {
         AutorizzazioneMissione autorizzazione = Optional.ofNullable(getFlowAutorizzazione(ordineMissione)).
                 orElse(null).stream().findFirst().orElse(null);
         if ( Optional.ofNullable(autorizzazione).isPresent()){
-           System.out.println("Ciao");
+            logger.info(autorizzazione);
         }
         UploadToComplexRequest uploadToComplexRequest= null;
         if ( Optional.ofNullable(utilTestService).isPresent())
