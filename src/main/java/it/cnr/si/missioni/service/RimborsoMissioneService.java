@@ -310,17 +310,19 @@ public class RimborsoMissioneService {
     }
 
     public void popolaCoda(RimborsoMissione rimborsoMissione) {
-        if (!isDevProfile()) {
-            if (rimborsoMissione.getMatricola() != null) {
-                Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
-                String idSede = null;
-                if (account != null) {
-                    idSede = account.getCodice_sede();
+        if ( Optional.ofNullable(rabbitMQService).isPresent()) {
+            if (!isDevProfile()) {
+                if (rimborsoMissione.getMatricola() != null) {
+                    Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
+                    String idSede = null;
+                    if (account != null) {
+                        idSede = account.getCodice_sede();
+                    }
+                    Missione missione = new Missione(TypeMissione.RIMBORSO, Long.valueOf(rimborsoMissione.getId().toString()), idSede,
+                            rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), Long.valueOf(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+                            rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
+                    rabbitMQService.send(missione);
                 }
-                Missione missione = new Missione(TypeMissione.RIMBORSO, Long.valueOf(rimborsoMissione.getId().toString()), idSede,
-                        rimborsoMissione.getMatricola(), rimborsoMissione.getDataInizioMissione(), rimborsoMissione.getDataFineMissione(), Long.valueOf(rimborsoMissione.getOrdineMissione().getId().toString()), rimborsoMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
-                        rimborsoMissione.getAnno(), rimborsoMissione.getNumero());
-                rabbitMQService.send(missione);
             }
         }
     }
