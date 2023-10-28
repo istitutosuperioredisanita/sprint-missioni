@@ -27,6 +27,7 @@ import java.util.List;
 public class AutorizzazioneMissioneProgStessaUo extends AbstractHappySign implements AutorizzazioneMissione {
     @Value("${flows.autorizzazione.uospes:#{null}}")
     private String templateName;
+
     public StartWorflowDto createUStartWorfloDto(OrdineMissione ordineMissione, StorageObject modulo,List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);
@@ -39,11 +40,13 @@ public class AutorizzazioneMissioneProgStessaUo extends AbstractHappySign implem
         startInfo.addSigner(UtilAce.getEmail(responsabilePrg));
 
 
-        File f = new File();
-        f.setFilename(modulo.getKey());
-        f.setPdf(getDocumento(modulo));
+        //File f = new File();
+        //f.setFilename(modulo.getKey());
+        //f.setPdf(getDocumento(modulo));
 
-        startInfo.setFileToSign(f);
+
+
+        startInfo.setFileToSign(getFile( modulo,allegati));
 
         return startInfo;
     }

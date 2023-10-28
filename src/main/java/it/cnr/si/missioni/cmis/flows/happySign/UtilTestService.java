@@ -43,7 +43,7 @@ public class UtilTestService {
         startInfo.addSigner(ordineMissione.getUid());
 
         File f = new File();
-        f.setFilename(modulo.getKey());
+        f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
         f.setPdf(getDocumento(modulo));
 
         startInfo.setFileToSign(f);

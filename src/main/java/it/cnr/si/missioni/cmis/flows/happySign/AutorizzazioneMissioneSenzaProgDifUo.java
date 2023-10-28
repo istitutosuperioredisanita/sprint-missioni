@@ -41,11 +41,12 @@ public class AutorizzazioneMissioneSenzaProgDifUo extends AbstractHappySign impl
         startInfo.addSigner(UtilAce.getEmail(userUoSpesa));
 
 
+        /*
         File f = new File();
         f.setFilename(modulo.getKey());
         f.setPdf(getDocumento(modulo));
-
-        startInfo.setFileToSign(f);
+*/
+        startInfo.setFileToSign(getFile( modulo,allegati));
 
         return startInfo;
     }

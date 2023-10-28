@@ -122,6 +122,20 @@ public class MissioniCMISService extends StoreService {
         this.alfresco = alfresco;
     }
 
+    public String parseFilename(String file) {
+        StringTokenizer fileName = new StringTokenizer(file,StorageDriver.SUFFIX,false);
+        String newFileName = null;
+
+        while (fileName.hasMoreTokens()){
+            newFileName = fileName.nextToken();
+        }
+
+        if (newFileName != null){
+            return super.sanitizeFilename(newFileName);
+        }
+        return super.sanitizeFilename(file);
+    }
+
     public String sanitizeFilename(String name) {
         name = name.trim();
         Pattern pattern = Pattern.compile(Costanti.STRING_FOR_SANITIZE_FILE_NAME);
