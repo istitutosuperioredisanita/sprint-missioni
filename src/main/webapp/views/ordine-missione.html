@@ -582,14 +582,10 @@
                         </span>
                 </p>
             </form>
-            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaOrdineMissione && ((ordineMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo) || (ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione) || ordineMissioneModel.stato === 'INS'||!showEsisteOrdineMissione)">
-                            <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
-                    </div>
-            </form>
+
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile||ordineMissioneModel.missioneGratuita == 'S'))||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'ordine-missione.button.invia' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
@@ -612,11 +608,18 @@
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
+            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
+                <div class="col-xs-4" ng-show="!validazione && !disabilitaOrdineMissione && ((ordineMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo) || (ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione) || ordineMissioneModel.stato === 'INS'||!showEsisteOrdineMissione)">
+                    <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'ordine-missione.button.savedraft' | translate}}"><span class="glyphicon glyphicon-list-alt" style="color:white"></span>&nbsp;{{'ordine-missione.button.savedraft' | translate}}</button>
+                </div>
+            </form>
+            <!--
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-3" ng-show="showEsisteOrdineMissione">
                       <a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
             </form>
+            -->
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato == 'INS' && !disabilitaOrdineMissione && validazione != 'S'">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>

@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.spring.storage.StorageObject;
@@ -36,18 +37,21 @@ public class AutorizzazioneRimborsoService {
     }
 
 
-    public UploadToComplexResponse sendAutorizzazione(RimborsoMissione rimborsoMissione, StorageObject moduloOrdineMissione) throws IOException {
+    public String sendAutorizzazione(RimborsoMissione rimborsoMissione, StorageObject modulo,List<StorageObject> allegati) throws Exception {
         AutorizzazioneRimborsoMissione autorizzazioneRimborso = Optional.ofNullable(getFlowAutorizzazione(rimborsoMissione)).
                 orElse(null).stream().findFirst().orElse(null);
         if ( Optional.ofNullable(autorizzazioneRimborso).isPresent()){
            logger.info(autorizzazioneRimborso);
         }
-        UploadToComplexRequest uploadToComplexRequest= null;
+        StartWorflowDto startWorflowDto= null;
         if ( Optional.ofNullable(utilTestRimborsoService).isPresent())
-            uploadToComplexRequest = utilTestRimborsoService.createUploadToComplexRequest(rimborsoMissione,moduloOrdineMissione);
+            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo);
         else
-            uploadToComplexRequest = autorizzazioneRimborso.createUploadComplexrequest(rimborsoMissione, moduloOrdineMissione);
-       return autorizzazioneRimborso.send(uploadToComplexRequest);
+            startWorflowDto = autorizzazioneRimborso.createUStartWorfloDto(rimborsoMissione, modulo,allegati);
+       return autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
+                                            startWorflowDto.getSigners(),
+                                            startWorflowDto.getApprovers(),
+                                            startWorflowDto.getFileToSign());
 
     }
 
