@@ -87,6 +87,17 @@ public abstract  class AbstractHappySign implements FlussiToHappySign{
         return IOUtils.toByteArray(missioniCMISService.getResource(storageObject));
     }
 
+    public File getFile( StorageObject modulo, List<StorageObject> allegati) throws IOException {
+        File f = new File();
+        f.setFilename(getNomeFile(modulo.getKey()));
+        f.setPdf(getDocumento(modulo));
+        return f;
+    }
+    public String getNomeFile ( String fileName){
+
+        return missioniCMISService.parseFilename(fileName);
+    }
+
     @Override
     public String send(String templateName, List<String> signerList, List<String> approvedList, File fileToSign) throws Exception {
         logger.info("UploadToComplexResponse send(UploadToComplexRequest request)");

@@ -43,12 +43,13 @@ public class AutorizzazioneMissioneProgDifUo extends AbstractHappySign implement
         startInfo.addSigner(UtilAce.getEmail(responsabilePrg));
         startInfo.addSigner(UtilAce.getEmail(userUoSpesa));
 
-
+/*
         File f = new File();
         f.setFilename(modulo.getKey());
         f.setPdf(getDocumento(modulo));
+*/
+        startInfo.setFileToSign(getFile( modulo,allegati));
 
-        startInfo.setFileToSign(f);
 
         return startInfo;
     }
