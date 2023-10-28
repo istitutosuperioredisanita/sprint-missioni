@@ -21,30 +21,19 @@ package it.cnr.si.missioni.service;
 
 
 import com.hazelcast.core.HazelcastInstance;
-
 import com.hazelcast.cp.lock.FencedLock;
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.cmis.CMISOrdineMissione;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
-import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.cache.service.CacheService;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.dto.happysign.request.GetStatusRequest;
-import it.iss.si.dto.happysign.response.GetDocumentResponse;
-import it.iss.si.dto.happysign.response.GetStatusResponse;
-import it.iss.si.service.EsitiFlowDocumentStatus;
-import it.iss.si.service.HappySignService;
-import it.iss.si.service.UtilHappySign;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

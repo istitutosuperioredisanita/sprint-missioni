@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.dto.happysign.request.UploadToComplexRequest;
@@ -35,18 +36,21 @@ public class AutorizzazioneService {
     }
 
 
-    public UploadToComplexResponse sendAutorizzazione(OrdineMissione ordineMissione, StorageObject moduloOrdineMissione) throws IOException {
+    public String sendAutorizzazione(OrdineMissione ordineMissione, StorageObject modulo,List<StorageObject> allegati) throws Exception {
         AutorizzazioneMissione autorizzazione = Optional.ofNullable(getFlowAutorizzazione(ordineMissione)).
                 orElse(null).stream().findFirst().orElse(null);
         if ( Optional.ofNullable(autorizzazione).isPresent()){
             logger.info(autorizzazione);
         }
-        UploadToComplexRequest uploadToComplexRequest= null;
+        StartWorflowDto startWorflowDto=   autorizzazione.createUStartWorfloDto(ordineMissione, modulo,allegati);;
         if ( Optional.ofNullable(utilTestService).isPresent())
-            uploadToComplexRequest = utilTestService.createUploadToComplexRequest(ordineMissione,moduloOrdineMissione);
-        else
-            uploadToComplexRequest = autorizzazione.createUploadComplexrequest(ordineMissione, moduloOrdineMissione);
-       return autorizzazione.send(uploadToComplexRequest);
+            startWorflowDto = utilTestService.createUStartWorfloDto(ordineMissione,modulo,allegati);
+
+
+       return autorizzazione.send(startWorflowDto.getTemplateName(),
+               startWorflowDto.getSigners(),
+               startWorflowDto.getApprovers(),
+               startWorflowDto.getFileToSign());
 
     }
 
