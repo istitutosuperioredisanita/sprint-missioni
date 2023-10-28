@@ -34,11 +34,12 @@ public class AutorizzazioneMissioneSenzaProgStessaUo extends AbstractHappySign i
         startInfo.addSigner(ordineMissione.getUid());
         startInfo.addSigner(UtilAce.getEmail(userUoRich));
 
+        /*
         File f = new File();
         f.setFilename(modulo.getKey());
         f.setPdf(getDocumento(modulo));
-
-        startInfo.setFileToSign(f);
+*/
+        startInfo.setFileToSign(getFile( modulo,allegati));
 
         return startInfo;
     }
