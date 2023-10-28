@@ -13,6 +13,7 @@ import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
+import it.iss.si.dto.happysign.base.File;
 import it.iss.si.dto.happysign.base.UserFea;
 import it.iss.si.dto.happysign.request.UploadToComplexRequest;
 import it.iss.si.dto.happysign.response.UploadToComplexResponse;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.List;
 
 public abstract  class AbstractHappySign implements FlussiToHappySign{
 
@@ -71,22 +73,14 @@ public abstract  class AbstractHappySign implements FlussiToHappySign{
         return Boolean.FALSE;
     }
 
+    public EmployeeDetails getUserFeaByCf(String codiceFiscale){
+        return aceService.getPersonaByCodiceFiscale( codiceFiscale);
 
-    public UserFea getUserFea( String mail){
-        return happySignService.getUserFeaByMail(mail);
     }
-
-    private UserFea getUserFea(EmployeeDetails detail){
-        return getUserFea(UtilAce.getEmail(detail));
-    }
-    public UserFea getUserFeaByCf(String codiceFiscale){
-        EmployeeDetails detail= aceService.getPersonaByCodiceFiscale( codiceFiscale);
-        return getUserFea(detail);
-    }
-    public UserFea getResponsabile( String uo){
+    public EmployeeDetails getResponsabile( String uo){
         UnitaOrganizzativa unitaOrganizzativa = unitaOrganizzativaService.loadUo(uo,null,DateUtils.getCurrentYear());
-        EmployeeDetails detail= aceService.findResponsabileBySigla(unitaOrganizzativa.getSigla_int_ente());
-        return getUserFea(detail);
+        return aceService.findResponsabileBySigla(unitaOrganizzativa.getSigla_int_ente());
+
     }
 
     public byte[] getDocumento(StorageObject storageObject) throws IOException {
@@ -94,9 +88,9 @@ public abstract  class AbstractHappySign implements FlussiToHappySign{
     }
 
     @Override
-    public UploadToComplexResponse send(UploadToComplexRequest request) {
+    public String send(String templateName, List<String> signerList, List<String> approvedList, File fileToSign) throws Exception {
         logger.info("UploadToComplexResponse send(UploadToComplexRequest request)");
-        return happySignService.uploadToComplexTemplate(request);
+        return happySignService.startFlowToSignSigleDocument(templateName,signerList,approvedList,fileToSign);
     }
 
 

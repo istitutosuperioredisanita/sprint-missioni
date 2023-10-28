@@ -330,7 +330,9 @@
             "sendToManager": "Invia al Responsabile del gruppo",
             "sendToManagerShort": "Invia al Responsabile",
             "anticipo-si": "Richiesta Anticipo: Sì",
-            "anticipo-no": "Richiesta Anticipo: No"
+            "anticipo-no": "Richiesta Anticipo: No",
+            "savedraft" : "Salva in Bozza",
+            "invia" : "Invia"
         },
         "messages": {
             "error": {

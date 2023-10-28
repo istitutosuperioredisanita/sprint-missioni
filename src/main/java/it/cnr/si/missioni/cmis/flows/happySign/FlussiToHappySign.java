@@ -1,10 +1,11 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.iss.si.dto.happysign.request.UploadToComplexRequest;
-import it.iss.si.dto.happysign.response.UploadToComplexResponse;
+import it.iss.si.dto.happysign.base.File;
+
+
+import java.util.List;
 
 public interface FlussiToHappySign {
-   UploadToComplexResponse send(UploadToComplexRequest request);
+   public String send(String templateName, List<String> signerList, List<String> approvedList, File fileToSign) throws Exception ;
 
 }

@@ -138,6 +138,14 @@ public class MissioneRespinta extends OggettoBulkXmlTransient {
         this.tipoFaseRespingi = tipoFaseRespingi;
     }
 
+
+    public String getTranslateStatoFlusso() {
+        if (!StringUtils.isEmpty(getTipoFaseRespingi()))
+            return "stato-flusso.".concat(getTipoFaseRespingi());
+        return "";
+    }
+
+
     @Transient
     public String getDecodeFase() {
         if (!StringUtils.isEmpty(getTipoFaseRespingi())) {

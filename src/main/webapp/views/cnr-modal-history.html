@@ -42,11 +42,10 @@
             <th style="text-align: center">{{'main.comment' | translate}}</th>
         </tr>
       </thead>
-
       <tbody id ="missioni">
         <tr ng-repeat="history in histories" data-method="get">
               <td class="col-md-2" style="text-align: center">{{history.dataInserimento | date:'dd/MM/yyyy HH:mm:ss'}}</td>
-              <td class="col-md-2" style="text-align: center">{{history.decodeFase}}</td>
+              <td class="col-md-2" style="text-align: center">{{'missione.form.'+history.translateStatoFlusso | translate}}</td>
               <td class="col-md-2" style="text-align: center">{{history.uidInsert}}</td>
               <td class="col-md-6" style="text-align: center">{{history.motivoRespingi}}</td>
         </tr>

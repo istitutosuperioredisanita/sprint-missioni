@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -76,10 +77,11 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
                 if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
                     ordineMissioneService.popolaCoda(ordineMissione);
                 } else {
-                    UploadToComplexResponse response = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione);
-                    if ( response.getStatus()!=0)
-                        throw  new Exception(response.getReason());
-                    String idFlusso = response.getListiddocument().get(0).getUuid();
+                    List<StorageObject> allegatiMissione= new ArrayList<StorageObject>();
+                    if ( anticipo!=null)
+                        allegatiMissione.add( documentoAnticipo);
+                    String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
+
                     if (StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
                         ordineMissione.setIdFlusso(idFlusso);
                         if (anticipo != null) {
