@@ -249,6 +249,28 @@ public class RimborsoMissioneDettagliResource {
         }
     }
 
+    @RequestMapping(value = "/rest/deleteAttachment",
+            method = RequestMethod.DELETE)
+    @Timed
+    public ResponseEntity<?> deleteAttachment(HttpServletRequest request,
+                                              @RequestParam(value = "id") String id, @RequestParam(value = "idRimborsoMissione")  Long idRimborso) {
+        log.debug("REST request per il downlaod degli allegati ");
+
+        if (!StringUtils.isEmpty(id)) {
+            try {
+                rimborsoMissioneService.gestioneCancellazioneAllegati(id, idRimborso);
+                return JSONResponseEntity.ok();
+            } catch (AwesomeException e) {
+                log.error("deleteAttachment", e);
+                return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+            }
+        } else {
+            String error = "Id Allegato non valorizzato";
+            log.error("deleteAttachment", error);
+            return JSONResponseEntity.badRequest(error);
+        }
+    }
+    /*
     @RequestMapping(value = "/rest/deleteAttachment/{id}/{idRimborso}",
             method = RequestMethod.GET)
     @Timed
@@ -270,4 +292,6 @@ public class RimborsoMissioneDettagliResource {
             return JSONResponseEntity.badRequest(error);
         }
     }
+    */
+
 }

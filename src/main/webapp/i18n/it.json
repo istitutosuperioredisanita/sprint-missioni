@@ -549,7 +549,9 @@
             "download": "Scarica ZIP Documenti",
             "sendToFinal": "Rendi Definitivo il Rimborso Missione",
             "confirm": "Conferma il Rimborso Missione",
-            "dettagli": "Dettagli Spesa"
+            "dettagli": "Dettagli Spesa",
+            "savedraft" : "Salva in Bozza",
+            "invia" : "Invia"
         }
     },
     "rimborso-missione-dettagli": {

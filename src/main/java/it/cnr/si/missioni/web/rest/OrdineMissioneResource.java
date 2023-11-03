@@ -452,11 +452,11 @@ public class OrdineMissioneResource {
         }
     }
 
-    @RequestMapping(value = "/rest/ordine/deleteAttachment/{id}/{idOrdine}",
-            method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/ordine/deleteAttachment",
+            method = RequestMethod.DELETE)
     @Timed
     public ResponseEntity<?> deleteAttachment(HttpServletRequest request,
-                                              @PathVariable String id, @PathVariable Long idOrdine) {
+                                              @RequestParam(value = "id") String id, @RequestParam(value = "idOrdine")  Long idOrdine) {
         log.debug("REST request per il downlaod degli allegati ");
 
         if (!StringUtils.isEmpty(id)) {
