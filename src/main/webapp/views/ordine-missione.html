@@ -613,13 +613,13 @@
                     <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'ordine-missione.button.savedraft' | translate}}"><span class="glyphicon glyphicon-list-alt" style="color:white"></span>&nbsp;{{'ordine-missione.button.savedraft' | translate}}</button>
                 </div>
             </form>
-            <!--
+
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-3" ng-show="showEsisteOrdineMissione">
+                    <div class="col-xs-3" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato==='DEF'">
                       <a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
             </form>
-            -->
+
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                     <div class="col-xs-1" ng-show="showEsisteOrdineMissione && ordineMissioneModel.stato == 'INS' && !disabilitaOrdineMissione && validazione != 'S'">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
