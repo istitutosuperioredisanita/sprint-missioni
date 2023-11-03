@@ -512,6 +512,7 @@ public class RimborsoMissioneService {
             String[] elencoMail = mailService.preparaElencoMail(listaMail);
             mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(basePath, rimborsoMissioneDB), false, true, elencoMail);
         }
+
         return rimborsoMissioneDB;
     }
 

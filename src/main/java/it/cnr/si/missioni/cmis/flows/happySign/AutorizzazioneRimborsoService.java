@@ -43,11 +43,10 @@ public class AutorizzazioneRimborsoService {
         if ( Optional.ofNullable(autorizzazioneRimborso).isPresent()){
            logger.info(autorizzazioneRimborso);
         }
-        StartWorflowDto startWorflowDto= null;
+        StartWorflowDto startWorflowDto= autorizzazioneRimborso.createUStartWorfloDto(rimborsoMissione, modulo,allegati);;
         if ( Optional.ofNullable(utilTestRimborsoService).isPresent())
-            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo);
-        else
-            startWorflowDto = autorizzazioneRimborso.createUStartWorfloDto(rimborsoMissione, modulo,allegati);
+            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo,allegati);
+
        return autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
                                             startWorflowDto.getSigners(),
                                             startWorflowDto.getApprovers(),

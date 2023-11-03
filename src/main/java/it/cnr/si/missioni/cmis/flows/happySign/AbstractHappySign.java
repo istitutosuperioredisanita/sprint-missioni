@@ -12,7 +12,9 @@ import it.cnr.si.missioni.util.proxy.json.service.ProgettoService;
 
 import it.cnr.si.missioni.util.proxy.json.service.UnitaOrganizzativaService;
 import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
+import it.iss.si.dto.happysign.base.AttachedFile;
 import it.iss.si.dto.happysign.base.File;
 import it.iss.si.dto.happysign.base.UserFea;
 import it.iss.si.dto.happysign.request.UploadToComplexRequest;
@@ -89,8 +91,19 @@ public abstract  class AbstractHappySign implements FlussiToHappySign{
 
     public File getFile( StorageObject modulo, List<StorageObject> allegati) throws IOException {
         File f = new File();
-        f.setFilename(getNomeFile(modulo.getKey()));
+        String fileName = modulo.getPropertyValue(StoragePropertyNames.NAME.value());
+        f.setFilename(fileName);
         f.setPdf(getDocumento(modulo));
+        if ( allegati!=null && allegati.size()>0){
+            for ( StorageObject so:allegati){
+                AttachedFile attachedFile = new AttachedFile();
+                    attachedFile.setAttached(false);
+                    attachedFile.setContent(getDocumento( so));
+                    attachedFile.setFilename(so.getPropertyValue(StoragePropertyNames.NAME.value()));
+                f.addAttachedFile(attachedFile);
+            }
+        }
+
         return f;
     }
     public String getNomeFile ( String fileName){

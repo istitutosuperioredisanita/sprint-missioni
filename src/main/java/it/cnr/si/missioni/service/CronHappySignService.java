@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.service;
 
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
+import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -42,6 +43,9 @@ public class CronHappySignService {
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
 
+    @Autowired
+    private CMISRimborsoMissioneService cmisRimborsoMissioneService;
+
     public void aggiornaEsistiMissioni(){
         MissioneFilter filtro = new MissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -56,7 +60,7 @@ public class CronHappySignService {
                 try {
                     esitoFlowDocumentStatus = happySignService.getDocumentStatus(ordineMissione.getIdFlusso());
 
-                    if ( EnumEsitoFlowDocumentStatus.SIGNED==esitoFlowDocumentStatus) {
+                      if ( EnumEsitoFlowDocumentStatus.SIGNED==esitoFlowDocumentStatus) {
                         GetDocumentResponse getDocumentResponse=happySignService.getDocument(ordineMissione.getIdFlusso());
                         if ( getDocumentResponse.getDocument()!=null){
                             StorageObject so=cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(
@@ -104,11 +108,10 @@ public class CronHappySignService {
                         GetDocumentResponse getDocumentResponse=happySignService.getDocument(rimborsoMissione.getIdFlusso());
                         if ( getDocumentResponse.getDocument()!=null){
 
-                            //da salvare sul documentale
-                            //StorageObject so=cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(
-                            //        getDocumentResponse.getDocument(),
-                            //        rimborsoMissione
-                            //);
+                            StorageObject so=cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(
+                                    getDocumentResponse.getDocument(),
+                                    rimborsoMissione
+                            );
                         }
                         //aggiorna file missione on Azure Cloud
                         FlowResult flowResult = new FlowResult();
