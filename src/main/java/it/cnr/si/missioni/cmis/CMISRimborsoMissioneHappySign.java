@@ -81,9 +81,13 @@ public class CMISRimborsoMissioneHappySign extends AbstractCMISRimborsoMissioneS
                 if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
                     rimborsoMissioneService.popolaCoda(rimborsoMissione);
                 } else {
-                    String idFlusso = autorizzazioneRimborsoService.sendAutorizzazione(rimborsoMissione,documento,allegati);
+                    List<StorageObject> signAllegati = new ArrayList<>();
+                    if (giustificativi!=null )
+                        signAllegati.addAll(giustificativi);
 
-                    if (StringUtils.isEmpty(rimborsoMissione.getIdFlusso())) {
+                    String idFlusso = autorizzazioneRimborsoService.sendAutorizzazione(rimborsoMissione,documento,signAllegati);
+
+                    if (!StringUtils.isEmpty(idFlusso)) {
                         rimborsoMissione.setIdFlusso(idFlusso);
 
                     }

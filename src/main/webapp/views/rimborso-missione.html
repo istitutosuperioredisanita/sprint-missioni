@@ -744,15 +744,10 @@ fine commento multi impegno-->
                         </span>
                 </p>
             </form>
-            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione && ((rimborsoMissioneModel.stato === 'CON' && (utenteAbilitatoValidareUo == 'S' || 
-                    utenteAbilitatoValidareUoContrAmm == 'S')) || rimborsoMissioneModel.stato === 'INS'||!showEsisteRimborsoMissione)">
-                           <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
-                    </div>
-            </form>
+
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-4" ng-show="!validazione && showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'INS'   && !disabilitaRimborsoMissione">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'rimborso-missione.button.invia' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
@@ -772,8 +767,14 @@ fine commento multi impegno-->
                             <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                     </div>
             </form>
+            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
+                <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione && ((rimborsoMissioneModel.stato === 'CON' && (utenteAbilitatoValidareUo == 'S' ||
+                    utenteAbilitatoValidareUoContrAmm == 'S')) || rimborsoMissioneModel.stato === 'INS'||!showEsisteRimborsoMissione)">
+                    <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'rimborso-missione.button.savedraft' | translate}}"><span class="glyphicon glyphicon-list-alt" style="color:white"></span>&nbsp;{{'rimborso-missione.button.savedraft' | translate}}</button>
+                </div>
+            </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione">
+                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'DEF'">
                       <a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
 

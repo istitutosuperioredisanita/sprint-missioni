@@ -90,7 +90,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/deleteAttachment/' + attachment.id+'/'+$routeParams.idRimborsoMissione);
+        var x = $http.delete('api/rest/deleteAttachment?id=' + attachment.id+'&idRimborsoMissione='+$routeParams.idRimborsoMissione);
         var y = x.then(function (result) {
             if ($scope.dettagliSpese && $scope.dettagliSpese.length > 0){
                 for (var i=0; i<$scope.dettagliSpese.length; i++) {

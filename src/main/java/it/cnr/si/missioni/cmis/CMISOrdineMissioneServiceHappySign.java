@@ -80,6 +80,8 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
                     List<StorageObject> allegatiMissione= new ArrayList<StorageObject>();
                     if ( anticipo!=null)
                         allegatiMissione.add( documentoAnticipo);
+                    if ( documentoAutoPropria!=null)
+                        allegatiMissione.add( documentoAutoPropria);
                     String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
 
                     if (!StringUtils.isEmpty(idFlusso)) {
