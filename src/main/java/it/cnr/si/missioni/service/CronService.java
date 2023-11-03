@@ -609,6 +609,7 @@ public class CronService {
         LOGGER.info("verificaFirmeHappySign");
         if (Optional.ofNullable(cronHappySignService).isPresent()){
             cronHappySignService.aggiornaEsistiMissioni();
+            cronHappySignService.aggiornaEsistiRimborsiMissioni();
         }
 
     }
