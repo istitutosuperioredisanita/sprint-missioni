@@ -72,7 +72,7 @@ public class MailService {
         this.from = env.getProperty("spring.mail.from");
         String s = env.getProperty("spring.mail.send.error.to");
         if (s == null)
-            s = "gianfranco.gasparro@cnr.it";
+            s = "ciro.salvio@iss.it";
         this.mailToError = Arrays.asList(s.split(","));
     }
 
