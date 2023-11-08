@@ -39,12 +39,7 @@ public class AutorizzazioneRimborsoMissioneDefault extends AbstractHappySign imp
         startInfo.addSigner(rimborsoMissione.getUid());
         startInfo.addSigner(UtilAce.getEmail(userUoRich));
 
-        /*
-        File f = new File();
-        f.setFilename(modulo.getKey());
-        f.setPdf(getDocumento(modulo));
-*/
-        startInfo.setFileToSign(getFile( modulo,null));
+        startInfo.setFileToSign(getFile( modulo,allegati));
 
         return startInfo;
     }
