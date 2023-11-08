@@ -114,7 +114,7 @@ public abstract  class AbstractHappySign implements FlussiToHappySign{
     @Override
     public String send(String templateName, List<String> signerList, List<String> approvedList, File fileToSign) throws Exception {
         logger.info("UploadToComplexResponse send(UploadToComplexRequest request)");
-        return happySignService.startFlowToSignSigleDocument(templateName,signerList,approvedList,fileToSign);
+        return happySignService.startFlowToSignSingleDocument(templateName,signerList,approvedList,fileToSign);
     }
 
 
