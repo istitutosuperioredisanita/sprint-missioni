@@ -961,7 +961,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/ordine/deleteAttachment?id=' + attachment.id+'&idOrdine' + attachment.idMissione);
+        var x = $http.delete('api/rest/ordine/deleteAttachment?id=' + attachment.id+'&idOrdine' + attachment.idMissione);
         var y = x.then(function (result) {
             var attachments = $scope.ordineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
