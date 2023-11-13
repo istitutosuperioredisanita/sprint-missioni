@@ -676,10 +676,10 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta di auto propria per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         } else if (objs.size() > 1) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di auto propria per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
-        } else {
-            StorageObject nodeFile = objs.get(0);
-            return nodeFile.getKey();
         }
+        if( objs.size()>0)
+             return objs.get(0).getKey();
+        return null;
     }
 
     public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) {
