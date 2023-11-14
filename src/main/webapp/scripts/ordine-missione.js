@@ -955,13 +955,47 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
       }
     }
 
+    $scope.goTaxi = function () {
+        if ($scope.ordineMissioneModel.id) {
+            if ($scope.validazione) {
+                $location.path('/ordine-missione/taxi/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione);
+            } else {
+                if ($scope.disabilitaOrdineMissione) {
+                    $location.path('/ordine-missione/taxi/' + $scope.ordineMissioneModel.id + '/' + "D");
+                } else {
+                    $location.path('/ordine-missione/taxi/' + $scope.ordineMissioneModel.id + '/' + "N");
+                }
+            }
+        } else {
+            ui.error("Per poter inserire i dati del taxi è necessario prima salvare l'ordine di missione");
+        }
+    };
+
+    $scope.goAutoNoleggio = function () {
+        if ($scope.ordineMissioneModel.id) {
+            if ($scope.validazione) {
+                $location.path('/ordine-missione/auto-noleggio/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione);
+            } else {
+                if ($scope.disabilitaOrdineMissione) {
+                    $location.path('/ordine-missione/auto-noleggio/' + $scope.ordineMissioneModel.id + '/' + "D");
+                } else {
+                    $location.path('/ordine-missione/auto-noleggio/' + $scope.ordineMissioneModel.id + '/' + "N");
+                }
+            }
+        } else {
+            ui.error("Per poter inserire i dati dell'auto da noleggiare è necessario prima salvare l'ordine di missione");
+        }
+    };
+
+
+
     $scope.confirmDeleteAttachment = function (attachment, idOrdineMissione) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.delete('api/rest/ordine/deleteAttachment?id=' + attachment.id+'&idOrdine' + attachment.idMissione);
+        var x = $http.delete('api/rest/ordine/deleteAttachment?id=' + attachment.id+'&idOrdine=' + attachment.idMissione);
         var y = x.then(function (result) {
             var attachments = $scope.ordineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
@@ -1032,6 +1066,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $scope.ordineMissioneModel.richiestaAnticipo = anticipo;
                         $scope.viewAttachments($scope.ordineMissioneModel.id);
                         $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
+                        ui.ok_message("Ordine Missione modificata in bozza con successo");
                     },
                     function (httpResponse) {
                             $rootScope.salvataggio = false;
@@ -1047,6 +1082,7 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                         $scope.uoForUsersSpecial = null;
                         $scope.ordineMissioneModel.isFireSearchAttachments = false;
                         $scope.inizializzaFormPerModifica();
+                        ui.ok_message("Ordine Missione salvata in bozza con successo");
                         var path = $location.path();
                         $location.path(path+'/'+$scope.ordineMissioneModel.id);
                     },
