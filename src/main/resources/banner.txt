@@ -17,4 +17,4 @@
     MMMMMMMM               MMMMMMMMiiiiiiii  sssssssssss      sssssssssss    iiiiiiii   ooooooooooo     nnnnnn    nnnnnniiiiiiii
 
 ${AnsiColor.BRIGHT_BLUE}:: Missioni in Memoria di Gianfranco Gasparro :: Running Spring Boot ${spring-boot.version} ::
-:: https://www.cnr.it ::${AnsiColor.DEFAULT}
+:: https://www.iss.it ::${AnsiColor.DEFAULT}
