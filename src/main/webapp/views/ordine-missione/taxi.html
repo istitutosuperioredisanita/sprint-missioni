@@ -18,11 +18,11 @@
   -->
 
 <div class="container-fluid">
-    <h4 center translate="ordine-missione-taxi.title" translate-values="{numeroOrdineMissione: '{{taxiOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{taxiOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Ordine di missione</h4>
+    <h4 center translate="ordine-missione-taxi.title" translate-values="{numeroOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{anticipoOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Ordine di missione</h4>
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-success" ng-show="success" translate="global.messages.success">
-                <strong>Taxi salvato con successo!</strong>
+                <strong>Anticipo salvato con successo!</strong>
             </div>
             <div class="alert alert-success" ng-show="delSuccess" translate="global.messages.delSuccess">
                 <strong>Cancellazione Effettuata</strong>
@@ -39,7 +39,7 @@
 
             <div class="panel panel-success">
                 <div class="panel-heading color-verde-scuro text-center">
-                    <h3 class="panel-title color-verde-scuro" translate="ordine-missione-taxi.form.box-dati">Dati Generali</h3>
+                    <h3 class="panel-title color-verde-scuro" translate="ordine-missione-anticipo.form.box-dati">Dati Generali</h3>
                 </div>
                 <div class="panel-body my-panel-body">
                     <form name="form" role="form" novalidate ng-submit="save()" show-validation>
@@ -47,21 +47,21 @@
                         <form class="form-inline" role="form" id="missioni">
                             <p class="col-md-5">
                         <span class="input-group">
-                          <span class="input-group-addon" translate="ordine-missione-taxi.form.importo">importo</span>
-                          <input ng-disabled="validazione != 'N' || isOrdineMissioneConfermato" type="text" class="input-sm form-control" required style="text-align:right" ng-currency name="importo" currency-symbol="€" ng-model="taxiOrdineMissioneModel.importo">
+                          <span class="input-group-addon" translate="ordine-missione-anticipo.form.importo">importo</span>
+                          <input ng-disabled="validazione != 'N' || isOrdineMissioneConfermato" type="text" class="input-sm form-control" required style="text-align:right" ng-currency name="importo" currency-symbol="€" ng-model="anticipoOrdineMissioneModel.importo">
                         </span>
                             </p>
                         </form>
 
                         <form class="form-inline col-md-7" role="form" id="missioni">
-                            <div class="panel panel-default" ng-if="taxiOrdineMissioneModel.id && (taxiOrdineMissioneModel.isFireSearchAttachments == true || taxiOrdineMissioneModel.isFireSearchAttachments == false )">
+                            <div class="panel panel-default" ng-if="anticipoOrdineMissioneModel.id && (anticipoOrdineMissioneModel.isFireSearchAttachments == true || anticipoOrdineMissioneModel.isFireSearchAttachments == false )">
                                 <div class="panel-heading color-verde-chiaro text-center">
                                     <h1 class="panel-title">Allegati</h1>
                                 </div>
                                 <div class="panel-body my-panel-body">
                                     <div>
-                                        <ul class="list-unstyled taxiOrdineMissioneModel.attachments" ng-show="taxiOrdineMissioneModel.attachmentsExists=true">
-                                            <li ng-repeat="attachment in taxiOrdineMissioneModel.attachments">
+                                        <ul class="list-unstyled anticipoOrdineMissioneModel.attachments" ng-show="anticipoOrdineMissioneModel.attachmentsExists=true">
+                                            <li ng-repeat="attachment in anticipoOrdineMissioneModel.attachments">
                                                 <span class="glyphicon glyphicon-download-alt"></span>
                                                 <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
                                                 <button ng-show="!isOrdineMissioneConfermato && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
@@ -69,8 +69,8 @@
                                         </ul>
                                         <h4 >
                                             <div class="row fileupload-buttonbar">
-                                                <span ng-hide="taxiOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                                                <ng-upload-form disabilita="isOrdineMissioneConfermato" validazione="validazione" is-finish-rest-attachments="taxiOrdineMissioneModel.isFireSearchAttachments" url="api/rest/public/ordineMissione/taxi/uploadAllegati?idTaxi={{taxiOrdineMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="taxiOrdineMissioneModel" size-limit="500000"></ng-upload-form>
+                                                <span ng-hide="anticipoOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                                                <ng-upload-form disabilita="isOrdineMissioneConfermato" validazione="validazione" is-finish-rest-attachments="anticipoOrdineMissioneModel.isFireSearchAttachments" url="api/rest/public/ordineMissione/anticipo/uploadAllegati?idAnticipo={{anticipoOrdineMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="anticipoOrdineMissioneModel" size-limit="500000"></ng-upload-form>
                                             </div>
                                         </h4>
                                     </div>
@@ -81,9 +81,9 @@
                         <form class="form-inline" role="form" id="missioni">
                             <p class="col-md-12">
                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione-taxi.form.note">note</span>
+                            <span class="input-group-addon" translate="ordine-missione-anticipo.form.note">note</span>
                             <textarea ng-disabled="validazione != 'N'|| isOrdineMissioneConfermato"
-                                      class="input-sm form-control" placeholder="{{'ordine-missione-taxi.form.note.placeholder' | translate}}" name="note" ng-model="taxiOrdineMissioneModel.note" rows = "3">
+                                      class="input-sm form-control" placeholder="{{'ordine-missione-anticipo.form.note.placeholder' | translate}}" name="note" ng-model="anticipoOrdineMissioneModel.note" rows = "3">
                             </textarea>
                         </span>
                             </p>
@@ -91,8 +91,8 @@
 
                         <!--
                                   <div class="col-md-1-button-large col-md-1 text-right">
-                                    <button ng-hide="taxiOrdineMissioneModel.viewAttachment || !taxiOrdineMissioneModel.id" class="btn btn-sm btn-default" ng-click="viewAttachments(taxiOrdineMissioneModel.id)">Allegati</button>
-                                    <button ng-show="taxiOrdineMissioneModel.viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect()">Nascondi allegati</button>
+                                    <button ng-hide="anticipoOrdineMissioneModel.viewAttachment || !anticipoOrdineMissioneModel.id" class="btn btn-sm btn-default" ng-click="viewAttachments(anticipoOrdineMissioneModel.id)">Allegati</button>
+                                    <button ng-show="anticipoOrdineMissioneModel.viewAttachment" class="btn btn-sm btn-warning" ng-click="deselect()">Nascondi allegati</button>
                                   </div>-->
                     </form>
 
@@ -103,15 +103,15 @@
                     </form>
                     <!--
                                 <form name="form-inline" role="form" ng-submit="confirm()">
-                                        <div class="col-md-4" ng-hide="taxiOrdineMissioneModel.id" >
+                                        <div class="col-md-4" ng-hide="anticipoOrdineMissioneModel.id" >
                                                 <button type="submit" class="btn btn-success" data-toggle="tooltip" ng-disabled="form.$invalid" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
                                         </div>
                                 </form>-->
-                    <div class="col-xs-3" ng-show="taxiOrdineMissioneModel.id">
-                        <a target="_blank" href="api/rest/public/printOrdineMissioneTaxi?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-taxi.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
+                    <div class="col-xs-3" ng-show="anticipoOrdineMissioneModel.id">
+                        <a target="_blank" href="api/rest/public/printOrdineMissioneAnticipo?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-anticipo.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                     </div>
                     <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                        <div class="col-xs-1" ng-show="taxiOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
+                        <div class="col-xs-1" ng-show="anticipoOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
                         </div>
                     </form>
