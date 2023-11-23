@@ -6,7 +6,7 @@ missioniApp.factory('TaxiService', function ($resource) {
         });
     });
 
-missioniApp.controller('TaxiMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, TaxiService, ElencoOrdiniMissioneService, ui, COSTANTI, AccessToken, DateService) {
+missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, TaxiService, ElencoOrdiniMissioneService, ui, COSTANTI, AccessToken, DateService) {
     
     $scope.validazione = $routeParams.validazione;
     $scope.idOrdineMissione = $routeParams.idOrdineMissione;
