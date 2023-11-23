@@ -218,6 +218,44 @@
             "print": "Stampa Richiesta Utilizzo Auto Propria"
         }
     },
+    "ordine-missione-auto-noleggio": {
+        "title": "UTILIZZO AUTO NOLEGGIO PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "form": {
+            "dati-patente": "Dati Patente",
+            "auto-noleggio": "Dati Auto Noleggio",
+            "percorso-da": "Percorso Da",
+            "percorso-a": "Percorso A",
+            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
+            "motivi-urgenza": "Per Attività caratterizzata da emergenza, urgenza, indifferibilità",
+            "motivi-trasporto": "Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
+            "altri-motivi": "Altri motivi (specificare)",
+            "addSpostamento": "Aggiungi Spostamento",
+            "box-dati": "Dati Generali",
+            "box-spostamenti": "Spostamenti"
+        },
+        "button": {
+            "print": "Stampa Richiesta Utilizzo Auto Noleggio"
+        }
+    },
+    "ordine-missione-taxi": {
+        "title": "UTILIZZO TAXI PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "form": {
+            "dati-patente": "Dati Patente",
+            "taxi": "Dati Taxi",
+            "percorso-da": "Percorso Da",
+            "percorso-a": "Percorso A",
+            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
+            "motivi-urgenza": "Per Attività caratterizzata da emergenza, urgenza, indifferibilità",
+            "motivi-trasporto": "Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
+            "altri-motivi": "Altri motivi (specificare)",
+            "addSpostamento": "Aggiungi Spostamento",
+            "box-dati": "Dati Generali",
+            "box-spostamenti": "Spostamenti"
+        },
+        "button": {
+            "print": "Stampa Richiesta Utilizzo Taxi"
+        }
+    },
     "ordine-missione-anticipo": {
         "title": "RICHIESTA ANTICIPO PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
         "form": {
@@ -230,31 +268,7 @@
             "print": "Stampa Richiesta Anticipo"
         }
     },
-    "ordine-missione-taxi": {
-        "title": "RICHIESTA TAXI PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
-        "form": {
-            "importo": "Importo Taxi*",
-            "note": "Note",
-            "note.placeholder": "Inserire eventuali Annotazioni",
-            "box-dati": "Dati Generali"
-        },
-        "button": {
-            "print": "Stampa Richiesta Taxi"
-        }
-    },
 
-    "ordine-missione-auto-noleggio": {
-        "title": "RICHIESTA NOLEGGIO AUTO PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
-        "form": {
-            "importo": "Importo auto da noleggiare*",
-            "note": "Note",
-            "note.placeholder": "Inserire eventuali Annotazioni",
-            "box-dati": "Dati Generali"
-        },
-        "button": {
-            "print": "Stampa Richiesta Noleggio Auto"
-        }
-    },
 
     "datiPatente": {
         "title": "Dati Patente di {{lastname}} {{firstname}} ",
