@@ -53,6 +53,8 @@ public class Costanti {
     public final static String NOME_STAMPA_ORDINE = "ordine";
     public final static String NOME_STAMPA_RIMBORSO = "rimborso";
     public final static String NOME_STAMPA_AUTO_PROPRIA = "autoPropria";
+    public final static String NOME_STAMPA_TAXI = "taxi";
+
     public final static String NOME_STAMPA_ANTICIPO = "anticipo";
     public final static String PARAMETER_DATA_SOURCE_FOR_PRINT = "REPORT_DATA_SOURCE";
 

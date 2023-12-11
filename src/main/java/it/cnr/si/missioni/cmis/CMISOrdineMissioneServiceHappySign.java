@@ -74,25 +74,25 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
         try {
 
-                if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
-                    ordineMissioneService.popolaCoda(ordineMissione);
-                } else {
-                    List<StorageObject> allegatiMissione= new ArrayList<StorageObject>();
-                    if ( anticipo!=null)
-                        allegatiMissione.add( documentoAnticipo);
-                    if ( documentoAutoPropria!=null)
-                        allegatiMissione.add( documentoAutoPropria);
-                    String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
+            if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                ordineMissioneService.popolaCoda(ordineMissione);
+            } else {
+                List<StorageObject> allegatiMissione= new ArrayList<StorageObject>();
+                if ( anticipo!=null)
+                    allegatiMissione.add( documentoAnticipo);
+                if ( documentoAutoPropria!=null)
+                    allegatiMissione.add( documentoAutoPropria);
+                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
 
-                    if (!StringUtils.isEmpty(idFlusso)) {
-                        ordineMissione.setIdFlusso(idFlusso);
-                        if (anticipo != null) {
-                            anticipo.setIdFlusso(idFlusso);
-                        }
+                if (!StringUtils.isEmpty(idFlusso)) {
+                    ordineMissione.setIdFlusso(idFlusso);
+                    if (anticipo != null) {
+                        anticipo.setIdFlusso(idFlusso);
                     }
-                    ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-
                 }
+                ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+            }
         } catch (Exception e) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }

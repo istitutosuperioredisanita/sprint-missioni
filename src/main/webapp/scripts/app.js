@@ -292,6 +292,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+               .when('/ordine-missione/taxi/:idOrdineMissione/:validazione?', {
+                   templateUrl: 'views/ordine-missione/taxi.html',
+                   controller: 'TaxiOrdineMissioneController',
+                   access: {
+                       authorizedRoles: [USER_ROLES.user]
+                   }
+               })
                 .when('/password', {
                     templateUrl: 'views/password.html',
                     controller: 'PasswordController',

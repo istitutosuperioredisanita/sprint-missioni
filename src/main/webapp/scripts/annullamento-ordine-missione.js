@@ -765,7 +765,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
 
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/deleteAttachment/' + attachment.id);
+        var x = $http.delete('api/rest/deleteAttachment?id=' + attachment.id);
         var y = x.then(function (result) {
             var attachments = $scope.annullamentoModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
