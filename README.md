@@ -77,5 +77,5 @@ docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=showcase,swagger consiglionazi
 ```
 ![Startup](docs/screenshot/startup_showcase.png)
 
-Collegarsi a http://localhost:8080 username: **_user_** ***REMOVED*** oppure come amministratore del sistema, username: **_***REMOVED***_** ***REMOVED*** 
+Collegarsi a http://localhost:8080 username: **_user_** password: **_user_**, oppure come amministratore del sistema, username: **_***REMOVED***_** password: **_***REMOVED***_** 
 

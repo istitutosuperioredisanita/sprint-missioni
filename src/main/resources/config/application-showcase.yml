@@ -126,7 +126,7 @@ spring:
     url: jdbc:h2:file:./DB-H2/misioni;DB_CLOSE_DELAY=-1
     name: missioni
     username: missioni
-    ***REMOVED***
+    password: ***REMOVED***
 
   proxy:
     SIGLA:
@@ -166,7 +166,7 @@ jhipster:
     authentication:
       oauth:
         clientid: sprintapp
-        ***REMOVED***
+        secret: ***REMOVED***
         tokenValidityInSeconds: 1800
   swagger:
     title: sprint API

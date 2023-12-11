@@ -63,7 +63,7 @@ jhipster:
         authentication:
             oauth:
                 clientid: sprintapp
-                ***REMOVED***
+                secret: ***REMOVED***
                 # Token is valid 30 minutes
                 tokenValidityInSeconds: 1800
         rememberme:

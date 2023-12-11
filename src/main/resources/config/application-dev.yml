@@ -38,7 +38,7 @@ spring:
       password: 
     OIL:
       username: ${spring.proxy.vecchiaScrivania.username}
-      ***REMOVED***
+      password: ${spring.proxy.vecchiaScrivania.password}
       url: https://helpdesk.amministrazione.cnr.it/hd/rest/
       newProblem: pest
       instance: /HDSiper
@@ -83,12 +83,12 @@ management:
 siper:
   url: https://siper.cnr.it/siper/
   username: ${spring.proxy.vecchiaScrivania.username}
-  ***REMOVED***
+  password: ${spring.proxy.vecchiaScrivania.password}
 
 ace:
   url: http://ace-webapp.test.si.cnr.it:5555/api
   username: ${spring.proxy.vecchiaScrivania.username}
-  ***REMOVED***
+  password: ${spring.proxy.vecchiaScrivania.password}
 
 authJWT:
   username: ace
@@ -97,7 +97,7 @@ authJWT:
 user:
   ***REMOVED***:
     username: ${spring.proxy.vecchiaScrivania.username}
-    ***REMOVED***
+    password: ${spring.proxy.vecchiaScrivania.password}
 
 flows:
   resource: http://as3dock.si.cnr.it:9200
@@ -111,7 +111,7 @@ flows:
   processDefinitionId: missioni
   currentTask: ${flows.processInstance}/currentTask
   username: ${spring.proxy.vecchiaScrivania.username}
-  ***REMOVED***
+  password: ${spring.proxy.vecchiaScrivania.password}
   clientId: sprintapp
   clientSecret: ***REMOVED***
 
@@ -141,7 +141,7 @@ org.apache.chemistry.opencmis.binding.spi.type: atompub
 org.apache.chemistry.opencmis.binding.connecttimeout: 40000
 org.apache.chemistry.opencmis.binding.readtimeout: 3000000
 org.apache.chemistry.opencmis.user: ***REMOVED***
-org.apache.chemistry.opencmis.***REMOVED***
+org.apache.chemistry.opencmis.password: ***REMOVED***
 org.apache.chemistry.opencmis.binding.httpinvoker.classname: org.apache.chemistry.opencmis.client.bindings.spi.http.DefaultHttpInvoker
 
 cache:
@@ -182,7 +182,7 @@ jhipster:
     authentication:
       oauth:
         clientid: sprintapp
-        ***REMOVED***
+        secret: ***REMOVED***
         # Token is valid 30 minutes
         tokenValidityInSeconds: 1800
 

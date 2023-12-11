@@ -276,7 +276,7 @@ missioniApp.controller('LoginController', function ($rootScope, $scope, $locatio
         $scope.login = function () {
             AuthenticationSharedService.login({
                 username: $scope.username,
-                ***REMOVED***
+                password: $scope.password
             });
         }
     });
