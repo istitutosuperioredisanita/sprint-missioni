@@ -105,6 +105,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected PrintOrdineMissioneAnticipoService printOrdineMissioneAnticipoService;
 
     @Autowired
+    protected PrintOrdineMissioneTaxiService printOrdineMissioneTaxiService;
+
+    @Autowired
     protected UtentiPresidenteSpecialiService utentiPresidenteSpecialeService;
 
     @Autowired
@@ -612,6 +615,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
+    public StorageObject getObjectTaxiOrdineMissione(OrdineMissioneTaxi taxi) throws ComponentException {
+        StorageObject node = recuperoFolderOrdineMissione(taxi.getOrdineMissione());
+        List<StorageObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value());
+        if (ant.size() == 0)
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono taxi collegati all'Ordine di Missione. ID Taxi:" + taxi.getId());
+        else if (ant.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files taxi di missione aventi l'ID :" + taxi.getId());
+        } else {
+            StorageObject nodeFile = ant.get(0);
+            return nodeFile;
+        }
+    }
+
     public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {
         return getObjectOrdineMissione(ordineMissione).getKey();
     }
@@ -649,6 +665,23 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
+
+    public StorageObject getStorageOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+        OrdineMissione ordineMissione = ordineMissioneTaxi.getOrdineMissione();
+        StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
+        List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value());
+
+        if (objs.size() == 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta anticipo dell'Ordine di Missione. ID Ordine di Missione:" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        } else if (objs.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files di annullamento dell'ordine di missione aventi l'ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        } else {
+            return objs.get(0);
+        }
+    }
+
+
+
     public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
         OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
@@ -678,9 +711,26 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di auto propria per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         }
         if( objs.size()>0)
-             return objs.get(0).getKey();
+            return objs.get(0).getKey();
         return null;
     }
+
+
+    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws ComponentException {
+        OrdineMissione ordineMissione = ordineMissioneTaxi.getOrdineMissione();
+        StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
+        List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_TAXI.value());
+
+        if (objs.size() == 0 && erroreSeNonTrovato) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta di taxi per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        } else if (objs.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di taxi per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        }
+        if( objs.size()>0)
+            return objs.get(0).getKey();
+        return null;
+    }
+
 
     public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) {
         OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
@@ -742,6 +792,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissioneAnticipo.CMIS_PROPERTY_NAME_DOC_ANTICIPO);
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissioneAnticipo.CMIS_PROPERTY_NAME_TIPODOC_ANTICIPO);
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissioneAnticipo.CMIS_PROPERTY_NAME_TIPODOC_ANTICIPO);
+        return metadataProperties;
+    }
+
+    public Map<String, Object> createMetadataForFileOrdineMissioneTaxi(String currentLogin, OrdineMissioneTaxi taxi) {
+        Map<String, Object> metadataProperties = new HashMap<String, Object>();
+        metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
+        metadataProperties.put(MissioniCMISService.PROPERTY_NAME, taxi.getFileName());
+        metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Taxi per l'Ordine Missione - anno " + taxi.getOrdineMissione().getAnno() + " numero " + taxi.getOrdineMissione().getNumero()));
+        metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Taxi Ordine di Missione"));
+        metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
+        metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_DOC_TAXI);
+        metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_TIPODOC_TAXI);
+        metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_TIPODOC_TAXI);
         return metadataProperties;
     }
 
@@ -837,9 +900,44 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
+    @Transactional(readOnly = true)
+    public StorageObject salvaStampaTaxiSuCMIS(String currentLogin, byte[] stampa,
+                                                   OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+        InputStream streamStampa = new ByteArrayInputStream(stampa);
+        String path = createFolderOrdineMissione(ordineMissioneTaxi.getOrdineMissione());
+        Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneTaxi(currentLogin, ordineMissioneTaxi);
+        try {
+            StorageObject node = null;
+            if (!ordineMissioneTaxi.getOrdineMissione().isStatoInviatoAlFlusso()) {
+                node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
+                        MimeTypes.PDF.mimetype(), ordineMissioneTaxi.getFileName(), StoragePath.construct(path));
+
+            } else {
+                node = getObjectTaxiOrdineMissione(ordineMissioneTaxi);
+                node = missioniCMISService.updateStream(node.getKey(), streamStampa, MimeTypes.PDF.mimetype());
+                missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+            }
+
+            missioniCMISService.addAspect(node,
+                    CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value());
+            return node;
+        } catch (Exception e) {
+            if (e.getCause() instanceof StorageException)
+                throw new ComponentException("File [" + ordineMissioneTaxi.getFileName()
+                        + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
+                    + Utility.getMessageException(e) + ")", e);
+        }
+    }
+
     protected StorageObject creaDocumentoAnticipo(String username, OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException, ComponentException {
         byte[] print = printOrdineMissioneAnticipoService.printOrdineMissioneAnticipo(ordineMissioneAnticipo, username);
         return salvaStampaAnticipoSuCMIS(username, print, ordineMissioneAnticipo);
+    }
+
+    protected StorageObject creaDocumentoTaxi(String username, OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException, ComponentException {
+        byte[] print = printOrdineMissioneTaxiService.printOrdineMissioneTaxi(ordineMissioneTaxi, username);
+        return salvaStampaTaxiSuCMIS(username, print, ordineMissioneTaxi);
     }
 
     protected StorageObject creaDocumentoAutoPropria(String username, OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException, ComponentException {
@@ -850,6 +948,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     public List<CMISFileAttachment> getAttachmentsAnticipo(OrdineMissione ordineMissione, Long idAnticipo) {
         List<StorageObject> documents = getAttachmentsAnticipo(ordineMissione);
         return creaCMISFileAttachment(idAnticipo, documents);
+    }
+
+    public List<CMISFileAttachment> getAttachmentsTaxi(OrdineMissione ordineMissione, Long idTaxi) {
+        List<StorageObject> documents = getAttachmentsTaxi(ordineMissione);
+        return creaCMISFileAttachment(idTaxi, documents);
     }
 
     private List<CMISFileAttachment> creaCMISFileAttachment(Long id, List<StorageObject> documents) {
@@ -877,6 +980,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
     }
 
+    public List<StorageObject> getAttachmentsTaxi(OrdineMissione ordineMissione) {
+        StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
+        return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value());
+    }
+
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione) {
         return getDocumentsOrdineMissione(ordineMissione, false);
     }
@@ -895,6 +1003,18 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             cmisFileAttachment.setId(so.getKey());
             cmisFileAttachment.setNomeFile(name);
             cmisFileAttachment.setIdMissione(idAnticipo);
+            return cmisFileAttachment;
+        }
+        return null;
+    }
+
+    public CMISFileAttachment uploadAttachmentTaxi(OrdineMissione ordineMissione, Long idTaxi, InputStream inputStream, String name, MimeTypes mimeTypes) {
+        StorageObject so = salvaAllegatoTaxiCMIS(ordineMissione, inputStream, name, mimeTypes);
+        if (so != null) {
+            CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+            cmisFileAttachment.setId(so.getKey());
+            cmisFileAttachment.setNomeFile(name);
+            cmisFileAttachment.setIdMissione(idTaxi);
             return cmisFileAttachment;
         }
         return null;
@@ -921,6 +1041,30 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
+
+
+    private StorageObject salvaAllegatoTaxiCMIS(
+            OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {
+
+        StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
+
+        Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_TAXI);
+        try {
+            StorageObject so = missioniCMISService.restoreSimpleDocument(
+                    metadataProperties,
+                    stream,
+                    mimeTypes.mimetype(),
+                    fileName,
+                    cmisPath);
+            missioniCMISService.addAspect(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value());
+            return so;
+        } catch (Exception e) {
+            if (e.getCause() instanceof StorageException)
+                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+        }
+    }
+
 
     private StoragePath buildFolderOrdineMissione(OrdineMissione ordineMissione) {
         StorageObject folder = recuperoFolderOrdineMissione(ordineMissione);
@@ -1010,6 +1154,31 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             }
             Map<String, byte[]> map = new HashMap<String, byte[]>();
             map.put(fileName, printAnticipo);
+            return map;
+        }
+        throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
+    }
+
+
+    public Map<String, byte[]> getFileOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) {
+        String fileName = null;
+        byte[] printTaxi = null;
+        StorageObject storage = getStorageOrdineMissioneTaxi(ordineMissioneTaxi);
+        if (storage != null) {
+            fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+            InputStream is = missioniCMISService.recuperoStreamFileFromObjectID(storage.getKey());
+            if (is != null) {
+                try {
+                    printTaxi = IOUtils.toByteArray(is);
+                    is.close();
+                } catch (IOException e) {
+                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                }
+            } else {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
+            }
+            Map<String, byte[]> map = new HashMap<String, byte[]>();
+            map.put(fileName, printTaxi);
             return map;
         }
         throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");

@@ -206,8 +206,8 @@
             "auto-propria": "Dati Auto Propria",
             "percorso-da": "Percorso Da",
             "percorso-a": "Percorso A",
-            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
-            "motivi-urgenza": "Per Attività caratterizzata da emergenza, urgenza, indifferibilità",
+            "motivi-ispettivi": "Il soggetto incaricato sia impegnato nello svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
+            "motivi-urgenza": "L’attività sia caratterizzata da emergenza, urgenza, indifferibilità, tra cui i casi di mancanza assoluta di mezzi di trasporto",
             "motivi-trasporto": "Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
             "altri-motivi": "Altri motivi (specificare)",
             "addSpostamento": "Aggiungi Spostamento",
@@ -230,6 +230,42 @@
             "print": "Stampa Richiesta Anticipo"
         }
     },
+    "ordine-missione-taxi": {
+        "title": "RICHIESTA TAXI PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "NB-title" : "NB",
+        "NB-text" : "Ai fini del rimborso le ricevute rilasciate dai taxi devono indicare obbligatoriamente l’importo, il nominativo del beneficiario, il percorso effettuato, la data e l’orario.",
+        "form": {
+            "dati-patente": "Dati Patente",
+            "taxi": "Dati Taxi",
+            "percorso-da": "Percorso Da",
+            "percorso-a": "Percorso A",
+            "mancanza-assoluta-mezzi-pubblici": "Mancanza assoluta di mezzi pubblici",
+            "mancanza-non-assoluta-mezzi-pubblici": "Mancanza di mezzi pubblici per sospensione del servizio per sciopero, per eventi eccezionali opportunamente documentati",
+            "necessità-trasporto-materiale": "Necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva </br> ed elenco dettagliato del materiale trasportato)",
+            "motivi-handicap-disabilità": "Personale con disabilità/portatore di handicap",
+            "altri-motivi": "Altri motivi (specificare)",
+            "addSpostamento": "Aggiungi Spostamento",
+            "box-dati": "Dati Generali",
+            "box-spostamenti": "Spostamenti"
+        },
+        "button": {
+            "print": "Stampa Richiesta Taxi"
+        }
+    },
+
+    "ordine-missione-auto-noleggio": {
+        "title": "RICHIESTA NOLEGGIO AUTO PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "form": {
+            "importo": "Importo auto da noleggiare*",
+            "note": "Note",
+            "note.placeholder": "Inserire eventuali Annotazioni",
+            "box-dati": "Dati Generali"
+        },
+        "button": {
+            "print": "Stampa Richiesta Noleggio Auto"
+        }
+    },
+
     "datiPatente": {
         "title": "Dati Patente di {{lastname}} {{firstname}} ",
         "form": {
@@ -306,8 +342,8 @@
             "data-fine": "Data Fine (Presunta)",
             "data-fine-obbligatoria": "Data Fine (Presunta)*",
             "data-fine.placeholder": "Data presunta di Fine della Missione",
-            "note-utilizzo-taxi-noleggio": "Note Taxi/Auto a Noleggio/Auto di Servizio",
-            "note-utilizzo-taxi-noleggio.placeholder": "Motivazione per l'Utilizzo del Taxi/Auto a Noleggio/Auto di Servizio e per il Personale al Seguito .",
+            "note-utilizzo-taxi-noleggio": "Note Auto a Noleggio",
+            "note-utilizzo-taxi-noleggio.placeholder": "Dettagliare il caso di motivata eccezionalità.",
             "note-segreteria": "Note per il direttore",
             "note-segreteria.placeholder": "Inserire eventuali note che il direttore può visualizzare in fase di autorizzazione",
             "importo-presunto": "Importo Presunto €",
@@ -327,6 +363,10 @@
             "print": "Stampa Ordine di Missione",
             "auto-propria-si": "Richiesta Utilizzo Auto Propria: Sì",
             "auto-propria-no": "Richiesta Utilizzo Auto Propria: No",
+            "taxi-si": "Richiesta Utilizzo Taxi: Sì",
+            "taxi-no": "Richiesta Utilizzo Taxi: No",
+            "auto-noleggio-si": "Richiesta Utilizzo Auto Noleggio: Sì",
+            "auto-noleggio-no": "Richiesta Utilizzo Auto Noleggio: No",
             "sendToManager": "Invia al Responsabile del gruppo",
             "sendToManagerShort": "Invia al Responsabile",
             "anticipo-si": "Richiesta Anticipo: Sì",
@@ -452,7 +492,7 @@
             "presidenza": "Presidenza",
             "ordine-missione.placeholder": "Selezionare l'Ordine di Missione",
             "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
-		},
+        },
         "button": {
             "sendToSign": "Invia alla Firma",
             "returnToSender": "Respingi al Mittente",
@@ -559,22 +599,22 @@
         "form": {
             "box-dettaglio-spese": "Dettaglio Spese",
             "dettaglio-spese": {
-                    "data": "Data*",
-                    "totale-dettagli" : "Totale Dettagli Spesa",
-                    "totale-dettagli-non-anticipati" : "Totale Dettagli Spesa Non Anticipati",
-                    "tipologia-spesa" : "Tipologia di Spesa*",
-                    "ds-spesa" : "Descrizione Spesa*",
-                    "tipologia-pasto" : "Tipo Pasto*",
-                    "importo": "Importo €*",
-                    "importoSenzaSimbolo": "Importo",
-                    "spesa-anticipata": "Spesa Anticipata dall'ente",
-                    "download-file": "Download File",
-                    "remove-file": "Elimina File",
-                    "km": "Km percorsi*",
-                    "impegno": "Impegno",
-                    "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
-                    "localita-spostamento": "Località Spostamento*"
-                },
+                "data": "Data*",
+                "totale-dettagli" : "Totale Dettagli Spesa",
+                "totale-dettagli-non-anticipati" : "Totale Dettagli Spesa Non Anticipati",
+                "tipologia-spesa" : "Tipologia di Spesa*",
+                "ds-spesa" : "Descrizione Spesa*",
+                "tipologia-pasto" : "Tipo Pasto*",
+                "importo": "Importo €*",
+                "importoSenzaSimbolo": "Importo",
+                "spesa-anticipata": "Spesa Anticipata dall'ente",
+                "download-file": "Download File",
+                "remove-file": "Elimina File",
+                "km": "Km percorsi*",
+                "impegno": "Impegno",
+                "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
+                "localita-spostamento": "Località Spostamento*"
+            },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"
         }
     },
@@ -902,3 +942,6 @@
     },
     "footer": "This is your footer"
 }
+
+
+
