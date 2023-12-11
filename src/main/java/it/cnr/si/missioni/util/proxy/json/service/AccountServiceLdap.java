@@ -325,8 +325,11 @@ public class AccountServiceLdap extends AbstractAccountService{
             Account account = new Account(getUserInfo(currentUser));
             List ruolo = new ArrayList<String>();
             ruolo.add(AuthoritiesConstants.USER);
-            if ( "ciro.salvio@iss.it".equalsIgnoreCase(currentUser))
-                ruolo.add(AuthoritiesConstants.ADMIN);
+            if ( "ciro.salvio@iss.it".equalsIgnoreCase(currentUser)) {
+                ruolo.add( AuthoritiesConstants.ADMIN);
+                ruolo.add( Costanti.ROLE_ADMIN);
+
+            }
             account.setInternalRoles(ruolo);
             account.setUid(securityService.getCurrentUserLogin());
 
