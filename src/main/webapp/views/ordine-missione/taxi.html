@@ -1,0 +1,265 @@
+<!--
+  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+  ~
+  ~      This program is free software: you can redistribute it and/or modify
+  ~      it under the terms of the GNU Affero General Public License as
+  ~      published by the Free Software Foundation, either version 3 of the
+  ~      License, or (at your option) any later version.
+  ~
+  ~      This program is distributed in the hope that it will be useful,
+  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~      GNU Affero General Public License for more details.
+  ~
+  ~      You should have received a copy of the GNU Affero General Public License
+  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~
+-->
+
+<div class="container-fluid">
+    <h4 center translate="ordine-missione-taxi.title" translate-values="{numeroOrdineMissione: '{{taxiOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{taxiOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">Ordine di missione</b></h4>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading color-celeste-avion text-center">
+                    <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <info-account account="accountModel"></info-account>
+                </div>
+            </div>
+            <div class="panel panel-success">
+                <div class="panel-heading color-verde-scuro text-center">
+                    <h3 class="panel-title color-verde-scuro" translate="ordine-missione-taxi.form.box-dati">Dati Generali</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <div class="col-md-12 well highlight" ng-show="isDisabilitataModificaAuto()">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.mancanza-assoluta-mezzi-pubblici">mancanza assoluta mezzi pubblici</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.mancanzaAssMezzi" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.mancanza-non-assoluta-mezzi-pubblici">mancanza NON assoluta mezzi pubblici</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.mancanzaMezzi" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.necessità-trasporto-materiale">necessità trasporto materiale</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.trasportoMateriali" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.motivi-handicap-disabilità">motivi handicap disabilità</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.motiviHandicap" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.altri-motivi">altri motivi</span>
+                                    <textarea ng-disabled="disabledfields" class="input-sm form-control" name="altriMotivi" ng-model="taxiOrdineMissioneModel.utilizzoAltriMotivi" rows="2"></textarea>
+                                </span>
+                            </p>
+                        </form>
+                    </div>
+                    <div class="col-md-12 well highlight" ng-hide="isDisabilitataModificaAuto()">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.mancanza-assoluta-mezzi-pubblici">mancanza assoluta mezzi pubblici</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.mancanzaAssMezzi" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.mancanza-non-assoluta-mezzi-pubblici">mancanza NON assoluta mezzi pubblici</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.mancanzaMezzi" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.necessità-trasporto-materiale">necessità trasporto materiale</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.trasportoMateriali" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.motivi-handicap-disabilità">motivi handicap disabilità</span>
+                                    <label class="checkbox">
+                                        <input ng-disabled="disabledfields" type="checkbox" ng-model="taxiOrdineMissioneModel.motiviHandicap" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.altri-motivi">altri motivi</span>
+                                    <textarea ng-disabled="disabledfields" class="input-sm form-control" name="altriMotivi" ng-model="taxiOrdineMissioneModel.utilizzoAltriMotivi" rows="2"></textarea>
+                                </span>
+                            </p>
+                        </form>
+                    </div>
+
+                    <div class="col-md-12">
+                        <button ng-show="validazione == 'N' && disabledfields" class="btn btn-outline" ng-click="edit()" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                    </div>
+                    <div class="col-md-1">
+                        <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                    </div>
+                    <div class="col-md-1">
+                        <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                    </div>
+
+                </div>
+            </div>
+
+            <form class="form-inline" role="form" id="missioni">
+                <div class="panel panel-default" ng-if="taxiOrdineMissioneModel.id && (taxiOrdineMissioneModel.isFireSearchAttachments == true || taxiOrdineMissioneModel.isFireSearchAttachments == false )">
+                    <div class="panel-heading color-verde-chiaro text-center">
+                        <h1 class="panel-title">Allegati</h1>
+                    </div>
+                    <div class="panel-body my-panel-body">
+                        <div>
+                            <ul class="list-unstyled taxiOrdineMissioneModel.attachments" ng-show="taxiOrdineMissioneModel.attachmentsExists=true">
+                                <li ng-repeat="attachment in taxiOrdineMissioneModel.attachments">
+                                    <span class="glyphicon glyphicon-download-alt"></span>
+                                    <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                                    <button ng-show="!isOrdineMissioneConfermato && validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                                </li>
+                            </ul>
+                            <h4 >
+                                <div class="row fileupload-buttonbar">
+                                    <span ng-hide="taxiOrdineMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                                    <ng-upload-form disabilita="isOrdineMissioneConfermato" validazione="validazione" is-finish-rest-attachments="taxiOrdineMissioneModel.isFireSearchAttachments" url="api/rest/public/ordineMissione/taxi/uploadAllegati?idTaxi={{taxiOrdineMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="taxiOrdineMissioneModel" size-limit="500000"></ng-upload-form>
+                                </div>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+
+            <div class="panel panel-success" >
+                <div class="panel-heading color-rosso-mattone text-center">
+                    <h3 class="panel-title color-rosso-mattone" translate="ordine-missione-taxi.form.box-spostamenti">Spostamenti</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+
+                    <button ng-disabled="addSpostamentoTaxi || !taxiOrdineMissioneModel.id || validazione != 'N'" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'ordine-missione-taxi.form.addSpostamento' | translate}}" ng-click="aggiungiRigaSpostamento()">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <table class="table table-condensed table-striped table-bordered table-responsive">
+                        <tr>
+                            <th>{{'ordine-missione-taxi.form.percorso-da' | translate}}</th>
+                            <th>{{'ordine-missione-taxi.form.percorso-a' | translate}}</th>
+                        </tr>
+                        <tbody id ="missioni" ng-show = "taxiOrdineMissioneModel.id">
+                        <tr ng-repeat="spostamentoTaxi in spostamentiTaxi">
+                            <td ng-hide="spostamentoTaxi.editing" class="col-md-6" style="text-align: left" >{{spostamentoTaxi.percorsoDa}}</td>
+                            <td ng-show="spostamentoTaxi.editing" class="col-xs-6" style="text-align:left">
+                                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoTaxi.percorsoDa" required maxlength="256">
+                            </td>
+                            <td ng-hide="spostamentoTaxi.editing" class="col-md-6" style="text-align: left">{{spostamentoTaxi.percorsoA}}</td>
+                            <td ng-show="spostamentoTaxi.editing" class="col-xs-6" style="text-align:left">
+                                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="spostamentoTaxi.percorsoA" required maxlength="256">
+                            </td>
+                            <td ng-hide="spostamentoTaxi.editing">
+                                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="editSpostamento(spostamentoTaxi)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                            </td>
+                            <td ng-hide="spostamentoTaxi.editing">
+                                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="confirmDeleteSpostamenti($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                            </td>
+                            <td ng-show="spostamentoTaxi.editing">
+                                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="modifySpostamento(spostamentoTaxi)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                            </td>
+                            <td ng-show="spostamentoTaxi.editing">
+                                <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoSpostamento(spostamentoTaxi)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                            </td>
+                        </tr>
+
+
+                        <tr ng-show="addSpostamentoTaxi" id="spostamentoAddTaxi">
+
+                            <td class="col-xs-6">
+                                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="newSpostamentoTaxi.percorsoDa" maxlength="256"</input>
+                            </td>
+                            <td class="col-xs-6">
+                                <input ng-disabled="validazione != 'N'" class="form-control" ng-model="newSpostamentoTaxi.percorsoA" maxlength="256"</input>
+                            </td>
+                            <td style="text-align: left">
+                                <form class="form-inline" role="form">
+                                    <div class="form-group btn-group">
+                                        <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="insertSpostamentoTaxi(newSpostamentoTaxi)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                                    </div>
+                                </form>
+                            </td>
+                            <td style="text-align: left">
+                                <form class="form-inline" role="form">
+                                    <div class="form-group btn-group">
+                                        <button ng-show="validazione == 'N'" class="btn btn-sm btn-link" ng-click="undoAddSpostamentoTaxi()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="col-xs-3" ng-show="taxiOrdineMissioneModel.id">
+                <a target="_blank" href="api/rest/public/printOrdineMissioneTaxi?idMissione={{idOrdineMissione}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione-taxi.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
+            </div>
+            <form name="form-inline" role="form" ng-submit="confirmDelete()">
+                <div class="col-xs-1" ng-show="taxiOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
+                    <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-md-11">
+            <ul class="pager">
+                <li class="previous"><a ng-click="previousPage()" translate="global.button.close" class="ng-scope">Chiudi</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+
