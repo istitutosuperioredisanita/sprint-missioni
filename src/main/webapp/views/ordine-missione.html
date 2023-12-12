@@ -1,4 +1,3 @@
-
 <!--
   ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
   ~
@@ -25,7 +24,7 @@
         <b>{{'missione.form.numero' | translate}}:</b> {{ordineMissioneModel.anno+"/"+ordineMissioneModel.numero}}  -
         <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{ordineMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  -
         <b>  {{'missione.form.stato' | translate}}: </b>{{ordineMissioneModel.decodeStato}}  -
-        <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{'missione.form.'+ordineMissioneModel.translateStatoFlusso | translate}} </span>
+        <span ng-show="ordineMissioneModel.statoFlusso && ordineMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{'missione.form.'+ordineMissioneModel.translateStatoFlusso | translate}}
     </div>
     <div  class="my-panel-body panel panel-success" ng-show="ordineMissioneModel.commentoFlusso && ordineMissioneModel.stato == 'INS'  && (ordineMissioneModel.statoFlusso == 'RUO' ||  ordineMissioneModel.statoFlusso == 'RUS')" align="center">
         <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{ordineMissioneModel.commentoFlusso}}
@@ -181,7 +180,7 @@
                             <span class="input-group-addon" translate="missione.form.oggetto-obbligatorio">oggetto</span>
                             <textarea ng-disabled="validazione || disabilitaOrdineMissione"
                                       class="input-sm form-control" name="oggetto" placeholder="{{'missione.form.oggetto.placeholder' | translate}}" ng-model="ordineMissioneModel.oggetto" rows = "2">
-                            </textarea>
+                            </textarea> 
                         </span>
                         </p>
                     </form>
@@ -238,7 +237,7 @@
                             <span class="input-group-addon" translate="missione.form.note">note</span>
                             <textarea ng-disabled="validazione || disabilitaOrdineMissione"
                                       class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="ordineMissioneModel.note" rows = "2">
-                            </textarea>
+                            </textarea> 
                         </span>
                         </p>
                     </form>
@@ -412,14 +411,14 @@
                             <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="ordineMissioneModel.cup"/>
                         </span>
                         </p>
-                        <!--<p class="col-md-2">
+                        <p class="col-md-2">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.cug">Missione CUG</span>
                               <label class="checkbox">
                                       <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.cug" ng-true-value="S" ng-false-value="N">
                               </label>
                           </span>
-                        </p>-->
+                        </p>
                         <p class="col-md-2">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
@@ -465,7 +464,7 @@
                             <span class="input-group-addon" translate="ordine-missione.form.note-segreteria">Note Segreteria</span>
                             <textarea
                                     class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="ordineMissioneModel.noteSegreteria" rows = "2">
-                            </textarea>
+                            </textarea> 
                         </span>
                         </p>
                     </form>
@@ -491,32 +490,29 @@
                             </ui-select>
                         </span>
                         </p>
+
+
+
                     </form>
-                    <!--<form class="form-inline" role="form" id="missioni">
+                    <form class="form-inline" role="form" id="missioni">
                         <div class="col-md-3">
-        <span class="input-group">
-            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
-            <label class="checkbox">
-                <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
-            </label>
-        </span>
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
                         </div>
-                        <div class="col-md-3">
-        <span class="input-group">
-            <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">personale al seguito</span>
-            <label class="checkbox">
-                <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
-            </label>
-        </span>
-                        </div>
-                    </form>-->
+                    </form>
 
                     <form class="form-inline" role="form" id="missioni">
                         <p class="col-md-12">
-        <span class="input-group">
-            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
-            <textarea ng-disabled="validazione || disabilitaOrdineMissione" class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="ordineMissioneModel.noteUtilizzoTaxiNoleggio" rows="2"></textarea>
-        </span>
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
+                            <textarea ng-disabled="validazione || disabilitaOrdineMissione"
+                                      class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="ordineMissioneModel.noteUtilizzoTaxiNoleggio" rows = "2">
+                            </textarea>
+                        </span>
                         </p>
                     </form>
 
@@ -526,18 +522,15 @@
                             <!-- Add other list items based on your requirements -->
                             <li><a ng-hide="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-no"></a></li>
                             <li><a ng-hide="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-no"></a></li>
-                            <li><a ng-hide="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-no"></a></li>
                             <li><a ng-hide="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-no">Anticipo</a></li>
 
                             <li><a ng-show="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si"></a></li>
                             <li><a ng-show="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-si"></a></li>
-                            <li><a ng-show="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-si"></a></li>
                             <li><a ng-show="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-si">Anticipo</a></li>
 
                             <cnr-modal-history id-missione="ordineMissioneModel.id" tipo-missione="'OR'"> </cnr-modal-history>
                         </ul>
                     </div>
-
                 </div>
             </div>
             <form class="form-inline col-md-12" role="form" id="missioni">
@@ -625,6 +618,3 @@
         </div>
     </div>
 </div>
-
-
-
