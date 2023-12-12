@@ -17,4 +17,26 @@
  *
  */
 
-//tabella sul db ancora da creare
+package it.cnr.si.missioni.repository;
+
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * Spring Data JPA repository for the OrdineMissioneTaxi entity.
+ */
+@Repository
+
+public interface OrdineMissioneTaxiRepository extends JpaRepository<OrdineMissioneTaxi, Long> {
+
+
+    @Query("select a from OrdineMissioneTaxi a where a.ordineMissione = ?1 and a.stato != 'ANN'")
+    OrdineMissioneTaxi getTaxi(OrdineMissione ordineMissione);
+
+
+}

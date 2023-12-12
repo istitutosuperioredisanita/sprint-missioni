@@ -19,19 +19,23 @@
 
 package it.cnr.si.missioni.repository;
 
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
+import it.cnr.si.missioni.domain.custom.persistence.SpostamentiTaxi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Spring Data JPA repository for the AutoPropria entity.
  */
-public interface OrdineMissioneAutoPropriaRepository extends
-        JpaRepository<OrdineMissioneAutoPropria, Long> {
+public interface SpostamentiTaxiRepository extends
+        JpaRepository<SpostamentiTaxi, Long> {
 
-    @Query("select a from OrdineMissioneAutoPropria a where a.ordineMissione = ?1 and a.stato != 'ANN'")
-    OrdineMissioneAutoPropria getAutoPropria(OrdineMissione ordineMissione);
+    @Query("select a from SpostamentiTaxi a where a.taxi = ?1 and stato != 'ANN' order by riga")
+    List<SpostamentiTaxi> getSpostamenti(OrdineMissioneTaxi ordineMissioneTaxi);
 
+    @Query("select max(riga) from SpostamentiTaxi a where a.taxi = ?1")
+    Long getMaxRigaSpostamenti(OrdineMissioneTaxi ordineMissioneTaxi);
 }

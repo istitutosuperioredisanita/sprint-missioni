@@ -37,6 +37,7 @@ import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneTaxiRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -83,6 +84,8 @@ public class OrdineMissioneService {
     SecurityService securityService;
     @Autowired
     OrdineMissioneAutoPropriaRepository OrdineMissioneAutoPropriaRepository;
+    @Autowired
+    OrdineMissioneTaxiRepository ordineMissioneTaxiRepository;
     @Autowired
     private Environment env;
     @Autowired
@@ -201,6 +204,10 @@ public class OrdineMissioneService {
                 OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissione);
                 if (anticipo != null) {
                     ordineMissione.setRichiestaAnticipo("S");
+                }
+                OrdineMissioneTaxi taxi = getTaxi(ordineMissione);
+                if(taxi != null){
+                    ordineMissione.setUtilizzoTaxi("S");
                 }
             }
 
@@ -789,6 +796,10 @@ public class OrdineMissioneService {
 
     public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione ordineMissione) {
         return OrdineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
+    }
+
+    public OrdineMissioneTaxi getTaxi (OrdineMissione ordineMissione) {
+        return ordineMissioneTaxiRepository.getTaxi(ordineMissione);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -1477,7 +1488,7 @@ public class OrdineMissioneService {
                     && ordineMissione.getUtilizzoAutoServizio().equals("N")
                     && ordineMissione.getPersonaleAlSeguito().equals("N")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                        + ": Non è possibile indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio o del personale al seguito se non si è scelto il loro utilizzo");
+                        + ": Non è possibile indicare le note all'utilizzo dell'auto a noleggio se non si è scelto il suo utilizzo");
             }
         }
         // if (ordineMissione.getUtilizzoAutoServizio() != null &&
@@ -1494,7 +1505,7 @@ public class OrdineMissioneService {
                 || Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S"))
                 && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                    + ": E' obbligatorio indicare le note all'utilizzo del taxi o dell'auto a noleggio o dell'auto di servizio o del personale al seguito se si è scelto il loro utilizzo");
+                    + ": E' obbligatorio indicare le note all'utilizzo dell'auto a noleggio se si è scelto il suo utilizzo");
         }
         // if
         // ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")

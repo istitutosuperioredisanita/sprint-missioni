@@ -44,6 +44,7 @@ spring:
     ordine: /missioni/OrdineMissione.jrxml
     anticipo: /missioni/OrdineMissioneAnticipo.jrxml
     autoPropria: /missioni/OrdineMissioneAutoPropria.jrxml
+    taxi: /missioni/OrdineMissioneTaxi.jrxml
   messages:
     basename: i18n/messages
   mvc:

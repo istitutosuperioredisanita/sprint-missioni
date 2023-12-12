@@ -62,6 +62,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegato";
     public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO = "Allegati";
     public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO = "Allegati Anticipo";
+
+    public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_TAXI = "Allegati Taxi";
+
     public static final String CMIS_PROPERTY_NAME_TIPODOC_ORDINE = "Ordine di Missione";
     public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE = "cnrmissioni:descrizioneOrdine";
     public static final String CMIS_PROPERTY_FLOW_NOTE = "cnrmissioni:note";
