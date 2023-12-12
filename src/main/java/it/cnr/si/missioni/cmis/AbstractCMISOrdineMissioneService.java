@@ -117,6 +117,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
     @Autowired
+    protected OrdineMissioneTaxiService ordineMissioneTaxiService;
+    @Autowired
     protected OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
 
     @Autowired
@@ -141,6 +143,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             caricaDatiDerivati(ordineMissione);
             OrdineMissioneAnticipo anticipo = null;
             OrdineMissioneAutoPropria autoPropria = null;
+            OrdineMissioneTaxi taxi = null;
             if (ordineMissione != null) {
                 anticipo = ordineMissioneAnticipoService.getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
                 if (anticipo != null) {
@@ -153,6 +156,12 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     ordineMissione.setUtilizzoAutoPropria("S");
                 } else {
                     ordineMissione.setUtilizzoAutoPropria("N");
+                }
+                taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
+                if (taxi != null) {
+                    ordineMissione.setUtilizzoTaxi("S");
+                } else {
+                    ordineMissione.setUtilizzoTaxi("N");
                 }
             }
             String username = securityService.getCurrentUserLogin();
@@ -511,7 +520,10 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         StorageObject documento = salvaStampaOrdineMissioneSuCMIS(stampa, ordineMissione, cmisOrdineMissione);
         OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
         OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()), true);
+        OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
         StorageObject documentoAnticipo = null;
+        StorageObject documentoTaxi= null;
+
         List<StorageObject> allegati = new ArrayList<>();
         List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione, true);
         if (allegatiOrdineMissione != null && !allegatiOrdineMissione.isEmpty()) {
@@ -525,13 +537,21 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                 allegati.addAll(allegatiAnticipo);
             }
         }
-
-
         StorageObject documentoAutoPropria = null;
         if (autoPropria != null) {
             autoPropria.setOrdineMissione(ordineMissione);
             documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
         }
+
+        if (taxi != null) {
+            taxi.setOrdineMissione(ordineMissione);
+            documentoTaxi = creaDocumentoTaxi(username, taxi);
+            List<StorageObject> allegatiTaxi = getAttachmentsAnticipo(ordineMissione);
+            if (allegatiTaxi != null && !allegatiTaxi.isEmpty()) {
+                allegati.addAll(allegatiTaxi);
+            }
+        }
+
 
         if (!isActiveSignFlow()) {
             ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -543,10 +563,12 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return;
         }
 
+        //TODO
         sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, documento, anticipo, documentoAnticipo, allegati, documentoAutoPropria);
 
     }
 
+    //TODO
     protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documento, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria);
 
 
@@ -799,8 +821,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         Map<String, Object> metadataProperties = new HashMap<String, Object>();
         metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
         metadataProperties.put(MissioniCMISService.PROPERTY_NAME, taxi.getFileName());
-        metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Taxi per l'Ordine Missione - anno " + taxi.getOrdineMissione().getAnno() + " numero " + taxi.getOrdineMissione().getNumero()));
-        metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Taxi Ordine di Missione"));
+        metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Richiesta Taxi per l'Ordine Missione - anno " + taxi.getOrdineMissione().getAnno() + " numero " + taxi.getOrdineMissione().getNumero()));
+        metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Richiesta Taxi Ordine di Missione"));
         metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_DOC_TAXI);
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_TIPODOC_TAXI);
