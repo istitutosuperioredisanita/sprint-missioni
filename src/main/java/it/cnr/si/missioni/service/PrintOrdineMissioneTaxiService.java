@@ -94,7 +94,7 @@ public class PrintOrdineMissioneTaxiService {
         printOrdineMissioneTaxi.setUtilizzoAltriMotivi(Utility.nvl(ordineMissioneTaxi.getUtilizzoAltriMotivi()));
 
         if (ordineMissioneTaxi.getListSpostamenti() != null) {
-            List<SpostamentiTaxi> listSpostamentiPrint = new ArrayList<SpostamentiTaxi>();
+            List<SpostamentiTaxi> listSpostamentiPrint = new ArrayList<>();
             for (Iterator<SpostamentiTaxi> iterator = ordineMissioneTaxi.getListSpostamenti().iterator(); iterator.hasNext(); ) {
                 SpostamentiTaxi spostamenti = iterator.next();
                 SpostamentiTaxi spostamentiPrint = new SpostamentiTaxi();

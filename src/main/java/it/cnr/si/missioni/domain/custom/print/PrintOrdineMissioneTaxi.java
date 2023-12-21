@@ -49,7 +49,6 @@ import java.util.Map;
         "oggetto",
         "dataInizioMissione",
         "dataFineMissione",
-        "importoPresunto",
         "stato",
         "destinazione",
         "mancanzaAssMezzi",
@@ -99,8 +98,6 @@ public class PrintOrdineMissioneTaxi {
     private String dataInizioMissione;
     @JsonProperty("dataFineMissione")
     private String dataFineMissione;
-    @JsonProperty("importoPresunto")
-    private String importoPresunto;
     @JsonProperty("stato")
     private String stato;
     @JsonProperty("destinazione")
@@ -412,22 +409,6 @@ public class PrintOrdineMissioneTaxi {
     @JsonProperty("dataFineMissione")
     public void setDataFineMissione(String dataFineMissione) {
         this.dataFineMissione = dataFineMissione;
-    }
-
-    /**
-     * @return The importoPresunto
-     */
-    @JsonProperty("importoPresunto")
-    public String getImportoPresunto() {
-        return importoPresunto;
-    }
-
-    /**
-     * @param importoPresunto The importoPresunto
-     */
-    @JsonProperty("importoPresunto")
-    public void setImportoPresunto(String importoPresunto) {
-        this.importoPresunto = importoPresunto;
     }
 
 
