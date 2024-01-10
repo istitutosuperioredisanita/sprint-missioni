@@ -144,6 +144,8 @@ public class MissioniAceServiceIss implements MissioniAceService{
                 userInfoDto.setIndirizzo_residenza(terzoInfo.getIndirizzo_residenza());
                 userInfoDto.setCap_residenza( terzoInfo.getCap_residenza());
                 userInfoDto.setProvincia_residenza(terzoInfo.getProvincia_residenza());
+                userInfoDto.setComune_nascita(terzoInfo.getComune_nascita());
+
             }
             /*
             Sull'anagrafica ISS per molte persone non c'è il comune di residenza presente invece nei dati provenienti da NOIPA degli stipendi
