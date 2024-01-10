@@ -42,6 +42,35 @@ missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootSc
     }
 
 
+    // Nel tuo controller AngularJS
+    $scope.taxiOrdineMissioneModelBackup = {}; // Stato backup
+
+    var saveCurrentState = function () {
+      // Salva lo stato corrente prima del cambiamento
+      $scope.taxiOrdineMissioneModelBackup = angular.copy($scope.taxiOrdineMissioneModel);
+    };
+
+    var restorePreviousState = function () {
+      // Ripristina lo stato precedente al click
+      $scope.taxiOrdineMissioneModel = angular.copy($scope.taxiOrdineMissioneModelBackup);
+    };
+
+ $scope.edit = function () {
+     saveCurrentState(); // Salva lo stato corrente prima della modifica
+      $scope.editing = true;
+      $scope.disabledfields = false;
+    }
+
+
+    $scope.undo = function () {
+      restorePreviousState(); // Annulla l'azione
+          $scope.editing = false;
+            $scope.disabledfields = true;
+    };
+
+
+
+
         var deleteTaxi = function () {
             var idTaxi = $scope.taxiOrdineMissioneModel.id;
                 $rootScope.salvataggio = true;
@@ -49,6 +78,8 @@ missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootSc
                         function (data) {
                             $rootScope.salvataggio = false;
                             inizializzaDati();
+                            $scope.spostamentiTaxi = [];
+                            undoEditing();
                         }).error(
                         function (data) {
                             $rootScope.salvataggio = false;
@@ -70,16 +101,8 @@ missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootSc
       undoEditingSpostamento(spostamento);
     }
 
-
-
-    $scope.undo = function () {
+    var undoEditing = function () {
       $scope.editing = false;
-      $scope.disabledfields = true;
-    }
-
-    $scope.edit = function () {
-      $scope.editing = true;
-      $scope.disabledfields = false;
     }
 
 
@@ -145,6 +168,7 @@ $scope.save = function() {
             });
     }
     $scope.disabledfields = true;
+    undoEditing();
 };
 
 function handleSaveError(errorData, status) {
@@ -266,20 +290,5 @@ function handleSaveError(errorData, status) {
                 $rootScope.salvataggio = false;
             });
         }
-
-//$scope.eseguiRichiestaGet = function() {
-//    var url = 'api/rest/public/ordineMissione/taxi/uploadAllegati?idTaxi=' + $scope.taxiOrdineMissioneModel.id + '&token=' + $scope.accessToken;
-//
-//    $http.get(url)
-//        .then(function(response) {
-//            // Gestisci la risposta positiva
-//            console.log(response.data);
-//        })
-//        .catch(function(error) {
-//            // Gestisci eventuali errori
-//            console.error(error);
-//        });
-//};
-
 
 });
