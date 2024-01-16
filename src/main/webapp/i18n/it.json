@@ -201,6 +201,8 @@
     },
     "ordine-missione-auto-propria": {
         "title": "UTILIZZO AUTO PROPRIA PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "NB-title" : "NB: ",
+        "NB-text" : "non è consentito l’uso del mezzo proprio per il personale non dipendente e per il raggiungimento della località di missione estera.",
         "form": {
             "dati-patente": "Dati Patente",
             "auto-propria": "Dati Auto Propria",
@@ -232,8 +234,8 @@
     },
     "ordine-missione-taxi": {
         "title": "RICHIESTA TAXI PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
-        "NB-title" : "NB",
-        "NB-text" : "Ai fini del rimborso le ricevute rilasciate dai taxi devono indicare obbligatoriamente l’importo, il nominativo del beneficiario, il percorso effettuato, la data e l’orario.",
+        "NB-title" : "NB: ",
+        "NB-text" : "ai fini del rimborso le ricevute rilasciate dai taxi devono indicare obbligatoriamente l’importo, il nominativo del beneficiario, il percorso effettuato, la data e l’orario.",
         "form": {
             "dati-patente": "Dati Patente",
             "taxi": "Dati Taxi",
@@ -255,6 +257,8 @@
 
     "ordine-missione-auto-noleggio": {
         "title": "RICHIESTA NOLEGGIO AUTO PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "NB-title" : "NB: ",
+        "NB-text" : "non è consentito l’uso del mezzo a noleggio per il personale non dipendente e per il raggiungimento della località di missione estera.",
         "form": {
             "importo": "Importo auto da noleggiare*",
             "note": "Note",
