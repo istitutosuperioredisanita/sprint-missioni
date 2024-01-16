@@ -297,7 +297,7 @@
                         </span>
                         </p>
                     </form>
-                    <form class="form-inline" role="form" id="missioni">
+                    <!--<form class="form-inline" role="form" id="missioni">
                         <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
@@ -311,7 +311,7 @@
                             </ui-select>
                         </span>
                         </p>
-                    </form>
+                    </form>-->
 
                     <form class="form-inline" role="form" id="missioni">
                         <p class="col-md-11">
@@ -411,14 +411,14 @@
                             <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="ordineMissioneModel.cup"/>
                         </span>
                         </p>
-                        <p class="col-md-2">
+                        <!--<p class="col-md-2">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.cug">Missione CUG</span>
                               <label class="checkbox">
                                       <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.cug" ng-true-value="S" ng-false-value="N">
                               </label>
                           </span>
-                        </p>
+                        </p>-->
                         <p class="col-md-2">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
@@ -515,6 +515,16 @@
                         </span>
                         </p>
                     </form>
+
+                    <div class="panel-body my-panel-body">
+                        <div class="col-md-12">
+                            <p>    <strong translate="ordine-missione-auto-noleggio.NB-title">NB title</strong>
+                                <span>
+                            <span translate="ordine-missione-auto-noleggio.NB-text">NB TEXT</span>
+                        </span>
+                            </p>
+                        </div>
+                    </div>
 
                     <div class="col-md-12">
                         <ul class="pager" ng-show="showEsisteOrdineMissione">

@@ -19,23 +19,23 @@
 
 <div class="container-fluid">
 
-  <h4 center translate="rimborso-missione.title">Rimborso missione</h4>
-  <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.id" align="center">
-                <b>{{'missione.form.numero' | translate}}:</b> {{rimborsoMissioneModel.anno+"/"+rimborsoMissioneModel.numero}}  --  
-                <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  --  
-                <b>  {{'missione.form.stato' | translate}}: </b>{{rimborsoMissioneModel.decodeStato}}  --  
-                <span ng-show="rimborsoMissioneModel.statoFlusso && rimborsoMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}  --  
+    <h4 center translate="rimborso-missione.title">Rimborso missione</h4>
+    <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.id" align="center">
+        <b>{{'missione.form.numero' | translate}}:</b> {{rimborsoMissioneModel.anno+"/"+rimborsoMissioneModel.numero}}  --
+        <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  --
+        <b>  {{'missione.form.stato' | translate}}: </b>{{rimborsoMissioneModel.decodeStato}}  --
+        <span ng-show="rimborsoMissioneModel.statoFlusso && rimborsoMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}  --
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.stato-invio-sigla' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoInvioSigla}}  --  
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.id-sigla' | translate}}: </b>{{rimborsoMissioneModel.idSigla}}
-  </div>
-        <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.commentoFlusso && rimborsoMissioneModel.stato == 'INS'  && (rimborsoMissioneModel.statoFlusso == 'RUO' ||  rimborsoMissioneModel.statoFlusso == 'RUS')" align="center">
-                      <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{rimborsoMissioneModel.commentoFlusso}}
-        </div>
-        <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.statoPagamento" align="center">
-                      <b>{{'rimborso-missione.form.stato-pagamento-sigla' | translate}} </b>{{rimborsoMissioneModel.statoPagamento}}
-        </div>
-            <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
-                    <p class="col-md-12">
+    </div>
+    <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.commentoFlusso && rimborsoMissioneModel.stato == 'INS'  && (rimborsoMissioneModel.statoFlusso == 'RUO' ||  rimborsoMissioneModel.statoFlusso == 'RUS')" align="center">
+        <b>{{'missione.form.motivazione-flusso' | translate}}:</b> {{rimborsoMissioneModel.commentoFlusso}}
+    </div>
+    <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.statoPagamento" align="center">
+        <b>{{'rimborso-missione.form.stato-pagamento-sigla' | translate}} </b>{{rimborsoMissioneModel.statoPagamento}}
+    </div>
+    <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
+        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
     <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
@@ -45,12 +45,12 @@
     <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
         <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
-                    <p class="col-md-12">
+        </p>
+    </form>
+    <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
+        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
     <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
@@ -60,75 +60,75 @@
     <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
         <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-<div class="row" ng-show="accountModel">
+        </p>
+    </form>
+    <div class="row" ng-show="accountModel">
         <div class="col-md-12">
 
-<div class="row">
-  <div class="panel panel-primary">
-    <div class="panel-heading color-celeste-avion text-center">
-      <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
-    </div>
-            <div class="panel-body my-panel-body">
-              <info-account account="accountModel"></info-account>
+            <div class="row">
+                <div class="panel panel-primary">
+                    <div class="panel-heading color-celeste-avion text-center">
+                        <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
+                    </div>
+                    <div class="panel-body my-panel-body">
+                        <info-account account="accountModel"></info-account>
 
-              <div class="col-md-12">
+                        <div class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.domicilio-fiscale">Domicilio</span>
                               <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="rimborsoMissioneModel.domicilioFiscaleRich"/>
                           </span>
-              </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-  </div>
-
-</div>
 
 
-<div class="row" ng-hide="rimborsoMissioneModel.id">
-  <div class="panel panel-success" >
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-2">
+            <div class="row" ng-hide="rimborsoMissioneModel.id">
+                <div class="panel panel-success" >
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-2">
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.ordini-con-rimborsi-diversi">Più rimborsi</span>
                             <label class="checkbox">
                                     <input ng-disabled="!modalitaPagamentos || !inquadramento" type="checkbox" ng-model="giaRimborsato" ng-true-value="S" ng-false-value="N" ng-change="onChangeGiaRimborsato(giaRimborsato)">
                             </label>
                         </span>
-                </p>
-  <div class="col-md-8">
-        <h4 ng-show="listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"></h4>
-    <table ng-show="listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
-      <thead>
-        <tr>
-            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.trattamentoView' | translate}}</th>
-            <th style="text-align: right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}</th>
-            <th style="text-align: center">{{'global.button.print' | translate}}</th>
-        </tr>
-      </thead>
+                        </p>
+                        <div class="col-md-8">
+                            <h4 ng-show="listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"></h4>
+                            <table ng-show="listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+                                    <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+                                    <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+                                    <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+                                    <th style="text-align: center">{{'missione.form.trattamentoView' | translate}}</th>
+                                    <th style="text-align: right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}</th>
+                                    <th style="text-align: center">{{'global.button.print' | translate}}</th>
+                                </tr>
+                                </thead>
 
-      <tbody id ="missioni">
-        <tr ng-repeat="rimborsoMissione in listaAltriRimborsi" data-method="get">
-              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
-              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
-              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
-              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
-              <td class="col-md-2" style="text-align: right">{{rimborsoMissione.totaleRimborsoComplessivo | currency : "€"}}</td>
-              <td class="col-md-1" style="text-align: center"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
-        </tr>
-      </tbody>  
-    </table>
-</div>
-            </form>
-              <form class="form-inline" role="form" id="missioni">
-                      <p class="col-md-12">
+                                <tbody id ="missioni">
+                                <tr ng-repeat="rimborsoMissione in listaAltriRimborsi" data-method="get">
+                                    <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+                                    <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+                                    <td class="col-md-2" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+                                    <td class="col-md-2" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
+                                    <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
+                                    <td class="col-md-2" style="text-align: right">{{rimborsoMissione.totaleRimborsoComplessivo | currency : "€"}}</td>
+                                    <td class="col-md-1" style="text-align: center"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                           <span class="input-group">
                             <span class="input-group-addon label-input-group-for-select" translate="ordine-missione.title">Ordine di Missione</span>
     <ui-select ng-disabled="!modalitaPagamentos || !inquadramento|| !elencoOrdiniMissione" id="missioni-ui-select" theme="select2" on-select="reloadOrdineMissione(rimborsoMissioneModel.idOrdineMissione)" ng-model="rimborsoMissioneModel.idOrdineMissione"/>
@@ -138,136 +138,136 @@
     <ui-select-choices repeat="ordineMissione.id as ordineMissione in elencoOrdiniMissione | filter: $select.search">
         <span ng-bind="ordineMissione.anno+' / '+ordineMissione.numero+' - Dal '+ (ordineMissione.dataInizioMissione | dateMissioni) +' Al '+ (ordineMissione.dataFineMissione | dateMissioni)+' - '+ordineMissione.destinazione+' - '+ordineMissione.oggetto"></span>
     </ui-select-choices>
-    </ui-select>
+                              </ui-select>
                           </span>
-                      </p>
-              </form>
-  </div>
-</div>
+                        </p>
+                    </form>
+                </div>
+            </div>
 
-<div class="panel panel-success">
-  <div class="panel-heading color-verde-scuro text-center">
-    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
-  </div>
-     <div class="panel-body my-panel-body">
-  <div class="my-panel-body panel panel-success small-margin-bottom" ng-show="rimborsoMissioneModel.id" align="center">
-                          <b>{{'ordine-missione.title' | translate}} - {{'missione.form.numero' | translate}}:</b>
-                          {{rimborsoMissioneModel.ordineMissione.anno}}/{{rimborsoMissioneModel.ordineMissione.numero}}
-                          <b> - Dal </b> {{rimborsoMissioneModel.ordineMissione.dataInizioMissione | date:'dd/MM/yyyy'}}
-                          <b> - Al </b>
-                          {{rimborsoMissioneModel.ordineMissione.dataFineMissione | date:'dd/MM/yyyy'}} - {{rimborsoMissioneModel.ordineMissione.destinazione}}
-  </div>
+            <div class="panel panel-success">
+                <div class="panel-heading color-verde-scuro text-center">
+                    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-dati">Dati Missione</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <div class="my-panel-body panel panel-success small-margin-bottom" ng-show="rimborsoMissioneModel.id" align="center">
+                        <b>{{'ordine-missione.title' | translate}} - {{'missione.form.numero' | translate}}:</b>
+                        {{rimborsoMissioneModel.ordineMissione.anno}}/{{rimborsoMissioneModel.ordineMissione.numero}}
+                        <b> - Dal </b> {{rimborsoMissioneModel.ordineMissione.dataInizioMissione | date:'dd/MM/yyyy'}}
+                        <b> - Al </b>
+                        {{rimborsoMissioneModel.ordineMissione.dataFineMissione | date:'dd/MM/yyyy'}} - {{rimborsoMissioneModel.ordineMissione.destinazione}}
+                    </div>
 
-        <h4 class="panel-heading small-padding" align="center" ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
-  <div class="col-md-2">
-  </div>
-  <div class="col-md-8">
-    <table ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
-      <thead>
-        <tr>
-            <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
-            <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.data' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
-            <th style="text-align: center">{{'missione.form.trattamentoView' | translate}}</th>
-            <th style="text-align: right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}</th>
-            <th style="text-align: center">{{'global.button.print' | translate}}</th>
-        </tr>
-      </thead>
+                    <h4 class="panel-heading small-padding" align="center" ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-8">
+                        <table ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+                            <thead>
+                            <tr>
+                                <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+                                <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+                                <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+                                <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+                                <th style="text-align: center">{{'missione.form.trattamentoView' | translate}}</th>
+                                <th style="text-align: right">{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}</th>
+                                <th style="text-align: center">{{'global.button.print' | translate}}</th>
+                            </tr>
+                            </thead>
 
-      <tbody id ="missioni">
-        <tr ng-repeat="rimborsoMissione in listaAltriRimborsi" data-method="get">
-              <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
-              <td style="text-align: right">{{rimborsoMissione.numero}}</td>
-              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-              <td class="col-md-2" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
-              <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
-              <td class="col-md-2" style="text-align: right">{{rimborsoMissione.totaleRimborsoComplessivo | currency : "€"}}</td>
-              <td class="col-md-1" style="text-align: center"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
-        </tr>
-      </tbody>  
-    </table>
-  </div>
+                            <tbody id ="missioni">
+                            <tr ng-repeat="rimborsoMissione in listaAltriRimborsi" data-method="get">
+                                <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+                                <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+                                <td class="col-md-2" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+                                <td class="col-md-2" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
+                                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
+                                <td class="col-md-2" style="text-align: right">{{rimborsoMissione.totaleRimborsoComplessivo | currency : "€"}}</td>
+                                <td class="col-md-1" style="text-align: center"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-            <form class="form-inline" role="form" id ="missioni">
-                <p class="col-md-6">
+                    <form class="form-inline" role="form" id ="missioni">
+                        <p class="col-md-6">
                         <span class="input-group">
                           <span class="input-group-addon" translate="missione.form.tipo-missione">Tipo Missione</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.tipoMissione" on-select="onChangeTipoMissione()"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!validazione || !disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.tipoMissione" on-select="onChangeTipoMissione()"/>
     <ui-select-match placeholder="{{'missione.form.tipo-missione' | translate}}" >
         <span ng-bind="$select.selected.tipo"></span>
     </ui-select-match>
     <ui-select-choices repeat="val.value as val in tipiMissione | filter: $select.search">
         <span ng-bind="val.tipo"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                </p>
-                <p class="col-md-6">
+                        </p>
+                        <p class="col-md-6">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.trattamento">Tipo Missione</span>
-   <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.trattamento" on-select="onChangeTrattamento()"/>
+   <ui-select id="missioni-ui-select" theme="select2" ng-disabled="true" ng-model="rimborsoMissioneModel.trattamento" on-select="onChangeTrattamento()"/>
     <ui-select-match placeholder="{{'missione.form.trattamento' | translate}}" >
         <span ng-bind="$select.selected.trattamento"></span>
     </ui-select-match>
     <ui-select-choices repeat="val.value as val in trattamenti | filter: $select.search">
         <span ng-bind="val.trattamento"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-              </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <div class="col-md-5">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <div class="col-md-5">
                         <span class="input-group" ng-show="missioneEstera">
                           <span class="input-group-addon" translate="missione.form.nazione">nazione</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.nazione"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!validazione || !disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.nazione"/>
     <ui-select-match allow-clear="true" placeholder="{{'missione.form.nazione' | translate}}" >
         <span ng-bind="$select.selected.ds_nazione"></span>
     </ui-select-match>
     <ui-select-choices repeat="naz.pg_nazione as naz in nazioni | filter: $select.search">
         <span ng-bind="naz.ds_nazione"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-              </div>
-                <p class="col-md-7">
+                        </div>
+                        <p class="col-md-7">
                         <span class="input-group">
                           <span class="input-group-addon" translate="missione.form.destinazione-obbligatoria">Tipo Missione</span>
-                            <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="destinazione" placeholder="{{'missione.form.destinazione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.destinazione"/>
+                            <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="destinazione" placeholder="{{'missione.form.destinazione.placeholder' | translate}}" ng-model="rimborsoMissioneModel.destinazione"/>
                         </span>
-              </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.oggetto-obbligatorio">oggetto</span>
-                            <textarea ng-disabled="validazione || disabilitaRimborsoMissione"
-                              class="input-sm form-control" name="oggetto" placeholder="{{'missione.form.oggetto.placeholder' | translate}}" ng-model="rimborsoMissioneModel.oggetto" rows = "2">
+                            <textarea ng-disabled="!validazione || !disabilitaRimborsoMissione"
+                                      class="input-sm form-control" name="oggetto" placeholder="{{'missione.form.oggetto.placeholder' | translate}}" ng-model="rimborsoMissioneModel.oggetto" rows = "2">
                             </textarea>
                         </span>
-                </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="column-in-column col-md-5">
-<cnr-widget-datetime-range id-missione="1" disabilitato="validazione || disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioMissione" end-datetime="rimborsoMissioneModel.dataFineMissione" start-label="{{'rimborso-missione.form.data-inizio-obbligatoria' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'rimborso-missione.form.data-fine-obbligatoria' | translate}}"></cnr-widget-datetime-range>
-                </p>
-                <p class="column-in-column col-md-7" ng-show="missioneEsteraConTam">
-<cnr-widget-datetime-range id-missione="idMissione" is-in-modifica="true" is-attiva="true" disabilitato="validazione || disabilitaRimborsoMissione" start-other-datetime="rimborsoMissioneModel.dataInizioMissione" end-other-datetime="rimborsoMissioneModel.dataFineMissione" start-datetime="rimborsoMissioneModel.dataInizioEstero" end-datetime="rimborsoMissioneModel.dataFineEstero" start-label="{{'rimborso-missione.form.data-inizio-frontiera' | translate}}" fn-change="onChangeDateInizioFineFrontiera" end-label="{{'rimborso-missione.form.data-fine-frontiera' | translate}}"></cnr-widget-datetime-range>
-                </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="column-in-column col-md-5">
+                            <cnr-widget-datetime-range id-missione="1" disabilitato="!validazione || !disabilitaRimborsoMissione" start-datetime="rimborsoMissioneModel.dataInizioMissione" end-datetime="rimborsoMissioneModel.dataFineMissione" start-label="{{'rimborso-missione.form.data-inizio-obbligatoria' | translate}}" fn-change="onChangeDateInizioFine" end-label="{{'rimborso-missione.form.data-fine-obbligatoria' | translate}}"></cnr-widget-datetime-range>
+                        </p>
+                        <p class="column-in-column col-md-7" ng-show="missioneEsteraConTam">
+                            <cnr-widget-datetime-range id-missione="idMissione" is-in-modifica="true" is-attiva="true" disabilitato="!validazione || !disabilitaRimborsoMissione" start-other-datetime="rimborsoMissioneModel.dataInizioMissione" end-other-datetime="rimborsoMissioneModel.dataFineMissione" start-datetime="rimborsoMissioneModel.dataInizioEstero" end-datetime="rimborsoMissioneModel.dataFineEstero" start-label="{{'rimborso-missione.form.data-inizio-frontiera' | translate}}" fn-change="onChangeDateInizioFineFrontiera" end-label="{{'rimborso-missione.form.data-fine-frontiera' | translate}}"></cnr-widget-datetime-range>
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.note">note</span>
-                            <textarea ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" 
-                              class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.note" rows = "2">
+                            <textarea ng-disabled="true"
+                                      class="input-sm form-control" placeholder="{{'missione.form.note.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.note" rows = "2">
                             </textarea>
                         </span>
-                </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="rimborsoMissioneModel.anno">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni" ng-show="rimborsoMissioneModel.anno">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.modalita-pagamento">Modalita di Pagamento</span>
     <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.modpag" on-select="onChangeModpag()"/>
@@ -277,13 +277,13 @@
     <ui-select-choices repeat="modalitaPagamento.cd_modalita_pag as modalitaPagamento in modalitaPagamentos | filter: $select.search">
         <span ng-bind="modalitaPagamento.ds_modalita_pag"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-            <div class="row" id="missioni">
-            <form class="form-inline" role="form" id="missioni" ng-show="rimborsoMissioneModel.modpag">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <div class="row" id="missioni">
+                        <form class="form-inline" role="form" id="missioni" ng-show="rimborsoMissioneModel.modpag">
+                            <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
     <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.pgBanca" on-select="onChangeTerzoModpag()"/>
@@ -293,479 +293,479 @@
     <ui-select-choices repeat="terzoModalitaPagamento.pg_banca as terzoModalitaPagamento in terzoModalitaPagamentos | filter: $select.search">
         <span ng-bind="terzoModalitaPagamento.ds_abicab + ' ' + terzoModalitaPagamento.numero_conto + ' ' + terzoModalitaPagamento.codice_iban"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-            </div>
-            <div class="row" id="missioni">
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-2">
+                            </p>
+                        </form>
+                    </div>
+                    <div class="row" id="missioni">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-2">
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.anticipo-ricevuto">Anticipi Ricevuti</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
                             <input ng-disabled="validazione || disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
                         </span>
-                    </p>
-            </form>
+                            </p>
+                        </form>
 
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
                             <input ng-disabled="validazione || disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
                         </span>
-                    </p>
-            </form>
+                            </p>
+                        </form>
 
-            <form class="form-inline" role="form" id="missioni">
-              <p class="col-md-1">
-                  <button type="button" ng-disabled="!rimborsoMissioneModel.anticipoAnnoMandato || !rimborsoMissioneModel.anticipoNumeroMandato" class="btn-sm glyphicon glyphicon-search" ng-click="validateMandato()" title="{{'rimborso-missione.form.valida-mandato' | translate}}"></button>
-              </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-1">
+                                <button type="button" ng-disabled="!rimborsoMissioneModel.anticipoAnnoMandato || !rimborsoMissioneModel.anticipoNumeroMandato" class="btn-sm glyphicon glyphicon-search" ng-click="validateMandato()" title="{{'rimborso-missione.form.valida-mandato' | translate}}"></button>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
                           <input ng-disabled="rimborsoMissioneModel.idOrdineMissione || validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
                         </span>
-                    </p>
-            </form>
-            </div>
-            <div class="row" id="missioni">
-                <!--<p class="col-md-9">
-                        <span class="input-group">
-                            <span class="input-group-addon" translate="rimborso-missione.form.altre-spese">altre spese</span>
-                            <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="domicilioFiscale" placeholder="{{'rimborso-missione.form.altre-spese.placeholder' | translate}}" ng-model="rimborsoMissioneModel.altreSpeseAntDescrizione"/>
-                        </span>
-                </p>-->
-                <p class="col-md-3">
+                            </p>
+                        </form>
+                    </div>
+                    <div class="row" id="missioni">
+                        <!--<p class="col-md-9">
+                                <span class="input-group">
+                                    <span class="input-group-addon" translate="rimborso-missione.form.altre-spese">altre spese</span>
+                                    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" name="domicilioFiscale" placeholder="{{'rimborso-missione.form.altre-spese.placeholder' | translate}}" ng-model="rimborsoMissioneModel.altreSpeseAntDescrizione"/>
+                                </span>
+                        </p>-->
+                        <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="rimborso-missione.form.altre-spese-importo">altri anticipi importo</span>
                           <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-altri-anticipi" ng-model="rimborsoMissioneModel.altreSpeseAntImporto" currency-symbol="">
                         </span>
-                </p>
-            </div>
-            <div class="row" id="missioni">
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-9">
+                        </p>
+                        <p class="col-md-3">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="rimborso-missione.form.rimborso-spese-terzi-importo">Rimborso da terzi importo</span>
+                          <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-rimborso-terzi" ng-model="rimborsoMissioneModel.speseTerziImporto" currency-symbol="">
+                        </span>
+                        </p>
+                    </div>
+                    <div class="row" id="missioni">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-9">
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.rimborso-spese-terzi">Rimborso da terzi</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.speseTerziRicevute" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </p>
-            </form>
-                <p class="col-md-3">
-                        <span class="input-group">
-                          <span class="input-group-addon" translate="rimborso-missione.form.rimborso-spese-terzi-importo">Rimborso da terzi importo</span>
-                          <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-rimborso-terzi" ng-model="rimborsoMissioneModel.speseTerziImporto" currency-symbol="">
-                        </span>
-                </p>
+                            </p>
+                        </form>
+                    </div>
+                </div>
             </div>
-  </div>
-</div>
 
 
 
-<div class="panel panel-danger">
-  <div class="panel-heading color-rosso-mattone text-center">
-    <h3 class="panel-title color-rosso-mattone" translate="missione.form.box-dati-fin">Dati Finanziari</h3>
-  </div>
-     <div class="panel-body my-panel-body">
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+            <div class="panel panel-danger">
+                <div class="panel-heading color-rosso-mattone text-center">
+                    <h3 class="panel-title color-rosso-mattone" translate="missione.form.box-dati-fin">Dati Finanziari</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-spesa">cds</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" on-select="reloadCds(rimborsoMissioneModel.cdsSpesa)" ng-model="rimborsoMissioneModel.cdsSpesa"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!validazione || !disabilitaRimborsoMissione || !rimborsoMissioneModel.numero" on-select="reloadCds(rimborsoMissioneModel.cdsSpesa)" ng-model="rimborsoMissioneModel.cdsSpesa"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cds-spesa' | translate}}" >
         <span ng-bind="$select.selected.cd_proprio_unita+' '+$select.selected.ds_unita_organizzativa"></span>
     </ui-select-match>
     <ui-select-choices repeat="cds.cd_proprio_unita as cds in elencoCds | filter: $select.search">
         <span ng-bind="cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
+                        </p>
+                    </form>
 
 
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-spesa">uo</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!rimborsoMissioneModel.cdsSpesa || validazione || disabilitaRimborsoMissione || rimborsoMissioneModel.numero" on-select="reloadUo(rimborsoMissioneModel.uoSpesa)" ng-model="rimborsoMissioneModel.uoSpesa"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!rimborsoMissioneModel.cdsSpesa || !validazione || !disabilitaRimborsoMissione || !rimborsoMissioneModel.numero" on-select="reloadUo(rimborsoMissioneModel.uoSpesa)" ng-model="rimborsoMissioneModel.uoSpesa"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-spesa' | translate}}" >
         <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
     </ui-select-match>
     <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUo | filter: $select.search">
         <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cdr-spesa">cdr</span>
-   <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!rimborsoMissioneModel.uoSpesa || disabilitaRimborsoMissione" on-select="reloadCdr(rimborsoMissioneModel.cdrSpesa)" ng-model="rimborsoMissioneModel.cdrSpesa"/>
+   <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!rimborsoMissioneModel.uoSpesa || !disabilitaRimborsoMissione" on-select="reloadCdr(rimborsoMissioneModel.cdrSpesa)" ng-model="rimborsoMissioneModel.cdrSpesa"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cdr-spesa' | translate}}" >
         <span ng-bind="$select.selected.cd_centro_responsabilita+' '+$select.selected.ds_cdr"></span>
     </ui-select-match>
     <ui-select-choices repeat="cdr.cd_centro_responsabilita as cdr in elencoCdr | filter: $select.search">
         <span ng-bind="cdr.cd_centro_responsabilita+' '+cdr.ds_cdr"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!elencoModuli || elencoModuli.length == 0 || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" on-select="reloadModulo(rimborsoMissioneModel.pgProgetto, rimborsoMissioneModel.cdrSpesa, rimborsoMissioneModel.uoSpesa)" ng-model="rimborsoMissioneModel.pgProgetto"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!elencoModuli || !elencoModuli.length == 0 || !rimborsoMissioneModel.cdrSpesa || !disabilitaRimborsoMissione" on-select="reloadModulo(rimborsoMissioneModel.pgProgetto, rimborsoMissioneModel.cdrSpesa, rimborsoMissioneModel.uoSpesa)" ng-model="rimborsoMissioneModel.pgProgetto"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.modulo' | translate}}" >
         <span ng-bind="$select.selected.cd_progetto+' '+$select.selected.ds_progetto"></span>
     </ui-select-match>
     <ui-select-choices repeat="modulo.pg_progetto as modulo in elencoModuli | filter: $select.search">
         <span ng-bind="modulo.cd_progetto+' '+modulo.ds_progetto"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
+                        </p>
+                    </form>
 
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-11">
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-   <ui-select id="missioni-ui-select" theme="select2" ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.gae"/>
+   <ui-select id="missioni-ui-select" theme="select2" ng-enabled="rimborsoMissioneModel.cdrSpesa" ng-disabled="!elencoGae || !elencoGae.length == 0  || !rimborsoMissioneModel.cdrSpesa || !disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.gae"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.gae' | translate}}" >
         <span ng-bind="$select.selected.cd_linea_attivita+' '+$select.selected.ds_linea_attivita"></span>
     </ui-select-match>
     <ui-select-choices repeat="gae.cd_linea_attivita as gae in elencoGae | filter: $select.search">
         <span ng-bind="gae.cd_linea_attivita+' '+gae.ds_linea_attivita"></span>
     </ui-select-choices>
-    </ui-select>                
+                            </ui-select>
                         </span>
-                    </p>
-                    <p class="col-md-1">
-                    <i ng-show="workingRestGae" class="fa fa-spinner fa-spin" style="font-size:16px"></i>
-                    <i ng-show="!workingRestGae" style="font-size:16px" class="fa">&#xf110;</i>
-                    </p>
-            </form>
+                        </p>
+                        <p class="col-md-1">
+                            <i ng-show="workingRestGae" class="fa fa-spinner fa-spin" style="font-size:16px"></i>
+                            <i ng-show="!workingRestGae" style="font-size:16px" class="fa">&#xf110;</i>
+                        </p>
+                    </form>
 
 
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
-   <ui-select id="missioni-ui-select" theme="select2" ng-model="rimborsoMissioneModel.voce" ng-disabled="disabilitaRimborsoMissione" />
+   <ui-select id="missioni-ui-select" theme="select2" ng-model="rimborsoMissioneModel.voce" ng-disabled="!disabilitaRimborsoMissione" />
     <ui-select-match allow-clear="true" placeholder="{{'missione.form.voce' | translate}}" >
         <span ng-bind="$select.selected.cd_elemento_voce+' '+$select.selected.ds_elemento_voce"></span>
     </ui-select-match>
     <ui-select-choices repeat="voce.cd_elemento_voce as voce in elencoVoci | filter: $select.search">
         <span ng-bind="voce.cd_elemento_voce+' '+voce.ds_elemento_voce"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-<!-- inizio commento per multi impegno
-     <div class="panel-body my-panel-body" ng-show="showEsisteRimborsoMissione">
-      <p class="col-md-2">
-      <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.button.addImpegno' | translate}}" ng-click="aggiungiRigaImpegno()"><span class="glyphicon glyphicon-plus"></span>{{'rimborso-missione.button.addImpegno' | translate}}</button> 
-                    </p>
-  <div class="col-md-5">
-          <table class="table table-condensed table-striped table-bordered table-responsive">
-          <tr>
-            <th class="col-xs-4">{{'missione.form.anno-impegno' | translate}}</th>
-            <th class="col-xs-6">{{'missione.form.numero-impegno' | translate}}</th>
-          </tr>
-          <tbody id ="missioni">
-            <tr ng-repeat="impegno in impegni">
-              <td ng-hide="impegno.editing" class="col-lg-4" style="text-align: center" type="number">{{impegno.esercizioOriginaleObbligazione}}</td>
-              <td ng-show="impegno.editing" ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="col-xs-4" style="text-align:center" type="number">
-                <input class="form-control" ng-model="impegno.esercizioOriginaleObbligazione" required maxlength="4">
-              </td>
-              <td ng-hide="impegno.editing" class="col-lg-6" style="text-align: right" type="number">{{impegno.pgObbligazione}}</td>
-              <td ng-show="impegno.editing" ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="col-xs-6" style="text-align: right" type="number">
-                <input class="form-control" ng-model="impegno.pgObbligazione" required maxlength="256">
-              </td>
-              <td ng-hide="impegno.editing">
-                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="editImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
-              </td>
-              <td ng-hide="impegno.editing">
-                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))"  class="btn btn-sm btn-link" ng-click="confirmDeleteImpegno($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
-              </td>
-              <td ng-show="impegno.editing">
-                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="modifyImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
-              </td>
-              <td ng-show="impegno.editing">
-                <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="undoImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
-              </td>
-            </tr>
+                        </p>
+                    </form>
+                    <!-- inizio commento per multi impegno
+                         <div class="panel-body my-panel-body" ng-show="showEsisteRimborsoMissione">
+                          <p class="col-md-2">
+                          <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip" title="{{'rimborso-missione.button.addImpegno' | translate}}" ng-click="aggiungiRigaImpegno()"><span class="glyphicon glyphicon-plus"></span>{{'rimborso-missione.button.addImpegno' | translate}}</button>
+                                        </p>
+                      <div class="col-md-5">
+                              <table class="table table-condensed table-striped table-bordered table-responsive">
+                              <tr>
+                                <th class="col-xs-4">{{'missione.form.anno-impegno' | translate}}</th>
+                                <th class="col-xs-6">{{'missione.form.numero-impegno' | translate}}</th>
+                              </tr>
+                              <tbody id ="missioni">
+                                <tr ng-repeat="impegno in impegni">
+                                  <td ng-hide="impegno.editing" class="col-lg-4" style="text-align: center" type="number">{{impegno.esercizioOriginaleObbligazione}}</td>
+                                  <td ng-show="impegno.editing" ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="col-xs-4" style="text-align:center" type="number">
+                                    <input class="form-control" ng-model="impegno.esercizioOriginaleObbligazione" required maxlength="4">
+                                  </td>
+                                  <td ng-hide="impegno.editing" class="col-lg-6" style="text-align: right" type="number">{{impegno.pgObbligazione}}</td>
+                                  <td ng-show="impegno.editing" ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="col-xs-6" style="text-align: right" type="number">
+                                    <input class="form-control" ng-model="impegno.pgObbligazione" required maxlength="256">
+                                  </td>
+                                  <td ng-hide="impegno.editing">
+                                    <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="editImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                                  </td>
+                                  <td ng-hide="impegno.editing">
+                                    <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))"  class="btn btn-sm btn-link" ng-click="confirmDeleteImpegno($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                                  </td>
+                                  <td ng-show="impegno.editing">
+                                    <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="modifyImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                                  </td>
+                                  <td ng-show="impegno.editing">
+                                    <button ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" class="btn btn-sm btn-link" ng-click="undoImpegno(impegno)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                                  </td>
+                                </tr>
 
 
-          <tr ng-show="addImpegno" id="impegnoAdd">
+                              <tr ng-show="addImpegno" id="impegnoAdd">
 
-            <td  class="col-sm-5" style="text-align:left">
-              <input class="form-control" ng-model="newImpegno.esercizioOriginaleObbligazione" maxlength="256"</input>
-            </td>
-            <td  class="col-sm-7" style="text-align:left">
-              <input class="form-control" ng-model="newImpegno.pgObbligazione" maxlength="256"</input>
-            </td>
-            <td >
-                  <button class="btn btn-sm btn-link" ng-click="insertImpegno(newImpegno)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
-            </td>
-            <td >
-                  <button class="btn btn-sm btn-link" ng-click="undoAddImpegno()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      </div>
+                                <td  class="col-sm-5" style="text-align:left">
+                                  <input class="form-control" ng-model="newImpegno.esercizioOriginaleObbligazione" maxlength="256"</input>
+                                </td>
+                                <td  class="col-sm-7" style="text-align:left">
+                                  <input class="form-control" ng-model="newImpegno.pgObbligazione" maxlength="256"</input>
+                                </td>
+                                <td >
+                                      <button class="btn btn-sm btn-link" ng-click="insertImpegno(newImpegno)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                                </td>
+                                <td >
+                                      <button class="btn btn-sm btn-link" ng-click="undoAddImpegno()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                                </td>
+                              </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          </div>
 
-            <div ng-hide="showEsisteRimborsoMissione"> --da sostituire al primo div che sta sotto..
-fine commento multi impegno-->
+                                <div ng-hide="showEsisteRimborsoMissione"> --da sostituire al primo div che sta sotto..
+                    fine commento multi impegno-->
 
-            <div>
-              <form class="form-inline" role="form" id="missioni">
-                      <p class="col-md-3">
+                    <div>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-3">
                           <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.anno-impegno">anno</span>
-                              <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
+                              <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="rimborsoMissioneModel.esercizioOriginaleObbligazione"/>
                           </span>
-                      </p>
-              </form>
+                            </p>
+                        </form>
 
-              <form class="form-inline" role="form" id="missioni">
-                      <p class="col-md-4">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-4">
                           <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.numero-impegno">numero</span>
-                              <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="rimborsoMissioneModel.pgObbligazione"/>
+                              <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="numero-impegno" ng-model="rimborsoMissioneModel.pgObbligazione"/>
                           </span>
-                      </p>
-              </form>
+                            </p>
+                        </form>
 
-                      <p class="col-md-1">
-              <cnr-modal-info-impegno anno="rimborsoMissioneModel.anno" cds="rimborsoMissioneModel.cdsSpesa" gae="rimborsoMissioneModel.gae" uo="rimborsoMissioneModel.uoSpesa" anno-impegno="rimborsoMissioneModel.esercizioOriginaleObbligazione" numero="rimborsoMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
-                      </p>
-            </div>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-4">
+                        <p class="col-md-1">
+                            <cnr-modal-info-impegno anno="rimborsoMissioneModel.anno" cds="rimborsoMissioneModel.cdsSpesa" gae="rimborsoMissioneModel.gae" uo="rimborsoMissioneModel.uoSpesa" anno-impegno="rimborsoMissioneModel.esercizioOriginaleObbligazione" numero="rimborsoMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
+                        </p>
+                    </div>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-4">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.cup">cup</span>
-                            <input ng-disabled="((disabilitaRimborsoMissione && validazione != 'D') || (rimborsoMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>
+                            <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="rimborsoMissioneModel.cup"/>
                         </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-2">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-2">
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.rimborso-importo-0">Rimborso a 0</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.rimborso0" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </p>
-                  <!--<p class="col-md-3">
-                           <span class="input-group">
-                              <span class="input-group-addon" translate="missione.form.cug">Missione CUG</span>
-                              <label class="checkbox">
-                                      <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.cug" ng-true-value="S" ng-false-value="N">
-                              </label>
-                          </span>
-                  </p>-->
-                  <p class="col-md-3">
+                        </p>
+                        <!--<p class="col-md-3">
+                                 <span class="input-group">
+                                    <span class="input-group-addon" translate="missione.form.cug">Missione CUG</span>
+                                    <label class="checkbox">
+                                            <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.cug" ng-true-value="S" ng-false-value="N">
+                                    </label>
+                                </span>
+                        </p>-->
+                        <p class="col-md-3">
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
                               <label class="checkbox">
-                                      <input ng-disabled="rimborsoMissioneModel" type="checkbox" ng-model="rimborsoMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
+                                      <input ng-disabled="!rimborsoMissioneModel" type="checkbox" ng-model="rimborsoMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
                               </label>
                           </span>
-                  </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group" ng-show="validazione === 'S'">
                             <span class="input-group-addon" translate="ordine-missione.form.note-segreteria">Note Segreteria</span>
                             <textarea
-                              class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="rimborsoMissioneModel.noteSegreteria" rows = "2">
+                                    class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="rimborsoMissioneModel.noteSegreteria" rows = "2">
                             </textarea> 
                         </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.cds-competenza">cds</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" on-select="reloadCdsCompetenza(rimborsoMissioneModel.cdsCompetenza)" ng-model="rimborsoMissioneModel.cdsCompetenza"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!validazione || !disabilitaRimborsoMissione" on-select="reloadCdsCompetenza(rimborsoMissioneModel.cdsCompetenza)" ng-model="rimborsoMissioneModel.cdsCompetenza"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.cds-competenza' | translate}}" >
         <span ng-bind="$select.selected.cd_proprio_unita+' '+$select.selected.ds_unita_organizzativa"></span>
     </ui-select-match>
     <ui-select-choices repeat="cds.cd_proprio_unita as cds in elencoCdsCompetenza | filter: $select.search">
         <span ng-bind="cds.cd_proprio_unita+' '+cds.ds_unita_organizzativa"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
-                    <p class="col-md-12">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
+                        <p class="col-md-12">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.uoCompetenza"/>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!validazione || !disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.uoCompetenza"/>
     <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-competenza' | translate}}" >
         <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
     </ui-select-match>
     <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUoCompetenza | filter: $select.search">
         <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
     </ui-select-choices>
-    </ui-select>
+                            </ui-select>
                         </span>
-                    </p>
-            </form>
-  </div>
-</div>
+                        </p>
+                    </form>
+                </div>
+            </div>
 
-<div class="panel panel-info">
-  <div class="panel-heading color-verde-giada text-center">
-    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
-  </div>
-     <div class="panel-body my-panel-body">
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-3">
+            <div class="panel panel-info">
+                <div class="panel-heading color-verde-giada text-center">
+                    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-3">
                          <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.utilizzo-taxi">Taxi</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoTaxi" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </p>
-                <div class="col-md-3">
+                        </p>
+                        <div class="col-md-3">
                          <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </div>
-                <div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">
                          <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </div>
-                <div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">
                          <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">persona seguito</span>
                             <label class="checkbox">
                                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </div>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-12">
+                        </div>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
                             <textarea ng-disabled="validazione || disabilitaRimborsoMissione"
-                              class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.noteUtilizzoTaxiNoleggio" rows = "2">
+                                      class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.noteUtilizzoTaxiNoleggio" rows = "2">
                             </textarea>
                         </span>
-                </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-3">
+                        </p>
+                    </form>
+                    <form class="form-inline" role="form" id="missioni">
+                        <p class="col-md-3">
                          <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.uso-auto-propria">Auto Propria</span>
                             <label class="checkbox">
                                     <input ng-disabled="1 == 1" type="checkbox" ng-model="rimborsoMissioneModel.autoPropria" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                </p>
-            </form>
-            <div class="col-md-12">
-              <ul class="pager" ng-show="showEsisteRimborsoMissione">
-                <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
-                <li ng-show = "!rimborsoMissioneModel.rimborso0 || rimborsoMissioneModel.rimborso0 != 'S'"><a ng-click="goDettagliSpesa()" translate="rimborso-missione.button.dettagli"></a></li>
-                 <cnr-modal-history id-missione="rimborsoMissioneModel.id" tipo-missione="'RI'"> </cnr-modal-history>
-             </ul>
+                        </p>
+                    </form>
+                    <div class="col-md-12">
+                        <ul class="pager" ng-show="showEsisteRimborsoMissione">
+                            <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
+                            <li ng-show = "!rimborsoMissioneModel.rimborso0 || rimborsoMissioneModel.rimborso0 != 'S'"><a ng-click="goDettagliSpesa()" translate="rimborso-missione.button.dettagli"></a></li>
+                            <cnr-modal-history id-missione="rimborsoMissioneModel.id" tipo-missione="'RI'"> </cnr-modal-history>
+                        </ul>
+                    </div>
+                </div>
+                <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoComplessivo | currency : "€"}}     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli-non-anticipati' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoSenzaAnticipi | currency : "€"}}
             </div>
-  </div>
-     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoComplessivo | currency : "€"}}     <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.totale-dettagli-non-anticipati' | translate}}</b> {{rimborsoMissioneModel.totaleRimborsoSenzaAnticipi | currency : "€"}}
-</div>
-<form class="form-inline col-md-12" role="form" id="missioni">
-<div class="panel panel-default" ng-if="rimborsoMissioneModel.id && (rimborsoMissioneModel.isFireSearchAttachments == true || rimborsoMissioneModel.isFireSearchAttachments == false )">
-  <div class="panel-heading color-verde-chiaro text-center">
-    <h1 class="panel-title">Allegati della missione (non allegare in questa sezione scontrini/ricevute che riguardano i dettagli spesa)</h1>
-  </div>
-  <div class="panel-body my-panel-body">
-          <div>
-            <ul class="list-unstyled rimborsoMissioneModel.attachments" ng-show="rimborsoMissioneModel.attachmentsExists=true">
-              <li ng-repeat="attachment in rimborsoMissioneModel.attachments">
-                <span class="glyphicon glyphicon-download-alt"></span>
-                <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-                <button ng-show="!disabilitaRimborsoMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
-              </li>
-            </ul>
-            <h4 >
-              <div class="row fileupload-buttonbar">
-                <span ng-hide="rimborsoMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
-                <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="api/rest/public/rimborsoMissione/uploadAllegati?idRimborso={{rimborsoMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
-              </div>
-            </h4>
-          </div> 
-  </div>
-</div>
-</form>
+            <form class="form-inline col-md-12" role="form" id="missioni">
+                <div class="panel panel-default" ng-if="rimborsoMissioneModel.id && (rimborsoMissioneModel.isFireSearchAttachments == true || rimborsoMissioneModel.isFireSearchAttachments == false )">
+                    <div class="panel-heading color-verde-chiaro text-center">
+                        <h1 class="panel-title">Allegati della missione (non allegare in questa sezione scontrini/ricevute che riguardano i dettagli spesa)</h1>
+                    </div>
+                    <div class="panel-body my-panel-body">
+                        <div>
+                            <ul class="list-unstyled rimborsoMissioneModel.attachments" ng-show="rimborsoMissioneModel.attachmentsExists=true">
+                                <li ng-repeat="attachment in rimborsoMissioneModel.attachments">
+                                    <span class="glyphicon glyphicon-download-alt"></span>
+                                    <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                                    <button ng-show="!disabilitaRimborsoMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                                </li>
+                            </ul>
+                            <h4 >
+                                <div class="row fileupload-buttonbar">
+                                    <span ng-hide="rimborsoMissioneModel.attachmentsExists=true" class="label label-warning">Nessun Allegato Disponibile</span>
+                                    <ng-upload-form disabilita="disabilitaRimborsoMissione" validazione="validazione" is-finish-rest-attachments="rimborsoMissioneModel.isFireSearchAttachments" url="api/rest/public/rimborsoMissione/uploadAllegati?idRimborso={{rimborsoMissioneModel.id}}&token={{accessToken}}" name="file" auto-upload="true" oggetto="rimborsoMissioneModel" size-limit="500000"></ng-upload-form>
+                                </div>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </form>
             <form class="form-inline" role="form" id="missioni" ng-show="showEsisteRimborsoMissione && (validazione === 'S' || rimborsoMissioneModel.noteRespingi)">
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
                             <textarea ng-disabled="!validazione || disabilitaRimborsoMissione"
-                              class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="rimborsoMissioneModel.noteRespingi" maxlength="2000" rows = "2">
+                                      class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="rimborsoMissioneModel.noteRespingi" maxlength="2000" rows = "2">
                             </textarea>
                         </span>
                 </p>
             </form>
 
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="!validazione && showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'INS'   && !disabilitaRimborsoMissione">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'rimborso-missione.button.invia' | translate}}</button>
-                    </div>
+                <div class="col-xs-4" ng-show="!validazione && showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'INS'   && !disabilitaRimborsoMissione">
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'rimborso-missione.button.invia' | translate}}</button>
+                </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' || 
+                <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' ||
                     utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
-                    </div>
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
+                </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' || 
+                <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' ||
                     utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
-                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
-                    </div>
+                    <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
+                </div>
             </form>
             <form name="form-inline" role="form" ng-submit="finalizeRimborsoMissione()">
-                    <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'D'">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
-                    </div>
+                <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'D'">
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'rimborso-missione.button.sendToFinal' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span></button>
+                </div>
             </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
                 <div class="col-xs-4" ng-show="!validazione && !disabilitaRimborsoMissione && ((rimborsoMissioneModel.stato === 'CON' && (utenteAbilitatoValidareUo == 'S' ||
@@ -774,41 +774,41 @@ fine commento multi impegno-->
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'DEF'">
-                      <a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
-                    </div>
+                <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'DEF'">
+                    <a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
+                </div>
 
-<!--
-                      <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(rimborsoMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
--->
+                <!--
+                                      <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(rimborsoMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
+                -->
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato != 'INS' && rimborsoMissioneModel.stato != 'ANN'">
-                      <a target="_blank" href="api/rest/public/zipDocumentiRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.download' | translate}}"><span class="glyphicon glyphicon-download" style="color:black"></span>&nbsp;{{'global.button.download' | translate}}</a>
-                    </div>
+                <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato != 'INS' && rimborsoMissioneModel.stato != 'ANN'">
+                    <a target="_blank" href="api/rest/public/zipDocumentiRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.download' | translate}}"><span class="glyphicon glyphicon-download" style="color:black"></span>&nbsp;{{'global.button.download' | translate}}</a>
+                </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
-                    <div class="col-xs-1" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato == 'INS' && !disabilitaRimborsoMissione && validazione != 'S'">
-                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
-                    </div>
+                <div class="col-xs-1" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato == 'INS' && !disabilitaRimborsoMissione && validazione != 'S'">
+                    <button type="submit" class="btn btn-danger" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:white"></span>&nbsp;{{'global.button.remove' | translate}}</button>
+                </div>
             </form>
-<form class="form-inline col-md-12" role="form" id="missioni" ng-show="rimborsoMissioneModel.stato == 'ANA'">
-<div class="panel panel-default" >
-  <div class="panel-heading color-verde-chiaro text-center">
-    <h1 class="panel-title" >Allegati dell'annullamento del rimborso missione</h1>
-  </div>
-  <div class="panel-body my-panel-body">
-          <div>
-            <ul class="list-unstyled rimborsoMissioneModel.attachmentsUndo" ng-show="rimborsoMissioneModel.stato == 'ANA'">
-              <li ng-repeat="attachment in rimborsoMissioneModel.attachmentsUndo">
-                <span class="glyphicon glyphicon-download-alt"></span>
-                <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-              </li>
-            </ul>
-          </div> 
-  </div>
-</div>
-</form>
+            <form class="form-inline col-md-12" role="form" id="missioni" ng-show="rimborsoMissioneModel.stato == 'ANA'">
+                <div class="panel panel-default" >
+                    <div class="panel-heading color-verde-chiaro text-center">
+                        <h1 class="panel-title" >Allegati dell'annullamento del rimborso missione</h1>
+                    </div>
+                    <div class="panel-body my-panel-body">
+                        <div>
+                            <ul class="list-unstyled rimborsoMissioneModel.attachmentsUndo" ng-show="rimborsoMissioneModel.stato == 'ANA'">
+                                <li ng-repeat="attachment in rimborsoMissioneModel.attachmentsUndo">
+                                    <span class="glyphicon glyphicon-download-alt"></span>
+                                    <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
