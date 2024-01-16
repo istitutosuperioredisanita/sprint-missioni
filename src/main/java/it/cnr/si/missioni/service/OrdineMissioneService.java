@@ -62,7 +62,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.OptimisticLockException;
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -206,7 +205,7 @@ public class OrdineMissioneService {
                     ordineMissione.setRichiestaAnticipo("S");
                 }
                 OrdineMissioneTaxi taxi = getTaxi(ordineMissione);
-                if(taxi != null){
+                if (taxi != null) {
                     ordineMissione.setUtilizzoTaxi("S");
                 }
             }
@@ -798,7 +797,7 @@ public class OrdineMissioneService {
         return OrdineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
     }
 
-    public OrdineMissioneTaxi getTaxi (OrdineMissione ordineMissione) {
+    public OrdineMissioneTaxi getTaxi(OrdineMissione ordineMissione) {
         return ordineMissioneTaxiRepository.getTaxi(ordineMissione);
     }
 
@@ -1484,9 +1483,7 @@ public class OrdineMissioneService {
         // dell'auto propria.");
         // }
         if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
-            if (ordineMissione.getUtilizzoTaxi().equals("N") && ordineMissione.getUtilizzoAutoNoleggio().equals("N")
-                    && ordineMissione.getUtilizzoAutoServizio().equals("N")
-                    && ordineMissione.getPersonaleAlSeguito().equals("N")) {
+            if (ordineMissione.getUtilizzoAutoNoleggio().equals("N")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
                         + ": Non è possibile indicare le note all'utilizzo dell'auto a noleggio se non si è scelto il suo utilizzo");
             }
@@ -1499,10 +1496,7 @@ public class OrdineMissioneService {
         // salvare una missione con la richiesta di utilizzo dell'auto di
         // servizio e dell'auto propria.");
         // }
-        if ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
-                || Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")
-                || Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S")
-                || Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S"))
+        if (Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
                 && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
                     + ": E' obbligatorio indicare le note all'utilizzo dell'auto a noleggio se si è scelto il suo utilizzo");
