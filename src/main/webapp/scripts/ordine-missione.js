@@ -464,14 +464,14 @@ missioniApp.controller('OrdineMissioneController', function ($rootScope, $scope,
                 $scope.ordineMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
                 $scope.ordineMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
                 $scope.ordineMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
-                $scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
+                //$scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
                 $scope.ordineMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
                 $scope.ordineMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.ordineMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
                 $scope.ordineMissioneModel.importoPresunto = ordineMissioneSelected.importoPresunto;
                 $scope.ordineMissioneModel.missioneGratuita = ordineMissioneSelected.missioneGratuita;
                 $scope.ordineMissioneModel.cup = ordineMissioneSelected.cup;
-                $scope.ordineMissioneModel.cug = ordineMissioneSelected.cug;
+                //$scope.ordineMissioneModel.cug = ordineMissioneSelected.cug;
                 $scope.ordineMissioneModel.presidente = ordineMissioneSelected.presidente;
                 if ($scope.ordineMissioneModel.uoSpesa){
                     $scope.restUo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsSpesa, $scope.ordineMissioneModel.uoSpesa);

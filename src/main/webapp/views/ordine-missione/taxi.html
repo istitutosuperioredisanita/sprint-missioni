@@ -83,6 +83,15 @@
                                 </span>
                             </p>
                         </form>
+                        <div class="col-md-1">
+                            <button ng-show="validazione == 'N' && disabledfields" class="btn btn-outline" ng-click="edit()" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                        </div>
+                        <div class="col-md-1">
+                            <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                        </div>
+                        <div class="col-md-1">
+                            <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                        </div>
                     </div>
                     <div class="col-md-12 well highlight" ng-hide="isDisabilitataModificaAuto()">
                         <form class="form-inline" role="form" id="missioni">
@@ -133,20 +142,33 @@
                                 </span>
                             </p>
                         </form>
+                        <div class="col-md-12">
+                            <button ng-show="validazione == 'N' && disabledfields" class="btn btn-outline" ng-click="edit()" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+                        </div>
+                        <div class="col-md-1">
+                            <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                        </div>
+                        <div class="col-md-1">
+                            <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                        </div>
                     </div>
 
-                    <div class="col-md-12">
-                        <button ng-show="validazione == 'N' && disabledfields" class="btn btn-outline" ng-click="edit()" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
-                    </div>
-                    <div class="col-md-1">
-                        <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="save()" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
-                    </div>
-                    <div class="col-md-1">
-                        <button ng-show="validazione == 'N' && !disabledfields" class="btn btn-sm" ng-click="undo()" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+
+                    <div class="panel-body my-panel-body">
+                        <div class="col-md-12">
+                            <p>    <strong translate="ordine-missione-taxi.NB-title">NB title</strong>
+                                <span>
+                            <span translate="ordine-missione-taxi.NB-text">NB TEXT</span>
+                        </span>
+                            </p>
+                        </div>
                     </div>
 
                 </div>
+
             </div>
+
+
 
             <form class="form-inline" role="form" id="missioni">
                 <div class="panel panel-default" ng-if="taxiOrdineMissioneModel.id && (taxiOrdineMissioneModel.isFireSearchAttachments == true || taxiOrdineMissioneModel.isFireSearchAttachments == false )">
