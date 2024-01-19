@@ -71,7 +71,7 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
     }
 
     //TODO
-    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria) {
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi) {
 
         try {
 
@@ -83,6 +83,8 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
                     allegatiMissione.add( documentoAnticipo);
                 if ( documentoAutoPropria!=null)
                     allegatiMissione.add( documentoAutoPropria);
+                if ( documentoTaxi!=null)
+                    allegatiMissione.add( documentoTaxi);
                 String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
 
                 if (!StringUtils.isEmpty(idFlusso)) {
