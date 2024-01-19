@@ -522,7 +522,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()), true);
         OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
         StorageObject documentoAnticipo = null;
-        StorageObject documentoTaxi= null;
+
 
         List<StorageObject> allegati = new ArrayList<>();
         List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione, true);
@@ -542,14 +542,10 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             autoPropria.setOrdineMissione(ordineMissione);
             documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
         }
-
+        StorageObject documentoTaxi= null;
         if (taxi != null) {
             taxi.setOrdineMissione(ordineMissione);
             documentoTaxi = creaDocumentoTaxi(username, taxi);
-            List<StorageObject> allegatiTaxi = getAttachmentsAnticipo(ordineMissione);
-            if (allegatiTaxi != null && !allegatiTaxi.isEmpty()) {
-                allegati.addAll(allegatiTaxi);
-            }
         }
 
 
@@ -564,12 +560,12 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
 
         //TODO
-        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, documento, anticipo, documentoAnticipo, allegati, documentoAutoPropria);
+        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, documento, anticipo, documentoAnticipo, allegati, documentoAutoPropria,documentoTaxi);
 
     }
 
     //TODO
-    protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documento, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria);
+    protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documento, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi);
 
 
 
