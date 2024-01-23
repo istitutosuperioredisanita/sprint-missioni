@@ -42,6 +42,10 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -70,8 +74,38 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
     }
 
-    //TODO
-    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi) {
+    //metodo riscrito con l'oggetto Map
+
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapAllegati, OrdineMissioneAnticipo anticipo) {
+        try {
+            if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                ordineMissioneService.popolaCoda(ordineMissione);
+            } else {
+                List<StorageObject> allegatiMissione = new ArrayList<>(mapAllegati.values());
+
+                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione, mapAllegati.get("documentoMissione"), allegatiMissione);
+
+                if (!StringUtils.isEmpty(idFlusso)) {
+                    ordineMissione.setIdFlusso(idFlusso);
+                    if (anticipo != null) {
+                        anticipo.setIdFlusso(idFlusso);
+                    }
+                }
+                ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+            }
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
+        logger.info("sendOrdineMissioneToSign");
+    }
+
+
+
+
+
+
+/*
+protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi) {
 
         try {
 
@@ -102,5 +136,6 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
         logger.info("sendOrdineMissioneToSign");
 
     }
+    */
 
 }

@@ -61,8 +61,8 @@ public class MessageForFlow extends JSONBody implements Serializable {
     String autoPropriaFlag;
     String noleggioFlag;
     String taxiFlag;
-    String servizioFlagOk;
-    String personaSeguitoFlagOk;
+    //String servizioFlagOk;
+    //String personaSeguitoFlagOk;
     String capitolo;
     String uoRichSigla;
     String uoCompetenzaSigla;
@@ -88,6 +88,11 @@ public class MessageForFlow extends JSONBody implements Serializable {
     String autoPropriaPrimoMotivo;
     String autoPropriaSecondoMotivo;
     String autoPropriaTerzoMotivo;
+    String taxiAltriMotivi;
+    String taxiPrimoMotivo;
+    String taxiSecondoMotivo;
+    String taxiTerzoMotivo;
+    String taxiQuartoMotivo;
     String pathFascicoloDocumenti;
     String titolo;
     String descrizione;
@@ -409,7 +414,7 @@ public class MessageForFlow extends JSONBody implements Serializable {
     public void setTaxiFlag(String taxiFlag) {
         this.taxiFlag = taxiFlag;
     }
-
+/*
     public String getServizioFlagOk() {
         return servizioFlagOk;
     }
@@ -424,7 +429,7 @@ public class MessageForFlow extends JSONBody implements Serializable {
 
     public void setPersonaSeguitoFlagOk(String personaSeguitoFlagOk) {
         this.personaSeguitoFlagOk = personaSeguitoFlagOk;
-    }
+    }*/
 
     public String getCapitolo() {
         return capitolo;
@@ -584,6 +589,46 @@ public class MessageForFlow extends JSONBody implements Serializable {
 
     public void setAutoPropriaTerzoMotivo(String autoPropriaTerzoMotivo) {
         this.autoPropriaTerzoMotivo = autoPropriaTerzoMotivo;
+    }
+
+    public String getTaxiAltriMotivi() {
+        return taxiAltriMotivi;
+    }
+
+    public void setTaxiAltriMotivi(String taxiAltriMotivi) {
+        this.taxiAltriMotivi = taxiAltriMotivi;
+    }
+
+    public String getTaxiPrimoMotivo() {
+        return taxiPrimoMotivo;
+    }
+
+    public void setTaxiPrimoMotivo(String taxiPrimoMotivo) {
+        this.taxiPrimoMotivo = taxiPrimoMotivo;
+    }
+
+    public String getTaxiSecondoMotivo() {
+        return taxiSecondoMotivo;
+    }
+
+    public void setTaxiSecondoMotivo(String taxiSecondoMotivo) {
+        this.taxiSecondoMotivo = taxiSecondoMotivo;
+    }
+
+    public String getTaxiTerzoMotivo() {
+        return taxiTerzoMotivo;
+    }
+
+    public void setTaxiTerzoMotivo(String taxiTerzoMotivo) {
+        this.taxiTerzoMotivo = taxiTerzoMotivo;
+    }
+
+    public String getTaxiQuartoMotivo() {
+        return taxiQuartoMotivo;
+    }
+
+    public void setTaxiQuartoMotivo(String taxiQuartoMotivo) {
+        this.taxiQuartoMotivo = taxiQuartoMotivo;
     }
 
     public String getPathFascicoloDocumenti() {

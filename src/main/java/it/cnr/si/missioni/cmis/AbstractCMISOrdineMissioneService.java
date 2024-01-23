@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMissioneService{
+public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMissioneService {
     public static final String PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC";
     public static final String PROPERTY_TIPOLOGIA_DOC_SPECIFICA = "wfcnr:tipologiaDocSpecifica";
     public static final String PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
@@ -244,8 +244,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             cmisOrdineMissione.setOggetto(ordineMissione.getOggetto());
             cmisOrdineMissione.setPriorita(ordineMissione.getPriorita());
             cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "si" : "no");
-            cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
-            cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");
+            /*cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
+            cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");*/
             cmisOrdineMissione.setUoRich(uoRichPerFlusso);
             cmisOrdineMissione.setUoSpesa(uoSpesaPerFlusso);
             cmisOrdineMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
@@ -275,6 +275,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                 cmisOrdineMissione.setSecondoMotivoAutoPropria("");
                 cmisOrdineMissione.setTerzoMotivoAutoPropria("");
                 cmisOrdineMissione.setAltriMotiviAutoPropria("");
+            }
+            if (taxi!= null){
+                cmisOrdineMissione.setPrimoMotivoTaxi(Utility.nvl(taxi.getMancanzaAssMezzi(), "N").equals("N") ? "" : CMISOrdineMissione.PRIMO_MOTIVO_UTILIZZO_TAXI);
+                cmisOrdineMissione.setSecondoMotivoTaxi(Utility.nvl(taxi.getMancanzaMezzi(), "N").equals("N") ? "" : CMISOrdineMissione.SECONDO_MOTIVO_UTILIZZO_TAXI);
+                cmisOrdineMissione.setTerzoMotivoTaxi(Utility.nvl(taxi.getTrasportoMateriali(), "N").equals("N") ? "" : CMISOrdineMissione.TERZO_MOTIVO_UTILIZZO_TAXI);
+                cmisOrdineMissione.setQuartoMotivoTaxi(Utility.nvl(taxi.getMotiviHandicap(), "N").equals("N") ? "" : CMISOrdineMissione.QUARTO_MOTIVO_UTILIZZO_TAXI);
+                cmisOrdineMissione.setAltriMotiviAutoPropria(taxi.getUtilizzoAltriMotivi() == null ? "" : taxi.getUtilizzoAltriMotivi());
+            }else {
+                cmisOrdineMissione.setPrimoMotivoTaxi("");
+                cmisOrdineMissione.setSecondoMotivoTaxi("");
+                cmisOrdineMissione.setTerzoMotivoTaxi("");
+                cmisOrdineMissione.setQuartoMotivoTaxi("");
+                cmisOrdineMissione.setAltriMotiviTaxi("");
             }
             if (!StringUtils.isEmpty(ordineMissione.getResponsabileGruppo())) {
                 cmisOrdineMissione.setUsernameResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -467,6 +480,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANNO_IMPEGNO_RES, cmisOrdineMissione.getImpegnoAnnoResiduo());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ANTICIPO, cmisOrdineMissione.getAnticipo().equals("true"));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_PROPRIA, cmisOrdineMissione.getAutoPropriaFlag().equals("true"));
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisOrdineMissione.getTaxiFlag().equals("true"));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_CAPITOLO, cmisOrdineMissione.getCapitolo());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE, cmisOrdineMissione.getOggetto());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESCRIZIONE_CAPITOLO, cmisOrdineMissione.getDescrizioneCapitolo());
@@ -484,9 +498,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisOrdineMissione.getNote());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisOrdineMissione.getNoteSegreteria());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisOrdineMissione.getImpegnoNumero());
-        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisOrdineMissione.getTaxiFlag().equals("true"));
-        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisOrdineMissione.getPersonaSeguitoFlag().equals("true"));
-        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisOrdineMissione.getAutoServizioFlag().equals("true"));
+        /*metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisOrdineMissione.getPersonaSeguitoFlag().equals("true"));
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisOrdineMissione.getAutoServizioFlag().equals("true"));*/
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESTINAZIONE, cmisOrdineMissione.getDestinazione());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ESTERA_FLAG, cmisOrdineMissione.getMissioneEsteraFlag().equals("true"));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DATA_INIZIO_MISSIONE, cmisOrdineMissione.getDataInizioMissione());
@@ -505,14 +518,20 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_AUTO_PROPRIA_SECONDO_MOTIVO, cmisOrdineMissione.getSecondoMotivoAutoPropria());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_AUTO_PROPRIA_TERZO_MOTIVO, cmisOrdineMissione.getTerzoMotivoAutoPropria());
 
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_TAXI_PRIMO_MOTIVO, cmisOrdineMissione.getPrimoMotivoTaxi());
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_TAXI_SECONDO_MOTIVO, cmisOrdineMissione.getSecondoMotivoTaxi());
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_TAXI_TERZO_MOTIVO, cmisOrdineMissione.getTerzoMotivoTaxi());
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_TAXI_QUARTO_MOTIVO, cmisOrdineMissione.getQuartoMotivoTaxi());
+
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE, cmisOrdineMissione.getUsernameRichiedente());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, !StringUtils.isEmpty(cmisOrdineMissione.getUsernameResponsabileGruppo()));
         return metadataProperties;
     }
 
-    public abstract void avviaFlusso(AnnullamentoOrdineMissione annullamento) ;
+    public abstract void avviaFlusso(AnnullamentoOrdineMissione annullamento);
 
     public abstract Boolean isActiveSignFlow();
+
     public void avviaFlusso(OrdineMissione ordineMissione) {
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
@@ -542,7 +561,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             autoPropria.setOrdineMissione(ordineMissione);
             documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
         }
-        StorageObject documentoTaxi= null;
+        StorageObject documentoTaxi = null;
         if (taxi != null) {
             taxi.setOrdineMissione(ordineMissione);
             documentoTaxi = creaDocumentoTaxi(username, taxi);
@@ -559,14 +578,23 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return;
         }
 
-        //TODO
-        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, documento, anticipo, documentoAnticipo, allegati, documentoAutoPropria,documentoTaxi);
+        // Creare un oggetto Map con tutti gli oggetti StorageObject
+        Map<String, StorageObject> mapAllegati = new HashMap<>();
+        mapAllegati.put("documentoMissione", documento);
+        mapAllegati.put("documentoAnticipoMissione", documentoAnticipo);
+        mapAllegati.put("documentoAutoPropriaMissione", documentoAutoPropria);
+        mapAllegati.put("documentoTaxiMissione", documentoTaxi);
+
+        // Aggiungere gli allegati all'oggetto Map
+        for (StorageObject allegato : allegati) {
+            mapAllegati.put("allegatoMissione_" + allegato.getKey(), allegato);
+        }
+
+        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, mapAllegati, anticipo);
 
     }
 
-    //TODO
-    protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documento, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi);
-
+    protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapAllegati, OrdineMissioneAnticipo anticipo);
 
 
     public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {
@@ -588,6 +616,14 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException {
         String id = getNodeRefOrdineMissioneAnticipo(ordineMissioneAnticipo);
+        if (id != null) {
+            return missioniCMISService.recuperoStreamFileFromObjectID(id);
+        }
+        return null;
+    }
+
+    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+        String id = getNodeRefOrdineMissioneTaxi(ordineMissioneTaxi);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
         }
@@ -699,7 +735,6 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     }
 
 
-
     public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
         OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
@@ -728,11 +763,14 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         } else if (objs.size() > 1) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di auto propria per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         }
-        if( objs.size()>0)
+        if (objs.size() > 0)
             return objs.get(0).getKey();
         return null;
     }
 
+    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+        return getNodeRefOrdineMissioneTaxi(ordineMissioneTaxi, true);
+    }
 
     public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws ComponentException {
         OrdineMissione ordineMissione = ordineMissioneTaxi.getOrdineMissione();
@@ -744,7 +782,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         } else if (objs.size() > 1) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di taxi per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         }
-        if( objs.size()>0)
+        if (objs.size() > 0)
             return objs.get(0).getKey();
         return null;
     }
@@ -790,9 +828,6 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return missioniCMISService.getStorageObjectByPath(pathFolder);
         }
     }
-
-
-
 
 
     private MessageForFlowOrdine createJsonForAbortFlowOrdineMissione() {
@@ -920,7 +955,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaTaxiSuCMIS(String currentLogin, byte[] stampa,
-                                                   OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+                                               OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
         InputStream streamStampa = new ByteArrayInputStream(stampa);
         String path = createFolderOrdineMissione(ordineMissioneTaxi.getOrdineMissione());
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneTaxi(currentLogin, ordineMissioneTaxi);

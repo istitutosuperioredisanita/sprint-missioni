@@ -169,6 +169,8 @@ public class Costanti {
     public final static String TIPO_DOCUMENTO_ANTICIPO = "anticipoMissione";
     public final static String TIPO_DOCUMENTO_AUTO_PROPRIA = "autoPropriaMissione";
     public final static String TIPO_DOCUMENTO_GIUSTIFICATIVO = "giustificativoMissione";
+    public final static String TIPO_DOCUMENTO_TAXI = "taxiMissione";
+
     public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
     public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
     public final static String TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO = "Annullamento Ordine di missione con Rimborso missione Consentito";

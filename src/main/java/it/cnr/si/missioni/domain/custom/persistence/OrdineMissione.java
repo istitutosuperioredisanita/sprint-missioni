@@ -84,6 +84,11 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String CMIS_PROPERTY_AUTO_PROPRIA_PRIMO_MOTIVO = "cnrmissioni:autoPropriaPrimoMotivo";
     public static final String CMIS_PROPERTY_AUTO_PROPRIA_SECONDO_MOTIVO = "cnrmissioni:autoPropriaSecondoMotivo";
     public static final String CMIS_PROPERTY_AUTO_PROPRIA_TERZO_MOTIVO = "cnrmissioni:autoPropriaTerzoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_PRIMO_MOTIVO = "cnrmissioni:taxiPrimoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_SECONDO_MOTIVO = "cnrmissioni:taxiSecondoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_TERZO_MOTIVO = "cnrmissioni:taxiTerzoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_QUARTO_MOTIVO = "cnrmissioni:taxiQuartoMotivo";
+
     public static final String CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO = "cnrmissioni:userNamePrimoFirmatario";
     public static final String CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA = "cnrmissioni:userNameFirmatarioSpesa";
     public static final String CMIS_PROPERTY_FLOW_UO_ORDINE = "cnrmissioni:uoOrdine";
@@ -99,8 +104,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String CMIS_PROPERTY_FLOW_AUTO_PROPRIA = "cnrmissioni:autoPropriaFlag";
     public static final String CMIS_PROPERTY_FLOW_NOLEGGIO = "cnrmissioni:noleggioFlag";
     public static final String CMIS_PROPERTY_FLOW_TAXI = "cnrmissioni:taxiFlag";
-    public static final String CMIS_PROPERTY_FLOW_AUTO_SERVIZIO = "cnrmissioni:servizioFlagOk";
-    public static final String CMIS_PROPERTY_FLOW_PERSONA_SEGUITO = "cnrmissioni:personaSeguitoFlagOk";
+    /*public static final String CMIS_PROPERTY_FLOW_AUTO_SERVIZIO = "cnrmissioni:servizioFlagOk";
+    public static final String CMIS_PROPERTY_FLOW_PERSONA_SEGUITO = "cnrmissioni:personaSeguitoFlagOk";*/
     public static final String CMIS_PROPERTY_FLOW_CAPITOLO = "cnrmissioni:capitolo";
     public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE_CAPITOLO = "cnrmissioni:descrizioneCapitolo";
     public static final String CMIS_PROPERTY_FLOW_MODULO = "cnrmissioni:modulo";
@@ -204,9 +209,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Column(name = "VALIDATO", length = 1, nullable = false)
     public String validato;
     @Size(min = 0, max = 1)
-    @Column(name = "UTILIZZO_TAXI", length = 1, nullable = false)
-    public String utilizzoTaxi;
-    @Size(min = 0, max = 1)
     @Column(name = "UTILIZZO_AUTO_NOLEGGIO", length = 1, nullable = false)
     public String utilizzoAutoNoleggio;
     @Size(min = 0, max = 1000)
@@ -271,12 +273,12 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Size(min = 0, max = 1000)
     @Column(name = "NOTE_UTILIZZO_TAXI_NOLEGGIO", length = 1000, nullable = true)
     public String noteUtilizzoTaxiNoleggio;
-    @Size(min = 0, max = 1)
+    /*@Size(min = 0, max = 1)
     @Column(name = "UTILIZZO_AUTO_SERVIZIO", length = 1, nullable = false)
     public String utilizzoAutoServizio;
     @Size(min = 0, max = 1)
     @Column(name = "PERSONALE_AL_SEGUITO", length = 1, nullable = false)
-    public String personaleAlSeguito;
+    public String personaleAlSeguito;*/
     @Size(min = 0, max = 50)
     @Column(name = "CUP", length = 50, nullable = true)
     public String cup;
@@ -324,6 +326,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String daChron;
     @Transient
     private String utilizzoAutoPropria;
+    @Transient
+    private String utilizzoTaxi;
     @Transient
     private DatiIstituto datiIstituto;
     @Transient
@@ -499,6 +503,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
         this.utilizzoAutoPropria = utilizzoAutoPropria;
     }
 
+    public String getUtilizzoTaxi() {
+        return utilizzoTaxi;
+    }
+
+    public void setUtilizzoTaxi(String utilizzoTaxi) {
+        this.utilizzoTaxi = utilizzoTaxi;
+    }
+
     public String getRichiestaAnticipo() {
         return richiestaAnticipo;
     }
@@ -570,8 +582,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
                 ", partenzaDa='" + partenzaDa + '\'' +
                 ", fondi='" + fondi + '\'' +
                 ", responsabileGruppo='" + responsabileGruppo + '\'' +
-                ", utilizzoAutoServizio='" + utilizzoAutoServizio + '\'' +
-                ", personaleAlSeguito='" + personaleAlSeguito + '\'' +
+                /*", utilizzoAutoServizio='" + utilizzoAutoServizio + '\'' +
+                ", personaleAlSeguito='" + personaleAlSeguito + '\'' +*/
                 ", cup='" + cup + '\'' +
                 ", missioneGratuita='" + missioneGratuita + '\'' +
                 ", cug='" + cug + '\'' +
@@ -962,14 +974,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
         return getTipoMissione() != null && getTipoMissione().equals(Costanti.MISSIONE_ESTERA);
     }
 
-    public String getUtilizzoTaxi() {
-        return utilizzoTaxi;
-    }
-
-    public void setUtilizzoTaxi(String utilizzoTaxi) {
-        this.utilizzoTaxi = utilizzoTaxi;
-    }
-
     public String getUtilizzoAutoNoleggio() {
         return utilizzoAutoNoleggio;
     }
@@ -993,7 +997,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
         }
         return "";
     }
-
+/*
     @Transient
     public String decodeUtilizzoAutoServizio() {
         if (!StringUtils.isEmpty(getUtilizzoAutoServizio())) {
@@ -1008,7 +1012,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
             return Costanti.SI_NO.get(getPersonaleAlSeguito());
         }
         return "";
-    }
+    }*/
 
     @Transient
     public String decodeUtilizzoAutoNoleggio() {
@@ -1203,7 +1207,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public void setFondi(String fondi) {
         this.fondi = fondi;
     }
-
+/*
     public String getUtilizzoAutoServizio() {
         return utilizzoAutoServizio;
     }
@@ -1218,7 +1222,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
     public void setPersonaleAlSeguito(String personaleAlSeguito) {
         this.personaleAlSeguito = personaleAlSeguito;
-    }
+    }*/
 
     public String getCup() {
         return cup;
