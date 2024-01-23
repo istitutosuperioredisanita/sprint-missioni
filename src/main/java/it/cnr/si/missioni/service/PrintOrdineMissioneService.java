@@ -161,7 +161,7 @@ public class PrintOrdineMissioneService {
         printOrdineMissione.setOggetto(ordineMissione.getOggetto());
         printOrdineMissione.setUtilizzoAutoNoleggio(ordineMissione.decodeUtilizzoAutoNoleggio());
         printOrdineMissione.setUtilizzoTaxi(ordineMissione.decodeUtilizzoTaxi());
-        printOrdineMissione.setUtilizzoAutoServizio(ordineMissione.decodeUtilizzoAutoServizio());
+        //printOrdineMissione.setUtilizzoAutoServizio(ordineMissione.decodeUtilizzoAutoServizio());
         printOrdineMissione.setMissioneGratuita(ordineMissione.decodeMissioneGratuita());
 
         OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
@@ -177,7 +177,7 @@ public class PrintOrdineMissioneService {
             printOrdineMissione.setRichiestaAnticipo(Costanti.NO);
         }
 
-        printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
+        //printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
         printOrdineMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(ordineMissione.getNoteUtilizzoTaxiNoleggio()));
         printOrdineMissione.setCup(ordineMissione.getCup() == null ? "" : ordineMissione.getCup());
         return printOrdineMissione;

@@ -23,6 +23,10 @@ public class CMISOrdineMissione extends CMISMissione {
     public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo";
     public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività caratterizzata da emergenza, urgenza, indifferibilità";
     public final static String TERZO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione";
+    public final static String PRIMO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza assoluta di mezzi pubblici";
+    public final static String SECONDO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza di mezzi pubblici per sospensione del servizio per sciopero, per eventi eccezionali opportunamente documentati;";
+    public final static String TERZO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva ed elenco dettagliato del materiale trasportato)";
+    public final static String QUARTO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per il personale con disabilità/portatore di handicap.";
     private Long idMissioneOrdine;
     private Long idMissioneRevoca;
     private String usernameFirmatarioAggiunto;
@@ -33,6 +37,11 @@ public class CMISOrdineMissione extends CMISMissione {
     private String primoMotivoAutoPropria;
     private String secondoMotivoAutoPropria;
     private String terzoMotivoAutoPropria;
+    private String altriMotiviTaxi;
+    private String primoMotivoTaxi;
+    private String secondoMotivoTaxi;
+    private String terzoMotivoTaxi;
+    private String quartoMotivoTaxi;
     private String anticipo;
     private String validazioneModulo;
     private String modulo;
@@ -130,6 +139,46 @@ public class CMISOrdineMissione extends CMISMissione {
 
     public void setTerzoMotivoAutoPropria(String terzoMotivoAutoPropria) {
         this.terzoMotivoAutoPropria = terzoMotivoAutoPropria;
+    }
+
+    public String getAltriMotiviTaxi() {
+        return altriMotiviTaxi;
+    }
+
+    public void setAltriMotiviTaxi(String altriMotiviTaxi) {
+        this.altriMotiviTaxi = altriMotiviTaxi;
+    }
+
+    public String getPrimoMotivoTaxi() {
+        return primoMotivoTaxi;
+    }
+
+    public void setPrimoMotivoTaxi(String primoMotivoTaxi) {
+        this.primoMotivoTaxi = primoMotivoTaxi;
+    }
+
+    public String getSecondoMotivoTaxi() {
+        return secondoMotivoTaxi;
+    }
+
+    public void setSecondoMotivoTaxi(String secondoMotivoTaxi) {
+        this.secondoMotivoTaxi = secondoMotivoTaxi;
+    }
+
+    public String getTerzoMotivoTaxi() {
+        return terzoMotivoTaxi;
+    }
+
+    public void setTerzoMotivoTaxi(String terzoMotivoTaxi) {
+        this.terzoMotivoTaxi = terzoMotivoTaxi;
+    }
+
+    public String getQuartoMotivoTaxi() {
+        return quartoMotivoTaxi;
+    }
+
+    public void setQuartoMotivoTaxi(String quartoMotivoTaxi) {
+        this.quartoMotivoTaxi = quartoMotivoTaxi;
     }
 
     public String getMissioneGratuita() {

@@ -65,6 +65,8 @@ public interface CMISOrdineMissioneService {
 
     public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException;
 
+    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException;
+
     public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException ;
 
     public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException;

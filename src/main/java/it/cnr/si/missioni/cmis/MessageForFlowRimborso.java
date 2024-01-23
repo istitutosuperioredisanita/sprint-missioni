@@ -150,11 +150,11 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
                 ", descrizioneUoSpesa='" + descrizioneUoSpesa + '\'' +
                 ", uoCompetenza='" + uoCompetenza + '\'' +
                 ", descrizioneUoCompetenza='" + descrizioneUoCompetenza + '\'' +
-                ", autoPropriaFlag='" + autoPropriaFlag + '\'' +
+                //", autoPropriaFlag='" + autoPropriaFlag + '\'' +
                 ", noleggioFlag='" + noleggioFlag + '\'' +
-                ", taxiFlag='" + taxiFlag + '\'' +
-                ", servizioFlagOk='" + servizioFlagOk + '\'' +
-                ", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
+                //", taxiFlag='" + taxiFlag + '\'' +
+                //", servizioFlagOk='" + servizioFlagOk + '\'' +
+                //", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
                 ", capitolo='" + capitolo + '\'' +
                 ", descrizioneCapitolo='" + descrizioneCapitolo + '\'' +
                 ", modulo='" + progetto + '\'' +
@@ -177,6 +177,11 @@ public class MessageForFlowRimborso extends MessageForFlow implements Serializab
                 ", autoPropriaPrimoMotivo='" + autoPropriaPrimoMotivo + '\'' +
                 ", autoPropriaSecondoMotivo='" + autoPropriaSecondoMotivo + '\'' +
                 ", autoPropriaTerzoMotivo='" + autoPropriaTerzoMotivo + '\'' +
+                ", taxiAltriMotivi='" + taxiAltriMotivi + '\'' +
+                ", taxiPrimoMotivo='" + taxiPrimoMotivo + '\'' +
+                ", taxiSecondoMotivo='" + taxiSecondoMotivo + '\'' +
+                ", taxiTerzoMotivo='" + taxiTerzoMotivo + '\'' +
+                ", taxiQuartoMotivo='" + taxiQuartoMotivo + '\'' +
                 ", pathFascicoloDocumenti='" + pathFascicoloDocumenti + '\'' +
                 ", titolo='" + titolo + '\'' +
                 ", descrizione='" + descrizione + '\'' +

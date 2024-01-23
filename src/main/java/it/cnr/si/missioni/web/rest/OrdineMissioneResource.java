@@ -108,6 +108,7 @@ public class OrdineMissioneResource {
         filter.setValidato("S");
         filter.setDaAnnullare("S");
         filter.setRecuperoAutoPropria("S");
+        filter.setRecuperoTaxi("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);

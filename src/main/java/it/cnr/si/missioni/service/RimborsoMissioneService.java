@@ -1462,12 +1462,12 @@ public class RimborsoMissioneService {
         if (isDiverso(rimborso.getUtilizzoTaxi(), ordine.getUtilizzoTaxi())) {
             aggiungiDifferenza(buffer, "Utilizzo Taxi. ", null);
         }
-        if (isDiverso(rimborso.getUtilizzoAutoServizio(), ordine.getUtilizzoAutoServizio())) {
+        /*if (isDiverso(rimborso.getUtilizzoAutoServizio(), ordine.getUtilizzoAutoServizio())) {
             aggiungiDifferenza(buffer, "Utilizzo Auto Servizio. ", null);
         }
         if (isDiverso(rimborso.getPersonaleAlSeguito(), ordine.getPersonaleAlSeguito())) {
             aggiungiDifferenza(buffer, "Personale Al Seguito. ", null);
-        }
+        }*/
         if (isDiverso(rimborso.getUtilizzoAutoNoleggio(), ordine.getUtilizzoAutoNoleggio())) {
             aggiungiDifferenza(buffer, "Utilizzo Auto Noleggio. ", null);
         }

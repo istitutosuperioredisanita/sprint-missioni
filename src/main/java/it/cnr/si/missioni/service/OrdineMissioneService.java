@@ -125,7 +125,8 @@ public class OrdineMissioneService {
 
     @Autowired
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
-
+    @Autowired
+    private OrdineMissioneTaxiService ordineMissioneTaxiService;
     @Autowired
     private ConfigService configService;
 
@@ -663,6 +664,16 @@ public class OrdineMissioneService {
                     }
                 }
             }
+            if (Utility.nvl(filter.getRecuperoTaxi()).equals("S")) {
+                for (OrdineMissione ordineMissione : ordineMissioneList) {
+                    OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
+                    if (taxi != null) {
+                        ordineMissione.setUtilizzoTaxi("S");
+                    } else {
+                        ordineMissione.setUtilizzoTaxi("N");
+                    }
+                }
+            }
 
             return ordineMissioneList;
 
@@ -767,6 +778,17 @@ public class OrdineMissioneService {
                         ordineMissione.setUtilizzoAutoPropria("S");
                     } else {
                         ordineMissione.setUtilizzoAutoPropria("N");
+                    }
+                }
+            }
+
+            if (Utility.nvl(filter.getRecuperoTaxi()).equals("S")) {
+                for (OrdineMissione ordineMissione : ordineMissioneList) {
+                    OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
+                    if (taxi != null) {
+                        ordineMissione.setUtilizzoTaxi("S");
+                    } else {
+                        ordineMissione.setUtilizzoTaxi("N");
                     }
                 }
             }
@@ -915,12 +937,12 @@ public class OrdineMissioneService {
         if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
             ordineMissione.setUtilizzoTaxi("N");
         }
-        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
+        /*if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
             ordineMissione.setUtilizzoAutoServizio("N");
         }
         if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
             ordineMissione.setPersonaleAlSeguito("N");
-        }
+        }*/
 
         aggiornaValidazione(ordineMissione);
 
@@ -1089,9 +1111,9 @@ public class OrdineMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "E' obbligatorio indicare il responsabile del gruppo.");
             }
 // CODICE DA TOGLIERE DA INIZIO ANNO FINO  AL RIBALTAMENTO EFFETTUATO
-            if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
+            /*if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-            }
+            }*/
 
         } else {
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
@@ -1107,9 +1129,9 @@ public class OrdineMissioneService {
                             "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
                 }
                 // CODICE DA TOGLIERE DA INIZIO ANNO FINO  AL RIBALTAMENTO EFFETTUATO
-                if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
+                /*if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-                }
+                }*/
                 if (ordineMissioneDB.isMissioneInserita()
                         && !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())) {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
@@ -1232,9 +1254,9 @@ public class OrdineMissioneService {
         ordineMissioneDB.setNoteUtilizzoTaxiNoleggio(ordineMissione.getNoteUtilizzoTaxiNoleggio());
         ordineMissioneDB.setUtilizzoAutoNoleggio(ordineMissione.getUtilizzoAutoNoleggio());
         ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
-        ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
+        /*ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
         ordineMissioneDB.setUtilizzoAutoServizio(ordineMissione.getUtilizzoAutoServizio());
-        ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
+        ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());*/
         ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
         ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
         ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -1561,7 +1583,7 @@ public class OrdineMissioneService {
         }
         LocalDate data = LocalDate.now();
         int anno = data.getYear();
-        if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())) {
+        /*if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())) {
             Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), anno,
                     ordineMissione.getUoSpesa());
             if (progetto == null) {
@@ -1572,7 +1594,7 @@ public class OrdineMissioneService {
                             + ": Il modulo indicato non è corretto rispetto alla UO " + ordineMissione.getUoSpesa());
                 }
             }
-        }
+        }*/
         if (!StringUtils.isEmpty(ordineMissione.getGae())) {
             if (StringUtils.isEmpty(ordineMissione.getCdrSpesa())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN,
@@ -1584,7 +1606,7 @@ public class OrdineMissioneService {
                         "La GAE " + ordineMissione.getGae() + " indicata non esiste");
             } else {
                 boolean progettoCdrIndicato = false;
-                if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())
+                /*if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())
                         && !StringUtils.isEmpty(gae.getPg_progetto())) {
                     progettoCdrIndicato = true;
                     if (gae.getPg_progetto().compareTo(ordineMissione.getPgProgetto()) != 0) {
@@ -1592,7 +1614,7 @@ public class OrdineMissioneService {
                                 CodiciErrore.DATI_INCONGRUENTI + ": La GAE indicata " + ordineMissione.getGae()
                                         + " non corrisponde al modulo indicato.");
                     }
-                }
+                }*/
                 if (!StringUtils.isEmpty(ordineMissione.getCdrSpesa())) {
                     progettoCdrIndicato = true;
                     if (!gae.getCd_centro_responsabilita().equals(ordineMissione.getCdrSpesa())) {
@@ -1693,11 +1715,11 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utente");
         } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo del Taxi");
-        } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
+        /*} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");
         } else if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");*/
         } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo auto a noleggio");

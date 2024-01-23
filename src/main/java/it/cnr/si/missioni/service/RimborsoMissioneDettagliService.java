@@ -197,13 +197,13 @@ public class RimborsoMissioneDettagliService {
         if (lista != null && !lista.isEmpty()) {
             TipoPasto tipoPasto = lista.get(0);
             if (rimborsoMissioneDettagli.getCdTiPasto().startsWith("G")) {
-                if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(50)) > 0) {
+                if (tipoPasto.getLimiteMaxPasto().compareTo(Double.valueOf(50)) > 0) {
                     livelloRich = 1;
                 } else {
                     livelloRich = 4;
                 }
             } else {
-                if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(30)) > 0) {
+                if (tipoPasto.getLimiteMaxPasto().compareTo(Double.valueOf(30)) > 0) {
                     livelloRich = 1;
                 } else {
                     livelloRich = 4;
@@ -219,7 +219,7 @@ public class RimborsoMissioneDettagliService {
         if (rimborsoMissione.getOrdineMissione().getId() != null) {
             OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(
                     OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
-            if (ordineMissione != null && Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S") && (!rimborsoMissione.isAssociato() || (rimborsoMissione.getInquadramento() != null && rimborsoMissione.getInquadramento().compareTo(Long.valueOf(47)) < 0))) {
+            if (ordineMissione != null /*&& Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S")*/ && (!rimborsoMissione.isAssociato() || (rimborsoMissione.getInquadramento() != null && rimborsoMissione.getInquadramento().compareTo(Long.valueOf(47)) < 0))) {
                 livello = 3;
             }
         }
