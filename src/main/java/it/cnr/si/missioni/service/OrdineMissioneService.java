@@ -1730,6 +1730,17 @@ public class OrdineMissioneService {
         } else if (StringUtils.isEmpty(ordineMissione.getNumero())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero");
         }
+        if(ordineMissione.getStato().equals(Costanti.STATO_CONFERMATO)){
+            if (StringUtils.isEmpty(ordineMissione.getGae())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": GAE");
+            } else if (StringUtils.isEmpty(ordineMissione.getVoce())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce di Bilancio");
+            } else if (StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Anno impegno");
+            } else if (StringUtils.isEmpty(ordineMissione.getPgObbligazione())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero impegno");
+            }
+        }
     }
 
     public List<CMISFileAttachment> getAttachments(Long idOrdineMissione)
