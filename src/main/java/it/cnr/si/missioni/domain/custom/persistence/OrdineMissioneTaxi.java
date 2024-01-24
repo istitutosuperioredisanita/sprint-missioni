@@ -21,7 +21,7 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 
 import it.cnr.si.missioni.util.Costanti;
-import lombok.*;
+
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -32,10 +32,7 @@ import java.util.List;
 /**
  * A user.
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Entity
 @Table(name = "ORDINE_MISSIONE_TAXI")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_TAXI", allocationSize = 0)
@@ -88,6 +85,13 @@ public class OrdineMissioneTaxi extends OggettoBulkXmlTransient implements Seria
     @Transient
     private List<SpostamentiTaxi> listSpostamenti;
 
+    public List<SpostamentiTaxi> getListSpostamenti() {
+        return listSpostamenti;
+    }
+
+    public void setListSpostamenti(List<SpostamentiTaxi> listSpostamenti) {
+        this.listSpostamenti = listSpostamenti;
+    }
 
     public Boolean isStatoNonInviatoAlFlusso() {
         return !StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INSERITO);
@@ -122,4 +126,84 @@ public class OrdineMissioneTaxi extends OggettoBulkXmlTransient implements Seria
         return "TaxiOrdineMissione" + getId() + ".pdf";
     }
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public OrdineMissione getOrdineMissione() {
+        return ordineMissione;
+    }
+
+    public void setOrdineMissione(OrdineMissione ordineMissione) {
+        this.ordineMissione = ordineMissione;
+    }
+
+    public String getMancanzaAssMezzi() {
+        return mancanzaAssMezzi;
+    }
+
+    public void setMancanzaAssMezzi(String mancanzaAssMezzi) {
+        this.mancanzaAssMezzi = mancanzaAssMezzi;
+    }
+
+    public String getMancanzaMezzi() {
+        return mancanzaMezzi;
+    }
+
+    public void setMancanzaMezzi(String mancanzaMezzi) {
+        this.mancanzaMezzi = mancanzaMezzi;
+    }
+
+    public String getTrasportoMateriali() {
+        return trasportoMateriali;
+    }
+
+    public void setTrasportoMateriali(String trasportoMateriali) {
+        this.trasportoMateriali = trasportoMateriali;
+    }
+
+    public String getMotiviHandicap() {
+        return motiviHandicap;
+    }
+
+    public void setMotiviHandicap(String motiviHandicap) {
+        this.motiviHandicap = motiviHandicap;
+    }
+
+    public String getUtilizzoAltriMotivi() {
+        return utilizzoAltriMotivi;
+    }
+
+    public void setUtilizzoAltriMotivi(String utilizzoAltriMotivi) {
+        this.utilizzoAltriMotivi = utilizzoAltriMotivi;
+    }
+
+    public String getStato() {
+        return stato;
+    }
+
+    public void setStato(String stato) {
+        this.stato = stato;
+    }
+
+    public String getIdFlusso() {
+        return idFlusso;
+    }
+
+    public void setIdFlusso(String idFlusso) {
+        this.idFlusso = idFlusso;
+    }
+
+    public String getStatoFlusso() {
+        return statoFlusso;
+    }
+
+    public void setStatoFlusso(String statoFlusso) {
+        this.statoFlusso = statoFlusso;
+    }
 }

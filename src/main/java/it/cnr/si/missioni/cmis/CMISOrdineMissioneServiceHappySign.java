@@ -76,14 +76,24 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
     //metodo riscrito con l'oggetto Map
 
+    private List<StorageObject> getAllAllegati( Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati){
+        List<StorageObject> allAllegati= new ArrayList<StorageObject>();
+        if ( allegati!=null && allAllegati.size()>0)
+            allAllegati.addAll(allegati);
+        for ( String s: mapDocumentiMissione.keySet()){
+            if ( !Costanti.DOCUMENTO_MISSIONE_KEY.equalsIgnoreCase(s))
+                allAllegati.add( mapDocumentiMissione.get( s));
+        }
+        return allAllegati;
+    }
+
     protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo) {
         try {
             if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
                 ordineMissioneService.popolaCoda(ordineMissione);
             } else {
 
-
-                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione, mapDocumentiMissione.get(Costanti.DOCUMENTO_MISSIONE_KEY), allegati);
+                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione, mapDocumentiMissione.get(Costanti.DOCUMENTO_MISSIONE_KEY), getAllAllegati( mapDocumentiMissione,allegati));
 
                 if (!StringUtils.isEmpty(idFlusso)) {
                     ordineMissione.setIdFlusso(idFlusso);
