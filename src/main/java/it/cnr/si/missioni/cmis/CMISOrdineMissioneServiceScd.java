@@ -202,7 +202,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
         }
     }
 
-    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documento, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi) {
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo) {
         MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
         try {
 
@@ -276,9 +276,9 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             });
             parameters.setAll(maps);
 
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento, ordineMissione.getStatoFlusso());
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo, ordineMissione.getStatoFlusso());
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria, ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiMissione.get( Costanti.DOCUMENTO_MISSIONE_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapDocumentiMissione.get( Costanti.DOCUMENTO_ANTICIPO_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY), ordineMissione.getStatoFlusso());
 
             messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 
