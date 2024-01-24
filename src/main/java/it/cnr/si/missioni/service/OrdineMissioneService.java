@@ -990,6 +990,29 @@ public class OrdineMissioneService {
         return updateOrdineMissione(ordineMissione, fromFlows, confirm, null);
     }
 
+    private void checkObbDatiContabili( OrdineMissione ordineMissione,boolean sendToSign){
+        //controlla che ci sia la Gae ,la voce di bilancio e l'impegno
+        if ( sendToSign){
+            if (StringUtils.isEmpty(ordineMissione.getFondi()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Fondi");
+
+            if (StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Anno impegno");
+
+            if (StringUtils.isEmpty(ordineMissione.getPgObbligazione()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero impegno");
+
+            if ( StringUtils.isEmpty(ordineMissione.getVoce()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
+        }
+        if ( !sendToSign) {
+            if (StringUtils.isEmpty(ordineMissione.getGae()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": GAE");
+        }
+
+
+
+    }
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows,
                                                Boolean confirm, String basePath) {
@@ -1038,6 +1061,7 @@ public class OrdineMissioneService {
         }
 
         if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("S")) {
+
             if (!ordineMissioneDB.getStato().equals(Costanti.STATO_CONFERMATO)) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione non confermato.");
             }
@@ -1054,6 +1078,7 @@ public class OrdineMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN,
                         "Operazione non possibile. Non è possibile modificare un ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
             }
+            checkObbDatiContabili(ordineMissione,true);
 
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
             ordineMissioneDB.setValidato("S");
@@ -1165,9 +1190,12 @@ public class OrdineMissioneService {
             } else if (!ordineMissioneDB.isMissioneDaValidare()) {
                 DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
                         ordineMissione.getAnno());
+                //bosgna controllare Anno Impegno, numero Impegno Fondi
                 if (Utility.nvl(istituto.getCreaImpegnoAut(), "N").equals("S")) {
 
                 }
+                checkObbDatiContabili( ordineMissione,false);
+                checkObbDatiContabili(ordineMissione,true);
                 cmisOrdineMissioneService.avviaFlusso(ordineMissioneDB);
                 ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
                 ordineMissioneDB.setDataInvioFirma(oggi);
@@ -1180,6 +1208,8 @@ public class OrdineMissioneService {
                     ordineMissioneDB.setDataInvioAmministrativo(oggi);
                 }
             } else if (ordineMissioneDB.isMissioneDaValidare()) {
+
+                checkObbDatiContabili( ordineMissione,false);
                 DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
                         ordineMissione.getAnno());
                 if (istituto.isAttivaGestioneResponsabileModulo()) {
@@ -1730,17 +1760,7 @@ public class OrdineMissioneService {
         } else if (StringUtils.isEmpty(ordineMissione.getNumero())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero");
         }
-        if(ordineMissione.getStato().equals(Costanti.STATO_CONFERMATO)){
-            if (StringUtils.isEmpty(ordineMissione.getGae())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": GAE");
-            } else if (StringUtils.isEmpty(ordineMissione.getVoce())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce di Bilancio");
-            } else if (StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Anno impegno");
-            } else if (StringUtils.isEmpty(ordineMissione.getPgObbligazione())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero impegno");
-            }
-        }
+
     }
 
     public List<CMISFileAttachment> getAttachments(Long idOrdineMissione)
