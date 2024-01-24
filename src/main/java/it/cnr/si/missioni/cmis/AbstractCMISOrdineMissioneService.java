@@ -539,7 +539,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         StorageObject documento = salvaStampaOrdineMissioneSuCMIS(stampa, ordineMissione, cmisOrdineMissione);
         OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
         OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()), true);
-        OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
+        OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()),true);
         StorageObject documentoAnticipo = null;
 
 

@@ -20,11 +20,6 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -32,10 +27,6 @@ import java.io.Serializable;
 /**
  * A user.
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "SPOSTAMENTI_TAXI")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_SPOSTAMENTI_TAXI", allocationSize = 0)
@@ -65,4 +56,52 @@ public class SpostamentiTaxi extends OggettoBulkXmlTransient implements Serializ
     @Column(name = "STATO", length = 3, nullable = false)
     private String stato;
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public OrdineMissioneTaxi getTaxi() {
+        return taxi;
+    }
+
+    public void setTaxi(OrdineMissioneTaxi taxi) {
+        this.taxi = taxi;
+    }
+
+    public String getPercorsoDa() {
+        return percorsoDa;
+    }
+
+    public void setPercorsoDa(String percorsoDa) {
+        this.percorsoDa = percorsoDa;
+    }
+
+    public String getPercorsoA() {
+        return percorsoA;
+    }
+
+    public void setPercorsoA(String percorsoA) {
+        this.percorsoA = percorsoA;
+    }
+
+    public Long getRiga() {
+        return riga;
+    }
+
+    public void setRiga(Long riga) {
+        this.riga = riga;
+    }
+
+    public String getStato() {
+        return stato;
+    }
+
+    public void setStato(String stato) {
+        this.stato = stato;
+    }
 }
