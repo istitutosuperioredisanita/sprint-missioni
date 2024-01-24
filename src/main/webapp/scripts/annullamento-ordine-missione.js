@@ -110,7 +110,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                 $scope.annullamentoModel.ordineMissione.presidente = ordineMissioneSelected.presidente;
                 if ($scope.annullamentoModel.ordineMissione.uoSpesa){
                     $scope.restUo($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.cdsSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
-                    $scope.restModuli($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);
+                    //$scope.restModuli($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);
                     $scope.restGae($scope.annullamentoModel.ordineMissione.anno, $scope.annullamentoModel.ordineMissione.pgProgetto, $scope.annullamentoModel.ordineMissione.cdrSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
                 }
                 if ($scope.annullamentoModel.ordineMissione.cdsCompetenza){
@@ -273,7 +273,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                         if (data.elements.length === 1){
                             $scope.annullamentoModel.ordineMissione.cdrSpesa = data.elements[0].cd_centro_responsabilita;
                             if (daQuery != 'S'){
-                                $scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);
+                                //$scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);
                                 $scope.restGae($scope.annullamentoModel.anno, $scope.annullamentoModel.ordineMissione.pgProgetto, $scope.annullamentoModel.ordineMissione.cdrSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
                             }
                         }
@@ -862,7 +862,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function ($rootSc
                                 $scope.restUo(model.anno, model.ordineMissione.cdsSpesa, model.ordineMissione.uoSpesa);
                                 $scope.restUoCompetenza(model.anno, model.ordineMissione.cdsCompetenza, model.ordineMissione.uoCompetenza);
                                 $scope.restCdr(model.ordineMissione.uoSpesa, "S");
-                                $scope.restModuli(model.anno, model.ordineMissione.uoSpesa);
+                                //$scope.restModuli(model.anno, model.ordineMissione.uoSpesa);
                                 $scope.restGae(model.anno, model.ordineMissione.pgProgetto, model.ordineMissione.cdrSpesa, model.ordineMissione.uoSpesa);
                                 $scope.restCapitoli(model.anno);
                                 $scope.annullamentoModel = model;

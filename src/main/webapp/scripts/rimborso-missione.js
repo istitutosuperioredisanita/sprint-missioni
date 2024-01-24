@@ -111,7 +111,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.autoPropria = ordineMissioneSelected.utilizzoAutoPropria;
                 if ($scope.rimborsoMissioneModel.uoSpesa){
                     $scope.restUo($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.cdsSpesa, $scope.rimborsoMissioneModel.uoSpesa);
-                    $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+                    //$scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
                     $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                 }
                 if ($scope.rimborsoMissioneModel.cdsCompetenza){
@@ -587,7 +587,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                         if (data.elements.length === 1){
                             $scope.rimborsoMissioneModel.cdrSpesa = data.elements[0].cd_centro_responsabilita;
                             if (daQuery != 'S'){
-                                $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+                                //$scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
                                 $scope.restGae($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.pgProgetto, $scope.rimborsoMissioneModel.cdrSpesa, $scope.rimborsoMissioneModel.uoSpesa);
                             }
                         }
@@ -886,7 +886,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
 
     $scope.reloadCdr = function(cdr) {
       $scope.annullaModulo();  
-      $scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
+      //$scope.restModuli($scope.rimborsoMissioneModel.anno, $scope.rimborsoMissioneModel.uoSpesa);
       $scope.restGae($scope.rimborsoMissioneModel.anno, null, cdr, $scope.rimborsoMissioneModel.uoSpesa);
     }
 
@@ -1454,7 +1454,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.restUo(model.anno, model.cdsSpesa, model.uoSpesa);
                 $scope.restUoCompetenza(model.anno, model.cdsCompetenza, model.uoCompetenza);
                 $scope.restCdr(model.uoSpesa, "S");
-                $scope.restModuli(model.anno, model.uoSpesa);
+                //$scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
                 $scope.restCapitoli(model.anno);
                 $scope.rimborsoMissioneModel = model;

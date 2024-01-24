@@ -39,7 +39,7 @@ public class UsersSpecial implements Serializable {
 
     @JsonProperty("uid")
     private String uid;
-    @JsonProperty("uoForUsersSpecial")
+        @JsonProperty("uoForUsersSpecial")
     private List<UoForUsersSpecial> uoForUsersSpecial;
     @JsonProperty("all")
     private String all;

@@ -97,7 +97,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                 $scope.annullamentoModel.rimborsoMissione.cup = rimborsoMissioneSelected.cup;
                 if ($scope.annullamentoModel.rimborsoMissione.uoSpesa){
                     $scope.restUo($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.cdsSpesa, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
-                    $scope.restModuli($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
+                    //$scope.restModuli($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                     $scope.restGae($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.pgProgetto, $scope.annullamentoModel.rimborsoMissione.cdrSpesa, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                 }
                 if ($scope.annullamentoModel.rimborsoMissione.cdsCompetenza){
@@ -276,7 +276,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                         if (data.elements.length === 1){
                             $scope.annullamentoModel.rimborsoMissione.cdrSpesa = data.elements[0].cd_centro_responsabilita;
                             if (daQuery != 'S'){
-                                $scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
+                                //$scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                                 $scope.restGae($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.pgProgetto, $scope.annullamentoModel.rimborsoMissione.cdrSpesa, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                             }
                         }
@@ -833,7 +833,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                                 $scope.restUo(model.anno, model.rimborsoMissione.cdsSpesa, model.rimborsoMissione.uoSpesa);
                                 $scope.restUoCompetenza(model.anno, model.rimborsoMissione.cdsCompetenza, model.rimborsoMissione.uoCompetenza);
                                 $scope.restCdr(model.rimborsoMissione.uoSpesa, "S");
-                                $scope.restModuli(model.anno, model.rimborsoMissione.uoSpesa);
+                                //$scope.restModuli(model.anno, model.rimborsoMissione.uoSpesa);
                                 $scope.restGae(model.anno, model.rimborsoMissione.pgProgetto, model.rimborsoMissione.cdrSpesa, model.rimborsoMissione.uoSpesa);
                                 $scope.restCapitoli(model.anno);
                                 $scope.annullamentoModel = model;
