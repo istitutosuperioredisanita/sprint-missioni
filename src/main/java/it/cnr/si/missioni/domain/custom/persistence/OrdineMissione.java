@@ -326,7 +326,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String daChron;
     @Transient
     private String utilizzoAutoPropria;
-    @Transient
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_TAXI", length = 1, nullable = false)
     private String utilizzoTaxi;
     @Transient
     private DatiIstituto datiIstituto;
