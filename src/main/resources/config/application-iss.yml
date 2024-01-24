@@ -34,9 +34,9 @@ spring:
     attrMail:
   proxy:
     SIGLA:
-      url: http://sigla-t:8080/SIGLA/
-      username: ente
-      password: 2023enteiss
+      url: http://sigla-sviluppo.iss.it:8080/SIGLA/
+      username: MISSIONIAPP
+      password: MISSIONIAPP
       context:
         cd_unita_organizzativa: "999.000"
         cd_cds: "999"
