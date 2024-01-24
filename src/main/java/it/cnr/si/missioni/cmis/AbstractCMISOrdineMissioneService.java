@@ -579,22 +579,21 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
 
         // Creare un oggetto Map con tutti gli oggetti StorageObject
-        Map<String, StorageObject> mapAllegati = new HashMap<>();
-        mapAllegati.put("documentoMissione", documento);
-        mapAllegati.put("documentoAnticipoMissione", documentoAnticipo);
-        mapAllegati.put("documentoAutoPropriaMissione", documentoAutoPropria);
-        mapAllegati.put("documentoTaxiMissione", documentoTaxi);
+        Map<String, StorageObject> mapDocumentiMissione = new HashMap<>();
+        mapDocumentiMissione.put(Costanti.DOCUMENTO_MISSIONE_KEY, documento);
+        if ( documentoAnticipo!=null)
+            mapDocumentiMissione.put(Costanti.DOCUMENTO_ANTICIPO_KEY, documentoAnticipo);
+        if ( documentoAutoPropria!=null)
+            mapDocumentiMissione.put(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY, documentoAutoPropria);
+        if ( documentoTaxi!=null)
+            mapDocumentiMissione.put(Costanti.DOCUMENTO_TAXI_KEY, documentoTaxi);
 
-        // Aggiungere gli allegati all'oggetto Map
-        for (StorageObject allegato : allegati) {
-            mapAllegati.put("allegatoMissione_" + allegato.getKey(), allegato);
-        }
 
-        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, mapAllegati, anticipo);
+        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, mapDocumentiMissione, allegati,anticipo);
 
     }
 
-    protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapAllegati, OrdineMissioneAnticipo anticipo);
+    protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo);
 
 
     public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {

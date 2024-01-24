@@ -201,6 +201,15 @@ public class Costanti {
     public final static Map<String, String> STATO_INVIO_SIGLA;
     public final static Map<String, String> FONDI;
 
+    public final static String  DOCUMENTO_MISSIONE_KEY="documentoMissione";
+    public final static String  DOCUMENTO_ANTICIPO_KEY="documentoAnticipoMissione";
+    public final static String  DOCUMENTO_AUTO_PROPRIA_KEY="documentoAutoPropriaMissione";
+    public final static String  DOCUMENTO_TAXI_KEY="documentoTaxiMissione";
+
+
+
+
+
     static {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put(TIPO_DOCUMENTO_ALLEGATO, "Allegato");
