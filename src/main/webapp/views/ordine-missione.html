@@ -368,12 +368,8 @@
                     </form>
                     <form class="form-inline" role="form" id="missioni">
                         <p class="col-md-3">
-                        <span class="input-group" ng-if="showEsisteOrdineMissione">
+                        <span class="input-group" >
                             <span class="input-group-addon" ng-attr-translate="{{ 'missione.form.anno-impegno-obbl' }}">anno</span>
-                            <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
-                        </span>
-                        <span class="input-group" ng-if="!showEsisteOrdineMissione">
-                            <span class="input-group-addon" ng-attr-translate="{{ 'missione.form.anno-impegno' }}">anno</span>
                             <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
                         </span>
                         </p>
@@ -383,13 +379,9 @@
 
                     <form class="form-inline" role="form" id="missioni">
                         <p class="col-md-3">
-                        <span class="input-group" ng-if="showEsisteOrdineMissione">
+                        <span class="input-group" >
                             <span class="input-group-addon" ng-attr-translate="{{ 'missione.form.numero-impegno-obbl' }}">numero</span>
-                            <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
-                        </span>
-                            <span class="input-group" ng-if="!showEsisteOrdineMissione">
-                            <span class="input-group-addon" ng-attr-translate="{{ 'missione.form.numero-impegno' }}">numero</span>
-                            <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
+                            <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
                         </span>
                         </p>
                     </form>
