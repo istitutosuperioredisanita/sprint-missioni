@@ -580,13 +580,14 @@
                         </span>
                 </p>
             </form>
-
             <form name="form-inline" role="form" ng-submit="confirm()">
+
                 <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile||ordineMissioneModel.missioneGratuita == 'S'))||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'ordine-missione.button.invia' | translate}}</button>
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
+
                 <div class="col-xs-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.missioneGratuita != 'S' && ordineMissioneModel.stato === 'INS' && validazione != 'S'">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToManager' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'ordine-missione.button.sendToManagerShort' | translate}}</button>
                 </div>

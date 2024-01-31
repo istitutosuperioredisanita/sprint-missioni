@@ -86,10 +86,6 @@ public class OrdineMissioneTaxiService {
         return null;
     }
 
-
-
-
-
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissioneTaxi createTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException,
             ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
