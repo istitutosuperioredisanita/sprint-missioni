@@ -34,9 +34,9 @@ spring:
     attrMail:
   proxy:
     SIGLA:
-      url: http://sigla-sviluppo.iss.it:8080/SIGLA/
-      username: MISSIONIAPP
-      password: MISSIONIAPP
+      url: http://localhost:8080/SIGLA/
+      username: ente
+      password: 2023enteiss
       context:
         cd_unita_organizzativa: "999.000"
         cd_cds: "999"
@@ -91,12 +91,14 @@ spring:
         oggetto: Annullamento Ordine di Missione.
       annullamentoRimborsoMittente:
         oggetto: Annullamento Rimborso Missione
-    host: smtp.cnr.it
+    host: extmail.iss.it
     protocol: smtp
     port: 25
-    from: missioni@cnr.it
-    tls: false
-    auth: false
+    from: missioni@iss.it
+    username: liferaymail@iss.it
+    password: J!#Gm[>fQy*8AE;2
+    tls: true
+    auth: true
     send.error.to: ciro.salvio@iss.it
   print:
     endpoint: http://sigla-t:8082/api/v1/get/print

@@ -1194,7 +1194,6 @@ public class OrdineMissioneService {
                 if (Utility.nvl(istituto.getCreaImpegnoAut(), "N").equals("S")) {
 
                 }
-                checkObbDatiContabili( ordineMissione,false);
                 checkObbDatiContabili(ordineMissione,true);
                 cmisOrdineMissioneService.avviaFlusso(ordineMissioneDB);
                 ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
