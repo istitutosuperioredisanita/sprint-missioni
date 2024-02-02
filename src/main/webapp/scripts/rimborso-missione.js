@@ -705,22 +705,22 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                      varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
+                              {condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue:"E"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
                 } else if (uo) {
                      varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
+                              {condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue:"E"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:uo.substring(0,3)+"%"}];
                 }
             } else if (cdr){
                      varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
+                              {condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue:"E"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }  else if (uo) {
                      varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
+                              {condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue:"E"},
                               {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
             }
             var postGae = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
