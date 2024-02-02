@@ -48,6 +48,11 @@
 					<description>Id Collegato</description>
 					<type>d:text</type>
 				</property>
+				<property name="missioni_rimborso_dettaglio:riga">
+					<title>Numero Missione</title>
+					<type>d:long</type>
+				</property>
+
 			</properties>
 		</type>
 	</types>
