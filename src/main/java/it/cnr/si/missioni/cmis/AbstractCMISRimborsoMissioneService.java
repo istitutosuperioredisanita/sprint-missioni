@@ -465,7 +465,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
 
         path = createFolderRimborsoMissioneDettaglio(dettaglio, path);
 
-        Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
+        Map<String, Object> metadataProperties = createMetadataForFileRimborsoDettaglioMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO,dettaglio);
         try {
             StorageObject node = missioniCMISService.restoreSimpleDocument(
                     metadataProperties,
@@ -494,7 +494,12 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         return null;
     }
 
+    private Map<String, Object> createMetadataForFileRimborsoDettaglioMissioneAllegati(String currentLogin, String fileName, String tipoDocumento,RimborsoMissioneDettagli rimborsoMissioneDettagli) {
+        Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati( currentLogin,fileName,tipoDocumento);
+        metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE,rimborsoMissioneDettagli.getRiga());
 
+        return metadataProperties;
+    }
     private Map<String, Object> createMetadataForFileRimborsoMissioneAllegati(String currentLogin, String fileName, String tipoDocumento) {
         Map<String, Object> metadataProperties = new HashMap<String, Object>();
         metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), RimborsoMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
