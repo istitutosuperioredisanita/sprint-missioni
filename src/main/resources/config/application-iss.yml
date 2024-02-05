@@ -7,8 +7,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
     name: missioni
-    username: MISSIONISVIL
-    password: MISSIONISVILPSW
+    username: MISSIONICOLL
+    password: MISSIONICOLLPSW
   jpa:
     database-platform: org.hibernate.dialect.Oracle12cDialect
     database: ORACLE
@@ -34,7 +34,7 @@ spring:
     attrMail:
   proxy:
     SIGLA:
-      url: http://localhost:8080/SIGLA/
+      url: http://sigla-t:8080/SIGLA/
       username: ente
       password: 2023enteiss
       context:
@@ -226,7 +226,7 @@ cnr:
     driver: AZURE
     azure:
       connectionString: cnr.azure.connectionString=DefaultEndpointsProtocol=http;AccountName=siglatest;AccountKey=3Zcx/A0zAPamRChFifloCkadNE09rPG94qRssq7G+Wnu+6ng0XcY03qTu6OKy6opyRSg9pCu8RFAxvM3ywBhlg==;EndpointSuffix=core.windows.net
-      containerName: sigla-main-storage
+      containerName: sigla-coll-main-storage
     path:
       comunicazioni:
         dal: /Comunicazioni da ISS
