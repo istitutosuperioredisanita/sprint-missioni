@@ -626,7 +626,7 @@ public class RimborsoMissioneService {
         rimborsoMissioneDB.setStatoInvioSigla(rimborsoMissione.getStatoInvioSigla());
         rimborsoMissioneDB.setCdTipoRapporto(rimborsoMissione.getCdTipoRapporto());
         rimborsoMissioneDB.setPersonaleAlSeguito(rimborsoMissione.getPersonaleAlSeguito());
-        rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
+        //rimborsoMissioneDB.setUtilizzoAutoServizio(rimborsoMissione.getUtilizzoAutoServizio());
         rimborsoMissioneDB.setCug(rimborsoMissione.getCug());
         rimborsoMissioneDB.setPresidente(rimborsoMissione.getPresidente());
         rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
@@ -933,9 +933,9 @@ public class RimborsoMissioneService {
         if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoTaxi())) {
             rimborsoMissione.setUtilizzoTaxi("N");
         }
-        if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
+        /*if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
             rimborsoMissione.setUtilizzoAutoServizio("N");
-        }
+        }*/
         if (StringUtils.isEmpty(rimborsoMissione.getPersonaleAlSeguito())) {
             rimborsoMissione.setPersonaleAlSeguito("N");
         }
@@ -1272,11 +1272,11 @@ public class RimborsoMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI + ": Le date di inizio e fine missione non possono essere uguali");
         }
         if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
-            if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N") && rimborsoMissione.getUtilizzoAutoServizio().equals("N") && rimborsoMissione.getPersonaleAlSeguito().equals("N")) {
+            if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N") /*&& rimborsoMissione.getUtilizzoAutoServizio().equals("N")*/ && rimborsoMissione.getPersonaleAlSeguito().equals("N")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Non è possibile indicare le note all'utilizzo dell'auto a noleggio se non si è scelto il suo utilizzo");
             }
         }
-        if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") || Utility.nvl(rimborsoMissione.getPersonaleAlSeguito()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
+        if ((Utility.nvl(rimborsoMissione.getUtilizzoAutoNoleggio()).equals("S") || /*Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") ||*/ Utility.nvl(rimborsoMissione.getPersonaleAlSeguito()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": E' obbligatorio indicare le note all'utilizzo dell'auto a noleggio se si è scelto il suo utilizzo");
         }
         if (rimborsoMissione.isMissioneEstera() && rimborsoMissione.isTrattamentoAlternativoMissione()) {
@@ -1355,8 +1355,8 @@ public class RimborsoMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utente");
         } else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoTaxi())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo del Taxi");
-        } else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");
+        /*} else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");*/
         } else if (StringUtils.isEmpty(rimborsoMissione.getPersonaleAlSeguito())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");
         } else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoNoleggio())) {
