@@ -51,6 +51,7 @@ import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.io.IOUtils;
+import org.hibernate.type.ZonedDateTimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1592,6 +1593,10 @@ public class OrdineMissioneService {
         }
         if (!StringUtils.hasLength(ordineMissione.getMatricola())) {
             ordineMissione.setMatricola(null);
+        }
+        if(ordineMissione.getDataInizioMissione().isBefore(ZonedDateTime.now())){
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
+                    + ": La data di inizio missione non può essere precedente alla data di oggi");
         }
     }
 
