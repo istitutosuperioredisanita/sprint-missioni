@@ -51,7 +51,6 @@ import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.type.ZonedDateTimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -991,9 +990,9 @@ public class OrdineMissioneService {
         return updateOrdineMissione(ordineMissione, fromFlows, confirm, null);
     }
 
-    private void checkObbDatiContabili( OrdineMissione ordineMissione,boolean sendToSign){
+    private void checkObbDatiContabili(OrdineMissione ordineMissione, boolean sendToSign) {
         //controlla che ci sia la Gae ,la voce di bilancio e l'impegno
-        if ( sendToSign){
+        if (sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getFondi()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Fondi");
 
@@ -1003,17 +1002,17 @@ public class OrdineMissioneService {
             if (StringUtils.isEmpty(ordineMissione.getPgObbligazione()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero impegno");
 
-            if ( StringUtils.isEmpty(ordineMissione.getVoce()))
+            if (StringUtils.isEmpty(ordineMissione.getVoce()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
         }
-        if ( !sendToSign) {
+        if (!sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getGae()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": GAE");
         }
 
 
-
     }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows,
                                                Boolean confirm, String basePath) {
@@ -1079,7 +1078,9 @@ public class OrdineMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN,
                         "Operazione non possibile. Non è possibile modificare un ordine di missione durante la fase di validazione. Rieseguire la ricerca.");
             }
-            checkObbDatiContabili(ordineMissione,true);
+            checkObbDatiContabili(ordineMissione, true);
+
+            sendMailToValidator(basePath, ordineMissioneDB);
 
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
             ordineMissioneDB.setValidato("S");
@@ -1195,7 +1196,7 @@ public class OrdineMissioneService {
                 if (Utility.nvl(istituto.getCreaImpegnoAut(), "N").equals("S")) {
 
                 }
-                checkObbDatiContabili(ordineMissione,true);
+                checkObbDatiContabili(ordineMissione, true);
                 cmisOrdineMissioneService.avviaFlusso(ordineMissioneDB);
                 ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
                 ordineMissioneDB.setDataInvioFirma(oggi);
@@ -1209,7 +1210,7 @@ public class OrdineMissioneService {
                 }
             } else if (ordineMissioneDB.isMissioneDaValidare()) {
 
-                checkObbDatiContabili( ordineMissione,false);
+                checkObbDatiContabili(ordineMissione, false);
                 DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
                         ordineMissione.getAnno());
                 if (istituto.isAttivaGestioneResponsabileModulo()) {
@@ -1319,6 +1320,41 @@ public class OrdineMissioneService {
         }
     }
 
+
+    private void sendMailToValidator(String basePath, OrdineMissione ordineMissioneDB) {
+        String testoMail = getTextMailToSendToValidator(basePath, ordineMissioneDB);
+        String uid = ordineMissioneDB.getUid();
+        String subjectMail = subjectSendToAdministrative + " " + getNominativo(uid);
+        List<UsersSpecial> listaValidatori = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
+
+        List<Account> listaAccount = new ArrayList<>();
+        for (UsersSpecial validatore : listaValidatori) {
+            Account account = accountService.loadAccountFromUsername(validatore.getUid());
+            listaAccount.add(account);
+        }
+
+        for (Account account : listaAccount) {
+            String emailValidator = account.getEmail_comunicazioni();
+
+            if (emailValidator != null && !emailValidator.isEmpty()) {
+                mailService.sendEmail(subjectMail, testoMail, false, true, emailValidator);
+            } else {
+                log.warn("Indirizzo email del validatore non disponibile per l'utente con ID: " + account.getUid());
+            }
+        }
+    }
+
+    private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
+        return "L'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " della uo "
+                + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
+                + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
+                + ordineMissione.getOggetto() + " è stato inviato per la tua validazione."
+                + " Si prega di verificarlo attraverso il link " + basePath + "/#/ordine-missione/"
+                + ordineMissione.getId() + "/S";
+    }
+
     private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
         if (lista != null && lista.size() > 0) {
             String[] elencoMail = mailService.prepareTo(lista);
@@ -1327,6 +1363,7 @@ public class OrdineMissioneService {
             }
         }
     }
+
 
     private String getNominativo(String user) {
         Account utente = accountService.loadAccountFromUsername(user);
@@ -1594,7 +1631,7 @@ public class OrdineMissioneService {
         if (!StringUtils.hasLength(ordineMissione.getMatricola())) {
             ordineMissione.setMatricola(null);
         }
-        if(ordineMissione.getDataInizioMissione().isBefore(ZonedDateTime.now())){
+        if (ordineMissione.getDataInizioMissione().isBefore(ZonedDateTime.now())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
                     + ": La data di inizio missione non può essere precedente alla data di oggi");
         }
