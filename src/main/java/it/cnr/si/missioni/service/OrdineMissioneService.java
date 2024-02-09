@@ -1323,25 +1323,9 @@ public class OrdineMissioneService {
 
     private void sendMailToValidator(String basePath, OrdineMissione ordineMissioneDB) {
         String testoMail = getTextMailToSendToValidator(basePath, ordineMissioneDB);
-        String uid = ordineMissioneDB.getUid();
-        String subjectMail = subjectSendToAdministrative + " " + getNominativo(uid);
+        String subjectMail = subjectSendToAdministrative + " " + getNominativo(ordineMissioneDB.getUid());
         List<UsersSpecial> listaValidatori = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
-
-        List<Account> listaAccount = new ArrayList<>();
-        for (UsersSpecial validatore : listaValidatori) {
-            Account account = accountService.loadAccountFromUsername(validatore.getUid());
-            listaAccount.add(account);
-        }
-
-        for (Account account : listaAccount) {
-            String emailValidator = account.getEmail_comunicazioni();
-
-            if (emailValidator != null && !emailValidator.isEmpty()) {
-                mailService.sendEmail(subjectMail, testoMail, false, true, emailValidator);
-            } else {
-                log.warn("Indirizzo email del validatore non disponibile per l'utente con ID: " + account.getUid());
-            }
-        }
+        sendMailToAdministrative(listaValidatori, testoMail, subjectMail);
     }
 
     private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
