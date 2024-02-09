@@ -1325,7 +1325,7 @@ public class OrdineMissioneService {
         String testoMail = getTextMailToSendToValidator(basePath, ordineMissioneDB);
         String subjectMail = subjectSendToAdministrative + " " + getNominativo(ordineMissioneDB.getUid());
         List<UsersSpecial> listaValidatori = accountService.getUserSpecialForUoPerValidazione(ordineMissioneDB.getUoSpesa());
-        sendMailToAdministrative(listaValidatori, testoMail, subjectMail);
+        sendMailToValidatori(listaValidatori, testoMail, subjectMail);
     }
 
     private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
@@ -1339,13 +1339,20 @@ public class OrdineMissioneService {
                 + ordineMissione.getId() + "/S";
     }
 
-    private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
+    private void sendMailToGroup(List<UsersSpecial> lista, String testoMail, String oggetto) {
         if (lista != null && lista.size() > 0) {
             String[] elencoMail = mailService.prepareTo(lista);
             if (elencoMail != null && elencoMail.length > 0) {
                 mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
             }
         }
+    }
+
+    private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
+        sendMailToGroup( lista,testoMail,oggetto);
+    }
+    private void sendMailToValidatori(List<UsersSpecial> lista, String testoMail, String oggetto) {
+        sendMailToGroup( lista,testoMail,oggetto);
     }
 
 
