@@ -933,9 +933,9 @@ public class RimborsoMissioneService {
         if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoTaxi())) {
             rimborsoMissione.setUtilizzoTaxi("N");
         }
-        /*if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
+        if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
             rimborsoMissione.setUtilizzoAutoServizio("N");
-        }*/
+        }
         if (StringUtils.isEmpty(rimborsoMissione.getPersonaleAlSeguito())) {
             rimborsoMissione.setPersonaleAlSeguito("N");
         }
