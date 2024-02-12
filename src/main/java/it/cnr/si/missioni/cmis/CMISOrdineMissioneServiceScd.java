@@ -279,6 +279,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiMissione.get( Costanti.DOCUMENTO_MISSIONE_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapDocumentiMissione.get( Costanti.DOCUMENTO_ANTICIPO_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_TAXI, mapDocumentiMissione.get(Costanti.DOCUMENTO_TAXI_KEY), ordineMissione.getStatoFlusso());
 
             messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 
