@@ -50,6 +50,9 @@ public class Gae extends RestServiceBean implements Serializable {
     private Integer esercizio_inizio;
     @JsonProperty("esercizio_fine")
     private Integer esercizio_fine;
+
+    @JsonProperty("esercizio_fine")
+    private String cd_responsabile_terzo;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
