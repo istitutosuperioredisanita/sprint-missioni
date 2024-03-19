@@ -27,6 +27,10 @@ public class CMISOrdineMissione extends CMISMissione {
     public final static String SECONDO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza di mezzi pubblici per sospensione del servizio per sciopero, per eventi eccezionali opportunamente documentati;";
     public final static String TERZO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva ed elenco dettagliato del materiale trasportato)";
     public final static String QUARTO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per il personale con disabilità/portatore di handicap.";
+
+    public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_NOLEGGIO = "In casi di motivata eccezionalità, attestate da apposita autodichiarazione del soggetto incaricato ";
+    public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_NOLEGGIO = "Per motivate esigenze di servizio, attestate da apposita autodichiarazione del soggetto incaricato. ";
+
     private Long idMissioneOrdine;
     private Long idMissioneRevoca;
     private String usernameFirmatarioAggiunto;
@@ -42,6 +46,9 @@ public class CMISOrdineMissione extends CMISMissione {
     private String secondoMotivoTaxi;
     private String terzoMotivoTaxi;
     private String quartoMotivoTaxi;
+
+    private String primoMotivoAutoNoleggio;
+    private String secondoMotivoAutoNoleggio;
     private String anticipo;
     private String validazioneModulo;
     private String modulo;
@@ -181,6 +188,22 @@ public class CMISOrdineMissione extends CMISMissione {
         this.quartoMotivoTaxi = quartoMotivoTaxi;
     }
 
+    public String getPrimoMotivoAutoNoleggio() {
+        return primoMotivoAutoNoleggio;
+    }
+
+    public void setPrimoMotivoAutoNoleggio(String primoMotivoAutoNoleggio) {
+        this.primoMotivoAutoNoleggio = primoMotivoAutoNoleggio;
+    }
+
+    public String getSecondoMotivoAutoNoleggio() {
+        return secondoMotivoAutoNoleggio;
+    }
+
+    public void setSecondoMotivoAutoNoleggio(String secondoMotivoAutoNoleggio) {
+        this.secondoMotivoAutoNoleggio = secondoMotivoAutoNoleggio;
+    }
+
     public String getMissioneGratuita() {
         return missioneGratuita;
     }
@@ -228,4 +251,6 @@ public class CMISOrdineMissione extends CMISMissione {
     public void setCodiceFiscaleRespModulo(String codiceFiscaleRespModulo) {
         this.codiceFiscaleRespModulo = codiceFiscaleRespModulo;
     }
+
+
 }

@@ -61,11 +61,11 @@ public class MessageForFlowAnnullamento extends MessageForFlowOrdine implements 
                 ", descrizioneUoSpesa='" + descrizioneUoSpesa + '\'' +
                 ", uoCompetenza='" + uoCompetenza + '\'' +
                 ", descrizioneUoCompetenza='" + descrizioneUoCompetenza + '\'' +
-                //", autoPropriaFlag='" + autoPropriaFlag + '\'' +
+                ", autoPropriaFlag='" + autoPropriaFlag + '\'' +
                 ", noleggioFlag='" + noleggioFlag + '\'' +
-                //", taxiFlag='" + taxiFlag + '\'' +
-                //", servizioFlagOk='" + servizioFlagOk + '\'' +
-                //", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
+                ", taxiFlag='" + taxiFlag + '\'' +
+                ", servizioFlagOk='" + servizioFlagOk + '\'' +
+                ", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
                 ", capitolo='" + capitolo + '\'' +
                 ", descrizioneCapitolo='" + descrizioneCapitolo + '\'' +
                 ", progetto='" + progetto + '\'' +

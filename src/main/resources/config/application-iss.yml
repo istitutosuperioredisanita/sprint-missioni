@@ -107,6 +107,7 @@ spring:
     anticipo: /missioni/iss/OrdineMissioneAnticipo.jrxml
     autoPropria: /missioni/iss/OrdineMissioneAutoPropria.jrxml
     taxi: /missioni/iss/OrdineMissioneTaxi.jrxml
+    autoNoleggio: /missioni/iss/OrdineMissioneAutoNoleggio.jrxml
 
 audit: false
 

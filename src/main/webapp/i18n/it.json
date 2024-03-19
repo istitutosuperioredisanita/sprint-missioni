@@ -208,10 +208,10 @@
             "auto-propria": "Dati Auto Propria",
             "percorso-da": "Percorso Da",
             "percorso-a": "Percorso A",
-            "motivi-ispettivi": "Il soggetto incaricato sia impegnato nello svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
+            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relative a compiti ispettivi, di verifica e controllo",
             "motivi-urgenza": "L’attività sia caratterizzata da emergenza, urgenza, indifferibilità, tra cui i casi di mancanza assoluta di mezzi di trasporto",
             "motivi-trasporto": "Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
-            "altri-motivi": "Altri motivi (specificare)",
+            "altri-motivi": "NOTE",
             "addSpostamento": "Aggiungi Spostamento",
             "box-dati": "Dati Generali",
             "box-spostamenti": "Spostamenti"
@@ -245,7 +245,7 @@
             "mancanza-non-assoluta-mezzi-pubblici": "Mancanza di mezzi pubblici per sospensione del servizio per sciopero, per eventi eccezionali opportunamente documentati",
             "necessità-trasporto-materiale": "Necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva </br> ed elenco dettagliato del materiale trasportato)",
             "motivi-handicap-disabilità": "Personale con disabilità/portatore di handicap",
-            "altri-motivi": "Altri motivi (specificare)",
+            "altri-motivi": "NOTE",
             "addSpostamento": "Aggiungi Spostamento",
             "box-dati": "Dati Generali",
             "box-spostamenti": "Spostamenti"
@@ -256,17 +256,22 @@
     },
 
     "ordine-missione-auto-noleggio": {
-        "title": "RICHIESTA NOLEGGIO AUTO PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "title": "RICHIESTA NOLEGGIO AUTO/CAR SHARING PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
         "NB-title" : "NB: ",
         "NB-text" : "non è consentito l’uso del mezzo a noleggio per il personale non dipendente e per il raggiungimento della località di missione estera.",
         "form": {
-            "importo": "Importo auto da noleggiare*",
-            "note": "Note",
-            "note.placeholder": "Inserire eventuali Annotazioni",
-            "box-dati": "Dati Generali"
+            "taxi": "Dati Auto A Noleggio",
+            "percorso-da": "Percorso Da",
+            "percorso-a": "Percorso A",
+            "motivo-esigenze-di-servizio": "Per motivate esigenze di servizio, attestate da apposita autodichiarazione del soggetto incaricato",
+            "motivo-motivata-eccezionalità": "In casi di motivata eccezionalità, attestate da apposita autodichiarazione del soggetto incaricato",
+            "note": "NOTE",
+            "addSpostamento": "Aggiungi Spostamento",
+            "box-dati": "Dati Generali",
+            "box-spostamenti": "Spostamenti"
         },
         "button": {
-            "print": "Stampa Richiesta Noleggio Auto"
+            "print": "Stampa Richiesta Auto A Noleggio"
         }
     },
 
@@ -369,8 +374,8 @@
             "auto-propria-no": "Richiesta Utilizzo Auto Propria: No",
             "taxi-si": "Richiesta Utilizzo Taxi: Sì",
             "taxi-no": "Richiesta Utilizzo Taxi: No",
-            "auto-noleggio-si": "Richiesta Utilizzo Auto Noleggio: Sì",
-            "auto-noleggio-no": "Richiesta Utilizzo Auto Noleggio: No",
+            "auto-noleggio-si": "Richiesta Utilizzo Auto Noleggio/CAR SHARING: Sì",
+            "auto-noleggio-no": "Richiesta Utilizzo Auto Noleggio/CAR SHARING: No",
             "sendToManager": "Invia al Responsabile del gruppo",
             "sendToManagerShort": "Invia al Responsabile",
             "anticipo-si": "Richiesta Anticipo: Sì",

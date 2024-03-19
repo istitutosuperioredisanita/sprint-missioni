@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
 import javax.persistence.OptimisticLockException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +113,7 @@ public class OrdineMissioneTaxiService {
         OrdineMissioneTaxi ordineMissioneTaxiDB = (OrdineMissioneTaxi) crudServiceBean.findById(OrdineMissioneTaxi.class, ordineMissioneTaxi.getId());
 
         if (ordineMissioneTaxiDB == null)
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Auto Propria Ordine di Missione da aggiornare inesistente.");
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Taxi Ordine di Missione da aggiornare inesistente.");
 
         if (ordineMissioneTaxiDB.getOrdineMissione() != null) {
             ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneTaxiDB.getOrdineMissione());
@@ -129,7 +130,7 @@ public class OrdineMissioneTaxiService {
         validaCRUD(ordineMissioneTaxiDB);
         ordineMissioneTaxiDB = (OrdineMissioneTaxi) crudServiceBean.modificaConBulk(ordineMissioneTaxiDB);
 
-        log.debug("Updated Information for Auto Propria Ordine di Missione: {}", ordineMissioneTaxiDB);
+        log.debug("Updated Information for Taxi Ordine di Missione: {}", ordineMissioneTaxiDB);
         return ordineMissioneTaxi;
     }
 
@@ -175,6 +176,14 @@ public class OrdineMissioneTaxiService {
         return null;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteTaxi(OrdineMissione ordineMissione) {
+        OrdineMissioneTaxi ordineMissioneTaxi = ordineMissioneTaxiRepository.getTaxi(ordineMissione);
+
+        if (ordineMissioneTaxi != null) {
+            cancellaOrdineMissioneTaxi(ordineMissioneTaxi);
+        }
+    }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteTaxi(Long idTaxiOrdineMissione) throws AwesomeException,
@@ -191,13 +200,26 @@ public class OrdineMissioneTaxiService {
     }
 
 
-    private void cancellaOrdineMissioneTaxi(OrdineMissioneTaxi OrdineMissioneTaxi)
+    private void cancellaSpostamenti(
+            OrdineMissioneTaxi ordineMissioneTaxi)
             throws ComponentException {
-        if (OrdineMissioneTaxi.isStatoNonInviatoAlFlusso()) {
-            OrdineMissioneTaxi.setToBeUpdated();
-            OrdineMissioneTaxi.setStato(Costanti.STATO_ANNULLATO);
-            crudServiceBean.modificaConBulk(OrdineMissioneTaxi);
-            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, OrdineMissioneTaxi.getOrdineMissione().getId());
+        List<SpostamentiTaxi> listaSpostamenti = spostamentiTaxiRepository.getSpostamenti(ordineMissioneTaxi);
+        if (listaSpostamenti != null && !listaSpostamenti.isEmpty()) {
+            for (Iterator<SpostamentiTaxi> iterator = listaSpostamenti.iterator(); iterator.hasNext(); ) {
+                SpostamentiTaxi spostamento = iterator.next();
+                cancellaSpostamento(spostamento);
+            }
+        }
+    }
+
+    private void cancellaOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi)
+            throws ComponentException {
+        cancellaSpostamenti(ordineMissioneTaxi);
+        if (ordineMissioneTaxi.isStatoNonInviatoAlFlusso()) {
+            ordineMissioneTaxi.setToBeUpdated();
+            ordineMissioneTaxi.setStato(Costanti.STATO_ANNULLATO);
+            crudServiceBean.modificaConBulk(ordineMissioneTaxi);
+            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, ordineMissioneTaxi.getOrdineMissione().getId());
 
             List<StorageObject> listaAllegati = cmisOrdineMissioneService.getAttachmentsTaxi(ordineMissione);
             if (listaAllegati != null) {
@@ -212,7 +234,7 @@ public class OrdineMissioneTaxiService {
             }
         } else {
             throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Non è possibile cancellare l'anticipo. E' già stato inviato al flusso per l'approvazione.");
+                    "Non è possibile cancellare il taxi");
         }
     }
 
@@ -276,7 +298,7 @@ public class OrdineMissioneTaxiService {
 
         SpostamentiTaxi spostamentiTaxiDB = (SpostamentiTaxi) crudServiceBean.findById(SpostamentiTaxi.class, spostamentoTaxi.getId());
         if (spostamentiTaxiDB == null)
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Spostamenti Auto Propria Ordine di Missione da aggiornare inesistente.");
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Spostamenti Taxi Ordine di Missione da aggiornare inesistente.");
 
         if (spostamentiTaxiDB.getTaxi().getOrdineMissione() != null) {
             ordineMissioneService.controlloOperazioniCRUDDaGui(spostamentiTaxiDB.getTaxi().getOrdineMissione());

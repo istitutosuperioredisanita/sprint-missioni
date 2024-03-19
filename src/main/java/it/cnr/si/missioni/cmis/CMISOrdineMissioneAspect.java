@@ -23,10 +23,14 @@ public enum CMISOrdineMissioneAspect {
     ORDINE_MISSIONE_ATTACHMENT_ALLEGATI("P:missioni_ordine_attachment:allegati"),
     ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO("P:missioni_ordine_attachment:allegati_anticipo"),
     ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI("P:missioni_ordine_attachment:allegati_taxi"),
+    ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO("P:missioni_ordine_attachment:allegati_auto_noleggio"),
     ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA("P:missioni_ordine_attachment:uso_auto_propria"),
     ORDINE_MISSIONE_ATTACHMENT_USO_TAXI("P:missioni_ordine_attachment:uso_taxi"),
+    ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_NOLEGGIO("P:missioni_ordine_attachment:uso_auto_noleggio"),
     ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO("P:missioni_ordine_attachment:richiesta_anticipo"),
     ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI("P:missioni_ordine_attachment:richiesta_taxi"),
+    ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO("P:missioni_ordine_attachment:richiesta_auto_noleggio"),
+
     ORDINE_MISSIONE_ATTACHMENT_DOCUMENT("D:missioni_ordine_attachment:document"),
     ORDINE_MISSIONE_ATTACHMENT_ORDINE("P:missioni_ordine_attachment:ordine"),
     ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE("P:missioni_ordine_attachment:annullamento_ordine");

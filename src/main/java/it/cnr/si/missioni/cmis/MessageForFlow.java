@@ -61,8 +61,8 @@ public class MessageForFlow extends JSONBody implements Serializable {
     String autoPropriaFlag;
     String noleggioFlag;
     String taxiFlag;
-    //String servizioFlagOk;
-    //String personaSeguitoFlagOk;
+    String servizioFlagOk;
+    String personaSeguitoFlagOk;
     String capitolo;
     String uoRichSigla;
     String uoCompetenzaSigla;
@@ -93,6 +93,9 @@ public class MessageForFlow extends JSONBody implements Serializable {
     String taxiSecondoMotivo;
     String taxiTerzoMotivo;
     String taxiQuartoMotivo;
+    String autoNoleggioPrimoMotivo;
+    String autoNoleggioSecondoMotivo;
+
     String pathFascicoloDocumenti;
     String titolo;
     String descrizione;
@@ -414,7 +417,7 @@ public class MessageForFlow extends JSONBody implements Serializable {
     public void setTaxiFlag(String taxiFlag) {
         this.taxiFlag = taxiFlag;
     }
-/*
+
     public String getServizioFlagOk() {
         return servizioFlagOk;
     }
@@ -429,7 +432,7 @@ public class MessageForFlow extends JSONBody implements Serializable {
 
     public void setPersonaSeguitoFlagOk(String personaSeguitoFlagOk) {
         this.personaSeguitoFlagOk = personaSeguitoFlagOk;
-    }*/
+    }
 
     public String getCapitolo() {
         return capitolo;
@@ -629,6 +632,22 @@ public class MessageForFlow extends JSONBody implements Serializable {
 
     public void setTaxiQuartoMotivo(String taxiQuartoMotivo) {
         this.taxiQuartoMotivo = taxiQuartoMotivo;
+    }
+
+    public String getAutoNoleggioPrimoMotivo() {
+        return autoNoleggioPrimoMotivo;
+    }
+
+    public void setAutoNoleggioPrimoMotivo(String autoNoleggioPrimoMotivo) {
+        this.autoNoleggioPrimoMotivo = autoNoleggioPrimoMotivo;
+    }
+
+    public String getAutoNoleggioSecondoMotivo() {
+        return autoNoleggioSecondoMotivo;
+    }
+
+    public void setAutoNoleggioSecondoMotivo(String autoNoleggioSecondoMotivo) {
+        this.autoNoleggioSecondoMotivo = autoNoleggioSecondoMotivo;
     }
 
     public String getPathFascicoloDocumenti() {

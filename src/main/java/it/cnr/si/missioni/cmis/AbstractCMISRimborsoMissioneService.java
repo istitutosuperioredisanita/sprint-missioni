@@ -234,8 +234,8 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         cmisRimborsoMissione.setNoteSegreteria(rimborsoMissione.getNoteSegreteria() == null ? "" : rimborsoMissione.getNoteSegreteria());
         cmisRimborsoMissione.setOggetto(rimborsoMissione.getOggetto());
         cmisRimborsoMissione.setTaxiFlag(rimborsoMissione.getUtilizzoTaxi().equals("S") ? "si" : "no");
-        /*cmisRimborsoMissione.setAutoServizioFlag(rimborsoMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
-        cmisRimborsoMissione.setPersonaSeguitoFlag(rimborsoMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");*/
+        cmisRimborsoMissione.setAutoServizioFlag(rimborsoMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
+        cmisRimborsoMissione.setPersonaSeguitoFlag(rimborsoMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");
         cmisRimborsoMissione.setUoRich(datiFlusso.getUoRichPerFlusso());
         cmisRimborsoMissione.setUoSpesa(datiFlusso.getUoSpesaPerFlusso());
         cmisRimborsoMissione.setUoCompetenza(datiFlusso.getUoCompetenzaPerFlusso() == null ? "" : datiFlusso.getUoCompetenzaPerFlusso());

@@ -53,11 +53,11 @@ public class MessageForFlowOrdine extends MessageForFlow implements Serializable
                 ", descrizioneUoSpesa='" + descrizioneUoSpesa + '\'' +
                 ", uoCompetenza='" + uoCompetenza + '\'' +
                 ", descrizioneUoCompetenza='" + descrizioneUoCompetenza + '\'' +
-                //", autoPropriaFlag='" + autoPropriaFlag + '\'' +
+                ", autoPropriaFlag='" + autoPropriaFlag + '\'' +
                 ", noleggioFlag='" + noleggioFlag + '\'' +
-                /*", taxiFlag='" + taxiFlag + '\'' +
+                ", taxiFlag='" + taxiFlag + '\'' +
                 ", servizioFlagOk='" + servizioFlagOk + '\'' +
-                ", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +*/
+                ", personaSeguitoFlagOk='" + personaSeguitoFlagOk + '\'' +
                 ", capitolo='" + capitolo + '\'' +
                 ", descrizioneCapitolo='" + descrizioneCapitolo + '\'' +
                 ", progetto='" + progetto + '\'' +
@@ -85,6 +85,8 @@ public class MessageForFlowOrdine extends MessageForFlow implements Serializable
                 ", taxiSecondoMotivo='" + taxiSecondoMotivo + '\'' +
                 ", taxiTerzoMotivo='" + taxiTerzoMotivo + '\'' +
                 ", taxiQuartoMotivo='" + taxiQuartoMotivo + '\'' +
+                ", autoNoleggioPrimoMotivo='" + autoNoleggioPrimoMotivo + '\'' +
+                ", autoNoleggioSecondoMotivo='" + autoNoleggioSecondoMotivo + '\'' +
                 ", pathFascicoloDocumenti='" + pathFascicoloDocumenti + '\'' +
                 ", titolo='" + titolo + '\'' +
                 ", descrizione='" + descrizione + '\'' +

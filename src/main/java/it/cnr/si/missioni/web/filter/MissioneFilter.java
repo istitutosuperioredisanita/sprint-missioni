@@ -39,7 +39,7 @@ public class MissioneFilter {
     private String includiMissioniAnnullate;
     private String recuperoAutoPropria;
     private String recuperoTaxi;
-
+    private String recuperoAutoNoleggio;
     private String respGruppo;
     private Long daNumero;
     private Long aNumero;
@@ -249,6 +249,14 @@ public class MissioneFilter {
         this.recuperoTaxi = recuperoTaxi;
     }
 
+    public String getRecuperoAutoNoleggio() {
+        return recuperoAutoNoleggio;
+    }
+
+    public void setRecuperoAutoNoleggio(String recuperoAutoNoleggio) {
+        this.recuperoAutoNoleggio = recuperoAutoNoleggio;
+    }
+
     public String getCup() {
         return cup;
     }
@@ -291,6 +299,7 @@ public class MissioneFilter {
                 ", includiMissioniAnnullate='" + includiMissioniAnnullate + '\'' +
                 ", recuperoAutoPropria='" + recuperoAutoPropria + '\'' +
                 ", recuperoTaxi='" + recuperoTaxi + '\'' +
+                ", recuperoAutoNoleggio='" + recuperoAutoNoleggio + '\'' +
                 ", respGruppo='" + respGruppo + '\'' +
                 ", daNumero=" + daNumero +
                 ", aNumero=" + aNumero +

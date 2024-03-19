@@ -1355,8 +1355,8 @@ public class RimborsoMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utente");
         } else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoTaxi())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo del Taxi");
-        /*} else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");*/
+        } else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoServizio())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");
         } else if (StringUtils.isEmpty(rimborsoMissione.getPersonaleAlSeguito())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");
         } else if (StringUtils.isEmpty(rimborsoMissione.getUtilizzoAutoNoleggio())) {
