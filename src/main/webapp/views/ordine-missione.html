@@ -65,12 +65,12 @@
                 </div>
                 <div class="panel-body my-panel-body">
                     <info-account account="accountModel"></info-account>
-                    <div class="col-md-12">
+                    <!--<div class="col-md-12">
                   <span class="input-group">
                   <span class="input-group-addon" translate="missione.form.domicilio-fiscale">Domicilio</span>
                   <input ng-disabled="validazione || disabilitaOrdineMissione" type="text" class="input-sm form-control" name="domicilioFiscaleRich" placeholder="{{'missione.form.domicilio-fiscale.placeholder' | translate}}" ng-model="ordineMissioneModel.domicilioFiscaleRich"/>
                   </span>
-                    </div>
+                    </div>-->
                 </div>
             </div>
             <div class="row">
@@ -454,7 +454,7 @@
                     </form>
                 </div>
             </div>
-            <div class="panel panel-info">
+            <div class="panel panel-info" ng-show="showEsisteOrdineMissione">
                 <div class="panel-heading color-verde-scuro text-center">
                     <h3 class="panel-title color-verde-scuro" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
                 </div>
@@ -474,6 +474,7 @@
                      </span>
                         </p>
                     </form>
+<!--
                     <form class="form-inline" role="form" id="missioni">
                         <div class="col-md-3">
                      <span class="input-group">
@@ -494,15 +495,8 @@
                      </span>
                         </p>
                     </form>
-                    <div class="panel-body my-panel-body">
-                        <div class="col-md-12">
-                            <p>    <strong translate="ordine-missione-auto-noleggio.NB-title">NB title</strong>
-                                <span>
-                        <span translate="ordine-missione-auto-noleggio.NB-text">NB TEXT</span>
-                        </span>
-                            </p>
-                        </div>
-                    </div>
+-->
+
                     <div class="col-md-12">
                         <ul class="pager" ng-show="showEsisteOrdineMissione">
                             <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
@@ -510,15 +504,18 @@
                             <li><a ng-hide="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-no"></a></li>
                             <li><a ng-hide="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-no"></a></li>
                             <li><a ng-hide="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-no">Anticipo</a></li>
+                            <li><a ng-hide="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-no"></a></li>
                             <li><a ng-show="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si"></a></li>
                             <li><a ng-show="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-si"></a></li>
                             <li><a ng-show="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-si">Anticipo</a></li>
+                            <li><a ng-show="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-si"></a></li>
+
                             <cnr-modal-history id-missione="ordineMissioneModel.id" tipo-missione="'OR'"> </cnr-modal-history>
                         </ul>
                     </div>
                 </div>
             </div>
-            <form class="form-inline col-md-12" role="form" id="missioni">
+            <form class="form-inline col-md-12" role="form" id="missioni" >
                 <div class="panel panel-default" ng-if="ordineMissioneModel.id && (ordineMissioneModel.isFireSearchAttachments == true || ordineMissioneModel.isFireSearchAttachments == false )">
                     <div class="panel-heading color-verde-chiaro text-center">
                         <h1 class="panel-title">Allegati</h1>

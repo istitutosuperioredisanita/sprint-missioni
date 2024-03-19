@@ -1334,6 +1334,22 @@ $scope.getDatiUo = function(uo) {
         }
     }
 
+        $scope.goAutoNoleggio = function() {
+            if ($scope.ordineMissioneModel.id) {
+                if ($scope.validazione) {
+                    $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione);
+                } else {
+                    if ($scope.disabilitaOrdineMissione) {
+                        $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + "D");
+                    } else {
+                        $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + "N");
+                    }
+                }
+            } else {
+                ui.error("Per poter inserire i dati dell'auto a noleggio è necessario prima salvare l'ordine di missione");
+            }
+        }
+
 
 
     $scope.confirmDeleteAttachment = function(attachment, idOrdineMissione) {

@@ -299,6 +299,13 @@ missioniApp
                        authorizedRoles: [USER_ROLES.user]
                    }
                })
+               .when('/ordine-missione/autoNoleggio/:idOrdineMissione/:validazione?', {
+                   templateUrl: 'views/ordine-missione/auto-noleggio.html',
+                   controller: 'AutoNoleggioOrdineMissioneController',
+                   access: {
+                       authorizedRoles: [USER_ROLES.user]
+                   }
+               })
                 .when('/password', {
                     templateUrl: 'views/password.html',
                     controller: 'PasswordController',

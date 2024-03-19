@@ -21,11 +21,13 @@ package it.cnr.si.missioni.cmis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoNoleggio;
 import it.cnr.si.missioni.service.MessageForFlowsService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -119,11 +121,11 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
             messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
             messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
-            //messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+            messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
             messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
-            //messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
-            //messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
-            //messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+            messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+            messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+            messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
             messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
             messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
             messageForFlows.setProgetto(cmisOrdineMissione.getModulo());
@@ -146,6 +148,13 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
             messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
             messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
+
             if (!annullamento.getOrdineMissione().isOrdineMissioneVecchiaScrivania()) {
                 messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().getIdFlusso());
             }
@@ -240,11 +249,11 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
             messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
             messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
-            //messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+            messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
             messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
-            //messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
-            //messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
-            //messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+            messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+            messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+            messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
             messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
             messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
             messageForFlows.setProgetto(cmisOrdineMissione.getModulo());
@@ -267,6 +276,12 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
             messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
             messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
 
             messageForFlows.setValidazioneSpesaFlag("si");
 
@@ -280,6 +295,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapDocumentiMissione.get( Costanti.DOCUMENTO_ANTICIPO_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_TAXI, mapDocumentiMissione.get(Costanti.DOCUMENTO_TAXI_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_NOLEGGIO, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_NOLEGGIO_KEY), ordineMissione.getStatoFlusso());
 
             messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
 
@@ -358,11 +374,11 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
             messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
             messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
-            //messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+            messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
             messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
-            //messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
-            //messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
-            //messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+            messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+            messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+            messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
             messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
             messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
             messageForFlows.setProgetto(cmisOrdineMissione.getModulo());
@@ -385,11 +401,13 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
             messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
             messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
-            messageForFlows.setTaxiAltriMotivi(cmisOrdineMissione.getAltriMotiviTaxi());
-            messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
-            messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
-            messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
             messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
+
 
             messageForFlows.setValidazioneSpesaFlag("si");
 
@@ -402,6 +420,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapAllegati.get("documentoAnticipo"), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapAllegati.get("documentoAutoPropria"), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_TAXI, mapAllegati.get("documentoTaxi"), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_NOLEGGIO, mapAllegati.get("documentoAutoNoleggio"), ordineMissione.getStatoFlusso());
 
             final MultiValueMap<String, Object> finalParameters = parameters;
 

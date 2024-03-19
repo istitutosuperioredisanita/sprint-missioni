@@ -52,6 +52,7 @@ spring:
     anticipo: /missioni/OrdineMissioneAnticipo.jrxml
     autoPropria: /missioni/OrdineMissioneAutoPropria.jrxml
     taxi: /missioni/OrdineMissioneTaxi.jrxml
+    autoNoleggio: /missioni/OrdineMissioneAutoNoleggio.jrxml
     endpoint: http://sigla-print.test.si.cnr.it/api/v1/get/print
   messages:
     basename: i18n/messages

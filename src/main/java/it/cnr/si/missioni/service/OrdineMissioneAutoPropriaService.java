@@ -154,8 +154,8 @@ public class OrdineMissioneAutoPropriaService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
         }
         if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(), "N").equals("N") &&
+                /*Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(), "N").equals("N") &&
+                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(), "N").equals("N") &&*/
                 Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi(), "N").equals("N")) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto propria.");
         }
@@ -212,8 +212,8 @@ public class OrdineMissioneAutoPropriaService {
         ordineMissioneAutoPropriaDB.setCartaCircolazione(ordineMissioneAutoPropria.getCartaCircolazione());
         ordineMissioneAutoPropriaDB.setEntePatente(ordineMissioneAutoPropria.getEntePatente());
         ordineMissioneAutoPropriaDB.setUtilizzoMotiviIspettivi(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
-        ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
-        ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
+        /*ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
+        ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());*/
         ordineMissioneAutoPropriaDB.setUtilizzoAltriMotivi(ordineMissioneAutoPropria.getUtilizzoAltriMotivi());
 
         ordineMissioneAutoPropriaDB.setToBeUpdated();

@@ -130,9 +130,9 @@ public class CMISRimborsoMissioneScd extends AbstractCMISRimborsoMissioneService
             messageForFlow.setUoCompetenza(cmisRimborsoMissione.getUoCompetenza());
             messageForFlow.setDescrizioneUoCompetenza(cmisRimborsoMissione.getDescrizioneUoCompetenza());
             messageForFlow.setNoleggioFlag(cmisRimborsoMissione.getNoleggioFlag());
-            /*messageForFlow.setTaxiFlag(cmisRimborsoMissione.getTaxiFlag());
+            messageForFlow.setTaxiFlag(cmisRimborsoMissione.getTaxiFlag());
             messageForFlow.setServizioFlagOk(cmisRimborsoMissione.getAutoServizioFlag());
-            messageForFlow.setPersonaSeguitoFlagOk(cmisRimborsoMissione.getPersonaSeguitoFlag());*/
+            messageForFlow.setPersonaSeguitoFlagOk(cmisRimborsoMissione.getPersonaSeguitoFlag());
             messageForFlow.setCapitolo(cmisRimborsoMissione.getCapitolo());
             messageForFlow.setDescrizioneCapitolo(cmisRimborsoMissione.getDescrizioneCapitolo());
             messageForFlow.setGae(cmisRimborsoMissione.getGae());

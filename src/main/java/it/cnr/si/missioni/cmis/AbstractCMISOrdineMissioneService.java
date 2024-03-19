@@ -114,10 +114,17 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
 
     @Autowired
+    protected PrintOrdineMissioneAutoNoleggioService printOrdineMissioneAutoNoleggioService;
+
+    @Autowired
     protected OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
     @Autowired
     protected OrdineMissioneTaxiService ordineMissioneTaxiService;
+
+    @Autowired
+    protected OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
+
     @Autowired
     protected OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
 
@@ -144,6 +151,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             OrdineMissioneAnticipo anticipo = null;
             OrdineMissioneAutoPropria autoPropria = null;
             OrdineMissioneTaxi taxi = null;
+            OrdineMissioneAutoNoleggio autoNoleggio= null;
             if (ordineMissione != null) {
                 anticipo = ordineMissioneAnticipoService.getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
                 if (anticipo != null) {
@@ -162,6 +170,12 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     ordineMissione.setUtilizzoTaxi("S");
                 } else {
                     ordineMissione.setUtilizzoTaxi("N");
+                }
+                autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()));
+                if (autoNoleggio != null) {
+                    ordineMissione.setUtilizzoAutoNoleggio("S");
+                } else {
+                    ordineMissione.setUtilizzoAutoNoleggio("N");
                 }
             }
             String username = securityService.getCurrentUserLogin();
@@ -244,8 +258,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             cmisOrdineMissione.setOggetto(ordineMissione.getOggetto());
             cmisOrdineMissione.setPriorita(ordineMissione.getPriorita());
             cmisOrdineMissione.setTaxiFlag(ordineMissione.getUtilizzoTaxi().equals("S") ? "si" : "no");
-            /*cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
-            cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");*/
+            cmisOrdineMissione.setAutoServizioFlag(ordineMissione.getUtilizzoAutoServizio().equals("S") ? "si" : "no");
+            cmisOrdineMissione.setPersonaSeguitoFlag(ordineMissione.getPersonaleAlSeguito().equals("S") ? "si" : "no");
             cmisOrdineMissione.setUoRich(uoRichPerFlusso);
             cmisOrdineMissione.setUoSpesa(uoSpesaPerFlusso);
             cmisOrdineMissione.setUoCompetenza(uoCompetenzaPerFlusso == null ? "" : uoCompetenzaPerFlusso);
@@ -289,6 +303,16 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                 cmisOrdineMissione.setQuartoMotivoTaxi("");
                 cmisOrdineMissione.setAltriMotiviTaxi("");
             }
+            if (autoNoleggio!= null){
+                cmisOrdineMissione.setPrimoMotivoAutoNoleggio(Utility.nvl(autoNoleggio.getMotivataEccezionalita(), "N").equals("N") ? "" : CMISOrdineMissione.PRIMO_MOTIVO_UTILIZZO_AUTO_NOLEGGIO);
+                cmisOrdineMissione.setSecondoMotivoAutoNoleggio(Utility.nvl(autoNoleggio.getEsigenzeServizio(), "N").equals("N") ? "" : CMISOrdineMissione.SECONDO_MOTIVO_UTILIZZO_AUTO_NOLEGGIO);
+                cmisOrdineMissione.setAltriMotiviAutoPropria(autoNoleggio.getNote() == null ? "" : autoNoleggio.getNote());
+            }else {
+                cmisOrdineMissione.setPrimoMotivoAutoNoleggio("");
+                cmisOrdineMissione.setSecondoMotivoAutoNoleggio("");
+                cmisOrdineMissione.setNote("");
+            }
+
             if (!StringUtils.isEmpty(ordineMissione.getResponsabileGruppo())) {
                 cmisOrdineMissione.setUsernameResponsabileGruppo(ordineMissione.getResponsabileGruppo());
                 cmisOrdineMissione.setUserNameResponsabileModulo(ordineMissione.getResponsabileGruppo());
@@ -498,8 +522,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE, cmisOrdineMissione.getNote());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NOTE_SEGRETERIA, cmisOrdineMissione.getNoteSegreteria());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisOrdineMissione.getImpegnoNumero());
-        /*metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisOrdineMissione.getPersonaSeguitoFlag().equals("true"));
-        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisOrdineMissione.getAutoServizioFlag().equals("true"));*/
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisOrdineMissione.getPersonaSeguitoFlag().equals("true"));
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisOrdineMissione.getAutoServizioFlag().equals("true"));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESTINAZIONE, cmisOrdineMissione.getDestinazione());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ESTERA_FLAG, cmisOrdineMissione.getMissioneEsteraFlag().equals("true"));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DATA_INIZIO_MISSIONE, cmisOrdineMissione.getDataInizioMissione());
@@ -523,6 +547,10 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_TAXI_TERZO_MOTIVO, cmisOrdineMissione.getTerzoMotivoTaxi());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_TAXI_QUARTO_MOTIVO, cmisOrdineMissione.getQuartoMotivoTaxi());
 
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_AUTO_NOLEGGIO_PRIMO_MOTIVO, cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_AUTO_NOLEGGIO_SECONDO_MOTIVO, cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
+
+
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE, cmisOrdineMissione.getUsernameRichiedente());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, !StringUtils.isEmpty(cmisOrdineMissione.getUsernameResponsabileGruppo()));
         return metadataProperties;
@@ -540,6 +568,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
         OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()), true);
         OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()),true);
+        OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()),true);
+
         StorageObject documentoAnticipo = null;
 
 
@@ -566,6 +596,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             taxi.setOrdineMissione(ordineMissione);
             documentoTaxi = creaDocumentoTaxi(username, taxi);
         }
+        StorageObject documentoAutoNoleggio = null;
+        if (autoNoleggio != null) {
+            autoNoleggio.setOrdineMissione(ordineMissione);
+            documentoAutoNoleggio = creaDocumentoAutoNoleggio(username, autoNoleggio);
+        }
 
 
         if (!isActiveSignFlow()) {
@@ -587,7 +622,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             mapDocumentiMissione.put(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY, documentoAutoPropria);
         if ( documentoTaxi!=null)
             mapDocumentiMissione.put(Costanti.DOCUMENTO_TAXI_KEY, documentoTaxi);
-
+        if ( documentoAutoNoleggio!=null)
+            mapDocumentiMissione.put(Costanti.DOCUMENTO_AUTO_NOLEGGIO_KEY, documentoAutoNoleggio);
 
         sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, mapDocumentiMissione, allegati,anticipo);
 
@@ -623,6 +659,14 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
         String id = getNodeRefOrdineMissioneTaxi(ordineMissioneTaxi);
+        if (id != null) {
+            return missioniCMISService.recuperoStreamFileFromObjectID(id);
+        }
+        return null;
+    }
+
+    public InputStream getStreamOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+        String id = getNodeRefOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
         }
@@ -681,6 +725,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
+    public StorageObject getObjectAutoNoleggioOrdineMissione(OrdineMissioneAutoNoleggio autoNoleggio) throws ComponentException {
+        StorageObject node = recuperoFolderOrdineMissione(autoNoleggio.getOrdineMissione());
+        List<StorageObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO.value());
+        if (ant.size() == 0)
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono auto noleggiate collegate all'Ordine di Missione. ID Taxi:" + autoNoleggio.getId());
+        else if (ant.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files taxi di missione aventi l'ID :" + autoNoleggio.getId());
+        } else {
+            StorageObject nodeFile = ant.get(0);
+            return nodeFile;
+        }
+    }
+
     public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {
         return getObjectOrdineMissione(ordineMissione).getKey();
     }
@@ -725,7 +782,21 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value());
 
         if (objs.size() == 0) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta anticipo dell'Ordine di Missione. ID Ordine di Missione:" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di taxi dell'Ordine di Missione. ID Ordine di Missione:" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        } else if (objs.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files di annullamento dell'ordine di missione aventi l'ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        } else {
+            return objs.get(0);
+        }
+    }
+
+    public StorageObject getStorageOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+        OrdineMissione ordineMissione = ordineMissioneAutoNoleggio.getOrdineMissione();
+        StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
+        List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO.value());
+
+        if (objs.size() == 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di auto noleggio dell'Ordine di Missione. ID Ordine di Missione:" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         } else if (objs.size() > 1) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files di annullamento dell'ordine di missione aventi l'ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         } else {
@@ -778,6 +849,25 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
         if (objs.size() == 0 && erroreSeNonTrovato) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta di taxi per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        } else if (objs.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di taxi per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        }
+        if (objs.size() > 0)
+            return objs.get(0).getKey();
+        return null;
+    }
+
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+        return getNodeRefOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio, true);
+    }
+
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, Boolean erroreSeNonTrovato) throws ComponentException {
+        OrdineMissione ordineMissione = ordineMissioneAutoNoleggio.getOrdineMissione();
+        StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
+        List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_NOLEGGIO.value());
+
+        if (objs.size() == 0 && erroreSeNonTrovato) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati di richiesta di auto noleggiate per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         } else if (objs.size() > 1) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files  di richiesta di taxi per l'ordine di missione con ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         }
@@ -857,6 +947,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_DOC_TAXI);
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_TIPODOC_TAXI);
         metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissioneTaxi.CMIS_PROPERTY_NAME_TIPODOC_TAXI);
+        return metadataProperties;
+    }
+
+    public Map<String, Object> createMetadataForFileOrdineMissioneAutoNoleggio(String currentLogin, OrdineMissioneAutoNoleggio autoNoleggio) {
+        Map<String, Object> metadataProperties = new HashMap<String, Object>();
+        metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), OrdineMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
+        metadataProperties.put(MissioniCMISService.PROPERTY_NAME, autoNoleggio.getFileName());
+        metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename("Richiesta Auto Noleggio per l'Ordine Missione - anno " + autoNoleggio.getOrdineMissione().getAnno() + " numero " + autoNoleggio.getOrdineMissione().getNumero()));
+        metadataProperties.put(MissioniCMISService.PROPERTY_TITLE, missioniCMISService.sanitizeFilename("Richiesta Auto Noleggio Ordine di Missione"));
+        metadataProperties.put(MissioniCMISService.PROPERTY_AUTHOR, currentLogin);
+        metadataProperties.put(PROPERTY_TIPOLOGIA_DOC, OrdineMissioneAutoNoleggio.CMIS_PROPERTY_NAME_DOC_AUTO_NOLEGGIO);
+        metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_SPECIFICA, OrdineMissioneAutoNoleggio.CMIS_PROPERTY_NAME_TIPODOC_AUTO_NOLEGGIO);
+        metadataProperties.put(PROPERTY_TIPOLOGIA_DOC_MISSIONI, OrdineMissioneAutoNoleggio.CMIS_PROPERTY_NAME_TIPODOC_AUTO_NOLEGGIO);
         return metadataProperties;
     }
 
@@ -982,6 +1085,37 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
+
+    @Transactional(readOnly = true)
+    public StorageObject salvaStampaAutoNoleggioSuCMIS(String currentLogin, byte[] stampa,
+                                               OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+        InputStream streamStampa = new ByteArrayInputStream(stampa);
+        String path = createFolderOrdineMissione(ordineMissioneAutoNoleggio.getOrdineMissione());
+        Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAutoNoleggio(currentLogin, ordineMissioneAutoNoleggio);
+        try {
+            StorageObject node = null;
+            if (!ordineMissioneAutoNoleggio.getOrdineMissione().isStatoInviatoAlFlusso()) {
+                node = missioniCMISService.restoreSimpleDocument(metadataProperties, streamStampa,
+                        MimeTypes.PDF.mimetype(), ordineMissioneAutoNoleggio.getFileName(), StoragePath.construct(path));
+
+            } else {
+                node = getObjectAutoNoleggioOrdineMissione(ordineMissioneAutoNoleggio);
+                node = missioniCMISService.updateStream(node.getKey(), streamStampa, MimeTypes.PDF.mimetype());
+                missioniCMISService.addPropertyForExistingDocument(metadataProperties, node);
+            }
+
+            missioniCMISService.addAspect(node,
+                    CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO.value());
+            return node;
+        } catch (Exception e) {
+            if (e.getCause() instanceof StorageException)
+                throw new ComponentException("File [" + ordineMissioneAutoNoleggio.getFileName()
+                        + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
+                    + Utility.getMessageException(e) + ")", e);
+        }
+    }
+
     protected StorageObject creaDocumentoAnticipo(String username, OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException, ComponentException {
         byte[] print = printOrdineMissioneAnticipoService.printOrdineMissioneAnticipo(ordineMissioneAnticipo, username);
         return salvaStampaAnticipoSuCMIS(username, print, ordineMissioneAnticipo);
@@ -997,6 +1131,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return salvaStampaAutoPropriaSuCMIS(username, print, ordineMissioneAutoPropria);
     }
 
+    protected StorageObject creaDocumentoAutoNoleggio(String username, OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException, ComponentException {
+        byte[] print = printOrdineMissioneAutoNoleggioService.printOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio, username);
+        return salvaStampaAutoNoleggioSuCMIS(username, print, ordineMissioneAutoNoleggio);
+    }
+
     public List<CMISFileAttachment> getAttachmentsAnticipo(OrdineMissione ordineMissione, Long idAnticipo) {
         List<StorageObject> documents = getAttachmentsAnticipo(ordineMissione);
         return creaCMISFileAttachment(idAnticipo, documents);
@@ -1005,6 +1144,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     public List<CMISFileAttachment> getAttachmentsTaxi(OrdineMissione ordineMissione, Long idTaxi) {
         List<StorageObject> documents = getAttachmentsTaxi(ordineMissione);
         return creaCMISFileAttachment(idTaxi, documents);
+    }
+
+    public List<CMISFileAttachment> getAttachmentsAutoNoleggio(OrdineMissione ordineMissione, Long idAutoNoleggio) {
+        List<StorageObject> documents = getAttachmentsAutoNoleggio(ordineMissione);
+        return creaCMISFileAttachment(idAutoNoleggio, documents);
     }
 
     private List<CMISFileAttachment> creaCMISFileAttachment(Long id, List<StorageObject> documents) {
@@ -1035,6 +1179,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     public List<StorageObject> getAttachmentsTaxi(OrdineMissione ordineMissione) {
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value());
+    }
+
+    public List<StorageObject> getAttachmentsAutoNoleggio(OrdineMissione ordineMissione) {
+        StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
+        return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO.value());
     }
 
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione) {
@@ -1068,6 +1217,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             cmisFileAttachment.setNomeFile(name);
             cmisFileAttachment.setIdMissione(idTaxi);
             return cmisFileAttachment;
+        }
+        return null;
+    }
+
+    public CMISFileAttachment uploadAttachmentAutoNoleggio(OrdineMissione ordineMissione, Long idAutoNoleggio, InputStream inputStream, String name, MimeTypes mimeTypes) {
+        StorageObject so = salvaAllegatoAutoNoleggioCMIS(ordineMissione, inputStream, name, mimeTypes);
+        if (so != null) {
+            CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+            cmisFileAttachment.setId(so.getKey());
+            cmisFileAttachment.setNomeFile(name);
+            cmisFileAttachment.setIdMissione(idAutoNoleggio);
+            return cmisFileAttachment;
+
         }
         return null;
     }
@@ -1109,6 +1271,28 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     fileName,
                     cmisPath);
             missioniCMISService.addAspect(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value());
+            return so;
+        } catch (Exception e) {
+            if (e.getCause() instanceof StorageException)
+                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+        }
+    }
+
+    private StorageObject salvaAllegatoAutoNoleggioCMIS(
+            OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {
+
+        StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
+
+        Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_AUTO_NOLEGGIO);
+        try {
+            StorageObject so = missioniCMISService.restoreSimpleDocument(
+                    metadataProperties,
+                    stream,
+                    mimeTypes.mimetype(),
+                    fileName,
+                    cmisPath);
+            missioniCMISService.addAspect(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO.value());
             return so;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
@@ -1235,6 +1419,31 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
         throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
     }
+
+    public Map<String, byte[]> getFileOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) {
+        String fileName = null;
+        byte[] printAutoNoleggio = null;
+        StorageObject storage = getStorageOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio);
+        if (storage != null) {
+            fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+            InputStream is = missioniCMISService.recuperoStreamFileFromObjectID(storage.getKey());
+            if (is != null) {
+                try {
+                    printAutoNoleggio = IOUtils.toByteArray(is);
+                    is.close();
+                } catch (IOException e) {
+                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                }
+            } else {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
+            }
+            Map<String, byte[]> map = new HashMap<String, byte[]>();
+            map.put(fileName, printAutoNoleggio);
+            return map;
+        }
+        throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
+    }
+
 
     public Map<String, byte[]> getFileOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) {
         String fileName = null;

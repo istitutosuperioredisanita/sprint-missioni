@@ -109,6 +109,7 @@ public class OrdineMissioneResource {
         filter.setDaAnnullare("S");
         filter.setRecuperoAutoPropria("S");
         filter.setRecuperoTaxi("S");
+        filter.setRecuperoAutoNoleggio("S");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);

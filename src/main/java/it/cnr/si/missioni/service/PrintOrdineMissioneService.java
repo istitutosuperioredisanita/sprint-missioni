@@ -177,7 +177,7 @@ public class PrintOrdineMissioneService {
             printOrdineMissione.setRichiestaAnticipo(Costanti.NO);
         }
 
-        //printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
+        printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
         printOrdineMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(ordineMissione.getNoteUtilizzoTaxiNoleggio()));
         printOrdineMissione.setCup(ordineMissione.getCup() == null ? "" : ordineMissione.getCup());
         return printOrdineMissione;

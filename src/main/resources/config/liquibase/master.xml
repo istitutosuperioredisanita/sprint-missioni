@@ -95,6 +95,9 @@
     <include file="classpath:config/liquibase/changelog/20231124180700_add_table_ordine_missione_taxi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20231124180701_add_table_spostamenti_taxi.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20231130180000_add_sequences_taxi.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20240221000001_add_table_ordine_missione_auto_noleggio.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20240221000001_add_table_spostamenti_auto_noleggio.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20240221000001_add_sequences_auto_noleggio.xml" relativeToChangelogFile="false"/>
 
 
     <!-- JHipster will add liquibase changelogs here -->

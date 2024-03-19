@@ -36,6 +36,7 @@ import it.cnr.si.missioni.cmis.*;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneAutoNoleggioRepository;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
 import it.cnr.si.missioni.repository.OrdineMissioneTaxiRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
@@ -86,6 +87,8 @@ public class OrdineMissioneService {
     @Autowired
     OrdineMissioneTaxiRepository ordineMissioneTaxiRepository;
     @Autowired
+    OrdineMissioneAutoNoleggioRepository ordineMissioneAutoNoleggioRepository;
+    @Autowired
     private Environment env;
     @Autowired
     private DatiSedeService datiSedeService;
@@ -127,6 +130,8 @@ public class OrdineMissioneService {
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
     @Autowired
     private OrdineMissioneTaxiService ordineMissioneTaxiService;
+    @Autowired
+    private OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
     @Autowired
     private ConfigService configService;
 
@@ -208,6 +213,10 @@ public class OrdineMissioneService {
                 OrdineMissioneTaxi taxi = getTaxi(ordineMissione);
                 if (taxi != null) {
                     ordineMissione.setUtilizzoTaxi("S");
+                }
+                OrdineMissioneAutoNoleggio autoNoleggio = getAutoNoleggio(ordineMissione);
+                if (autoNoleggio != null) {
+                    ordineMissione.setUtilizzoAutoNoleggio("S");
                 }
             }
 
@@ -675,6 +684,17 @@ public class OrdineMissioneService {
                 }
             }
 
+            if (Utility.nvl(filter.getRecuperoAutoNoleggio()).equals("S")) {
+                for (OrdineMissione ordineMissione : ordineMissioneList) {
+                    OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()));
+                    if (autoNoleggio != null) {
+                        ordineMissione.setUtilizzoAutoNoleggio("S");
+                    } else {
+                        ordineMissione.setUtilizzoAutoNoleggio("N");
+                    }
+                }
+            }
+
             return ordineMissioneList;
 
         } else {
@@ -793,6 +813,17 @@ public class OrdineMissioneService {
                 }
             }
 
+            if (Utility.nvl(filter.getRecuperoAutoNoleggio()).equals("S")) {
+                for (OrdineMissione ordineMissione : ordineMissioneList) {
+                    OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()));
+                    if (autoNoleggio != null) {
+                        ordineMissione.setUtilizzoAutoNoleggio("S");
+                    } else {
+                        ordineMissione.setUtilizzoAutoNoleggio("N");
+                    }
+                }
+            }
+
             return ordineMissioneList;
         }
     }
@@ -823,12 +854,17 @@ public class OrdineMissioneService {
         return ordineMissioneTaxiRepository.getTaxi(ordineMissione);
     }
 
+    public OrdineMissioneAutoNoleggio getAutoNoleggio(OrdineMissione ordineMissione) {
+        return ordineMissioneAutoNoleggioRepository.getAutoNoleggio(ordineMissione);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione createOrdineMissione(OrdineMissione ordineMissione)
             throws ComponentException {
         controlloDatiObbligatoriDaGUI(ordineMissione);
         inizializzaCampiPerInserimento(ordineMissione);
-        validaCRUD(ordineMissione);
+        boolean updateOrdineMissione = false;
+        validaCRUD(ordineMissione, updateOrdineMissione);
         ordineMissione = (OrdineMissione) crudServiceBean.creaConBulk(ordineMissione);
         // autoPropriaRepository.save(autoPropria);
         log.debug("Created Information for User: {}", ordineMissione);
@@ -937,12 +973,12 @@ public class OrdineMissioneService {
         if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
             ordineMissione.setUtilizzoTaxi("N");
         }
-        /*if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
+        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
             ordineMissione.setUtilizzoAutoServizio("N");
         }
         if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
             ordineMissione.setPersonaleAlSeguito("N");
-        }*/
+        }
 
         aggiornaValidazione(ordineMissione);
 
@@ -1177,7 +1213,8 @@ public class OrdineMissioneService {
 
         // //effettuo controlli di validazione operazione CRUD
         if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R") && !fromFlows) {
-            validaCRUD(ordineMissioneDB);
+            boolean updateOrdineMissione = true;
+            validaCRUD(ordineMissioneDB, updateOrdineMissione);
         }
         if (confirm) {
             Parametri parametri = parametriService.getParametri();
@@ -1285,9 +1322,9 @@ public class OrdineMissioneService {
         ordineMissioneDB.setNoteUtilizzoTaxiNoleggio(ordineMissione.getNoteUtilizzoTaxiNoleggio());
         ordineMissioneDB.setUtilizzoAutoNoleggio(ordineMissione.getUtilizzoAutoNoleggio());
         ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
-        /*ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
+        ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
         ordineMissioneDB.setUtilizzoAutoServizio(ordineMissione.getUtilizzoAutoServizio());
-        ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());*/
+        ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
         ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
         ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
         ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -1349,10 +1386,11 @@ public class OrdineMissioneService {
     }
 
     private void sendMailToAdministrative(List<UsersSpecial> lista, String testoMail, String oggetto) {
-        sendMailToGroup( lista,testoMail,oggetto);
+        sendMailToGroup(lista, testoMail, oggetto);
     }
+
     private void sendMailToValidatori(List<UsersSpecial> lista, String testoMail, String oggetto) {
-        sendMailToGroup( lista,testoMail,oggetto);
+        sendMailToGroup(lista, testoMail, oggetto);
     }
 
 
@@ -1439,6 +1477,9 @@ public class OrdineMissioneService {
             controlloOperazioniCRUDDaGui(ordineMissione);
             ordineMissioneAnticipoService.deleteAnticipo(ordineMissione);
             ordineMissioneAutoPropriaService.deleteAutoPropria(ordineMissione);
+            ordineMissioneTaxiService.deleteTaxi(ordineMissione);
+            ordineMissioneAutoNoleggioService.deleteAutoNoleggio(ordineMissione);
+
             // effettuo controlli di validazione operazione CRUD
             ordineMissione.setStato(Costanti.STATO_ANNULLATO);
             ordineMissione.setToBeUpdated();
@@ -1528,7 +1569,7 @@ public class OrdineMissioneService {
         }
     }
 
-    private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione) {
+    private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
         if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
                     + ": La data di fine missione non può essere precedente alla data di inizio missione");
@@ -1562,12 +1603,12 @@ public class OrdineMissioneService {
         // salvare una missione con la richiesta di utilizzo del taxi e
         // dell'auto propria.");
         // }
-        if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
+        /*if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
             if (ordineMissione.getUtilizzoAutoNoleggio().equals("N")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
                         + ": Non è possibile indicare le note all'utilizzo dell'auto a noleggio se non si è scelto il suo utilizzo");
             }
-        }
+        }*/
         // if (ordineMissione.getUtilizzoAutoServizio() != null &&
         // ordineMissione.getUtilizzoAutoServizio().equals("S") &&
         // !ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) !=
@@ -1576,11 +1617,11 @@ public class OrdineMissioneService {
         // salvare una missione con la richiesta di utilizzo dell'auto di
         // servizio e dell'auto propria.");
         // }
-        if (Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
+        /*if (Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
                 && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
                     + ": E' obbligatorio indicare le note all'utilizzo dell'auto a noleggio se si è scelto il suo utilizzo");
-        }
+        }*/
         // if
         // ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
         // && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S"))
@@ -1622,9 +1663,11 @@ public class OrdineMissioneService {
         if (!StringUtils.hasLength(ordineMissione.getMatricola())) {
             ordineMissione.setMatricola(null);
         }
-        if (ordineMissione.getDataInizioMissione().isBefore(ZonedDateTime.now())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
-                    + ": La data di inizio missione non può essere precedente alla data di oggi");
+        if (!updateOrdineMissione) {
+            if (ordineMissione.getDataInizioMissione().isBefore(ZonedDateTime.now())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
+                        + ": La data di inizio missione non può essere precedente alla data di oggi");
+            }
         }
     }
 
@@ -1751,10 +1794,10 @@ public class OrdineMissioneService {
 
     }
 
-    private void validaCRUD(OrdineMissione ordineMissione) {
+    private void validaCRUD(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
         if (ordineMissione != null) {
             controlloCampiObbligatori(ordineMissione);
-            controlloCongruenzaDatiInseriti(ordineMissione);
+            controlloCongruenzaDatiInseriti(ordineMissione, updateOrdineMissione);
             controlloDatiFinanziari(ordineMissione);
             DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
                     ordineMissione.getAnno());
@@ -1775,16 +1818,16 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Obbligo di Rientro");
         } else if (StringUtils.isEmpty(ordineMissione.getUid())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utente");
-        } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
+        /*} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo del Taxi");
-        /*} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
+        } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");
         } else if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");*/
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");
         } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
-                    CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo auto a noleggio");
+                    CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo auto a noleggio");*/
         } else if (StringUtils.isEmpty(ordineMissione.getStato())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Stato");
         } else if (StringUtils.isEmpty(ordineMissione.getValidato())) {

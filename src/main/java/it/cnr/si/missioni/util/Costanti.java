@@ -55,6 +55,8 @@ public class Costanti {
     public final static String NOME_STAMPA_AUTO_PROPRIA = "autoPropria";
     public final static String NOME_STAMPA_TAXI = "taxi";
     public final static String NOME_STAMPA_ANTICIPO = "anticipo";
+    public final static String NOME_STAMPA_AUTO_NOLEGGIO = "autoNoleggio";
+
     public final static String PARAMETER_DATA_SOURCE_FOR_PRINT = "REPORT_DATA_SOURCE";
 
     public final static String NOME_CACHE_MESSAGGIO = "cacheMessaggio";
@@ -170,6 +172,7 @@ public class Costanti {
     public final static String TIPO_DOCUMENTO_AUTO_PROPRIA = "autoPropriaMissione";
     public final static String TIPO_DOCUMENTO_GIUSTIFICATIVO = "giustificativoMissione";
     public final static String TIPO_DOCUMENTO_TAXI = "taxiMissione";
+    public final static String TIPO_DOCUMENTO_AUTO_NOLEGGIO = "autoNoleggioMissione";
 
     public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
     public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
@@ -205,9 +208,7 @@ public class Costanti {
     public final static String  DOCUMENTO_ANTICIPO_KEY="documentoAnticipoMissione";
     public final static String  DOCUMENTO_AUTO_PROPRIA_KEY="documentoAutoPropriaMissione";
     public final static String  DOCUMENTO_TAXI_KEY="documentoTaxiMissione";
-
-
-
+    public final static String  DOCUMENTO_AUTO_NOLEGGIO_KEY="documentoAutoNoleggioMissione";
 
 
     static {

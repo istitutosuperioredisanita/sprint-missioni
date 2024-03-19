@@ -18,8 +18,8 @@
 -->
 
 <div class="container-fluid">
-    <h4 center translate="ordine-missione-taxi.title"
-        translate-values="{numeroOrdineMissione: '{{taxiOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{taxiOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">
+    <h4 center translate="ordine-missione-auto-noleggio.title"
+        translate-values="{numeroOrdineMissione: '{{autoNoleggioOrdineMissioneModel.ordineMissione.numero}}', dataOrdineMissione: '{{autoNoleggioOrdineMissioneModel.ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">
         Ordine di missione</b></h4>
     <div class="row">
         <div class="col-md-12">
@@ -34,7 +34,7 @@
             </div>
             <div class="panel panel-success">
                 <div class="panel-heading color-verde-scuro text-center">
-                    <h3 class="panel-title color-verde-scuro" translate="ordine-missione-taxi.form.box-dati">Dati
+                    <h3 class="panel-title color-verde-scuro" translate="ordine-missione-auto-noleggio.form.box-dati">Dati
                         Generali</h3>
                 </div>
                 <div class="panel-body my-panel-body">
@@ -43,10 +43,10 @@
                             <p class="col-md-12">
                                 <span class="input-group">
                                     <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.mancanza-assoluta-mezzi-pubblici">mancanza assoluta mezzi pubblici</span>
+                                          translate="ordine-missione-auto-noleggio.form.motivo-esigenze-di-servizio">esigenze servizio</span>
                                     <label class="checkbox">
                                         <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.mancanzaAssMezzi" ng-true-value="S"
+                                               ng-model="autoNoleggioOrdineMissioneModel.esigenzeServizio" ng-true-value="S"
                                                ng-false-value="N">
                                     </label>
                                 </span>
@@ -56,10 +56,10 @@
                             <p class="col-md-12">
                                 <span class="input-group">
                                     <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.mancanza-non-assoluta-mezzi-pubblici">mancanza NON assoluta mezzi pubblici</span>
+                                          translate="ordine-missione-auto-noleggio.form.motivo-motivata-eccezionalità">motivata eccezionalita</span>
                                     <label class="checkbox">
                                         <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.mancanzaMezzi" ng-true-value="S"
+                                               ng-model="autoNoleggioOrdineMissioneModel.motivataEccezionalita" ng-true-value="S"
                                                ng-false-value="N">
                                     </label>
                                 </span>
@@ -68,35 +68,9 @@
                         <form class="form-inline" role="form" id="missioni">
                             <p class="col-md-12">
                                 <span class="input-group">
-                                    <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.necessità-trasporto-materiale">necessità trasporto materiale</span>
-                                    <label class="checkbox">
-                                        <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.trasportoMateriali" ng-true-value="S"
-                                               ng-false-value="N">
-                                    </label>
-                                </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-12">
-                                <span class="input-group">
-                                    <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.motivi-handicap-disabilità">motivi handicap disabilità</span>
-                                    <label class="checkbox">
-                                        <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.motiviHandicap" ng-true-value="S"
-                                               ng-false-value="N">
-                                    </label>
-                                </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-12">
-                                <span class="input-group">
-                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.altri-motivi">altri motivi</span>
+                                    <span class="input-group-addon" translate="ordine-missione-auto-noleggio.form.note">note</span>
                                     <textarea ng-disabled="disabledfields" class="input-sm form-control"
-                                              name="altriMotivi" ng-model="taxiOrdineMissioneModel.utilizzoAltriMotivi"
+                                              name="altriMotivi" ng-model="autoNoleggioOrdineMissioneModel.note"
                                               rows="2"></textarea>
                                 </span>
                             </p>
@@ -123,10 +97,10 @@
                             <p class="col-md-12">
                                 <span class="input-group">
                                     <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.mancanza-assoluta-mezzi-pubblici">mancanza assoluta mezzi pubblici</span>
+                                          translate="ordine-missione-auto-noleggio.form.motivo-esigenze-di-servizio">esigenze servizio</span>
                                     <label class="checkbox">
                                         <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.mancanzaAssMezzi" ng-true-value="S"
+                                               ng-model="autoNoleggioOrdineMissioneModel.esigenzeServizio" ng-true-value="S"
                                                ng-false-value="N">
                                     </label>
                                 </span>
@@ -136,10 +110,10 @@
                             <p class="col-md-12">
                                 <span class="input-group">
                                     <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.mancanza-non-assoluta-mezzi-pubblici">mancanza NON assoluta mezzi pubblici</span>
+                                          translate="ordine-missione-auto-noleggio.form.motivo-motivata-eccezionalità">motivata eccezionalita</span>
                                     <label class="checkbox">
                                         <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.mancanzaMezzi" ng-true-value="S"
+                                               ng-model="autoNoleggioOrdineMissioneModel.motivataEccezionalita" ng-true-value="S"
                                                ng-false-value="N">
                                     </label>
                                 </span>
@@ -148,35 +122,9 @@
                         <form class="form-inline" role="form" id="missioni">
                             <p class="col-md-12">
                                 <span class="input-group">
-                                    <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.necessità-trasporto-materiale">necessità trasporto materiale</span>
-                                    <label class="checkbox">
-                                        <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.trasportoMateriali" ng-true-value="S"
-                                               ng-false-value="N">
-                                    </label>
-                                </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-12">
-                                <span class="input-group">
-                                    <span class="input-group-addon"
-                                          translate="ordine-missione-taxi.form.motivi-handicap-disabilità">motivi handicap disabilità</span>
-                                    <label class="checkbox">
-                                        <input ng-disabled="disabledfields" type="checkbox"
-                                               ng-model="taxiOrdineMissioneModel.motiviHandicap" ng-true-value="S"
-                                               ng-false-value="N">
-                                    </label>
-                                </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-12">
-                                <span class="input-group">
-                                    <span class="input-group-addon" translate="ordine-missione-taxi.form.altri-motivi">altri motivi</span>
+                                    <span class="input-group-addon" translate="ordine-missione-auto-noleggio.form.note">note</span>
                                     <textarea ng-disabled="disabledfields" class="input-sm form-control"
-                                              name="altriMotivi" ng-model="taxiOrdineMissioneModel.utilizzoAltriMotivi"
+                                              name="altriMotivi" ng-model="autoNoleggioOrdineMissioneModel.note"
                                               rows="2"></textarea>
                                 </span>
                             </p>
@@ -202,9 +150,9 @@
 
                     <div class="panel-body my-panel-body">
                         <div class="col-md-12">
-                            <p><strong translate="ordine-missione-taxi.NB-title">NB title</strong>
+                            <p><strong translate="ordine-missione-auto-noleggio.NB-title">NB title</strong>
                                 <span>
-                            <span translate="ordine-missione-taxi.NB-text">NB TEXT</span>
+                            <span translate="ordine-missione-auto-noleggio.NB-text">NB TEXT</span>
                         </span>
                             </p>
                         </div>
@@ -217,15 +165,15 @@
 
             <form class="form-inline" role="form" id="missioni">
                 <div class="panel panel-default"
-                     ng-if="taxiOrdineMissioneModel.id && (taxiOrdineMissioneModel.isFireSearchAttachments == true || taxiOrdineMissioneModel.isFireSearchAttachments == false )">
+                     ng-if="autoNoleggioOrdineMissioneModel.id && (autoNoleggioOrdineMissioneModel.isFireSearchAttachments == true || autoNoleggioOrdineMissioneModel.isFireSearchAttachments == false )">
                     <div class="panel-heading color-verde-chiaro text-center">
                         <h1 class="panel-title">Allegati</h1>
                     </div>
                     <div class="panel-body my-panel-body">
                         <div>
-                            <ul class="list-unstyled taxiOrdineMissioneModel.attachments"
-                                ng-show="taxiOrdineMissioneModel.attachmentsExists=true">
-                                <li ng-repeat="attachment in taxiOrdineMissioneModel.attachments">
+                            <ul class="list-unstyled autoNoleggioOrdineMissioneModel.attachments"
+                                ng-show="autoNoleggioOrdineMissioneModel.attachmentsExists=true">
+                                <li ng-repeat="attachment in autoNoleggioOrdineMissioneModel.attachments">
                                     <span class="glyphicon glyphicon-download-alt"></span>
                                     <a target="_blank"
                                        href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}"
@@ -240,12 +188,12 @@
                             </ul>
                             <h4>
                                 <div class="row fileupload-buttonbar">
-                                    <span ng-hide="taxiOrdineMissioneModel.attachmentsExists=true"
+                                    <span ng-hide="autoNoleggioOrdineMissioneModel.attachmentsExists=true"
                                           class="label label-warning">Nessun Allegato Disponibile</span>
                                     <ng-upload-form disabilita="isOrdineMissioneConfermato" validazione="validazione"
-                                                    is-finish-rest-attachments="taxiOrdineMissioneModel.isFireSearchAttachments"
-                                                    url="api/rest/public/ordineMissione/taxi/uploadAllegati?idTaxi={{taxiOrdineMissioneModel.id}}&token={{accessToken}}"
-                                                    name="file" auto-upload="true" oggetto="taxiOrdineMissioneModel"
+                                                    is-finish-rest-attachments="autoNoleggioOrdineMissioneModel.isFireSearchAttachments"
+                                                    url="api/rest/public/ordineMissione/autoNoleggio/uploadAllegati?idAutoNoleggio={{autoNoleggioOrdineMissioneModel.id}}&token={{accessToken}}"
+                                                    name="file" auto-upload="true" oggetto="autoNoleggioOrdineMissioneModel"
                                                     size-limit="500000"></ng-upload-form>
                                 </div>
                             </h4>
@@ -257,81 +205,81 @@
 
             <div class="panel panel-success">
                 <div class="panel-heading color-rosso-mattone text-center">
-                    <h3 class="panel-title color-rosso-mattone" translate="ordine-missione-taxi.form.box-spostamenti">
+                    <h3 class="panel-title color-rosso-mattone" translate="ordine-missione-auto-noleggio.form.box-spostamenti">
                         Spostamenti</h3>
                 </div>
                 <div class="panel-body my-panel-body">
 
-                    <button ng-disabled="addSpostamentoTaxi || !taxiOrdineMissioneModel.id || validazione != 'N'"
+                    <button ng-disabled="addSpostamentoAutoNoleggio || !autoNoleggioOrdineMissioneModel.id || validazione != 'N'"
                             class="btn btn-sm btn-success color-verde-giada" data-toggle="tooltip"
-                            title="{{'ordine-missione-taxi.form.addSpostamento' | translate}}"
+                            title="{{'ordine-missione-auto-noleggio.form.addSpostamento' | translate}}"
                             ng-click="aggiungiRigaSpostamento()">
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
 
                     <table class="table table-condensed table-striped table-bordered table-responsive">
                         <tr>
-                            <th>{{'ordine-missione-taxi.form.percorso-da' | translate}}</th>
-                            <th>{{'ordine-missione-taxi.form.percorso-a' | translate}}</th>
+                            <th>{{'ordine-missione-auto-noleggio.form.percorso-da' | translate}}</th>
+                            <th>{{'ordine-missione-auto-noleggio.form.percorso-a' | translate}}</th>
                         </tr>
-                        <tbody id="missioni" ng-show="taxiOrdineMissioneModel.id">
-                        <tr ng-repeat="spostamentoTaxi in spostamentiTaxi">
-                            <td ng-hide="spostamentoTaxi.editing" class="col-md-6" style="text-align: left">
-                                {{spostamentoTaxi.percorsoDa}}
+                        <tbody id="missioni" ng-show="autoNoleggioOrdineMissioneModel.id">
+                        <tr ng-repeat="spostamentoAutoNoleggio in spostamentiAutoNoleggio">
+                            <td ng-hide="spostamentoAutoNoleggio.editing" class="col-md-6" style="text-align: left">
+                                {{spostamentoAutoNoleggio.percorsoDa}}
                             </td>
-                            <td ng-show="spostamentoTaxi.editing" class="col-xs-6" style="text-align:left">
+                            <td ng-show="spostamentoAutoNoleggio.editing" class="col-xs-6" style="text-align:left">
                                 <input ng-disabled="validazione != 'N'" class="form-control"
-                                       ng-model="spostamentoTaxi.percorsoDa" required maxlength="256">
+                                       ng-model="spostamentoAutoNoleggio.percorsoDa" required maxlength="256">
                             </td>
-                            <td ng-hide="spostamentoTaxi.editing" class="col-md-6" style="text-align: left">
-                                {{spostamentoTaxi.percorsoA}}
+                            <td ng-hide="spostamentoAutoNoleggio.editing" class="col-md-6" style="text-align: left">
+                                {{spostamentoAutoNoleggio.percorsoA}}
                             </td>
-                            <td ng-show="spostamentoTaxi.editing" class="col-xs-6" style="text-align:left">
+                            <td ng-show="spostamentoAutoNoleggio.editing" class="col-xs-6" style="text-align:left">
                                 <input ng-disabled="validazione != 'N'" class="form-control"
-                                       ng-model="spostamentoTaxi.percorsoA" required maxlength="256">
+                                       ng-model="spostamentoAutoNoleggio.percorsoA" required maxlength="256">
                             </td>
-                            <td ng-hide="spostamentoTaxi.editing">
+                            <td ng-hide="spostamentoAutoNoleggio.editing">
                                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link"
-                                        ng-click="editSpostamento(spostamentoTaxi)" data-toggle="tooltip"
+                                        ng-click="editSpostamento(spostamentoAutoNoleggio)" data-toggle="tooltip"
                                         title="{{'global.button.edit' | translate}}"><span
                                         class="glyphicon glyphicon-pencil"></span></button>
                             </td>
-                            <td ng-hide="spostamentoTaxi.editing">
+                            <td ng-hide="spostamentoAutoNoleggio.editing">
                                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link"
                                         ng-click="confirmDeleteSpostamenti($index)" data-toggle="tooltip"
                                         title="{{'global.button.remove' | translate}}"><span
                                         class="glyphicon glyphicon-trash" style="color:red"></span></button>
                             </td>
-                            <td ng-show="spostamentoTaxi.editing">
+                            <td ng-show="spostamentoAutoNoleggio.editing">
                                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link"
-                                        ng-click="modifySpostamento(spostamentoTaxi)" data-toggle="tooltip"
+                                        ng-click="modifySpostamento(spostamentoAutoNoleggio)" data-toggle="tooltip"
                                         title="{{'global.button.saveEdit' | translate}}"><span
                                         class="glyphicon glyphicon-ok" style="color:green"></span></button>
                             </td>
-                            <td ng-show="spostamentoTaxi.editing">
+                            <td ng-show="spostamentoAutoNoleggio.editing">
                                 <button ng-show="validazione == 'N'" class="btn btn-sm btn-link"
-                                        ng-click="undoSpostamento(spostamentoTaxi)" data-toggle="tooltip"
+                                        ng-click="undoSpostamento(spostamentoAutoNoleggio)" data-toggle="tooltip"
                                         title="{{'global.button.undo' | translate}}"><span
                                         class="glyphicon glyphicon-remove" style="color:orange"></span></button>
                             </td>
                         </tr>
 
 
-                        <tr ng-show="addSpostamentoTaxi" id="spostamentoAddTaxi">
+                        <tr ng-show="addSpostamentoAutoNoleggio" id="spostamentoAddAutoNoleggio">
 
                             <td class="col-xs-6">
                                 <input ng-disabled="validazione != 'N'" class="form-control"
-                                       ng-model="newSpostamentoTaxi.percorsoDa" maxlength="256"</input>
+                                       ng-model="newSpostamentoAutoNoleggio.percorsoDa" maxlength="256"</input>
                             </td>
                             <td class="col-xs-6">
                                 <input ng-disabled="validazione != 'N'" class="form-control"
-                                       ng-model="newSpostamentoTaxi.percorsoA" maxlength="256"</input>
+                                       ng-model="newSpostamentoAutoNoleggio.percorsoA" maxlength="256"</input>
                             </td>
                             <td style="text-align: left">
                                 <form class="form-inline" role="form">
                                     <div class="form-group btn-group">
                                         <button ng-show="validazione == 'N'" class="btn btn-sm btn-link"
-                                                ng-click="insertSpostamentoTaxi(newSpostamentoTaxi)"
+                                                ng-click="insertSpostamentoAutoNoleggio(newSpostamentoAutoNoleggio)"
                                                 data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}">
                                             <span class="glyphicon glyphicon-ok" style="color:green"></span></button>
                                     </div>
@@ -341,7 +289,7 @@
                                 <form class="form-inline" role="form">
                                     <div class="form-group btn-group">
                                         <button ng-show="validazione == 'N'" class="btn btn-sm btn-link"
-                                                ng-click="undoAddSpostamentoTaxi()" data-toggle="tooltip"
+                                                ng-click="undoAddSpostamentoAutoNoleggio()" data-toggle="tooltip"
                                                 title="{{'global.button.undo' | translate}}"><span
                                                 class="glyphicon glyphicon-remove" style="color:orange"></span></button>
                                     </div>
@@ -354,17 +302,17 @@
             </div>
 
 
-            <div class="col-xs-3" ng-show="taxiOrdineMissioneModel.id">
+            <div class="col-xs-3" ng-show="autoNoleggioOrdineMissioneModel.id">
                 <a target="_blank"
-                   href="api/rest/public/printOrdineMissioneTaxi?idMissione={{idOrdineMissione}}&token={{accessToken}}"
+                   href="api/rest/public/printOrdineMissioneAutoNoleggio?idMissione={{idOrdineMissione}}&token={{accessToken}}"
                    class="btn btn-default" data-toggle="tooltip"
-                   title="{{'ordine-missione-taxi.button.print' | translate}}"><span class="glyphicon glyphicon-print"
+                   title="{{'ordine-missione-auto-noleggio.button.print' | translate}}"><span class="glyphicon glyphicon-print"
                                                                                      style="color:black"></span>&nbsp;{{'global.button.print'
                     | translate}}</a>
             </div>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">
                 <div class="col-xs-1"
-                     ng-show="taxiOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
+                     ng-show="autoNoleggioOrdineMissioneModel.id && !isOrdineMissioneConfermato && validazione == 'N'">
                     <button type="submit" class="btn btn-danger" data-toggle="tooltip"
                             title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash"
                                                                                  style="color:white"></span>&nbsp;{{'global.button.remove'

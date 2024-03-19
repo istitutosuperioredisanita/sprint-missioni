@@ -1,15 +1,15 @@
 'use strict';
 
-missioniApp.factory('TaxiOrdineMissioneService', function ($http) {
+missioniApp.factory('AutoNoleggioOrdineMissioneService', function ($http) {
         return {
-            findTaxi: function(idMissione) {
-                var promise = $http.get('api/rest/ordineMissione/taxi/get', {params: {idMissione: idMissione}}).then(function (response) {
+            findAutoNoleggio: function(idMissione) {
+                var promise = $http.get('api/rest/ordineMissione/autoNoleggio/get', {params: {idMissione: idMissione}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
             },
-            findSpostamenti: function(idTaxi) {
-                var promise = $http.get('api/rest/ordineMissione/taxi/getSpostamenti', {params: {idTaxi: idTaxi}}).then(function (response) {
+            findSpostamenti: function(idAutoNoleggio) {
+                var promise = $http.get('api/rest/ordineMissione/autoNoleggio/getSpostamenti', {params: {idAutoNoleggio: idAutoNoleggio}}).then(function (response) {
                     return response.data;
                 });
                 return promise;
@@ -18,7 +18,7 @@ missioniApp.factory('TaxiOrdineMissioneService', function ($http) {
     });
 
 
-missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, TaxiOrdineMissioneService, ElencoOrdiniMissioneService, ui, COSTANTI, DateService) {
+missioniApp.controller('AutoNoleggioOrdineMissioneController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, AutoNoleggioOrdineMissioneService, ElencoOrdiniMissioneService, ui, COSTANTI, DateService) {
 
     $scope.disabledfields = true;
 
@@ -28,31 +28,31 @@ missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootSc
     $scope.accountModel = $sessionStorage.accountWork;
 
     $scope.aggiungiRigaSpostamento = function () {
-      $scope.addSpostamentoTaxi = true;
-      $scope.newSpostamentoTaxi = {};
+      $scope.addSpostamentoAutoNoleggio = true;
+      $scope.newSpostamentoAutoNoleggio = {};
     }
 
     $scope.confirmDeleteSpostamenti = function (index) {
-        var spostamentoDaEliminare = $scope.spostamentiTaxi[index];
+        var spostamentoDaEliminare = $scope.spostamentiAutoNoleggio[index];
         ui.confirmCRUD("Confermi l'eliminazione dello spostamento da  "+spostamentoDaEliminare.percorsoDa+" a "+spostamentoDaEliminare.percorsoA+"?", deleteSpostamenti, index);
     }
 
     $scope.confirmDelete = function () {
-        ui.confirmCRUD("Confermi l'eliminazione della richiesta del taxi per l'ordine di missione numero "+$scope.taxiOrdineMissioneModel.ordineMissione.numero+" del "+$filter('date')($scope.taxiOrdineMissioneModel.ordineMissione.dataInserimento, COSTANTI.FORMATO_DATA)+"?", deleteTaxi);
+        ui.confirmCRUD("Confermi l'eliminazione della richiesta del autoNoleggio per l'ordine di missione numero "+$scope.autoNoleggioOrdineMissioneModel.ordineMissione.numero+" del "+$filter('date')($scope.autoNoleggioOrdineMissioneModel.ordineMissione.dataInserimento, COSTANTI.FORMATO_DATA)+"?", deleteAutoNoleggio);
     }
 
 
     // Nel tuo controller AngularJS
-    $scope.taxiOrdineMissioneModelBackup = {}; // Stato backup
+    $scope.autoNoleggioOrdineMissioneModelBackup = {}; // Stato backup
 
     var saveCurrentState = function () {
       // Salva lo stato corrente prima del cambiamento
-      $scope.taxiOrdineMissioneModelBackup = angular.copy($scope.taxiOrdineMissioneModel);
+      $scope.autoNoleggioOrdineMissioneModelBackup = angular.copy($scope.autoNoleggioOrdineMissioneModel);
     };
 
     var restorePreviousState = function () {
       // Ripristina lo stato precedente al click
-      $scope.taxiOrdineMissioneModel = angular.copy($scope.taxiOrdineMissioneModelBackup);
+      $scope.autoNoleggioOrdineMissioneModel = angular.copy($scope.autoNoleggioOrdineMissioneModelBackup);
     };
 
  $scope.edit = function () {
@@ -69,30 +69,15 @@ missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootSc
     };
 
 
-    var deleteAutoPropria = function () {
-        var idAutoPropria = $scope.autoPropriaOrdineMissioneModel.id;
-                        $rootScope.salvataggio = true;
-            $http.delete('api/rest/ordineMissione/autoPropria/' + idAutoPropria).success(
-                    function (data) {
-                        $rootScope.salvataggio = false;
-                        inizializzaDati();
-                        $scope.spostamentiAutoPropria = [];
-                        undoEditing();
-                    }).error(
-                    function (data) {
-                        $rootScope.salvataggio = false;
-                    }
-            );
-    }
 
-        var deleteTaxi = function () {
-            var idTaxi = $scope.taxiOrdineMissioneModel.id;
+        var deleteAutoNoleggio = function () {
+            var idAutoNoleggio = $scope.autoNoleggioOrdineMissioneModel.id;
                 $rootScope.salvataggio = true;
-                $http.delete('api/rest/ordineMissione/taxi/' + idTaxi).success(
+                $http.delete('api/rest/ordineMissione/autoNoleggio/' + idAutoNoleggio).success(
                         function (data) {
                             $rootScope.salvataggio = false;
                             inizializzaDati();
-                            $scope.spostamentiTaxi = [];
+                            $scope.spostamentiAutoNoleggio = [];
                             undoEditing();
                         }).error(
                         function (data) {
@@ -122,32 +107,32 @@ missioniApp.controller('TaxiOrdineMissioneController', function ($scope, $rootSc
 
 
     $scope.isDisabilitataModificaAuto = function (){
-        if ($scope.taxiOrdineMissioneModel && $scope.taxiOrdineMissioneModel.id && !$scope.editing){
+        if ($scope.autoNoleggioOrdineMissioneModel && $scope.autoNoleggioOrdineMissioneModel.id && !$scope.editing){
             return true;
         }
         return false;
     }
 
     var inizializzaDati = function(){
-            $scope.taxiOrdineMissioneModel = {};
+            $scope.autoNoleggioOrdineMissioneModel = {};
             ElencoOrdiniMissioneService.findById($scope.idOrdineMissione).then(function(data){
-            $scope.taxiOrdineMissioneModel.ordineMissione = data;
+            $scope.autoNoleggioOrdineMissioneModel.ordineMissione = data;
             });
         };
 
 
-$http.get('api/rest/ordineMissione/taxi/get', { params: { idMissione: $scope.idOrdineMissione } }).then(function (response) {
-    var datiTaxiOrdineMissione = response.data;
-    if (datiTaxiOrdineMissione.id === undefined) {
+$http.get('api/rest/ordineMissione/autoNoleggio/get', { params: { idMissione: $scope.idOrdineMissione } }).then(function (response) {
+    var datiAutoNoleggioOrdineMissione = response.data;
+    if (datiAutoNoleggioOrdineMissione.id === undefined) {
         inizializzaDati();
         $scope.isOrdineMissioneConfermato = false;
     } else {
-        TaxiOrdineMissioneService.findSpostamenti(datiTaxiOrdineMissione.id).then(function (data) {
-            $scope.spostamentiTaxi = data;
+        AutoNoleggioOrdineMissioneService.findSpostamenti(datiAutoNoleggioOrdineMissione.id).then(function (data) {
+            $scope.spostamentiAutoNoleggio = data;
         });
-         $scope.taxiOrdineMissioneModel = datiTaxiOrdineMissione;
-         $scope.viewAttachments($scope.taxiOrdineMissioneModel.id);
-         if ($scope.taxiOrdineMissioneModel.ordineMissione.stato === 'CON') {
+         $scope.autoNoleggioOrdineMissioneModel = datiAutoNoleggioOrdineMissione;
+         $scope.viewAttachments($scope.autoNoleggioOrdineMissioneModel.id);
+         if ($scope.autoNoleggioOrdineMissioneModel.ordineMissione.stato === 'CON') {
              $scope.isOrdineMissioneConfermato = true;
          } else {
              $scope.isOrdineMissioneConfermato = false;
@@ -159,22 +144,22 @@ $http.get('api/rest/ordineMissione/taxi/get', { params: { idMissione: $scope.idO
 $scope.save = function() {
     $rootScope.salvataggio = true;
 
-    if ($scope.taxiOrdineMissioneModel.id) {
-        $http.put('api/rest/ordineMissione/taxi/modify', $scope.taxiOrdineMissioneModel)
+    if ($scope.autoNoleggioOrdineMissioneModel.id) {
+        $http.put('api/rest/ordineMissione/autoNoleggio/modify', $scope.autoNoleggioOrdineMissioneModel)
             .success(function(data) {
                 $rootScope.salvataggio = false;
-                $scope.viewAttachments($scope.taxiOrdineMissioneModel.id);
+                $scope.viewAttachments($scope.autoNoleggioOrdineMissioneModel.id);
             })
             .error(function(errorData, status) {
                 $rootScope.salvataggio = false;
                 handleSaveError(errorData, status);
             });
     } else {
-        $http.post('api/rest/ordineMissione/taxi/create', $scope.taxiOrdineMissioneModel)
+        $http.post('api/rest/ordineMissione/autoNoleggio/create', $scope.autoNoleggioOrdineMissioneModel)
             .success(function(data) {
                 $rootScope.salvataggio = false;
-                $scope.taxiOrdineMissioneModel = data;
-                $scope.taxiOrdineMissioneModel.isFireSearchAttachments = false;
+                $scope.autoNoleggioOrdineMissioneModel = data;
+                $scope.autoNoleggioOrdineMissioneModel.isFireSearchAttachments = false;
             })
             .error(function(errorData, status) {
                 $rootScope.salvataggio = false;
@@ -193,12 +178,12 @@ function handleSaveError(errorData, status) {
 }
 
     var deleteSpostamenti = function (index) {
-        var idSpostamento = $scope.spostamentiTaxi[index].id;
+        var idSpostamento = $scope.spostamentiAutoNoleggio[index].id;
             $rootScope.salvataggio = true;
-            $http.delete('api/rest/ordineMissione/taxi/spostamenti/' + idSpostamento).success(
+            $http.delete('api/rest/ordineMissione/autoNoleggio/spostamenti/' + idSpostamento).success(
                     function (data) {
                         $rootScope.salvataggio = false;
-                        $scope.spostamentiTaxi.splice(index,1);
+                        $scope.spostamentiAutoNoleggio.splice(index,1);
                     }).error(
                     function (data) {
                         $rootScope.salvataggio = false;
@@ -207,28 +192,28 @@ function handleSaveError(errorData, status) {
     }
 
     var annullaDatiNuovaRiga = function () {
-      delete $scope.addSpostamentoTaxi;
-      delete $scope.newSpostamentoTaxi;
+      delete $scope.addSpostamentoAutoNoleggio;
+      delete $scope.newSpostamentoAutoNoleggio;
       delete $scope.error;
     };
 
-    $scope.undoAddSpostamentoTaxi = function () {
+    $scope.undoAddSpostamentoAutoNoleggio = function () {
       annullaDatiNuovaRiga();
-      $scope.addSpostamentoTaxi = false;
+      $scope.addSpostamentoAutoNoleggio = false;
     };
 
 
 
-    $scope.insertSpostamentoTaxi = function (newRigaSpostamento) {
-        newRigaSpostamento.taxi = $scope.taxiOrdineMissioneModel;
+    $scope.insertSpostamentoAutoNoleggio = function (newRigaSpostamento) {
+        newRigaSpostamento.autoNoleggio = $scope.autoNoleggioOrdineMissioneModel;
             $rootScope.salvataggio = true;
-            $http.post('api/rest/ordineMissione/taxi/createSpostamento', newRigaSpostamento).success(function(data){
+            $http.post('api/rest/ordineMissione/autoNoleggio/createSpostamento', newRigaSpostamento).success(function(data){
                     $rootScope.salvataggio = false;
-                    if (!$scope.spostamentiTaxi){
-                        $scope.spostamentiTaxi = [];
+                    if (!$scope.spostamentiAutoNoleggio){
+                        $scope.spostamentiAutoNoleggio = [];
                     }
-                    $scope.spostamentiTaxi.push(data);
-                    $scope.undoAddSpostamentoTaxi();
+                    $scope.spostamentiAutoNoleggio.push(data);
+                    $scope.undoAddSpostamentoAutoNoleggio();
             }).error(function (data) {
                 $rootScope.salvataggio = false;
             });
@@ -236,18 +221,18 @@ function handleSaveError(errorData, status) {
 
 
 
-    $scope.modifySpostamento = function (spostamentoTaxi) {
+    $scope.modifySpostamento = function (spostamentoAutoNoleggio) {
         $rootScope.salvataggio = true;
-        $http.put('api/rest/ordineMissione/taxi/modifySpostamento', spostamentoTaxi).success(function(data){
+        $http.put('api/rest/ordineMissione/autoNoleggio/modifySpostamento', spostamentoAutoNoleggio).success(function(data){
             $rootScope.salvataggio = false;
-            undoEditingSpostamento(spostamentoTaxi);
+            undoEditingSpostamento(spostamentoAutoNoleggio);
         }).error(function (data) {
             $rootScope.salvataggio = false;
         });
     }
 
     $scope.ricerca = function () {
-        TaxiService.findMissioni($scope.cdsRich, $scope.daNumero, $scope.aNumero).then(function(data){
+        AutoNoleggioService.findMissioni($scope.cdsRich, $scope.daNumero, $scope.aNumero).then(function(data){
             $scope.ordiniMissione = data;
         });
     }
@@ -259,21 +244,21 @@ function handleSaveError(errorData, status) {
 
 
 
-    $scope.viewAttachments = function (idTaxi) {
-        if (!$scope.taxiOrdineMissioneModel.isFireSearchAttachments){
-            $http.get('api/rest/ordineMissione/taxi/viewAttachments/' + idTaxi).then(function (data) {
-                $scope.taxiOrdineMissioneModel.isFireSearchAttachments = true;
+    $scope.viewAttachments = function (idAutoNoleggio) {
+        if (!$scope.autoNoleggioOrdineMissioneModel.isFireSearchAttachments){
+            $http.get('api/rest/ordineMissione/autoNoleggio/viewAttachments/' + idAutoNoleggio).then(function (data) {
+                $scope.autoNoleggioOrdineMissioneModel.isFireSearchAttachments = true;
                 var attachments = data.data;
                 if (attachments && Object.keys(attachments).length > 0){
                     $scope.attachmentsExists = true;
                 } else {
                     $scope.attachmentsExists = false;
                 }
-                $scope.taxiOrdineMissioneModel.attachments = attachments;
+                $scope.autoNoleggioOrdineMissioneModel.attachments = attachments;
             }, function () {
-                $scope.taxiOrdineMissioneModel.isFireSearchAttachments = false;
-                $scope.taxiOrdineMissioneModel.attachmentsExists = false;
-                $scope.taxiOrdineMissioneModel.attachments = {};
+                $scope.autoNoleggioOrdineMissioneModel.isFireSearchAttachments = false;
+                $scope.autoNoleggioOrdineMissioneModel.attachmentsExists = false;
+                $scope.autoNoleggioOrdineMissioneModel.attachments = {};
             });
         }
     }
@@ -287,14 +272,14 @@ function handleSaveError(errorData, status) {
             $rootScope.salvataggio = true;
             var x = $http.delete('api/rest/ordine/deleteAttachment?id=' + attachment.id+'&idOrdine=' + $routeParams.idOrdineMissione);
             var y = x.then(function (result) {
-                var attachments = $scope.taxiOrdineMissioneModel.attachments;
+                var attachments = $scope.autoNoleggioOrdineMissioneModel.attachments;
                 if (attachments && Object.keys(attachments).length > 0){
                     var newAttachments = attachments.filter(function(el){
                         return el.id !== attachment.id;
                     });
-                    $scope.taxiOrdineMissioneModel.attachments = newAttachments;
+                    $scope.autoNoleggioOrdineMissioneModel.attachments = newAttachments;
                     if (Object.keys(newAttachments).length = 0){
-                        $scope.taxiOrdineMissioneModel.attachmentsExists = false;
+                        $scope.autoNoleggioOrdineMissioneModel.attachmentsExists = false;
                     }
                 }
                 $rootScope.salvataggio = false;
