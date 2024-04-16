@@ -32,7 +32,7 @@ public class AutorizzazioneRimborsoMissioneDefault extends AbstractHappySign imp
     @Value("${flows.rimborso.default.signSiglaUo:#{null}}")
     private String signSiglaUo;
 
-    public StartWorflowDto createUStartWorfloDto(RimborsoMissione rimborsoMissione, StorageObject modulo,List<StorageObject> allegati) throws IOException{
+    public StartWorflowDto createStartWorkflowDto(RimborsoMissione rimborsoMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);
         EmployeeDetails userUoRich = getResponsabile( rimborsoMissione.getUoRich());

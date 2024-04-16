@@ -28,7 +28,7 @@ public class AutorizzazioneMissioneProgStessaUo extends AbstractHappySign implem
     @Value("${flows.autorizzazione.uospes:#{null}}")
     private String templateName;
 
-    public StartWorflowDto createUStartWorfloDto(OrdineMissione ordineMissione, StorageObject modulo,List<StorageObject> allegati) throws IOException{
+    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);
         EmployeeDetails responsabilePrg = getUserFeaByCf(getProgetto(ordineMissione).getCodice_fiscale_responsabile());

@@ -27,7 +27,7 @@ import java.util.List;
 public class AutorizzazioneMissioneSenzaProgStessaUo extends AbstractHappySign implements AutorizzazioneMissione {
     @Value("${flows.autorizzazione.noprogstessauo:#{null}}")
     private String templateName;
-    public StartWorflowDto createUStartWorfloDto(OrdineMissione ordineMissione, StorageObject modulo,List<StorageObject> allegati) throws IOException{
+    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);
         EmployeeDetails userUoRich = getResponsabile( ordineMissione.getUoRich());
