@@ -3,11 +3,9 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import it.iss.si.dto.happysign.base.*;
-import it.iss.si.dto.happysign.request.UploadToComplexRequest;
 import it.iss.si.service.HappySignService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -33,7 +31,7 @@ public class UtilTestService {
     public byte[] getDocumento(StorageObject storageObject) throws IOException {
         return IOUtils.toByteArray(missioniCMISService.getResource(storageObject));
     }
-    public StartWorflowDto createUStartWorfloDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
+    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 
