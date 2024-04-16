@@ -28,7 +28,7 @@ public class AutorizzazioneMissioneSenzaProgDifUo extends AbstractHappySign impl
     @Value("${flows.autorizzazione.noprogdifuo:#{null}}")
     private String templateName;
 
-    public StartWorflowDto createUStartWorfloDto(OrdineMissione ordineMissione, StorageObject modulo,List<StorageObject> allegati) throws IOException{
+    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);
 

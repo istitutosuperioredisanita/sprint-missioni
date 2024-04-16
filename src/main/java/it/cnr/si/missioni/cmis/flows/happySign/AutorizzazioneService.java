@@ -3,14 +3,11 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.dto.happysign.request.UploadToComplexRequest;
-import it.iss.si.dto.happysign.response.UploadToComplexResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +39,7 @@ public class AutorizzazioneService {
         if ( Optional.ofNullable(autorizzazione).isPresent()){
             logger.info(autorizzazione);
         }
-        StartWorflowDto startWorflowDto=   autorizzazione.createUStartWorfloDto(ordineMissione, modulo,allegati);;
+        StartWorflowDto startWorflowDto=   autorizzazione.createStartWorkflowDto(ordineMissione, modulo,allegati);
         if ( Optional.ofNullable(utilTestService).isPresent())
             startWorflowDto = utilTestService.createUStartWorfloDto(ordineMissione,modulo,allegati);
 

@@ -39,7 +39,8 @@ import java.io.Serializable;
         "nazione_nascita",
         "comune_residenza",
         "provincia_residenza",
-        "telefono_comunicazioni"
+        "telefono_comunicazioni",
+        "codice_fiscale"
 })
 
 public class TerzoInfo extends RestServiceBean implements Serializable {
@@ -65,6 +66,8 @@ public class TerzoInfo extends RestServiceBean implements Serializable {
     private String provincia_residenza;
     @JsonProperty("telefono_comunicazioni")
     private String telefono_comunicazioni;
+    @JsonProperty("codice_fiscale")
+    private String codice_fiscale;
 
     public String getCap_residenza() {
         return cap_residenza;
@@ -152,5 +155,13 @@ public class TerzoInfo extends RestServiceBean implements Serializable {
 
     public void setTelefono_comunicazioni(String telefono_comunicazioni) {
         this.telefono_comunicazioni = telefono_comunicazioni;
+    }
+
+    public String getCodice_fiscale() {
+        return codice_fiscale;
+    }
+
+    public void setCodice_fiscale(String codice_fiscale) {
+        this.codice_fiscale = codice_fiscale;
     }
 }
