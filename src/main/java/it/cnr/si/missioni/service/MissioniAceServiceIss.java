@@ -19,6 +19,7 @@
 
 package it.cnr.si.missioni.service;
 
+import it.cnr.si.missioni.cmis.flows.happySign.AbstractHappySign;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
@@ -38,6 +39,7 @@ import it.iss.si.dto.anagrafica.EmployeeDetails;
 import it.iss.si.dto.anagrafica.ResidenzaDomicilio;
 import it.iss.si.dto.uo.UoDetails;
 import it.iss.si.service.AceService;
+import it.iss.si.service.HappySignService;
 import it.iss.si.service.UtilAce;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -138,17 +140,18 @@ public class MissioniAceServiceIss implements MissioniAceService{
             userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
             userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
             userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
-            TerzoInfo terzoInfo = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
+
+            /*TerzoInfo terzoInfo = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
             if ( Optional.ofNullable(terzoInfo).isPresent()) {
                 userInfoDto.setComune_residenza(terzoInfo.getComune_residenza());
                 userInfoDto.setIndirizzo_residenza(terzoInfo.getIndirizzo_residenza());
                 userInfoDto.setCap_residenza( terzoInfo.getCap_residenza());
                 userInfoDto.setProvincia_residenza(terzoInfo.getProvincia_residenza());
                 userInfoDto.setComune_nascita(terzoInfo.getComune_nascita());
+                userInfoDto.setComune_residenza(terzoInfo.getComune_residenza());
+            }*/
 
-            }
-            /*
-            Sull'anagrafica ISS per molte persone non c'è il comune di residenza presente invece nei dati provenienti da NOIPA degli stipendi
+            //Sull'anagrafica ISS per molte persone non c'è il comune di residenza presente invece nei dati provenienti da NOIPA degli stipendi
             ResidenzaDomicilio residenzaDomicilio
                     = getResidenza(userDetail.getIdAnagrafe());
             if ( Optional.ofNullable(residenzaDomicilio).isPresent()) {
@@ -158,7 +161,7 @@ public class MissioniAceServiceIss implements MissioniAceService{
                 userInfoDto.setProvincia_residenza( residenzaDomicilio.getProvincia());
             }
 
-             */
+
 
 
 
