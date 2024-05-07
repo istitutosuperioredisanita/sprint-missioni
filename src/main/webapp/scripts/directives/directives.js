@@ -265,12 +265,15 @@ angular.module('missioniApp')
             if (account.profilo){
                 scope.accountBanner.qualificaRich = account.profilo.trim();
             }
-            scope.accountBanner.livelloRich = account.livello; 
+            scope.accountBanner.livelloRich = account.livello;
             scope.accountBanner.codiceFiscale = account.codice_fiscale; 
             scope.accountBanner.dataNascita = account.data_nascita; 
             scope.accountBanner.strutturaAppartenenza = account.struttura_appartenenza; 
-            scope.accountBanner.luogoNascita = account.comune_nascita; 
-          } 
+            scope.accountBanner.luogoNascita = account.comune_nascita;
+
+            //alert(JSON.stringify(account));
+
+          }
         } 
     return {
       restrict: 'AE',

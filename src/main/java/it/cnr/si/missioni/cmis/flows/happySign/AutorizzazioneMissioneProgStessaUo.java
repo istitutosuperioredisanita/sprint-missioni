@@ -1,14 +1,10 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
-import it.iss.si.dto.happysign.base.EnumTypeSigner;
-import it.iss.si.dto.happysign.base.File;
-import it.iss.si.dto.happysign.base.Signer;
-import it.iss.si.dto.happysign.base.UserFea;
-import it.iss.si.dto.happysign.request.UploadToComplexRequest;
 import it.iss.si.service.HappySignURLCondition;
 import it.iss.si.service.UtilAce;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,18 +18,18 @@ import java.util.List;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.progstessauo:}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.}')"
 )
 public class AutorizzazioneMissioneProgStessaUo extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.uospes:#{null}}")
+    @Value("${flows.autorizzazione.default.template:#{null}}")
     private String templateName;
 
-    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
-        StartWorflowDto startInfo= new StartWorflowDto();
+    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
+        StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName(templateName);
         EmployeeDetails responsabilePrg = getUserFeaByCf(getProgetto(ordineMissione).getCodice_fiscale_responsabile());
 
-        EmployeeDetails userUoRich = getResponsabile( ordineMissione.getUoRich());
+        EmployeeDetails userUoRich = getResponsabile(ordineMissione.getUoRich());
 
         startInfo.addSigner(ordineMissione.getUid());
         startInfo.addSigner(UtilAce.getEmail(userUoRich));
@@ -45,14 +41,13 @@ public class AutorizzazioneMissioneProgStessaUo extends AbstractHappySign implem
         //f.setPdf(getDocumento(modulo));
 
 
-
-        startInfo.setFileToSign(getFile( modulo,allegati));
+        startInfo.setFileToSign(getFile(modulo, allegati));
 
         return startInfo;
     }
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return ( signRespProgetto(ordineMissione ) && ( !signRespUoAfferente(ordineMissione)));
+        return (signRespProgetto(ordineMissione) && (signUoRichEqUoSpesa(ordineMissione)));
     }
 }

@@ -143,6 +143,8 @@ public class MissioniAceServiceIss implements MissioniAceService {
             userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
             userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
             userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+            userInfoDto.setProfilo(userDetail.getRapporto().getQualifica().getValue());
+            userInfoDto.setLivello_profilo(String.valueOf(userDetail.getRapporto().getLivello()));
 
             TerzoInfo terzoInfo = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
             if ( Optional.ofNullable(terzoInfo).isPresent()) {

@@ -20,7 +20,7 @@ import java.util.List;
 @ConditionalOnExpression(
         "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.}')"
 )
-public class AutorizzazioneMissioneProgDifUo extends AbstractHappySign implements AutorizzazioneMissione {
+public class AutorizzazioneMissioneNoCaricoEnte extends AbstractHappySign implements AutorizzazioneMissione {
     @Value("${flows.autorizzazione.default.template:#{null}}")
     private String templateName;
 
@@ -28,29 +28,23 @@ public class AutorizzazioneMissioneProgDifUo extends AbstractHappySign implement
     public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
         StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName(templateName);
-        EmployeeDetails responsabilePrg = getUserFeaByCf(getProgetto(ordineMissione).getCodice_fiscale_responsabile());
 
-        EmployeeDetails userUoRich = getResponsabile(ordineMissione.getUoRich());
-        EmployeeDetails userUoSpesa = getResponsabile(ordineMissione.getUoSpesa());
+        EmployeeDetails presidente = getPresidente();
+        EmployeeDetails dirGenerale = getDirGenerale();
 
         startInfo.addSigner(ordineMissione.getUid());
-        startInfo.addSigner(UtilAce.getEmail(userUoRich));
-        startInfo.addSigner(UtilAce.getEmail(responsabilePrg));
-        startInfo.addSigner(UtilAce.getEmail(userUoSpesa));
+        startInfo.addSigner(UtilAce.getEmail(presidente));
+        startInfo.addSigner(UtilAce.getEmail(dirGenerale));
+        setRepScientificoToSign(startInfo,ordineMissione);
+        setDirDipToSign(startInfo,ordineMissione);
 
-/*
-        File f = new File();
-        f.setFilename(modulo.getKey());
-        f.setPdf(getDocumento(modulo));
-*/
         startInfo.setFileToSign(getFile(modulo, allegati));
-
 
         return startInfo;
     }
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (signRespProgetto(ordineMissione) && (!signUoRichEqUoSpesa(ordineMissione)));
+        return (!signRespProgetto(ordineMissione) && signGae(ordineMissione) && isMissioneNoCaricoEnte(ordineMissione));
     }
 }

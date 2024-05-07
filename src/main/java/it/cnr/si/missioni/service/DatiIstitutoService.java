@@ -59,6 +59,11 @@ public class DatiIstitutoService {
     public DatiIstituto getDatiIstituto(String istituto, Integer anno) {
         return datiIstitutoRepository.getDatiIstituto(istituto, anno);
     }
+    @Transactional(readOnly = true)
+    public DatiIstituto getDatiIstitutoFromDesc(String descrIstituto, Integer anno) {
+        return datiIstitutoRepository.getDatiIstitutoFromDesc(descrIstituto, anno);
+    }
+
 
     private DatiIstituto getDatiIstitutoAndLock(String istituto, Integer anno) {
         return datiIstitutoRepository.getDatiIstitutoAndLock(istituto, anno);

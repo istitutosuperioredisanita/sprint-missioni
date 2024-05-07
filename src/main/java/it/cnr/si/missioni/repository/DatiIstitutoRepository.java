@@ -39,6 +39,9 @@ public interface DatiIstitutoRepository extends
     @Query("select a from DatiIstituto a where a.istituto = ?1 and a.anno = ?2")
     DatiIstituto getDatiIstituto(String istituto, Integer anno);
 
+    @Query("select a from DatiIstituto a where a.descrIstituto = ?1 and a.anno = ?2")
+    DatiIstituto getDatiIstitutoFromDesc(String descr, Integer anno);
+
     @Query("select a from DatiIstituto a where a.anno = ?1")
     List<DatiIstituto> getDatiIstituti(Integer anno);
 }

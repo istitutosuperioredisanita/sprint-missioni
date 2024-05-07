@@ -307,7 +307,8 @@
                         <p class="col-md-11">
                      <span class="input-group">
                         <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
-                        <ui-select id="missioni-ui-select" theme="select2" ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 || !ordineMissioneModel.cdrSpesa || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" ng-model="ordineMissioneModel.gae"/>
+                        <ui-select id="missioni-ui-select" theme="select2" ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 ||
+                        !ordineMissioneModel.cdrSpesa || !ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" ng-model="ordineMissioneModel.gae"/>
                         <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.gae' | translate}}" >
                            <span ng-bind="$select.selected.cd_linea_attivita+' '+$select.selected.ds_linea_attivita"></span>
                         </ui-select-match>
@@ -326,7 +327,7 @@
                         <p class="col-md-12">
                      <span class="input-group">
                         <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
-                        <ui-select id="missioni-ui-select" theme="select2" ng-model="ordineMissioneModel.voce" ng-disabled="!ordineMissioneModel.uoSpesa || !valida || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" />
+                        <ui-select id="missioni-ui-select" theme="select2" ng-model="ordineMissioneModel.voce" ng-disabled="!ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" />
                         <ui-select-match allow-clear="true" placeholder="{{'missione.form.voce' | translate}}" >
                            <span ng-bind="$select.selected.cd_elemento_voce+' '+$select.selected.ds_elemento_voce"></span>
                         </ui-select-match>
@@ -342,7 +343,7 @@
                         <p class="col-md-2">
                      <span class="input-group">
                         <span class="input-group-addon" translate="ordine-missione.form.fondi">Fondi</span>
-                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!ordineMissioneModel.uoSpesa || !valida || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" ng-model="ordineMissioneModel.fondi" />
+                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" ng-model="ordineMissioneModel.fondi" />
                         <ui-select-match placeholder="{{'ordine-missione.form.fondi' | translate}}" >
                            <span ng-bind="$select.selected.fondo"></span>
                         </ui-select-match>
@@ -351,13 +352,11 @@
                         </ui-select-choices>
                          </ui-select>
                      </span>
-                        </p>
-                    </form>
                     <form class="form-inline" role="form" id="missioni">
                         <p class="col-md-3">
                      <span class="input-group" >
                      <span class="input-group-addon" ng-attr-translate="{{ 'missione.form.anno-impegno-obbl' }}">anno</span>
-                     <input ng-disabled="!ordineMissioneModel.uoSpesa || !valida || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
+                     <input ng-disabled="!ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.esercizioOriginaleObbligazione"/>
                      </span>
                         </p>
                     </form>
@@ -365,7 +364,7 @@
                         <p class="col-md-3">
                      <span class="input-group" >
                      <span class="input-group-addon" ng-attr-translate="{{ 'missione.form.numero-impegno-obbl' }}">numero</span>
-                     <input ng-disabled="!ordineMissioneModel.uoSpesa || !valida || ((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
+                     <input ng-disabled="!ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" type="number" style="text-align:center" class="input-sm form-control" name="anno-impegno" ng-model="ordineMissioneModel.pgObbligazione"/>
                      </span>
                         </p>
                     </form>
@@ -550,10 +549,15 @@
                 </p>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile||ordineMissioneModel.missioneGratuita == 'S'))||(ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione))  && !disabilitaOrdineMissione">
-                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'ordine-missione.button.invia' | translate}}</button>
+                <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile || ordineMissioneModel.missioneGratuita == 'S')) || (ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione)) && !disabilitaOrdineMissione">
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}">
+                        <span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;
+                        <span ng-if="utenteAbilitatoValidareUo !== 'N'">{{'ordine-missione.button.sendToValidate' | translate}}</span>
+                        <span ng-if="utenteAbilitatoValidareUo === 'N'">{{'ordine-missione.button.invia' | translate}}</span>
+                    </button>
                 </div>
             </form>
+
             <form name="form-inline" role="form" ng-submit="sendToManagerOrdineMissione()">
                 <div class="col-xs-4" ng-show="showEsisteOrdineMissione && !disabilitaOrdineMissione && showResponsabile && ordineMissioneModel.missioneGratuita != 'S' && ordineMissioneModel.stato === 'INS' && validazione != 'S'">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.sendToManager' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'ordine-missione.button.sendToManagerShort' | translate}}</button>

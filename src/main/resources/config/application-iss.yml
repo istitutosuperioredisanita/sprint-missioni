@@ -2,7 +2,7 @@
 spring:
   config:
     file:
-      pathFileConfigJson: E:\iss\sprint-missioni-config\
+      pathFileConfigJson: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
@@ -129,13 +129,12 @@ flows:
   password: P@sswordprimoaccess0
   organizzation: iss
   keystore:
-    path: E:\iss\sprint-missioni-config\isscol_client.p12
+    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\isscol_client.p12
     password: password
   autorizzazione:
-    progdifuo: duilioapp
-    progstessauo: duilioapp
-    noprogdifuo: duilioapp
-    noprogstessauo: duilioapp
+    default:
+      template : duilioapp
+
   rimborso:
     default:
       template : duilioapp
