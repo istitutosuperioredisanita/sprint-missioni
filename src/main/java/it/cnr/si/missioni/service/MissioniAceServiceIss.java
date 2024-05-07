@@ -147,10 +147,10 @@ public class MissioniAceServiceIss implements MissioniAceService {
             userInfoDto.setLivello_profilo(String.valueOf(userDetail.getRapporto().getLivello()));
 
             TerzoInfo terzoInfo = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
-            if ( Optional.ofNullable(terzoInfo).isPresent()) {
+            if (Optional.ofNullable(terzoInfo).isPresent()) {
                 userInfoDto.setComune_residenza(terzoInfo.getComune_residenza());
                 userInfoDto.setIndirizzo_residenza(terzoInfo.getIndirizzo_residenza());
-                userInfoDto.setCap_residenza( terzoInfo.getCap_residenza());
+                userInfoDto.setCap_residenza(terzoInfo.getCap_residenza());
                 userInfoDto.setProvincia_residenza(terzoInfo.getProvincia_residenza());
                 userInfoDto.setComune_nascita(terzoInfo.getComune_nascita());
             }
@@ -269,10 +269,14 @@ public class MissioniAceServiceIss implements MissioniAceService {
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
         logger.info("MissioniAceServiceIss->findUtentiCdsuo");
 
-        String uoSigla = Utility.getUoSigla(uo);
+        String uoSigla = uo.matches("\\d{3}\\.\\d{3}") ? uo : Utility.getUoSigla(uo);
+
         UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaByUo(uoSigla);
-        if (!Optional.ofNullable(unitaOrganizzativa).isPresent())
+
+        if (unitaOrganizzativa == null) {
             return Collections.emptyList();
+        }
+
         return getListSimpleUtenteWebDto(aceService.getPersoneDetailUo(unitaOrganizzativa.getSigla_int_ente(), true));
     }
 

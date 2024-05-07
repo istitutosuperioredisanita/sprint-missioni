@@ -18,10 +18,10 @@ import java.util.List;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.gae:}')"
 )
 public class AutorizzazioneMissioneGae extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.default.template:#{null}}")
+    @Value("${flows.autorizzazione.gae:#{null}}")
     private String templateName;
 
     @Override
@@ -39,16 +39,12 @@ public class AutorizzazioneMissioneGae extends AbstractHappySign implements Auto
         startInfo.setFileToSign(getFile(modulo, allegati));
 
 
-        /*UsersSpecial validatore = getValidatorIfMatchUid(ordineMissione.getUid(), ordineMissione.getUoRich(), true);
-        if (validatore != null) {
-            startInfo.addSigner(validatore.getUid());
-        }*/
         return startInfo;
     }
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
         return (!signRespProgetto(ordineMissione) && signGae(ordineMissione)
-                && signUoRichEqUoSpesa(ordineMissione) || !signUoRichEqUoSpesa(ordineMissione));
+                && signUoRichEqUoGae(ordineMissione) || !signUoRichEqUoGae(ordineMissione));
     }
 }

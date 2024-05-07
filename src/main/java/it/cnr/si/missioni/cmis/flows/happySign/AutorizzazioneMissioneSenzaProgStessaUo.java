@@ -43,6 +43,6 @@ public class AutorizzazioneMissioneSenzaProgStessaUo extends AbstractHappySign i
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (!signRespProgetto(ordineMissione) && (signUoRichEqUoSpesa(ordineMissione)));
+        return (!signRespProgetto(ordineMissione) && (signUoRichEqUoGae(ordineMissione)));
     }
 }

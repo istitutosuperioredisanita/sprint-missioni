@@ -132,14 +132,30 @@ flows:
     path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\isscol_client.p12
     password: password
   autorizzazione:
-    default:
-      template : duilioapp
+    progdifuo: duilioapp
+    progstessauo: duilioapp
+    noprogdifuo: duilioapp
+    dirgae: duilioapp
+    gae: duilioapp
+    dirgen: duilioapp
+    nocaricoente: duilioapp
+    p_dirigenti: duilioapp
+    vocipresidente: duilioapp
 
   rimborso:
     default:
       template : duilioapp
       signSiglaUo : DRUE
 
+codiciUo:
+  presidenza: 000.033
+  direzioneGenerale: 000.031
+  drue: 000.000
+
+keyUo:
+  presidenza: 14
+  direzioneGenerale: 6
+  direzione: 7
 
 storage:
   maxItemsPerPage: 10

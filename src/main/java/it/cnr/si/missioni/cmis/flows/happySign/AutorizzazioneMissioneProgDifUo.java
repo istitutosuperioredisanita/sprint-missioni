@@ -51,6 +51,6 @@ public class AutorizzazioneMissioneProgDifUo extends AbstractHappySign implement
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (signRespProgetto(ordineMissione) && (!signUoRichEqUoSpesa(ordineMissione)));
+        return (signRespProgetto(ordineMissione) && (!signUoRichEqUoGae(ordineMissione)));
     }
 }
