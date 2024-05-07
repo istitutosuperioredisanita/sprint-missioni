@@ -87,11 +87,10 @@ public class Costanti {
 
     public final static String USER_CRON_MISSIONI = "app.missioni";
     public final static String ACE_SIGLA_CUG = "CUG";
-    public final static String ACE_SIGLA_PRESIDENTE = "Presidenza";
-    public final static String SIGLA_ACE_DIR_I_FASCIA = "I fascia";
-
-    public final static String SIGLA_ACE_PRESIDENTE_INTERA = "PRE - Presidenza";
-    public final static Integer SIGLA_ACE_PRESIDENTE_KEY = 14;
+    public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
+    public final static String ACE_SIGLA_DIR_I_FASCIA = "I fascia";
+    public final static String ACE_SIGLA_DRUE = "DRUE";
+    public final static String ACE_SIGLA_PRESIDENTE_DESC = "Presidente";
 
     public final static String STRING_FOR_SANITIZE_FILE_NAME = "([\\/:@()&\u20AC<>?\"])";
     public final static String REST_OIL_NEW_PROBLEM = "pest/HDSiper";
@@ -187,11 +186,7 @@ public class Costanti {
     public final static String RUOLO_FIRMA_ESTERE = RUOLO_FIRMA + "-estere";
     public final static String RUOLO_FIRMA_PRESIDENTE = RUOLO_FIRMA + "-presidente";
     public final static String SIGLA_ACE_DIREZIONE_GENERALE = "DG";
-    public final static String SIGLA_ACE_DIREZIONE_GENERALE_INTERA = "DG - Direzione Generale";
-    public final static String SIGLA_ACE_DRUE_INTERA = "DRUE - Direzione Centrale Risorse Umane ed Economiche";
     public final static String SIGLA_ACE_DIR_GENERALE_VALUE = "Direttore Generale";
-    public final static Integer SIGLA_ACE_DIR_GENERALE_KEY = 6;
-    public final static Integer SIGLA_ACE_DIR_KEY = 7;
 
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
     public static final String ROLE_FLOWS = "USER_flows#missioni";
@@ -214,11 +209,11 @@ public class Costanti {
     public final static Map<String, String> STATO_INVIO_SIGLA;
     public final static Map<String, String> FONDI;
 
-    public final static String  DOCUMENTO_MISSIONE_KEY="documentoMissione";
-    public final static String  DOCUMENTO_ANTICIPO_KEY="documentoAnticipoMissione";
-    public final static String  DOCUMENTO_AUTO_PROPRIA_KEY="documentoAutoPropriaMissione";
-    public final static String  DOCUMENTO_TAXI_KEY="documentoTaxiMissione";
-    public final static String  DOCUMENTO_AUTO_NOLEGGIO_KEY="documentoAutoNoleggioMissione";
+    public final static String DOCUMENTO_MISSIONE_KEY = "documentoMissione";
+    public final static String DOCUMENTO_ANTICIPO_KEY = "documentoAnticipoMissione";
+    public final static String DOCUMENTO_AUTO_PROPRIA_KEY = "documentoAutoPropriaMissione";
+    public final static String DOCUMENTO_TAXI_KEY = "documentoTaxiMissione";
+    public final static String DOCUMENTO_AUTO_NOLEGGIO_KEY = "documentoAutoNoleggioMissione";
 
 
     static {

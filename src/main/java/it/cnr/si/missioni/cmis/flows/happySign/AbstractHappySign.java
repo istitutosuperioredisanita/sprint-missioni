@@ -3,7 +3,6 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.FlussiToHappySign;
-import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.DatiIstitutoService;
 import it.cnr.si.missioni.service.MissioniAceService;
@@ -11,6 +10,7 @@ import it.cnr.si.missioni.service.MissioniAceServiceIss;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.*;
 import it.cnr.si.missioni.util.proxy.json.service.*;
 import it.cnr.si.spring.storage.StorageObject;
@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +35,20 @@ import java.util.Optional;
 public abstract class AbstractHappySign implements FlussiToHappySign {
 
     private static final Log logger = LogFactory.getLog(AbstractHappySign.class);
+
+    @Value("${codiciUo.drue:#{null}}")
+    private String uoCodeDrue;
+    @Value("${codiciUo.direzioneGenerale:#{null}}")
+    private String uoCodeDirGenerale;
+    @Value("${codiciUo.presidenza:#{null}}")
+    private String uoCodePresidenza;
+    @Value("${keyUo.direzione:#{null}}")
+    private String keyUoDirezione;
+    @Value("${keyUo.direzioneGenerale:#{null}}")
+    private String keyUoDirGenerale;
+    @Value("${keyUo.presidenza:#{null}}")
+    private String keyUoPresidenza;
+
     @Autowired
     protected HappySignService happySignService;
     @Autowired
@@ -98,24 +113,26 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         return Boolean.FALSE;
     }
 
-    protected Boolean signUoRichEqUoSpesa(OrdineMissione ordineMissione) {
+    protected Boolean signUoRichEqUoGae(OrdineMissione ordineMissione) {
+        String uoGae = getUoGAE(ordineMissione);
 
         if (ordineMissione == null)
             return Boolean.FALSE;
-        if (ordineMissione.getUoRich().equalsIgnoreCase(ordineMissione.getUoSpesa())) {
+        if (ordineMissione.getUoRich().equalsIgnoreCase(uoGae)) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }
     }
 
-    protected Boolean signRespDipUoEqUoSpesa(OrdineMissione ordineMissione) {
+    protected Boolean signRespDipUoEqUoGae(OrdineMissione ordineMissione) {
+        String uoGae = getUoGAE(ordineMissione);
 
         if (ordineMissione == null)
             return Boolean.FALSE;
         else {
             Account direttore = uoService.getDirettore(ordineMissione.getUoRich());
-            if (direttore.getCodice_uo().equalsIgnoreCase(ordineMissione.getUoSpesa())) {
+            if (direttore.getCodice_uo().equalsIgnoreCase(uoGae)) {
                 return Boolean.TRUE;
             } else {
                 return Boolean.FALSE;
@@ -183,23 +200,20 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
 
     public EmployeeDetails getPresidente() {
 
-        DatiIstituto datiIstituto = datiIstitutoService.getDatiIstitutoFromDesc(Costanti.SIGLA_ACE_PRESIDENTE_INTERA, DateUtils.getCurrentYear());
-        Account direttore = uoService.getDirettore(datiIstituto.getIstituto());
+        Account direttore = uoService.getDirettore(formatUoCode(uoCodePresidenza));
         return getUserFeaByCf(direttore.getCodice_fiscale());
     }
 
     public EmployeeDetails getDirGenerale() {
 
-        DatiIstituto datiIstituto = datiIstitutoService.getDatiIstitutoFromDesc(Costanti.SIGLA_ACE_DIREZIONE_GENERALE_INTERA, DateUtils.getCurrentYear());
-        Account direttore = uoService.getDirettore(datiIstituto.getIstituto());
+        Account direttore = uoService.getDirettore(formatUoCode(uoCodeDirGenerale));
         return getUserFeaByCf(direttore.getCodice_fiscale());
     }
 
 
     public EmployeeDetails getDirDRUE() {
 
-        DatiIstituto datiIstituto = datiIstitutoService.getDatiIstitutoFromDesc(Costanti.SIGLA_ACE_DRUE_INTERA, DateUtils.getCurrentYear());
-        Account direttore = uoService.getDirettore(datiIstituto.getIstituto());
+        Account direttore = uoService.getDirettore(formatUoCode(uoCodeDrue));
         return getUserFeaByCf(direttore.getCodice_fiscale());
     }
 
@@ -214,7 +228,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     public Boolean isDirGenerale(OrdineMissione ordineMissione) {
         EmployeeDetails dirGenerale = getPersonaByUsmFromAce(ordineMissione.getUid());
 
-        if ((Objects.equals(dirGenerale.getRapporto().getQualifica().getKey(), Costanti.SIGLA_ACE_DIR_GENERALE_KEY))
+        if ((Objects.equals(dirGenerale.getRapporto().getQualifica().getKey(), keyUoDirGenerale))
                 && (dirGenerale.getRapporto().getQualifica().getValue().equalsIgnoreCase(Costanti.SIGLA_ACE_DIR_GENERALE_VALUE))) {
             return Boolean.TRUE;
         } else {
@@ -226,31 +240,22 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     public Boolean isPresidente(OrdineMissione ordineMissione) {
         EmployeeDetails presidente = getPersonaByUsmFromAce(ordineMissione.getUid());
 
-        if (Objects.equals(presidente.getRapporto().getQualifica().getKey(), Costanti.SIGLA_ACE_PRESIDENTE_KEY)) {
+        if (Objects.equals(presidente.getRapporto().getQualifica().getKey(), keyUoPresidenza)
+                && presidente.getRapporto().getQualifica().getValue().equalsIgnoreCase(Costanti.ACE_SIGLA_PRESIDENTE_DESC)) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }
     }
 
-    /*public Boolean isDirDRUE(OrdineMissione ordineMissione) {
-
-        EmployeeDetails dirDRUE = getPersonaByUsmFromAce(ordineMissione.getUid());
-
-        if (Objects.equals(dirDRUE.getRapporto().getQualifica().getKey(), Costanti.SIGLA_ACE_DIR_KEY)
-                && ordineMissione.getUoRich().equalsIgnoreCase(Costanti.SIGLA_ACE_DRUE_INTERA)) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
-    }*/
 
     public Boolean isDirIFascia(OrdineMissione ordineMissione) {
 
         EmployeeDetails dir = getPersonaByUsmFromAce(ordineMissione.getUid());
 
-        if (Objects.equals(dir.getRapporto().getQualifica().getKey(), Costanti.SIGLA_ACE_DIR_KEY)
-        && dir.getRapporto().getQualifica().getValue().contains(Costanti.SIGLA_ACE_DIR_I_FASCIA)) {
+        if (Objects.equals(dir.getRapporto().getQualifica().getKey(), keyUoDirezione)
+                && dir.getRapporto().getQualifica().getValue().contains(Costanti.ACE_SIGLA_DIR_I_FASCIA)
+                && !ordineMissione.getUoRich().equals(formatUoCode(uoCodeDrue))) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
@@ -296,25 +301,47 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         return aceService.getPersonaByUsername(username);
     }
 
-    public Boolean isMissioneNoCaricoEnte(OrdineMissione ordineMissione){
-        if(Optional.ofNullable(ordineMissione.getMissioneGratuita()).isPresent()){
+    public Boolean isMissioneNoCaricoEnte(OrdineMissione ordineMissione) {
+        if (Optional.ofNullable(ordineMissione.getMissioneGratuita()).isPresent()) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }
     }
 
-    /*public UsersSpecial getValidatorIfMatchUid(String uid, String uo, Boolean isPerValidazione) {
-        List<UsersSpecial> userSpecialForUo = accountService.getUserSpecialForUo(uo, isPerValidazione);
+    public Boolean isDirDRUE(OrdineMissione ordineMissione) {
 
-        for (UsersSpecial userSpecial : userSpecialForUo) {
-            if (userSpecial.getUid().equals(uid)) {
-                return userSpecial; // Restituisce l'utente con uid uguale se la condizione è vera
-            }
+        EmployeeDetails dirDRUE = getPersonaByUsmFromAce(ordineMissione.getUid());
+
+        if (Objects.equals(dirDRUE.getRapporto().getQualifica().getKey(), keyUoDirezione)
+                && ordineMissione.getUoRich().equalsIgnoreCase(formatUoCode(uoCodeDrue))) {
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
+        }
+    }
+
+    private String getUoGAE(OrdineMissione ordineMissione) {
+        Gae gae = getGae(ordineMissione);
+        String codCompletoCDR = gae.getCd_centro_responsabilita();
+        return codCompletoCDR.substring(4);
+    }
+
+
+    private String formatUoCode(String uoCode) {
+        if (uoCode == null) {
+            return null;
         }
 
-        return null; // Nessun utente con uid uguale trovato
-    }*/
+        String[] parts = uoCode.split("\\.");
+        StringBuilder formattedUoCode = new StringBuilder();
+
+        for (String part : parts) {
+            formattedUoCode.append(String.format("%03d", Integer.parseInt(part))).append(".");
+        }
+
+        return formattedUoCode.deleteCharAt(formattedUoCode.length() - 1).toString();
+    }
 
 
 }

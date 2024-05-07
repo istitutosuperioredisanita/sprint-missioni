@@ -18,10 +18,10 @@ import java.util.List;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.dirgae:}')"
 )
 public class AutorizzazioneMissioneDirGae extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.default.template:#{null}}")
+    @Value("${flows.autorizzazione.dirgae:#{null}}")
     private String templateName;
 
 
@@ -48,6 +48,6 @@ public class AutorizzazioneMissioneDirGae extends AbstractHappySign implements A
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
         return (!signRespProgetto(ordineMissione) && signGae(ordineMissione) && isDirDipartimento(ordineMissione)
-                && (signRespDipUoEqUoSpesa(ordineMissione) || !signRespDipUoEqUoSpesa(ordineMissione)));
+                && (signRespDipUoEqUoGae(ordineMissione) || !signRespDipUoEqUoGae(ordineMissione)));
     }
 }
