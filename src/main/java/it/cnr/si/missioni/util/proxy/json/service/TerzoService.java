@@ -54,6 +54,19 @@ public class TerzoService {
             return null;
         }
     }
+    public TerzoInfo loadUserInfoByCdTerzo(String cdTerzo) {
+        String app = Costanti.APP_SIGLA;
+        String url = Costanti.REST_USERINFO_BYCDTERZO_SIGLA + cdTerzo;
+        JSONBody body = new JSONBody();
+        try {
+            String risposta = commonService.process(body, app, url, false, HttpMethod.GET);
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(risposta, TerzoInfo.class);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
 
     public Terzo loadTerzo(String cf, String cdTerzo) throws AwesomeException {
         if (cf != null || cdTerzo != null) {

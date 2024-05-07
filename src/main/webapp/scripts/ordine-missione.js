@@ -830,17 +830,11 @@ $scope.getDatiUo = function(uo) {
     if (uo && uo.includes(".")) {
         uo = uo.replace(".", "");
     }
-    ElencoOrdiniMissioneService.getDatiUo(uo).then(function(data) {
-        console.log('Data from service:', data);
-        if (data) {
-            var model = data.data;
-            $scope.ordineDaValidare = model.ordine_da_validare;
-
-            $scope.valida = ($scope.ordineDaValidare === 'S') ? true : false;
-        }
+    ElencoOrdiniMissioneService.getDatiUo(uo).then(function(response) {
+        var model = response.data;
+        $scope.valida = model.ordine_da_validare === 'S';
     });
 };
-
 
 
 
@@ -889,6 +883,7 @@ $scope.getDatiUo = function(uo) {
     }
 
     $scope.gestioneUtenteAbilitatoValidare = function(uo) {
+
         $scope.utenteAbilitatoValidareUo = 'N';
         var uoForUsersSpecial = $sessionStorage.account.uoForUsersSpecial;
         if (uo && uoForUsersSpecial) {
@@ -897,14 +892,15 @@ $scope.getDatiUo = function(uo) {
                 var uoForUserSpecial = uoForUsersSpecial[k];
                 if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S') {
                     $scope.utenteAbilitatoValidareUo = 'S';
+                    break;
                 }
             }
         }
     }
 
     $scope.reloadUoWork = function(uo) {
+        $scope.getDatiUo(uo.cd_unita_organizzativa);
         $scope.gestioneUtenteAbilitatoValidare(uo.cd_unita_organizzativa);
-
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
@@ -934,7 +930,9 @@ $scope.getDatiUo = function(uo) {
     }
 
     $scope.reloadUo = function(uo) {
+
         $scope.getDatiUo(uo);
+        $scope.gestioneUtenteAbilitatoValidare(uo);
         $scope.annullaCdr();
         $scope.impostaGestioneResponsabileGruppo(uo);
         $scope.restCdr(uo, "N");

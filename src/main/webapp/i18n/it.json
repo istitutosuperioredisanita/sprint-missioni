@@ -381,7 +381,9 @@
             "anticipo-si": "Richiesta Anticipo: Sì",
             "anticipo-no": "Richiesta Anticipo: No",
             "savedraft" : "Salva in Bozza",
-            "invia" : "Invia"
+            "invia" : "Invia",
+            "sendToValidate" : "Invia in validazione"
+
         },
         "messages": {
             "error": {

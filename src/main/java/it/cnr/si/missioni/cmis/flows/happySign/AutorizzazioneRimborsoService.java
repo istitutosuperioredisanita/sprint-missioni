@@ -1,6 +1,7 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import org.apache.commons.logging.Log;
