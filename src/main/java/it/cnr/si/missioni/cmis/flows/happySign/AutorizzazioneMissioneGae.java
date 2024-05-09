@@ -3,10 +3,9 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.dto.anagrafica.EmployeeDetails;
 import it.iss.si.service.HappySignURLCondition;
-import it.iss.si.service.UtilAce;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Conditional;
@@ -29,12 +28,10 @@ public class AutorizzazioneMissioneGae extends AbstractHappySign implements Auto
         StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName(templateName);
 
-        EmployeeDetails dirDRUE = getDirDRUE();
-
         startInfo.addSigner(ordineMissione.getUid());
-        startInfo.addSigner(UtilAce.getEmail(dirDRUE));
         setRepScientificoToSign(startInfo,ordineMissione);
         setDirDipToSign(startInfo,ordineMissione);
+        startInfo.addSigner(getDirUffEcoGiur());
 
         startInfo.setFileToSign(getFile(modulo, allegati));
 
@@ -44,7 +41,6 @@ public class AutorizzazioneMissioneGae extends AbstractHappySign implements Auto
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (!signRespProgetto(ordineMissione) && signGae(ordineMissione)
-                && signUoRichEqUoGae(ordineMissione) || !signUoRichEqUoGae(ordineMissione));
+        return (signGae(ordineMissione) && uoGaeSuDirCentrale(ordineMissione));
     }
 }

@@ -19,22 +19,23 @@ import java.util.List;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.vocipresidente:}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.dirigentiIfascia:}')"
 )
-public class AutorizzazioneMissioneVociPresidente extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.vocipresidente:#{null}}")
+public class AutorizzazioneMissioneDirigenti_1Fascia extends AbstractHappySign implements AutorizzazioneMissione {
+    @Value("${flows.autorizzazione.dirigentiIfascia:#{null}}")
     private String templateName;
+
 
     @Override
     public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
         StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName(templateName);
 
-        EmployeeDetails presidente = getPresidente();
-
+        EmployeeDetails dirGenerale = getDirGenerale();
 
         startInfo.addSigner(ordineMissione.getUid());
-        startInfo.addSigner(UtilAce.getEmail(presidente));
+        startInfo.addSigner(UtilAce.getEmail(dirGenerale));
+        setRepScientificoToSign(startInfo,ordineMissione);
         startInfo.addSigner(getDirUffEcoGiur());
 
         startInfo.setFileToSign(getFile(modulo, allegati));
@@ -44,6 +45,6 @@ public class AutorizzazioneMissioneVociPresidente extends AbstractHappySign impl
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (signGae(ordineMissione) && uoGaeSuDirCentrale(ordineMissione) && isIncarico_VociPresidente(ordineMissione));
+        return (signGae(ordineMissione) && uoGaeSuDirCentrale(ordineMissione) && isDirIFascia(ordineMissione));
     }
 }

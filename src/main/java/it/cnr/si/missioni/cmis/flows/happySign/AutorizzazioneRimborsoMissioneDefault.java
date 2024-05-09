@@ -28,9 +28,7 @@ public class AutorizzazioneRimborsoMissioneDefault extends AbstractHappySign imp
     public StartWorflowDto createStartWorkflowDto(RimborsoMissione rimborsoMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);
-        //EmployeeDetails userUoRich = getResponsabile( rimborsoMissione.getUoRich());
         startInfo.addSigner(rimborsoMissione.getUid());
-        //startInfo.addSigner(UtilAce.getEmail(userUoRich));
 
         startInfo.setFileToSign(getFile( modulo,allegati));
 

@@ -675,14 +675,17 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             $scope.elencoGae = [];
         }
     }
-
-    $scope.restCapitoli = function(anno) {
+//passa la voce e controlla se la voce selezionata con presidenza == true sia 2089 e 2090
+    $scope.restCapitoli = function(anno, presidente, voce) {
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.VOCE;
         var varOrderBy = [{
             name: 'cd_elemento_voce',
             type: 'ASC'
         }];
+        var varClauses = [];
+
+        if(presidente === "N"){
         var varClauses = [{
                 condition: 'AND',
                 fieldName: 'esercizio',
@@ -720,6 +723,14 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 fieldValue: "D"
             }
         ];
+        } else if (presidente === "S" || (voce === "2089" || voce === "2090")) {
+            varClauses.push({
+                condition: 'AND',
+                fieldName: 'fl_missioni_presidenza',
+                operator: "=",
+                fieldValue: true
+            });
+        }
         var postVoce = {
             activePage: 0,
             maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
@@ -824,17 +835,17 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     }
 
 
-$scope.valida = false;
+    $scope.valida = false;
 
-$scope.getDatiUo = function(uo) {
-    if (uo && uo.includes(".")) {
-        uo = uo.replace(".", "");
-    }
-    ElencoOrdiniMissioneService.getDatiUo(uo).then(function(response) {
-        var model = response.data;
-        $scope.valida = model.ordine_da_validare === 'S';
-    });
-};
+    $scope.getDatiUo = function(uo) {
+        if (uo && uo.includes(".")) {
+            uo = uo.replace(".", "");
+        }
+        ElencoOrdiniMissioneService.getDatiUo(uo).then(function(response) {
+            var model = response.data;
+            $scope.valida = model.ordine_da_validare === 'S';
+        });
+    };
 
 
 
@@ -1268,7 +1279,7 @@ $scope.getDatiUo = function(uo) {
         $scope.restNazioni();
         $scope.restCds($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
         $scope.reloadCds($scope.ordineMissioneModel.cdsRich);
-        $scope.restCapitoli($scope.ordineMissioneModel.anno);
+        $scope.restCapitoli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.presidente, $scope.ordineMissioneModel.voce);
         $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsRich);
     }
 
@@ -1332,21 +1343,21 @@ $scope.getDatiUo = function(uo) {
         }
     }
 
-        $scope.goAutoNoleggio = function() {
-            if ($scope.ordineMissioneModel.id) {
-                if ($scope.validazione) {
-                    $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione);
-                } else {
-                    if ($scope.disabilitaOrdineMissione) {
-                        $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + "D");
-                    } else {
-                        $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + "N");
-                    }
-                }
+    $scope.goAutoNoleggio = function() {
+        if ($scope.ordineMissioneModel.id) {
+            if ($scope.validazione) {
+                $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione);
             } else {
-                ui.error("Per poter inserire i dati dell'auto a noleggio è necessario prima salvare l'ordine di missione");
+                if ($scope.disabilitaOrdineMissione) {
+                    $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + "D");
+                } else {
+                    $location.path('/ordine-missione/autoNoleggio/' + $scope.ordineMissioneModel.id + '/' + "N");
+                }
             }
+        } else {
+            ui.error("Per poter inserire i dati dell'auto a noleggio è necessario prima salvare l'ordine di missione");
         }
+    }
 
 
 
@@ -1487,7 +1498,7 @@ $scope.getDatiUo = function(uo) {
                 $scope.restCdr(model.uoSpesa, "S");
                 //$scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
-                $scope.restCapitoli(model.anno);
+                $scope.restCapitoli(model.anno, model.presidente, model.voce);
                 $scope.ordineMissioneModel = model;
                 $scope.viewAttachments($scope.ordineMissioneModel.id);
                 $scope.inizializzaFormPerModifica();

@@ -327,7 +327,8 @@
                         <p class="col-md-12">
                      <span class="input-group">
                         <span class="input-group-addon label-input-group-for-select" translate="missione.form.voce">voce</span>
-                        <ui-select id="missioni-ui-select" theme="select2" ng-model="ordineMissioneModel.voce" ng-disabled="!ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" />
+                        <ui-select id="missioni-ui-select" theme="select2" ng-model="ordineMissioneModel.voce" ng-disabled="!ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'"
+                                   ng-click="restCapitoli(ordineMissioneModel.anno,ordineMissioneModel.presidente,ordineMissioneModel.voce)"/>
                         <ui-select-match allow-clear="true" placeholder="{{'missione.form.voce' | translate}}" >
                            <span ng-bind="$select.selected.cd_elemento_voce+' '+$select.selected.ds_elemento_voce"></span>
                         </ui-select-match>

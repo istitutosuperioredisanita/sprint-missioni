@@ -19,10 +19,10 @@ import java.util.List;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.p_dirigenti:}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.dirigentiIIfascia:}')"
 )
-public class AutorizzazioneMissioneP_Dirigenti extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.p_dirigenti:#{null}}")
+public class AutorizzazioneMissioneDirigenti_2Fascia extends AbstractHappySign implements AutorizzazioneMissione {
+    @Value("${flows.autorizzazione.dirigentiIIfascia:#{null}}")
     private String templateName;
 
 
@@ -31,13 +31,14 @@ public class AutorizzazioneMissioneP_Dirigenti extends AbstractHappySign impleme
         StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName(templateName);
 
-        EmployeeDetails dirGenerale = getDirGenerale();
         EmployeeDetails dirDRUE = getDirDRUE();
+        EmployeeDetails dirDRAG = getDirDRAG();
 
         startInfo.addSigner(ordineMissione.getUid());
-        startInfo.addSigner(UtilAce.getEmail(dirGenerale));
-        startInfo.addSigner(UtilAce.getEmail(dirDRUE));
         setRepScientificoToSign(startInfo,ordineMissione);
+        startInfo.addSigner(UtilAce.getEmail(dirDRUE));
+        startInfo.addSigner(UtilAce.getEmail(dirDRAG));
+        startInfo.addSigner(getDirUffEcoGiur());
 
         startInfo.setFileToSign(getFile(modulo, allegati));
 
@@ -46,7 +47,6 @@ public class AutorizzazioneMissioneP_Dirigenti extends AbstractHappySign impleme
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (!signRespProgetto(ordineMissione) && signGae(ordineMissione)
-                && (isPresidente(ordineMissione) || isDirIFascia(ordineMissione)));
+        return (signGae(ordineMissione) && uoGaeSuDirCentrale(ordineMissione) && isDirIIFascia(ordineMissione));
     }
 }
