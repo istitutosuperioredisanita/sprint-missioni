@@ -41,9 +41,9 @@ public class AutorizzazioneService {
             logger.info(autorizzazione);
         }
         StartWorflowDto startWorflowDto=   autorizzazione.createStartWorkflowDto(ordineMissione, modulo,allegati);
-        /*if ( Optional.ofNullable(utilTestService).isPresent())
+        if ( Optional.ofNullable(utilTestService).isPresent())
             startWorflowDto = utilTestService.createStartWorkflowDto(ordineMissione,modulo,allegati);
-*/
+
 
        return autorizzazione.send(startWorflowDto.getTemplateName(),
                startWorflowDto.getSigners(),
