@@ -30,12 +30,11 @@ public class AutorizzazioneMissioneDirGen extends AbstractHappySign implements A
         startInfo.setTemplateName(templateName);
 
         EmployeeDetails presidente = getPresidente();
-        EmployeeDetails dirDRUE = getDirDRUE();
 
         startInfo.addSigner(ordineMissione.getUid());
         startInfo.addSigner(UtilAce.getEmail(presidente));
-        startInfo.addSigner(UtilAce.getEmail(dirDRUE));
         setRepScientificoToSign(startInfo,ordineMissione);
+        startInfo.addSigner(getDirUffEcoGiur());
 
         startInfo.setFileToSign(getFile(modulo, allegati));
 
@@ -44,6 +43,6 @@ public class AutorizzazioneMissioneDirGen extends AbstractHappySign implements A
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (!signRespProgetto(ordineMissione) && signGae(ordineMissione) && isDirGenerale(ordineMissione));
+        return (signGae(ordineMissione) && uoGaeSuDirCentrale(ordineMissione) && isDirGenerale(ordineMissione));
     }
 }

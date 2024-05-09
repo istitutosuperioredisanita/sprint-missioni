@@ -45,6 +45,6 @@ public class AutorizzazioneMissioneNoCaricoEnte extends AbstractHappySign implem
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (!signRespProgetto(ordineMissione) && signGae(ordineMissione) && isMissioneNoCaricoEnte(ordineMissione));
+        return (signGae(ordineMissione) && isMissioneNoCaricoEnte(ordineMissione));
     }
 }

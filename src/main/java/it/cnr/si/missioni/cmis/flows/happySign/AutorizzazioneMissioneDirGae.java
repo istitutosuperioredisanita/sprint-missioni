@@ -32,13 +32,12 @@ public class AutorizzazioneMissioneDirGae extends AbstractHappySign implements A
 
         EmployeeDetails dirGenerale = getDirGenerale();
         EmployeeDetails presidente = getPresidente();
-        EmployeeDetails dirDRUE = getDirDRUE();
 
         startInfo.addSigner(ordineMissione.getUid());
         startInfo.addSigner(UtilAce.getEmail(dirGenerale));
         startInfo.addSigner(UtilAce.getEmail(presidente));
-        startInfo.addSigner(UtilAce.getEmail(dirDRUE));
         setRepScientificoToSign(startInfo, ordineMissione);
+        startInfo.addSigner(getDirUffEcoGiur());
 
         startInfo.setFileToSign(getFile(modulo, allegati));
 
@@ -47,7 +46,6 @@ public class AutorizzazioneMissioneDirGae extends AbstractHappySign implements A
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (!signRespProgetto(ordineMissione) && signGae(ordineMissione) && isDirDipartimento(ordineMissione)
-                && (signRespDipUoEqUoGae(ordineMissione) || !signRespDipUoEqUoGae(ordineMissione)));
+        return (signGae(ordineMissione) && isDirDipartimento(ordineMissione) && uoGaeSuDirCentrale(ordineMissione));
     }
 }

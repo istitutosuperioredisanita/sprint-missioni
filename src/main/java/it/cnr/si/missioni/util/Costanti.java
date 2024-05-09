@@ -89,6 +89,8 @@ public class Costanti {
     public final static String ACE_SIGLA_CUG = "CUG";
     public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
     public final static String ACE_SIGLA_DIR_I_FASCIA = "I fascia";
+    public final static String ACE_SIGLA_DIR_II_FASCIA = "I fascia";
+
     public final static String ACE_SIGLA_DRUE = "DRUE";
     public final static String ACE_SIGLA_PRESIDENTE_DESC = "Presidente";
 

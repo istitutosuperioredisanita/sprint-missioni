@@ -121,6 +121,7 @@ user:
     password: ${spring.proxy.vecchiaScrivania.password}
 
 
+
 flows:
   test: true
   type: HAPPPYSIGN
@@ -131,6 +132,7 @@ flows:
   keystore:
     path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\isscol_client.p12
     password: password
+
   autorizzazione:
     progdifuo: duilioapp
     progstessauo: duilioapp
@@ -139,8 +141,11 @@ flows:
     gae: duilioapp
     dirgen: duilioapp
     nocaricoente: duilioapp
-    p_dirigenti: duilioapp
+    dirigentiIfascia: duilioapp
+    dirigentiIIfascia: duilioapp
+    presidente: duilioapp
     vocipresidente: duilioapp
+    cns_cnt: duilioapp
 
   rimborso:
     default:
@@ -151,11 +156,21 @@ codiciUo:
   presidenza: 000.033
   direzioneGenerale: 000.031
   drue: 000.000
+  drag: 000.032
 
 keyUo:
   presidenza: 14
   direzioneGenerale: 6
-  direzione: 7
+  dirIfascia: 7
+  dirIIfascia: 8
+
+codiciCds:
+  dirCentrale: 000
+  cns: 001
+  cnt: 002
+
+dirUffEcoGiur:
+  username: grazia.corbello@iss.it
 
 storage:
   maxItemsPerPage: 10
