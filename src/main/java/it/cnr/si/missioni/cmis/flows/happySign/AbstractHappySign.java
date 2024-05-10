@@ -312,11 +312,16 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     public void setRepScientificoToSign(StartWorflowDto startInfo, OrdineMissione ordineMissione) {
 
         EmployeeDetails richiedente = getPersonaByUsmFromAce(ordineMissione.getUid());
-        EmployeeDetails respScientifico = getRespScientifico(ordineMissione);
+        try {
+            EmployeeDetails respScientifico = getRespScientifico(ordineMissione);
 
-        if (!UtilAce.getEmail(richiedente).equals(UtilAce.getEmail(respScientifico))) {
-            startInfo.addSigner(UtilAce.getEmail(respScientifico));
+            if (!UtilAce.getEmail(richiedente).equals(UtilAce.getEmail(respScientifico))) {
+                startInfo.addSigner(UtilAce.getEmail(respScientifico));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
 
     }
 
