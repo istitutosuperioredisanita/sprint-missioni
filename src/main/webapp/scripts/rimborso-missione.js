@@ -97,7 +97,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                 $scope.rimborsoMissioneModel.esercizioObbligazione = ordineMissioneSelected.esercizioObbligazione;
                 $scope.rimborsoMissioneModel.pgObbligazione = ordineMissioneSelected.pgObbligazione;
                 $scope.rimborsoMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
-                //$scope.rimborsoMissioneModel.utilizzoAutoNoleggioServizio = ordineMissioneSelected.utilizzoAutoServizio;
+                $scope.rimborsoMissioneModel.utilizzoAutoNoleggioServizio = ordineMissioneSelected.utilizzoAutoServizio;
                 $scope.rimborsoMissioneModel.personaleAlSeguito = ordineMissioneSelected.personaleAlSeguito;
                 $scope.rimborsoMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
                 $scope.rimborsoMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
@@ -133,19 +133,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
             }
         }
     }
-
-    $scope.valida = false;
-
-    $scope.getDatiUo = function(uo) {
-        if (uo && uo.includes(".")) {
-            uo = uo.replace(".", "");
-        }
-        ElencoOrdiniMissioneService.getDatiUo(uo).then(function(response) {
-            var model = response.data;
-            $scope.valida = model.ordine_da_validare === 'S';
-        });
-    };
-
 
     $scope.restOrdiniMissioneDaRimborsare = function(userWork, ordiniGiaRimborsati){
         ElencoOrdiniMissioneService.findMissioniDaRimborsare(userWork.login, ordiniGiaRimborsati).then(function(data){
@@ -202,7 +189,7 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.recuperoDatiInquadramento = function(userWork, terzoSigla){
-        ProxyServiceegetInquadramento(terzoSigla.cd_anag).then(function(ret){
+        ProxyService.getInquadramento(terzoSigla.cd_anag).then(function(ret){
             if (ret && ret.data && ret.data.elements && ret.data.elements.length > 0){
                 $scope.inquadramento = ret.data.elements;
             } else {
@@ -851,7 +838,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
                     var uoForUserSpecial = uoForUsersSpecial[k];
                     if (uoSiper == uoForUserSpecial.codice_uo && uoForUserSpecial.ordine_da_validare == 'S'){
                     $scope.utenteAbilitatoValidareUo = 'S';
-                    break;
                     }
                 }
             }
@@ -875,8 +861,8 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.reloadUoWork = function(uo){
-        $scope.getDatiUo(uo);
         $scope.gestioneUtenteAbilitatoValidare(uo);
+
         $scope.accountModel = null;
         $sessionStorage.accountWork = $scope.accountModel;
         $scope.elencoPersone = [];
@@ -894,8 +880,6 @@ missioniApp.controller('RimborsoMissioneController', function ($rootScope, $scop
     }
 
     $scope.reloadUo = function(uo) {
-      $scope.getDatiUo(uo);
-      $scope.gestioneUtenteAbilitatoValidare(uo);
       $scope.annullaCdr();  
       $scope.restCdr(uo, "N");
     }
