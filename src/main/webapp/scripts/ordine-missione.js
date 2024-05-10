@@ -685,7 +685,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         }];
         var varClauses = [];
 
-        if(presidente === "N"){
+
         var varClauses = [{
                 condition: 'AND',
                 fieldName: 'esercizio',
@@ -723,7 +723,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 fieldValue: "D"
             }
         ];
-        } else if (presidente === "S" || (voce === "2089" || voce === "2090")) {
+       if(presidente === "S"){
             varClauses.push({
                 condition: 'AND',
                 fieldName: 'fl_missioni_presidenza',
