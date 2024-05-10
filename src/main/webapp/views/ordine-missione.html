@@ -308,7 +308,7 @@
                      <span class="input-group">
                         <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
                         <ui-select id="missioni-ui-select" theme="select2" ng-enabled="ordineMissioneModel.cdrSpesa" ng-disabled="!elencoGae || elencoGae.length == 0 ||
-                        !ordineMissioneModel.cdrSpesa || !ordineMissioneModel.uoSpesa || utenteAbilitatoValidareUo === 'N'" ng-model="ordineMissioneModel.gae"/>
+                        !ordineMissioneModel.cdrSpesa || !ordineMissioneModel.uoSpesa " ng-model="ordineMissioneModel.gae"/>
                         <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.gae' | translate}}" >
                            <span ng-bind="$select.selected.cd_linea_attivita+' '+$select.selected.ds_linea_attivita"></span>
                         </ui-select-match>
