@@ -631,6 +631,8 @@ public class RimborsoMissioneService {
         rimborsoMissioneDB.setPresidente(rimborsoMissione.getPresidente());
         rimborsoMissioneDB.setCup(rimborsoMissione.getCup());
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
+        rimborsoMissioneDB.setLivelloRich(rimborsoMissione.getLivelloRich());
+        rimborsoMissioneDB.setQualificaRich(rimborsoMissione.getQualificaRich());
     }
 
     private String getEmail(String user) {
@@ -1374,6 +1376,7 @@ public class RimborsoMissioneService {
         RimborsoMissione rimborsoMissione = getRimborsoMissione(idMissione, true);
         byte[] printRimborsoMissione = null;
         String fileName = null;
+       // stampaRimborso(rimborsoMissione);
         if ((rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneInserita() && !rimborsoMissione.isMissioneDaValidare()) || (rimborsoMissione.isStatoFlussoApprovato())) {
             return cmisRimborsoMissioneService.getFileRimborsoMissione(rimborsoMissione);
         } else {
