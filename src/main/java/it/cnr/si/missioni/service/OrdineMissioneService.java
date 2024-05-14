@@ -1339,6 +1339,8 @@ public class OrdineMissioneService {
         ordineMissioneDB.setDataInvioRespGruppo(ordineMissione.getDataInvioRespGruppo());
         ordineMissioneDB.setDataInvioFirma(ordineMissione.getDataInvioFirma());
         ordineMissioneDB.setCommentoFlusso(ordineMissione.getCommentoFlusso());
+        ordineMissioneDB.setLivelloRich(ordineMissione.getLivelloRich());
+        ordineMissioneDB.setQualificaRich(ordineMissione.getQualificaRich());
     }
 
     private void sendMailToAdministrative(String basePath, OrdineMissione ordineMissioneDB) {
