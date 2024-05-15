@@ -21,6 +21,7 @@ package it.cnr.si.missioni.service;
 
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.ILock;
 import com.hazelcast.cp.lock.FencedLock;
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
@@ -149,7 +150,7 @@ public class CronService {
 
     @CacheEvict(value = Costanti.NOME_CACHE_PROXY, allEntries = true)
     public void evictCache() throws ComponentException {
-        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyEvictCache);
+        ILock lock = hazelcastInstance.getLock(lockKeyEvictCache);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
@@ -203,7 +204,8 @@ public class CronService {
 
     @Transactional
     public void loadCache() throws ComponentException {
-        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyLoadCache);
+        ILock lock = hazelcastInstance.getLock(lockKeyEvictCache);
+
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
@@ -229,12 +231,14 @@ public class CronService {
             LOGGER.error("Errore", e);
             throw new ComponentException(e);
         }
+
+
     }
 
 
     @Transactional
     public void comunicaDatiRimborsoSigla() throws ComponentException {
-        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyComunicaDati);
+        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDati);
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
