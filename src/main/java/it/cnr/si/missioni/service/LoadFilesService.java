@@ -156,7 +156,7 @@ public class LoadFilesService {
     private InputStream getInputStream(String fileName){
         StorageObject node = missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathConfig() + "/" + missioniCMISService.sanitizeFilename(fileName));
         if (node == null || (node.<BigInteger>getPropertyValue(StoragePropertyNames.CONTENT_STREAM_LENGTH.value())).compareTo(BigInteger.ZERO) == 0) {
-            InputStream is = getConfiguratioFile(fileName);
+            InputStream is = getConfigurationFile(fileName);
             if ( !Optional.ofNullable(is).isPresent())
                 return null;
             Map<String, Object> metadataProperties = new HashMap<String, Object>();
@@ -174,7 +174,7 @@ public class LoadFilesService {
         }
         return missioniCMISService.getResource(node);
     }
-    private InputStream getConfiguratioFile(String fileName){
+    private InputStream getConfigurationFile(String fileName){
         if ( Optional.ofNullable(pathFileConfigJson).isPresent()) {
             File f = new File(pathFileConfigJson.concat(fileName));
             if (f.exists()) {
@@ -231,11 +231,11 @@ public class LoadFilesService {
     }
 
     private String getFileNameFromRestServices() {
-//   		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
+		if (env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT)) {
         return "restServicesDev.json";
-//   		} else {
-//   			return "restServices.json";
-//   		}
+   		} else {
+   			return "restServices.json";
+   		}
     }
 
     @Value("${spring.config.file.pathFileConfigJson}")

@@ -170,7 +170,7 @@ public class MissioniAceServiceIss implements MissioniAceService {
         return null;
     }
 
-    //@Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
+    @Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
         EmployeeDetails userDetail = aceService.getPersonaByUsername(currentLogin);
         logger.info("MissioniAceServiceIss->getAccountFromSiper");
