@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.cmis;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.flows.happySign.AutorizzazioneAnnulloService;
 import it.cnr.si.missioni.cmis.flows.happySign.AutorizzazioneService;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -54,14 +55,33 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
     @Autowired
     AutorizzazioneService autorizzazioneService;
-    private static final Log logger = LogFactory.getLog(CMISOrdineMissioneServiceHappySign.class);
-    public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
-        String username = securityService.getCurrentUserLogin();
-        byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
-        CMISOrdineMissione cmisOrdineMissione = create(annullamento.getOrdineMissione(), annullamento.getAnno());
-        StorageObject so = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
 
-        logger.info("da implementare Annullamento");
+    @Autowired
+    AutorizzazioneAnnulloService autorizzazioneAnnulloService;
+    private static final Log logger = LogFactory.getLog(CMISOrdineMissioneServiceHappySign.class);
+    protected void sendAnnullamentoOrdineMissioneToSign(AnnullamentoOrdineMissione annullamentoOrdineMissione, CMISOrdineMissione cmisOrdineMissione,
+                                                                  Map<String, StorageObject> mapDocumentiAnnulloMissione,
+                                                                  List<StorageObject> allegati){
+
+        try {
+            if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(annullamentoOrdineMissione.getOrdineMissione().getUoSpesa(),
+                    annullamentoOrdineMissione.getOrdineMissione().getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                annullamentoOrdineMissioneService.popolaCoda(annullamentoOrdineMissione);
+            } else {
+
+                String idFlusso = autorizzazioneAnnulloService.sendAutorizzazione(annullamentoOrdineMissione, mapDocumentiAnnulloMissione.get(Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY), getAllAllegati( null,allegati,true));
+
+                if (!StringUtils.isEmpty(idFlusso)) {
+                    annullamentoOrdineMissione.setIdFlusso(idFlusso);
+
+                }
+                annullamentoOrdineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+            }
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
+        logger.info("sendOrdineMissioneToSign");
+
     }
 
     @Override
@@ -76,13 +96,21 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
     //metodo riscrito con l'oggetto Map
 
-    private List<StorageObject> getAllAllegati( Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati){
+    private List<StorageObject> getAllAllegati( Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati, boolean annullamento){
         List<StorageObject> allAllegati= new ArrayList<StorageObject>();
         if ( allegati!=null && allAllegati.size()>0)
             allAllegati.addAll(allegati);
-        for ( String s: mapDocumentiMissione.keySet()){
-            if ( !Costanti.DOCUMENTO_MISSIONE_KEY.equalsIgnoreCase(s))
-                allAllegati.add( mapDocumentiMissione.get( s));
+        boolean addAllegato=false;
+        if ( mapDocumentiMissione!=null && mapDocumentiMissione.size()>0) {
+            for (String s : mapDocumentiMissione.keySet()) {
+                addAllegato=true;
+                if ( !annullamento && Costanti.DOCUMENTO_MISSIONE_KEY.equalsIgnoreCase(s))
+                    addAllegato=false;
+                if ( annullamento && Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY.equalsIgnoreCase(s))
+                    addAllegato=false;
+                if (addAllegato)
+                    allAllegati.add(mapDocumentiMissione.get(s));
+            }
         }
         return allAllegati;
     }
@@ -93,7 +121,7 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
                 ordineMissioneService.popolaCoda(ordineMissione);
             } else {
 
-                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione, mapDocumentiMissione.get(Costanti.DOCUMENTO_MISSIONE_KEY), getAllAllegati( mapDocumentiMissione,allegati));
+                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione, mapDocumentiMissione.get(Costanti.DOCUMENTO_MISSIONE_KEY), getAllAllegati( mapDocumentiMissione,allegati,false));
 
                 if (!StringUtils.isEmpty(idFlusso)) {
                     ordineMissione.setIdFlusso(idFlusso);

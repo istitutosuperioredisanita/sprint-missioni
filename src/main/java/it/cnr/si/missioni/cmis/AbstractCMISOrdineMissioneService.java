@@ -556,7 +556,21 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return metadataProperties;
     }
 
-    public abstract void avviaFlusso(AnnullamentoOrdineMissione annullamento);
+    protected abstract  void sendAnnullamentoOrdineMissioneToSign(AnnullamentoOrdineMissione annullamento, CMISOrdineMissione cmisOrdineMissione,
+                                                        Map<String, StorageObject> mapDocumentiAnnulloMissione,
+                                                        List<StorageObject> allegati);
+    public void avviaFlusso(AnnullamentoOrdineMissione annullamento){
+        String username = securityService.getCurrentUserLogin();
+        byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
+        CMISOrdineMissione cmisOrdineMissione = create(annullamento.getOrdineMissione(), annullamento.getAnno());
+        StorageObject documentoAnnulloMissione = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
+        // Creare un oggetto Map con tutti gli oggetti StorageObject
+        Map<String, StorageObject> mapDocumentiAnnullamentoMissione = new HashMap<>();
+        mapDocumentiAnnullamentoMissione.put(Costanti.DOCUMENTO_MISSIONE_KEY, documentoAnnulloMissione);
+
+
+        sendAnnullamentoOrdineMissioneToSign( annullamento,cmisOrdineMissione,mapDocumentiAnnullamentoMissione,null);
+    }
 
     public abstract Boolean isActiveSignFlow();
 

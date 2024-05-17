@@ -146,12 +146,14 @@ flows:
     presidente: duilioapp
     vocipresidente: duilioapp
     cns_cnt: duilioapp
-
   rimborso:
     default:
       template : duilioapp
       signSiglaUo : DRUE
-
+  annullo:
+    default:
+      template: duilioapp
+      signSiglaUo: DRUE
 codiciUo:
   presidenza: 000.033
   direzioneGenerale: 000.031

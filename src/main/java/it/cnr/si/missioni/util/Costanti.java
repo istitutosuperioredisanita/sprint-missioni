@@ -217,6 +217,8 @@ public class Costanti {
     public final static String DOCUMENTO_TAXI_KEY = "documentoTaxiMissione";
     public final static String DOCUMENTO_AUTO_NOLEGGIO_KEY = "documentoAutoNoleggioMissione";
 
+    public final static String DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY = "documentoAnnulloMissione";
+
 
     static {
         Map<String, String> aMap = new HashMap<String, String>();
