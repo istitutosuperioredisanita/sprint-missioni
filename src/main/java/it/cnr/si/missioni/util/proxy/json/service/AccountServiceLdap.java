@@ -29,10 +29,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.missioni.service.showcase.ACEService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.*;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
@@ -86,6 +83,10 @@ public class AccountServiceLdap extends AbstractAccountService{
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired
+    ExternalUserAdminService externalUserAdminService;
+
 
     public UsersSpecial getUoForUsersSpecial(String uid) {
         if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null) {
@@ -325,8 +326,9 @@ public class AccountServiceLdap extends AbstractAccountService{
             Account account = new Account(getUserInfo(currentUser));
             List ruolo = new ArrayList<String>();
             ruolo.add(AuthoritiesConstants.USER);
-            if ( "ciro.salvio@iss.it".equalsIgnoreCase(currentUser))
+            if (externalUserAdminService.isExternalUserAdmin(currentUser))
                 ruolo.add(AuthoritiesConstants.ADMIN);
+
             account.setInternalRoles(ruolo);
             account.setUid(securityService.getCurrentUserLogin());
 

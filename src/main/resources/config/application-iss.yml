@@ -265,3 +265,8 @@ cnr:
 
 keycloak:
   enabled: false
+admin:
+  usernames:
+    - ciro.salvio@iss.it
+    - davide.mirra@iss.it
+
