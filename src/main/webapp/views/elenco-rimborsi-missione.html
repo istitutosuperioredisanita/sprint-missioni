@@ -1,174 +1,189 @@
 <!--
-  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
-  ~
-  ~      This program is free software: you can redistribute it and/or modify
-  ~      it under the terms of the GNU Affero General Public License as
-  ~      published by the Free Software Foundation, either version 3 of the
-  ~      License, or (at your option) any later version.
-  ~
-  ~      This program is distributed in the hope that it will be useful,
-  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~      GNU Affero General Public License for more details.
-  ~
-  ~      You should have received a copy of the GNU Affero General Public License
-  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  ~
-  ~
-  -->
-
+   ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+   ~
+   ~      This program is free software: you can redistribute it and/or modify
+   ~      it under the terms of the GNU Affero General Public License as
+   ~      published by the Free Software Foundation, either version 3 of the
+   ~      License, or (at your option) any later version.
+   ~
+   ~      This program is distributed in the hope that it will be useful,
+   ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
+   ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   ~      GNU Affero General Public License for more details.
+   ~
+   ~      You should have received a copy of the GNU Affero General Public License
+   ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   ~
+   ~
+   -->
 <div class="missioni">
     <h4 translate="elenco-rimborsi-missione.title">Ordini</h4>
     <div class="row">
         <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
-               <p class="col-md-12">
-                  <span class="input-group">
-                  <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
-    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
-    <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
-        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
-    </ui-select-match>
-    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
-        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
-    </ui-select-choices>
-    </ui-select>
-                   </span>
-               </p>
-            </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
-                <p class="col-md-12">
-                    <span class="input-group">
-                    <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
-    <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
-    <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
-        <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
-    </ui-select-match>
-    <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
-        <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
-    </ui-select-choices>
-    </ui-select>
-                    </span>
-                </p>
-            </form>
-    </div>
-<div ng-show="uoWorkForSpecialUser || !uoForUsersSpecial">
-
-<div class="panel panel-primary" ng-show="accountModel">
-  <div class="panel-heading color-celeste-avion text-center">
-    <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
-  </div>
-          <div class="panel-body my-panel-body">
-            <info-account account="accountModel"></info-account>
-          </div>
-</div>
-<div class="panel panel-success">
-  <div class="panel color-verde-scuro text-center row-trim-after">
-        <h4 translate="elenco-rimborsi-missione.filter.title">Filter by date</h4>
-  </div>
-     <div class="panel-body my-panel-body">
-        <div class="col-md-2">
-            <p class="input-group">
-                <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.anno">from</span>
-                <input type="text" style="text-align:center" class="input-sm form-control" name="anno" ng-model="anno" />
-            </p>
-        </div>
-        <div class="col-md-4">
-            <p class="input-group">
-                <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.da-numero">from</span>
-                <input type="text" class="input-sm form-control" style="text-align:right" name="daNumero" ng-model="daNumero" />
-                <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.a-numero">to</span>
-                <input type="text" class="input-sm form-control" style="text-align:right" name="aNumero" ng-model="aNumero" />
-            </p>
-        </div>
-        <div>
-            <p class="input-group">
-                <cnr-widget-date-range start-date="daData" end-date="aData" ng-model-date="daData" start-label="{{'elenco-rimborsi-missione.filter.da-data' | translate}}" end-label="{{'elenco-rimborsi-missione.filter.a-data' | translate}}"/></cnr-widget-date-range>
-            </p>
-        </div>
-            <form class="form-inline" role="form" id="missioni">
-        <div>
-            <p class="input-group">
-                <cnr-widget-date-range start-date="daDataMissione" end-date="aDataMissione" ng-model-date="daDataMissione" start-label="{{'elenco-ordini-missione.filter.da-data-missione' | translate}}" end-label="{{'elenco-ordini-missione.filter.a-data-missione' | translate}}"/></cnr-widget-date-range>
-            </p>
-        </div>
-        </form>
-        <div class="col-md-2">
-            <p class="input-group">
-                <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.anno-ordine">from</span>
-                <input type="text" style="text-align:center" class="input-sm form-control" name="annoOrdine" ng-model="annoOrdine" />
-            </p>
-        </div>
-        <div class="col-md-5">
-            <p class="input-group">
-                <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.da-numero-ordine">from</span>
-                <input type="text" class="input-sm form-control" style="text-align:right" name="daNumeroOrdine" ng-model="daNumeroOrdine" />
-                <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.a-numero-ordine">to</span>
-                <input type="text" class="input-sm form-control" style="text-align:right" name="aNumeroOrdine" ng-model="aNumeroOrdine" />
-            </p>
-        </div>
-        <div class="col-md-3">
-            <p class="input-group">
-                <span class="input-group-addon" translate="missione.form.cup">cup</span>
-                <input type="text" class="input-sm form-control" style="text-align:center" name="cup" ng-model="cup" />
-            </p>
-        </div>
-        <div class="col-md-2">
+            <p class="col-md-12">
             <span class="input-group">
-              <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
-                <label class="checkbox">
-                  <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N">
-                </label>
+               <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
+               <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
+               <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
+                  <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+               </ui-select-match>
+               <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
+                  <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+               </ui-select-choices>
+                </ui-select>
             </span>
+            </p>
+        </form>
+        <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
+            <p class="col-md-12">
+            <span class="input-group">
+               <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
+               <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
+               <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
+                  <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
+               </ui-select-match>
+               <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
+                  <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
+               </ui-select-choices>
+                </ui-select>
+            </span>
+            </p>
+        </form>
+    </div>
+    <div ng-show="uoWorkForSpecialUser || !uoForUsersSpecial">
+        <div class="panel panel-primary" ng-show="accountModel">
+            <div class="panel-heading color-celeste-avion text-center">
+                <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
+            </div>
+            <div class="panel-body my-panel-body">
+                <info-account account="accountModel"></info-account>
+            </div>
         </div>
-        <div class="col-md-7 float-right">
-          <button type="button" class="btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
+        <div class="panel panel-success">
+            <div class="panel color-verde-scuro text-center row-trim-after">
+                <h4 translate="elenco-rimborsi-missione.filter.title">Filter by date</h4>
+            </div>
+            <div class="panel-body my-panel-body">
+                <div class="col-md-2">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.anno">from</span>
+                        <input type="text" style="text-align:center" class="input-sm form-control" name="anno" ng-model="anno" />
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.da-numero">from</span>
+                        <input type="text" class="input-sm form-control" style="text-align:right" name="daNumero" ng-model="daNumero" />
+                        <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.a-numero">to</span>
+                        <input type="text" class="input-sm form-control" style="text-align:right" name="aNumero" ng-model="aNumero" />
+                    </p>
+                </div>
+                <div>
+                    <p class="input-group">
+                        <cnr-widget-date-range start-date="daData" end-date="aData" ng-model-date="daData" start-label="{{'elenco-rimborsi-missione.filter.da-data' | translate}}" end-label="{{'elenco-rimborsi-missione.filter.a-data' | translate}}"/>
+                        </cnr-widget-date-range>
+                    </p>
+                </div>
+                <form class="form-inline" role="form" id="missioni">
+                    <div>
+                        <p class="input-group">
+                            <cnr-widget-date-range start-date="daDataMissione" end-date="aDataMissione" ng-model-date="daDataMissione" start-label="{{'elenco-ordini-missione.filter.da-data-missione' | translate}}" end-label="{{'elenco-ordini-missione.filter.a-data-missione' | translate}}"/>
+                            </cnr-widget-date-range>
+                        </p>
+                    </div>
+                </form>
+                <div class="col-md-2">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.anno-ordine">from</span>
+                        <input type="text" style="text-align:center" class="input-sm form-control" name="annoOrdine" ng-model="annoOrdine" />
+                    </p>
+                </div>
+                <div class="col-md-5">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.da-numero-ordine">from</span>
+                        <input type="text" class="input-sm form-control" style="text-align:right" name="daNumeroOrdine" ng-model="daNumeroOrdine" />
+                        <span class="input-group-addon" translate="elenco-rimborsi-missione.filter.a-numero-ordine">to</span>
+                        <input type="text" class="input-sm form-control" style="text-align:right" name="aNumeroOrdine" ng-model="aNumeroOrdine" />
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="missione.form.cup">cup</span>
+                        <input type="text" class="input-sm form-control" style="text-align:center" name="cup" ng-model="cup" />
+                    </p>
+                </div>
+                <div class="col-md-2">
+               <span class="input-group">
+               <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
+               <label class="checkbox">
+               <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N">
+               </label>
+               </span>
+                </div>
+                <div class="col-md-7 float-right">
+                    <button type="button" class="btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
+                </div>
+                <div class="col-md-12 text-center" ng-show="messageRimborsiNonEsistenti">
+                    <h5 translate="elenco-rimborsi-missione.no-result">Nessun Risultato</h5>
+                </div>
+            </div>
         </div>
-        <div class="col-md-12 text-center" ng-show="messageRimborsiNonEsistenti">
-          <h5 translate="elenco-rimborsi-missione.no-result">Nessun Risultato</h5>
+        <div ng-show="endSearching">
+            <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
+                <thead>
+                <tr>
+                    <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+                    <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+                    <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+                    <th ng-hide="accountModel" style="text-align: left">{{'main.userid' | translate}}</th>
+                    <th ng-hide="accountModel" style="text-align: left">{{'missione.form.uo' | translate}}</th>
+                    <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+                    <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+                    <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+                    <th style="text-align: center">{{'missione.form.trattamentoShort' | translate}}</th>
+                    <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
+                    <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
+                    <th style="text-align: center">{{'global.button.print' | translate}}</th>
+                </tr>
+                </thead>
+                <tbody id ="missioni">
+                <tr ng-repeat="rimborsoMissione in rimborsiMissione" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
+                    <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
+                    <td style="text-align: right">{{rimborsoMissione.numero}}</td>
+                    <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+                    <td ng-hide="accountModel" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
+                    <td ng-hide="accountModel" style="text-align: left">{{rimborsoMissione.uoRich}}</td>
+                    <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
+                    <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
+                    <td class="col-md-4" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
+                    <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
+                    <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td class="col-md-1" style="text-align: center" ng-click="$event.stopPropagation()">
+                        <a ng-click="goPrintRimborsoMissione(rimborsoMissione.id, accessToken)" class="btn btn-default" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-print" style="color:black"></span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div id="errorModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title"><span class="red glyphicon glyphicon-remove-sign"></span> Errore</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{errorMessage}}</p>
+                        </div>
+                        <div class="modal-footer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3" ng-show="rimborsiMissione">
+                <button type="button" ng-click="stampa()" class="btn btn-default" data-toggle="tooltip" title="{{'global.button.print' | translate}}"><span class="glyphicon glyphicon-print"></span></button>
+            </div>
         </div>
     </div>
-    </div>
-
-
-    <div ng-show="endSearching">
-      <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
-        <thead>
-          <tr>
-              <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
-              <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
-              <th style="text-align: center">{{'missione.form.data' | translate}}</th>
-              <th ng-hide="accountModel" style="text-align: left">{{'main.userid' | translate}}</th>
-              <th ng-hide="accountModel" style="text-align: left">{{'missione.form.uo' | translate}}</th>
-              <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
-              <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
-              <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
-              <th style="text-align: center">{{'missione.form.trattamentoShort' | translate}}</th>
-              <th style="text-align: center">{{'rimborso-missione.form.data-inizio' | translate}}</th>
-              <th style="text-align: center">{{'rimborso-missione.form.data-fine' | translate}}</th>
-              <th style="text-align: center">{{'global.button.print' | translate}}</th>
-          </tr>
-        </thead>
-
-        <tbody id ="missioni">
-          <tr ng-repeat="rimborsoMissione in rimborsiMissione" ng-click="doSelectRimborsoMissione(rimborsoMissione)" data-method="get">
-                <td style="text-align: center" >{{rimborsoMissione.anno}}</td>
-                <td style="text-align: right">{{rimborsoMissione.numero}}</td>
-                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
-                <td ng-hide="accountModel" class="col-md-2" style="text-align: left">{{rimborsoMissione.uid}}</td>
-                <td ng-hide="accountModel" style="text-align: left">{{rimborsoMissione.uoRich}}</td>
-                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeStato}}</td>
-                <td class="col-md-2" style="text-align: left">{{rimborsoMissione.destinazione}}</td>
-                <td class="col-md-4" style="text-align: left">{{rimborsoMissione.oggetto}}</td>
-                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.decodeTrattamentoShort}}</td>
-                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-                <td class="col-md-1" style="text-align: center">{{rimborsoMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
-                <td class="col-md-1" style="text-align: center" ng-click="$event.stopPropagation()"><a target="_blank" href="api/rest/public/printRimborsoMissione?idMissione={{rimborsoMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
-          </tr>
-        </tbody>  
-      </table>
-      <div class="col-xs-3" ng-show="rimborsiMissione">
-        <button type="button" ng-click="stampa()" class="btn btn-default" data-toggle="tooltip" title="{{'global.button.print' | translate}}"><span class="glyphicon glyphicon-print"></span></button>
-      </div>
-    </div>
-  </div>
 </div>
