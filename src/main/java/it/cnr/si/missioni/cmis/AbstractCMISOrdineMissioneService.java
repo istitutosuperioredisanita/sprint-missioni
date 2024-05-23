@@ -566,8 +566,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         StorageObject documentoAnnulloMissione = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
         // Creare un oggetto Map con tutti gli oggetti StorageObject
         Map<String, StorageObject> mapDocumentiAnnullamentoMissione = new HashMap<>();
-        mapDocumentiAnnullamentoMissione.put(Costanti.DOCUMENTO_MISSIONE_KEY, documentoAnnulloMissione);
-
+        mapDocumentiAnnullamentoMissione.put(Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY, documentoAnnulloMissione);
 
         sendAnnullamentoOrdineMissioneToSign( annullamento,cmisOrdineMissione,mapDocumentiAnnullamentoMissione,null);
     }

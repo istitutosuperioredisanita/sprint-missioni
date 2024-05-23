@@ -3,7 +3,6 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import it.iss.si.dto.happysign.base.AttachedFile;
@@ -32,7 +31,7 @@ public class UtilTestAnnullamentoService {
     public byte[] getDocumento(StorageObject storageObject) throws IOException {
         return IOUtils.toByteArray(missioniCMISService.getResource(storageObject));
     }
-    public StartWorflowDto createUStartWorfloDto(AnnullamentoOrdineMissione annullamentoOrdineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
+    public StartWorflowDto createUStartWorkflowDto(AnnullamentoOrdineMissione annullamentoOrdineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 

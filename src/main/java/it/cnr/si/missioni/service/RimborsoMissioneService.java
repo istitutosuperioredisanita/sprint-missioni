@@ -310,7 +310,7 @@ public class RimborsoMissioneService {
     }
 
     public void popolaCoda(RimborsoMissione rimborsoMissione) {
-        if ( Optional.ofNullable(rabbitMQService).isPresent()) {
+        if (Optional.ofNullable(rabbitMQService).isPresent()) {
             if (!isDevProfile()) {
                 if (rimborsoMissione.getMatricola() != null) {
                     Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
@@ -409,6 +409,9 @@ public class RimborsoMissioneService {
             }
             if (!StringUtils.isEmpty(rimborsoMissione.getVoce())) {
                 rimborsoMissioneDB.setVoce(rimborsoMissione.getVoce());
+            }
+            if (!StringUtils.isEmpty(rimborsoMissione.getPgProgetto())) {
+                rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
             }
             rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
             rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
@@ -577,7 +580,11 @@ public class RimborsoMissioneService {
         rimborsoMissioneDB.setDataInizioMissione(rimborsoMissione.getDataInizioMissione());
         rimborsoMissioneDB.setDataFineMissione(rimborsoMissione.getDataFineMissione());
         rimborsoMissioneDB.setDestinazione(rimborsoMissione.getDestinazione());
+
         rimborsoMissioneDB.setGae(rimborsoMissione.getGae());
+
+        rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+
         rimborsoMissioneDB.setNote(rimborsoMissione.getNote());
         rimborsoMissioneDB.setUoContrAmm(rimborsoMissione.getUoContrAmm());
         rimborsoMissioneDB.setNoteSegreteria(rimborsoMissione.getNoteSegreteria());
@@ -596,8 +603,8 @@ public class RimborsoMissioneService {
         rimborsoMissioneDB.setNoteUtilizzoTaxiNoleggio(rimborsoMissione.getNoteUtilizzoTaxiNoleggio());
         rimborsoMissioneDB.setUtilizzoAutoNoleggio(rimborsoMissione.getUtilizzoAutoNoleggio());
         rimborsoMissioneDB.setUtilizzoTaxi(rimborsoMissione.getUtilizzoTaxi());
-        rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
-        rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+//        rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
+//        rimborsoMissioneDB.setPgProgetto(rimborsoMissione.getPgProgetto());
         rimborsoMissioneDB.setEsercizioOriginaleObbligazione(rimborsoMissione.getEsercizioOriginaleObbligazione());
         rimborsoMissioneDB.setPgObbligazione(rimborsoMissione.getPgObbligazione());
 
@@ -1275,7 +1282,7 @@ public class RimborsoMissioneService {
         }
         if (!StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
             //if (rimborsoMissione.getUtilizzoTaxi().equals("N") && rimborsoMissione.getUtilizzoAutoNoleggio().equals("N") /*&& rimborsoMissione.getUtilizzoAutoServizio().equals("N")*/ && rimborsoMissione.getPersonaleAlSeguito().equals("N")) {
-            if (rimborsoMissione.getUtilizzoTaxi().equals("N") ) {
+            if (rimborsoMissione.getUtilizzoTaxi().equals("N")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Non è possibile indicare le note all'utilizzo del Taxi se non si è scelto il suo utilizzo");
             }
         }
@@ -1373,11 +1380,10 @@ public class RimborsoMissioneService {
         }
     }
 
-    public Map<String, byte[]> printRimborsoMissione(Long idMissione) throws ComponentException {
+    public Map<String, byte[]> printRimborsoMissione(Long idMissione) throws ComponentException, AwesomeException {
         RimborsoMissione rimborsoMissione = getRimborsoMissione(idMissione, true);
         byte[] printRimborsoMissione = null;
         String fileName = null;
-       // stampaRimborso(rimborsoMissione);
         if ((rimborsoMissione.isStatoInviatoAlFlusso() && !rimborsoMissione.isMissioneInserita() && !rimborsoMissione.isMissioneDaValidare()) || (rimborsoMissione.isStatoFlussoApprovato())) {
             return cmisRimborsoMissioneService.getFileRimborsoMissione(rimborsoMissione);
         } else {
@@ -1385,8 +1391,7 @@ public class RimborsoMissioneService {
         }
     }
 
-    public Map<String, byte[]> stampaRimborso(RimborsoMissione rimborsoMissione)
-            throws ComponentException {
+    public Map<String, byte[]> stampaRimborso(RimborsoMissione rimborsoMissione) {
         byte[] printRimborsoMissione;
         String fileName;
         retrieveDetails(rimborsoMissione);

@@ -2,9 +2,7 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneAnnullamentoMissione;
-import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +42,7 @@ public class AutorizzazioneAnnulloService {
         }
         StartWorflowDto startWorflowDto=   autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo,allegati);
         if ( Optional.ofNullable(utilTestAnnullamentoService).isPresent())
-            startWorflowDto = utilTestAnnullamentoService.createUStartWorfloDto(annullamentoOrdineMissione,modulo,allegati);
+            startWorflowDto = utilTestAnnullamentoService.createUStartWorkflowDto(annullamentoOrdineMissione,modulo,allegati);
 
 
        return autorizzazioneAnnullamentoMissione.send(startWorflowDto.getTemplateName(),

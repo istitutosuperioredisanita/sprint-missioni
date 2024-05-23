@@ -1296,7 +1296,19 @@ public class OrdineMissioneService {
         ordineMissioneDB.setDataFineMissione(ordineMissione.getDataFineMissione());
         ordineMissioneDB.setDestinazione(ordineMissione.getDestinazione());
         ordineMissioneDB.setDistanzaDallaSede(ordineMissione.getDistanzaDallaSede());
-        ordineMissioneDB.setGae(ordineMissione.getGae());
+
+        String gaeField = ordineMissione.getGae();
+        if (gaeField != null) {
+            ordineMissione.setGae(gaeField);
+            ordineMissioneDB.setGae(ordineMissione.getGae());
+        }
+
+        Gae gae = gaeService.loadGae(ordineMissione);
+
+
+        ordineMissione.setPgProgetto(gae.getPg_progetto());
+        ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
+
         ordineMissioneDB.setImportoPresunto(ordineMissione.getImportoPresunto());
         ordineMissioneDB.setModulo(ordineMissione.getModulo());
         ordineMissioneDB.setNote(ordineMissione.getNote());
@@ -1324,7 +1336,7 @@ public class OrdineMissioneService {
         ordineMissioneDB.setUtilizzoTaxi(ordineMissione.getUtilizzoTaxi());
         ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
         ordineMissioneDB.setUtilizzoAutoServizio(ordineMissione.getUtilizzoAutoServizio());
-        ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
+        //ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
         ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
         ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
         ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -1563,10 +1575,10 @@ public class OrdineMissioneService {
                 if (StringUtils.isEmpty(ordineMissione.getComuneResidenzaRich())) {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
                             CodiciErrore.CAMPO_OBBLIGATORIO + ": Comune di Residenza del Richiedente");
-                } else if (StringUtils.isEmpty(ordineMissione.getIndirizzoResidenzaRich())) {
+                } /*else if (StringUtils.isEmpty(ordineMissione.getIndirizzoResidenzaRich())) {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
                             CodiciErrore.CAMPO_OBBLIGATORIO + ": Indirizzo di Residenza del Richiedente");
-                }
+                }*/
             }
         }
     }

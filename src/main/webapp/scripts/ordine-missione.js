@@ -354,8 +354,8 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                         if (data.elements.length === 1) {
                             $scope.ordineMissioneModel.cdrSpesa = data.elements[0].cd_centro_responsabilita;
                             if (daQuery != 'S') {
-                                //$scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
                                 $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                                $scope.restModulo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa, $scope.ordineMissioneModel.pgProgetto);
                             }
                         }
                     } else {
@@ -368,7 +368,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         }
     }
 
-    $scope.restModuli = function(anno, uo) {
+    /*$scope.restModulo = function(anno, uo) {
         if (uo) {
             $scope.elencoModuli = [];
             var app = APP_FOR_REST.SIGLA;
@@ -430,7 +430,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         } else {
             $scope.elencoModuli = [];
         }
-    }
+    }*/
 
     $scope.restImpegno = function() {
         if ($scope.ordineMissioneModel.esercizioOriginaleObbligazione && $scope.ordineMissioneModel.pgObbligazione) {
@@ -528,6 +528,113 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         }
     }
 
+
+
+    $scope.restModulo = function(anno, uo, pgProgetto) {
+        if (uo) {
+            $scope.elencoModuli = [];
+            var app = APP_FOR_REST.SIGLA;
+            var url = SIGLA_REST.MODULO;
+            var varOrderBy = [{
+                name: 'cd_progetto',
+                type: 'ASC'
+            }];
+
+            if (uo.substring(0, 3) == COSTANTI.CDS_SAC) {
+                uo = COSTANTI.UO_STANDARD_SAC;
+            }
+
+            var varClauses;
+            if (pgProgetto) {
+                varClauses = [{
+                        condition: 'AND',
+                        fieldName: 'livello',
+                        operator: "=",
+                        fieldValue: 2
+                    },
+                    {
+                        condition: 'AND',
+                        fieldName: 'fl_utilizzabile',
+                        operator: "=",
+                        fieldValue: true
+                    },
+                    {
+                        condition: 'AND',
+                        fieldName: 'esercizio',
+                        operator: "=",
+                        fieldValue: anno
+                    },
+                    {
+                        condition: 'AND',
+                        fieldName: 'pg_progetto',
+                        operator: "=",
+                        fieldValue: pgProgetto
+                    }
+                ];
+            } else {
+                varClauses = [{
+                        condition: 'AND',
+                        fieldName: 'livello',
+                        operator: "=",
+                        fieldValue: 2
+                    },
+                    {
+                        condition: 'AND',
+                        fieldName: 'fl_utilizzabile',
+                        operator: "=",
+                        fieldValue: true
+                    },
+                    {
+                        condition: 'AND',
+                        fieldName: 'esercizio',
+                        operator: "=",
+                        fieldValue: anno
+                    },
+                    {
+                        condition: 'AND',
+                        fieldName: 'cd_unita_organizzativa',
+                        operator: "=",
+                        fieldValue: uo
+                    }
+                ];
+            }
+
+            var postModuli = {
+                activePage: 0,
+                maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
+                orderBy: varOrderBy,
+                clauses: varClauses
+            };
+
+            $http.post(urlRestProxy + app + '/', postModuli, {
+                    params: {
+                        proxyURL: url
+                    }
+                })
+                .then(function(response) {
+                    var data = response.data;
+                    console.log(data);
+                    if (data && data.elements) {
+                        $scope.elencoModuli = data.elements;
+                        console.log($scope.elencoModuli);
+                        if (data.elements.length === 1) {
+                            $scope.ordineMissioneModel.modulo = data.elements[0].cd_progetto;
+                            $scope.ordineMissioneModel.modulo = data.elements[0].ds_progetto;
+                        }
+                    } else {
+                        $scope.elencoModuli = [];
+                    }
+                })
+                .catch(function(error) {
+                    console.error(error);
+                });
+        } else {
+            $scope.elencoModuli = [];
+        }
+    };
+
+
+
     $scope.restGae = function(anno, modulo, cdr, uo) {
         if (cdr || modulo || uo) {
             $scope.elencoGae = [];
@@ -561,7 +668,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                         {
                             condition: 'AND',
                             fieldName: 'ti_gestione',
-                            operator: "!",
+                            operator: "!=",
                             fieldValue: "E"
                         },
                         {
@@ -659,8 +766,10 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             }).success(function(data) {
                 $scope.workingRestGae = false;
                 if (data) {
+                    console.log(data);
                     if (data.elements) {
                         $scope.elencoGae = data.elements;
+                        console.log($scope.elencoGae);
                         if (data.elements.length === 1) {
                             $scope.ordineMissioneModel.gae = data.elements[0].cd_linea_attivita;
                         }
@@ -674,9 +783,112 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         } else {
             $scope.elencoGae = [];
         }
-    }
-//passa la voce e controlla se la voce selezionata con presidenza == true sia 2089 e 2090
+    };
+
+
+
+
+    //da implementare e testare
     $scope.restCapitoli = function(anno, presidente, voce) {
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.VOCE;
+        var varOrderBy = [{
+            name: 'cd_elemento_voce',
+            type: 'ASC'
+        }];
+
+        var varClauses = [{
+                condition: 'AND',
+                fieldName: 'esercizio',
+                operator: "=",
+                fieldValue: anno
+            },
+            {
+                condition: 'AND',
+                fieldName: 'ti_gestione',
+                operator: "=",
+                fieldValue: "S"
+            },
+            {
+                condition: 'AND',
+                fieldName: 'ti_elemento_voce',
+                operator: "=",
+                fieldValue: "C"
+            },
+            {
+                condition: 'AND',
+                fieldName: 'fl_solo_residuo',
+                operator: "=",
+                fieldValue: false
+            },
+            {
+                condition: 'AND',
+                fieldName: 'fl_missioni',
+                operator: "=",
+                fieldValue: true
+            },
+            {
+                condition: 'AND',
+                fieldName: 'ti_appartenenza',
+                operator: "=",
+                fieldValue: "D"
+            }
+        ];
+
+        if (presidente === "S") {
+            varClauses.push({
+                condition: 'AND',
+                fieldName: 'fl_missioni_presidenza',
+                operator: "=",
+                fieldValue: true
+            });
+        } else {
+            varClauses.push({
+                condition: 'AND',
+                fieldName: 'fl_missioni_presidenza',
+                operator: "=",
+                fieldValue: false
+            });
+        }
+
+        var postVoce = {
+            activePage: 0,
+            maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
+            orderBy: varOrderBy,
+            clauses: varClauses
+        };
+
+        $http.post(urlRestProxy + app + '/', postVoce, {
+            params: {
+                proxyURL: url
+            }
+        }).success(function(data) {
+            if (data) {
+                var listaVoci = data.elements;
+                if (listaVoci) {
+                    $scope.elencoVoci = [];
+                    if (listaVoci.length === 1) {
+                        $scope.ordineMissioneModel.voce = listaVoci[0].cd_elemento_voce;
+                    }
+                    var ind = -1;
+                    for (var i = 0; i < listaVoci.length; i++) {
+                        ind++;
+                        $scope.elencoVoci[ind] = listaVoci[i];
+                    }
+                } else {
+                    $scope.elencoVoci = [];
+                }
+            } else {
+                $scope.elencoVoci = [];
+            }
+        }).error(function(data) {
+            $scope.elencoVoci = [];
+        });
+    };
+
+
+    //OLD
+    /*$scope.restCapitoli = function(anno, presidente, voce) {
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.VOCE;
         var varOrderBy = [{
@@ -761,7 +973,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.elencoVoci = [];
             }
         }).error(function(data) {});
-    }
+    }*/
 
 
     $scope.onChangeDuplica = function(duplica) {
@@ -800,7 +1012,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.ordineMissioneModel.cdrSpesa = ordineMissioneSelected.cdrSpesa;
                 $scope.ordineMissioneModel.cdsCompetenza = ordineMissioneSelected.cdsCompetenza;
                 $scope.ordineMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
-                //$scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
+                $scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
                 $scope.ordineMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
                 $scope.ordineMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.ordineMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
@@ -811,8 +1023,8 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.ordineMissioneModel.presidente = ordineMissioneSelected.presidente;
                 if ($scope.ordineMissioneModel.uoSpesa) {
                     $scope.restUo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsSpesa, $scope.ordineMissioneModel.uoSpesa);
-                    //$scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
                     $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
+                    $scope.restModulo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa, $scope.ordineMissioneModel.pgProgetto);
                 }
                 if ($scope.ordineMissioneModel.cdsCompetenza) {
                     $scope.restCdsCompetenza($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsCompetenza);
@@ -951,8 +1163,8 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
 
     $scope.reloadCdr = function(cdr) {
         $scope.annullaModulo();
-        //$scope.restModuli($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa);
         $scope.restGae($scope.ordineMissioneModel.anno, null, cdr, $scope.ordineMissioneModel.uoSpesa);
+        $scope.restModulo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa, $scope.ordineMissioneModel.pgProgetto);
     }
 
     $scope.reloadModulo = function(pgProgetto, cdr, uo) {
@@ -1161,11 +1373,26 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         }
     }
 
-    $scope.cambioPresidenza = function(presidenza) {
+
+    //OLD
+    /*$scope.cambioPresidenza = function(presidenza) {
         if (presidenza == "S") {
             ui.message("Questa opzione selezionata indica che la missione è per conto della presidenza del ISS");
         }
-    }
+    }*/
+
+
+    //da implementare e testare
+    $scope.cambioPresidenza = function(presidenza) {
+        if (presidenza === "S") {
+            ui.message("Questa opzione selezionata indica che la missione è per conto della presidenza del ISS");
+            if ($scope.ordineMissioneModel.voce && !$scope.elencoVoci.some(v => v.cd_elemento_voce === $scope.ordineMissioneModel.voce && v.fl_missioni_presidenza === true)) {
+                $scope.ordineMissioneModel.voce = '';
+            }
+        }
+        $scope.restCapitoli($scope.ordineMissioneModel.anno, presidenza, $scope.ordineMissioneModel.voce);
+    };
+
 
 
     var confirmOrdineMissione = function() {
@@ -1496,8 +1723,8 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.restUo(model.anno, model.cdsSpesa, model.uoSpesa);
                 $scope.restUoCompetenza(model.anno, model.cdsCompetenza, model.uoCompetenza);
                 $scope.restCdr(model.uoSpesa, "S");
-                //$scope.restModuli(model.anno, model.uoSpesa);
                 $scope.restGae(model.anno, model.pgProgetto, model.cdrSpesa, model.uoSpesa);
+                $scope.restModulo(model.anno, model.uoSpesa, model.pgProgetto);
                 $scope.restCapitoli(model.anno, model.presidente, model.voce);
                 $scope.ordineMissioneModel = model;
                 $scope.viewAttachments($scope.ordineMissioneModel.id);
