@@ -3,6 +3,7 @@ package it.cnr.si.missioni.service;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.FlowResult;
+import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.Costanti;
@@ -39,12 +40,15 @@ public class CronHappySignService {
     private OrdineMissioneService ordineMissioneService;
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
+    @Autowired
+    private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
 
     @Autowired
     private CMISRimborsoMissioneService cmisRimborsoMissioneService;
+
 
     public void aggiornaEsistiMissioni(){
         MissioneFilter filtro = new MissioneFilter();
@@ -91,6 +95,7 @@ public class CronHappySignService {
             }
         }
     }
+
     public void aggiornaEsistiRimborsiMissioni(){
 
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
@@ -135,7 +140,51 @@ public class CronHappySignService {
                 }
             }
         }
+    }
 
+    public void aggiornaEsistiAnnullamentiMissioni(){
 
+        RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
+        filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+        filtro.setStato(Costanti.STATO_CONFERMATO);
+        filtro.setDaCron("S");
+        List<AnnullamentoOrdineMissione> listaAnnullamentiOrdini = annullamentoOrdineMissioneService.getAnnullamenti(filtro, false, false);
+        if ( Optional.ofNullable(listaAnnullamentiOrdini).isPresent()){
+            for ( AnnullamentoOrdineMissione annullamentoOrdine:listaAnnullamentiOrdini) {
+
+                EnumEsitoFlowDocumentStatus esitoFlowDocumentStatus= null;
+                try {
+                    esitoFlowDocumentStatus = happySignService.getDocumentStatus(annullamentoOrdine.getIdFlusso());
+                    if ( EnumEsitoFlowDocumentStatus.SIGNED==esitoFlowDocumentStatus) {
+                        GetDocumentResponse getDocumentResponse=happySignService.getDocument(annullamentoOrdine.getIdFlusso());
+                        if ( getDocumentResponse.getDocument()!=null){
+
+                            StorageObject so=cmisOrdineMissioneService.salvaStampaAnnullamentoOrdineMissioneSuCMIS(
+                                    getDocumentResponse.getDocument(),
+                                    annullamentoOrdine
+                            );
+                        }
+                        //aggiorna file missione on Azure Cloud
+                        FlowResult flowResult = new FlowResult();
+                        flowResult.setIdMissione(annullamentoOrdine.getId().toString());
+                        flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
+                        flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
+                        flowService.aggiornaMissioneFlows(flowResult);
+                    }
+                    if (  EnumEsitoFlowDocumentStatus.REFUSED==esitoFlowDocumentStatus) {
+                        FlowResult flowResult = new FlowResult();
+                        flowResult.setIdMissione(annullamentoOrdine.getId().toString());
+                        flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
+                        flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                        flowResult.setCommento("Respinta da firma su HappySign");
+                        flowResult.setUser("Utente Flusso Firma");
+                        flowService.aggiornaMissioneFlows(flowResult);
+
+                    }
+                } catch (Exception e) {
+                    log.error("Annullamento Ordine Missione:"+annullamentoOrdine.getIdFlusso(),e);
+                }
+            }
+        }
     }
 }
