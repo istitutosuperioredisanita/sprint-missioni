@@ -61,10 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -232,18 +229,24 @@ public class AnnullamentoOrdineMissioneService {
         return annullamento;
     }
 
+
     public void popolaCoda(AnnullamentoOrdineMissione annullamento) {
-        if (annullamento.getMatricola() != null) {
-            Account account = accountService.loadAccountFromUsername(annullamento.getUid());
-            String idSede = null;
-            if (account != null) {
-                idSede = account.getCodice_sede();
+        if (Optional.ofNullable(rabbitMQService).isPresent()) {
+            if (!isDevProfile()) {
+                if (annullamento.getMatricola() != null) {
+                    Account account = accountService.loadAccountFromUsername(annullamento.getUid());
+
+                    String idSede = null;
+                    if (account != null) {
+                        idSede = account.getCodice_sede();
+                    }
+                    Missione missione = new Missione(TypeMissione.ANNULLAMENTO, Long.valueOf(annullamento.getId().toString()), idSede,
+                            annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(),
+                            annullamento.getOrdineMissione().getDataFineMissione(), Long.valueOf(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+                            annullamento.getOrdineMissione().getAnno(), annullamento.getOrdineMissione().getNumero());
+                    rabbitMQService.send(missione);
+                }
             }
-            Missione missione = new Missione(TypeMissione.ANNULLAMENTO, Long.valueOf(annullamento.getId().toString()), idSede,
-                    annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(),
-                    annullamento.getOrdineMissione().getDataFineMissione(), Long.valueOf(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
-                    annullamento.getOrdineMissione().getAnno(), annullamento.getOrdineMissione().getNumero());
-            rabbitMQService.send(missione);
         }
     }
 
