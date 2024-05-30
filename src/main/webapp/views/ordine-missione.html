@@ -499,20 +499,35 @@
 -->
 
                     <div class="col-md-12">
-                        <ul class="pager" ng-show="showEsisteOrdineMissione">
-                            <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
-                            <!-- Add other list items based on your requirements -->
-                            <li><a ng-hide="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-no"></a></li>
-                            <li><a ng-hide="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-no"></a></li>
-                            <li><a ng-hide="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-no">Anticipo</a></li>
-                            <li><a ng-hide="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-no"></a></li>
-                            <li><a ng-show="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si"></a></li>
-                            <li><a ng-show="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-si"></a></li>
-                            <li><a ng-show="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-si">Anticipo</a></li>
-                            <li><a ng-show="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-si"></a></li>
+                    <ul class="pager" ng-show="showEsisteOrdineMissione">
+                        <li class="previous" ng-show="idMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
+                        <li>
+                            <a ng-hide="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()"  translate="ordine-missione.button.anticipo-no">Anticipo</a>
+                        </li>
+                        <li>
+                            <a ng-show="ordineMissioneModel.richiestaAnticipo=='S'" ng-click="goAnticipo()"  translate="ordine-missione.button.anticipo-si">Anticipo</a>
+                        </li>
+                        <li>
+                            <a ng-hide="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" ng-class="{ 'disabled': ordineMissioneModel.utilizzoTaxi === 'S' || ordineMissioneModel.utilizzoAutoNoleggio === 'S'}" translate="ordine-missione.button.auto-propria-no">Auto Propria No</a>
+                        </li>
+                        <li>
+                            <a ng-show="ordineMissioneModel.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si">Auto Propria Si</a>
+                        </li>
+                        <li>
+                            <a ng-hide="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" ng-class="{ 'disabled': ordineMissioneModel.utilizzoAutoNoleggio === 'S' || ordineMissioneModel.utilizzoAutoPropria === 'S'}" translate="ordine-missione.button.taxi-no">Taxi No</a>
+                        </li>
+                        <li>
+                            <a ng-show="ordineMissioneModel.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-si">Taxi Si</a>
+                        </li>
+                        <li>
+                            <a ng-hide="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" ng-class="{ 'disabled': ordineMissioneModel.utilizzoAutoPropria === 'S' || ordineMissioneModel.utilizzoTaxi === 'S'}" translate="ordine-missione.button.auto-noleggio-no">Auto Noleggio No</a>
+                        </li>
+                        <li>
+                            <a ng-show="ordineMissioneModel.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-si">Auto Noleggio Si</a>
+                        </li>
+                        <cnr-modal-history id-missione="ordineMissioneModel.id" tipo-missione="'OR'"> </cnr-modal-history>
+                    </ul>
 
-                            <cnr-modal-history id-missione="ordineMissioneModel.id" tipo-missione="'OR'"> </cnr-modal-history>
-                        </ul>
                     </div>
                 </div>
             </div>

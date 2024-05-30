@@ -206,15 +206,14 @@
                         </span>
                     </p>
             </form>
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
-                        <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-                    <select ng-disabled="annullamentoModel.idOrdineMissione" ng-change="reloadModulo(annullamentoModel.ordineMissione.pgProgetto, annullamentoModel.ordineMissione.cdrSpesa, annullamentoModel.ordineMissione.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
-                        </span>
-                    </p>
-            </form>
-
+<!--            <form class="form-inline" role="form" id="missioni">-->
+<!--                    <p class="col-md-12">-->
+<!--                        <span class="input-group">-->
+<!--                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>-->
+<!--                    <select ng-disabled="annullamentoModel.idOrdineMissione" ng-change="reloadModulo(annullamentoModel.ordineMissione.pgProgetto, annullamentoModel.ordineMissione.cdrSpesa, annullamentoModel.ordineMissione.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="annullamentoModel.ordineMissione.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>-->
+<!--                        </span>-->
+<!--                    </p>-->
+<!--            </form>-->
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-11">
                         <span class="input-group">
@@ -301,47 +300,28 @@
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-taxi">Taxi</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.utilizzoTaxi" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                </p>
-                <div class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
+                <div class="col-md-12" ng-class="{'disabled': showEsisteAnnullamento || !showEsisteAnnullamento}">
+                    <div class="content">
+                        <ul class="pager" ng-show="showEsisteAnnullamento">
+                            <li><a ng-hide="annullamentoModel.ordineMissione.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-no">Anticipo</a></li>
+                            <li><a ng-hide="annullamentoModel.ordineMissione.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-no">Auto Propria No</a></li>
+                            <li><a ng-hide="annullamentoModel.ordineMissione.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-no">Taxi No</a></li>
+                            <li><a ng-hide="annullamentoModel.ordineMissione.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-no">Auto Noleggio No</a></li>
+                            <li><a ng-show="annullamentoModel.ordineMissione.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-si">Anticipo</a></li>
+                            <li><a ng-show="annullamentoModel.ordineMissione.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si">Auto Propria Si</a></li>
+                            <li><a ng-show="annullamentoModel.ordineMissione.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-si">Taxi Si</a></li>
+                            <li><a ng-show="annullamentoModel.ordineMissione.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-si">Auto Noleggio Si</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                </div>
-                <div class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">persona seguito</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idOrdineMissione" type="checkbox" ng-model="annullamentoModel.ordineMissione.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                </div>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
-                <p class="col-md-12">
-                        <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
-                            <textarea ng-disabled="annullamentoModel.idOrdineMissione" class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="annullamentoModel.ordineMissione.noteUtilizzoTaxiNoleggio" rows = "2">
-                            </textarea>
-                        </span>
-                </p>
+
+                <!--                <p class="col-md-12">-->
+<!--                        <span class="input-group">-->
+<!--                            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>-->
+<!--                            <textarea ng-disabled="annullamentoModel.idOrdineMissione" class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="annullamentoModel.ordineMissione.noteUtilizzoTaxiNoleggio" rows = "2">-->
+<!--                            </textarea>-->
+<!--                        </span>-->
+<!--                </p>-->
             </form>
 
   </div>
