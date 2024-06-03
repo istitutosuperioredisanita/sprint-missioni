@@ -95,6 +95,7 @@ public class PrintOrdineMissioneAutoPropriaService {
         printOrdineMissioneAutoPropria.setPolizzaAssicurativa(ordineMissioneAutoPropria.getPolizzaAssicurativa());
         printOrdineMissioneAutoPropria.setNumeroPatente(ordineMissioneAutoPropria.getNumeroPatente());
         printOrdineMissioneAutoPropria.setMotiviIspettivi(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(), "N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
+        printOrdineMissioneAutoPropria.setMotiviSediDisagiate(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate(), "N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate());
         printOrdineMissioneAutoPropria.setMotiviUrgenza(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(), "N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());
         printOrdineMissioneAutoPropria.setMotiviTrasporto(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(), "N").equals("N") ? "" : ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
         printOrdineMissioneAutoPropria.setAltriMotivi(Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi()));

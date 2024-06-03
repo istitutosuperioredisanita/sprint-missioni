@@ -1521,9 +1521,15 @@ public class RimborsoMissioneService {
             OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordine);
             String autoPropriaOrdine = "N";
             String autoPropriaRimborso = "N";
-            if (autoPropria != null && Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N").equals("S")) {
-                autoPropriaOrdine = "S";
+//            if (autoPropria != null && Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N").equals("S")) {
+//                autoPropriaOrdine = "S";
+//            }
+            if(autoPropria != null){
+                if (!Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N").equals("S") || !Utility.nvl(autoPropria.getUtilizzoMotiviSediDisagiate(), "N").equals("S")) {
+                    autoPropriaOrdine = "S";
+                }
             }
+
 
             if (rimborso.getRimborsoMissioneDettagli() != null && !rimborso.getRimborsoMissioneDettagli().isEmpty()) {
                 for (RimborsoMissioneDettagli dettaglio : rimborso.getRimborsoMissioneDettagli()) {

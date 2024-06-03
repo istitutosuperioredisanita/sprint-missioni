@@ -44,6 +44,9 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
     @Column(name = "UTILIZZO_MOTIVI_ISPETTIVI", length = 1, nullable = true)
     public String utilizzoMotiviIspettivi;
     @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_MOTIVI_SEDI_DISAGIATE", length = 1, nullable = true)
+    public String utilizzoMotiviSediDisagiate;
+    @Size(min = 0, max = 1)
     @Column(name = "UTILIZZO_MOTIVI_URGENZA", length = 1, nullable = true)
     public String utilizzoMotiviUrgenza;
     @Size(min = 0, max = 1)
@@ -229,6 +232,14 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
         this.utilizzoMotiviIspettivi = utilizzoMotiviIspettivi;
     }
 
+    public String getUtilizzoMotiviSediDisagiate() {
+        return utilizzoMotiviSediDisagiate;
+    }
+
+    public void setUtilizzoMotiviSediDisagiate(String utilizzoMotiviSediDisagiate) {
+        this.utilizzoMotiviSediDisagiate = utilizzoMotiviSediDisagiate;
+    }
+
     public String getUtilizzoMotiviUrgenza() {
         return utilizzoMotiviUrgenza;
     }
@@ -269,6 +280,7 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
                 ", entePatente='" + entePatente + '\'' +
                 ", stato='" + stato + '\'' +
                 ", utilizzoMotiviIspettivi='" + utilizzoMotiviIspettivi + '\'' +
+                ", utilizzoMotiviSediDisagiate='" + utilizzoMotiviSediDisagiate + '\'' +
                 ", utilizzoMotiviUrgenza='" + utilizzoMotiviUrgenza + '\'' +
                 ", utilizzoMotiviTrasporto='" + utilizzoMotiviTrasporto + '\'' +
                 ", utilizzoAltriMotivi='" + utilizzoAltriMotivi + '\'' +

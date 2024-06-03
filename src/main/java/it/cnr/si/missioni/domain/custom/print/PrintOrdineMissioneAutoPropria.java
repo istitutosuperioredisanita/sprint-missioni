@@ -60,6 +60,7 @@ import java.util.Map;
         "entePatente",
         "stato",
         "motiviIspettivi",
+        "motiviSediDisagiate",
         "motiviUrgenza",
         "motiviTrasporto",
         "altriMotivi",
@@ -127,6 +128,8 @@ public class PrintOrdineMissioneAutoPropria {
     private String stato;
     @JsonProperty("motiviIspettivi")
     private String motiviIspettivi;
+    @JsonProperty("motiviSediDisagiate")
+    private String motiviSediDisagiate;
     @JsonProperty("motiviUrgenza")
     private String motiviUrgenza;
     @JsonProperty("motiviTrasporto")
@@ -634,6 +637,14 @@ public class PrintOrdineMissioneAutoPropria {
 
     public void setMotiviIspettivi(String motiviIspettivi) {
         this.motiviIspettivi = motiviIspettivi;
+    }
+
+    public String getMotiviSediDisagiate() {
+        return motiviSediDisagiate;
+    }
+
+    public void setMotiviSediDisagiate(String motiviSediDisagiate) {
+        this.motiviSediDisagiate = motiviSediDisagiate;
     }
 
     public String getMotiviUrgenza() {
