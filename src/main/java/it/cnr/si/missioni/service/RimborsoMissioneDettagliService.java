@@ -155,8 +155,11 @@ public class RimborsoMissioneDettagliService {
                 OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
                 if (ordineMissione != null) {
                     OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
-                    if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S")) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione, verifica e controlli.");
+//                    if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S")) {
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione, verifica e controlli.");
+//                    }
+                    if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S") || !Utility.nvl(autoPropria.utilizzoMotiviSediDisagiate, "N").equals("S")) {
+                        throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione o la sede disagiata, verifica e controlli.");
                     }
                 }
             }

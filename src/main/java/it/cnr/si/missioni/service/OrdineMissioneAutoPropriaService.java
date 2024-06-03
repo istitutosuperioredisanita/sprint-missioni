@@ -154,6 +154,7 @@ public class OrdineMissioneAutoPropriaService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
         }
         if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(), "N").equals("N") &&
+                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate(), "N").equals("N") &&
                 /*Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(), "N").equals("N") &&
                 Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(), "N").equals("N") &&*/
                 Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi(), "N").equals("N")) {
@@ -212,6 +213,7 @@ public class OrdineMissioneAutoPropriaService {
         ordineMissioneAutoPropriaDB.setCartaCircolazione(ordineMissioneAutoPropria.getCartaCircolazione());
         ordineMissioneAutoPropriaDB.setEntePatente(ordineMissioneAutoPropria.getEntePatente());
         ordineMissioneAutoPropriaDB.setUtilizzoMotiviIspettivi(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
+        ordineMissioneAutoPropriaDB.setUtilizzoMotiviSediDisagiate(ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate());
         /*ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
         ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());*/
         ordineMissioneAutoPropriaDB.setUtilizzoAltriMotivi(ordineMissioneAutoPropria.getUtilizzoAltriMotivi());
