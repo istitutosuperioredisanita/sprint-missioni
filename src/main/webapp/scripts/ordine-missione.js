@@ -1386,12 +1386,23 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     $scope.cambioPresidenza = function(presidenza) {
         if (presidenza === "S") {
             ui.message("Questa opzione selezionata indica che la missione è per conto della presidenza del ISS");
-            if ($scope.ordineMissioneModel.voce && !$scope.elencoVoci.some(v => v.cd_elemento_voce === $scope.ordineMissioneModel.voce && v.fl_missioni_presidenza === true)) {
-                $scope.ordineMissioneModel.voce = '';
+            if ($scope.ordineMissioneModel.voce) {
+                var voceFound = false;
+                for (var i = 0; i < $scope.elencoVoci.length; i++) {
+                    var v = $scope.elencoVoci[i];
+                    if (v.cd_elemento_voce === $scope.ordineMissioneModel.voce && v.fl_missioni_presidenza === true) {
+                        voceFound = true;
+                        break;
+                    }
+                }
+                if (!voceFound) {
+                    $scope.ordineMissioneModel.voce = '';
+                }
             }
         }
         $scope.restCapitoli($scope.ordineMissioneModel.anno, presidenza, $scope.ordineMissioneModel.voce);
     };
+
 
 
 
