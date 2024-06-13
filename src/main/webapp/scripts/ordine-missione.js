@@ -1504,14 +1504,17 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             function(responseHeaders) {
                 $rootScope.salvataggio = false;
                 $scope.idMissione = null;
-                $scope.ordineMissioneModel = {}
+                $scope.ordineMissioneModel = {};
                 $scope.inizializzaFormPerInserimento($sessionStorage.account, false);
+                // Redirect alla home dopo il completamento dell'operazione
+                $location.path('/');
             },
             function(httpResponse) {
                 $rootScope.salvataggio = false;
             }
         );
-    }
+    };
+
 
     var serviziRestInizialiInserimento = function() {
         $scope.restNazioni();
