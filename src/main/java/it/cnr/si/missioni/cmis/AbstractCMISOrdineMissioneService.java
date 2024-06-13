@@ -420,30 +420,60 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected StorageObject salvaStampaOrdineMissioneSuCMIS(
             byte[] stampa, OrdineMissione ordineMissione,
             CMISOrdineMissione cmisOrdineMissione) {
+
+        if (stampa == null || stampa.length == 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Il byte array 'stampa' è nullo o vuoto.");
+        }
+
         InputStream streamStampa = new ByteArrayInputStream(stampa);
         String path = createFolderOrdineMissione(ordineMissione);
-        ordineMissione.setStringBasePath(path);
-        Map<String, Object> metadataProperties = createMetadataForFileOrdineMissione(securityService.getCurrentUserLogin(), cmisOrdineMissione);
-        try {
-            StorageObject so = null;
-            if (!ordineMissione.isStatoInviatoAlFlusso()) {
-                so = missioniCMISService.restoreSimpleDocument(
-                        metadataProperties,
-                        streamStampa,
-                        MimeTypes.PDF.mimetype(),
-                        ordineMissione.getFileName(),
-                        StoragePath.construct(path));
 
+        if (path == null || path.isEmpty()) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Il path generato è nullo o vuoto.");
+        }
+
+        ordineMissione.setStringBasePath(path);
+
+        Map<String, Object> metadataProperties;
+        try {
+            metadataProperties = createMetadataForFileOrdineMissione(securityService.getCurrentUserLogin(), cmisOrdineMissione);
+        } catch (Exception e) {
+            logger.error("Errore nella creazione delle proprietà di metadata: {}", e);
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella creazione delle proprietà di metadata.");
+        }
+
+        if (metadataProperties == null || metadataProperties.isEmpty()) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Le proprietà di metadata sono nulle o vuote.");
+        }
+
+        try {
+            StorageObject so;
+            if (!ordineMissione.isStatoInviatoAlFlusso()) {
+                try {
+                    so = missioniCMISService.restoreSimpleDocument(
+                            metadataProperties,
+                            streamStampa,
+                            MimeTypes.PDF.mimetype(),
+                            ordineMissione.getFileName(),
+                            StoragePath.construct(path));
+                } catch (StorageException e) {
+                    logger.error("StorageException durante il restore del documento: {}", e);
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Il documento esiste già o ci sono problemi con le proprietà obbligatorie.");
+                }
             } else {
                 so = getObjectOrdineMissione(ordineMissione);
                 so = missioniCMISService.updateStream(so.getKey(), streamStampa, MimeTypes.PDF.mimetype());
                 missioniCMISService.addPropertyForExistingDocument(metadataProperties, so);
             }
+
             missioniCMISService.addAspect(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
             return so;
         } catch (Exception e) {
-            if (e.getCause() instanceof StorageException)
+            if (e.getCause() instanceof StorageException) {
+                logger.error("StorageException durante la registrazione del file: {}", e);
                 throw new AwesomeException(CodiciErrore.ERRGEN, "File [" + ordineMissione.getFileName() + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!");
+            }
+            logger.error("Exception durante la registrazione del file XML sul Documentale: {}", e);
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")");
         }
     }
