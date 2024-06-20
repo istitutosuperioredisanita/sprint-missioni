@@ -195,6 +195,14 @@ public class Costanti {
     public static final String ROLE_ADMIN = "ADMIN#missioni";
     public static final String ROLE_USER = "USER#missioni";
 
+    public static final String SPESA_INDENNITA_KM = "INDENNITA' KM";
+    public static final String SPESA_TAXI = "TAXI";
+    public static final String SPESA_NOLEGGIO_AUTO = "NOLEGGIO AUTO";
+    public static final String SPESA_PEDAGGIO_AUTOSTRADA = "USER#missioni";
+    public static final String SPESA_PARCHEGGIO = "PARCHEGGIO";
+    public static final String SPESA_ACC_DISABILE = "ALTRO MEZZO TRASPORT";
+    public static final String SPESA_CARB_AUTO_NOLL_ECC = "ALTRO";
+    public static final String SPESA_PERNOTTAMENTO = "ALBERGO";
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
     public final static List<String> TIPI_DOCUMENTO_FLOWS_DA_FIRMARE;

@@ -314,7 +314,7 @@
                             <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
-                            <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
+                            <input ng-disabled="validazione || disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
                         </span>
                             </p>
                         </form>
@@ -323,7 +323,7 @@
                             <p class="col-md-3">
                         <span class="input-group">
                             <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
-                            <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
+                            <input ng-disabled="validazione || disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
                         </span>
                             </p>
                         </form>
@@ -337,7 +337,7 @@
                             <p class="col-md-3">
                         <span class="input-group">
                           <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
-                          <input ng-disabled="!rimborsoMissioneModel.idOrdineMissione || !validazione || !disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
+                          <input ng-disabled="rimborsoMissioneModel.idOrdineMissione || validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
                         </span>
                             </p>
                         </form>
@@ -594,10 +594,11 @@
                            <span class="input-group">
                               <span class="input-group-addon" translate="missione.form.presidenza">Presidenza</span>
                               <label class="checkbox">
-                                      <input ng-disabled="!rimborsoMissioneModel" type="checkbox" ng-model="rimborsoMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
+                                      <input ng-disabled="!validazione || !disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.presidente" ng-true-value="S" ng-false-value="N">
                               </label>
                           </span>
                         </p>
+
                     </form>
                     <form class="form-inline" role="form" id="missioni">
                         <p class="col-md-12">
