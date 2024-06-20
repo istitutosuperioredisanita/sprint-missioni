@@ -53,6 +53,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Service class for managing users.
@@ -96,6 +97,15 @@ public class RimborsoMissioneDettagliService {
     private CRUDComponentSession crudServiceBean;
     @Autowired
     private Environment env;
+
+    @Autowired
+    private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
+
+    @Autowired
+    private OrdineMissioneTaxiService ordineMissioneTaxiService;
+
+    @Autowired
+    private OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
 
     @Transactional(readOnly = true)
     public CMISFileAttachment uploadAllegato(Long idRimborsoMissioneDettagli,
@@ -155,10 +165,7 @@ public class RimborsoMissioneDettagliService {
                 OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
                 if (ordineMissione != null) {
                     OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
-//                    if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S")) {
-//                        throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione, verifica e controlli.");
-//                    }
-                    if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S") || !Utility.nvl(autoPropria.utilizzoMotiviSediDisagiate, "N").equals("S")) {
+                    if (autoPropria != null && (!Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S") || !Utility.nvl(autoPropria.utilizzoMotiviSediDisagiate, "N").equals("S"))) {
                         throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione o la sede disagiata, verifica e controlli.");
                     }
                 }
@@ -193,6 +200,80 @@ public class RimborsoMissioneDettagliService {
             controlloCongruenzaPasto(rimborsoMissioneDettagli, rimborsoMissione, livelloRich);
         }
     }
+
+    private void controlliSpeseMezzi(RimborsoMissioneDettagli rimborsoMissioneDettagli, RimborsoMissione rimborsoMissione) {
+
+        Long idMissione = Long.valueOf(rimborsoMissione.getOrdineMissione().getId().toString());
+        String utilizzoTaxi = ordineMissioneTaxiService.getTaxi(idMissione) != null ? "S" : "N";
+        String utilizzoAutoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(idMissione) != null ? "S" : "N";
+        String utilizzoAutoPropria = ordineMissioneAutoPropriaService.getAutoPropria(idMissione) != null ? "S" : "N";
+
+        List<RimborsoMissioneDettagli> listaRimborsoMissioneDettagli = rimborsoMissioneDettagliRepository
+                .getRimborsoMissioneDettagli(rimborsoMissione);
+
+        boolean tassaSoggiorno = listaRimborsoMissioneDettagli.stream()
+                .anyMatch(dettaglio -> dettaglio.getImportoEuro().compareTo(BigDecimal.ZERO) != 0
+                        && dettaglio.getCdTiSpesa().equalsIgnoreCase(Costanti.SPESA_PERNOTTAMENTO));
+
+        String cdTiSpesa = rimborsoMissioneDettagli.getCdTiSpesa();
+
+        boolean isTaxiUsed = Objects.equals(utilizzoTaxi, "S");
+        boolean isAutoNoleggioUsed = Objects.equals(utilizzoAutoNoleggio, "S");
+        boolean isAutoPropriaUsed = Objects.equals(utilizzoAutoPropria, "S");
+
+        switch (cdTiSpesa) {
+            case Costanti.SPESA_INDENNITA_KM:
+                if ((isTaxiUsed || isAutoNoleggioUsed) && !isAutoPropriaUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere l'indennità chilometrica perché non è stata utilizzata l'auto propria per gli spostamenti.");
+                }
+                break;
+
+            case Costanti.SPESA_NOLEGGIO_AUTO:
+                if ((isTaxiUsed || isAutoPropriaUsed) && !isAutoNoleggioUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso per il noleggio dell'auto o car sharing perché il servizio non è stato utilizzato.");
+                }
+                break;
+
+            case Costanti.SPESA_TAXI:
+                if ((isAutoPropriaUsed || isAutoNoleggioUsed) && !isTaxiUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso per il taxi perché il taxi non è stato utilizzato.");
+                }
+                break;
+
+            case Costanti.SPESA_PEDAGGIO_AUTOSTRADA:
+                if (isTaxiUsed && !isAutoNoleggioUsed && !isAutoPropriaUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso del pedaggio autostradale perché non è stata utilizzata un'auto a noleggio/car sharing o l'auto propria.");
+                }
+                break;
+
+            case Costanti.SPESA_PARCHEGGIO:
+                if (isTaxiUsed && !isAutoNoleggioUsed && !isAutoPropriaUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso del parcheggio perché non è stata utilizzata un'auto a noleggio/car sharing o l'auto propria.");
+                }
+                break;
+
+            case Costanti.SPESA_ACC_DISABILE:
+                // TODO: Verificare
+                if (!isAutoNoleggioUsed && !isAutoPropriaUsed && !isTaxiUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso delle spese per l'accompagnatore disabile perché nessun mezzo è stato utilizzato.");
+                }
+                break;
+
+            case Costanti.SPESA_CARB_AUTO_NOLL_ECC:
+                if ((isTaxiUsed || isAutoPropriaUsed) && !isAutoNoleggioUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso del carburante per l'auto a noleggio perché il servizio non è stato utilizzato.");
+                }
+                if (tassaSoggiorno) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso della tassa di soggiorno perché è già stata inclusa nel pernottamento.");
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
 
     protected Integer recuperoLivelloEquivalente(RimborsoMissioneDettagli rimborsoMissioneDettagli,
                                                  RimborsoMissione rimborsoMissione, Integer livelloRich) {
@@ -264,6 +345,8 @@ public class RimborsoMissioneDettagliService {
         impostaImportoDivisa(rimborsoMissioneDettagli);
         validaCRUD(rimborsoMissioneDettagli);
         controlliPasto(rimborsoMissioneDettagli, rimborsoMissione);
+
+        controlliSpeseMezzi(rimborsoMissioneDettagli, rimborsoMissione);
 
         aggiornaDatiImpegni(rimborsoMissioneDettagli);
 
@@ -397,6 +480,8 @@ public class RimborsoMissioneDettagliService {
 
         validaCRUD(rimborsoMissioneDettagliDB);
         controlliPasto(rimborsoMissioneDettagli, rimborsoMissione);
+
+        controlliSpeseMezzi(rimborsoMissioneDettagli, rimborsoMissione);
 
         aggiornaDatiImpegni(rimborsoMissioneDettagliDB);
 

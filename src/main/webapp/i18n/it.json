@@ -346,12 +346,12 @@
             "partenza-da-altro": "Luogo di Partenza*",
             "distanza": "Km. di distanza dalla sede",
             "distanza.placeholder": "Distanza dalla Sede di Servizio: Km.",
-            "data-inizio-obbligatoria": "Data Inizio Missione (Presunta)*",
-            "data-inizio": "Data Inizio (Presunta)",
+            "data-inizio-obbligatoria": "Data Inizio Missione*",
+            "data-inizio": "Data Inizio",
             "data-inizio.placeholder": "Data di Inizio della Missione",
-            "data-fine": "Data Fine (Presunta)",
-            "data-fine-obbligatoria": "Data Fine (Presunta)*",
-            "data-fine.placeholder": "Data presunta di Fine della Missione",
+            "data-fine": "Data Fine",
+            "data-fine-obbligatoria": "Data Fine*",
+            "data-fine.placeholder": "Data di Fine della Missione",
             "note-utilizzo-taxi-noleggio": "NOTE",
             "note-utilizzo-taxi-noleggio.placeholder": "Dettagliare il caso di motivata eccezionalità.",
             "note-segreteria": "Note per il direttore",
@@ -542,7 +542,7 @@
         "form": {
             "numero": "Progressivo di Annullamento",
             "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
-            "motivo-annullamento": "Motivo di Annullamento",
+            "motivo-annullamento": "Motivo di Annullamento*",
             "consenti-rimborso": "Consentire la richiesta di rimborso delle spese di missione già sostenute"
         },
         "button": {
