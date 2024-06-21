@@ -41,8 +41,10 @@ public class AutorizzazioneRimborsoService {
            logger.info(autorizzazioneRimborso);
         }
         StartWorflowDto startWorflowDto= autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo,allegati);;
-        if ( Optional.ofNullable(utilTestRimborsoService).isPresent())
+        if ( Optional.ofNullable(utilTestRimborsoService).isPresent()){
+            UtilTestService.showSigned(startWorflowDto);
             startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo,allegati);
+        }
 
        return autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
                                             startWorflowDto.getSigners(),
