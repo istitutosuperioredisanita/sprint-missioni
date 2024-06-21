@@ -41,8 +41,10 @@ public class AutorizzazioneAnnulloService {
             logger.info(autorizzazioneAnnullamentoMissione);
         }
         StartWorflowDto startWorflowDto=   autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo,allegati);
-        if ( Optional.ofNullable(utilTestAnnullamentoService).isPresent())
+        if ( Optional.ofNullable(utilTestAnnullamentoService).isPresent()){
+            UtilTestService.showSigned(startWorflowDto);
             startWorflowDto = utilTestAnnullamentoService.createUStartWorkflowDto(annullamentoOrdineMissione,modulo,allegati);
+        }
 
 
        return autorizzazioneAnnullamentoMissione.send(startWorflowDto.getTemplateName(),
