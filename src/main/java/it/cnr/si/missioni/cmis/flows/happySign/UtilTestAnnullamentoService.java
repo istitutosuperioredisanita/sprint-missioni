@@ -55,19 +55,4 @@ public class UtilTestAnnullamentoService {
 
         return startInfo;
     }
-
-    public static void showSigned(StartWorflowDto startWorflowDto){
-        logger.info("firmatari per l'annullamento della missione in produzione");
-        List<String> signers = startWorflowDto.getSigners();
-        if(signers == null || signers.isEmpty()){
-            logger.error("non ci sono firmatari");
-        } else {
-            logger.info("firmatari presenti: \n\n");
-            for (String signer:
-                    signers) {
-                logger.info(signer+"\n");
-
-            }
-        }
-    }
 }
