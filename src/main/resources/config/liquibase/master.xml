@@ -99,6 +99,7 @@
     <include file="classpath:config/liquibase/changelog/20240221000001_add_table_spostamenti_auto_noleggio.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20240221000001_add_sequences_auto_noleggio.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20240515100000_add_column_sedi_disagiate_auto_propria.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20240625000000_modify_column_modulo.xml" relativeToChangelogFile="false"/>
 
 
     <!-- JHipster will add liquibase changelogs here -->

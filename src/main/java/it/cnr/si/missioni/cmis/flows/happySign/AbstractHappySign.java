@@ -1,5 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
+import feign.FeignException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.FlussiToHappySign;
@@ -30,9 +31,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static it.cnr.si.missioni.cmis.flows.happySign.UtilHappySign.formatCdsCode;
 import static it.cnr.si.missioni.cmis.flows.happySign.UtilHappySign.formatUoCode;
+import static it.cnr.si.missioni.util.Costanti.ACE_SIGLA_PRESIDENTE_DESC;
 
 public abstract class AbstractHappySign implements FlussiToHappySign {
 
@@ -62,6 +65,10 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     private String codeCdsCnt;
     @Value("${dirUffEcoGiur.username:#{null}}")
     private String dirUffEcoGiur;
+    @Value("${vociPresidenza.voce2089:#{null}}")
+    private String voce2089;
+    @Value("${vociPresidenza.voce2090:#{null}}")
+    private String voce2090;
     @Autowired
     protected HappySignService happySignService;
     @Autowired
@@ -159,7 +166,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
             return Boolean.FALSE;
         else {
             if (Optional.ofNullable(ordineMissione.getPresidente()).isPresent()
-                    && ordineMissione.getVoce().contains("2089") || ordineMissione.getVoce().contains("2090")) {
+                    && ordineMissione.getVoce().contains(voce2089) || ordineMissione.getVoce().contains(voce2090)) {
                 return Boolean.TRUE;
             } else {
                 return Boolean.FALSE;
@@ -206,7 +213,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         return missioniCMISService.parseFilename(fileName);
     }
 
-    public EmployeeDetails getRespScientifico(OrdineMissione ordineMissione) {
+    public EmployeeDetails getRespScientifico(OrdineMissione ordineMissione) throws FeignException {
         String cdResponsabileTerzo = getGae(ordineMissione).getCd_responsabile_terzo();
         TerzoInfo terzoInfo = terzoService.loadUserInfoByCdTerzo(cdResponsabileTerzo);
         return getUserFeaByCf(terzoInfo.getCodice_fiscale());
@@ -252,78 +259,46 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
 
     public Boolean isDirGenerale(OrdineMissione ordineMissione) {
         EmployeeDetails dirGenerale = getPersonaByUsmFromAce(ordineMissione.getUid());
-
-        if ((Objects.equals(dirGenerale.getRapporto().getQualifica().getKey(), keyUoDirGenerale))
-                && (dirGenerale.getRapporto().getQualifica().getValue().equalsIgnoreCase(Costanti.SIGLA_ACE_DIR_GENERALE_VALUE))) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
-
+        return Objects.equals(dirGenerale.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirGenerale))
+                && dirGenerale.getRapporto().getQualifica().getValue().equalsIgnoreCase(Costanti.SIGLA_ACE_DIR_GENERALE_VALUE);
     }
+
 
     public Boolean isPresidente(OrdineMissione ordineMissione) {
         EmployeeDetails presidente = getPersonaByUsmFromAce(ordineMissione.getUid());
-
-        if (Objects.equals(presidente.getRapporto().getQualifica().getKey(), keyUoPresidenza)
-                && presidente.getRapporto().getQualifica().getValue().equalsIgnoreCase(Costanti.ACE_SIGLA_PRESIDENTE_DESC)) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return Objects.equals(presidente.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoPresidenza))
+                && Objects.equals(presidente.getRapporto().getQualifica().getValue(), ACE_SIGLA_PRESIDENTE_DESC);
     }
 
 
     public Boolean isDirIFascia(OrdineMissione ordineMissione) {
-
         EmployeeDetails dir = getPersonaByUsmFromAce(ordineMissione.getUid());
-
-        if (Objects.equals(dir.getRapporto().getQualifica().getKey(), keyUoDirIFascia)) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return Objects.equals(dir.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirIFascia));
     }
 
+
     public Boolean isDirIIFascia(OrdineMissione ordineMissione) {
-
         EmployeeDetails dir = getPersonaByUsmFromAce(ordineMissione.getUid());
-
-        if (Objects.equals(dir.getRapporto().getQualifica().getKey(), keyUoDirIIFascia)) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return Objects.equals(dir.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirIIFascia));
     }
 
 
     public Boolean isDirDipartimento(OrdineMissione ordineMissione) {
-
         EmployeeDetails richDetails = getPersonaByUsmFromAce(ordineMissione.getUid());
         EmployeeDetails respDetails = getResponsabile(ordineMissione.getUoRich());
-
-        if (UtilAce.getEmail(richDetails).equals(UtilAce.getEmail(respDetails))) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return UtilAce.getEmail(richDetails).equals(UtilAce.getEmail(respDetails));
     }
+
 
     public void setRepScientificoToSign(StartWorflowDto startInfo, OrdineMissione ordineMissione) {
-
         EmployeeDetails richiedente = getPersonaByUsmFromAce(ordineMissione.getUid());
-        try {
-            EmployeeDetails respScientifico = getRespScientifico(ordineMissione);
+        EmployeeDetails respScientifico = getRespScientifico(ordineMissione);
 
-            if (!UtilAce.getEmail(richiedente).equals(UtilAce.getEmail(respScientifico))) {
-                startInfo.addSigner(UtilAce.getEmail(respScientifico));
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+        if (!UtilAce.getEmail(richiedente).equals(UtilAce.getEmail(respScientifico))) {
+            startInfo.addSigner(UtilAce.getEmail(respScientifico));
         }
-
-
     }
+
 
     public void setDirDipToSign(StartWorflowDto startInfo, OrdineMissione ordineMissione) {
 
@@ -341,23 +316,14 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     }
 
     public Boolean isMissioneNoCaricoEnte(OrdineMissione ordineMissione) {
-        if (Optional.ofNullable(ordineMissione.getMissioneGratuita()).isPresent()) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return Optional.ofNullable(ordineMissione.getMissioneGratuita()).isPresent();
     }
 
+
     public Boolean isDirDRUE(OrdineMissione ordineMissione) {
-
         EmployeeDetails dirDRUE = getPersonaByUsmFromAce(ordineMissione.getUid());
-
-        if (Objects.equals(dirDRUE.getRapporto().getQualifica().getKey(), keyUoDirIFascia)
-                && ordineMissione.getUoRich().equalsIgnoreCase(formatUoCode(uoCodeDrue))) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return Objects.equals(dirDRUE.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirIFascia))
+                && ordineMissione.getUoRich().equalsIgnoreCase(formatUoCode(uoCodeDrue));
     }
 
 
@@ -384,6 +350,79 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     private String getCDR(OrdineMissione ordineMissione) {
         Gae gae = getGae(ordineMissione);
         return gae.getCd_centro_responsabilita();
+    }
+
+    public Boolean checkIsDirDipartimento(OrdineMissione ordineMissione) {
+        Boolean result;
+        if (!isPresidente(ordineMissione) && !isDirGenerale(ordineMissione)) {
+            result = isDirDipartimento(ordineMissione);
+        }
+        else {
+            result = Boolean.FALSE;
+        }
+        return result;
+    }
+
+    private Integer convertStringToInteger(String s) {
+        return Integer.valueOf(s);
+    }
+
+
+    protected Boolean setSignersToMissioni(OrdineMissione ordineMissione, String s) {
+        boolean signGae = signGae(ordineMissione);
+        boolean uoGaeSuDirCentrale = uoGaeSuDirCentrale(ordineMissione);
+
+
+        Predicate<OrdineMissione> condition;
+        switch (s) {
+            case Costanti.IS_PRESIDENTE:
+                condition = this::isPresidente;
+                break;
+            case Costanti.CHECK_IS_DIR_DIPARTIMENTO:
+                condition = this::checkIsDirDipartimento;
+                break;
+            case Costanti.IS_DIR_GENERALE:
+                condition = this::isDirGenerale;
+                break;
+            case Costanti.IS_DIR_II_FASCIA:
+                condition = this::isDirIIFascia;
+                break;
+            case Costanti.IS_DIR_I_FASCIA:
+                condition = this::isDirIFascia;
+                break;
+            case Costanti.IS_DIR_DRUE:
+                condition = this::isDirDRUE;
+                break;
+            case Costanti.IS_INCARICO_VOCI_PRESIDENTE:
+                condition = this::isIncarico_VociPresidente;
+                break;
+            case Costanti.IS_MISSIONE_NO_CARICO_ENTE:
+                condition = this::isMissioneNoCaricoEnte;
+                break;
+            default:
+                condition = ordine -> false;
+                break;
+        }
+
+        Predicate<OrdineMissione> allNegatedConditions = ordine ->
+                !isPresidente(ordine) &&
+                        !checkIsDirDipartimento(ordine) &&
+                        !isDirGenerale(ordine) &&
+                        !isDirIIFascia(ordine) &&
+                        !isDirIFascia(ordine) &&
+                        !isDirDRUE(ordine) &&
+                        !isIncarico_VociPresidente(ordine) &&
+                        !isMissioneNoCaricoEnte(ordine);
+
+        if (Costanti.OLD_AUTH.equals(s)) {
+            return !signGae && !uoGaeSuDirCentrale && allNegatedConditions.test(ordineMissione);
+        }
+
+        if (s.isEmpty()) {
+            return signGae && uoGaeSuDirCentrale && allNegatedConditions.test(ordineMissione);
+        }
+
+        return signGae && uoGaeSuDirCentrale && condition.test(ordineMissione);
     }
 
 }

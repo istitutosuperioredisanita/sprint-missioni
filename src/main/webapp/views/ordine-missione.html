@@ -568,9 +568,8 @@
             <form name="form-inline" role="form" ng-submit="confirm()">
                 <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile || ordineMissioneModel.missioneGratuita == 'S')) || (ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione)) && !disabilitaOrdineMissione">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}">
-                        <span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;
-                        <span ng-if="utenteAbilitatoValidareUo !== 'N'">{{'ordine-missione.button.sendToValidate' | translate}}</span>
-                        <span ng-if="utenteAbilitatoValidareUo === 'N'">{{'ordine-missione.button.invia' | translate}}</span>
+                        <span ng-if="utenteAbilitatoValidareUo !== 'N'" class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}
+                        <span ng-if="utenteAbilitatoValidareUo === 'N'" class="glyphicon glyphicon-share-alt" style="color:white">{{'ordine-missione.button.invia' | translate}}</span>
                     </button>
                 </div>
             </form>

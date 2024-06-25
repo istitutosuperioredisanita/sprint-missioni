@@ -41,6 +41,6 @@ public class AutorizzazioneMissioneGae extends AbstractHappySign implements Auto
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (signGae(ordineMissione) && uoGaeSuDirCentrale(ordineMissione));
+        return (setSignersToMissioni(ordineMissione,""));
     }
 }

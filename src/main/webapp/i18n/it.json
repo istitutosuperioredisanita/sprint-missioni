@@ -350,7 +350,7 @@
             "data-inizio": "Data Inizio",
             "data-inizio.placeholder": "Data di Inizio della Missione",
             "data-fine": "Data Fine",
-            "data-fine-obbligatoria": "Data Fine*",
+            "data-fine-obbligatoria": "Data Fine Missione*",
             "data-fine.placeholder": "Data di Fine della Missione",
             "note-utilizzo-taxi-noleggio": "NOTE",
             "note-utilizzo-taxi-noleggio.placeholder": "Dettagliare il caso di motivata eccezionalità.",
