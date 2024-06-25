@@ -220,59 +220,43 @@ public class RimborsoMissioneDettagliService {
         boolean isTaxiUsed = Objects.equals(utilizzoTaxi, "S");
         boolean isAutoNoleggioUsed = Objects.equals(utilizzoAutoNoleggio, "S");
         boolean isAutoPropriaUsed = Objects.equals(utilizzoAutoPropria, "S");
+        String messaggioErrore = "ATTENZIONE! Voce non selezionabile in quanto NON preventivamente autorizzata";
 
         switch (cdTiSpesa) {
             case Costanti.SPESA_INDENNITA_KM:
                 if ((isTaxiUsed || isAutoNoleggioUsed) && !isAutoPropriaUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere l'indennità chilometrica perché non è stata utilizzata l'auto propria per gli spostamenti.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_NOLEGGIO_AUTO:
                 if ((isTaxiUsed || isAutoPropriaUsed) && !isAutoNoleggioUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso per il noleggio dell'auto o car sharing perché il servizio non è stato utilizzato.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
-
             case Costanti.SPESA_TAXI:
-                if ((isAutoPropriaUsed || isAutoNoleggioUsed) && !isTaxiUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso per il taxi perché il taxi non è stato utilizzato.");
+                if ((isAutoPropriaUsed || isAutoNoleggioUsed) && (!isTaxiUsed &&
+                        (rimborsoMissione.getUtilizzoTaxi() == null || rimborsoMissione.getUtilizzoTaxi().isEmpty()))) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_PEDAGGIO_AUTOSTRADA:
-                if (isTaxiUsed && !isAutoNoleggioUsed && !isAutoPropriaUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso del pedaggio autostradale perché non è stata utilizzata un'auto a noleggio/car sharing o l'auto propria.");
-                }
-                break;
-
             case Costanti.SPESA_PARCHEGGIO:
                 if (isTaxiUsed && !isAutoNoleggioUsed && !isAutoPropriaUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso del parcheggio perché non è stata utilizzata un'auto a noleggio/car sharing o l'auto propria.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_ACC_DISABILE:
-                // TODO: Verificare
                 if (!isAutoNoleggioUsed && !isAutoPropriaUsed && !isTaxiUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso delle spese per l'accompagnatore disabile perché nessun mezzo è stato utilizzato.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
-
-            case Costanti.SPESA_CARB_AUTO_NOLL_ECC:
-                if ((isTaxiUsed || isAutoPropriaUsed) && !isAutoNoleggioUsed) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso del carburante per l'auto a noleggio perché il servizio non è stato utilizzato.");
-                }
-                if (tassaSoggiorno) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile richiedere il rimborso della tassa di soggiorno perché è già stata inclusa nel pernottamento.");
-                }
-                break;
-
             default:
                 break;
         }
     }
-
 
 
     protected Integer recuperoLivelloEquivalente(RimborsoMissioneDettagli rimborsoMissioneDettagli,

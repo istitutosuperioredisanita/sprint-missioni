@@ -3,6 +3,7 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
 import it.iss.si.service.HappySignURLCondition;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Conditional(HappySignURLCondition.class)
@@ -45,6 +47,7 @@ public class AutorizzazioneMissioneNoCaricoEnte extends AbstractHappySign implem
 
     @Override
     public Boolean isFlowToSend(OrdineMissione ordineMissione) {
-        return (signGae(ordineMissione) && isMissioneNoCaricoEnte(ordineMissione));
+        return (setSignersToMissioni(ordineMissione, Costanti.IS_MISSIONE_NO_CARICO_ENTE));
+
     }
 }

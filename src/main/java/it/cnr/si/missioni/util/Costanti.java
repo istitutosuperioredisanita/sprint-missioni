@@ -19,8 +19,12 @@
 
 package it.cnr.si.missioni.util;
 
+import it.cnr.si.missioni.cmis.flows.happySign.AbstractHappySign;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 
 
 /**
@@ -189,6 +193,16 @@ public class Costanti {
     public final static String RUOLO_FIRMA_PRESIDENTE = RUOLO_FIRMA + "-presidente";
     public final static String SIGLA_ACE_DIREZIONE_GENERALE = "DG";
     public final static String SIGLA_ACE_DIR_GENERALE_VALUE = "Direttore Generale";
+    public final static String IS_INCARICO_VOCI_PRESIDENTE = "isIncarico_VociPresidente";
+    public final static String IS_DIR_I_FASCIA = "isDirIFascia";
+    public final static String IS_MISSIONE_NO_CARICO_ENTE = "isMissioneNoCaricoEnte";
+    public final static String IS_PRESIDENTE = "isPresidente";
+    public final static String CHECK_IS_DIR_DIPARTIMENTO = "checkIsDirDipartimento";
+    public final static String IS_DIR_GENERALE = "isDirGenerale";
+    public final static String IS_DIR_DRUE = "isDirDRUE";
+    public final static String IS_DIR_II_FASCIA = "isDirIIFascia";
+
+    public final static String OLD_AUTH = "OLD_AUTH";
 
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
     public static final String ROLE_FLOWS = "USER_flows#missioni";
