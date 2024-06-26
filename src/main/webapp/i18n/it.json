@@ -384,7 +384,6 @@
             "savedraft" : "Salva in Bozza",
             "invia" : "Invia",
             "sendToValidate" : "Invia in validazione"
-
         },
         "messages": {
             "error": {
@@ -508,6 +507,7 @@
             "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
         },
         "button": {
+            "send": "Invia",
             "sendToSign": "Invia alla Firma",
             "returnToSender": "Respingi al Mittente",
             "returnToSenderShort": "Respingi"
