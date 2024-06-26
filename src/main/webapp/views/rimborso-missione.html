@@ -752,13 +752,16 @@
             </form>
 
             <form name="form-inline" role="form" ng-submit="confirm()">
-                <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((rimborsoMissioneModel.stato === 'INS' && (!showResponsabile || rimborsoMissioneModel.missioneGratuita == 'S')) || (rimborsoMissioneModel.stato === 'INR' && isResponsabileGruppoMissione)) && !disabilitaRimborsoMissione">
+                <div class="col-xs-4" ng-show="!validazione && showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'INS' && !disabilitaRimborsoMissione">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}">
-                        <span ng-if="utenteAbilitatoValidareUo !== 'N'" class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}
-                        <span ng-if="utenteAbilitatoValidareUo === 'N'" class="glyphicon glyphicon-share-alt" style="color:white">{{'ordine-missione.button.invia' | translate}}</span>
+                        <span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;
+                        <span ng-if="utenteAbilitatoValidareUo == 'S'">{{'missione.button.sendToSign' | translate}}</span>
+                        <span ng-if="utenteAbilitatoValidareUo == 'N'">{{'missione.button.send' | translate}}</span>
                     </button>
                 </div>
             </form>
+
+
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
                 <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' ||
                     utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
