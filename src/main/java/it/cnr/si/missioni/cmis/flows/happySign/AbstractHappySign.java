@@ -354,10 +354,10 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
 
     public Boolean checkIsDirDipartimento(OrdineMissione ordineMissione) {
         Boolean result;
-        if (!isPresidente(ordineMissione) && !isDirGenerale(ordineMissione)) {
+        if (!isPresidente(ordineMissione) && !isDirGenerale(ordineMissione) &&
+                !isDirIFascia(ordineMissione) && !isDirIIFascia(ordineMissione) && !isDirDRUE(ordineMissione)) {
             result = isDirDipartimento(ordineMissione);
-        }
-        else {
+        } else {
             result = Boolean.FALSE;
         }
         return result;
@@ -372,37 +372,36 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         boolean signGae = signGae(ordineMissione);
         boolean uoGaeSuDirCentrale = uoGaeSuDirCentrale(ordineMissione);
 
-
         Predicate<OrdineMissione> condition;
-        switch (s) {
-            case Costanti.IS_PRESIDENTE:
-                condition = this::isPresidente;
-                break;
-            case Costanti.CHECK_IS_DIR_DIPARTIMENTO:
-                condition = this::checkIsDirDipartimento;
-                break;
-            case Costanti.IS_DIR_GENERALE:
-                condition = this::isDirGenerale;
-                break;
-            case Costanti.IS_DIR_II_FASCIA:
-                condition = this::isDirIIFascia;
-                break;
-            case Costanti.IS_DIR_I_FASCIA:
-                condition = this::isDirIFascia;
-                break;
-            case Costanti.IS_DIR_DRUE:
-                condition = this::isDirDRUE;
-                break;
-            case Costanti.IS_INCARICO_VOCI_PRESIDENTE:
-                condition = this::isIncarico_VociPresidente;
-                break;
-            case Costanti.IS_MISSIONE_NO_CARICO_ENTE:
-                condition = this::isMissioneNoCaricoEnte;
-                break;
-            default:
-                condition = ordine -> false;
-                break;
-        }
+            switch (s) {
+                case Costanti.IS_PRESIDENTE:
+                    condition = this::isPresidente;
+                    break;
+                case Costanti.CHECK_IS_DIR_DIPARTIMENTO:
+                    condition = this::checkIsDirDipartimento;
+                    break;
+                case Costanti.IS_DIR_GENERALE:
+                    condition = this::isDirGenerale;
+                    break;
+                case Costanti.IS_DIR_II_FASCIA:
+                    condition = this::isDirIIFascia;
+                    break;
+                case Costanti.IS_DIR_I_FASCIA:
+                    condition = this::isDirIFascia;
+                    break;
+                case Costanti.IS_DIR_DRUE:
+                    condition = this::isDirDRUE;
+                    break;
+                case Costanti.IS_INCARICO_VOCI_PRESIDENTE:
+                    condition = this::isIncarico_VociPresidente;
+                    break;
+                case Costanti.IS_MISSIONE_NO_CARICO_ENTE:
+                    condition = this::isMissioneNoCaricoEnte;
+                    break;
+                default:
+                    condition = ordine -> false;
+                    break;
+            }
 
         Predicate<OrdineMissione> allNegatedConditions = ordine ->
                 !isPresidente(ordine) &&
