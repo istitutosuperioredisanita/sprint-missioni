@@ -507,8 +507,8 @@
             "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
         },
         "button": {
-            "send": "Invia",
-            "sendToSign": "Invia alla Firma",
+            "sendToValidate": "Invia in Validazione",
+            "sendToSign": "Invia in Firma",
             "returnToSender": "Respingi al Mittente",
             "returnToSenderShort": "Respingi"
         }

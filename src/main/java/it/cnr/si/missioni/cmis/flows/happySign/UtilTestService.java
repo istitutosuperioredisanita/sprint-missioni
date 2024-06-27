@@ -35,8 +35,8 @@ public class UtilTestService {
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 
-        startInfo.addSigner(ordineMissione.getUid());
-        startInfo.addSigner(ordineMissione.getUid());
+        startInfo.addSigner("davide.mirra@iss.it");
+        startInfo.addSigner("simona.fortunato@iss.it");
 
         File f = new File();
         f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
