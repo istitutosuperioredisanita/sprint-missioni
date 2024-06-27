@@ -568,9 +568,9 @@
             <form name="form-inline" role="form" ng-submit="confirm()">
                 <div class="col-xs-4" ng-show="((!validazione && isResponsabileGruppoMissione) || (!isResponsabileGruppoMissione)) && showEsisteOrdineMissione && ((ordineMissioneModel.stato === 'INS' && (!showResponsabile || ordineMissioneModel.missioneGratuita == 'S')) || (ordineMissioneModel.stato === 'INR' && isResponsabileGruppoMissione)) && !disabilitaOrdineMissione">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}">
-                        <span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;
+                        <span ng-class="{'glyphicon glyphicon-share-alt': utenteAbilitatoValidareUo == 'S', 'glyphicon glyphicon-check': utenteAbilitatoValidareUo != 'S'}" style="color:white"></span>&nbsp;
                         <span ng-if="utenteAbilitatoValidareUo == 'S'">{{'missione.button.sendToSign' | translate}}</span>
-                        <span ng-if="utenteAbilitatoValidareUo == 'N'">{{'missione.button.send' | translate}}</span>
+                        <span ng-if="utenteAbilitatoValidareUo == 'N'">{{'missione.button.sendToValidate' | translate}}</span>
                     </button>
                 </div>
             </form>
@@ -582,7 +582,7 @@
             </form>
             <form name="form-inline" role="form" ng-submit="validateOrdineMissione()">
                 <div class="col-xs-4" ng-show="showEsisteOrdineMissione && validazione === 'S' && ordineMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
-                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">

@@ -25,7 +25,7 @@
         <b>  {{'missione.form.data-inserimento' | translate}}: </b>{{rimborsoMissioneModel.dataInserimento | date:'dd/MM/yyyy'}}  --
         <b>  {{'missione.form.stato' | translate}}: </b>{{rimborsoMissioneModel.decodeStato}}  --
         <span ng-show="rimborsoMissioneModel.statoFlusso && rimborsoMissioneModel.statoFlusso!='INS'"><b>  {{'missione.form.stato-flusso' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoFlusso}}  --
-                <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.stato-invio-sigla' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoInvioSigla}}  --  
+                <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.stato-invio-sigla' | translate}}: </b>{{rimborsoMissioneModel.decodeStatoInvioSigla}}  --
                 <span ng-show="rimborsoMissioneModel.idSigla"><b>  {{'rimborso-missione.form.id-sigla' | translate}}: </b>{{rimborsoMissioneModel.idSigla}}
     </div>
     <div  class="my-panel-body panel panel-success" ng-show="rimborsoMissioneModel.commentoFlusso && rimborsoMissioneModel.stato == 'INS'  && (rimborsoMissioneModel.statoFlusso == 'RUO' ||  rimborsoMissioneModel.statoFlusso == 'RUS')" align="center">
@@ -606,7 +606,7 @@
                             <span class="input-group-addon" translate="ordine-missione.form.note-segreteria">Note Segreteria</span>
                             <textarea
                                     class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="rimborsoMissioneModel.noteSegreteria" rows = "2">
-                            </textarea> 
+                            </textarea>
                         </span>
                         </p>
                     </form>
@@ -649,48 +649,54 @@
                 </div>
                 <div class="panel-body my-panel-body">
                     <form class="form-inline" role="form" id="missioni">
-                        <p class="col-md-3">
+                        <!-- controllo flag taxi (elimina se già impostato nell'ordine missione) -->
+                        <p class="col-md-3" ng-show="rimborsoMissioneModel.ordineMissione.utilizzoTaxi == 'N'">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="ordine-missione.form.utilizzo-taxi">Taxi</span>
+                          <label class="checkbox">
+                            <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoTaxi" ng-true-value="S" ng-false-value="N">
+                          </label>
+                        </span>
+                        </p>
+                        <!--
+                        </p>
+                        <div class="col-md-3">
                          <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-taxi">Taxi</span>
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
                             <label class="checkbox">
-                                    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoTaxi" ng-true-value="S" ng-false-value="N">
+                                    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
                             </label>
                         </span>
-                            <!--
-                            </p>
-                            <div class="col-md-3">
-                             <span class="input-group">
-                                <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
-                                <label class="checkbox">
-                                        <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
-                                </label>
-                            </span>
-                            </div>
-                            <div class="col-md-3">
-                             <span class="input-group">
-                                <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
-                                <label class="checkbox">
-                                        <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
-                                </label>
-                            </span>
-                            </div>
-                            <div class="col-md-3">
-                             <span class="input-group">
-                                <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">persona seguito</span>
-                                <label class="checkbox">
-                                        <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
-                                </label>
-                            </span>
-                            </div>
-                            -->
+                        </div>
+                        <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                        </div>
+                        <div class="col-md-3">
+                         <span class="input-group">
+                            <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">persona seguito</span>
+                            <label class="checkbox">
+                                    <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                        </div>
+                        -->
                     </form>
                     <form class="form-inline" role="form" id="missioni">
-                        <p class="col-md-12">
+                        <p class="col-md-12" ng-show="rimborsoMissioneModel.ordineMissione.utilizzoTaxi == 'N'">
                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
-                            <textarea ng-disabled="validazione || disabilitaRimborsoMissione"
-                                      class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="rimborsoMissioneModel.noteUtilizzoTaxiNoleggio" rows = "2">
-                            </textarea>
+                          <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
+                          <textarea ng-disabled="validazione || disabilitaRimborsoMissione"
+                                    class="input-sm form-control"
+                                    placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}"
+                                    name="note"
+                                    ng-model="rimborsoMissioneModel.noteUtilizzoTaxiNoleggio"
+                                    rows="2">
+                          </textarea>
                         </span>
                         </p>
                     </form>
@@ -754,9 +760,9 @@
             <form name="form-inline" role="form" ng-submit="confirm()">
                 <div class="col-xs-4" ng-show="!validazione && showEsisteRimborsoMissione && rimborsoMissioneModel.stato === 'INS' && !disabilitaRimborsoMissione">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'ordine-missione.button.confirm' | translate}}">
-                        <span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;
+                        <span ng-class="{'glyphicon glyphicon-share-alt': utenteAbilitatoValidareUo == 'S', 'glyphicon glyphicon-check': utenteAbilitatoValidareUo != 'S'}" style="color:white"></span>&nbsp;
                         <span ng-if="utenteAbilitatoValidareUo == 'S'">{{'missione.button.sendToSign' | translate}}</span>
-                        <span ng-if="utenteAbilitatoValidareUo == 'N'">{{'missione.button.send' | translate}}</span>
+                        <span ng-if="utenteAbilitatoValidareUo == 'N'">{{'missione.button.sendToValidate' | translate}}</span>
                     </button>
                 </div>
             </form>
@@ -765,7 +771,7 @@
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
                 <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' ||
                     utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
-                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteRimborsoMissione()">

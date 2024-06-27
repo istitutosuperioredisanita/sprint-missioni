@@ -235,7 +235,7 @@ public class RimborsoMissioneDettagliService {
                 }
                 break;
             case Costanti.SPESA_TAXI:
-                if ((isAutoPropriaUsed || isAutoNoleggioUsed) && (!isTaxiUsed &&
+                if ((isAutoPropriaUsed || isAutoNoleggioUsed) && (!isTaxiUsed ||
                         (rimborsoMissione.getUtilizzoTaxi() == null || rimborsoMissione.getUtilizzoTaxi().isEmpty()))) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
