@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Conditional(HappySignURLCondition.class)
@@ -36,7 +35,7 @@ public class AutorizzazioneMissioneDirGen extends AbstractHappySign implements A
         startInfo.addSigner(ordineMissione.getUid());
         startInfo.addSigner(UtilAce.getEmail(presidente));
         setRepScientificoToSign(startInfo,ordineMissione);
-        startInfo.addSigner(getDirUffEcoGiur());
+        setDirUffEcoGiur(ordineMissione,startInfo);
 
         startInfo.setFileToSign(getFile(modulo, allegati));
 
