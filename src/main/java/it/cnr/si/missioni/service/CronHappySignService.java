@@ -58,20 +58,6 @@ public class CronHappySignService {
         MissioneFilter filtro = new MissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
-        //da testare anche per rimborso e annullamento
-//        filtro.setListaStatiMissione(new ArrayList<>());
-//        filtro.setListaStatiFlussoMissione(new ArrayList<>());
-//
-//        filtro.getListaStatiMissione().addAll(Arrays.asList(
-//                Costanti.STATO_INSERITO,
-//                Costanti.STATO_ANNULLATO,
-//                Costanti.STATO_CONFERMATO
-//        ));
-//
-//        filtro.getListaStatiFlussoMissione().addAll(Arrays.asList(
-//                Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO,
-//                Costanti.STATO_INVIATO_FLUSSO
-//        ));
         filtro.setDaCron("S");
         List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, false);
         if ( Optional.ofNullable(listaOrdiniMissione).isPresent()){
@@ -103,9 +89,7 @@ public class CronHappySignService {
                         flowResult.setIdMissione(ordineMissione.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        Optional<SignersDocumentDetails> firstSigner = Arrays.stream(documentDetails.getSigners()).findFirst();
-                        String noteRespinta = firstSigner.map(SignersDocumentDetails::getNote).orElse("Respinta da firma su HappySign");
-                        flowResult.setCommento(noteRespinta);
+                        setNoteMissioneRespinta(documentDetails,flowResult);
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 
@@ -153,7 +137,7 @@ public class CronHappySignService {
                         flowResult.setIdMissione(rimborsoMissione.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento(documentDetails.getCancelnote());
+                        setNoteMissioneRespinta(documentDetails,flowResult);
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 
@@ -202,7 +186,7 @@ public class CronHappySignService {
                         flowResult.setIdMissione(annullamentoOrdine.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento(documentDetails.getCancelnote());
+                        setNoteMissioneRespinta(documentDetails,flowResult);
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 
@@ -212,5 +196,11 @@ public class CronHappySignService {
                 }
             }
         }
+    }
+
+    private void setNoteMissioneRespinta (GetDocumentDetailResponse documentDetails, FlowResult flowResult){
+        Optional<SignersDocumentDetails> firstSigner = Arrays.stream(documentDetails.getSigners()).findFirst();
+        String noteRespinta = firstSigner.map(SignersDocumentDetails::getNote).orElse("Respinta da firma su HappySign");
+        flowResult.setCommento(noteRespinta);
     }
 }
