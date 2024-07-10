@@ -11,7 +11,9 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.dto.happysign.base.EnumEsitoFlowDocumentStatus;
+import it.iss.si.dto.happysign.base.SignersDocumentDetails;
 import it.iss.si.dto.happysign.request.GetStatusRequest;
+import it.iss.si.dto.happysign.response.GetDocumentDetailResponse;
 import it.iss.si.dto.happysign.response.GetDocumentResponse;
 import it.iss.si.service.HappySignURLCondition;
 import org.slf4j.Logger;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,6 +58,20 @@ public class CronHappySignService {
         MissioneFilter filtro = new MissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
+        //da testare anche per rimborso e annullamento
+//        filtro.setListaStatiMissione(new ArrayList<>());
+//        filtro.setListaStatiFlussoMissione(new ArrayList<>());
+//
+//        filtro.getListaStatiMissione().addAll(Arrays.asList(
+//                Costanti.STATO_INSERITO,
+//                Costanti.STATO_ANNULLATO,
+//                Costanti.STATO_CONFERMATO
+//        ));
+//
+//        filtro.getListaStatiFlussoMissione().addAll(Arrays.asList(
+//                Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO,
+//                Costanti.STATO_INVIATO_FLUSSO
+//        ));
         filtro.setDaCron("S");
         List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, false);
         if ( Optional.ofNullable(listaOrdiniMissione).isPresent()){
@@ -80,11 +98,14 @@ public class CronHappySignService {
                         flowService.aggiornaMissioneFlows(flowResult);
                     }
                     if ( EnumEsitoFlowDocumentStatus.REFUSED==esitoFlowDocumentStatus){
+                        GetDocumentDetailResponse documentDetails = happySignService.getDocumentDetails(ordineMissione.getIdFlusso());
                         FlowResult flowResult = new FlowResult();
                         flowResult.setIdMissione(ordineMissione.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento("Respinta da firma su HappySign");
+                        Optional<SignersDocumentDetails> firstSigner = Arrays.stream(documentDetails.getSigners()).findFirst();
+                        String noteRespinta = firstSigner.map(SignersDocumentDetails::getNote).orElse("Respinta da firma su HappySign");
+                        flowResult.setCommento(noteRespinta);
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 
@@ -101,6 +122,7 @@ public class CronHappySignService {
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
+
         filtro.setDaCron("S");
         List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filtro, false, false);
         if ( Optional.ofNullable(listaRimborsiMissione).isPresent()){
@@ -126,11 +148,12 @@ public class CronHappySignService {
                         flowService.aggiornaMissioneFlows(flowResult);
                     }
                     if (  EnumEsitoFlowDocumentStatus.REFUSED==esitoFlowDocumentStatus) {
+                        GetDocumentDetailResponse documentDetails = happySignService.getDocumentDetails(rimborsoMissione.getIdFlusso());
                         FlowResult flowResult = new FlowResult();
                         flowResult.setIdMissione(rimborsoMissione.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento("Respinta da firma su HappySign");
+                        flowResult.setCommento(documentDetails.getCancelnote());
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 
@@ -147,6 +170,7 @@ public class CronHappySignService {
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
+
         filtro.setDaCron("S");
         List<AnnullamentoOrdineMissione> listaAnnullamentiOrdini = annullamentoOrdineMissioneService.getAnnullamenti(filtro, false, false);
         if ( Optional.ofNullable(listaAnnullamentiOrdini).isPresent()){
@@ -172,11 +196,13 @@ public class CronHappySignService {
                         flowService.aggiornaMissioneFlows(flowResult);
                     }
                     if (  EnumEsitoFlowDocumentStatus.REFUSED==esitoFlowDocumentStatus) {
+                        GetDocumentDetailResponse documentDetails = happySignService.getDocumentDetails(annullamentoOrdine.getIdFlusso());
+
                         FlowResult flowResult = new FlowResult();
                         flowResult.setIdMissione(annullamentoOrdine.getId().toString());
                         flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
                         flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setCommento("Respinta da firma su HappySign");
+                        flowResult.setCommento(documentDetails.getCancelnote());
                         flowResult.setUser("Utente Flusso Firma");
                         flowService.aggiornaMissioneFlows(flowResult);
 

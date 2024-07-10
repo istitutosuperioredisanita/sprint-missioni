@@ -3,7 +3,6 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.spring.storage.StorageObject;
 import it.iss.si.service.HappySignURLCondition;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +30,7 @@ public class AutorizzazioneMissioneGae extends AbstractHappySign implements Auto
         startInfo.addSigner(ordineMissione.getUid());
         setRepScientificoToSign(startInfo,ordineMissione);
         setDirDipToSign(startInfo,ordineMissione);
-        startInfo.addSigner(getDirUffEcoGiur());
+        setDirUffEcoGiur(ordineMissione,startInfo);
 
         startInfo.setFileToSign(getFile(modulo, allegati));
 

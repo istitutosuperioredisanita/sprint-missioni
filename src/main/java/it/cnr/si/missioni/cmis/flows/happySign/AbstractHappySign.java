@@ -244,9 +244,11 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         return getUserFeaByCf(direttore.getCodice_fiscale());
     }
 
-    public String getDirUffEcoGiur() {
+    public void setDirUffEcoGiur(OrdineMissione ordineMissione, StartWorflowDto startInfo) {
 
-        return dirUffEcoGiur;
+        if (!ordineMissione.getUid().equalsIgnoreCase(dirUffEcoGiur)) {
+            startInfo.addSigner(dirUffEcoGiur);
+        }
     }
 
 
