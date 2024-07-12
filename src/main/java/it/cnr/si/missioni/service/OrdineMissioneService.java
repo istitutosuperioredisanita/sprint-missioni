@@ -235,8 +235,8 @@ public class OrdineMissioneService {
             Map<String, byte[]> map = new HashMap<String, byte[]>();
             byte[] printOrdineMissione = null;
             String fileName = null;
-            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
-                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
+                if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
+                    && !ordineMissione.isMissioneDaValidare())) {
                 StorageObject storage = null;
                 try {
                     storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);

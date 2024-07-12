@@ -677,7 +677,8 @@ public class AnnullamentoOrdineMissioneService {
     @Transactional(readOnly = true)
     public Map<String, byte[]> printAnnullamentoMissione(Long idMissione) throws ComponentException {
         AnnullamentoOrdineMissione annullamento = getAnnullamentoOrdineMissione(idMissione, true);
-        if (!annullamento.isStatoNonInviatoAlFlusso()) {
+        if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneInserita()
+                && !annullamento.isMissioneDaValidare()) {
             return cmisOrdineMissioneService.getFileAnnullamentoOrdineMissione(annullamento);
         } else {
             return stampaAnnullamento(annullamento);
