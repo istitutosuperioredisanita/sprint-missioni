@@ -1,0 +1,318 @@
+<!--
+  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+  ~
+  ~      This program is free software: you can redistribute it and/or modify
+  ~      it under the terms of the GNU Affero General Public License as
+  ~      published by the Free Software Foundation, either version 3 of the
+  ~      License, or (at your option) any later version.
+  ~
+  ~      This program is distributed in the hope that it will be useful,
+  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~      GNU Affero General Public License for more details.
+  ~
+  ~      You should have received a copy of the GNU Affero General Public License
+  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~
+  -->
+
+<div class="missioni">
+    <h4 translate="elenco-annullamento-ordine-missione.title">Ordini</h4>
+    <div class="row">
+        <form class="form-inline" role="form" id="missioni" ng-show="uoForUsersSpecial">
+            <p class="col-md-12">
+                  <span class="input-group">
+                  <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-userid-missione">uo</span>
+    <ui-select id="missioni-ui-select" theme="select2" ng-disabled="disableUo" ng-model="uoWorkForSpecialUser" on-select="reloadUoWork(uoWorkForSpecialUser)"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.uo-userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in uoForUsersSpecial | filter: $select.search">
+        <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+    </ui-select-choices>
+                      </ui-select>
+                   </span>
+            </p>
+        </form>
+        <form class="form-inline" role="form" id="missioni" ng-show="elencoPersone">
+            <p class="col-md-12">
+                    <span class="input-group">
+                    <span class="input-group-addon label-input-group-for-select" translate="missione.form.userid-missione">user</span>
+    <ui-select id="missioni-ui-select" theme="select2" on-select="reloadUserWork(userWork)" ng-model="userWork"/>
+    <ui-select-match allow-clear="true" placeholder="{{'missione.form.userid-missione' | translate}}" >
+        <span ng-bind="$select.selected.cognome+' '+$select.selected.nome+' ('+$select.selected.matricola+')'"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="persona.uid as persona in elencoPersone | filter: $select.search">
+        <span ng-bind="persona.cognome+' '+persona.nome+' ('+persona.matricola+')'"></span>
+    </ui-select-choices>
+                        </ui-select>
+                    </span>
+            </p>
+        </form>
+    </div>
+    <div ng-show="uoWorkForSpecialUser || !uoForUsersSpecial">
+
+        <div class="panel panel-primary" ng-show="accountModel">
+            <div class="panel-heading color-celeste-avion text-center">
+                <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
+            </div>
+            <div class="panel-body my-panel-body">
+                <info-account account="accountModel"></info-account>
+            </div>
+        </div>
+        <div class="panel panel-success">
+            <div class="panel color-verde-scuro text-center row-trim-after">
+                <h4 translate="elenco-annullamento-ordine-missione.filter.title">Filter by date</h4>
+            </div>
+            <div class="panel-body my-panel-body">
+                <div class="col-md-2">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="elenco-annullamento-ordine-missione.filter.anno">from</span>
+                        <input type="text" style="text-align:center" class="input-sm form-control" name="daNumero" ng-model="anno" />
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="input-group">
+                        <span class="input-group-addon" translate="elenco-annullamento-ordine-missione.filter.da-numero">from</span>
+                        <input type="text" class="input-sm form-control" style="text-align:right" name="daNumero" ng-model="daNumero" />
+                        <span class="input-group-addon" translate="elenco-annullamento-ordine-missione.filter.a-numero">to</span>
+                        <input type="text" class="input-sm form-control" style="text-align:right" name="aNumero" ng-model="aNumero" />
+                    </p>
+                </div>
+                <div>
+                    <p class="input-group">
+                        <cnr-widget-date-range start-date="daData" end-date="aData" ng-model-date="daData" start-label="{{'elenco-annullamento-ordine-missione.filter.da-data' | translate}}" end-label="{{'elenco-annullamento-ordine-missione.filter.a-data' | translate}}"/></cnr-widget-date-range>
+                    </p>
+                </div>
+                <form class="form-inline" role="form" id="missioni">
+                    <div>
+                        <p class="input-group">
+                            <cnr-widget-date-range start-date="daDataMissione" end-date="aDataMissione" ng-model-date="daDataMissione" start-label="{{'elenco-annullamento-ordine-missione.filter.da-data-missione' | translate}}" end-label="{{'elenco-annullamento-ordine-missione.filter.a-data-missione' | translate}}"/></cnr-widget-date-range>
+                        </p>
+                    </div>
+                </form>
+                <form class="form-inline" role="form" id="missioni">
+                    <div class="col-md-3">
+                        <span class="input-group">
+                          <span class="input-group-addon" translate="elenco-annullamento-ordine-missione.filter.ordini-missione">Ordini di Missione</span>
+    <ui-select id="missioni-ui-select" theme="select2" ng-model="statoOrdineMissione" on-select="onChangeStatoOrdineMissione(statoOrdineMissione)"/>
+    <ui-select-match placeholder="{{'elenco-annullamento-ordine-missione.filter.ordini-missione' | translate}}" >
+        <span ng-bind="$select.selected.stato"></span>
+    </ui-select-match>
+    <ui-select-choices repeat="val.value as val in valoriStatoOrdineMissione | filter: $select.search">
+        <span ng-bind="val.stato"></span>
+    </ui-select-choices>
+                            </ui-select>
+                        </span>
+                    </div>
+                    <div class="col-md-2">
+            <span class="input-group">
+              <span class="input-group-addon" translate="elenco-annullamento-ordine-missione.filter.annullati">Annullati</span>
+                <label class="checkbox">
+                  <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N">
+                </label>
+            </span>
+                    </div>
+                    <div class="col-md-3" ng-show="!uoForUsersSpecial">
+            <span class="input-group">
+              <span class="input-group-addon" translate="ordine-missione.form.responsabile-gruppo">Responsabile del Gruppo</span>
+                <label class="checkbox">
+                  <input type="checkbox" ng-model="respGruppo" ng-true-value="S" ng-false-value="N">
+                </label>
+            </span>
+                    </div>
+                    <div class="col-md-4">
+            <span class="input-group">
+              <span class="input-group-addon" translate="missione.form.cup">CUP</span>
+                <input type="text" style="text-align:center" class="input-sm form-control" name="cup" ng-model="cup" />
+            </span>
+                    </div>
+                </form>
+                <form class="form-inline" role="form" id="missioni">
+                    <div class="col-md-7 float-right">
+                        <button type="button" class="margin-top btn btn-primary" ng-click="ricerca()"><span class="glyphicon glyphicon-search"></span>&nbsp;{{'global.button.search' | translate}}</button>
+                    </div>
+                </form>
+                <div class="col-md-12 text-center" ng-show="messageOrdiniNonEsistenti">
+                    <h5 translate="elenco-annullamento-ordine-missione.no-result">Nessun Risultato</h5>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="endSearching">
+            <table class="table table-condensed table-striped table-bordered table-responsive table-selected">
+                <thead>
+                <tr>
+                    <!--              <th style="text-align: center">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.anno')">
+                                      <h6>
+                                        <b>{{'missione.form.anno' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.anno'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: right">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.numero')">
+                                      <h6>
+                                        <b>{{'missione.form.numero' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.numero'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: center">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.dataInserimento')">
+                                      <h6>
+                                        <b>{{'missione.form.data' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.dataInserimento'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th ng-hide="accountModel" style="text-align: left">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.uid')">
+                                      <h6>
+                                        <b>{{'main.userid' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.uid'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th ng-hide="accountModel" style="text-align: left">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.uoRich')">
+                                      <h6>
+                                        <b>{{'missione.form.uo' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.uoRich'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: center">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.decodeStato')">
+                                      <h6>
+                                        <b>{{'missione.form.stato' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.decodeStato'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: center">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.decodeStato')">
+                                      <h6>
+                                        <b>{{'missione.form.destinazione' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.destinazione'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: left">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.oggetto')">
+                                      <h6>
+                                        <b>{{'missione.form.oggetto' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.oggetto'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: left">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.dataInizioMissione')">
+                                      <h6>
+                                        <b>{{'ordine-missione.form.data-inizio' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.dataInizioMissione'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th>
+                                  <th style="text-align: left">
+                                    <a href="" ng-click="doOrderMissioni('ordineMissione.dataFineMissione')">
+                                      <h6>
+                                        <b>{{'ordine-missione.form.data-fine' | translate}}
+                                          <span ng-show="predicate=='ordineMissione.dataFineMissione'">
+                                            <span ng-show="reverse" class="glyphicon glyphicon-chevron-up"></span>
+                                            <span ng-show="!reverse" class="glyphicon glyphicon-chevron-down"></span>
+                                          </span>
+                                        </b>
+                                      </h6>
+                                    </a>
+                                  </th> -->
+                    <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
+                    <th style="text-align: right">{{'missione.form.numero' | translate}}</th>
+                    <th style="text-align: center">{{'missione.form.data' | translate}}</th>
+                    <th ng-hide="accountModel && respGruppo!='S'" style="text-align: left">{{'main.userid' | translate}}</th>
+                    <th ng-hide="accountModel && respGruppo!='S'" style="text-align: left">{{'missione.form.uo' | translate}}</th>
+                    <th style="text-align: center">{{'missione.form.stato' | translate}}</th>
+                    <th style="text-align: left">{{'missione.form.destinazione' | translate}}</th>
+                    <th style="text-align: left">{{'missione.form.oggetto' | translate}}</th>
+                    <th style="text-align: center">{{'missione.form.trattamentoShort' | translate}}</th>
+                    <th style="text-align: center">{{'elenco-annullamento-ordine-missione.form.anticipo' | translate}}</th>
+                    <th style="text-align: center">{{'ordine-missione.form.data-inizio' | translate}}</th>
+                    <th style="text-align: center">{{'ordine-missione.form.data-fine' | translate}}</th>
+                    <th style="text-align: center">{{'global.button.print' | translate}}</th>
+                </tr>
+                </thead>
+
+                <tbody id ="missioni">
+                <tr ng-repeat="ordineMissione in ordiniMissione" ng-click="doSelectOrdineMissione(ordineMissione)" data-method="get">
+                    <td style="text-align: center" >{{ordineMissione.anno}}</td>
+                    <td style="text-align: right">{{ordineMissione.numero}}</td>
+                    <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}</td>
+                    <td ng-hide="accountModel && respGruppo!='S'" class="col-md-2" style="text-align: left">{{ordineMissione.uid}}</td>
+                    <td ng-hide="accountModel && respGruppo!='S'" style="text-align: left">{{ordineMissione.uoRich}}</td>
+                    <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeStato}}</td>
+                    <td class="col-md-2" style="text-align: left">{{ordineMissione.destinazione}}</td>
+                    <td class="col-md-4" style="text-align: left">{{ordineMissione.oggetto}}</td>
+                    <td class="col-md-1" style="text-align: center">{{ordineMissione.decodeTrattamentoShort}}</td>
+                    <td class="col-md-1" style="text-align: center">{{ordineMissione.richiestaAnticipo}}</td>
+                    <td class="col-md-1" style="text-align: center">{{ordineMissione.dataInizioMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td class="col-md-1" style="text-align: center">{{ordineMissione.dataFineMissione | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td class="col-md-1" style="text-align: center" ng-click="$event.stopPropagation()"><a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissione.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip"><span class="glyphicon glyphicon-print" style="color:black"></span></a></td>
+                </tr>
+                </tbody>
+            </table>
+            <!--   <div style="text-align: center" ng-show="ordiniMissione.length>10">
+                    Righe: 
+                    <select id="rows-per-page" ng-model="rowsPerPage" class="input-xlarge">
+                      <option>10</option>
+                      <option>30</option>
+                      <option>50</option>
+                      <option>100</option>
+                    </select>
+                  </div>  
+                  <div style="text-align: center">
+                    <paginator uid='0'></paginator>
+                  </div>-->
+            <div class="col-xs-3" ng-show="ordiniMissione">
+                <button type="button" ng-click="stampa()" class="btn btn-default" data-toggle="tooltip" title="{{'global.button.print' | translate}}"><span class="glyphicon glyphicon-print"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
