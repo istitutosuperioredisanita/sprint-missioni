@@ -235,8 +235,8 @@ public class OrdineMissioneService {
             Map<String, byte[]> map = new HashMap<String, byte[]>();
             byte[] printOrdineMissione = null;
             String fileName = null;
-                if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
-                    && !ordineMissione.isMissioneDaValidare())) {
+            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
+                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
                 StorageObject storage = null;
                 try {
                     storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
@@ -1584,6 +1584,11 @@ public class OrdineMissioneService {
     }
 
     private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
+
+        if (!String.valueOf(ordineMissione.getEsercizioOriginaleObbligazione()).matches("\\d{4}")) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "L'anno dell' impegno deve essere composto da 4 cifre");
+        }
+
         if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
                     + ": La data di fine missione non può essere precedente alla data di inizio missione");

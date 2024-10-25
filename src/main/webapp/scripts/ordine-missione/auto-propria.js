@@ -28,7 +28,7 @@ missioniApp.factory('AutoPropriaOrdineMissioneService', function($http) {
 missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, AutoProprieService, DatiPatenteServiceUser, AutoPropriaOrdineMissioneService, ElencoOrdiniMissioneService, ui, COSTANTI, DateService) {
 
     $scope.disabledfields = true;
-
+    var statoIniziale = {};
 
     $scope.validazione = $routeParams.validazione;
     $scope.idOrdineMissione = $routeParams.idOrdineMissione;
@@ -121,6 +121,14 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
 
             ElencoOrdiniMissioneService.findById($scope.idOrdineMissione).then(function(data) {
                 $scope.autoPropriaOrdineMissioneModel.ordineMissione = data;
+                // Salva lo stato iniziale solo con i dati essenziali
+                statoIniziale = {
+                    numeroPatente: datiPatente.numero,
+                    dataRilascioPatente: datiPatente.dataRilascio,
+                    dataScadenzaPatente: datiPatente.dataScadenza,
+                    entePatente: datiPatente.ente,
+                    ordineMissione: data
+                };
             });
         });
     }
@@ -132,7 +140,9 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
     }).then(function(response) {
         var datiAutoPropriaOrdineMissione = response.data;
         if (datiAutoPropriaOrdineMissione.id === undefined) {
-            inizializzaDati();
+            inizializzaDati().then(function() {
+                statoIniziale = angular.copy($scope.autoPropriaOrdineMissioneModel); // Salva lo stato iniziale una volta caricati i dati
+            });
         } else {
             $scope.autoPropriaOrdineMissioneModel = datiAutoPropriaOrdineMissione;
             $http.get('api/rest/ordineMissione/autoPropria/getSpostamenti', {
@@ -251,7 +261,22 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
         });
     }
 
-    $scope.previousPage = function() {
-        parent.history.back();
+    // Funzione per verificare se ci si trova nello stato iniziale (solo dati essenziali)
+    function isStatoIniziale() {
+        return angular.equals($scope.autoPropriaOrdineMissioneModel, statoIniziale);
     }
+
+    // Funzione previousPage aggiornata con il controllo dello stato iniziale
+    $scope.previousPage = function() {
+        if (isStatoIniziale()) {
+            parent.history.back();
+        } else {
+            if (!isStatoIniziale() && $scope.spostamentiAutoPropria === undefined || $scope.spostamentiAutoPropria.length == 0) {
+                ui.error("Inserire almeno uno spostamento. La lista non può essere vuota.");
+            } else if (isStatoIniziale() || $scope.spostamentiAutoPropria.length > 0) {
+                parent.history.back();
+            }
+        }
+
+    };
 });
