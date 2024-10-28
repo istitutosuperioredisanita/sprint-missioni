@@ -21,12 +21,12 @@ package it.cnr.si.missioni.cmis;
 
 public class CMISOrdineMissione extends CMISMissione {
     public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo";
-    public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria nei casi di oggettive situazioni di disagio, quali sedi geografiche particolarmente disagiate o di difficoltà all’uso dei mezzi di trasporto ordinari";
+    public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria nei casi di accertata la convenienza economica per l’ISS, anche per lo svolgimento di funzioni diverse da quelle istituzionali relative a compiti ispettivi, di verifica e controllo, in caso di oggettive situazioni di disagio o di difficoltà all’uso dei mezzi di trasporto ordinari";
 
     //public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività caratterizzata da emergenza, urgenza, indifferibilità";
     public final static String TERZO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione";
-    public final static String PRIMO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza assoluta di mezzi pubblici";
-    public final static String SECONDO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza di mezzi pubblici per sospensione del servizio per sciopero, per eventi eccezionali opportunamente documentati;";
+    public final static String PRIMO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per l'inadeguatezza dei mezzi ordinari di linea per raggiungere il luogo della missione nei tempi necessari";
+    public final static String SECONDO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza assoluta di mezzi pubblici nel luogo di missione, anche per sospensione del servizio per sciopero e/o per eventi eccezionali opportunamente documentati";
     public final static String TERZO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva ed elenco dettagliato del materiale trasportato)";
     public final static String QUARTO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per il personale con disabilità/portatore di handicap.";
 

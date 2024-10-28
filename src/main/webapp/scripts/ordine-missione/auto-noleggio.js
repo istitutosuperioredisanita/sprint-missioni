@@ -313,10 +313,19 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiAutoNoleggio === undefined || $scope.spostamentiAutoNoleggio.length == 0) {
-                ui.error("Inserire almeno uno spostamento. La lista non può essere vuota.");
+                ui.error("Per salvare le modifiche e tornare indietro, inserire almeno uno spostamento");
             } else if (isStatoIniziale() || $scope.spostamentiAutoNoleggio.length > 0) {
                 parent.history.back();
             }
         }
     }
+
+        $scope.checkAndPrintAutoNoleggioMissione = function () {
+            if (!$scope.spostamentiAutoNoleggio || $scope.spostamentiAutoNoleggio.length === 0) {
+                ui.error("Per stampare il report, inserire almeno uno spostamento");
+            } else {
+                const printUrl = `api/rest/public/printOrdineMissioneAutoNoleggio?idMissione=${$scope.idOrdineMissione}&token=${$scope.accessToken}`;
+                window.open(printUrl, '_blank');
+            }
+        };
 });

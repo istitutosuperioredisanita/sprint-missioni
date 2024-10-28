@@ -343,9 +343,9 @@ public class OrdineMissioneTaxiService {
         } else {
             fileName = "OrdineMissioneTaxi" + idMissione + ".pdf";
             printOrdineMissione = printTaxi(username, ordineMissioneTaxi);
-            if (ordineMissioneTaxi.isRichiestaTaxiInserito()) {
-                cmisOrdineMissioneService.salvaStampaTaxiSuCMIS(username, printOrdineMissione, ordineMissioneTaxi);
-            }
+//            if (ordineMissioneTaxi.isRichiestaTaxiInserito()) {
+//                cmisOrdineMissioneService.salvaStampaTaxiSuCMIS(username, printOrdineMissione, ordineMissioneTaxi);
+//            }
             map.put(fileName, printOrdineMissione);
         }
         return map;

@@ -338,9 +338,9 @@ public class OrdineMissioneAutoNoleggioService {
         } else {
             fileName = "OrdineMissioneAutoNoleggio" + idMissione + ".pdf";
             printOrdineMissione = printAutoNoleggio(username, ordineMissioneAutoNoleggio);
-            if (ordineMissioneAutoNoleggio.isRichiestaAutoNoleggioInserito()) {
-                cmisOrdineMissioneService.salvaStampaAutoNoleggioSuCMIS(username, printOrdineMissione, ordineMissioneAutoNoleggio);
-            }
+//            if (ordineMissioneAutoNoleggio.isRichiestaAutoNoleggioInserito()) {
+//                cmisOrdineMissioneService.salvaStampaAutoNoleggioSuCMIS(username, printOrdineMissione, ordineMissioneAutoNoleggio);
+//            }
             map.put(fileName, printOrdineMissione);
         }
         return map;
