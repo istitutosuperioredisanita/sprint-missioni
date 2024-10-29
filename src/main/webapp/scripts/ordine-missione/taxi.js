@@ -335,15 +335,13 @@ missioniApp.controller('TaxiOrdineMissioneController', function($scope, $rootSco
             }
         }
     }
-
     $scope.checkAndPrintTaxiMissione = function () {
         if (!$scope.spostamentiTaxi || $scope.spostamentiTaxi.length === 0) {
             ui.error("Per stampare il report, inserire almeno uno spostamento");
         } else {
-            const printUrl = `api/rest/public/printOrdineMissioneTaxi?idMissione=${$scope.idOrdineMissione}&token=${$scope.accessToken}`;
+            const printUrl = ('api/rest/public/printOrdineMissioneTaxi?idMissione=').concat($scope.idOrdineMissione).concat('&token=').concat($scope.accessToken);
             window.open(printUrl, '_blank');
         }
-    };
 
-
+    }
 });

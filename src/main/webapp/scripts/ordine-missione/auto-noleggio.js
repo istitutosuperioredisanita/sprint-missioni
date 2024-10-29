@@ -324,8 +324,8 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
             if (!$scope.spostamentiAutoNoleggio || $scope.spostamentiAutoNoleggio.length === 0) {
                 ui.error("Per stampare il report, inserire almeno uno spostamento");
             } else {
-                const printUrl = `api/rest/public/printOrdineMissioneAutoNoleggio?idMissione=${$scope.idOrdineMissione}&token=${$scope.accessToken}`;
+                 const printUrl = ('api/rest/public/printOrdineMissioneAutoNoleggio?idMissione=').concat($scope.idOrdineMissione).concat('&token=').concat($scope.accessToken);
                 window.open(printUrl, '_blank');
             }
-        };
+        }
 });
