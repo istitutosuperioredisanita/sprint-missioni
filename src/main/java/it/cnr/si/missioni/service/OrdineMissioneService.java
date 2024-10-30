@@ -1585,8 +1585,10 @@ public class OrdineMissioneService {
 
     private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
 
-        if (!String.valueOf(ordineMissione.getEsercizioOriginaleObbligazione()).matches("\\d{4}")) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "L'anno dell' impegno deve essere composto da 4 cifre");
+        if ( !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())!=null) {
+            if (!String.valueOf(ordineMissione.getEsercizioOriginaleObbligazione()).matches("\\d{4}")) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "L'anno dell' impegno deve essere composto da 4 cifre");
+            }
         }
 
         if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())) {
