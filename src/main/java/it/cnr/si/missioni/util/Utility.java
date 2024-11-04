@@ -211,4 +211,14 @@ public class Utility {
         return Utility.replace(uo, ".", "");
     }
 
+    public static int countMotiviRichiestaMezzi(String... motivi) {
+        int count = 0;
+        for (String motivo : motivi) {
+            if (Utility.nvl(motivo, "N").equals("S")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }

@@ -158,8 +158,10 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
         }
     });
 
+    $scope.inserimentoEffettuato = false;
 
     $scope.save = function() {
+
         $rootScope.salvataggio = true;
 
         if ($scope.autoNoleggioOrdineMissioneModel.id) {
@@ -167,6 +169,7 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
                 .success(function(data) {
                     $rootScope.salvataggio = false;
                     $scope.viewAttachments($scope.autoNoleggioOrdineMissioneModel.id);
+                    $scope.inserimentoEffettuato = true;
                 })
                 .error(function(errorData, status) {
                     $rootScope.salvataggio = false;
@@ -178,6 +181,7 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
                     $rootScope.salvataggio = false;
                     $scope.autoNoleggioOrdineMissioneModel = data;
                     $scope.autoNoleggioOrdineMissioneModel.isFireSearchAttachments = false;
+                    $scope.inserimentoEffettuato = true;
                 })
                 .error(function(errorData, status) {
                     $rootScope.salvataggio = false;
@@ -302,14 +306,12 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
         });
     }
 
-    // Funzione per verificare se ci si trova nello stato iniziale (solo dati essenziali)
     function isStatoIniziale() {
         return angular.equals($scope.autoNoleggioOrdineMissioneModel, statoIniziale);
     }
 
-    // Funzione previousPage aggiornata con il controllo dello stato iniziale
     $scope.previousPage = function() {
-        if (isStatoIniziale()) {
+        if (isStatoIniziale() || !$scope.inserimentoEffettuato) {
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiAutoNoleggio === undefined || $scope.spostamentiAutoNoleggio.length == 0) {
@@ -320,12 +322,12 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
         }
     }
 
-        $scope.checkAndPrintAutoNoleggioMissione = function () {
-            if (!$scope.spostamentiAutoNoleggio || $scope.spostamentiAutoNoleggio.length === 0) {
-                ui.error("Per stampare il report, inserire almeno uno spostamento");
-            } else {
-                 const printUrl = ('api/rest/public/printOrdineMissioneAutoNoleggio?idMissione=').concat($scope.idOrdineMissione).concat('&token=').concat($scope.accessToken);
-                window.open(printUrl, '_blank');
-            }
+    $scope.checkAndPrintAutoNoleggioMissione = function () {
+        if (!$scope.spostamentiAutoNoleggio || $scope.spostamentiAutoNoleggio.length === 0) {
+            ui.error("Per stampare il report, inserire almeno uno spostamento");
+        } else {
+            const printUrl = ('api/rest/public/printOrdineMissioneAutoNoleggio?idMissione=').concat($scope.idOrdineMissione).concat('&token=').concat($scope.accessToken);
+            window.open(printUrl, '_blank');
         }
+    }
 });

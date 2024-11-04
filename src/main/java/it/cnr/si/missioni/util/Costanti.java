@@ -210,9 +210,14 @@ public class Costanti {
     public static final String ROLE_USER = "USER#missioni";
 
     public static final String SPESA_INDENNITA_KM = "INDENNITA' KM";
+
+    public static final String SPESE_VISTO_VIAGGI_ESTERO = "SPESE VISTO";
+
+    public static final String SPESA_IND_AUTO_PROPRIA = "IND AUTO PROPRIA";
+
     public static final String SPESA_TAXI = "TAXI";
     public static final String SPESA_NOLEGGIO_AUTO = "NOLEGGIO AUTO";
-    public static final String SPESA_PEDAGGIO_AUTOSTRADA = "USER#missioni";
+    public static final String SPESA_PEDAGGIO_AUTOSTRADA = "PEDAGGIO AUTOSTRADA";
     public static final String SPESA_PARCHEGGIO = "PARCHEGGIO";
     public static final String SPESA_ACC_DISABILE = "ALTRO MEZZO TRASPORT";
     public static final String SPESA_CARB_AUTO_NOLL_ECC = "ALTRO";

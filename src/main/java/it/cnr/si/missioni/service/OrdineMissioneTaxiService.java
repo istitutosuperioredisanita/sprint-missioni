@@ -137,13 +137,23 @@ public class OrdineMissioneTaxiService {
 
 
     private void validaCRUD(OrdineMissioneTaxi ordineMissioneTaxi) {
-
+        // Controlla se nessun motivo è selezionato
         if (Utility.nvl(ordineMissioneTaxi.getMancanzaAssMezzi(), "N").equals("N") &&
                 Utility.nvl(ordineMissioneTaxi.getMancanzaMezzi(), "N").equals("N") &&
                 Utility.nvl(ordineMissioneTaxi.getTrasportoMateriali(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneTaxi.getMotiviHandicap(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneTaxi.getUtilizzoAltriMotivi(), "N").equals("N")) {
+                Utility.nvl(ordineMissioneTaxi.getMotiviHandicap(), "N").equals("N")) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo del taxi.");
+        }
+
+        int countMotivi = Utility.countMotiviRichiestaMezzi(
+                ordineMissioneTaxi.getMancanzaAssMezzi(),
+                ordineMissioneTaxi.getMancanzaMezzi(),
+                ordineMissioneTaxi.getTrasportoMateriali(),
+                ordineMissioneTaxi.getMotiviHandicap()
+        );
+
+        if (countMotivi > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare SOLO un motivo per la richiesta di utilizzo del taxi.");
         }
     }
 

@@ -173,35 +173,41 @@ missioniApp.controller('TaxiOrdineMissioneController', function($scope, $rootSco
         }
     });
 
+$scope.inserimentoEffettuato = false;
 
-    $scope.save = function() {
-        $rootScope.salvataggio = true;
 
-        if ($scope.taxiOrdineMissioneModel.id) {
-            $http.put('api/rest/ordineMissione/taxi/modify', $scope.taxiOrdineMissioneModel)
-                .success(function(data) {
-                    $rootScope.salvataggio = false;
-                    $scope.viewAttachments($scope.taxiOrdineMissioneModel.id);
-                })
-                .error(function(errorData, status) {
-                    $rootScope.salvataggio = false;
-                    handleSaveError(errorData, status);
-                });
-        } else {
-            $http.post('api/rest/ordineMissione/taxi/create', $scope.taxiOrdineMissioneModel)
-                .success(function(data) {
-                    $rootScope.salvataggio = false;
-                    $scope.taxiOrdineMissioneModel = data;
-                    $scope.taxiOrdineMissioneModel.isFireSearchAttachments = false;
-                })
-                .error(function(errorData, status) {
-                    $rootScope.salvataggio = false;
-                    handleSaveError(errorData, status);
-                });
-        }
-        $scope.disabledfields = true;
-        undoEditing();
-    };
+$scope.save = function() {
+    $rootScope.salvataggio = true;
+
+    // Logica per il salvataggio
+    if ($scope.taxiOrdineMissioneModel.id) {
+        $http.put('api/rest/ordineMissione/taxi/modify', $scope.taxiOrdineMissioneModel)
+            .success(function(data) {
+                $rootScope.salvataggio = false;
+                $scope.viewAttachments($scope.taxiOrdineMissioneModel.id);
+                $scope.inserimentoEffettuato = true;
+            })
+            .error(function(errorData, status) {
+                $rootScope.salvataggio = false;
+                handleSaveError(errorData, status);
+            });
+    } else {
+        $http.post('api/rest/ordineMissione/taxi/create', $scope.taxiOrdineMissioneModel)
+            .success(function(data) {
+                $rootScope.salvataggio = false;
+                $scope.taxiOrdineMissioneModel = data;
+                $scope.taxiOrdineMissioneModel.isFireSearchAttachments = false;
+                $scope.inserimentoEffettuato = true;
+            })
+            .error(function(errorData, status) {
+                $rootScope.salvataggio = false;
+                handleSaveError(errorData, status);
+            });
+    }
+
+    $scope.disabledfields = true;
+    undoEditing();
+};
 
     function handleSaveError(errorData, status) {
         if (errorData && errorData.codiceErrore === 'ERRGEN') {
@@ -325,7 +331,7 @@ missioniApp.controller('TaxiOrdineMissioneController', function($scope, $rootSco
 
     // Funzione previousPage aggiornata con il controllo dello stato iniziale
     $scope.previousPage = function() {
-        if (isStatoIniziale()) {
+        if (isStatoIniziale() || !$scope.inserimentoEffettuato) {
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiTaxi === undefined || $scope.spostamentiTaxi.length == 0) {
@@ -335,6 +341,7 @@ missioniApp.controller('TaxiOrdineMissioneController', function($scope, $rootSco
             }
         }
     }
+
     $scope.checkAndPrintTaxiMissione = function () {
         if (!$scope.spostamentiTaxi || $scope.spostamentiTaxi.length === 0) {
             ui.error("Per stampare il report, inserire almeno uno spostamento");

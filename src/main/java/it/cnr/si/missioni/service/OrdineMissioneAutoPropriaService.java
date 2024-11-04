@@ -140,6 +140,7 @@ public class OrdineMissioneAutoPropriaService {
     }
 
     private void validaCRUD(OrdineMissioneAutoPropria ordineMissioneAutoPropria) {
+        // Verifica se i dati dell'auto propria sono completi
         if (StringUtils.isEmpty(ordineMissioneAutoPropria.getCartaCircolazione()) ||
                 StringUtils.isEmpty(ordineMissioneAutoPropria.getTarga()) ||
                 StringUtils.isEmpty(ordineMissioneAutoPropria.getPolizzaAssicurativa()) ||
@@ -147,20 +148,27 @@ public class OrdineMissioneAutoPropriaService {
                 StringUtils.isEmpty(ordineMissioneAutoPropria.getModello())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati dell'auto propria non esistenti o incompleti.");
         }
+
+        // Verifica se i dati della patente sono completi
         if (StringUtils.isEmpty(ordineMissioneAutoPropria.getDataRilascioPatente()) ||
                 StringUtils.isEmpty(ordineMissioneAutoPropria.getDataScadenzaPatente()) ||
                 StringUtils.isEmpty(ordineMissioneAutoPropria.getEntePatente()) ||
                 StringUtils.isEmpty(ordineMissioneAutoPropria.getNumeroPatente())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati della patente non esistenti o incompleti.");
         }
-        if (Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate(), "N").equals("N") &&
-                /*Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto(), "N").equals("N") &&*/
-                Utility.nvl(ordineMissioneAutoPropria.getUtilizzoAltriMotivi(), "N").equals("N")) {
+
+        int countMotivi = Utility.countMotiviRichiestaMezzi(
+                ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi(),
+                ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate()
+        );
+
+        if (countMotivi == 0) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto propria.");
+        } else if (countMotivi > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare SOLO un motivo per la richiesta di utilizzo dell'auto propria.");
         }
     }
+
 
     private void validaCRUD(SpostamentiAutoPropria spostamentiAutoPropria) {
         if (StringUtils.isEmpty(spostamentiAutoPropria.getPercorsoDa()) ||

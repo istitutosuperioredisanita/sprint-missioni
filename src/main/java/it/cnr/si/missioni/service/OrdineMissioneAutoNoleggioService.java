@@ -107,11 +107,19 @@ public class OrdineMissioneAutoNoleggioService {
     }
 
     private void validaCRUD(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) {
-
+        // Controlla se nessun motivo è selezionato
         if (Utility.nvl(ordineMissioneAutoNoleggio.getEsigenzeServizio(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneAutoNoleggio.getMotivataEccezionalita(), "N").equals("N") &&
-                Utility.nvl(ordineMissioneAutoNoleggio.getNote(), "N").equals("N")) {
+                Utility.nvl(ordineMissioneAutoNoleggio.getMotivataEccezionalita(), "N").equals("N")) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare almeno un motivo per la richiesta di utilizzo dell'auto a noleggio.");
+        }
+
+        int countMotivi = Utility.countMotiviRichiestaMezzi(
+                ordineMissioneAutoNoleggio.getEsigenzeServizio(),
+                ordineMissioneAutoNoleggio.getMotivataEccezionalita()
+        );
+
+        if (countMotivi > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare SOLO un motivo per la richiesta di utilizzo dell'auto a noleggio.");
         }
     }
 

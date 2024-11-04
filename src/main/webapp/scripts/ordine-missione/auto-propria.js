@@ -155,12 +155,16 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
         }
     });
 
+    $scope.inserimentoEffettuato = false;
+
     $scope.save = function() {
+
         $rootScope.salvataggio = true;
         if ($scope.autoPropriaOrdineMissioneModel.id) {
             $http.put('api/rest/ordineMissione/autoPropria/modify', $scope.autoPropriaOrdineMissioneModel)
                 .then(function(response) {
                     $rootScope.salvataggio = false;
+                    $scope.inserimentoEffettuato = true;
                 })
                 .catch(function(error) {
                     $rootScope.salvataggio = false;
@@ -171,6 +175,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
                 .then(function(response) {
                     $rootScope.salvataggio = false;
                     $scope.autoPropriaOrdineMissioneModel = response.data;
+                    $scope.inserimentoEffettuato = true;
                 })
                 .catch(function(error) {
                     $rootScope.salvataggio = false;
@@ -180,6 +185,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
         $scope.disabledfields = true;
         undoEditing();
     }
+
 
     function handleSaveError(errorData, status) {
         if (status === 400) {
@@ -268,7 +274,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
 
     // Funzione previousPage aggiornata con il controllo dello stato iniziale
     $scope.previousPage = function() {
-        if (isStatoIniziale()) {
+        if (isStatoIniziale() || !$scope.inserimentoEffettuato) {
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiAutoPropria === undefined || $scope.spostamentiAutoPropria.length == 0) {

@@ -1286,9 +1286,12 @@ public class RimborsoMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Non è possibile indicare le note all'utilizzo del Taxi se non si è scelto il suo utilizzo");
             }
         }
-        if ((Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") || /*Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") ||*/ Utility.nvl(rimborsoMissione.getPersonaleAlSeguito()).equals("S") || Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": E' obbligatorio indicare le note del Taxi se si è scelto il suo utilizzo");
+        if (Utility.nvl(rimborsoMissione.getOrdineMissione().getUtilizzoTaxi()).equals("N")){
+            if ((Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") || /*Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") ||*/ Utility.nvl(rimborsoMissione.getPersonaleAlSeguito()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": E' obbligatorio indicare le note del Taxi se si è scelto il suo utilizzo");
+            }
         }
+
         if (rimborsoMissione.isMissioneEstera() && rimborsoMissione.isTrattamentoAlternativoMissione()) {
             if (rimborsoMissione.isAssociato()) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Per gli associati non è previsto il trattamento alternativo di missione.");
