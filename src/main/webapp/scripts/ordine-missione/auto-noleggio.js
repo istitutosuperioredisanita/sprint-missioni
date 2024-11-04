@@ -311,7 +311,7 @@ missioniApp.controller('AutoNoleggioOrdineMissioneController', function($scope, 
     }
 
     $scope.previousPage = function() {
-        if (isStatoIniziale() || !$scope.inserimentoEffettuato) {
+        if (isStatoIniziale() || !$scope.inserimentoEffettuato && $scope.spostamentiAutoNoleggio.length > 0) {
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiAutoNoleggio === undefined || $scope.spostamentiAutoNoleggio.length == 0) {

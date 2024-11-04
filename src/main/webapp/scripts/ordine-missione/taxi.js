@@ -331,7 +331,7 @@ $scope.save = function() {
 
     // Funzione previousPage aggiornata con il controllo dello stato iniziale
     $scope.previousPage = function() {
-        if (isStatoIniziale() || !$scope.inserimentoEffettuato) {
+        if (isStatoIniziale() || !$scope.inserimentoEffettuato && $scope.spostamentiTaxi.length > 0) {
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiTaxi === undefined || $scope.spostamentiTaxi.length == 0) {

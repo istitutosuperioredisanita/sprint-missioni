@@ -274,7 +274,7 @@ missioniApp.controller('AutoPropriaOrdineMissioneController', function($scope, $
 
     // Funzione previousPage aggiornata con il controllo dello stato iniziale
     $scope.previousPage = function() {
-        if (isStatoIniziale() || !$scope.inserimentoEffettuato) {
+        if (isStatoIniziale() || !$scope.inserimentoEffettuato && $scope.spostamentiAutoPropria.length > 0) {
             parent.history.back();
         } else {
             if (!isStatoIniziale() && $scope.spostamentiAutoPropria === undefined || $scope.spostamentiAutoPropria.length == 0) {
