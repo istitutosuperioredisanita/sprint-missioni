@@ -203,20 +203,28 @@ public class OrdineMissioneService {
             ordineMissione = listaOrdiniMissione.get(0);
             if (retrieveDataFromFlows) {
                 OrdineMissioneAutoPropria autoPropria = getAutoPropria(ordineMissione);
-                if (autoPropria != null) {
+                if (autoPropria != null && autoPropria.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
                     ordineMissione.setUtilizzoAutoPropria("S");
+                } else {
+                    ordineMissione.setUtilizzoAutoPropria("N");
                 }
                 OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissione);
-                if (anticipo != null) {
+                if (anticipo != null && anticipo.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
                     ordineMissione.setRichiestaAnticipo("S");
+                } else {
+                    ordineMissione.setRichiestaAnticipo("N");
                 }
                 OrdineMissioneTaxi taxi = getTaxi(ordineMissione);
-                if (taxi != null) {
+                if (taxi != null && taxi.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
                     ordineMissione.setUtilizzoTaxi("S");
+                } else {
+                    ordineMissione.setUtilizzoTaxi("N");
                 }
                 OrdineMissioneAutoNoleggio autoNoleggio = getAutoNoleggio(ordineMissione);
-                if (autoNoleggio != null) {
+                if (autoNoleggio != null && autoNoleggio.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
                     ordineMissione.setUtilizzoAutoNoleggio("S");
+                } else {
+                    ordineMissione.setUtilizzoAutoNoleggio("N");
                 }
             }
 
@@ -1301,12 +1309,14 @@ public class OrdineMissioneService {
         if (gaeField != null) {
             ordineMissione.setGae(gaeField);
             ordineMissioneDB.setGae(ordineMissione.getGae());
+        } else {
+            Gae gae = gaeService.loadGae(ordineMissione);
+            if(gae != null){
+                ordineMissione.setPgProgetto(gae.getPg_progetto());
+            } else {
+
+            }
         }
-
-        Gae gae = gaeService.loadGae(ordineMissione);
-
-
-        ordineMissione.setPgProgetto(gae.getPg_progetto());
         ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
 
         ordineMissioneDB.setImportoPresunto(ordineMissione.getImportoPresunto());
@@ -1524,6 +1534,8 @@ public class OrdineMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Uo Spesa");
             } else if (StringUtils.isEmpty(ordineMissione.getCdrSpesa())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Cdr Spesa");
+            } else if (StringUtils.isEmpty(ordineMissione.getGae())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": GAE");
             } else if (StringUtils.isEmpty(ordineMissione.getDataInizioMissione())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN,
                         CodiciErrore.CAMPO_OBBLIGATORIO + ": Data Inizio Missione");
