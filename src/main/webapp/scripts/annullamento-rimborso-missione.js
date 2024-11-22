@@ -121,48 +121,44 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         }
     }
 
-$scope.recuperoDatiModalitaPagamento = function(terzoSigla) {
-    ProxyService.getModalitaPagamento(terzoSigla).then(function(ret) {
-        if (ret && ret.data && ret.data.elements) {
-            $scope.modalitaPagamentos = ret.data.elements;
+   $scope.recuperoDatiModalitaPagamento = function (terzoSigla) {
+        ProxyService.getModalitaPagamento(terzoSigla).then(function (ret) {
+            if (ret && ret.data && ret.data.elements) {
+                $scope.modalitaPagamentos = ret.data.elements;
 
-            // Verifica se il modello contiene un valore e lo sincronizza con l'elenco
-            if ($scope.annullamentoModel.rimborsoMissione.modpag) {
-                const selectedPayment = $scope.modalitaPagamentos.find(
-                    (item) => item.cd_modalita_pag === $scope.annullamentoModel.rimborsoMissione.modpag
-                );
-                if (selectedPayment) {
-                    $scope.annullamentoModel.rimborsoMissione.modpag = selectedPayment.cd_modalita_pag;
+                if ($scope.annullamentoModel.rimborsoMissione.modpag) {
+                    var selectedPayment = $scope.modalitaPagamentos.find(function (item) {
+                        return item.cd_modalita_pag === $scope.annullamentoModel.rimborsoMissione.modpag;
+                    });
+                    if (selectedPayment) {
+                        $scope.annullamentoModel.rimborsoMissione.modpag = selectedPayment.cd_modalita_pag;
+                    }
                 }
+            } else {
+                $scope.modalitaPagamentos = [];
             }
-        } else {
-            $scope.modalitaPagamentos = []; // Resetta la lista se nessun dato è disponibile
-        }
-    });
-};
+        });
+    };
 
 
-$scope.recuperoDatiTerzoModalitaPagamento = function(terzoSigla, tipoPagamento) {
-    ProxyService.getTerzoModalitaPagamento(terzoSigla, tipoPagamento).then(function(ret) {
-        if (ret && ret.data && ret.data.elements) {
-            $scope.terzoModalitaPagamentos = ret.data.elements;
+    $scope.recuperoDatiTerzoModalitaPagamento = function (terzoSigla, tipoPagamento) {
+        ProxyService.getTerzoModalitaPagamento(terzoSigla, tipoPagamento).then(function (ret) {
+            if (ret && ret.data && ret.data.elements) {
+                $scope.terzoModalitaPagamentos = ret.data.elements;
 
-            // Verifica se il modello contiene un valore e lo sincronizza con l'elenco
-            if ($scope.annullamentoModel.rimborsoMissione.pgBanca) {
-                const selectedPayment = $scope.terzoModalitaPagamentos.find(
-                    (item) => item.pg_banca === $scope.annullamentoModel.rimborsoMissione.pgBanca
-                );
-                if (selectedPayment) {
-                    $scope.annullamentoModel.rimborsoMissione.pgBanca = selectedPayment.pg_banca;
+                if ($scope.annullamentoModel.rimborsoMissione.pgBanca) {
+                    var selectedPayment = $scope.terzoModalitaPagamentos.find(function (item) {
+                        return item.pg_banca === $scope.annullamentoModel.rimborsoMissione.pgBanca;
+                    });
+                    if (selectedPayment) {
+                        $scope.annullamentoModel.rimborsoMissione.pgBanca = selectedPayment.pg_banca;
+                    }
                 }
+            } else {
+                $scope.terzoModalitaPagamentos = [];
             }
-        } else {
-            $scope.terzoModalitaPagamentos = []; // Resetta la lista se nessun dato è disponibile
-        }
-    });
-};
-
-
+        });
+    };
 
 
     $scope.restRimborsiMissioneDaAnnullare = function(userWork){
