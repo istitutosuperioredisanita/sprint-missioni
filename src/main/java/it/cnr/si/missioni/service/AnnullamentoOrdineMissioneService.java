@@ -357,8 +357,14 @@ public class AnnullamentoOrdineMissioneService {
     }
 
     private String getTextMailSendToAdministrative(String basePath, AnnullamentoOrdineMissione annullamento) {
-        return "L'annullamento dell'ordine di missione " + annullamento.getOrdineMissione().getAnno() + "-" + annullamento.getOrdineMissione().getNumero() + " della uo " + annullamento.getOrdineMissione().getUoRich() + " " + annullamento.getOrdineMissione().getDatoreLavoroRich() + " di " + getNominativo(annullamento.getOrdineMissione().getUid()) + " per la missione a " + annullamento.getOrdineMissione().getDestinazione() + " dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto " + annullamento.getOrdineMissione().getOggetto() + "  è stato inviato per la verifica/completamento dei dati finanziari."
-                + "Si prega di verificarlo attraverso il link " + basePath + "/#/annullamentoOrdineMissione/" + annullamento.getOrdineMissione().getId() + "/S";
+        String url = basePath + "/#/annullamentoOrdineMissione/" + annullamento.getOrdineMissione().getId() + "/S";
+        return "<p>L'annullamento dell'ordine di missione " + annullamento.getOrdineMissione().getAnno() + "-" + annullamento.getOrdineMissione().getNumero()
+                + " della uo " + annullamento.getOrdineMissione().getUoRich() + " " + annullamento.getOrdineMissione().getDatoreLavoroRich()
+                + " di " + getNominativo(annullamento.getOrdineMissione().getUid()) + " per la missione a " + annullamento.getOrdineMissione().getDestinazione()
+                + " dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto "
+                + annullamento.getOrdineMissione().getOggetto() + " è stato inviato per la tua validazione.</p>"
+                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
     private void aggiornaDatiAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento, Boolean confirm,

@@ -63,7 +63,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     private String codeCdsCns;
     @Value("${codiciCds.cnt:#{null}}")
     private String codeCdsCnt;
-    @Value("${dirUffEcoGiur.username:#{null}}")
+    @Value("${idUo.dirUffEcoGiur:#{null}}")
     private String dirUffEcoGiur;
     @Value("${vociPresidenza.voce2089:#{null}}")
     private String voce2089;
@@ -165,8 +165,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         if (ordineMissione == null)
             return Boolean.FALSE;
         else {
-            if (Optional.ofNullable(ordineMissione.getPresidente()).isPresent()
-                    && ordineMissione.getVoce().contains(voce2089) || ordineMissione.getVoce().contains(voce2090)) {
+            if (Optional.ofNullable(ordineMissione.getPresidente()).isPresent() && ordineMissione.getPresidente().equals("S")) {
                 return Boolean.TRUE;
             } else {
                 return Boolean.FALSE;
@@ -246,8 +245,8 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
 
     public void setDirUffEcoGiur(OrdineMissione ordineMissione, StartWorflowDto startInfo) {
 
-        if (!ordineMissione.getUid().equalsIgnoreCase(dirUffEcoGiur)) {
-            startInfo.addSigner(dirUffEcoGiur);
+        if (!ordineMissione.getUid().equalsIgnoreCase(getDirUffEcoEGiud())) {
+            startInfo.addSigner(getDirUffEcoEGiud());
         }
     }
 
@@ -341,6 +340,14 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         String cdsCNTFormatted = formatCdsCode(codeCdsCnt);
         return cdr.startsWith(cdsCNSFormatted) || cdr.startsWith(cdsCNTFormatted);
     }
+
+    private String getDirUffEcoEGiud(){
+
+        EmployeeDetails dir = aceService.findResponsabile(Integer.valueOf(dirUffEcoGiur));
+        return UtilAce.getEmail(dir);
+    }
+
+
 
 
     private String getUoGAE(OrdineMissione ordineMissione) {

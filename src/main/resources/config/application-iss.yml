@@ -35,8 +35,8 @@ spring:
   proxy:
     SIGLA:
       url: http://sigla-t:8080/SIGLA/
-      username: ente
-      password: 2023enteiss
+      username: missioni
+      password: missioni
       context:
         cd_unita_organizzativa: "999.000"
         cd_cds: "999"
@@ -171,12 +171,13 @@ codiciCds:
   cns: 001
   cnt: 002
 
-dirUffEcoGiur:
-  username: grazia.corbello@iss.it
+idUo:
+  dirUffEcoGiur: 1412
 
-vociPresidenza:
-  voce2089: 2089
-  voce2090: 2090
+
+#vociPresidenza:
+#  voce2089: 2089
+#  voce2090: 2090
 
 storage:
   maxItemsPerPage: 10

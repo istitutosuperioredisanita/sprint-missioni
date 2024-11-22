@@ -86,7 +86,7 @@
 
               <td ng-hide="rigaAutoPropria.editing" class="col-md-2" style="text-align: left">{{rigaAutoPropria.targa}}</td>
               <td ng-show="rigaAutoPropria.editing" class="col-xs-2" style="text-align:left">
-                <input class="form-control" ng-model="rigaAutoPropria.targa" required maxlength="50"></input>
+                <input class="form-control" ng-model="rigaAutoPropria.targa" required maxlength="50" ng-blur="validateTarga(rigaAutoPropria.targa)"></input>
               </td>
 
               <td ng-hide="rigaAutoPropria.editing" class="col-md-3" style="text-align: left">{{rigaAutoPropria.cartaCircolazione}}</td>
@@ -122,9 +122,15 @@
             <td class="col-xs-3">
               <input class="form-control" ng-model="newAutoPropria.modello" maxlength="100"/>
             </td>
-            <td class="col-xs-2">
-              <input class="form-control" ng-model="newAutoPropria.targa" maxlength="50"/>
-            </td>
+              <td class="col-xs-2">
+                  <input
+                          class="form-control"
+                          ng-model="newAutoPropria.targa"
+                          maxlength="50"
+                          ng-blur="validateTarga(newAutoPropria.targa)"
+                  />
+              </td>
+
             <td class="col-xs-3">
               <input class="form-control" ng-model="newAutoPropria.cartaCircolazione" maxlength="100"></input>
             </td>

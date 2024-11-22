@@ -228,44 +228,42 @@ public class RimborsoMissioneDettagliService {
         // Gestione delle spese in base al codice di spesa
         switch (cdTiSpesa) {
             case Costanti.SPESA_INDENNITA_KM:
-                if (!isAutoPropriaUsed || (utilizzoMotiviIspettivi.equals("N") && utilizzoMotiviSediDisagiate.equals("S") &&
-                        (isTaxiUsed || isAutoNoleggioUsed))) {
+                if (!isAutoPropriaUsed || utilizzoMotiviIspettivi.equals("N") && utilizzoMotiviSediDisagiate.equals("S")) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_IND_AUTO_PROPRIA:
-                if(!isAutoPropriaUsed || utilizzoMotiviIspettivi.equals("S") && utilizzoMotiviSediDisagiate.equals("N")
-                        && isTaxiUsed || isAutoNoleggioUsed) {
+                if(!isAutoPropriaUsed || utilizzoMotiviIspettivi.equals("S") && utilizzoMotiviSediDisagiate.equals("N")) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_NOLEGGIO_AUTO:
-                if ((isTaxiUsed || isAutoPropriaUsed) && !isAutoNoleggioUsed) {
+                if (!isAutoNoleggioUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_TAXI:
-                if ((isAutoPropriaUsed || isAutoNoleggioUsed) && !isTaxiUsed) {
+                if (!isTaxiUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_PEDAGGIO_AUTOSTRADA:
-                if ((!isAutoPropriaUsed || !isAutoNoleggioUsed) && isTaxiUsed) {
+                if (!isAutoPropriaUsed || !isAutoNoleggioUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
             case Costanti.SPESA_PARCHEGGIO:
-                if (isTaxiUsed && !isAutoNoleggioUsed && !isAutoPropriaUsed) {
+                if (!isAutoNoleggioUsed || !isAutoPropriaUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
 
             case Costanti.SPESA_ACC_DISABILE:
-                if (isAutoNoleggioUsed && isAutoPropriaUsed && !isTaxiUsed) {
+                if (!isTaxiUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
 

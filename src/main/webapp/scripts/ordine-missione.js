@@ -88,7 +88,7 @@ missioniApp.factory('OrdineMissioneService', function($resource, DateUtils) {
     });
 });
 
-missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, $routeParams, $sessionStorage, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
+missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, $routeParams, $sessionStorage, OrdineMissioneService,AutoNoleggioOrdineMissioneService,RichiestaAnticipoService,AutoPropriaOrdineMissioneService,TaxiOrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, AccessToken,
     ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, Session, DatiIstitutoService, DateService, DateUtils, MissioniRespinte) {
 
     var urlRestProxy = URL_REST.STANDARD;
@@ -1014,6 +1014,10 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.ordineMissioneModel.uoCompetenza = ordineMissioneSelected.uoCompetenza;
                 $scope.ordineMissioneModel.pgProgetto = ordineMissioneSelected.pgProgetto;
                 $scope.ordineMissioneModel.utilizzoAutoNoleggio = ordineMissioneSelected.utilizzoAutoNoleggio;
+                $scope.ordineMissioneModel.utilizzoAutoPropria = ordineMissioneSelected.utilizzoAutoPropria;
+                $scope.ordineMissioneModel.richiestaAnticipo = ordineMissioneSelected.richiestaAnticipo;
+                $scope.ordineMissioneModel.utilizzoTaxi = ordineMissioneSelected.utilizzoTaxi;
+
                 $scope.ordineMissioneModel.noteUtilizzoTaxiNoleggio = ordineMissioneSelected.noteUtilizzoTaxiNoleggio;
                 $scope.ordineMissioneModel.partenzaDa = ordineMissioneSelected.partenzaDa;
                 $scope.ordineMissioneModel.importoPresunto = ordineMissioneSelected.importoPresunto;
@@ -1022,6 +1026,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 //$scope.ordineMissioneModel.cug = ordineMissioneSelected.cug;
                 $scope.ordineMissioneModel.presidente = ordineMissioneSelected.presidente;
                 if ($scope.ordineMissioneModel.uoSpesa) {
+
                     $scope.restUo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsSpesa, $scope.ordineMissioneModel.uoSpesa);
                     $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
                     $scope.restModulo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa, $scope.ordineMissioneModel.pgProgetto);
@@ -1416,6 +1421,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                     $scope.ordineMissioneModel = data;
                     $scope.disabilitaOrdineMissione = impostaDisabilitaOrdineMissione();
                     $scope.viewAttachments($scope.ordineMissioneModel.id);
+                    $location.path('/');
                 });
             },
             function(httpResponse) {
@@ -1434,6 +1440,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                     $scope.ordineMissioneModel = data;
                     $scope.viewAttachments($scope.ordineMissioneModel.id);
                     $scope.inizializzaFormPerModifica();
+                    $location.path('/');
                 });
             },
             function(httpResponse) {
@@ -1669,8 +1676,10 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         parent.history.back();
     }
 
+
     $scope.save = function() {
         controlliPrimaDelSalvataggio();
+        aggiornaValoriOrdineMissione(); // Imposta i valori su 'S' o 'N'
         if ($scope.esisteOrdineMissione()) {
             $rootScope.salvataggio = true;
             var autoPropria = $scope.ordineMissioneModel.utilizzoAutoPropria;
@@ -1731,6 +1740,11 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                         }
                     });
                 }
+                console.log('Valori assegnati a ordineMissioneModel:', model);
+
+                $scope.updateMissioneStatus(model.id);
+
+                //$scope.getAutoNoleggioMissione();
                 $scope.restNazioni();
                 $scope.restCds(model.anno, model.cdsSpesa);
                 $scope.restCdsCompetenza(model.anno, model.cdsCompetenza);
@@ -1782,4 +1796,64 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             $scope.inizializzaFormPerInserimento($scope.accountModel, true);
         }
     }
+
+
+$scope.updateMissioneStatus = function(idMissione) {
+    // Recupera informazioni sull'auto a noleggio
+    AutoNoleggioOrdineMissioneService.findAutoNoleggio(idMissione).then(function(autoNoleggioData) {
+        $scope.autoNoleggioOrdineMissioneModel = autoNoleggioData;
+
+        if (autoNoleggioData) {
+            $scope.ordineMissioneModel.utilizzoAutoNoleggio = "S";
+        } else {
+            $scope.ordineMissioneModel.utilizzoAutoNoleggio = "N";
+        }
+    }).catch(function(error) {
+        $scope.ordineMissioneModel.utilizzoAutoNoleggio = "N";
+    });
+
+    // Recupera informazioni sull'auto propria
+    AutoPropriaOrdineMissioneService.findAutoPropria(idMissione).then(function(autoPropriaData) {
+
+        if (autoPropriaData) {
+            $scope.ordineMissioneModel.utilizzoAutoPropria = "S";
+        } else {
+            $scope.ordineMissioneModel.utilizzoAutoPropria = "N";
+        }
+    }).catch(function(error) {
+        $scope.ordineMissioneModel.utilizzoAutoPropria = "N";
+    });
+
+    // Recupera informazioni sul taxi
+    TaxiOrdineMissioneService.findTaxi(idMissione).then(function(taxiData) {
+
+        if (taxiData) {
+            $scope.ordineMissioneModel.utilizzoTaxi = "S";
+        } else {
+            $scope.ordineMissioneModel.utilizzoTaxi = "N";
+        }
+    }).catch(function(error) {
+        console.error('Errore durante il recupero dei dati Taxi:', error);
+    });
+
+    // Recupera informazioni sull'anticipo
+    $http.get('api/rest/ordineMissione/anticipo/get', { params: { idMissione: idMissione } })
+        .then(function(response) {
+            var datiAnticipoOrdineMissione = response.data;
+
+            if (datiAnticipoOrdineMissione) {
+                $scope.anticipoOrdineMissioneModel = datiAnticipoOrdineMissione;
+                $scope.ordineMissioneModel.richiestaAnticipo = "S";
+            } else {
+                $scope.ordineMissioneModel.richiestaAnticipo = "N";
+            }
+        })
+        .catch(function(error) {
+            $scope.ordineMissioneModel.richiestaAnticipo = "N";
+        });
+};
+
+
+
+
 });

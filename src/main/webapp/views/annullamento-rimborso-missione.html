@@ -151,13 +151,6 @@
                 </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
-                    <div class="col-md-7">
-                        <p class="input-group" ng-show="showObbligoRientro">
-<cnr-widget-datetime-range id-missione="1" disabilitato="annullamentoModel.idRimborsoMissione" start-datetime="annullamentoModel.rimborsoMissione.dataInizioEstero" end-datetime="annullamentoModel.rimborsoMissione.dataFineEstero" start-label="{{'rimborso-missione.form.data-inizio-frontiera' | translate}}" end-label="{{'rimborso-missione.form.data-fine-frontiera' | translate}}"></cnr-widget-datetime-range>
-                        </p>
-                    </div>
-            </form>
-            <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="missione.form.note">note</span>
@@ -232,15 +225,6 @@
                     </p>
             </form>
             <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-12">
-                        <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="missione.form.modulo">modulo</span>
-                    <select ng-disabled="annullamentoModel.idRimborsoMissione" ng-change="reloadModulo(annullamentoModel.rimborsoMissione.pgProgetto, annullamentoModel.rimborsoMissione.cdrSpesa, annullamentoModel.rimborsoMissione.uoSpesa)" class="form-control" id="missioni" placeholder="{{'missione.form.modulo.placeholder' | translate}}" ng-model="annullamentoModel.rimborsoMissione.pgProgetto" ng-options="modulo.pg_progetto as modulo.cd_progetto+' '+modulo.ds_progetto for modulo in elencoModuli"><option value=""></option></select>
-                        </span>
-                    </p>
-            </form>
-
-            <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-11">
                         <span class="input-group">
                           <span class="input-group-addon label-input-group-for-select" translate="missione.form.gae">gae</span>
@@ -303,30 +287,6 @@
                             </label>
                         </span>
                 </p>
-                <div class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idRimborsoMissione" type="checkbox" ng-model="annullamentoModel.rimborsoMissione.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                </div>
-                <div class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-servizio">auto servizio</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idRimborsoMissione" type="checkbox" ng-model="annullamentoModel.rimborsoMissione.utilizzoAutoServizio" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                </div>
-                <div class="col-md-3">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="ordine-missione.form.persona-seguito">persona seguito</span>
-                            <label class="checkbox">
-                                    <input ng-disabled="annullamentoModel.idRimborsoMissione" type="checkbox" ng-model="annullamentoModel.rimborsoMissione.personaleAlSeguito" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                </div>
             </form>
             <form class="form-inline" role="form" id="missioni">
                 <p class="col-md-12">
@@ -351,6 +311,11 @@
                         </span>
                     </p>
             </form>
+    <div class="col-md-12">
+        <ul class="pager" ng-show="showEsisteAnnullamento">
+            <li class="previous" ng-show="annullamentoModel.idRimborsoMissione"><a ng-click="previousPage()" translate="global.button.close">Chiudi</a></li>
+        </ul>
+    </div>
 <form class="form-inline col-md-12" role="form" id="missioni">
 <div class="panel panel-default" ng-if="annullamentoModel.id && (annullamentoModel.isFireSearchAttachments == true || annullamentoModel.isFireSearchAttachments == false )">
   <div class="panel-heading color-verde-chiaro text-center">

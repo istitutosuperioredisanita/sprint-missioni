@@ -227,7 +227,6 @@
                     </p>
             </form>
 
-
             <form class="form-inline" role="form" id="missioni">
                     <p class="col-md-11">
                         <span class="input-group">
@@ -294,38 +293,76 @@
   </div>
 </div>
 
-<div class="panel panel-info" ng-hide="!annullamentoModel.idOrdineMissione">
-  <div class="panel-heading color-verde-giada text-center">
-    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
-  </div>
-     <div class="panel-body my-panel-body">
+    <div class="panel panel-info" ng-hide="!annullamentoModel.idOrdineMissione">
+        <div class="panel-heading color-verde-giada text-center">
+            <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
+        </div>
+        <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni">
-                <div class="col-md-12" ng-class="{'disabled': showEsisteAnnullamento || !showEsisteAnnullamento}">
+                <div class="col-md-12">
                     <div class="content">
-                        <ul class="pager" ng-show="showEsisteAnnullamento">
-                            <li><a ng-hide="annullamentoModel.ordineMissione.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-no">Anticipo</a></li>
-                            <li><a ng-hide="annullamentoModel.ordineMissione.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-no">Auto Propria No</a></li>
-                            <li><a ng-hide="annullamentoModel.ordineMissione.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-no">Taxi No</a></li>
-                            <li><a ng-hide="annullamentoModel.ordineMissione.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-no">Auto Noleggio No</a></li>
-                            <li><a ng-show="annullamentoModel.ordineMissione.richiestaAnticipo=='S'" ng-click="goAnticipo()" translate="ordine-missione.button.anticipo-si">Anticipo</a></li>
-                            <li><a ng-show="annullamentoModel.ordineMissione.utilizzoAutoPropria=='S'" ng-click="goAutoPropria()" translate="ordine-missione.button.auto-propria-si">Auto Propria Si</a></li>
-                            <li><a ng-show="annullamentoModel.ordineMissione.utilizzoTaxi=='S'" ng-click="goTaxi()" translate="ordine-missione.button.taxi-si">Taxi Si</a></li>
-                            <li><a ng-show="annullamentoModel.ordineMissione.utilizzoAutoNoleggio=='S'" ng-click="goAutoNoleggio()" translate="ordine-missione.button.auto-noleggio-si">Auto Noleggio Si</a></li>
+                        <ul class="pager">
+                            <!-- Pulsante sempre abilitato -->
+                            <li class="previous">
+                                <a ng-click="previousPage()" translate="global.button.close">Chiudi</a>
+                            </li>
+                            <!-- Altri pulsanti abilitati/disabilitati in base a showEsisteAnnullamento -->
+                            <li>
+                                <a ng-hide="annullamentoModel.ordineMissione.richiestaAnticipo=='S'"
+                                   ng-click="goAnticipo()"
+                                   translate="ordine-missione.button.anticipo-no"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Anticipo</a>
+                            </li>
+                            <li>
+                                <a ng-hide="annullamentoModel.ordineMissione.utilizzoAutoPropria=='S'"
+                                   ng-click="goAutoPropria()"
+                                   translate="ordine-missione.button.auto-propria-no"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Auto Propria No</a>
+                            </li>
+                            <li>
+                                <a ng-hide="annullamentoModel.ordineMissione.utilizzoTaxi=='S'"
+                                   ng-click="goTaxi()"
+                                   translate="ordine-missione.button.taxi-no"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Taxi No</a>
+                            </li>
+                            <li>
+                                <a ng-hide="annullamentoModel.ordineMissione.utilizzoAutoNoleggio=='S'"
+                                   ng-click="goAutoNoleggio()"
+                                   translate="ordine-missione.button.auto-noleggio-no"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Auto Noleggio No</a>
+                            </li>
+                            <li>
+                                <a ng-show="annullamentoModel.ordineMissione.richiestaAnticipo=='S'"
+                                   ng-click="goAnticipo()"
+                                   translate="ordine-missione.button.anticipo-si"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Anticipo</a>
+                            </li>
+                            <li>
+                                <a ng-show="annullamentoModel.ordineMissione.utilizzoAutoPropria=='S'"
+                                   ng-click="goAutoPropria()"
+                                   translate="ordine-missione.button.auto-propria-si"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Auto Propria Si</a>
+                            </li>
+                            <li>
+                                <a ng-show="annullamentoModel.ordineMissione.utilizzoTaxi=='S'"
+                                   ng-click="goTaxi()"
+                                   translate="ordine-missione.button.taxi-si"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Taxi Si</a>
+                            </li>
+                            <li>
+                                <a ng-show="annullamentoModel.ordineMissione.utilizzoAutoNoleggio=='S'"
+                                   ng-click="goAutoNoleggio()"
+                                   translate="ordine-missione.button.auto-noleggio-si"
+                                   ng-class="{'disabled': !showEsisteAnnullamento || showEsisteAnnullamento}">Auto Noleggio Si</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
-
-                <!--                <p class="col-md-12">-->
-<!--                        <span class="input-group">-->
-<!--                            <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>-->
-<!--                            <textarea ng-disabled="annullamentoModel.idOrdineMissione" class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="annullamentoModel.ordineMissione.noteUtilizzoTaxiNoleggio" rows = "2">-->
-<!--                            </textarea>-->
-<!--                        </span>-->
-<!--                </p>-->
             </form>
+        </div>
+    </div>
 
-  </div>
-</div>
+
 <form class="form-inline col-md-12" role="form" id="missioni">
 <div class="panel panel-default" ng-hide="!annullamentoModel.idOrdineMissione" ng-disabled="annullamentoModel.idOrdineMissione" ng-if="annullamentoModel.ordineMissione.id && (annullamentoModel.isFireSearchAttachments == true || annullamentoModel.isFireSearchAttachments == false )">
   <div class="panel-heading color-verde-chiaro text-center">
@@ -378,7 +415,11 @@
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento&& annullamentoModel.stato == 'INS' ">
-                            <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.confirm' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'global.button.confirm' | translate}}</button>
+                        <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.confirm' | translate}}">
+                            <span ng-class="{'glyphicon glyphicon-share-alt': utenteAbilitatoValidareUo == 'S', 'glyphicon glyphicon-check': utenteAbilitatoValidareUo == 'N'}" style="color:white"></span>&nbsp;
+                            <span ng-if="utenteAbilitatoValidareUo == 'S'">{{'missione.button.sendToSign' | translate}}</span>
+                            <span ng-if="utenteAbilitatoValidareUo == 'N'">{{'missione.button.sendToValidate' | translate}}</span>
+                        </button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateAnnullamentoOrdineMissione()">

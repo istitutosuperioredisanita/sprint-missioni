@@ -39,9 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.mail.internet.MimeMessage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Profile("!showcase")
 @Service("MailService")
@@ -81,12 +79,14 @@ public class MailService {
         return preparaElencoMail(listaEmail);
     }
 
+//no duplicati nella group-list dei destinatari
     public List<String> preparaListaMail(List<UsersSpecial> lista) {
+        Set<String> emailSet = new HashSet<>();
         List<String> listaEmail = new ArrayList<>();
-        for (int i = 0; i < lista.size(); i++) {
-            UsersSpecial user = lista.get(i);
-            String mail = accountService.getEmail(user.getUid());
-            if (!StringUtils.isEmpty(mail)) {
+
+        for (UsersSpecial user : lista) {
+            String mail = user.getUid();
+            if (!StringUtils.isEmpty(mail) && emailSet.add(mail)) {
                 listaEmail.add(mail);
             }
         }

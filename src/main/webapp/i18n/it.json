@@ -369,7 +369,7 @@
         },
         "button": {
             "sendToFinal": "Rendi Definitivo l'Ordine di Missione",
-            "confirm": "Conferma l'Ordine di Missione",
+            "confirm": "Invia l'Ordine di Missione",
             "print": "Stampa Ordine di Missione",
             "auto-propria-si": "Richiesta Utilizzo Auto Propria: Sì",
             "auto-propria-no": "Richiesta Utilizzo Auto Propria: No",
@@ -383,7 +383,7 @@
             "anticipo-no": "Richiesta Anticipo: No",
             "savedraft" : "Salva in Bozza",
             "invia" : "Invia",
-            "sendToValidate" : "Invia in validazione"
+            "sendToValidate" : "Invia per la Validazione"
         },
         "messages": {
             "error": {
@@ -499,7 +499,7 @@
             "no-history-respingi": "Non esistono Operazioni 'Respingi' registrate",
             "fase-respingi": "Fase Respingi",
             "cup": "Codice CUP",
-            "motivo-respingi-mittente": "Motivo Respingi al mittente",
+            "motivo-respingi-mittente": "Motivo Respingi al mittente*",
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
             "cug": "Comitato Garanzia",
             "presidenza": "Presidenza",
@@ -507,7 +507,7 @@
             "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
         },
         "button": {
-            "sendToValidate": "Invia in Validazione",
+            "sendToValidate": "Invia per la Validazione",
             "sendToSign": "Invia in Firma",
             "returnToSender": "Respingi al Mittente",
             "returnToSenderShort": "Respingi"
@@ -602,7 +602,7 @@
             "print": "Stampa Rimborso",
             "download": "Scarica ZIP Documenti",
             "sendToFinal": "Rendi Definitivo il Rimborso Missione",
-            "confirm": "Conferma il Rimborso Missione",
+            "confirm": "Invia il Rimborso Missione",
             "dettagli": "Dettagli Spesa",
             "savedraft" : "Salva in Bozza",
             "invia" : "Invia"

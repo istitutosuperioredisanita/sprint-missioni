@@ -148,7 +148,7 @@ public class AccountServiceLdap extends AbstractAccountService{
             UoForUsersSpecial uoForUsersSpecial = iteratorUo.next();
             if (uoForUsersSpecial.getCodice_uo() != null && getUoSigla(uoForUsersSpecial).equals(uo)) {
                 if (isPerValidazione) {
-                    return Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S");
+                    return Utility.nvl(uoForUsersSpecial.getOrdine_da_validare(), "N").equals("S");
                 } else {
                     return true;
                 }

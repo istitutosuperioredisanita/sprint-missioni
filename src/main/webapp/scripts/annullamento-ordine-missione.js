@@ -332,51 +332,35 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
         }
     }
 
-    $scope.restCdr = function(uo, daQuery) {
-        if (uo) {
-            $scope.elencoCdr = [];
-            var app = APP_FOR_REST.SIGLA;
-            var url = SIGLA_REST.CDR;
-            var objectPostCdrOrderBy = [{
-                name: 'cd_centro_responsabilita',
-                type: 'ASC'
-            }];
-            var objectPostCdrClauses = [{
-                condition: 'AND',
-                fieldName: 'cd_unita_organizzativa',
-                operator: "=",
-                fieldValue: uo
-            }];
-            var objectPostCdr = {
-                activePage: 0,
-                maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
-                orderBy: objectPostCdrOrderBy,
-                clauses: objectPostCdrClauses
-            }
-            $http.post(urlRestProxy + app + '/', objectPostCdr, {
-                params: {
-                    proxyURL: url
-                }
-            }).success(function(data) {
-                if (data) {
-                    if (data.elements) {
-                        $scope.elencoCdr = data.elements;
-                        if (data.elements.length === 1) {
-                            $scope.annullamentoModel.ordineMissione.cdrSpesa = data.elements[0].cd_centro_responsabilita;
-                            if (daQuery != 'S') {
-                                //$scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.ordineMissione.uoSpesa);
-                                $scope.restGae($scope.annullamentoModel.anno, $scope.annullamentoModel.ordineMissione.pgProgetto, $scope.annullamentoModel.ordineMissione.cdrSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
+        $scope.restCdr = function(uo, daQuery){
+            if (uo){
+                $scope.elencoCdr = [];
+                var app = APP_FOR_REST.SIGLA;
+                var url = SIGLA_REST.CDR;
+                var objectPostCdrOrderBy = [{name: 'cd_centro_responsabilita', type: 'ASC'}];
+                var objectPostCdrClauses = [{condition: 'AND', fieldName: 'cd_unita_organizzativa', operator: "=", fieldValue:uo}];
+                var objectPostCdr = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:objectPostCdrOrderBy, clauses:objectPostCdrClauses}
+                $http.post(urlRestProxy + app+'/', objectPostCdr, {params: {proxyURL: url}}).success(function (data) {
+                    if (data){
+                        if (data.elements){
+                            $scope.elencoCdr = data.elements;
+                            if (data.elements.length === 1){
+                                $scope.annullamentoModel.ordineMissione.cdrSpesa = data.elements[0].cd_centro_responsabilita;
+                                if (daQuery != 'S'){
+                                    //$scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
+                                    $scope.restGae($scope.annullamentoModel.anno, $scope.annullamentoModel.ordineMissione.pgProgetto, $scope.annullamentoModel.ordineMissione.cdrSpesa, $scope.annullamentoModel.ordineMissione.uoSpesa);
+                                }
                             }
+                        } else {
+                            $scope.elencoCdr = [];
                         }
-                    } else {
-                        $scope.elencoCdr = [];
                     }
-                }
-            }).error(function(data) {});
-        } else {
-            $scope.elencoCdr = [];
+                }).error(function (data) {
+                });
+            } else {
+                $scope.elencoCdr = [];
+            }
         }
-    }
 
     $scope.restModuli = function(anno, uo) {
         if (uo) {
@@ -536,77 +520,18 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
         }
     }
 
-    $scope.restGae = function(anno, modulo, cdr, uo) {
-        if (cdr || modulo || uo) {
-            $scope.elencoGae = [];
-            var app = APP_FOR_REST.SIGLA;
-            var url = SIGLA_REST.GAE;
-            var varOrderBy = [{
-                name: 'cd_linea_attivita',
-                type: 'ASC'
-            }];
-            var varClauses = [];
-            if (modulo) {
-                if (cdr) {
-                    varClauses = [{
-                            condition: 'AND',
-                            fieldName: 'esercizio',
-                            operator: "=",
-                            fieldValue: anno
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'pg_progetto',
-                            operator: "=",
-                            fieldValue: modulo
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'cd_centro_responsabilita',
-                            operator: "=",
-                            fieldValue: cdr
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'ti_gestione',
-                            operator: "=",
-                            fieldValue: "S"
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'cd_centro_responsabilita',
-                            operator: "LIKE",
-                            fieldValue: cdr.substring(0, 3) + "%"
-                        }
-                    ];
-                } else if (uo) {
-                    varClauses = [{
-                            condition: 'AND',
-                            fieldName: 'esercizio',
-                            operator: "=",
-                            fieldValue: anno
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'pg_progetto',
-                            operator: "=",
-                            fieldValue: modulo
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'ti_gestione',
-                            operator: "=",
-                            fieldValue: "S"
-                        },
-                        {
-                            condition: 'AND',
-                            fieldName: 'cd_centro_responsabilita',
-                            operator: "LIKE",
-                            fieldValue: uo.substring(0, 3) + "%"
-                        }
-                    ];
-                }
-            } else if (cdr) {
+$scope.restGae = function(anno, modulo, cdr, uo) {
+    if (cdr || modulo || uo) {
+        $scope.elencoGae = [];
+        var app = APP_FOR_REST.SIGLA;
+        var url = SIGLA_REST.GAE;
+        var varOrderBy = [{
+            name: 'cd_linea_attivita',
+            type: 'ASC'
+        }];
+        var varClauses = [];
+        if (modulo) {
+            if (cdr) {
                 varClauses = [{
                         condition: 'AND',
                         fieldName: 'esercizio',
@@ -615,15 +540,22 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
                     },
                     {
                         condition: 'AND',
+                        fieldName: 'pg_progetto',
+                        operator: "=",
+                        fieldValue: modulo
+                    },
+                    {
+                        condition: 'AND',
                         fieldName: 'cd_centro_responsabilita',
                         operator: "=",
                         fieldValue: cdr
                     },
+                    // Modifica: Cambiato `ti_gestione` operator da "=" a "!=" per escludere "E"
                     {
                         condition: 'AND',
                         fieldName: 'ti_gestione',
-                        operator: "=",
-                        fieldValue: "S"
+                        operator: "!=",
+                        fieldValue: "E"
                     },
                     {
                         condition: 'AND',
@@ -641,48 +573,105 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
                     },
                     {
                         condition: 'AND',
-                        fieldName: 'ti_gestione',
+                        fieldName: 'pg_progetto',
                         operator: "=",
-                        fieldValue: "S"
+                        fieldValue: modulo
+                    },
+                    // Modifica: Cambiato `ti_gestione` operator da "=" a "!=" per escludere "E"
+                    {
+                        condition: 'AND',
+                        fieldName: 'ti_gestione',
+                        operator: "!=",
+                        fieldValue: "E"
                     },
                     {
                         condition: 'AND',
                         fieldName: 'cd_centro_responsabilita',
                         operator: "LIKE",
-                        fieldValue: cdr.substring(0, 3) + "%"
+                        fieldValue: uo.substring(0, 3) + "%"
                     }
                 ];
             }
-            var postGae = {
-                activePage: 0,
-                maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
-                orderBy: varOrderBy,
-                clauses: varClauses
-            }
-            $scope.workingRestGae = true;
-            $http.post(urlRestProxy + app + '/', postGae, {
-                params: {
-                    proxyURL: url
+        } else if (cdr) {
+            varClauses = [{
+                    condition: 'AND',
+                    fieldName: 'esercizio',
+                    operator: "=",
+                    fieldValue: anno
+                },
+                {
+                    condition: 'AND',
+                    fieldName: 'cd_centro_responsabilita',
+                    operator: "=",
+                    fieldValue: cdr
+                },
+                // Modifica: Cambiato `ti_gestione` operator da "=" a "!=" per escludere "E"
+                {
+                    condition: 'AND',
+                    fieldName: 'ti_gestione',
+                    operator: "!=",
+                    fieldValue: "E"
+                },
+                {
+                    condition: 'AND',
+                    fieldName: 'cd_centro_responsabilita',
+                    operator: "LIKE",
+                    fieldValue: cdr.substring(0, 3) + "%"
                 }
-            }).success(function(data) {
-                $scope.workingRestGae = false;
-                if (data) {
-                    if (data.elements) {
-                        $scope.elencoGae = data.elements;
-                        if (data.elements.length === 1) {
-                            $scope.annullamentoModel.ordineMissione.gae = data.elements[0].cd_linea_attivita;
-                        }
-                    } else {
-                        $scope.elencoGae = [];
-                    }
+            ];
+        } else if (uo) {
+            varClauses = [{
+                    condition: 'AND',
+                    fieldName: 'esercizio',
+                    operator: "=",
+                    fieldValue: anno
+                },
+                // Modifica: Cambiato `ti_gestione` operator da "=" a "!=" per escludere "E"
+                {
+                    condition: 'AND',
+                    fieldName: 'ti_gestione',
+                    operator: "!=",
+                    fieldValue: "E"
+                },
+                {
+                    condition: 'AND',
+                    fieldName: 'cd_centro_responsabilita',
+                    operator: "LIKE",
+                    fieldValue: cdr.substring(0, 3) + "%"
                 }
-            }).error(function(data) {
-                $scope.workingRestGae = false;
-            });
-        } else {
-            $scope.elencoGae = [];
+            ];
         }
+        var postGae = {
+            activePage: 0,
+            maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
+            orderBy: varOrderBy,
+            clauses: varClauses
+        }
+        $scope.workingRestGae = true;
+        $http.post(urlRestProxy + app + '/', postGae, {
+            params: {
+                proxyURL: url
+            }
+        }).success(function(data) {
+            $scope.workingRestGae = false;
+            if (data) {
+                if (data.elements) {
+                    $scope.elencoGae = data.elements;
+                    // Modifica: Assegnazione aggiornata a `$scope.ordineMissioneModel.gae` anziché a `$scope.annullamentoModel.ordineMissione.gae`
+                    if (data.elements.length === 1) {
+                            $scope.annullamentoModel.ordineMissione.gae = data.elements[0].cd_linea_attivita;
+                    }
+                } else {
+                    $scope.elencoGae = [];
+                }
+            }
+        }).error(function(data) {
+            $scope.workingRestGae = false;
+        });
+    } else {
+        $scope.elencoGae = [];
     }
+}
 
     $scope.restCapitoli = function(anno) {
         var app = APP_FOR_REST.SIGLA;
@@ -1129,6 +1118,7 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
                 AnnullamentoOrdineMissioneService.get($scope.annullamentoModel.id).then(function(data) {
                     $scope.annullamentoModel = data;
                     $scope.inizializzaFormPerModifica();
+                    $location.path('/');
                 });
             },
             function(httpResponse) {
@@ -1243,4 +1233,8 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
             $scope.today();
         }
     }
+
+        $scope.previousPage = function() {
+            parent.history.back();
+        }
 });

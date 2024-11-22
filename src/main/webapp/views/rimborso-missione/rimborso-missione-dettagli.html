@@ -174,10 +174,29 @@ fine commento multi impegno-->
                           </div>
                         </div>
         <div class="col-md-1-button col-md-1 text-right" >
-           <button ng-show="!disabilita && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="editDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.edit' | translate}}"><span class="glyphicon glyphicon-pencil"></span></button>
+            <button ng-show="!disabilita && !dettaglioSpesa.editing"
+                    class="btn btn-sm btn-link"
+                    ng-click="editDettaglioSpesa(dettaglioSpesa)"
+                    data-toggle="tooltip"
+                    title="{{'global.button.edit' | translate}}">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
             <button ng-show="!disabilita && validazione == 'N' && !dettaglioSpesa.editing " class="btn btn-sm btn-link" ng-click="confirmDeleteDettaglioSpesa($index)" data-toggle="tooltip" title="{{'global.button.remove' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
-            <button ng-show="!disabilita && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(dettaglioSpesa)" ng-click="modifyDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.saveEdit' | translate}}"><span class="glyphicon glyphicon-ok" style="color:green"></span></button>
-            <button ng-show="!disabilita && dettaglioSpesa.editing" class="btn btn-sm btn-link" ng-click="undoDettaglioSpesa(dettaglioSpesa)" data-toggle="tooltip" title="{{'global.button.undo' | translate}}"><span class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+            <button ng-show="!disabilita && dettaglioSpesa.editing"
+                    class="btn btn-sm btn-link"
+                    ng-disabled="saveButtonDisable(dettaglioSpesa)"
+                    ng-click="modifyDettaglioSpesa(dettaglioSpesa)"
+                    data-toggle="tooltip"
+                    title="{{'global.button.saveEdit' | translate}}">
+                <span class="glyphicon glyphicon-ok" style="color:green"></span>
+            </button>
+            <button ng-show="!disabilita && dettaglioSpesa.editing"
+                    class="btn btn-sm btn-link"
+                    ng-click="undoDettaglioSpesa(dettaglioSpesa)"
+                    data-toggle="tooltip"
+                    title="{{'global.button.undo' | translate}}">
+                <span class="glyphicon glyphicon-remove" style="color:orange"></span>
+            </button>
         </div>
                       </div>
                     </li>
