@@ -1080,7 +1080,7 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
     }
 
     $scope.previousPage = function() {
-        parent.history.back();
+        $location.path('/');
     }
 
     $scope.confirmDeleteAttachment = function(attachment) {
@@ -1234,7 +1234,4 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
         }
     }
 
-        $scope.previousPage = function() {
-            parent.history.back();
-        }
 });

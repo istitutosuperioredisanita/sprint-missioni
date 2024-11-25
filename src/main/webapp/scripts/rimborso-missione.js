@@ -1681,7 +1681,7 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     }
 
     $scope.previousPage = function() {
-        parent.history.back();
+        $location.path('/');
     }
 
     $scope.editImpegno = function(impegno) {

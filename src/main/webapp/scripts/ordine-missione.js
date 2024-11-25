@@ -1673,13 +1673,12 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     }
 
     $scope.previousPage = function() {
-        parent.history.back();
+        $location.path('/');
     }
 
 
     $scope.save = function() {
         controlliPrimaDelSalvataggio();
-        aggiornaValoriOrdineMissione(); // Imposta i valori su 'S' o 'N'
         if ($scope.esisteOrdineMissione()) {
             $rootScope.salvataggio = true;
             var autoPropria = $scope.ordineMissioneModel.utilizzoAutoPropria;

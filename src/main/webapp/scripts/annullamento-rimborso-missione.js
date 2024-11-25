@@ -766,8 +766,8 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         }
     }
 
-    $scope.previousPage = function () {
-      parent.history.back();
+    $scope.previousPage = function() {
+        $location.path('/');
     }
 
     $scope.confirmDeleteAttachment = function (attachment) {
@@ -926,9 +926,6 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         }
     }
 
-        $scope.previousPage = function() {
-            parent.history.back();
-        }
 
     $scope.inizializzaModalitaPagamento = function() {
         if ($scope.annullamentoModel.rimborsoMissione && $scope.annullamentoModel.rimborsoMissione.cdTerzoSigla) {

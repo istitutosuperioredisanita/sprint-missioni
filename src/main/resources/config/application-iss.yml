@@ -2,13 +2,13 @@
 spring:
   config:
     file:
-      pathFileConfigJson: E:\iss\sprint-missioni-config\
+      pathFileConfigJson: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
     name: missioni
-    username: MISSIONICOLL
-    password: ***REMOVED***
+    username: MISSIONISVIL
+    password: MISSIONISVILPSW
   jpa:
     database-platform: org.hibernate.dialect.Oracle12cDialect
     database: ORACLE
@@ -130,7 +130,7 @@ flows:
   password: ***REMOVED***
   organizzation: iss
   keystore:
-    path: E:\iss\sprint-missioni-config\isscol_client.p12
+    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\isscol_client.p12
     password: password
 
   autorizzazione:
