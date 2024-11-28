@@ -1477,6 +1477,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                     $scope.ordineMissioneModel = data;
                     $scope.viewAttachments($scope.ordineMissioneModel.id);
                     $scope.inizializzaFormPerModifica();
+                    $location.path('/');
                 });
             },
             function(httpResponse) {
@@ -1739,11 +1740,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                         }
                     });
                 }
-                console.log('Valori assegnati a ordineMissioneModel:', model);
 
-                $scope.updateMissioneStatus(model.id);
-
-                //$scope.getAutoNoleggioMissione();
                 $scope.restNazioni();
                 $scope.restCds(model.anno, model.cdsSpesa);
                 $scope.restCdsCompetenza(model.anno, model.cdsCompetenza);
@@ -1795,64 +1792,5 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             $scope.inizializzaFormPerInserimento($scope.accountModel, true);
         }
     }
-
-
-$scope.updateMissioneStatus = function(idMissione) {
-    // Recupera informazioni sull'auto a noleggio
-    AutoNoleggioOrdineMissioneService.findAutoNoleggio(idMissione).then(function(autoNoleggioData) {
-        $scope.autoNoleggioOrdineMissioneModel = autoNoleggioData;
-
-        if (autoNoleggioData) {
-            $scope.ordineMissioneModel.utilizzoAutoNoleggio = "S";
-        } else {
-            $scope.ordineMissioneModel.utilizzoAutoNoleggio = "N";
-        }
-    }).catch(function(error) {
-        $scope.ordineMissioneModel.utilizzoAutoNoleggio = "N";
-    });
-
-    // Recupera informazioni sull'auto propria
-    AutoPropriaOrdineMissioneService.findAutoPropria(idMissione).then(function(autoPropriaData) {
-
-        if (autoPropriaData) {
-            $scope.ordineMissioneModel.utilizzoAutoPropria = "S";
-        } else {
-            $scope.ordineMissioneModel.utilizzoAutoPropria = "N";
-        }
-    }).catch(function(error) {
-        $scope.ordineMissioneModel.utilizzoAutoPropria = "N";
-    });
-
-    // Recupera informazioni sul taxi
-    TaxiOrdineMissioneService.findTaxi(idMissione).then(function(taxiData) {
-
-        if (taxiData) {
-            $scope.ordineMissioneModel.utilizzoTaxi = "S";
-        } else {
-            $scope.ordineMissioneModel.utilizzoTaxi = "N";
-        }
-    }).catch(function(error) {
-        console.error('Errore durante il recupero dei dati Taxi:', error);
-    });
-
-    // Recupera informazioni sull'anticipo
-    $http.get('api/rest/ordineMissione/anticipo/get', { params: { idMissione: idMissione } })
-        .then(function(response) {
-            var datiAnticipoOrdineMissione = response.data;
-
-            if (datiAnticipoOrdineMissione) {
-                $scope.anticipoOrdineMissioneModel = datiAnticipoOrdineMissione;
-                $scope.ordineMissioneModel.richiestaAnticipo = "S";
-            } else {
-                $scope.ordineMissioneModel.richiestaAnticipo = "N";
-            }
-        })
-        .catch(function(error) {
-            $scope.ordineMissioneModel.richiestaAnticipo = "N";
-        });
-};
-
-
-
 
 });

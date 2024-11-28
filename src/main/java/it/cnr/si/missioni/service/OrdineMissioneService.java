@@ -40,7 +40,6 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.*;
@@ -69,7 +68,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing users.
@@ -193,6 +191,10 @@ public class OrdineMissioneService {
                 || accountService.isUserEnableToWorkUo(ordineMissione.getUoRich()) || accountService.isUserEnableToWorkUo(ordineMissione.getUoSpesa());
     }
 
+
+
+
+    //TODO capire gestione degli stati della missione per la visualizzazione degli stati delle autorizz. agg. (SI/NO)
     public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDataFromFlows)
             throws ComponentException {
         MissioneFilter filter = new MissioneFilter();
@@ -204,34 +206,34 @@ public class OrdineMissioneService {
             ordineMissione = listaOrdiniMissione.get(0);
             if (retrieveDataFromFlows) {
                 OrdineMissioneAutoPropria autoPropria = getAutoPropria(ordineMissione);
-                if (autoPropria != null && autoPropria.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
+                if (autoPropria != null && autoPropria.getOrdineMissione().checkStatiFlussoTrue()) {
                     ordineMissione.setUtilizzoAutoPropria("S");
                 } else {
                     ordineMissione.setUtilizzoAutoPropria("N");
                 }
                 OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissione);
-                if (anticipo != null && anticipo.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
+                if (anticipo != null && anticipo.getOrdineMissione().checkStatiFlussoTrue()) {
                     ordineMissione.setRichiestaAnticipo("S");
                 } else {
                     ordineMissione.setRichiestaAnticipo("N");
                 }
                 OrdineMissioneTaxi taxi = getTaxi(ordineMissione);
-                if (taxi != null && taxi.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
+                if (taxi != null && taxi.getOrdineMissione().checkStatiFlussoTrue()) {
                     ordineMissione.setUtilizzoTaxi("S");
                 } else {
                     ordineMissione.setUtilizzoTaxi("N");
                 }
                 OrdineMissioneAutoNoleggio autoNoleggio = getAutoNoleggio(ordineMissione);
-                if (autoNoleggio != null && autoNoleggio.getOrdineMissione().isStatoNonInviatoAlFlusso()) {
+                if (autoNoleggio != null && autoNoleggio.getOrdineMissione().checkStatiFlussoTrue()) {
                     ordineMissione.setUtilizzoAutoNoleggio("S");
                 } else {
                     ordineMissione.setUtilizzoAutoNoleggio("N");
                 }
             }
-
         }
         return ordineMissione;
     }
+
 
     public OrdineMissione getOrdineMissione(Long idMissione) throws ComponentException {
         return getOrdineMissione(idMissione, false);
@@ -992,6 +994,12 @@ public class OrdineMissioneService {
         }
         if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
             ordineMissione.setPersonaleAlSeguito("N");
+        }
+        if (StringUtils.isEmpty(ordineMissione.getRichiestaAnticipo())) {
+            ordineMissione.setRichiestaAnticipo("N");
+        }
+        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoPropria())) {
+            ordineMissione.setUtilizzoAutoPropria("N");
         }
 
         aggiornaValidazione(ordineMissione);

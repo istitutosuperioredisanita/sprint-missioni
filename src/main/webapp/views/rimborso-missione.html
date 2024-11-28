@@ -746,14 +746,21 @@
                     </div>
                 </div>
             </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="showEsisteRimborsoMissione && (validazione === 'S' || rimborsoMissioneModel.noteRespingi)">
+            <form class="form-inline" role="form" id="missioni"
+                  ng-show="showEsisteRimborsoMissione && (validazione === 'S' || rimborsoMissioneModel.noteRespingi) &&
+               utenteAbilitatoValidareUo == 'S' && rimborsoMissioneModel.stato === 'CON'">
                 <p class="col-md-12">
-                        <span class="input-group">
-                            <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
-                            <textarea ng-disabled="!validazione || disabilitaRimborsoMissione"
-                                      class="input-sm form-control" placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}" name="noteRespingi" ng-model="rimborsoMissioneModel.noteRespingi" maxlength="2000" rows = "2">
-                            </textarea>
-                        </span>
+        <span class="input-group">
+            <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
+            <textarea ng-disabled="!validazione || disabilitaRimborsoMissione"
+                      class="input-sm form-control"
+                      placeholder="{{'missione.form.motivo-respingi-mittente.placeholder' | translate}}"
+                      name="noteRespingi"
+                      ng-model="rimborsoMissioneModel.noteRespingi"
+                      maxlength="2000"
+                      rows="2">
+            </textarea>
+        </span>
                 </p>
             </form>
 
@@ -769,15 +776,26 @@
 
 
             <form name="form-inline" role="form" ng-submit="validateRimborsoMissione()">
-                <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' ||
-                    utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
-                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
+                <div class="col-xs-4"
+                     ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' &&
+                  utenteAbilitatoValidareUo == 'S' && rimborsoMissioneModel.stato === 'CON' &&
+                  (utenteAbilitatoValidareUoContrAmm == 'S' || utenteAbilitatoValidareUo == 'S') &&
+                  !disabilitaRimborsoMissione">
+                    <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}">
+                        <span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}
+                    </button>
                 </div>
             </form>
+
             <form name="form-inline" role="form" ng-submit="ritornaMittenteRimborsoMissione()">
-                <div class="col-xs-4" ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' && (utenteAbilitatoValidareUo == 'S' ||
-                    utenteAbilitatoValidareUoContrAmm == 'S') && !disabilitaRimborsoMissione">
-                    <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
+                <div class="col-xs-4"
+                     ng-show="showEsisteRimborsoMissione && validazione === 'S' && rimborsoMissioneModel.stato != 'INS' &&
+                  utenteAbilitatoValidareUo == 'S' && rimborsoMissioneModel.stato === 'CON' &&
+                  (utenteAbilitatoValidareUoContrAmm == 'S' || utenteAbilitatoValidareUo == 'S') &&
+                  !disabilitaRimborsoMissione">
+                    <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}">
+                        <span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}
+                    </button>
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="finalizeRimborsoMissione()">

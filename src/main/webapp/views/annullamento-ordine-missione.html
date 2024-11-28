@@ -392,7 +392,7 @@
                     <p class="col-md-12">
                         <span class="input-group">
                             <span class="input-group-addon" translate="annullamento-ordine-missione.form.motivo-annullamento">Note Segreteria</span>
-                            <textarea 
+                            <textarea ng-disabled="annullamentoModel.stato == 'CON' && utenteAbilitatoValidareUo=='N'"
                               class="input-sm form-control" placeholder="{{'annullamento-ordine-missione.form.motivo-annullamento' | translate}}" name="motivoAnnullamento" ng-model="annullamentoModel.motivoAnnullamento" rows = "2">
                             </textarea> 
                         </span>
@@ -402,19 +402,19 @@
                 <p class="col-md-12">
                          <span class="input-group">
                             <span class="input-group-addon" translate="annullamento-ordine-missione.form.consenti-rimborso">Consenti</span>
-                            <label class="checkbox">
-                                    <input type="checkbox" ng-model="annullamentoModel.consentiRimborso" ng-true-value="S" ng-false-value="N">
+                            <label class="checkbox" >
+                                    <input type="checkbox" ng-model="annullamentoModel.consentiRimborso" ng-true-value="S" ng-false-value="N" ng-disabled="annullamentoModel.stato == 'CON' && utenteAbilitatoValidareUo=='N'">
                             </label>
                         </span>
                 </p>
             </form>
-            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
+            <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni" >
                     <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento && (annullamentoModel.stato == 'INS'|| !showEsisteAnnullamento)">
                             <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento&& annullamentoModel.stato == 'INS' ">
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && !validazione && !disabilitaAnnullamento && annullamentoModel.stato == 'INS' ">
                         <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.confirm' | translate}}">
                             <span ng-class="{'glyphicon glyphicon-share-alt': utenteAbilitatoValidareUo == 'S', 'glyphicon glyphicon-check': utenteAbilitatoValidareUo == 'N'}" style="color:white"></span>&nbsp;
                             <span ng-if="utenteAbilitatoValidareUo == 'S'">{{'missione.button.sendToSign' | translate}}</span>
@@ -428,15 +428,13 @@
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteAnnullamento()">
-                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S' && !disabilitaAnnullamento">
-                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSenderShort' | translate}}</button>
+                    <div class="col-xs-4" ng-show="showEsisteAnnullamento && validazione === 'S' && !disabilitaAnnullamento && utenteAbilitatoValidareUo == 'S'">
+                            <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()">
                     <div class="col-xs-3" ng-show="showEsisteAnnullamento">
                       <a target="_blank" href="api/rest/public/printAnnullamentoMissione?idMissione={{annullamentoModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'annullamento-ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
-                    </div>
-
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirmDelete()">

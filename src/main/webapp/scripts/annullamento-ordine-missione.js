@@ -974,6 +974,7 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
                 ElencoOrdiniMissioneService.findAnnullamentoById($scope.annullamentoModel.id).then(function(data) {
                     $scope.annullamentoModel = data;
                     $scope.inizializzaFormPerModifica();
+                    $location.path('/');
                 });
             },
             function(httpResponse) {
@@ -991,6 +992,7 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
                 ElencoOrdiniMissioneService.findAnnullamentoById($scope.annullamentoModel.id).then(function(data) {
                     $scope.annullamentoModel = data;
                     $scope.inizializzaFormPerModifica();
+                    $location.path('/');
                 });
             },
             function(httpResponse) {
@@ -1115,7 +1117,7 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
             function(responseHeaders) {
                 $rootScope.salvataggio = false;
                 ui.ok_message("Annullamento Ordine di Missione respinto al mittente.");
-                AnnullamentoOrdineMissioneService.get($scope.annullamentoModel.id).then(function(data) {
+                ElencoOrdiniMissioneService.findAnnullamentoById($scope.annullamentoModel.id).then(function(data) {
                     $scope.annullamentoModel = data;
                     $scope.inizializzaFormPerModifica();
                     $location.path('/');

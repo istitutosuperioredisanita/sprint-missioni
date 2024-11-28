@@ -330,7 +330,13 @@ public class AnnullamentoOrdineMissioneService {
     }
 
     private String getTextMailReturnToSender(String basePath, AnnullamentoOrdineMissione annullamento) {
-        return "L'annullamento ordine di missione " + annullamento.getAnno() + "-" + annullamento.getNumero() + " di " + getNominativo(annullamento.getUid()) + " per la missione a " + annullamento.getOrdineMissione().getDestinazione() + " dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto " + annullamento.getOrdineMissione().getOggetto() + " le è stata respinto da " + getNominativo(securityService.getCurrentUserLogin());
+        String url = basePath + "/#/annullamento-ordine-missione/" + annullamento.getId();
+
+        return "L'annullamento ordine di missione " + annullamento.getAnno() + "-" + annullamento.getNumero() + " di " + getNominativo(annullamento.getUid()) +
+                " per la missione a " + annullamento.getOrdineMissione().getDestinazione() + " dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) +
+                " al " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto " + annullamento.getOrdineMissione().getOggetto() +
+                " le è stata respinto da " + getNominativo(securityService.getCurrentUserLogin()) +".</p>"
+                + "<p><a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
     private void sendMailToAdministrative(String basePath, AnnullamentoOrdineMissione annullamento) {

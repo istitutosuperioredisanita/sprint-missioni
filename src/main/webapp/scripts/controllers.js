@@ -36,139 +36,118 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
                 });
     }
 
-    //nascosti tab ordini/rimborsi x richiedenti e delegati
-    var recuperoMissioni = function(uo) {
-        // Flag per verificare l'autorizzazione per la validazione in base alle UO
-        var autorizzatoAValidare = false;
-
-        var validators = $scope.account.uoForUsersSpecial;
-
-        if (!uo) {
-            // Se `uo` è null, verifica se ci sono unità operative abilitate a validare
-            if (validators && validators.length > 0) {
-                autorizzatoAValidare = validators.some(function(item) {
-                    return item.ordine_da_validare === "S";
-                });
-            }
-        } else {
-            // Se `uo` è specificato, verifica l'abilitazione per questa specifica unità
-            autorizzatoAValidare = validators.some(function(item) {
-                var formattedCodiceUo = item.codice_uo.slice(0, 3) + "." + item.codice_uo.slice(3);
-                return formattedCodiceUo === uo && item.ordine_da_validare === "S";
-            });
-        }
-
-        // Imposta i flag di visualizzazione in base all'autorizzazione
-        $scope.esistonoOrdiniDaValidare = autorizzatoAValidare;
-        $scope.esistonoRimborsiDaValidare = autorizzatoAValidare;
-        //$scope.esistonoAnnullamentiDaValidare = autorizzatoAValidare;
-
-        // Recupero degli annullamenti ordini missioni da validare
-        ElencoOrdiniMissioneService.findListAnnullamentiToValidate(uo).then(function(response) {
-            $scope.listAnnullamentiOrdiniMissioniToValidate = response || [];
+    var recuperoMissioni = function(uo){
+        ElencoOrdiniMissioneService.findListAnnullamentiToValidate(uo).then(function(response){
+            $scope.listAnnullamentiOrdiniMissioniToValidate = response;
             $scope.esistonoAnnullamentiDaApprovare = false;
             $scope.esistonoAnnullamentiApprovati = false;
             $scope.esistonoAnnullamentiRespinti = false;
             $scope.esistonoAnnullamentiDaConfermare = false;
             $scope.esistonoAnnullamentiDaValidare = false;
-
-            $scope.listAnnullamentiOrdiniMissioniToValidate.forEach(function(item) {
-                var stato = item.statoFlussoRitornoHome;
-                if (stato === 'D') $scope.esistonoAnnullamentiDaApprovare = true;
-                if (stato === 'R') $scope.esistonoAnnullamentiRespinti = true;
-                if (stato === 'C') $scope.esistonoAnnullamentiDaConfermare = true;
-                if (stato === 'A') $scope.esistonoAnnullamentiApprovati = true;
-                if (stato === 'V') $scope.esistonoAnnullamentiDaValidare = true;
-            });
-
-            // Verifica se la lista è vuota
-            if ($scope.listAnnullamentiOrdiniMissioniToValidate.length === 0) {
-                $scope.esistonoAnnullamentiDaValidare = false;
+            if ($scope.listAnnullamentiOrdiniMissioniToValidate){
+                for (var i=0; i< $scope.listAnnullamentiOrdiniMissioniToValidate.length; i++) {
+                    if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
+                        $scope.esistonoAnnullamentiDaApprovare = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'R'){
+                        $scope.esistonoAnnullamentiRespinti = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'C'){
+                        $scope.esistonoAnnullamentiDaConfermare = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'A'){
+                        $scope.esistonoAnnullamentiApprovati = true;
+                    } else if ($scope.listAnnullamentiOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoAnnullamentiDaValidare = true;
+                    }
+                }
             }
             $scope.endSearchCmisAnnullamenti = true;
-        }, function() {
+        },
+        function(error){
             $scope.endSearchCmisAnnullamenti = true;
         });
 
-        // Recupero degli ordini missioni da validare
-        ElencoOrdiniMissioneService.findListToValidate(uo).then(function(response) {
-            $scope.listOrdiniMissioniToValidate = response.data || [];
+        ElencoOrdiniMissioneService.findListToValidate(uo).then(function(response){
+            $scope.listOrdiniMissioniToValidate = response.data;
+            $scope.esistonoOrdiniDaRendereDefinitivi = false;
             $scope.esistonoOrdiniDaApprovare = false;
+            $scope.esistonoOrdiniAnnullati = false;
+            $scope.esistonoOrdiniApprovati = false;
             $scope.esistonoOrdiniRespinti = false;
             $scope.esistonoOrdiniDaConfermare = false;
-            $scope.esistonoOrdiniApprovati = false;
-            $scope.esistonoOrdiniAnnullati = false;
-            $scope.esistonoOrdiniDaRendereDefinitivi = false;
+            $scope.esistonoOrdiniDaValidare = false;
             $scope.esistonoOrdiniResponsabileGruppo = false;
-            $scope.esistonoOrdiniDaValidare = false; // Default a false
-
-            if ($scope.listOrdiniMissioniToValidate.length > 0) {
-                $scope.listOrdiniMissioniToValidate.forEach(function(item) {
-                    var stato = item.statoFlussoRitornoHome;
-                    if (stato === 'D') $scope.esistonoOrdiniDaApprovare = true;
-                    if (stato === 'R') $scope.esistonoOrdiniRespinti = true;
-                    if (stato === 'C') $scope.esistonoOrdiniDaConfermare = true;
-                    if (stato === 'A') $scope.esistonoOrdiniApprovati = true;
-                    if (stato === 'N') $scope.esistonoOrdiniAnnullati = true;
-                    if (stato === 'V') $scope.esistonoOrdiniDaValidare = autorizzatoAValidare; // Controllo su autorizzatoAValidare
-                    if (stato === 'F') $scope.esistonoOrdiniDaRendereDefinitivi = true;
-                    if (stato === 'M') $scope.esistonoOrdiniResponsabileGruppo = true;
-                });
+            if ($scope.listOrdiniMissioniToValidate){
+                for (var i=0; i< $scope.listOrdiniMissioniToValidate.length; i++) {
+                    if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
+                        $scope.esistonoOrdiniDaApprovare = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'R'){
+                        $scope.esistonoOrdiniRespinti = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'C'){
+                        $scope.esistonoOrdiniDaConfermare = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'A'){
+                        $scope.esistonoOrdiniApprovati = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'N'){
+                        $scope.esistonoOrdiniAnnullati = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoOrdiniDaValidare = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'F'){
+                        $scope.esistonoOrdiniDaRendereDefinitivi = true;
+                    } else if ($scope.listOrdiniMissioniToValidate[i].statoFlussoRitornoHome == 'M'){
+                        $scope.esistonoOrdiniResponsabileGruppo = true;
+                    }
+                }
             }
             $scope.endSearchCmisOrdine = true;
-        }, function() {
-            $scope.esistonoOrdiniDaValidare = false; // Garantisce che rimanga falso se c'è un errore
+        },
+        function(error){
             $scope.endSearchCmisOrdine = true;
         });
 
-        // Recupero dei rimborsi missioni da validare
-        ElencoRimborsiMissioneService.findListToValidate(uo).then(function(response) {
-            $scope.listRimborsiMissioniToValidate = response.data || [];
+        ElencoRimborsiMissioneService.findListToValidate(uo).then(function(response){
+            $scope.listRimborsiMissioniToValidate = response.data;
             $scope.esistonoRimborsiDaApprovare = false;
+            $scope.esistonoRimborsiAnnullati = false;
+            $scope.esistonoRimborsiApprovati = false;
             $scope.esistonoRimborsiRespinti = false;
             $scope.esistonoRimborsiDaConfermare = false;
-            $scope.esistonoRimborsiApprovati = false;
-            $scope.esistonoRimborsiAnnullati = false;
-            $scope.esistonoRimborsiAllaValidazioneAmm = false;
-            $scope.esistonoRimborsiDaValidare = false; // Default a false
-
-            if ($scope.listRimborsiMissioniToValidate.length > 0) {
-                $scope.listRimborsiMissioniToValidate.forEach(function(item) {
-                    var stato = item.statoFlussoRitornoHome;
-                    if (stato === 'D') $scope.esistonoRimborsiDaApprovare = true;
-                    if (stato === 'R') $scope.esistonoRimborsiRespinti = true;
-                    if (stato === 'C') $scope.esistonoRimborsiDaConfermare = true;
-                    if (stato === 'A') $scope.esistonoRimborsiApprovati = true;
-                    if (stato === 'N') $scope.esistonoRimborsiAnnullati = true;
-                    if (stato === 'V') $scope.esistonoRimborsiDaValidare = autorizzatoAValidare; // Controllo su autorizzatoAValidare
-                    if (stato === 'VA') $scope.esistonoRimborsiAllaValidazioneAmm = true;
-                });
+            if ($scope.listRimborsiMissioniToValidate){
+                for (var i=0; i< $scope.listRimborsiMissioniToValidate.length; i++) {
+                    if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'D'){
+                        $scope.esistonoRimborsiDaApprovare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'R'){
+                        $scope.esistonoRimborsiRespinti = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'C'){
+                        $scope.esistonoRimborsiDaConfermare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'A'){
+                        $scope.esistonoRimborsiApprovati = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'N'){
+                        $scope.esistonoRimborsiAnnullati = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'V'){
+                        $scope.esistonoRimborsiDaValidare = true;
+                    } else if ($scope.listRimborsiMissioniToValidate[i].statoFlussoRitornoHome == 'VA'){
+                        $scope.esistonoRimborsiAllaValidazioneAmm = true;
+                    }
+                }
             }
             $scope.endSearchCmisRimborso = true;
-        }, function() {
-            $scope.esistonoRimborsiDaValidare = false; // Garantisce che rimanga falso se c'è un errore
+        },
+        function(error){
             $scope.endSearchCmisRimborso = true;
         });
 
-
-        // Recupero lista annullamenti rimborsi missioni
-        ElencoRimborsiMissioneService.findListAnnullamentiToValidate(uo).then(function(response) {
-            $scope.listAnnullamentiRimborsiMissioniToValidate = response || [];
+        ElencoRimborsiMissioneService.findListAnnullamentiToValidate(uo).then(function(response){
+            $scope.listAnnullamentiRimborsiMissioniToValidate = response;
             $scope.esistonoAnnullamentiRimborsiDaConfermare = false;
-
-            $scope.listAnnullamentiRimborsiMissioniToValidate.forEach(function() {
-                $scope.esistonoAnnullamentiRimborsiDaConfermare = true;
-            });
-
-            if ($scope.listAnnullamentiRimborsiMissioniToValidate.length === 0) {
-                $scope.esistonoAnnullamentiRimborsiDaConfermare = false;
+            if ($scope.listAnnullamentiRimborsiMissioniToValidate){
+                for (var i=0; i< $scope.listAnnullamentiRimborsiMissioniToValidate.length; i++) {
+                    $scope.esistonoAnnullamentiRimborsiDaConfermare = true;
+                }
             }
             $scope.endSearchCmisAnnullamentiRimborso = true;
-        }, function() {
+        },
+        function(error){
             $scope.endSearchCmisAnnullamentiRimborso = true;
         });
     }
-
     $scope.uoWorkForSpecialUser = null;
     $scope.endSearchCmisAnnullamenti = false;
     $scope.endSearchCmisAnnullamentiRimborso = false;

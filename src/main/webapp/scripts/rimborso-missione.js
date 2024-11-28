@@ -1305,6 +1305,7 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     }
 
     $scope.reloadUo = function(uo) {
+        $scope.gestioneUtenteAbilitatoValidare(uo);
         $scope.annullaCdr();
         $scope.restCdr(uo, "N");
     }
@@ -1532,6 +1533,7 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
                     $scope.rimborsoMissioneModel = data;
                     $scope.viewAttachments($scope.rimborsoMissioneModel.id);
                     $scope.inizializzaFormPerModifica();
+                    $location.path('/');
                 });
             },
             function(httpResponse) {

@@ -525,7 +525,7 @@
             "da-data-missione": "Da Data Missione",
             "a-data-missione": "A Data Missione",
             "anno": "Anno",
-            "annullati": "Includi Annullati",
+            "eliminati": "Includi Eliminati",
             "ordini-missione": "Ordini di Missione"
         },
         "form": {

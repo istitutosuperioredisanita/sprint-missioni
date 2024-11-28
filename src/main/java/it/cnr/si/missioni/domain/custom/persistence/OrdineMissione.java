@@ -1348,5 +1348,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public Boolean isOrdineMissioneVecchiaScrivania() {
         return getIdFlusso() != null && getIdFlusso().startsWith("activiti");
     }
-
+    @Transient
+    public Boolean checkStatiFlussoTrue() {
+        return isStatoInviatoAlFlusso() || isStatoRespintoFlusso() || isStatoNonInviatoAlFlusso() || isStatoFlussoApprovato();
+    }
 }
