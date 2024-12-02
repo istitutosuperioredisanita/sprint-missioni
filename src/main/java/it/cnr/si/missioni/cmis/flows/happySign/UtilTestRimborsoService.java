@@ -38,8 +38,8 @@ public class UtilTestRimborsoService {
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 
-        startInfo.addSigner(rimborsoMissione.getUid());
-        startInfo.addSigner(rimborsoMissione.getUid());
+        startInfo.addSigner(rimborsoMissione.getUidInsert());
+        startInfo.addSigner(rimborsoMissione.getUidInsert());
 
         File f = new File();
         f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
