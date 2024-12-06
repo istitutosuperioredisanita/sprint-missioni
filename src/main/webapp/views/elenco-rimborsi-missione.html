@@ -130,15 +130,16 @@
                         <p class="input-group">
                             <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
                             <label class="checkbox">
-                                <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N">
+                                <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N" ng-change="onChangeFlagAnn()">
                             </label>
                         </p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3" ng-if="!(annullati == 'S' || (statoRimborsoMissione && statoRimborsoMissione !== 'T'))">
                         <p class="input-group">
                             <span class="input-group-addon" translate="elenco-ordini-missione.filter.stati">Stati</span>
                             <ui-select id="missioni-ui-select" theme="select2" ng-model="statoFiltroSelezionato"
-                                       on-select="onChangeStatoRimborsoMissione(statoFiltroSelezionato)">
+                                       on-select="onChangeStatoRimborsoMissione(statoFiltroSelezionato)"
+                                       ng-disabled="annullati == 'S' || (statoRimborsoMissione && statoRimborsoMissione !== 'T')">
                                 <ui-select-match placeholder="{{'elenco-ordini-missione.filter.stati-placeholder' | translate}}">
                                     <span ng-bind="$select.selected.stato"></span>
                                 </ui-select-match>

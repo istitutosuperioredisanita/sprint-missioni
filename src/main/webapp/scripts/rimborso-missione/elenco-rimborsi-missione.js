@@ -395,4 +395,12 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
     } else {
         $scope.accountModel = accountLog;
     }
+
+
+            $scope.onChangeFlagAnn = function() {
+                var valueFiltroStati = $scope.statoSecondoFiltroSelezionato;
+                if (valueFiltroStati && valueFiltroStati.value !== 'T' && $scope.annullati == 'S') {
+                    $scope.statoSecondoFiltroSelezionato.value = 'T';
+                }
+            };
 });
