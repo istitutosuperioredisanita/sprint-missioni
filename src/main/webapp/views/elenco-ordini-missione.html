@@ -110,7 +110,7 @@
                     <span class="input-group-addon" translate="elenco-ordini-missione.filter.ordini-missione">Ordini di Missione</span>
                     <ui-select id="missioni-ui-select" theme="select2" ng-model="statoOrdineMissione"
                                on-select="onChangeStatoOrdineMissione(statoOrdineMissione)"
-                               ng-disabled="statoSecondoFiltroSelezionato && statoSecondoFiltroSelezionato.value !== 'T'">
+                               ng-disabled="statoSecondoFiltroSelezionato && statoSecondoFiltroSelezionato.value !== 'T' && annullati == 'N'">
                         <ui-select-match placeholder="{{'elenco-ordini-missione.filter.ordini-missione' | translate}}">
                             <span ng-bind="$select.selected.stato"></span>
                         </ui-select-match>
@@ -141,7 +141,7 @@
                 <span class="input-group">
                     <span class="input-group-addon" translate="elenco-ordini-missione.filter.annullati">Annullati</span>
                     <label class="checkbox">
-                        <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N" ng-change="onChangeFlagAnn()">
+                        <input type="checkbox" ng-model="annullati" ng-true-value="S" ng-false-value="N">
                     </label>
                 </span>
                 </div>

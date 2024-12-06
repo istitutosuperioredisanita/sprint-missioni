@@ -433,11 +433,4 @@ $scope.loadPaginatedData = function() {
         }
     };
 
-        $scope.onChangeFlagAnn = function() {
-            var valueFiltroStati = $scope.statoSecondoFiltroSelezionato;
-            if (valueFiltroStati && valueFiltroStati.value !== 'T' && $scope.annullati == 'S') {
-                $scope.statoSecondoFiltroSelezionato.value = 'T';
-            }
-        };
-
 });
