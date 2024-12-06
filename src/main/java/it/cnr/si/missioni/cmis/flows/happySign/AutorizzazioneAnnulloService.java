@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class AutorizzazioneAnnulloService {
 
     @Autowired
     UtilTestAnnullamentoService utilTestAnnullamentoService;
+    UtilHappySign utilHappySign;
     private final List<AutorizzazioneAnnullamentoMissione> autorizzazioneAnnullamentoMissione;
     @Autowired
     public AutorizzazioneAnnulloService(List<AutorizzazioneAnnullamentoMissione> autorizzazioneAnnullamentoMissione) {
@@ -41,8 +43,13 @@ public class AutorizzazioneAnnulloService {
             logger.info(autorizzazioneAnnullamentoMissione);
         }
         StartWorflowDto startWorflowDto=   autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo,allegati);
+        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
+        startWorflowDto.setSigners(signersDef);
+        UtilHappySign.setTemplateFirme(startWorflowDto);
+
         if ( Optional.ofNullable(utilTestAnnullamentoService).isPresent()){
             UtilTestService.showSigned(startWorflowDto);
+            utilTestAnnullamentoService.sendMailForAnnullamentoOrdineMissione(annullamentoOrdineMissione,startWorflowDto.getSigners());
             startWorflowDto = utilTestAnnullamentoService.createUStartWorkflowDto(annullamentoOrdineMissione,modulo,allegati);
         }
 

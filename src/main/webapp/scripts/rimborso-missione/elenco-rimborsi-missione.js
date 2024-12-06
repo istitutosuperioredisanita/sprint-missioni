@@ -57,6 +57,46 @@ missioniApp.factory('ElencoRimborsiMissioneService', function($http, ui) {
             });
             return promise;
         },
+        findRimborsiDaAnnullare: function(user) {
+            var promise = $http.get('api/rest/rimborsiMissione/listDaAnnullare', {
+                params: {
+                    user: user
+                }
+            }).then(function(response) {
+                return response.data;
+            });
+            return promise;
+        },
+        findRimborsiMissioneDaInviareAllaFirma: function(user) {
+            var promise = $http.get('api/rest/rimborsiMissione/listDaInviareAllaFirma', {
+                params: {
+                    user: user
+                }
+            }).then(function(response) {
+                return response.data;
+            });
+            return promise;
+        },
+        findRimborsiMissioneDaApprovare: function(user) {
+            var promise = $http.get('api/rest/rimborsiMissione/listDaApprovare', {
+                params: {
+                    user: user
+                }
+            }).then(function(response) {
+                return response.data;
+            });
+            return promise;
+        },
+        findRimborsiMissioneDaConfermare: function(user) {
+            var promise = $http.get('api/rest/rimborsiMissione/listDaConfermare', {
+                params: {
+                    user: user
+                }
+            }).then(function(response) {
+                return response.data;
+            });
+            return promise;
+        },
         findById: function(id) {
             var promise = $http.get('api/rest/rimborsoMissione/getById', {
                 params: {
@@ -120,7 +160,11 @@ missioniApp.factory('ElencoRimborsiMissioneService', function($http, ui) {
     }
 });
 
-missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoRimborsiMissioneService, $filter, ui, ProxyService, DateService) {
+missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoRimborsiMissioneService,ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
+
+    $scope.statoSecondoFiltroSelezionato = '';
+    $scope.valoriFiltroStatiRimb = ProxyService.valueFiltroStatiRimb;
+
 
     $scope.tipiMissione = {
         'Italia': 'I',
@@ -140,7 +184,9 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
         'Definitivo': 'DEF'
     };
 
-
+    $scope.onChangeStatoRimborsoMissione = function(stato,stato2) {
+        $scope.statoSecondoFiltroSelezionato = stato;
+    };
 
     $scope.goPrintRimborsoMissione = function(idMissione, accessToken) {
         ElencoRimborsiMissioneService.stampaRimborso(idMissione, accessToken)
@@ -148,9 +194,53 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
                 window.location.href = response.config.url;
             })
             .catch(function(error) {
-                $scope.errorMessage = error.data.message;
-                $('#errorModal').modal('show');
+                ui.error("Errore durante il processo di stampa del Rimborso di Missione");
             });
+    };
+
+
+        $scope.currentPage = 1;
+        $sessionStorage.rowsPerPage = $scope.rowsPerPage;
+        $scope.rowsPerPage = $sessionStorage.rowsPerPage || 10;
+        $scope.totalItems = 0;
+
+        $scope.getTotalPages = function() {
+            return Math.ceil($scope.totalItems / $scope.rowsPerPage);
+        };
+
+
+        $scope.isFirstPage = function() {
+            return $scope.currentPage === 1;
+        };
+
+        $scope.isLastPage = function() {
+            return $scope.currentPage === $scope.getTotalPages();
+        };
+
+        $scope.changePage = function(page) {
+            if (page < 1 || page > $scope.getTotalPages()) return; // Pagina fuori intervallo
+            $scope.currentPage = page; // Aggiorna la pagina corrente
+            $scope.loadPaginatedData(); // Aggiorna i dati visibili
+        };
+
+
+    $scope.updateRowsPerPage = function() {
+        $sessionStorage.rowsPerPage = $scope.rowsPerPage; // Salva il valore nel sessionStorage
+        $scope.currentPage = 1; // Torna alla prima pagina
+        $scope.loadPaginatedData(); // Aggiorna i dati visibili
+    };
+
+
+
+    $scope.loadPaginatedData = function() {
+        const startIndex = ($scope.currentPage - 1) * $scope.rowsPerPage;
+        const endIndex = startIndex + parseInt($scope.rowsPerPage, 10);
+
+        if ($scope.rimborsiMissione && $scope.rimborsiMissione.length > 0) {
+            $scope.paginatedItems = $scope.rimborsiMissione.slice(startIndex, endIndex);
+        } else {
+            $scope.paginatedItems = [];
+        }
     };
 
 
@@ -158,36 +248,63 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.rimborsiMissione = null;
-        var daDataFormatted = null;
-        var aDataFormatted = null;
-        var daDataMissioneFormatted = null;
-        var aDataMissioneFormatted = null;
-        if ($scope.daData) {
-            daDataFormatted = $filter('date')($scope.daData, "dd/MM/yyyy");
-        }
-        if ($scope.aData) {
-            aDataFormatted = $filter('date')($scope.aData, "dd/MM/yyyy");
-        }
 
-        if ($scope.daDataMissione) {
-            daDataMissioneFormatted = $filter('date')($scope.daDataMissione, "dd/MM/yyyy");
+        var daDataFormatted = $scope.daData ? $filter('date')($scope.daData, "dd/MM/yyyy") : null;
+        var aDataFormatted = $scope.aData ? $filter('date')($scope.aData, "dd/MM/yyyy") : null;
+        var daDataMissioneFormatted = $scope.daDataMissione ? $filter('date')($scope.daDataMissione, "dd/MM/yyyy") : null;
+        var aDataMissioneFormatted = $scope.aDataMissione ? $filter('date')($scope.aDataMissione, "dd/MM/yyyy") : null;
+
+        // Determina quale valore è selezionato
+        var filtroSelezionato = $scope.statoSecondoFiltroSelezionato ? $scope.statoSecondoFiltroSelezionato.value : 'T';
+
+        // Gestione dello switch in base al filtro selezionato
+        switch (filtroSelezionato) {
+            case 'T':
+                ElencoRimborsiMissioneService.findRimborsiMissione(
+                    $scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero,
+                    $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annoOrdine,
+                    $scope.daNumeroOrdine, $scope.aNumeroOrdine, $scope.annullati, null,
+                    null, $scope.cup, daDataMissioneFormatted, aDataMissioneFormatted
+                ).then(handleResponse);
+                break;
+            case 'DA ANN':
+                ElencoRimborsiMissioneService.findRimborsiDaAnnullare($scope.userWork).then(handleResponse);
+                break;
+
+            case 'DA INV':
+                ElencoRimborsiMissioneService.findRimborsiMissioneDaInviareAllaFirma($scope.userWork).then(handleResponse);
+                break;
+
+            case 'DA CONF':
+                ElencoRimborsiMissioneService.findRimborsiMissioneDaConfermare($scope.userWork).then(handleResponse);
+                break;
+
+            case 'DA APP':
+                ElencoRimborsiMissioneService.findRimborsiMissioneDaApprovare($scope.userWork).then(handleResponse);
+                break;
+
+            default:
+                console.error('Filtro selezionato non riconosciuto:', filtroSelezionato);
+                $scope.endSearching = true;
+                $rootScope.salvataggio = false;
+                break;
         }
-        if ($scope.aDataMissione) {
-            aDataMissioneFormatted = $filter('date')($scope.aDataMissione, "dd/MM/yyyy");
+    };
+
+    function handleResponse(data) {
+        if (data && data.length > 0) {
+            $scope.rimborsiMissione = data || [];
+            $scope.totalItems = $scope.rimborsiMissione.length;
+            $scope.currentPage = 1;
+            $scope.loadPaginatedData();
+            $scope.messageRimborsiNonEsistenti = false;
+        } else {
+            $scope.messageRimborsiNonEsistenti = true;
         }
-        ElencoRimborsiMissioneService.findRimborsiMissione($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero,
-            $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annoOrdine, $scope.daNumeroOrdine, $scope.aNumeroOrdine,
-            $scope.annullati, null, null, $scope.cup, daDataMissioneFormatted, aDataMissioneFormatted).then(function(data) {
-            if (data && data.length > 0) {
-                $scope.rimborsiMissione = data;
-                $scope.messageRimborsiNonEsistenti = false;
-            } else {
-                $scope.messageRimborsiNonEsistenti = true;
-            }
-            $scope.endSearching = true;
-            $rootScope.salvataggio = false;
-        });
+        $scope.endSearching = true;
+        $rootScope.salvataggio = false;
     }
+
 
     $scope.doSelectRimborsoMissione = function(rimborsoMissione) {
         $location.path('/rimborso-missione/' + rimborsoMissione.id);

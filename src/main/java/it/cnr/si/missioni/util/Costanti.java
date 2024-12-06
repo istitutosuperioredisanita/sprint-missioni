@@ -202,6 +202,13 @@ public class Costanti {
     public final static String IS_DIR_DRUE = "isDirDRUE";
     public final static String IS_DIR_II_FASCIA = "isDirIIFascia";
 
+    public final static String CLASS_AUTORIZZ_MISS_GAE = "AutorizzazioneMissioneGae";
+    public final static String CLASS_AUTORIZZ_MISS_DIR_GAE = "AutorizzazioneMissioneDirGae";
+
+    public final static String TIPO_MISS_GAE = "AutorizzazioneMissione Uo Richiedente = Uo GAE";
+    public final static String TIPO_MISS_DIR_GAE = "AutorizzazioneMissione del Direttore del Dipartimento Uo Struttura = Uo GAE";
+
+
     public final static String OLD_AUTH = "OLD_AUTH";
 
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";

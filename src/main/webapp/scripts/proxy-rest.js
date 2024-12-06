@@ -111,6 +111,22 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
        {priorita:'Media', value: '1'}
     ];
 
+    var valoriFiltroStati = [
+        { stato: 'Tutti', value: 'T' },
+        { stato: 'Da annullare', value: 'DA ANN'},
+        { stato: 'Da inviare alla firma', value: 'DA INV' },
+        { stato: 'Da confermare', value: 'DA CONF' },
+        { stato: 'Da approvare', value: 'DA APP' }
+    ];
+
+    var valoriFiltroStatiRimb = [
+        { stato: 'Tutti', value: 'T' },
+        { stato: 'Da annullare', value: 'DA ANN'},
+        { stato: 'Da inviare alla firma', value: 'DA INV' },
+        { stato: 'Da confermare', value: 'DA CONF' },
+        { stato: 'Da approvare', value: 'DA APP' }
+    ];
+
     var trattamenti = [
        {trattamento:'Rimborso Documentato', value: 'R'},
        {trattamento:'Trattamento Alternativo di Missione', value: 'T'}
@@ -586,6 +602,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              valuePriorita: valoriPriorita,
              valueTrattamenti: trattamenti,
              valueFondi: fondi,
-             valueObblighiRientro: obblighiRientro };
+             valueObblighiRientro: obblighiRientro,
+             valueFiltroStati: valoriFiltroStati,
+             valueFiltroStatiRimb: valoriFiltroStatiRimb};
 });
 

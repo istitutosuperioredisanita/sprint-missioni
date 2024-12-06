@@ -91,6 +91,8 @@ spring:
         oggetto: Annullamento Ordine di Missione.
       annullamentoRimborsoMittente:
         oggetto: Annullamento Rimborso Missione
+      listaFirmatariInProd:
+        oggetto: Lista dei Firmatari in Produzione
     host: extmail.iss.it
     protocol: smtp
     port: 25
@@ -132,6 +134,12 @@ flows:
   keystore:
     path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\isscol_client.p12
     password: password
+  templateFirme:
+    1firma: duilioapp
+    2Firme: duilioapp
+    3Firme: duilioapp
+    4Firme: duilioapp
+    5Firme: duilioapp
 
   autorizzazione:
     progdifuo: duilioapp

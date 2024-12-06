@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,9 +41,16 @@ public class AutorizzazioneRimborsoService {
         if ( Optional.ofNullable(autorizzazioneRimborso).isPresent()){
            logger.info(autorizzazioneRimborso);
         }
-        StartWorflowDto startWorflowDto= autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo,allegati);;
+
+        StartWorflowDto startWorflowDto= autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo,allegati);
+        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
+        startWorflowDto.setSigners(signersDef);
+        UtilHappySign.setTemplateFirme(startWorflowDto);
+
         if ( Optional.ofNullable(utilTestRimborsoService).isPresent()){
             UtilTestService.showSigned(startWorflowDto);
+
+            utilTestRimborsoService.sendMailForRimborsoMissione(rimborsoMissione,startWorflowDto.getSigners());
             startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo,allegati);
         }
 

@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -377,6 +378,14 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     }
 
 
+    /**
+     * Verifica se un OrdineMissione soddisfa i criteri di firma.
+     *
+     * @param ordineMissione La missione da controllare.
+     * @param s              Chiave per selezionare la condizione.
+     * @return true se le condizioni specifiche sono soddisfatte.
+     *
+     * */
     protected Boolean setSignersToMissioni(OrdineMissione ordineMissione, String s) {
         boolean signGae = signGae(ordineMissione);
         boolean uoGaeSuDirCentrale = uoGaeSuDirCentrale(ordineMissione);
@@ -426,7 +435,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
             return !signGae && !uoGaeSuDirCentrale && allNegatedConditions.test(ordineMissione);
         }
 
-        if (s.isEmpty()) {
+        if (StringUtils.isEmpty(s)) {
             return signGae && uoGaeSuDirCentrale && allNegatedConditions.test(ordineMissione);
         }
 

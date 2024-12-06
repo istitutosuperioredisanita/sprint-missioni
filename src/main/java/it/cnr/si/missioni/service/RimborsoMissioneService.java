@@ -493,6 +493,12 @@ public class RimborsoMissioneService {
         }
 
         controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
+
+        //check privilegi utente e set validato
+        if(!accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), rimborsoMissione.getUoSpesa())){
+            rimborsoMissioneDB.setValidato("N");
+        }
+
         if (confirm && !rimborsoMissioneDB.isMissioneDaValidare() && rimborsoMissioneDB.isPassataValidazioneAmministrativa()) {
             if (!accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), rimborsoMissione.getUoSpesa())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare i rimborsi missione per la uo " + rimborsoMissione.getUoSpesa() + ".");

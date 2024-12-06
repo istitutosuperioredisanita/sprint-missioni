@@ -3,6 +3,7 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
+import it.cnr.si.missioni.service.MailService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import it.iss.si.dto.happysign.base.AttachedFile;
@@ -12,10 +13,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +30,10 @@ public class UtilTestAnnullamentoService {
 
     @Autowired
     protected MissioniCMISService missioniCMISService;
+    @Autowired(required = false)
+    private MailService mailService;
+    @Value("${spring.mail.messages.listaFirmatariInProd.oggetto}")
+    private String listaFirmatariInProd;
 
     public byte[] getDocumento(StorageObject storageObject) throws IOException {
         return IOUtils.toByteArray(missioniCMISService.getResource(storageObject));
@@ -35,8 +42,8 @@ public class UtilTestAnnullamentoService {
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 
-        startInfo.addSigner(annullamentoOrdineMissione.getUid());
-        startInfo.addSigner(annullamentoOrdineMissione.getUid());
+        startInfo.addSigner(annullamentoOrdineMissione.getUidInsert());
+        startInfo.addSigner(annullamentoOrdineMissione.getUidInsert());
 
         File f = new File();
         f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
@@ -55,4 +62,32 @@ public class UtilTestAnnullamentoService {
 
         return startInfo;
     }
+
+    public void sendMailForAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento, List<String> signers) {
+        List<String> destinatari = new ArrayList<>();
+        destinatari.add("davide.mirra@iss.it");
+        // TODO: Da commentare in locale
+         destinatari.add("martina.damia@iss.it");
+         destinatari.add("simona.fortunato@iss.it");
+
+        StringBuilder testoMail = new StringBuilder();
+        testoMail.append("<p>Di seguito gli utenti che, in PRODUZIONE, dovranno firmare l'Annullamento dell'Ordine di Missione: ")
+                .append(annullamento.getOrdineMissione().getId())
+                .append("<br>Elenco dei firmatari:<br><ul>");
+
+        for (String signer : signers) {
+            testoMail.append("<li>").append(signer).append("</li>");
+        }
+        testoMail.append("</ul>");
+        testoMail.append("</p>");
+
+        String testoMailString = testoMail.toString();
+        String[] elencoMail = mailService.preparaElencoMail(destinatari);
+
+        if (elencoMail != null && elencoMail.length > 0) {
+            mailService.sendEmail(listaFirmatariInProd, testoMailString, false, true, elencoMail);
+        }
+    }
+
+
 }

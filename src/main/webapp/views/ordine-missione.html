@@ -565,7 +565,8 @@
                     </div>
                 </div>
             </form>
-            <form class="form-inline" role="form" id="missioni" ng-show="showEsisteOrdineMissione && utenteAbilitatoValidareUo=='S' && ordineMissioneModel.stato === 'CON' && (validazione === 'S' || !disabilitaOrdineMissione || ordineMissioneModel.noteRespingi)">
+
+            <form class="form-inline" role="form" id="missioni" ng-show="showEsisteOrdineMissione && (ordineMissioneModel.stato != 'INS' || ordineMissioneModel.stato == 'CON') && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
                 <p class="col-md-12">
                <span class="input-group">
                <span class="input-group-addon" translate="missione.form.motivo-respingi-mittente">note</span>
@@ -590,12 +591,12 @@
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="validateOrdineMissione()">
-                <div class="col-xs-4" ng-show="(ordineMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo == 'S') || showEsisteOrdineMissione && validazione === 'S' && ordineMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
+                <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (ordineMissioneModel.stato != 'INS' || ordineMissioneModel.stato == 'CON') && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
                     <button type="submit" class="btn btn-success" data-toggle="tooltip" title="{{'missione.button.sendToSign' | translate}}"><span class="glyphicon glyphicon-share-alt" style="color:white"></span>&nbsp;{{'missione.button.sendToSign' | translate}}</button>
                 </div>
             </form>
             <form name="form-inline" role="form" ng-submit="ritornaMittenteOrdineMissione()">
-                <div class="col-xs-4" ng-show="(ordineMissioneModel.stato === 'CON' && utenteAbilitatoValidareUo == 'S') || showEsisteOrdineMissione && validazione === 'S' && ordineMissioneModel.stato != 'INS' && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
+                <div class="col-xs-4" ng-show="showEsisteOrdineMissione && (ordineMissioneModel.stato != 'INS' || ordineMissioneModel.stato == 'CON') && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione">
                     <button type="submit" class="btn btn-warning" data-toggle="tooltip" title="{{'missione.button.returnToSender' | translate}}"><span class="glyphicon glyphicon-backward" style="color:white"></span>&nbsp;{{'missione.button.returnToSender' | translate}}</button>
                 </div>
             </form>
