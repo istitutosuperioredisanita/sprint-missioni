@@ -1,69 +1,69 @@
-<!--
-  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
-  ~
-  ~      This program is free software: you can redistribute it and/or modify
-  ~      it under the terms of the GNU Affero General Public License as
-  ~      published by the Free Software Foundation, either version 3 of the
-  ~      License, or (at your option) any later version.
-  ~
-  ~      This program is distributed in the hope that it will be useful,
-  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~      GNU Affero General Public License for more details.
-  ~
-  ~      You should have received a copy of the GNU Affero General Public License
-  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  ~
-  ~
-  -->
+<!--&lt;!&ndash;-->
+<!--  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche-->
+<!--  ~-->
+<!--  ~      This program is free software: you can redistribute it and/or modify-->
+<!--  ~      it under the terms of the GNU Affero General Public License as-->
+<!--  ~      published by the Free Software Foundation, either version 3 of the-->
+<!--  ~      License, or (at your option) any later version.-->
+<!--  ~-->
+<!--  ~      This program is distributed in the hope that it will be useful,-->
+<!--  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of-->
+<!--  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the-->
+<!--  ~      GNU Affero General Public License for more details.-->
+<!--  ~-->
+<!--  ~      You should have received a copy of the GNU Affero General Public License-->
+<!--  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+<!--  ~-->
+<!--  ~-->
+<!--  &ndash;&gt;-->
 
-<div ng-cloak>
-    <div class="row" ng-hide="idHelpdesk">
-        <div class="col-md-10 col-md-offset-1">
-            <div class="title">
-                <p class="lead" translate="helpdesk.title">HELPDESK</p>
-            </div>
-            <div class="alert alert-info alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <div translate="helpdesk.form.avviso"></div>
-            </div>
-        </div>
-    </div>
+<!--<div ng-cloak>-->
+<!--    <div class="row" ng-hide="idHelpdesk">-->
+<!--        <div class="col-md-10 col-md-offset-1">-->
+<!--            <div class="title">-->
+<!--                <p class="lead" translate="helpdesk.title">HELPDESK</p>-->
+<!--            </div>-->
+<!--            <div class="alert alert-info alert-dismissible" role="alert">-->
+<!--                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+<!--                <div translate="helpdesk.form.avviso"></div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
 
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <form id="helpdesk">
-              <div class="form-group" ng-hide="idHelpdesk">
-                <label for="categoria" translate="helpdesk.form.categoria">Categoria</label>
-                <select class="form-control" id="categoria" ng-model="helpdeskModel.categoria" ng-options="categoria.id as categoria.descrizione for categoria in categorie"></select>
-              </div>
-              <div class="form-group" ng-hide="idHelpdesk">
-                <label for="emailObject" translate="helpdesk.form.oggetto">Object</label>
-                <input type="text" class="form-control" id="emailObject" ng-model="helpdeskModel.titolo" placeholder="{{'helpdesk.form.oggetto' | translate}}" />
-              </div>
-              <div class="form-group" ng-hide="idHelpdesk">
-                <label for="emailMessage" translate="helpdesk.form.messaggio">Message</label>
-                <textarea class="form-control" id="emailMessage" ng-model="helpdeskModel.descrizione" placeholder="{{'helpdesk.form.messaggio' | translate}}" rows="5"></textarea>
-              </div>
-              <div class="form-group" ng-show="idHelpdesk">
-                <label for="nota" translate="helpdesk.form.nota">Nota</label>
-                <textarea class="form-control" id="nota" ng-model="helpdeskModel.nota" placeholder="{{'helpdesk.form.nota' | translate}}" rows="5"></textarea>
-              </div>
-              <div class="form-group">
-                <!-- The fileinput-button span is used to style the file input field as button -->
-                <span class="btn btn-success fileinput-button">
-                    <i class="glyphicon glyphicon-plus"></i>
-                    <span>Aggiunti Allegato</span>
-                    <!-- The file input field used as target for the file upload widget -->
-                    <input id="fileupload" type="file" name="file" multiple>
-                </span>
-                <br>
-                <!-- The container for the uploaded files -->
-                <div id="files" class="files"></div>
-              </div>
-              <br>
-              <button type="button" class="btn btn-primary" name="sendMail" ng-disabled="sendMailButtonDisable()" translate="helpdesk.form.invia">Send</button>
-            </form>
-        </div>
-    </div>
-</div>
+<!--    <div class="row">-->
+<!--        <div class="col-md-8 col-md-offset-2">-->
+<!--            <form id="helpdesk">-->
+<!--              <div class="form-group" ng-hide="idHelpdesk">-->
+<!--                <label for="categoria" translate="helpdesk.form.categoria">Categoria</label>-->
+<!--                <select class="form-control" id="categoria" ng-model="helpdeskModel.categoria" ng-options="categoria.id as categoria.descrizione for categoria in categorie"></select>-->
+<!--              </div>-->
+<!--              <div class="form-group" ng-hide="idHelpdesk">-->
+<!--                <label for="emailObject" translate="helpdesk.form.oggetto">Object</label>-->
+<!--                <input type="text" class="form-control" id="emailObject" ng-model="helpdeskModel.titolo" placeholder="{{'helpdesk.form.oggetto' | translate}}" />-->
+<!--              </div>-->
+<!--              <div class="form-group" ng-hide="idHelpdesk">-->
+<!--                <label for="emailMessage" translate="helpdesk.form.messaggio">Message</label>-->
+<!--                <textarea class="form-control" id="emailMessage" ng-model="helpdeskModel.descrizione" placeholder="{{'helpdesk.form.messaggio' | translate}}" rows="5"></textarea>-->
+<!--              </div>-->
+<!--              <div class="form-group" ng-show="idHelpdesk">-->
+<!--                <label for="nota" translate="helpdesk.form.nota">Nota</label>-->
+<!--                <textarea class="form-control" id="nota" ng-model="helpdeskModel.nota" placeholder="{{'helpdesk.form.nota' | translate}}" rows="5"></textarea>-->
+<!--              </div>-->
+<!--              <div class="form-group">-->
+<!--                &lt;!&ndash; The fileinput-button span is used to style the file input field as button &ndash;&gt;-->
+<!--                <span class="btn btn-success fileinput-button">-->
+<!--                    <i class="glyphicon glyphicon-plus"></i>-->
+<!--                    <span>Aggiunti Allegato</span>-->
+<!--                    &lt;!&ndash; The file input field used as target for the file upload widget &ndash;&gt;-->
+<!--                    <input id="fileupload" type="file" name="file" multiple>-->
+<!--                </span>-->
+<!--                <br>-->
+<!--                &lt;!&ndash; The container for the uploaded files &ndash;&gt;-->
+<!--                <div id="files" class="files"></div>-->
+<!--              </div>-->
+<!--              <br>-->
+<!--              <button type="button" class="btn btn-primary" name="sendMail" ng-disabled="sendMailButtonDisable()" translate="helpdesk.form.invia">Send</button>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
