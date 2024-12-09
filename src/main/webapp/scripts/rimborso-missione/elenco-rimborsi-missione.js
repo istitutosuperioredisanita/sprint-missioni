@@ -184,9 +184,15 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
         'Definitivo': 'DEF'
     };
 
-    $scope.onChangeStatoRimborsoMissione = function(stato,stato2) {
+    $scope.onChangeStatoRimborsoMissione = function(stato) {
         $scope.statoSecondoFiltroSelezionato = stato;
     };
+
+    $scope.$watch('annullati', function(newValue) {
+        if (newValue === 'S') {
+            $scope.statoFiltroSelezionato = { value: 'T', stato: 'Tutti' }; // Imposta il valore del filtro Stati su 'T'
+        }
+    });
 
     $scope.goPrintRimborsoMissione = function(idMissione, accessToken) {
         ElencoRimborsiMissioneService.stampaRimborso(idMissione, accessToken)
@@ -253,9 +259,14 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
         var aDataFormatted = $scope.aData ? $filter('date')($scope.aData, "dd/MM/yyyy") : null;
         var daDataMissioneFormatted = $scope.daDataMissione ? $filter('date')($scope.daDataMissione, "dd/MM/yyyy") : null;
         var aDataMissioneFormatted = $scope.aDataMissione ? $filter('date')($scope.aDataMissione, "dd/MM/yyyy") : null;
+        var filtroSelezionato = '';
 
-        // Determina quale valore è selezionato
-        var filtroSelezionato = $scope.statoSecondoFiltroSelezionato ? $scope.statoSecondoFiltroSelezionato.value : 'T';
+        if($scope.annullati === 'S'){
+            filtroSelezionato = 'T';
+            $scope.statoSecondoFiltroSelezionato = null;
+        } else {
+            filtroSelezionato = $scope.statoSecondoFiltroSelezionato ? $scope.statoSecondoFiltroSelezionato.value : 'T';
+        }
 
         // Gestione dello switch in base al filtro selezionato
         switch (filtroSelezionato) {

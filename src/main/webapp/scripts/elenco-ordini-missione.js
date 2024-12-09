@@ -239,26 +239,24 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
     };
 
 
-$scope.updateRowsPerPage = function() {
-    $sessionStorage.rowsPerPage = $scope.rowsPerPage; // Salva il valore nel sessionStorage
-    $scope.currentPage = 1; // Torna alla prima pagina
-    $scope.loadPaginatedData(); // Aggiorna i dati visibili
-};
+    $scope.updateRowsPerPage = function() {
+        $sessionStorage.rowsPerPage = $scope.rowsPerPage; // Salva il valore nel sessionStorage
+        $scope.currentPage = 1; // Torna alla prima pagina
+        $scope.loadPaginatedData(); // Aggiorna i dati visibili
+    };
 
 
 
-$scope.loadPaginatedData = function() {
-    const startIndex = ($scope.currentPage - 1) * $scope.rowsPerPage;
-    const endIndex = startIndex + parseInt($scope.rowsPerPage, 10);
+    $scope.loadPaginatedData = function() {
+        const startIndex = ($scope.currentPage - 1) * $scope.rowsPerPage;
+        const endIndex = startIndex + parseInt($scope.rowsPerPage, 10);
 
-    if ($scope.ordiniMissione && $scope.ordiniMissione.length > 0) {
-        $scope.paginatedItems = $scope.ordiniMissione.slice(startIndex, endIndex);
-    } else {
-        $scope.paginatedItems = [];
-    }
-};
-
-
+        if ($scope.ordiniMissione && $scope.ordiniMissione.length > 0) {
+            $scope.paginatedItems = $scope.ordiniMissione.slice(startIndex, endIndex);
+        } else {
+            $scope.paginatedItems = [];
+        }
+    };
 
 
 
@@ -271,12 +269,17 @@ $scope.loadPaginatedData = function() {
         var aDataFormatted = $scope.aData ? $filter('date')($scope.aData, "dd/MM/yyyy") : null;
         var daDataMissioneFormatted = $scope.daDataMissione ? $filter('date')($scope.daDataMissione, "dd/MM/yyyy") : null;
         var aDataMissioneFormatted = $scope.aDataMissione ? $filter('date')($scope.aDataMissione, "dd/MM/yyyy") : null;
+        var filtroStatiSelezionato = '';
 
-        // Determina quale valore è selezionato
-        var filtroSelezionato = $scope.statoSecondoFiltroSelezionato ? $scope.statoSecondoFiltroSelezionato.value : 'T';
+        if($scope.annullati === 'S'){
+            filtroStatiSelezionato = 'T';
+            $scope.statoSecondoFiltroSelezionato = null;
+        } else {
+            filtroStatiSelezionato = $scope.statoSecondoFiltroSelezionato ? $scope.statoSecondoFiltroSelezionato.value : 'T';
+        }
 
         // Gestione dello switch in base al filtro selezionato
-        switch (filtroSelezionato) {
+        switch (filtroStatiSelezionato) {
             case 'T':
                 ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annullati, $scope.respGruppo, $scope.cup, daDataMissioneFormatted, aDataMissioneFormatted, $scope.statoOrdineMissione).then(handleResponse);
                 break;
@@ -298,7 +301,7 @@ $scope.loadPaginatedData = function() {
                 break;
 
             default:
-                console.error('Filtro selezionato non riconosciuto:', filtroSelezionato);
+                console.error('Filtro selezionato non riconosciuto:', filtroStatiSelezionato);
                 $scope.endSearching = true;
                 $rootScope.salvataggio = false;
                 break;
@@ -432,5 +435,11 @@ $scope.loadPaginatedData = function() {
             $scope.statoOrdineMissione = null; // Resetta il filtro Ordini di Missione
         }
     };
+
+        $scope.$watch('statoFiltroSelezionato', function(newValue) {
+            if (newValue && newValue !== 'T') {
+                $scope.statoOrdineMissione = { value: 'T', stato: 'Tutti' }; // Imposta il valore del filtro Stati su 'T'
+            }
+        });
 
 });

@@ -109,8 +109,7 @@
                 <span class="input-group">
                     <span class="input-group-addon" translate="elenco-ordini-missione.filter.ordini-missione">Ordini di Missione</span>
                     <ui-select id="missioni-ui-select" theme="select2" ng-model="statoOrdineMissione"
-                               on-select="onChangeStatoOrdineMissione(statoOrdineMissione)"
-                               ng-disabled="statoSecondoFiltroSelezionato && statoSecondoFiltroSelezionato.value !== 'T' && annullati == 'N'">
+                               on-select="onChangeStatoOrdineMissione(statoOrdineMissione)">
                         <ui-select-match placeholder="{{'elenco-ordini-missione.filter.ordini-missione' | translate}}">
                             <span ng-bind="$select.selected.stato"></span>
                         </ui-select-match>
