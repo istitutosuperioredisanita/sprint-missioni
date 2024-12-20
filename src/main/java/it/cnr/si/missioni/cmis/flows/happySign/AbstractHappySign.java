@@ -274,9 +274,13 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
 
 
     public Boolean isDirIFascia(OrdineMissione ordineMissione) {
-        EmployeeDetails dir = getPersonaByUsmFromAce(ordineMissione.getUid());
-        return Objects.equals(dir.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirIFascia));
+        EmployeeDetails dirIFascia = getPersonaByUsmFromAce(ordineMissione.getUid());
+        EmployeeDetails dirDip = getResponsabile(ordineMissione.getUoSpesa());
+
+        return ordineMissione.getUid().equals(UtilAce.getEmail(dirDip)) &&
+                Objects.equals(dirIFascia.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirIFascia));
     }
+
 
 
     public Boolean isDirIIFascia(OrdineMissione ordineMissione) {
@@ -287,8 +291,9 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
 
     public Boolean isDirDipartimento(OrdineMissione ordineMissione) {
         EmployeeDetails richDetails = getPersonaByUsmFromAce(ordineMissione.getUid());
-        EmployeeDetails respDetails = getResponsabile(ordineMissione.getUoRich());
-        return UtilAce.getEmail(richDetails).equals(UtilAce.getEmail(respDetails));
+        EmployeeDetails respDetails = getResponsabile(ordineMissione.getUoSpesa());
+        return UtilAce.getEmail(richDetails).equals(UtilAce.getEmail(respDetails)) &&
+                !(Objects.equals(richDetails.getRapporto().getQualifica().getKey(), convertStringToInteger(keyUoDirIFascia)));
     }
 
 
@@ -305,12 +310,11 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     public void setDirDipToSign(StartWorflowDto startInfo, OrdineMissione ordineMissione) {
 
         EmployeeDetails richiedente = getPersonaByUsmFromAce(ordineMissione.getUid());
-        EmployeeDetails dirUoRich = getResponsabile(ordineMissione.getUoRich());
+        EmployeeDetails dirUoRich = getResponsabile(ordineMissione.getUoSpesa());
 
         if (!UtilAce.getEmail(richiedente).equals(UtilAce.getEmail(dirUoRich))) {
             startInfo.addSigner(UtilAce.getEmail(dirUoRich));
         }
-
     }
 
     public EmployeeDetails getPersonaByUsmFromAce(String username) {
@@ -365,7 +369,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     public Boolean checkIsDirDipartimento(OrdineMissione ordineMissione) {
         Boolean result;
         if (!isPresidente(ordineMissione) && !isDirGenerale(ordineMissione) &&
-                !isDirIFascia(ordineMissione) && !isDirIIFascia(ordineMissione) && !isDirDRUE(ordineMissione)) {
+                !isDirIFascia(ordineMissione) && !isDirIIFascia(ordineMissione)) {
             result = isDirDipartimento(ordineMissione);
         } else {
             result = Boolean.FALSE;
@@ -395,6 +399,9 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
                 case Costanti.IS_PRESIDENTE:
                     condition = this::isPresidente;
                     break;
+                case Costanti.IS_DIR_I_FASCIA:
+                    condition = this::isDirIFascia;
+                    break;
                 case Costanti.CHECK_IS_DIR_DIPARTIMENTO:
                     condition = this::checkIsDirDipartimento;
                     break;
@@ -404,9 +411,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
                 case Costanti.IS_DIR_II_FASCIA:
                     condition = this::isDirIIFascia;
                     break;
-                case Costanti.IS_DIR_I_FASCIA:
-                    condition = this::isDirIFascia;
-                    break;
+
                 case Costanti.IS_DIR_DRUE:
                     condition = this::isDirDRUE;
                     break;

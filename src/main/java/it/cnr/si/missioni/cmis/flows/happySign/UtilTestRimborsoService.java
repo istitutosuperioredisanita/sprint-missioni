@@ -74,7 +74,7 @@ public class UtilTestRimborsoService {
          destinatari.add("simona.fortunato@iss.it");
 
         StringBuilder testoMail = new StringBuilder();
-        testoMail.append("<p>Di seguito gli utenti che, in PRODUZIONE, dovranno firmare il Rimborso Missione per l'Ordine di Missione: ")
+        testoMail.append("<p>Di seguito gli utenti che, in PRODUZIONE, dovranno firmare il Rimborso per l'Ordine di Missione: ")
                 .append(rimborso.getOrdineMissione().getId())
                 .append("<br>Elenco dei firmatari:<br><ul>");
 

@@ -31,11 +31,11 @@ public class AutorizzazioneMissioneDirGae extends AbstractHappySign implements A
         StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName(templateName);
 
-        EmployeeDetails dirGenerale = getDirGenerale();
+        //EmployeeDetails dirGenerale = getDirGenerale();
         EmployeeDetails presidente = getPresidente();
 
         startInfo.addSigner(ordineMissione.getUid());
-        startInfo.addSigner(UtilAce.getEmail(dirGenerale));
+        //startInfo.addSigner(UtilAce.getEmail(dirGenerale));
         startInfo.addSigner(UtilAce.getEmail(presidente));
         setRepScientificoToSign(startInfo, ordineMissione);
         setDirUffEcoGiur(ordineMissione,startInfo);
