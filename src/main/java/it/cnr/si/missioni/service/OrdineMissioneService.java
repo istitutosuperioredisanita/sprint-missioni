@@ -1014,7 +1014,7 @@ public class OrdineMissioneService {
         ordineMissione.setNumero(datiIstitutoService.getNextPG(ordineMissione.getUoRich(), anno,
                 Costanti.TIPO_ORDINE_DI_MISSIONE));
         if (StringUtils.isEmpty(ordineMissione.getTrattamento())) {
-            ordineMissione.setTrattamento("R");
+            ordineMissione.setTrattamento("O");
         }
         if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())) {
             ordineMissione.setObbligoRientro("S");

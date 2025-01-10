@@ -130,6 +130,8 @@ public class Costanti {
     public final static String PRIORITA_MEDIA = "1";
     public final static String TAM = "T";
     public final static String RIMBORSO_DOCUMENTATO = "R";
+    public final static String ORDINE_DOCUMENTATO = "O";
+
     public final static String RESIDENZA_DOMICILIO = "R";
     public final static String SEDE_LAVORO = "S";
     public final static String ALTRO = "A";
@@ -235,6 +237,7 @@ public class Costanti {
     public final static Map<String, String> PRIORITA;
     public final static Map<String, String> TRATTAMENTO;
     public final static Map<String, String> TRATTAMENTO_SHORT;
+    public final static Map<String, String> TRATTAMENTO_SHORT_O;
     public final static Map<String, String> PARTENZA_DA;
     public final static Map<String, String> STATO;
     public final static Map<String, String> TIPO_MISSIONE;
@@ -291,6 +294,13 @@ public class Costanti {
         aMap.put(TAM, "TAM");
         aMap.put(RIMBORSO_DOCUMENTATO, "Rimborso");
         TRATTAMENTO_SHORT = Collections.unmodifiableMap(aMap);
+    }
+
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(TAM, "TAM");
+        aMap.put(ORDINE_DOCUMENTATO, "Ordine");
+        TRATTAMENTO_SHORT_O = Collections.unmodifiableMap(aMap);
     }
 
     static {

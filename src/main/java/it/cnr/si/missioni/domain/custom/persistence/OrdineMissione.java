@@ -968,8 +968,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
     @Transient
     public String getDecodeTrattamentoShort() {
-        if (!StringUtils.isEmpty(getTrattamento())) {
-            return Costanti.TRATTAMENTO_SHORT.get(getTrattamento());
+        if (!StringUtils.isEmpty(getTrattamento()) && !StringUtils.isEmpty(Costanti.TRATTAMENTO_SHORT_O)) {
+            return Costanti.TRATTAMENTO_SHORT_O.get(getTrattamento());
         }
         return "";
     }

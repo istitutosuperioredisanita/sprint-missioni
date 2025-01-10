@@ -35,8 +35,8 @@ spring:
   proxy:
     SIGLA:
       url: http://sigla-t:8080/SIGLA/
-      username: missioni
-      password: missioni
+      username: ***REMOVED***
+      password: ***REMOVED***
       context:
         cd_unita_organizzativa: "999.000"
         cd_cds: "999"

@@ -463,7 +463,7 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
     @Transient
     public String getDecodeTrattamentoShort() {
-        if (!StringUtils.isEmpty(getTrattamento())) {
+        if (!StringUtils.isEmpty(getTrattamento()) && !StringUtils.isEmpty(Costanti.TRATTAMENTO_SHORT)) {
             return Costanti.TRATTAMENTO_SHORT.get(getTrattamento());
         }
         return "";
