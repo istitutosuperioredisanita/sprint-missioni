@@ -26,8 +26,8 @@ spring:
     userSearchBase: Dc=iss,dc=it
     userSearchFilter: (&(objectCategory=Person)(userPrincipalName={0}))
     url: ldap://iss.it:389
-    managerDn: liferayuser@iss.it
-    managerPassword: G2wHrKqHGE
+    managerDn: ldapuser@iss.it
+    managerPassword: ***REMOVED***
     change.password.url: https://utenti.iss.it
     attrName: givenname
     attrSurname: sn
@@ -237,6 +237,11 @@ cron:
     name: happysign
     active: true
     cronExpression: "0 */1 * ? * *"
+
+#  happysignGC:
+#    name: happysignGC
+#    active: true
+#    cronExpression: "0 */10 * ? * *"
 
 jhipster:
   mail:

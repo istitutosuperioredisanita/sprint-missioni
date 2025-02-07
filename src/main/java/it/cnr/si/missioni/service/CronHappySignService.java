@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Conditional(HappySignURLCondition.class)
@@ -54,6 +55,8 @@ public class CronHappySignService {
     private CMISRimborsoMissioneService cmisRimborsoMissioneService;
 
 
+    //public final AtomicInteger errorCount = new AtomicInteger(0);
+
     public void aggiornaEsistiMissioni(){
         MissioneFilter filtro = new MissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -61,6 +64,9 @@ public class CronHappySignService {
         filtro.setDaCron("S");
         List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, false);
         if ( Optional.ofNullable(listaOrdiniMissione).isPresent()){
+//            long currentMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+//            double memoryMb = currentMemory / (double) (1024 * 1024);
+//            log.info("Memoria attuale nel cron service in MB: {}" ,memoryMb);
             for ( OrdineMissione ordineMissione:listaOrdiniMissione) {
                 GetStatusRequest request = new GetStatusRequest();
                 request.setUuid(ordineMissione.getIdFlusso());
@@ -95,6 +101,7 @@ public class CronHappySignService {
 
                     }
                 } catch (Exception e) {
+                    //errorCount.incrementAndGet();
                     log.error("ordineMissione:"+ordineMissione.getIdFlusso(),e);
                 }
             }
@@ -143,6 +150,7 @@ public class CronHappySignService {
 
                     }
                 } catch (Exception e) {
+                    //errorCount.incrementAndGet();
                     log.error("Rimborso Missione:"+rimborsoMissione.getIdFlusso(),e);
                 }
             }
@@ -192,6 +200,7 @@ public class CronHappySignService {
 
                     }
                 } catch (Exception e) {
+                    //errorCount.incrementAndGet();
                     log.error("Annullamento Ordine Missione:"+annullamentoOrdine.getIdFlusso(),e);
                 }
             }
