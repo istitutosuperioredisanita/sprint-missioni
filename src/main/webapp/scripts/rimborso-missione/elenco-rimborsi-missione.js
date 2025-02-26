@@ -310,6 +310,10 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
             $scope.loadPaginatedData();
             $scope.messageRimborsiNonEsistenti = false;
         } else {
+            // Reset dei risultati precedenti
+            $scope.ordiniMissione = [];
+            $scope.paginatedItems = [];
+            $scope.totalItems = 0;
             $scope.messageRimborsiNonEsistenti = true;
         }
         $scope.endSearching = true;

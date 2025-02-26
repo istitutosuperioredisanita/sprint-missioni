@@ -320,6 +320,10 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
             console.log('Elementi nella pagina corrente:', $scope.paginatedItems);
 
         } else {
+            // Reset dei risultati precedenti
+            $scope.ordiniMissione = [];
+            $scope.paginatedItems = [];
+            $scope.totalItems = 0;
             $scope.messageOrdiniNonEsistenti = true;
         }
         $scope.endSearching = true;
