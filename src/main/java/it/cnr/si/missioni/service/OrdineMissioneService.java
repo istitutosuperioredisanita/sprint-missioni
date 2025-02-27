@@ -1528,7 +1528,7 @@ public class OrdineMissioneService {
                 + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
                 + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
                 + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-                + ordineMissione.getOggetto() + " è stata annullato.</p>";
+                + ordineMissione.getOggetto() + " è stato annullato.</p>";
     }
 
 //    private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
