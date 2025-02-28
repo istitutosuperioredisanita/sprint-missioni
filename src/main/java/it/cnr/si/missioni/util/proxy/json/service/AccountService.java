@@ -114,5 +114,5 @@ public interface AccountService {
 
     public String getBodyAccount(Account account);
 
-
+    public UsersSpecial findOrCreateUserSpecial(String uid);
 }

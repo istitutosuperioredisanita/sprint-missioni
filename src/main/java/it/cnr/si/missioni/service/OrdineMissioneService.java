@@ -452,7 +452,7 @@ public class OrdineMissioneService {
         List<UsersSpecial> listaUtenti = new ArrayList<>();
         DatiSede datiSede = null;
         Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
-        UsersSpecial richiedente = accountService.getUoForUsersSpecial(account.getUid());
+        String emailRich = ordineMissioneDaAggiornare.getUid();
         boolean missioneConAnticipo = false;
         OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissioneDaAggiornare);
         if (anticipo != null) {
@@ -494,24 +494,24 @@ public class OrdineMissioneService {
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("U")) {
             listaUtenti = accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), false);
-            aggiuntaRichMailList(listaUtenti,richiedente);
+            aggiuntaRichMailList(listaUtenti,emailRich);
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("V")) {
             listaUtenti = accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), true);
-            aggiuntaRichMailList(listaUtenti,richiedente);
+            aggiuntaRichMailList(listaUtenti,emailRich);
         }
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("V")) {
                 List<UsersSpecial> listaUtentiSpesa = accountService
                         .getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true);
                 listaUtenti.addAll(listaUtentiSpesa);
-                aggiuntaRichMailList(listaUtenti,richiedente);
+                aggiuntaRichMailList(listaUtenti,emailRich);
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("U")) {
                 List<UsersSpecial> listaUtentiSpesa = accountService
                         .getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false);
                 listaUtenti.addAll(listaUtentiSpesa);
-                aggiuntaRichMailList(listaUtenti,richiedente);
+                aggiuntaRichMailList(listaUtenti,emailRich);
             }
         }
         String oggetto = isAnnullamento ? approvazioneAnnullamentoOrdineMissione : approvazioneOrdineMissione;
@@ -2024,9 +2024,14 @@ public class OrdineMissioneService {
 
 
 
-    private void aggiuntaRichMailList(List<UsersSpecial> listaUtenti, UsersSpecial richiedente) {
-        if (listaUtenti.stream().noneMatch(user -> user.getUid().equals(richiedente.getUid()))) {
-            listaUtenti.add(richiedente);
+    private void aggiuntaRichMailList(List<UsersSpecial> listaUtenti, String uidRichiedente) {
+        if (uidRichiedente != null &&
+                listaUtenti.stream().noneMatch(user -> user != null &&
+                        uidRichiedente.equals(user.getUid()))) {
+            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(uidRichiedente);
+            if (richiedente != null) {
+                listaUtenti.add(richiedente);
+            }
         }
     }
 
