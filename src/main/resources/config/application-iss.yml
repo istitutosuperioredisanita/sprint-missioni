@@ -205,7 +205,7 @@ authJWT:
   urlToken: https://login.microsoftonline.com/cf30c7fd-6616-4b62-ad83-b574b27d5912/
   scopes: api://anag.iss.it/.default
   clientId: 0603aa0e-ce6f-48f3-9e67-b0783b22e8e3
-  secret: .MV8Q~Lc1fUkZx.XiJLELrLZwq-fgaoPzJwS0a8p
+  secret: F2p8Q~43jZ_d_K3jlN7.RsC_AOEzhdni3obt7bjy
 
 cron:
   comunicaDati:
