@@ -252,12 +252,12 @@ public class RimborsoMissioneDettagliService {
                 break;
 
             case Costanti.SPESA_PEDAGGIO_AUTOSTRADA:
-                if (!isAutoPropriaUsed || !isAutoNoleggioUsed) {
+                if (!isAutoPropriaUsed && !isAutoNoleggioUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;
             case Costanti.SPESA_PARCHEGGIO:
-                if (!isAutoNoleggioUsed || !isAutoPropriaUsed) {
+                if (!isAutoNoleggioUsed && !isAutoPropriaUsed) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
                 }
                 break;

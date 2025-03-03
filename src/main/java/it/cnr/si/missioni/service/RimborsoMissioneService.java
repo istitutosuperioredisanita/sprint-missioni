@@ -261,29 +261,29 @@ public class RimborsoMissioneService {
         DatiIstituto datiIstitutoSpesa = null;
 
         Account account = accountService.loadAccountFromUsername(rimborsoMissioneDaAggiornare.getUid());
-        UsersSpecial richiedente = accountService.getUoForUsersSpecial(account.getUid());
+        String emailRich = rimborsoMissioneDaAggiornare.getUid();
 
         if (!rimborsoMissioneDaAggiornare.getUoRich().equals(rimborsoMissioneDaAggiornare.getUoSpesa())) {
             datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoSpesa(), rimborsoMissioneDaAggiornare.getAnno());
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("U")) {
             listaUtenti = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), false);
-            aggRichInMailList(listaUtenti,richiedente);
+            aggiuntaRichMailList(listaUtenti,emailRich);
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("V")) {
             listaUtenti = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), true);
-            aggRichInMailList(listaUtenti,richiedente);
+            aggiuntaRichMailList(listaUtenti,emailRich);
         }
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("U")) {
                 List<UsersSpecial> listaUtentiSpesa = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), false);
                 listaUtenti.addAll(listaUtentiSpesa);
-                aggRichInMailList(listaUtenti,richiedente);
+                aggiuntaRichMailList(listaUtenti,emailRich);
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("V")) {
                 List<UsersSpecial> listaUtentiSpesa = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), true);
                 listaUtenti.addAll(listaUtentiSpesa);
-                aggRichInMailList(listaUtenti,richiedente);
+                aggiuntaRichMailList(listaUtenti,emailRich);
             }
         }
         if (listaUtenti.size() > 0) {
@@ -1871,9 +1871,14 @@ public class RimborsoMissioneService {
         return null;
     }
 
-    private void aggRichInMailList(List<UsersSpecial> listaUtenti, UsersSpecial richiedente) {
-        if (listaUtenti.stream().noneMatch(user -> user.getUid().equals(richiedente.getUid()))) {
-            listaUtenti.add(richiedente);
+    private void aggiuntaRichMailList(List<UsersSpecial> listaUtenti, String uidRichiedente) {
+        if (uidRichiedente != null &&
+                listaUtenti.stream().noneMatch(user -> user != null &&
+                        uidRichiedente.equals(user.getUid()))) {
+            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(uidRichiedente);
+            if (richiedente != null) {
+                listaUtenti.add(richiedente);
+            }
         }
     }
 
