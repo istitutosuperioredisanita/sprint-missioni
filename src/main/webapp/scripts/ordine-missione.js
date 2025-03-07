@@ -1674,7 +1674,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     }
 
     $scope.previousPage = function() {
-        $location.path('/');
+        parent.history.back();
     }
 
 

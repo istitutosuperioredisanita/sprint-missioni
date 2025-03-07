@@ -1085,7 +1085,7 @@ public class OrdineMissioneService {
     }
 
     private void checkObbDatiContabili(OrdineMissione ordineMissione, boolean sendToSign) {
-        //controlla che ci sia la Gae ,la voce di bilancio e l'impegno
+        //controlla che ci sia la Gae ,la voce di bilancio, l'impegno e l'importo presunto
         if (sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getFondi()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Fondi");
@@ -1098,6 +1098,9 @@ public class OrdineMissioneService {
 
             if (StringUtils.isEmpty(ordineMissione.getVoce()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
+
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
         }
         if (!sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getGae()))
@@ -1665,6 +1668,8 @@ public class OrdineMissioneService {
                             CodiciErrore.CAMPO_OBBLIGATORIO + ": Indirizzo di Residenza del Richiedente");
                 }*/
             }
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()))
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
         }
     }
 

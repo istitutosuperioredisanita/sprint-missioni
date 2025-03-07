@@ -278,11 +278,18 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
             filtroStatiSelezionato = $scope.statoSecondoFiltroSelezionato ? $scope.statoSecondoFiltroSelezionato.value : 'T';
         }
 
+//        if($scope.statoOrdineMissione === 'N'){
+//            filtroStatiSelezionato = 'N';
+//        }
+
         // Gestione dello switch in base al filtro selezionato
         switch (filtroStatiSelezionato) {
             case 'T':
                 ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annullati, $scope.respGruppo, $scope.cup, daDataMissioneFormatted, aDataMissioneFormatted, $scope.statoOrdineMissione).then(handleResponse);
                 break;
+//            case 'N':
+//                ElencoOrdiniMissioneService.findMissioniDaRimborsare($scope.userWork,false).then(handleResponse);
+//                break;
 
             case 'DA ANN':
                 ElencoOrdiniMissioneService.findMissioniDaAnnullare($scope.userWork).then(handleResponse);

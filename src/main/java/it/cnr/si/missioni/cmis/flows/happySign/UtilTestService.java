@@ -49,6 +49,7 @@ public class UtilTestService {
         StartWorflowDto startInfo = new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 
+        //TODO aspettare conferma per impostare 1 sola firma per chi inserisce l'ordine
         startInfo.addSigner(ordineMissione.getUidInsert());
         startInfo.addSigner(ordineMissione.getUidInsert());
 
@@ -85,32 +86,6 @@ public class UtilTestService {
         }
     }
 
-
-    public void sendMailForOrdineMissione2(OrdineMissione ordineMissione, List<String> signers) {
-        List<String> destinatari = new ArrayList<>();
-        destinatari.add("davide.mirra@iss.it");
-        // TODO: Da commentare in locale
-        // destinatari.add("martina.damia@iss.it");
-        // destinatari.add("simona.fortunato@iss.it");
-
-        StringBuilder testoMail = new StringBuilder();
-        testoMail.append("<p>Di seguito gli utenti che, in PRODUZIONE, dovranno firmare l'Ordine di Missione: ")
-                .append(ordineMissione.getId())
-                .append("<br>Elenco dei firmatari:<br><ul>");
-
-        for (String signer : signers) {
-            testoMail.append("<li>").append(signer).append("</li>");
-        }
-        testoMail.append("</ul>");
-        testoMail.append("</p>");
-
-        String testoMailString = testoMail.toString();
-        String[] elencoMail = mailService.preparaElencoMail(destinatari);
-
-        if (elencoMail != null && elencoMail.length > 0) {
-            mailService.sendEmail(listaFirmatariInProd, testoMailString, false, true, elencoMail);
-        }
-    }
 
 
     public void sendMailForOrdineMissione(OrdineMissione ordineMissione, List<String> signers, AutorizzazioneMissione autorizzazione) {

@@ -45,6 +45,7 @@ public class UtilTestRimborsoService {
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName("duilio_app");
 
+        //TODO aspettare conferma per impostare 1 sola firma per chi inserisce il rimborso
         startInfo.addSigner(rimborsoMissione.getUidInsert());
         startInfo.addSigner(rimborsoMissione.getUidInsert());
 

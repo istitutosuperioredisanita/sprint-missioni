@@ -7,8 +7,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
     name: missioni
-    username: MISSIONICOLL
-    password: ***REMOVED***
+    username: MISSIONISVIL
+    password: MISSIONISVILPSW
   jpa:
     database-platform: org.hibernate.dialect.Oracle12cDialect
     database: ORACLE

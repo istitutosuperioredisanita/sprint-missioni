@@ -361,7 +361,7 @@
             "note-utilizzo-taxi-noleggio.placeholder": "Dettagliare il caso di motivata eccezionalità.",
             "note-segreteria": "Note per il direttore",
             "note-segreteria.placeholder": "Inserire eventuali note che il direttore può visualizzare in fase di autorizzazione",
-            "importo-presunto": "Importo Presunto €",
+            "importo-presunto": "Importo Presunto €*",
             "uso-auto-propria": "Utilizzo Auto Propria",
             "utilizzo-auto-noleggio": "Utilizzo Auto Noleggio",
             "utilizzo-taxi": "Utilizzo Taxi",

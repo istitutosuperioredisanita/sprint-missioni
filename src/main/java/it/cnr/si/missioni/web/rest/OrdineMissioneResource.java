@@ -111,6 +111,7 @@ public class OrdineMissioneResource {
         filter.setRecuperoAutoPropria("S");
         filter.setRecuperoTaxi("S");
         filter.setRecuperoAutoNoleggio("S");
+//        filter.setGiaRimborsato("N");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);
@@ -136,6 +137,7 @@ public class OrdineMissioneResource {
                                                           MissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione da Annullare");
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+//        filter.setGiaRimborsato("S");
         filter.setGiaRimborsato("N");
         filter.setValidato("S");
         filter.setDaAnnullare("S");
