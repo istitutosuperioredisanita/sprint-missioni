@@ -36,28 +36,33 @@ public class AutorizzazioneService {
     }
 
 
-    public String sendAutorizzazione(OrdineMissione ordineMissione, StorageObject modulo,List<StorageObject> allegati) throws Exception {
+    public String sendAutorizzazione(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws Exception {
         AutorizzazioneMissione autorizzazione = Optional.ofNullable(getFlowAutorizzazione(ordineMissione)).
                 orElse(null).stream().findFirst().orElse(null);
-        if ( Optional.ofNullable(autorizzazione).isPresent()){
+        if (Optional.ofNullable(autorizzazione).isPresent()) {
             logger.info(autorizzazione);
         }
-        StartWorflowDto startWorflowDto=   autorizzazione.createStartWorkflowDto(ordineMissione, modulo,allegati);
+
+        StartWorflowDto startWorflowDto = autorizzazione.createStartWorkflowDto(ordineMissione, modulo, allegati);
         List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
         startWorflowDto.setSigners(signersDef);
         UtilHappySign.setTemplateFirme(startWorflowDto);
 
-        if ( Optional.ofNullable(utilTestService).isPresent()) {
+        if (Optional.ofNullable(utilTestService).isPresent()) {
             UtilTestService.showSigned(startWorflowDto);
-            utilTestService.sendMailForOrdineMissione(ordineMissione,startWorflowDto.getSigners(),autorizzazione);
             startWorflowDto = utilTestService.createStartWorkflowDto(ordineMissione, modulo, allegati);
         }
 
-       return autorizzazione.send(startWorflowDto.getTemplateName(),
-               startWorflowDto.getSigners(),
-               startWorflowDto.getApprovers(),
-               startWorflowDto.getFileToSign());
+        String result = autorizzazione.send(startWorflowDto.getTemplateName(),
+                startWorflowDto.getSigners(),
+                startWorflowDto.getApprovers(),
+                startWorflowDto.getFileToSign());
 
+        if (Optional.ofNullable(utilTestService).isPresent()) {
+            utilTestService.sendMailForOrdineMissione(ordineMissione, signersDef, autorizzazione);
+        }
+
+        return result;
     }
 
 }

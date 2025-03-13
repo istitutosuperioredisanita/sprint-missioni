@@ -70,6 +70,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -275,16 +276,15 @@ public class RimborsoMissioneService {
             aggiuntaRichMailList(listaUtenti,emailRich);
         }
         if (datiIstitutoSpesa != null) {
+            Set<UsersSpecial> listaUtentiSpesaSingle = new HashSet<>();
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("U")) {
-                List<UsersSpecial> listaUtentiSpesa = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), false);
-                listaUtenti.addAll(listaUtentiSpesa);
-                aggiuntaRichMailList(listaUtenti,emailRich);
+                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), false));
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("V")) {
-                List<UsersSpecial> listaUtentiSpesa = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), true);
-                listaUtenti.addAll(listaUtentiSpesa);
-                aggiuntaRichMailList(listaUtenti,emailRich);
+                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), true));
             }
+            listaUtenti.addAll(listaUtentiSpesaSingle);
+            aggiuntaRichMailList(listaUtenti, emailRich);
         }
         if (listaUtenti.size() > 0) {
             mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));

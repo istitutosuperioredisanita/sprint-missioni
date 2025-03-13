@@ -501,18 +501,15 @@ public class OrdineMissioneService {
             aggiuntaRichMailList(listaUtenti,emailRich);
         }
         if (datiIstitutoSpesa != null) {
+            Set<UsersSpecial> listaUtentiSpesaSingle = new HashSet<>();
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("V")) {
-                List<UsersSpecial> listaUtentiSpesa = accountService
-                        .getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true);
-                listaUtenti.addAll(listaUtentiSpesa);
-                aggiuntaRichMailList(listaUtenti,emailRich);
+                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true));
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("U")) {
-                List<UsersSpecial> listaUtentiSpesa = accountService
-                        .getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false);
-                listaUtenti.addAll(listaUtentiSpesa);
-                aggiuntaRichMailList(listaUtenti,emailRich);
+                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false));
             }
+            listaUtenti.addAll(listaUtentiSpesaSingle);
+            aggiuntaRichMailList(listaUtenti, emailRich);
         }
         String oggetto = isAnnullamento ? approvazioneAnnullamentoOrdineMissione : approvazioneOrdineMissione;
         String testo = isAnnullamento ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare)

@@ -36,29 +36,33 @@ public class AutorizzazioneAnnulloService {
     }
 
 
-    public String sendAutorizzazione(AnnullamentoOrdineMissione annullamentoOrdineMissione, StorageObject modulo,List<StorageObject> allegati) throws Exception {
+    public String sendAutorizzazione(AnnullamentoOrdineMissione annullamentoOrdineMissione, StorageObject modulo, List<StorageObject> allegati) throws Exception {
         AutorizzazioneAnnullamentoMissione autorizzazioneAnnullamentoMissione = Optional.ofNullable(getFlowAutorizzazione(annullamentoOrdineMissione)).
                 orElse(null).stream().findFirst().orElse(null);
-        if ( Optional.ofNullable(autorizzazioneAnnullamentoMissione).isPresent()){
+        if (Optional.ofNullable(autorizzazioneAnnullamentoMissione).isPresent()) {
             logger.info(autorizzazioneAnnullamentoMissione);
         }
-        StartWorflowDto startWorflowDto=   autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo,allegati);
+
+        StartWorflowDto startWorflowDto = autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo, allegati);
         List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
         startWorflowDto.setSigners(signersDef);
         UtilHappySign.setTemplateFirme(startWorflowDto);
 
-        if ( Optional.ofNullable(utilTestAnnullamentoService).isPresent()){
+        if (Optional.ofNullable(utilTestAnnullamentoService).isPresent()) {
             UtilTestService.showSigned(startWorflowDto);
-            utilTestAnnullamentoService.sendMailForAnnullamentoOrdineMissione(annullamentoOrdineMissione,startWorflowDto.getSigners());
-            startWorflowDto = utilTestAnnullamentoService.createUStartWorkflowDto(annullamentoOrdineMissione,modulo,allegati);
+            startWorflowDto = utilTestAnnullamentoService.createUStartWorkflowDto(annullamentoOrdineMissione, modulo, allegati);
         }
 
+        String result = autorizzazioneAnnullamentoMissione.send(startWorflowDto.getTemplateName(),
+                startWorflowDto.getSigners(),
+                startWorflowDto.getApprovers(),
+                startWorflowDto.getFileToSign());
 
-       return autorizzazioneAnnullamentoMissione.send(startWorflowDto.getTemplateName(),
-               startWorflowDto.getSigners(),
-               startWorflowDto.getApprovers(),
-               startWorflowDto.getFileToSign());
+        if (Optional.ofNullable(utilTestAnnullamentoService).isPresent()) {
+            utilTestAnnullamentoService.sendMailForAnnullamentoOrdineMissione(annullamentoOrdineMissione, signersDef);
+        }
 
+        return result;
     }
 
 }

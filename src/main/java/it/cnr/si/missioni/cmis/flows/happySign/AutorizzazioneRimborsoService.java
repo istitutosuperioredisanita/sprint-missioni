@@ -35,30 +35,33 @@ public class AutorizzazioneRimborsoService {
     }
 
 
-    public String sendAutorizzazione(RimborsoMissione rimborsoMissione, StorageObject modulo,List<StorageObject> allegati) throws Exception {
+    public String sendAutorizzazione(RimborsoMissione rimborsoMissione, StorageObject modulo, List<StorageObject> allegati) throws Exception {
         AutorizzazioneRimborsoMissione autorizzazioneRimborso = Optional.ofNullable(getFlowAutorizzazione(rimborsoMissione)).
                 orElse(null).stream().findFirst().orElse(null);
-        if ( Optional.ofNullable(autorizzazioneRimborso).isPresent()){
-           logger.info(autorizzazioneRimborso);
+        if (Optional.ofNullable(autorizzazioneRimborso).isPresent()) {
+            logger.info(autorizzazioneRimborso);
         }
 
-        StartWorflowDto startWorflowDto= autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo,allegati);
+        StartWorflowDto startWorflowDto = autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo, allegati);
         List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
         startWorflowDto.setSigners(signersDef);
         UtilHappySign.setTemplateFirme(startWorflowDto);
 
-        if ( Optional.ofNullable(utilTestRimborsoService).isPresent()){
+        if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
             UtilTestService.showSigned(startWorflowDto);
-
-            utilTestRimborsoService.sendMailForRimborsoMissione(rimborsoMissione,startWorflowDto.getSigners());
-            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo,allegati);
+            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione, modulo, allegati);
         }
 
-       return autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
-                                            startWorflowDto.getSigners(),
-                                            startWorflowDto.getApprovers(),
-                                            startWorflowDto.getFileToSign());
+        String result = autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
+                startWorflowDto.getSigners(),
+                startWorflowDto.getApprovers(),
+                startWorflowDto.getFileToSign());
 
+        if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
+            utilTestRimborsoService.sendMailForRimborsoMissione(rimborsoMissione, signersDef);
+        }
+
+        return result;
     }
 
 }
