@@ -1477,95 +1477,6 @@ public class OrdineMissioneService {
         return mails;
     }
 
-    private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
-        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
-
-        return "<p>L'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " della UO "
-                + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
-                + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-                + ordineMissione.getOggetto() + " è stato inviato per la tua validazione (verifica/completamento dei dati finanziari).</p>"
-                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
-    }
-
-    private String getTextMailSendToManager(String basePath, OrdineMissione ordineMissione) {
-        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId();
-
-        return "<p>L'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " di "
-                + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-                + ordineMissione.getOggetto()
-                + " le è stata inviata per l'approvazione in quanto responsabile del gruppo.</p>"
-                + "<p>Si prega di confermarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
-    }
-
-    private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione, boolean missioneConAnticipo) {
-        OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo((Long) ordineMissione.getId());
-        StringBuilder testoMail = new StringBuilder();
-
-        testoMail.append("<p>L'ordine di missione ")
-                .append(ordineMissione.getAnno()).append("-").append(ordineMissione.getNumero())
-                .append(" di ").append(getNominativo(ordineMissione.getUid()))
-                .append(" per la missione a ").append(ordineMissione.getDestinazione())
-                .append(" dal ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()))
-                .append(" al ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()))
-                .append(" avente per oggetto ").append(ordineMissione.getOggetto());
-
-        if (missioneConAnticipo) {
-            testoMail.append(" è stata approvata con una richiesta di anticipo di € ")
-                    .append(Utility.numberFormat(anticipo.getImporto())).append(".</p>");
-        } else {
-            testoMail.append(" è stata approvata.</p>");
-        }
-        return testoMail.toString();
-    }
-
-
-    private String getTextMailApprovazioneAnnullamentoOrdine(OrdineMissione ordineMissione) {
-        return "<p>L'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " di "
-                + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-                + ordineMissione.getOggetto() + " è stato annullato.</p>";
-    }
-
-//    private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
-//        return "<p>È stata approvata la richiesta di anticipo di € " + Utility.numberFormat(anticipo.getImporto())
-//                + " relativa all'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero()
-//                + " di " + getNominativo(ordineMissione.getUid()) + " per la missione a "
-//                + ordineMissione.getDestinazione() + " dal "
-//                + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-//                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-//                + ordineMissione.getOggetto() + ".</p>";
-//    }
-
-    private String getTextMailSendToAdministrative(String basePath, OrdineMissione ordineMissione) {
-        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
-
-        return "<p>L'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " della UO "
-                + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
-                + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-                + ordineMissione.getOggetto() + " è stato inviato per la verifica/completamento dei dati finanziari.</p>"
-                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
-    }
-
-    private String getTextMailReturnToSender(String basePath, OrdineMissione ordineMissione) {
-        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId();
-
-        return "<p>L'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " di "
-                + getNominativo(ordineMissione.getUid()) + " per la missione a " + ordineMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto "
-                + ordineMissione.getOggetto() + " le è stata respinto da " + getNominativo(securityService.getCurrentUserLogin())
-                + " per il seguente motivo: " + ordineMissione.getNoteRespingi() + ".</p>"
-                + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
-    }
-
-
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteOrdineMissione(Long idOrdineMissione) {
         OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class,
@@ -2035,6 +1946,93 @@ public class OrdineMissioneService {
                 listaUtenti.add(richiedente);
             }
         }
+    }
+
+    private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
+        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
+
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> della UO "
+                + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + ordineMissione.getOggetto() + "</u> è stato inviato per la tua validazione (verifica/completamento dei dati finanziari).</p>"
+                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
+    private String getTextMailSendToManager(String basePath, OrdineMissione ordineMissione) {
+        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId();
+
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + ordineMissione.getOggetto()
+                + "</u> le è stata inviata per l'approvazione in quanto responsabile del gruppo.</p>"
+                + "<p>Si prega di confermarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
+    private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione, boolean missioneConAnticipo) {
+        OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo((Long) ordineMissione.getId());
+        StringBuilder testoMail = new StringBuilder();
+
+        testoMail.append("<p>L'ordine di missione ")
+                .append("<b>").append(ordineMissione.getAnno()).append("-").append(ordineMissione.getNumero()).append("</b>")
+                .append(" di ").append(getNominativo(ordineMissione.getUid()))
+                .append(" per la missione a <b>").append(ordineMissione.getDestinazione()).append("</b>")
+                .append(" dal ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()))
+                .append(" al ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()))
+                .append(" avente per oggetto: <u>").append(ordineMissione.getOggetto()).append("</u>");
+
+        if (missioneConAnticipo) {
+            testoMail.append(" è stata approvata con una richiesta di anticipo di € ")
+                    .append(Utility.numberFormat(anticipo.getImporto())).append(".</p>");
+        } else {
+            testoMail.append(" è stata approvata.</p>");
+        }
+        return testoMail.toString();
+    }
+
+    private String getTextMailApprovazioneAnnullamentoOrdine(OrdineMissione ordineMissione) {
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + ordineMissione.getOggetto() + "</u> è stato annullato.</p>";
+    }
+
+// private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
+//     return "<p>È stata approvata la richiesta di anticipo di € " + Utility.numberFormat(anticipo.getImporto())
+//             + " relativa all'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero()
+//             + "</b> di " + getNominativo(ordineMissione.getUid()) + " per la missione a <b>"
+//             + ordineMissione.getDestinazione() + "</b> dal "
+//             + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+//             + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto <i>"
+//             + ordineMissione.getOggetto() + "</i>.</p>";
+// }
+
+    private String getTextMailSendToAdministrative(String basePath, OrdineMissione ordineMissione) {
+        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
+
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> della UO "
+                + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + ordineMissione.getOggetto() + "</u> è stato inviato per la verifica/completamento dei dati finanziari.</p>"
+                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
+    private String getTextMailReturnToSender(String basePath, OrdineMissione ordineMissione) {
+        String url = basePath + "/#/ordine-missione/" + ordineMissione.getId();
+
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + ordineMissione.getOggetto() + "</u> le è stata respinto da " + getNominativo(securityService.getCurrentUserLogin())
+                + " per il seguente motivo: <i>" + ordineMissione.getNoteRespingi() + "</i>.</p>"
+                + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
 }

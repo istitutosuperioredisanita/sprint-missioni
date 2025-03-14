@@ -579,17 +579,6 @@ public class RimborsoMissioneService {
         sendMailToValidatori(listaValidatori, testoMail, subjectMail);
     }
 
-    private String getTextMailToSendToValidator(String basePath, RimborsoMissione rimborsoMissione) {
-        String url = basePath + "/#/rimborso-missione/" + rimborsoMissione.getId() + "/S";
-        return "<p>Il rimborso missione " + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero()
-                + " della uo " + rimborsoMissione.getUoRich() + " " + rimborsoMissione.getDatoreLavoroRich()
-                + " di " + getNominativo(rimborsoMissione.getUid()) + " per la missione a " + rimborsoMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto "
-                + rimborsoMissione.getOggetto() + " è stato inviato per la tua validazione (verifica/completamento dei dati finanziari).</p>"
-                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
-    }
-
     private void sendMailToValidatori(List<UsersSpecial> lista, String testoMail, String oggetto) {
         sendMailToGroup(lista, testoMail, oggetto);
     }
@@ -600,45 +589,6 @@ public class RimborsoMissioneService {
                 mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
             }
         }
-    }
-
-    private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
-        return "<p>Il rimborso missione " + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + " di "
-                + getNominativo(rimborsoMissione.getUid()) + " per la missione a " + rimborsoMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto "
-                + rimborsoMissione.getOggetto() + " è stata approvato.</p>";
-    }
-
-    private String getTextMailReturnToSender(String basePath, RimborsoMissione rimborsoMissione) {
-        String url = basePath + "/#/ordine-missione/" + rimborsoMissione.getId();
-        return "<p>Il rimborso missione " + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + " di "
-                + getNominativo(rimborsoMissione.getUid()) + " per la missione a " + rimborsoMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto "
-                + rimborsoMissione.getOggetto() + " è stata respinta da " + getNominativo(securityService.getCurrentUserLogin())
-                + " per il seguente motivo: " + rimborsoMissione.getNoteRespingi() + ".</p>"
-                + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
-    }
-
-    private String getTestoMailAumentoMissioneResponsabileGruppo(RimborsoMissione rimborsoMissione, OrdineMissione ordine) {
-        return "<p>Il rimborso missione " + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + " di "
-                + getNominativo(rimborsoMissione.getUid()) + " per la missione a " + rimborsoMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto "
-                + rimborsoMissione.getOggetto() + " ha un importo totale di euro "
-                + Utility.numberFormat(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate()) + ".</p>";
-    }
-
-    private String getTextMailSendToAdministrative(String basePath, RimborsoMissione rimborsoMissione) {
-        String url = basePath + "/#/rimborso-missione/" + rimborsoMissione.getId() + "/S";
-        return "<p>Il rimborso missione " + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero()
-                + " della uo " + rimborsoMissione.getUoRich() + " " + rimborsoMissione.getDatoreLavoroRich()
-                + " di " + getNominativo(rimborsoMissione.getUid()) + " per la missione a " + rimborsoMissione.getDestinazione()
-                + " dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto "
-                + rimborsoMissione.getOggetto() + " è stato inviato per la verifica/completamento dei dati finanziari.</p>"
-                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
     private void aggiornaDatiRimborsoMissione(RimborsoMissione rimborsoMissione, Boolean confirm,
@@ -1884,6 +1834,56 @@ public class RimborsoMissioneService {
 
     public InputStream getResource(StorageObject so) {
         return cmisRimborsoMissioneService.getResource(so);
+    }
+
+    private String getTextMailToSendToValidator(String basePath, RimborsoMissione rimborsoMissione) {
+        String url = basePath + "/#/rimborso-missione/" + rimborsoMissione.getId() + "/S";
+        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero()
+                + "</b> della uo " + rimborsoMissione.getUoRich() + " " + rimborsoMissione.getDatoreLavoroRich()
+                + " di " + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + rimborsoMissione.getOggetto() + "</u> è stato inviato per la tua validazione (verifica/completamento dei dati finanziari).</p>"
+                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
+    private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
+        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + "</b> di "
+                + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + rimborsoMissione.getOggetto() + "</u> è stata approvato.</p>";
+    }
+
+    private String getTextMailReturnToSender(String basePath, RimborsoMissione rimborsoMissione) {
+        String url = basePath + "/#/ordine-missione/" + rimborsoMissione.getId();
+        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + "</b> di "
+                + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + rimborsoMissione.getOggetto() + "</u> è stata respinta da " + getNominativo(securityService.getCurrentUserLogin())
+                + " per il seguente motivo: <i>" + rimborsoMissione.getNoteRespingi() + "</i>.</p>"
+                + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
+    private String getTestoMailAumentoMissioneResponsabileGruppo(RimborsoMissione rimborsoMissione, OrdineMissione ordine) {
+        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + "</b> di "
+                + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + rimborsoMissione.getOggetto() + "</u> ha un importo totale di € "
+                + Utility.numberFormat(rimborsoMissione.getTotaleRimborsoSenzaSpeseAnticipate()) + ".</p>";
+    }
+
+    private String getTextMailSendToAdministrative(String basePath, RimborsoMissione rimborsoMissione) {
+        String url = basePath + "/#/rimborso-missione/" + rimborsoMissione.getId() + "/S";
+        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero()
+                + "</b> della uo " + rimborsoMissione.getUoRich() + " " + rimborsoMissione.getDatoreLavoroRich()
+                + " di " + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + rimborsoMissione.getOggetto() + "</u> è stato inviato per la verifica/completamento dei dati finanziari.</p>"
+                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 }
 
