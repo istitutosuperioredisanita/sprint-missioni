@@ -70,7 +70,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -252,7 +251,6 @@ public class RimborsoMissioneService {
         }
 
         gestioneMailResponsabileGruppo(rimborsoMissioneDaAggiornare);
-        List<UsersSpecial> listaUtenti = new ArrayList<>();
         DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(
                 Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoRich())
                         .filter(s -> !s.equalsIgnoreCase("ZZZ.ZZZ"))
@@ -267,28 +265,42 @@ public class RimborsoMissioneService {
         if (!rimborsoMissioneDaAggiornare.getUoRich().equals(rimborsoMissioneDaAggiornare.getUoSpesa())) {
             datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoSpesa(), rimborsoMissioneDaAggiornare.getAnno());
         }
+
+        // Sostituisci la dichiarazione della lista con un Set
+        Set<UsersSpecial> utentiUnici = new HashSet<>();
+
+        // Aggiungi utenti della UO richiedente
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("U")) {
-            listaUtenti = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), false);
-            aggiuntaRichMailList(listaUtenti,emailRich);
+            utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), false));
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("V")) {
-            listaUtenti = accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), true);
-            aggiuntaRichMailList(listaUtenti,emailRich);
+            utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), true));
         }
+
+        // Aggiungi il richiedente direttamente
+        if (emailRich != null) {
+            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(emailRich);
+            if (richiedente != null) {
+                utentiUnici.add(richiedente);
+            }
+        }
+
+        // Aggiungi utenti della UO spesa
         if (datiIstitutoSpesa != null) {
-            Set<UsersSpecial> listaUtentiSpesaSingle = new HashSet<>();
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("U")) {
-                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), false));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), false));
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("V")) {
-                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), true));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), true));
             }
-            listaUtenti.addAll(listaUtentiSpesaSingle);
-            aggiuntaRichMailList(listaUtenti, emailRich);
         }
-        if (listaUtenti.size() > 0) {
+
+        // Invia una singola email a tutti i destinatari
+        if (utentiUnici.size()>0) {
+            List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
             mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
         }
+
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso()) && !datiIstituto.getMailNotificheRimborso().equals("N")) {
             mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailNotificheRimborso());
         }
@@ -365,7 +377,7 @@ public class RimborsoMissioneService {
         boolean isRitornoMissioneAmministrativi = false;
         boolean emailToValidatorSent = false;
 
-            if (rimborsoMissioneDB == null) {
+        if (rimborsoMissioneDB == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
         }
         try {
@@ -495,7 +507,7 @@ public class RimborsoMissioneService {
         controlloCongruenzaTestataDettagli(rimborsoMissioneDB);
 
         //check privilegi utente e set validato
-        if(!accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), rimborsoMissione.getUoSpesa())){
+        if (!accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), rimborsoMissione.getUoSpesa())) {
             rimborsoMissioneDB.setValidato("N");
         }
 
@@ -582,6 +594,7 @@ public class RimborsoMissioneService {
     private void sendMailToValidatori(List<UsersSpecial> lista, String testoMail, String oggetto) {
         sendMailToGroup(lista, testoMail, oggetto);
     }
+
     private void sendMailToGroup(List<UsersSpecial> lista, String testoMail, String oggetto) {
         if (lista != null && lista.size() > 0) {
             String[] elencoMail = mailService.prepareTo(lista);
@@ -679,7 +692,6 @@ public class RimborsoMissioneService {
         Account utente = accountService.loadAccountFromUsername(user);
         return utente.getCognome() + " " + utente.getNome();
     }
-
 
 
     private void controlloCongruenzaTestataDettagli(RimborsoMissione rimborsoMissione) {
@@ -1309,7 +1321,7 @@ public class RimborsoMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Non è possibile indicare le note all'utilizzo del Taxi se non si è scelto il suo utilizzo");
             }
         }
-        if (Utility.nvl(rimborsoMissione.getOrdineMissione().getUtilizzoTaxi()).equals("N")){
+        if (Utility.nvl(rimborsoMissione.getOrdineMissione().getUtilizzoTaxi()).equals("N")) {
             if ((Utility.nvl(rimborsoMissione.getUtilizzoTaxi()).equals("S") || /*Utility.nvl(rimborsoMissione.getUtilizzoAutoServizio()).equals("S") ||*/ Utility.nvl(rimborsoMissione.getPersonaleAlSeguito()).equals("S")) && StringUtils.isEmpty(rimborsoMissione.getNoteUtilizzoTaxiNoleggio())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": E' obbligatorio indicare le note del Taxi se si è scelto il suo utilizzo");
             }
@@ -1550,7 +1562,7 @@ public class RimborsoMissioneService {
 //            if (autoPropria != null && Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N").equals("S")) {
 //                autoPropriaOrdine = "S";
 //            }
-            if(autoPropria != null){
+            if (autoPropria != null) {
                 if (!Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N").equals("S") || !Utility.nvl(autoPropria.getUtilizzoMotiviSediDisagiate(), "N").equals("S")) {
                     autoPropriaOrdine = "S";
                 }
@@ -1707,7 +1719,6 @@ public class RimborsoMissioneService {
     }
 
 
-
     public void gestioneCancellazioneAllegati(String idNodo, Long idRimborsoMissione) {
         if (idRimborsoMissione != null) {
             RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, idRimborsoMissione);
@@ -1819,17 +1830,6 @@ public class RimborsoMissioneService {
             return listaDocumentiRimborso;
         }
         return null;
-    }
-
-    private void aggiuntaRichMailList(List<UsersSpecial> listaUtenti, String uidRichiedente) {
-        if (uidRichiedente != null &&
-                listaUtenti.stream().noneMatch(user -> user != null &&
-                        uidRichiedente.equals(user.getUid()))) {
-            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(uidRichiedente);
-            if (richiedente != null) {
-                listaUtenti.add(richiedente);
-            }
-        }
     }
 
     public InputStream getResource(StorageObject so) {

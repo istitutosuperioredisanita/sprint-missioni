@@ -449,7 +449,6 @@ public class OrdineMissioneService {
     }
 
     public void gestioneEmailDopoApprovazione(OrdineMissione ordineMissioneDaAggiornare, Boolean isAnnullamento) {
-        List<UsersSpecial> listaUtenti = new ArrayList<>();
         DatiSede datiSede = null;
         Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
         String emailRich = ordineMissioneDaAggiornare.getUid();
@@ -492,29 +491,43 @@ public class OrdineMissioneService {
             datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
                     ordineMissioneDaAggiornare.getAnno());
         }
+
+        Set<UsersSpecial> utentiUnici = new HashSet<>();
+
+        // Aggiungi utenti della UO richiedente
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("U")) {
-            listaUtenti = accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), false);
-            aggiuntaRichMailList(listaUtenti,emailRich);
+            utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), false));
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("V")) {
-            listaUtenti = accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), true);
-            aggiuntaRichMailList(listaUtenti,emailRich);
+            utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), true));
         }
+
+        // Aggiungi il richiedente direttamente
+        if (emailRich != null) {
+            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(emailRich);
+            if (richiedente != null) {
+                utentiUnici.add(richiedente);
+            }
+        }
+
+        // Aggiungi utenti della UO spesa
         if (datiIstitutoSpesa != null) {
-            Set<UsersSpecial> listaUtentiSpesaSingle = new HashSet<>();
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("V")) {
-                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true));
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("U")) {
-                listaUtentiSpesaSingle.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false));
             }
-            listaUtenti.addAll(listaUtentiSpesaSingle);
-            aggiuntaRichMailList(listaUtenti, emailRich);
         }
+
+
         String oggetto = isAnnullamento ? approvazioneAnnullamentoOrdineMissione : approvazioneOrdineMissione;
         String testo = isAnnullamento ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare)
                 : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo);
-        if (listaUtenti.size() > 0) {
+
+        // Invia una singola email a tutti i destinatari
+        if (utentiUnici.size()>0) {
+            List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
             mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("E")
@@ -1935,18 +1948,6 @@ public class OrdineMissioneService {
         return cmisOrdineMissioneService.getAllDocumentsOrdineMissione(missione);
     }
 
-
-
-    private void aggiuntaRichMailList(List<UsersSpecial> listaUtenti, String uidRichiedente) {
-        if (uidRichiedente != null &&
-                listaUtenti.stream().noneMatch(user -> user != null &&
-                        uidRichiedente.equals(user.getUid()))) {
-            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(uidRichiedente);
-            if (richiedente != null) {
-                listaUtenti.add(richiedente);
-            }
-        }
-    }
 
     private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
         String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
