@@ -199,7 +199,7 @@ cache:
 logging.config: classpath:logback-local.xml
 
 aceiss:
-  url: "https://webapi.iss.it/anag/"
+  url: https://webapi.iss.it/anag/
   keystore:
     path: C:/Users/mirra_davide/Desktop/JAVA/ISS/sprint-missioni-config/sprint-missioni-config/webapi-iss-it.p12
     password: ***REMOVED***
