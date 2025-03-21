@@ -7,8 +7,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
     name: missioni
-    username: MISSIONISVIL
-    password: MISSIONISVILPSW
+    username: MISSIONICOLL
+    password: ***REMOVED***
   jpa:
     database-platform: org.hibernate.dialect.Oracle12cDialect
     database: ORACLE
@@ -199,13 +199,16 @@ cache:
 logging.config: classpath:logback-local.xml
 
 aceiss:
-  url: https://webapi.iss.it/anag/
-
+  url: "https://webapi.iss.it/anag/"
+  keystore:
+    path: C:/Users/mirra_davide/Desktop/JAVA/ISS/sprint-missioni-config/sprint-missioni-config/webapi-iss-it.p12
+    password: ***REMOVED***
 authJWT:
   urlToken: https://login.microsoftonline.com/cf30c7fd-6616-4b62-ad83-b574b27d5912/
   scopes: api://anag.iss.it/.default
   clientId: 0603aa0e-ce6f-48f3-9e67-b0783b22e8e3
   secret: F2p8Q~43jZ_d_K3jlN7.RsC_AOEzhdni3obt7bjy
+
 
 cron:
   comunicaDati:
@@ -277,7 +280,7 @@ cnr:
     driver: AZURE
     azure:
       connectionString: cnr.azure.connectionString=DefaultEndpointsProtocol=http;AccountName=siglatest;AccountKey=***REMOVED***;EndpointSuffix=core.windows.net
-      containerName: sigla-main-storage
+      containerName: sigla-coll-main-storage
     path:
       comunicazioni:
         dal: /Comunicazioni da ISS
