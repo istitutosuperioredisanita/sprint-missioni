@@ -127,7 +127,11 @@ public class MailService {
     }
 
     public void sendEmail(String subject, String content, boolean isMultipart, boolean isHtml, String... to) {
-        sendEmail(subject, content, null, isMultipart, isHtml, to);
+        // Remove duplicate email addresses
+        Set<String> uniqueRecipients = new HashSet<>(Arrays.asList(to));
+        String[] uniqueToArray = uniqueRecipients.toArray(new String[0]);
+
+        sendEmail(subject, content, null, isMultipart, isHtml, uniqueToArray);
     }
 
     public void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isHtml, String... to) {
