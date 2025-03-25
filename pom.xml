@@ -31,22 +31,17 @@
     <scm>
         <connection>scm:git@github.com:istitutosuperioredisanita/sprint-missioni.git</connection>
         <developerConnection>scm:git@github.com:istitutosuperioredisanita/sprint-missioni.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>3.1.125</tag>
     </scm>
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/istitutosuperioredisanita/sprint-missioni</url>
-        </repository>
-        <snapshotRepository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/istitutosuperioredisanita/sprint-missioni</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </snapshotRepository>
+        </repository>
     </distributionManagement>
     <properties>
         <ace-iss.version>1.0-SNAPSHOT</ace-iss.version>
