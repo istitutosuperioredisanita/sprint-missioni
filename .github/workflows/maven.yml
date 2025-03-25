@@ -57,4 +57,4 @@ jobs:
         run: mvn clean deploy -s .m2/settings.xml --batch-mode --errors --fail-at-end --show-version -DskipTests
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
