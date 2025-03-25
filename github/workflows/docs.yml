@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - modifiche-iss
 env:
   DEFAULT_BRANCH: "master"
   #SPHINXOPTS: "-W --keep-going -T"
