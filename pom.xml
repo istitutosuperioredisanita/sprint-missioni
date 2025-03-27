@@ -212,16 +212,19 @@
             <artifactId>storage-cloud-filesystem</artifactId>
             <version>${storage.cloud.version}</version>
         </dependency>
-
         <dependency>
             <groupId>it.iss.si</groupId>
             <artifactId>ace-client-iss</artifactId>
-            <version>${ace-iss.version}</version>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${user.home}\.m2\repository\it\iss\si\ace-client-iss\1.0-SNAPSHOT\ace-client-iss-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>it.iss.si</groupId>
             <artifactId>happysign-client</artifactId>
-            <version>${happysign.version}</version>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${user.home}\.m2\repository\it\iss\si\happysign-client\1.0-SNAPSHOT\happysign-client-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
