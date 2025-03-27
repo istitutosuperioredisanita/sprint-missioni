@@ -18,4 +18,4 @@ jobs:
         run: mvn release:prepare release:perform -s .m2/settings.xml -PAZURE --batch-mode --errors --fail-at-end --show-version -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.Token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
