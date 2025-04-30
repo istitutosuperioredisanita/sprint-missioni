@@ -573,7 +573,8 @@ public class CronService {
 
     @Transactional
     public void verificaFlussoEComunicaDatiRimborsoSigla() throws ComponentException {
-        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyComunicaDatiVecchiaScrivania);
+        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDatiVecchiaScrivania);
+
         LOGGER.info("requested lock: " + lock.getPartitionKey());
 
         try {
