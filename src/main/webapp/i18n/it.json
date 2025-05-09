@@ -634,7 +634,8 @@
                 "km": "Km percorsi*",
                 "impegno": "Impegno",
                 "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
-                "localita-spostamento": "Località Spostamento*"
+                "localita-spostamento": "Località Spostamento*",
+                "spesa-tracciata": "Spesa Tracciata"
             },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"
         }

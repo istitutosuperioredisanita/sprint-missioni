@@ -35,6 +35,7 @@ import java.util.Map;
         "cd_ti_spesa",
         "ds_ti_spesa",
         "fl_spesa_anticipata",
+        "fl_spesa_tracciata",
         "fl_diaria_manuale",
         "percentuale_maggiorazione",
         "im_totale_spesa",
@@ -76,6 +77,8 @@ public class SpeseMissioneColl implements Serializable {
     private String dsTiSpesa;
     @JsonProperty("fl_spesa_anticipata")
     private Boolean flSpesaAnticipata;
+    @JsonProperty("fl_spesa_tracciata")
+    private Boolean flSpesaTracciata;
     @JsonProperty("fl_diaria_manuale")
     private Boolean flDiariaManuale;
     @JsonProperty("percentuale_maggiorazione")
@@ -227,6 +230,22 @@ public class SpeseMissioneColl implements Serializable {
     @JsonProperty("fl_spesa_anticipata")
     public void setFlSpesaAnticipata(Boolean flSpesaAnticipata) {
         this.flSpesaAnticipata = flSpesaAnticipata;
+    }
+
+    /**
+     * @return The flSpesaTracciata
+     */
+    @JsonProperty("fl_spesa_tracciata")
+    public Boolean getFlSpesaTracciata() {
+        return flSpesaTracciata;
+    }
+
+    /**
+     * @param flSpesaTracciata The fl_spesa_tracciata
+     */
+    @JsonProperty("fl_spesa_tracciata")
+    public void setFlSpesaTracciata(Boolean flSpesaTracciata) {
+        this.flSpesaTracciata = flSpesaTracciata;
     }
 
     /**

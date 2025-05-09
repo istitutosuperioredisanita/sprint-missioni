@@ -50,11 +50,12 @@
                             {{dettaglioSpesa.dsTiSpesa}}
                             <span ng-show="dettaglioSpesa.cdTiPasto"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.tipologia-pasto' | translate}}:</b>{{dettaglioSpesa.cdTiPasto}}</span>
                             <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b> {{dettaglioSpesa.dsSpesa}}
-                            <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.decodeSpesaAnticipata}}
+                              <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata' | translate}}:</b> {{dettaglioSpesa.flSpesaAnticipata === 'S' ? 'Sì' : 'No'}}
+                              <b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.spesa-tracciata' | translate}}:</b> {{dettaglioSpesa.flSpesaTracciata === 'S' ? 'Sì' : 'No'}}
                             <br>
 <!--
                             <span ng-show="dettaglioSpesa.dsNoGiustificativo"><b>{{'rimborso-missione-dettagli.form.dettaglio-spese.mancanza-giustificativo' | translate}}:</b>  {{dettaglioSpesa.dsNoGiustificativo}}</span>
--->                            
+-->
                             <br>
                             <b>{{'rimborso-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' | translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
                             <span ng-show="dettaglioSpesa.kmPercorsi"><b> - {{'rimborso-missione-dettagli.form.dettaglio-spese.km' | translate}}:</b>{{dettaglioSpesa.kmPercorsi}}</span>
@@ -130,22 +131,30 @@ fine commento multi impegno-->
                                     </p>
                             </form>
 -->
-                            <form class="form-inline" role="form" id="missioni">
-                                    <p class="col-md-3" ng-hide="dettaglioSpesa.rimborso">
-                                         <span class="input-group">
-                                            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
-                                            <label class="checkbox">
-                                                    <input type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-change="cambioSpesaAnticipata(dettaglioSpesa.flSpesaAnticipata)" ng-true-value="S" ng-false-value="N">
-                                            </label>
-                                        </span>
-                                    </p>
-                                    <p class="col-md-3">
-                                        <span class="input-group">
-                                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
-                                            <input ng-disabled="dettaglioSpesa.rimborso || validazione == 'S'" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25"</input>
-                                        </span>
-                                    </p>
-                            </form>
+                              <form class="form-inline" role="form" id="missioni">
+                                  <p class="col-md-3 me-3" ng-hide="dettaglioSpesa.rimborso">
+        <span class="input-group">
+            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
+            <label class="checkbox ms-0 ps-1">
+                <input type="checkbox" ng-model="dettaglioSpesa.flSpesaAnticipata" ng-change="cambioSpesaAnticipata(dettaglioSpesa.flSpesaAnticipata)" ng-true-value="S" ng-false-value="N">
+            </label>
+        </span>
+                                  </p>
+                                  <p class="col-md-2 me-5" ng-hide="dettaglioSpesa.rimborso">
+        <span class="input-group">
+            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-tracciata">Spesa Tracciata</span>
+            <label class="checkbox ms-0 ps-1">
+                <input type="checkbox" ng-model="dettaglioSpesa.flSpesaTracciata" ng-change="cambioSpesaTracciata(dettaglioSpesa.flSpesaTracciata)" ng-true-value="S" ng-false-value="N">
+            </label>
+        </span>
+                                  </p>
+                                  <p class="col-md-3 ms-auto ps-5">
+        <span class="input-group">
+            <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
+            <input ng-disabled="dettaglioSpesa.rimborso || validazione == 'S'" class="form-control align-right" ng-model="dettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25">
+        </span>
+                                  </p>
+                              </form>
                             <form class="form-inline" role="form" id="missioni" ng-show="dettaglioSpesa.rimborso">
                                     <p class="col-md-3">
                                         <span class="input-group">
@@ -250,23 +259,31 @@ fine commento multi impegno-->
                         </span>
                     </p>
             </form>
--->            
-            <form class="form-inline" role="form" id="missioni">
-                    <p class="col-md-3" ng-hide="rimborso">
-                         <span class="input-group">
-                            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
-                            <label class="checkbox">
-                                    <input type="checkbox" ng-change="cambioSpesaAnticipata(newDettaglioSpesa.flSpesaAnticipata)" ng-model="newDettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
-                            </label>
-                        </span>
-                    </p>
-                    <p class="col-md-3">
-                        <span class="input-group">
-                          <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
-                            <input ng-disabled="rimborso" class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25">
-                        </span>
-                    </p>
-            </form>
+-->
+              <form class="form-inline" role="form" id="missioni">
+                  <p class="col-md-3 me-3" ng-hide="rimborso">
+        <span class="input-group">
+            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-anticipata">Spesa Anticipata</span>
+            <label class="checkbox ms-0 ps-1">
+                <input type="checkbox" ng-change="cambioSpesaAnticipata(newDettaglioSpesa.flSpesaAnticipata)" ng-model="newDettaglioSpesa.flSpesaAnticipata" ng-true-value="S" ng-false-value="N">
+            </label>
+        </span>
+                  </p>
+                  <p class="col-md-2 me-5" ng-hide="rimborso">
+        <span class="input-group">
+            <span class="input-group-addon" translate="rimborso-missione-dettagli.form.dettaglio-spese.spesa-tracciata">Spesa Tracciata</span>
+            <label class="checkbox ms-0 ps-1">
+                <input type="checkbox" ng-change="cambioSpesaTracciata(newDettaglioSpesa.flSpesaTracciata)" ng-model="newDettaglioSpesa.flSpesaTracciata" ng-true-value="S" ng-false-value="N">
+            </label>
+        </span>
+                  </p>
+                  <p class="col-md-3 ms-auto ps-5">
+        <span class="input-group">
+            <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione-dettagli.form.dettaglio-spese.importo">importo</span>
+            <input ng-disabled="rimborso" class="form-control align-right" ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="€" maxlength="25">
+        </span>
+                  </p>
+              </form>
             <form class="form-inline" role="form" id="missioni" ng-show="rimborso">
                     <p class="col-md-3">
                         <span class="input-group">

@@ -104,6 +104,8 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     private Long kmPercorsi;
     @Column(name = "FL_SPESA_ANTICIPATA", length = 1, nullable = true)
     private String flSpesaAnticipata;
+    @Column(name = "FL_SPESA_TRACCIATA", length = 1, nullable = true)
+    private String flSpesaTracciata;
     @Size(min = 0, max = 10)
     @Column(name = "CD_DIVISA", length = 10, nullable = true)
     private String cdDivisa;
@@ -120,7 +122,8 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     private String tiCdTiSpesa;
     @Transient
     private String decodeSpesaAnticipata;
-
+    @Transient
+    private String decodeSpesaTracciata;
     @Column(name = "ID_RIMBORSO_IMPEGNI", length = 20)
     private Long idRimborsoImpegni;
 
@@ -286,6 +289,14 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
         this.flSpesaAnticipata = flSpesaAnticipata;
     }
 
+    public String getFlSpesaTracciata() {
+        return flSpesaTracciata;
+    }
+
+    public void setFlSpesaTracciata(String flSpesaTracciata) {
+        this.flSpesaTracciata = flSpesaTracciata;
+    }
+
     public String getCdDivisa() {
         return cdDivisa;
     }
@@ -337,6 +348,19 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
     @Transient
     public Boolean isSpesaAnticipata() {
         return Utility.nvl(getFlSpesaAnticipata(), "N").equals("S");
+    }
+
+    @Transient
+    public String getDecodeSpesaTracciata() {
+        if (!StringUtils.isEmpty(getFlSpesaTracciata())) {
+            return Costanti.SI_NO.get(getFlSpesaTracciata());
+        } else {
+            return Costanti.SI_NO.get("N");
+        }
+    }
+    @Transient
+    public Boolean isSpesaTracciata() {
+        return Utility.nvl(getFlSpesaTracciata(), "N").equals("S");
     }
 
     public String getGiustificativo() {
@@ -477,6 +501,11 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
                 return false;
         } else if (!flSpesaAnticipata.equals(other.flSpesaAnticipata))
             return false;
+        if (flSpesaTracciata == null) {
+            if (other.flSpesaTracciata != null)
+                return false;
+        } else if (!flSpesaTracciata.equals(other.flSpesaTracciata))
+            return false;
         if (importoEuro == null) {
             if (other.importoEuro != null)
                 return false;
@@ -525,6 +554,7 @@ public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements
                 ", cdTiPasto='" + cdTiPasto + '\'' +
                 ", kmPercorsi=" + kmPercorsi +
                 ", flSpesaAnticipata='" + flSpesaAnticipata + '\'' +
+                ", flSpesaTracciata='" + flSpesaTracciata + '\'' +
                 ", cdDivisa='" + cdDivisa + '\'' +
                 ", importoDivisa=" + importoDivisa +
                 ", importoEuro=" + importoEuro +
