@@ -477,6 +477,7 @@ public class RimborsoMissioneDettagliService {
         rimborsoMissioneDettagliDB.setDsTiSpesa(rimborsoMissioneDettagli.getDsTiSpesa());
         rimborsoMissioneDettagliDB.setNote(rimborsoMissioneDettagli.getNote());
         rimborsoMissioneDettagliDB.setFlSpesaAnticipata(rimborsoMissioneDettagli.getFlSpesaAnticipata());
+        rimborsoMissioneDettagliDB.setFlSpesaTracciata(rimborsoMissioneDettagli.getFlSpesaTracciata());
         rimborsoMissioneDettagliDB.setKmPercorsi(rimborsoMissioneDettagli.getKmPercorsi());
         rimborsoMissioneDettagliDB.setCambio(rimborsoMissioneDettagli.getCambio());
         rimborsoMissioneDettagliDB.setCdDivisa(rimborsoMissioneDettagli.getCdDivisa());

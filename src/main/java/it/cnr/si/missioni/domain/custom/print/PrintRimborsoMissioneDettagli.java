@@ -25,6 +25,8 @@ public class PrintRimborsoMissioneDettagli {
     private String importo;
     private String kmPercorsi;
 
+    private String spesaTracc;
+
     public String getData() {
         return data;
     }
@@ -55,5 +57,13 @@ public class PrintRimborsoMissioneDettagli {
 
     public void setKmPercorsi(String kmPercorsi) {
         this.kmPercorsi = kmPercorsi;
+    }
+
+    public String getSpesaTracc() {
+        return spesaTracc;
+    }
+
+    public void setSpesaTracc(String spesaTracc) {
+        this.spesaTracc = spesaTracc;
     }
 }
