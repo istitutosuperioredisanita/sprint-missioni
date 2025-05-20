@@ -1,0 +1,193 @@
+<div class="container-fluid">
+    <h4 center translate="ordine-missione-dettagli.title"
+        translate-values="{numeroOrdineMissione: '{{ordineMissione.numero}}', destinazioneOrdineMissione: '{{ordineMissione.destinazione}}', dataOrdineMissione: '{{ordineMissione.dataInserimento | date:'dd/MM/yyyy'}}'}">
+        Ordine Missione
+    </h4>
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="panel panel-primary">
+                <div class="panel-heading color-celeste-avion text-center">
+                    <h3 class="panel-title color-celeste-avion" translate="missione.form.box-info">Informazioni anagrafiche</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <info-account account="accountModel"></info-account>
+                </div>
+            </div>
+
+            <div class="panel panel-success">
+                <div class="panel-heading color-rosso-mattone text-center">
+                    <h3 class="panel-title color-rosso-mattone"
+                        translate="ordine-missione-dettagli.form.box-dettaglio-spese">Dettaglio Spese</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+
+                            <div>
+                                <div class="text-left">
+                                    <ul class="list-unstyled subscriptions">
+                                        <li ng-repeat="dettaglioSpesa in dettagliSpese">
+                                            <div class="row">
+                                                <div ng-hide="dettaglioSpesa.editing">
+                                                    <div class="col-md-10">
+                                                        <b>{{'ordine-missione-dettagli.form.dettaglio-spese.tipologia-spesa' |
+                                                            translate}}:</b>
+                                                        {{dettaglioSpesa.cdTiSpesa}}
+                                                        <b>
+                                                            - {{'ordine-missione-dettagli.form.dettaglio-spese.ds-spesa' | translate}}:</b>
+                                                        {{dettaglioSpesa.dsSpesa}}
+                                                        <br>
+                                                        <b>{{'ordine-missione-dettagli.form.dettaglio-spese.importoSenzaSimbolo' |
+                                                            translate}}:</b> {{dettaglioSpesa.importoEuro | currency : "€"}}
+                                                    </div>
+                                                </div>
+                                                <div ng-show="dettaglioSpesa.editing">
+                                                    <div class="col-md-11">
+                                                        <form class="form-inline" role="form" id="missioni">
+                                                            <p class="col-md-10">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select"
+                                                translate="ordine-missione-dettagli.form.dettaglio-spese.tipologia-spesa">tipo spesa</span>
+                                        <select ng-disabled="!tipi_spesa || tipi_spesa.length == 0" class="form-control"
+                                                ng-model="newDettaglioSpesa.cdTiSpesa"
+                                                ng-change="onChangeTipoSpesa(newDettaglioSpesa.cdTiSpesa)"
+                                                ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+                                        </span>
+                                                            </p>
+                                                        </form>
+                                                        <form class="form-inline" role="form" id="missioni">
+                                                            <p class="col-md-12">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select"
+                                                translate="ordine-missione-dettagli.form.dettaglio-spese.ds-spesa">ds spesa</span>
+                                        <textarea ng-disabled="validazione == 'S'" class="input-sm form-control"
+                                                  ng-model="dettaglioSpesa.dsSpesa" rows="1"></textarea>
+                                        </span>
+                                                            </p>
+                                                        </form>
+                                                        <form class="form-inline" role="form" id="missioni">
+                                                            <p class="col-md-3">
+                                        <span class="input-group">
+                                          <span class="input-group-addon label-input-group-for-select"
+                                                translate="ordine-missione-dettagli.form.dettaglio-spese.importo">importo</span>
+                                            <input ng-disabled="dettaglioSpesa.ordine || validazione == 'S'"
+                                                   class="form-control align-right" ng-model="dettaglioSpesa.importoEuro"
+                                                   ng-currency currency-symbol="€" maxlength="25"></input>
+                                        </span>
+                                                            </p>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1-button col-md-1 text-right">
+                                                    <button ng-show="!disabilita && !dettaglioSpesa.editing"
+                                                            class="btn btn-sm btn-link"
+                                                            ng-click="editDettaglioSpesa(dettaglioSpesa)"
+                                                            data-toggle="tooltip"
+                                                            title="{{'global.button.edit' | translate}}">
+                                                        <span class="glyphicon glyphicon-pencil"></span>
+                                                    </button>
+                                                    <button ng-show="!disabilita && validazione == 'N' && !dettaglioSpesa.editing "
+                                                            class="btn btn-sm btn-link"
+                                                            ng-click="confirmDeleteDettaglioSpesa($index)"
+                                                            data-toggle="tooltip"
+                                                            title="{{'global.button.remove' | translate}}"><span
+                                                            class="glyphicon glyphicon-trash" style="color:red"></span>
+                                                    </button>
+                                                    <button ng-show="!disabilita && dettaglioSpesa.editing"
+                                                            class="btn btn-sm btn-link"
+                                                            ng-disabled="saveButtonDisable(dettaglioSpesa)"
+                                                            ng-click="modifyDettaglioSpesa(dettaglioSpesa)"
+                                                            data-toggle="tooltip"
+                                                            title="{{'global.button.saveEdit' | translate}}">
+                                                        <span class="glyphicon glyphicon-ok" style="color:green"></span>
+                                                    </button>
+                                                    <button ng-show="!disabilita && dettaglioSpesa.editing"
+                                                            class="btn btn-sm btn-link"
+                                                            ng-click="undoDettaglioSpesa(dettaglioSpesa)"
+                                                            data-toggle="tooltip"
+                                                            title="{{'global.button.undo' | translate}}">
+                                                        <span class="glyphicon glyphicon-remove" style="color:orange"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 text-center" ng-show="addDettaglioSpesa" id="addDettaglio">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-10">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select"
+                                translate="ordine-missione-dettagli.form.dettaglio-spese.tipologia-spesa">tipo spesa</span>
+                        <select ng-disabled="!tipi_spesa || tipi_spesa.length == 0" class="form-control"
+                                ng-model="newDettaglioSpesa.cdTiSpesa"
+                                ng-change="onChangeTipoSpesa(newDettaglioSpesa.cdTiSpesa)"
+                                ng-options="tipo_spesa.cd_ti_spesa as tipo_spesa.ds_ti_spesa for tipo_spesa in tipi_spesa"></select>
+                        </span>
+                                    </p>
+                                </form>
+
+                                <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-12">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select"
+                                translate="ordine-missione-dettagli.form.dettaglio-spese.ds-spesa">ds spesa</span>
+                        <textarea class="input-sm form-control" ng-model="newDettaglioSpesa.dsSpesa" rows="1"></textarea>
+                        </span>
+                                    </p>
+                                </form>
+                                <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-3">
+                        <span class="input-group">
+                          <span class="input-group-addon label-input-group-for-select"
+                                translate="ordine-missione-dettagli.form.dettaglio-spese.importo">importo</span>
+                            <input ng-disabled="ordine" class="form-control align-right"
+                                   ng-model="newDettaglioSpesa.importoEuro" ng-currency currency-symbol="€"
+                                   maxlength="25">
+                        </span>
+                                    </p>
+                                </form>
+                            </div>
+                            <div class="col-md-1 text-right">
+                                <button class="btn btn-sm btn-link" ng-disabled="saveButtonDisable(newDettaglioSpesa)"
+                                        ng-click="insertDettaglioSpesa(newDettaglioSpesa)" data-toggle="tooltip"
+                                        title="{{'global.button.saveEdit' | translate}}"><span
+                                        class="glyphicon glyphicon-ok" style="color:green"></span></button>
+                                <button class="btn btn-sm btn-link" ng-click="undoAddDettaglioSpesa()" data-toggle="tooltip"
+                                        title="{{'global.button.undo' | translate}}"><span
+                                        class="glyphicon glyphicon-remove" style="color:orange"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button ng-show="!disabilita  && validazione == 'N'" ng-enabled="ordineMissione.id"
+                            class="btn btn-sm btn-success color-verde-giada"
+                            data-toggle="tooltip"
+                            title="{{'ordine-missione-dettagli.form.add-dettaglio-spesa' | translate}}"
+                            ng-click="aggiungiDettaglioSpesa()"><span class="glyphicon glyphicon-plus"></span></button>
+                </div>
+            </div>
+        </div>
+        <b>{{'ordine-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{getTotaleDettagliSpesa() |
+        currency : "€"}}
+
+        <div class="col-md-11">
+            <ul class="pager">
+                <li class="previous"><a ng-click="previousPage()" translate="global.button.close"></a></li>
+            </ul>
+        </div>
+        <div class="col-md-3" ng-show="autoPropriaOrdineMissioneModel.id">
+            <a target="_blank"
+               href="api/rest/public/printOrdineMissione?idOrdineMissione={{idOrdineMissione}}&token={{accessToken}}"
+               class="btn btn-default" data-toggle="tooltip"
+               title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print"
+                                                                            style="color:black"></span></a>
+        </div>
+    </div>
+</div>

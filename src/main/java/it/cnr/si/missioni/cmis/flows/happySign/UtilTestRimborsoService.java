@@ -70,7 +70,7 @@ public class UtilTestRimborsoService {
     public void sendMailForRimborsoMissione(RimborsoMissione rimborso, List<String> signers) {
         List<String> destinatari = new ArrayList<>();
         destinatari.add("davide.mirra@iss.it");
-        // TODO: Da commentare in locale
+//        // TODO: Da commentare in locale
 //         destinatari.add("martina.damia@iss.it");
 //         destinatari.add("simona.fortunato@iss.it");
 

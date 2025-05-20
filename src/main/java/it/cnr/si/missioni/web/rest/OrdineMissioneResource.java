@@ -25,6 +25,7 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.Costanti;
@@ -88,6 +89,12 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, true);
+            if (Utility.nvl(filter.getRecuperoTotali(), "N").equals("S")) {
+                for (OrdineMissione ordine : ordiniMissione) {
+                    ordineMissioneService.retrieveDetails(ordine);
+                    impostaTotaliSpesePres(ordine);
+                }
+            }
         } catch (ComponentException e) {
             log.error("ERRORE getOrdiniMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -318,6 +325,7 @@ public class OrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione ");
         try {
             OrdineMissione ordineMissione = ordineMissioneService.getOrdineMissione(idMissione, true);
+            impostaTotaliSpesePres(ordineMissione);
             return JSONResponseEntity.ok(ordineMissione);
         } catch (ComponentException e) {
             log.error("ERRORE getOrdineMissione", e);
@@ -558,6 +566,12 @@ public class OrdineMissioneResource {
             String error = "Id Allegato non valorizzato";
             log.error("deleteAttachment", error);
             return JSONResponseEntity.badRequest(error);
+        }
+    }
+
+    protected void impostaTotaliSpesePres(OrdineMissione ordineMissione) {
+        if (ordineMissione != null) {
+            ordineMissione.setTotaleSpesePresComplessivo(ordineMissione.getTotaleSpeseOrdine());
         }
     }
 

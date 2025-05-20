@@ -20,6 +20,9 @@
 package it.cnr.si.missioni.domain.custom.print;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PrintOrdineMissione extends PrintMissione {
 
     public String missioneGratuita;
@@ -34,6 +37,11 @@ public class PrintOrdineMissione extends PrintMissione {
     private String note;
     private String priorita;
     private String importoPresunto;
+
+    private String totMissione;
+
+    private List<PrintOrdineMissioneDettagli> printDettagliSpeseOrdineMissione = new ArrayList<PrintOrdineMissioneDettagli>();
+
 
     public String getObbligoRientro() {
         return obbligoRientro;
@@ -131,4 +139,19 @@ public class PrintOrdineMissione extends PrintMissione {
         this.motivoAnnullamento = motivoAnnullamento;
     }
 
+    public String getTotMissione() {
+        return totMissione;
+    }
+
+    public void setTotMissione(String totMissione) {
+        this.totMissione = totMissione;
+    }
+
+    public List<PrintOrdineMissioneDettagli> getPrintDettagliSpeseOrdineMissione() {
+        return printDettagliSpeseOrdineMissione;
+    }
+
+    public void setPrintDettagliSpeseOrdineMissione(List<PrintOrdineMissioneDettagli> printDettagliSpeseOrdineMissione) {
+        this.printDettagliSpeseOrdineMissione = printDettagliSpeseOrdineMissione;
+    }
 }

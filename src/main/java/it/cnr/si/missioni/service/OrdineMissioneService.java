@@ -20,7 +20,6 @@
 package it.cnr.si.missioni.service;
 
 import it.cnr.jada.criteria.Order;
-import it.cnr.jada.criteria.restrictions.Conjunction;
 import it.cnr.jada.criteria.restrictions.Disjunction;
 import it.cnr.jada.criteria.restrictions.Restrictions;
 import it.cnr.jada.criterion.CriterionList;
@@ -156,6 +155,9 @@ public class OrdineMissioneService {
     @Autowired
     private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
+    @Autowired
+    private OrdineMissioneDettagliService ordineMissioneDettagliService;
+
     @Value("${spring.mail.messages.invioResponsabileGruppo.oggetto}")
     private String subjectSendToManagerOrdine;
 
@@ -196,10 +198,8 @@ public class OrdineMissioneService {
     }
 
 
-
-
     //TODO capire gestione degli stati della missione per la visualizzazione degli stati delle autorizz. agg. (SI/NO)
-    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDataFromFlows)
+    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows)
             throws ComponentException {
         MissioneFilter filter = new MissioneFilter();
         filter.setDaId(idMissione);
@@ -208,6 +208,9 @@ public class OrdineMissioneService {
         List<OrdineMissione> listaOrdiniMissione = getOrdiniMissione(filter, false, true);
         if (listaOrdiniMissione != null && !listaOrdiniMissione.isEmpty()) {
             ordineMissione = listaOrdiniMissione.get(0);
+            if (retrieveDetail) {
+                retrieveDetails(ordineMissione);
+            }
             if (retrieveDataFromFlows) {
                 OrdineMissioneAutoPropria autoPropria = getAutoPropria(ordineMissione);
                 if (autoPropria != null && autoPropria.getOrdineMissione().checkStatiFlussoTrue()) {
@@ -239,50 +242,53 @@ public class OrdineMissioneService {
     }
 
 
-    public OrdineMissione getOrdineMissione(Long idMissione) throws ComponentException {
-        return getOrdineMissione(idMissione, false);
+    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail) throws ComponentException {
+        return getOrdineMissione(idMissione, retrieveDetail, true);
     }
+
 
     public Map<String, byte[]> printOrdineMissione(Long idMissione) throws ComponentException {
         String username = securityService.getCurrentUserLogin();
-        OrdineMissione ordineMissione = getOrdineMissione(idMissione);
+        OrdineMissione ordineMissione = getOrdineMissione(idMissione, true);
         if (ordineMissione != null) {
             Map<String, byte[]> map = new HashMap<String, byte[]>();
             byte[] printOrdineMissione = null;
             String fileName = null;
-            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
-                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
-                StorageObject storage = null;
-                try {
-                    storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
-                } catch (ComponentException e1) {
-                    throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
-                            + Utility.getMessageException(e1) + ")", e1);
-                }
-                if (storage != null) {
-                    fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
-                    InputStream is = null;
-                    try {
-                        is = missioniCMISService.getResource(storage);
-                    } catch (Exception e) {
-                        throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
-                                + Utility.getMessageException(e) + ")", e);
-                    }
-                    if (is != null) {
-                        try {
-                            printOrdineMissione = IOUtils.toByteArray(is);
-                            is.close();
-                        } catch (IOException e) {
-                            throw new ComponentException("Errore nella conversione dello stream in byte del file ("
-                                    + Utility.getMessageException(e) + ")", e);
-                        }
-                    }
-                } else {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Errore nel recupero del contenuto del file sul documentale");
-                }
-                map.put(fileName, printOrdineMissione);
-            } else {
+            retrieveDetails(ordineMissione);
+
+//            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
+//                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
+//                StorageObject storage = null;
+//                try {
+//                    storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
+//                } catch (ComponentException e1) {
+//                    throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
+//                            + Utility.getMessageException(e1) + ")", e1);
+//                }
+//                if (storage != null) {
+//                    fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+//                    InputStream is = null;
+//                    try {
+//                        is = missioniCMISService.getResource(storage);
+//                    } catch (Exception e) {
+//                        throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
+//                                + Utility.getMessageException(e) + ")", e);
+//                    }
+//                    if (is != null) {
+//                        try {
+//                            printOrdineMissione = IOUtils.toByteArray(is);
+//                            is.close();
+//                        } catch (IOException e) {
+//                            throw new ComponentException("Errore nella conversione dello stream in byte del file ("
+//                                    + Utility.getMessageException(e) + ")", e);
+//                        }
+//                    }
+//                } else {
+//                    throw new AwesomeException(CodiciErrore.ERRGEN,
+//                            "Errore nel recupero del contenuto del file sul documentale");
+//                }
+//                map.put(fileName, printOrdineMissione);
+//            } else {
                 fileName = "OrdineMissione" + idMissione + ".pdf";
                 printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
                 if (ordineMissione.isMissioneInserita()) {
@@ -290,10 +296,17 @@ public class OrdineMissioneService {
                             ordineMissione);
                 }
                 map.put(fileName, printOrdineMissione);
-            }
+            //}
             return map;
         }
         return null;
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void retrieveDetails(OrdineMissione ordineMissione) throws NumberFormatException, ComponentException {
+        List<OrdineMissioneDettagli> list = ordineMissioneDettagliService.getOrdineMissioneDettagli(Long.valueOf(ordineMissione.getId().toString()));
+        ordineMissione.setOrdineMissioneDettagli(list);
     }
 
     private boolean isDevProfile() {
@@ -301,7 +314,7 @@ public class OrdineMissioneService {
     }
 
     public String jsonForPrintOrdineMissione(Long idMissione) throws ComponentException {
-        OrdineMissione ordineMissione = getOrdineMissione(idMissione);
+        OrdineMissione ordineMissione = getOrdineMissione(idMissione, true);
         return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, securityService.getCurrentUserLogin());
     }
 
@@ -408,6 +421,7 @@ public class OrdineMissioneService {
     }
 
     private void aggiornaOrdineMissioneFirmato(OrdineMissione ordineMissioneDaAggiornare) {
+        retrieveDetails(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
         gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
@@ -526,7 +540,7 @@ public class OrdineMissioneService {
                 : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo);
 
         // Invia una singola email a tutti i destinatari
-        if (utentiUnici.size()>0) {
+        if (utentiUnici.size() > 0) {
             List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
             mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
         }
@@ -1250,7 +1264,7 @@ public class OrdineMissioneService {
             }*/
 
         } else {
-            validaCRUD(ordineMissione,true);
+            validaCRUD(ordineMissione, true);
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
         }
 
@@ -1286,6 +1300,7 @@ public class OrdineMissioneService {
         // //effettuo controlli di validazione operazione CRUD
         if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R") && !fromFlows) {
             boolean updateOrdineMissione = true;
+            retrieveDetails(ordineMissioneDB);
             validaCRUD(ordineMissioneDB, updateOrdineMissione);
         }
 
@@ -1501,6 +1516,8 @@ public class OrdineMissioneService {
             ordineMissioneTaxiService.deleteTaxi(ordineMissione);
             ordineMissioneAutoNoleggioService.deleteAutoNoleggio(ordineMissione);
 
+            ordineMissioneDettagliService.cancellaOrdineMissioneDettagli(ordineMissione, false);
+
             // effettuo controlli di validazione operazione CRUD
             ordineMissione.setStato(Costanti.STATO_ANNULLATO);
             ordineMissione.setToBeUpdated();
@@ -1701,6 +1718,24 @@ public class OrdineMissioneService {
                         + ": La data di inizio missione non può essere precedente alla data di oggi");
             }
         }
+
+        if (ordineMissione.getImportoPresunto() != null && ordineMissione.getImportoPresunto().compareTo(BigDecimal.ZERO) < 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto non può essere negativo");
+        }
+
+        // Controllo aggiuntivo: verifica se il totale delle spese non superi l'importo presunto
+        if (ordineMissione.getImportoPresunto() != null) {
+            //BigDecimal totaleSpese = ordineMissione.getTotaleSpeseOrdine();
+            BigDecimal totaleSpesePresComp = Utility.nvl(ordineMissione.getTotaleSpeseOrdine());
+
+            if (totaleSpesePresComp != null && totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
+                throw new AwesomeException(CodiciErrore.ERRGEN,
+                        "Il totale delle spese (" + Utility.nvl(totaleSpesePresComp) + ") non può superare l'importo presunto ("
+                                + Utility.nvl(ordineMissione.getImportoPresunto()) + ")");
+            }
+        }
+
+
     }
 
     private void controlloDatiFinanziari(OrdineMissione ordineMissione) {
