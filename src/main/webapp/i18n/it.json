@@ -388,7 +388,8 @@
             "anticipo-no": "Richiesta Anticipo: No",
             "savedraft" : "Salva in Bozza",
             "invia" : "Invia",
-            "sendToValidate" : "Invia per la Validazione"
+            "sendToValidate" : "Invia per la Validazione",
+            "dettagli-presunti": "Dettagli Spese Presunte"
         },
         "messages": {
             "error": {
@@ -423,6 +424,20 @@
                     "maxlength": "Il numero della Polizza Assicurativa può essere lungo al massimo 50 caratteri"
                 }
             }
+        }
+    },
+    "ordine-missione-dettagli": {
+        "title": "ORDINE MISSIONE  {{numeroOrdineMissione}} DEL {{dataOrdineMissione}}  ({{destinazioneOrdineMissione}})  - DETTAGLI SPESE PRESUNTE",
+        "form": {
+            "box-dettaglio-spese": "Dettaglio Spese Presunte",
+            "dettaglio-spese": {
+                "totale-dettagli" : "Totale Spese Presunte",
+                "tipologia-spesa" : "Tipologia di Spesa*",
+                "ds-spesa" : "Descrizione Spesa*",
+                "importo": "Importo €*",
+                "importoSenzaSimbolo": "Importo"
+            },
+            "add-dettaglio-spesa": "Aggiungi Dettaglio Spese Presunte"
         }
     },
     "missione": {

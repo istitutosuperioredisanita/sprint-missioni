@@ -19,6 +19,8 @@
 
 package it.cnr.si.missioni.cmis;
 
+import java.math.BigDecimal;
+
 public class CMISOrdineMissione extends CMISMissione {
     public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo";
     public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria nei casi di accertata la convenienza economica per l’ISS, anche per lo svolgimento di funzioni diverse da quelle istituzionali relative a compiti ispettivi, di verifica e controllo, in caso di oggettive situazioni di disagio o di difficoltà all’uso dei mezzi di trasporto ordinari";
@@ -61,6 +63,9 @@ public class CMISOrdineMissione extends CMISMissione {
 
     private String descrizioneModulo;
     private String missioneGratuita;
+
+    private BigDecimal totaleOrdineMissione;
+
 
     public Long getIdMissioneRevoca() {
         return idMissioneRevoca;
@@ -254,5 +259,11 @@ public class CMISOrdineMissione extends CMISMissione {
         this.codiceFiscaleRespModulo = codiceFiscaleRespModulo;
     }
 
+    public BigDecimal getTotaleOrdineMissione() {
+        return totaleOrdineMissione;
+    }
 
+    public void setTotaleOrdineMissione(BigDecimal totaleOrdineMissione) {
+        this.totaleOrdineMissione = totaleOrdineMissione;
+    }
 }

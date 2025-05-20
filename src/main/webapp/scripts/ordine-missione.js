@@ -1409,6 +1409,17 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     };
 
 
+    $scope.getTotaleSpesePresMissione = function () {
+        var totale = 0;
+        if ($scope.ordineMissioneModel && $scope.ordineMissioneModel.ordineMissioneDettagli && $scope.ordineMissioneModel.ordineMissioneDettagli.length > 0) {
+            for (var i = 0; i < $scope.ordineMissioneModel.ordineMissioneDettagli.length; i++) {
+                if ($scope.ordineMissioneModel.ordineMissioneDettagli[i].importoEuro) {
+                    totale = totale + $scope.ordineMissioneModel.ordineMissioneDettagli[i].importoEuro;
+                }
+            }
+        }
+        return totale;
+    };
 
 
     var confirmOrdineMissione = function() {
@@ -1718,6 +1729,38 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             );
         }
     }
+
+        $scope.goDettagliSpesaPresunta = function() {
+            if ($scope.ordineMissioneModel.id) {
+                var dataInizio = null;
+                var dataFine = null;
+                if ($scope.ordineMissioneModel.tipoMissione === 'E' && $scope.ordineMissioneModel.trattamento === 'T') {
+                    if (!$scope.ordineMissioneModel.dataInizioEstero || !$scope.ordineMissioneModel.dataFineEstero) {
+                        ui.error("Valorizzare la data di imbarco in partenza e la data di sbarco del ritorno.");
+                    }
+                    dataInizio = $scope.ordineMissioneModel.dataInizioEstero;
+                    dataFine = $scope.ordineMissioneModel.dataFineEstero;
+                } else {
+                    if (!$scope.ordineMissioneModel.dataInizioMissione || !$scope.ordineMissioneModel.dataFineMissione) {
+                        ui.error("Valorizzare le date inizio e fine missione.");
+                    }
+                    dataInizio = $scope.ordineMissioneModel.dataInizioMissione;
+                    dataFine = $scope.ordineMissioneModel.dataFineMissione;
+                }
+    
+                if ($scope.validazione) {
+                    $location.path('/ordine-missione/ordine-missione-dettagli/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione + '/' + dataInizio + '/' + dataFine);
+                } else {
+                    if ($scope.disabilitaRimborsoMissione) {
+                        $location.path('/ordine-missione/ordine-missione-dettagli/' + $scope.ordineMissioneModel.id + '/' + "D" + '/' + dataInizio + '/' + dataFine);
+                    } else {
+                        $location.path('/ordine-missione/ordine-missione-dettagli/' + $scope.ordineMissioneModel.id + '/' + "N" + '/' + dataInizio + '/' + dataFine);
+                    }
+                }
+            } else {
+                ui.error("Per poter inserire i dati di dettaglio delle spese è necessario prima salvare l'ordine missione");
+            }
+        }
 
     $scope.histories = [];
     $scope.idMissione = $routeParams.idMissione;

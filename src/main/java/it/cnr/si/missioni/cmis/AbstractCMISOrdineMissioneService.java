@@ -320,6 +320,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                 cmisOrdineMissione.setUserNameResponsabileModulo(ordineMissione.getResponsabileGruppo());
             }
             cmisOrdineMissione.setNomeFile(ordineMissione.getFileName());
+            cmisOrdineMissione.setTotaleOrdineMissione(ordineMissione.getTotaleSpeseOrdine());
+
 
             return cmisOrdineMissione;
         }
@@ -415,6 +417,62 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), aspectsToAdd);
         return metadataProperties;
     }
+
+    private StorageObject salvaAllegatoOrdineMissioneDettaglioCMIS(
+            OrdineMissioneDettagli dettaglio, InputStream stream, String fileName, MimeTypes mimeTypes) {
+
+        StorageObject folder = recuperoFolderOrdineMissione(dettaglio.getOrdineMissione());
+        String path;
+        if (folder == null) {
+            path = createFolderOrdineMissione(dettaglio.getOrdineMissione());
+        } else {
+            path = folder.getPath();
+        }
+
+        path = createFolderOrdineMissioneDettaglio(dettaglio, path);
+        
+        Map<String, Object> metadataProperties = getMetadataPropertiesFolderOrdineDettaglio(dettaglio);
+
+
+        try {
+            StorageObject node = missioniCMISService.restoreSimpleDocument(
+                    metadataProperties,
+                    stream,
+                    mimeTypes.mimetype(),
+                    fileName,
+                    StoragePath.construct(path));
+            missioniCMISService.addAspect(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
+            return node;
+        } catch (Exception e) {
+            if (e.getCause() instanceof StorageException)
+                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+        }
+    }
+    
+    public String createFolderOrdineMissioneDettaglio(OrdineMissioneDettagli dettaglio, String path) {
+        return missioniCMISService.createFolderIfNotPresent(path, dettaglio.constructCMISNomeFile(), getMetadataPropertiesFolderOrdineDettaglio(dettaglio));
+    }
+
+    private Map<String, Object> getMetadataPropertiesFolderOrdineDettaglio(OrdineMissioneDettagli dettaglio) {
+        Map<String, Object> metadataProperties = new HashMap<String, Object>();
+        String name = dettaglio.constructCMISNomeFile();
+        String folderName = name;
+        folderName = missioniCMISService.sanitizeFolderName(folderName);
+        metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), OrdineMissioneDettagli.CMIS_PROPERTY_MAIN);
+        metadataProperties.put(MissioniCMISService.PROPERTY_DESCRIPTION, missioniCMISService.sanitizeFilename(name));
+        metadataProperties.put(MissioniCMISService.PROPERTY_NAME, missioniCMISService.sanitizeFilename(name));
+        metadataProperties.put(OrdineMissioneDettagli.CMIS_PROPERTY_ID_DETTAGLIO_ORDINE, dettaglio.getId());
+        metadataProperties.put(OrdineMissioneDettagli.CMIS_PROPERTY_CD_TIPO_SPESA_DETTAGLIO_ORDINE_MISSIONE, dettaglio.getCdTiSpesa());
+        metadataProperties.put(OrdineMissioneDettagli.CMIS_PROPERTY_DS_TIPO_SPESA_DETTAGLIO_ORDINE_MISSIONE, dettaglio.getDsTiSpesa());
+        metadataProperties.put(OrdineMissioneDettagli.CMIS_PROPERTY_RIGA_DETTAGLIO_ORDINE_MISSIONE, dettaglio.getRiga());
+        List<String> aspectsToAdd = new ArrayList<String>();
+        aspectsToAdd.add(MissioniCMISService.ASPECT_TITLED);
+        metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), aspectsToAdd);
+        return metadataProperties;
+    }
+
+
 
 
     protected StorageObject salvaStampaOrdineMissioneSuCMIS(
@@ -585,6 +643,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_USERNAME_RICHIEDENTE, cmisOrdineMissione.getUsernameRichiedente());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_VALIDAZIONE_MODULO, !StringUtils.isEmpty(cmisOrdineMissione.getUsernameResponsabileGruppo()));
+
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TOTALE_ORDINE_MISSIONE, cmisOrdineMissione.getTotaleOrdineMissione());
+
         return metadataProperties;
     }
 
@@ -670,6 +731,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         if ( documentoAutoNoleggio!=null)
             mapDocumentiMissione.put(Costanti.DOCUMENTO_AUTO_NOLEGGIO_KEY, documentoAutoNoleggio);
 
+        // la parte che sta nel rimborso che si setta i giustificativi non mi serve perche in fase di ordine non li inserisco
         sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, mapDocumentiMissione, allegati,anticipo);
 
     }
@@ -1278,6 +1340,18 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
         return null;
     }
+    public CMISFileAttachment uploadAttachmentDetail(OrdineMissioneDettagli ordineMissioneDettagli, InputStream inputStream, String name, MimeTypes mimeTypes) {
+        StorageObject doc = salvaAllegatoOrdineMissioneDettaglioCMIS(ordineMissioneDettagli, inputStream, name, mimeTypes);
+        if (doc != null) {
+            CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
+            cmisFileAttachment.setId(doc.getKey());
+            cmisFileAttachment.setNomeFile(name);
+            cmisFileAttachment.setIdMissione(Long.valueOf(ordineMissioneDettagli.getId().toString()));
+            return cmisFileAttachment;
+        }
+        return null;
+    }
+    
 
     private StorageObject salvaAllegatoAnticipoCMIS(
             OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {

@@ -278,6 +278,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/ordine-missione/ordine-missione-dettagli/:idOrdineMissione/:validazione?/:inizioMissione/:fineMissione', {
+                    templateUrl: 'views/ordine-missione/ordine-missione-dettagli.html',
+                    controller: 'OrdineMissioneDettagliController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/ordine-missione/auto-propria/:idOrdineMissione/:validazione?', {
                     templateUrl: 'views/ordine-missione/auto-propria.html',
                     controller: 'AutoPropriaOrdineMissioneController',
