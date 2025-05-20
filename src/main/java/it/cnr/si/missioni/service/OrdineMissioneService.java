@@ -256,39 +256,39 @@ public class OrdineMissioneService {
             String fileName = null;
             retrieveDetails(ordineMissione);
 
-//            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
-//                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
-//                StorageObject storage = null;
-//                try {
-//                    storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
-//                } catch (ComponentException e1) {
-//                    throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
-//                            + Utility.getMessageException(e1) + ")", e1);
-//                }
-//                if (storage != null) {
-//                    fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
-//                    InputStream is = null;
-//                    try {
-//                        is = missioniCMISService.getResource(storage);
-//                    } catch (Exception e) {
-//                        throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
-//                                + Utility.getMessageException(e) + ")", e);
-//                    }
-//                    if (is != null) {
-//                        try {
-//                            printOrdineMissione = IOUtils.toByteArray(is);
-//                            is.close();
-//                        } catch (IOException e) {
-//                            throw new ComponentException("Errore nella conversione dello stream in byte del file ("
-//                                    + Utility.getMessageException(e) + ")", e);
-//                        }
-//                    }
-//                } else {
-//                    throw new AwesomeException(CodiciErrore.ERRGEN,
-//                            "Errore nel recupero del contenuto del file sul documentale");
-//                }
-//                map.put(fileName, printOrdineMissione);
-//            } else {
+            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
+                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
+                StorageObject storage = null;
+                try {
+                    storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
+                } catch (ComponentException e1) {
+                    throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
+                            + Utility.getMessageException(e1) + ")", e1);
+                }
+                if (storage != null) {
+                    fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+                    InputStream is = null;
+                    try {
+                        is = missioniCMISService.getResource(storage);
+                    } catch (Exception e) {
+                        throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
+                                + Utility.getMessageException(e) + ")", e);
+                    }
+                    if (is != null) {
+                        try {
+                            printOrdineMissione = IOUtils.toByteArray(is);
+                            is.close();
+                        } catch (IOException e) {
+                            throw new ComponentException("Errore nella conversione dello stream in byte del file ("
+                                    + Utility.getMessageException(e) + ")", e);
+                        }
+                    }
+                } else {
+                    throw new AwesomeException(CodiciErrore.ERRGEN,
+                            "Errore nel recupero del contenuto del file sul documentale");
+                }
+                map.put(fileName, printOrdineMissione);
+            } else {
                 fileName = "OrdineMissione" + idMissione + ".pdf";
                 printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
                 if (ordineMissione.isMissioneInserita()) {
@@ -296,7 +296,7 @@ public class OrdineMissioneService {
                             ordineMissione);
                 }
                 map.put(fileName, printOrdineMissione);
-            //}
+            }
             return map;
         }
         return null;
@@ -1723,9 +1723,7 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto non può essere negativo");
         }
 
-        // Controllo aggiuntivo: verifica se il totale delle spese non superi l'importo presunto
         if (ordineMissione.getImportoPresunto() != null) {
-            //BigDecimal totaleSpese = ordineMissione.getTotaleSpeseOrdine();
             BigDecimal totaleSpesePresComp = Utility.nvl(ordineMissione.getTotaleSpeseOrdine());
 
             if (totaleSpesePresComp != null && totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
