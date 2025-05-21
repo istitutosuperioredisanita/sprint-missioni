@@ -254,6 +254,7 @@ public class ComunicaRimborsoSiglaService {
 
                 spesaMissione.setFlDiariaManuale(false);
                 spesaMissione.setFlSpesaAnticipata(dettaglio.getFlSpesaAnticipata().equals("S"));
+                spesaMissione.setFlSpesaTracciata(dettaglio.getFlSpesaTracciata().equals("S"));
                 spesaMissione.setImBaseMaggiorazione(BigDecimal.ZERO);
                 spesaMissione.setImDiariaLorda(BigDecimal.ZERO);
                 spesaMissione.setImDiariaNetto(BigDecimal.ZERO);
