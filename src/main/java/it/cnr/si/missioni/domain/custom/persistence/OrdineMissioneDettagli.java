@@ -21,6 +21,7 @@ package it.cnr.si.missioni.domain.custom.persistence;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import org.springframework.util.StringUtils;
@@ -53,10 +54,12 @@ public class OrdineMissioneDettagli extends OggettoBulkXmlTransient implements S
     private String uid;
     @Column(name = "RIGA", length = 50, nullable = false)
     private Long riga;
+
     @ManyToOne
     @JoinColumn(name = "ID_ORDINE_MISSIONE", nullable = false)
-    @JsonBackReference // Questo campo verrà ignorato durante la serializzazione
+    @JsonBackReference // Indica che questo è il lato "indietro" della relazione. Jackson ignorerà questo riferimento durante la serializzazione per prevenire la ricorsione.
     private OrdineMissione ordineMissione;
+    
     @Size(min = 0, max = 3)
     @Column(name = "STATO", length = 3, nullable = false)
     private String stato;

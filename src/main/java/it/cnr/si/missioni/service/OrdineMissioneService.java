@@ -59,10 +59,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -940,6 +942,7 @@ public class OrdineMissioneService {
         controlloDatiObbligatoriDaGUI(ordineMissione);
         inizializzaCampiPerInserimento(ordineMissione);
         boolean updateOrdineMissione = false;
+        calcSpeseTotOrdine(ordineMissione, null);
         validaCRUD(ordineMissione, updateOrdineMissione);
         ordineMissione = (OrdineMissione) crudServiceBean.creaConBulk(ordineMissione);
         // autoPropriaRepository.save(autoPropria);
@@ -1158,6 +1161,7 @@ public class OrdineMissioneService {
 
         boolean isValidatore = accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissioneDB.getUoSpesa()) && Utility.nvl(ordineMissione.getDaChron(), "N").equals("N");
 
+        calcSpeseTotOrdine(ordineMissione, ordineMissioneDB);
         // try {
         // crudServiceBean.lockBulk(ordineMissioneDB);
         // } catch (OptimisticLockException | PersistencyException |
@@ -1300,7 +1304,6 @@ public class OrdineMissioneService {
         // //effettuo controlli di validazione operazione CRUD
         if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R") && !fromFlows) {
             boolean updateOrdineMissione = true;
-            retrieveDetails(ordineMissioneDB);
             validaCRUD(ordineMissioneDB, updateOrdineMissione);
         }
 
@@ -1374,6 +1377,26 @@ public class OrdineMissioneService {
         }
         return ordineMissioneDB;
     }
+
+    private void calcSpeseTotOrdine(OrdineMissione ordineMissione, @Nullable OrdineMissione ordineMissioneDB) {
+        BigDecimal dbTotOrdine = ordineMissioneDB != null
+                ? Utility.nvl(ordineMissioneDB.getTotaleSpesePresComplessivo())
+                : BigDecimal.ZERO;
+
+        BigDecimal calcTotOrdine = Utility.nvl(ordineMissione.getTotaleSpeseOrdine());
+        BigDecimal toUpdateTotOrdine = Utility.nvl(ordineMissione.getTotaleSpesePresComplessivo());
+
+        BigDecimal totaleSpesaOrdine = calcolaTot(dbTotOrdine, calcTotOrdine, toUpdateTotOrdine);
+
+        if (ordineMissioneDB != null) {
+            ordineMissioneDB.setTotaleSpesePresComplessivo(totaleSpesaOrdine);
+        } else {
+            ordineMissione.setTotaleSpesePresComplessivo(totaleSpesaOrdine);
+        }
+    }
+
+
+
 
     private void aggiornaDatiOrdineMissione(OrdineMissione ordineMissione, Boolean confirm,
                                             OrdineMissione ordineMissioneDB) {
@@ -1613,7 +1636,7 @@ public class OrdineMissioneService {
 
     private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
 
-        if ( !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
+        if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
             if (!String.valueOf(ordineMissione.getEsercizioOriginaleObbligazione()).matches("\\d{4}")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "L'anno dell' impegno deve essere composto da 4 cifre");
             }
@@ -1724,12 +1747,19 @@ public class OrdineMissioneService {
         }
 
         if (ordineMissione.getImportoPresunto() != null) {
-            BigDecimal totaleSpesePresComp = Utility.nvl(ordineMissione.getTotaleSpeseOrdine());
+            BigDecimal totaleSpesePresComp = ordineMissione.getTotaleSpesePresComplessivo();
 
-            if (totaleSpesePresComp != null && totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
+            if (totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.ITALY);
+                currencyFormatter.setMinimumFractionDigits(2);
+                currencyFormatter.setMaximumFractionDigits(2);
+
+                String totaleSpeseFormattato = currencyFormatter.format(totaleSpesePresComp);
+                String importoPresuntoFormattato = currencyFormatter.format(ordineMissione.getImportoPresunto());
+
                 throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Il totale delle spese (" + Utility.nvl(totaleSpesePresComp) + ") non può superare l'importo presunto ("
-                                + Utility.nvl(ordineMissione.getImportoPresunto()) + ")");
+                        "Il totale delle spese (" + totaleSpeseFormattato + ") non può superare l'importo presunto ("
+                                + importoPresuntoFormattato + ").");
             }
         }
 
@@ -1861,6 +1891,7 @@ public class OrdineMissioneService {
 
     private void validaCRUD(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
         if (ordineMissione != null) {
+
             controlloCampiObbligatori(ordineMissione);
             controlloCongruenzaDatiInseriti(ordineMissione, updateOrdineMissione);
             controlloDatiFinanziari(ordineMissione);
@@ -2069,4 +2100,15 @@ public class OrdineMissioneService {
                 + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
+    // Se il valore attuale è zero, prova con i valori aggiornati; altrimenti mantiene o aggiorna se disponibile.
+    private BigDecimal calcolaTot(BigDecimal dbTotOrdine, BigDecimal calcTotOrdine, BigDecimal toUpdateTotOrdine) {
+
+        if (dbTotOrdine.compareTo(BigDecimal.ZERO) == 0) {
+            return calcTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? calcTotOrdine :
+                    toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine :
+                            BigDecimal.ZERO;
+        } else {
+            return toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine : dbTotOrdine;
+        }
+    }
 }
