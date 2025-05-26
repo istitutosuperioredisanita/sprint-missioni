@@ -19,6 +19,7 @@
 
 package it.cnr.si.missioni.domain.custom.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.cnr.jada.criteria.Projection;
 import it.cnr.jada.criteria.projections.Projections;
@@ -361,9 +362,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String commentFlows;
     @Transient
     private String statoFlussoRitornoHome;
-
     @Transient
-    @JsonManagedReference // Questo campo verrà serializzato normalmente
+    @JsonManagedReference //  Indica che questo è il lato "proprietario" della relazione. Jackson serializzerà questa lista e i suoi contenuti.
     private List<OrdineMissioneDettagli> ordineMissioneDettagli;
 
     @Transient

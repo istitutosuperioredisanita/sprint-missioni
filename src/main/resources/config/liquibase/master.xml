@@ -101,8 +101,8 @@
     <include file="classpath:config/liquibase/changelog/20240515100000_add_column_sedi_disagiate_auto_propria.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20240625000000_modify_column_modulo.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20250508000002_add_column_rimborso_fl_trac.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/20250515000006_add_table_ordine_missione_dettagli.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/20250516000001_add_sequences_ordine_missione_dettagli.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20250515000007_add_table_ordine_missione_dettagli.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20250516000005_add_sequences_ordine_missione_dettagli.xml" relativeToChangelogFile="false"/>
 
 
     <!-- JHipster will add liquibase changelogs here -->

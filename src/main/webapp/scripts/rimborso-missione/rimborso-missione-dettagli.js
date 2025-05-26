@@ -76,6 +76,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     var inizializzaNuovaRiga = function(dettaglioSpesa){
         $scope.newDettaglioSpesa.flSpesaAnticipata = "N";
+        $scope.newDettaglioSpesa.flSpesaTracciata = "N";
         $scope.newDettaglioSpesa.cdDivisa = "EURO";
         $scope.newDettaglioSpesa.cambio = 1;
         $scope.tipi_pasto = [];
@@ -178,9 +179,15 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.cambioSpesaAnticipata = function (spesaAnticipata) {
         if (spesaAnticipata == "S"){
-            ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta direttamente dall'Ente(tramite agenzia viaggi o altro), quindi non riguarda anticipi ricevuti per la Missione. Per questo la spesa non verrà conteggiata nella Missione.");
+            ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta direttamente dall'Ente(tramite agenzia viaggi o altro), quindi non riguarda anticipi ricevuti per la missione. Per questo la spesa non verrà conteggiata nella missione.");
         }
     }
+
+       $scope.cambioSpesaTracciata = function (spesaTracciata) {
+            if (spesaTracciata == "S"){
+                ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta con strumenti di pagamento tracciabili (carta di credito, bonifico, ecc.).");
+            }
+        }
 
     var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
@@ -329,8 +336,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             }
         }
     }
-
-
     $scope.reloadFromTipoSpesa = function (dettaglioSpesa) {
         if (dettaglioSpesa.cdTiSpesa){
             $scope.tipi_spesa = [];
@@ -498,21 +503,20 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         }
     }
 
-var inizializzaDati = function(){
-    ElencoRimborsiMissioneService.findById($scope.idRimborsoMissione).then(function(data){
-        $scope.rimborsoMissione = data;
-        if ($scope.rimborsoMissione){
-            $scope.disabilita = impostadisabilitaRimborsoMissione();
-            RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione).then(function(data){
-                $scope.dettagliSpese = data;
-                console.log("Dettagli spese recuperati:", $scope.dettagliSpese); // <---- LOG AGGIUNTO
-                if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
-                    $scope.getTotaleDettagliSpesa();
-                }
-            });
-        }
-    });
-}
+   var inizializzaDati = function(){
+        ElencoRimborsiMissioneService.findById($scope.idRimborsoMissione).then(function(data){
+            $scope.rimborsoMissione = data;
+            if ($scope.rimborsoMissione){
+                $scope.disabilita = impostadisabilitaRimborsoMissione();
+                RimborsoMissioneDettagliService.findDettagli($scope.idRimborsoMissione).then(function(data){
+                    $scope.dettagliSpese = data;
+                    if ($scope.dettagliSpese && $scope.dettagliSpese[0]){
+                        $scope.getTotaleDettagliSpesa();
+                    }
+                });
+            }
+        });
+    }
 
     inizializzaDati();
 

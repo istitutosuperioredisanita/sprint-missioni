@@ -1410,15 +1410,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
 
 
     $scope.getTotaleSpesePresMissione = function () {
-        var totale = 0;
-        if ($scope.ordineMissioneModel && $scope.ordineMissioneModel.ordineMissioneDettagli && $scope.ordineMissioneModel.ordineMissioneDettagli.length > 0) {
-            for (var i = 0; i < $scope.ordineMissioneModel.ordineMissioneDettagli.length; i++) {
-                if ($scope.ordineMissioneModel.ordineMissioneDettagli[i].importoEuro) {
-                    totale = totale + $scope.ordineMissioneModel.ordineMissioneDettagli[i].importoEuro;
-                }
-            }
-        }
-        return totale;
+        return $scope.ordineMissioneModel.totaleSpesePresComplessivo;
     };
 
 

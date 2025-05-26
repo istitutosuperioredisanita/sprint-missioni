@@ -21,6 +21,7 @@ package it.cnr.si.missioni.service;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.flows.happySign.UtilTestRimborsoService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
@@ -32,6 +33,8 @@ import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.*;
 import it.cnr.si.missioni.util.proxy.json.service.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +81,9 @@ public class PrintOrdineMissioneService {
 
     @Autowired
     private VoceService voceService;
+
+    private static final Log logger = LogFactory.getLog(PrintOrdineMissioneService.class);
+
 
     //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
@@ -186,6 +192,8 @@ public class PrintOrdineMissioneService {
         printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
         printOrdineMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(ordineMissione.getNoteUtilizzoTaxiNoleggio()));
         BigDecimal totMissione = BigDecimal.ZERO;
+
+        ordineMissioneService.retrieveDetails(ordineMissione);
 
         if (ordineMissione.getOrdineMissioneDettagli() != null && !ordineMissione.getOrdineMissioneDettagli().isEmpty()) {
             List<PrintOrdineMissioneDettagli> listDettagliPrint = new ArrayList<PrintOrdineMissioneDettagli>();
