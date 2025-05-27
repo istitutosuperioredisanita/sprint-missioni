@@ -40,12 +40,12 @@
             <url>https://maven.pkg.github.com/istitutosuperioredisanita/sprint-missioni</url>
         </repository>
         <snapshotRepository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/istitutosuperioredisanita/sprint-missioni</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/istitutosuperioredisanita/sprint-missioni</url>
         </snapshotRepository>
     </distributionManagement>
     <properties>
