@@ -19,6 +19,8 @@
 
 package it.cnr.si.missioni.domain.custom.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.cnr.jada.criteria.Projection;
 import it.cnr.jada.criteria.projections.Projections;
 import it.cnr.si.missioni.util.Costanti;
@@ -35,6 +37,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A user.
@@ -127,6 +131,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String ATTACHMENT_ALLEGATO_ANTICIPO = ":allegati_anticipo";
     public static final String ATTACHMENT_ALLEGATO_ORDINE_MISSIONE = ":allegati";
     public static final String CMIS_PROPERTY_ORDINE_ATTACHMENT_ELIMINATO = "missioni_ordine_attachment:eliminato";
+
+    public static final String CMIS_PROPERTY_FLOW_TOTALE_ORDINE_MISSIONE = "cnrmissioni:totaleOrdineMissione";
+
     public static final Projection PROJECTIONLIST_ELENCO_MISSIONI = Projections.projectionList().
             add(Projections.property("id")).
             add(Projections.property("anno")).
@@ -355,6 +362,12 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String commentFlows;
     @Transient
     private String statoFlussoRitornoHome;
+    @Transient
+    @JsonManagedReference //  Indica che questo è il lato "proprietario" della relazione. Jackson serializzerà questa lista e i suoi contenuti.
+    private List<OrdineMissioneDettagli> ordineMissioneDettagli;
+
+    @Transient
+    private BigDecimal totaleSpesePresComplessivo;
 
     public OrdineMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione,
                           String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String responsabileGruppo, String uoRich,
@@ -1351,5 +1364,34 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Transient
     public Boolean checkStatiFlussoTrue() {
         return isStatoInviatoAlFlusso() || isStatoRespintoFlusso() || isStatoNonInviatoAlFlusso() || isStatoFlussoApprovato();
+    }
+    @Transient
+    public List<OrdineMissioneDettagli> getOrdineMissioneDettagli() {
+        return ordineMissioneDettagli;
+    }
+    @Transient
+    public void setOrdineMissioneDettagli(List<OrdineMissioneDettagli> ordineMissioneDettagli) {
+        this.ordineMissioneDettagli = ordineMissioneDettagli;
+    }
+
+    public BigDecimal getTotaleSpesePresComplessivo() {
+        return totaleSpesePresComplessivo;
+    }
+
+    public void setTotaleSpesePresComplessivo(BigDecimal totaleSpesePresComplessivo) {
+        this.totaleSpesePresComplessivo = totaleSpesePresComplessivo;
+    }
+
+    @Transient
+    public BigDecimal getTotaleSpeseOrdine() {
+        BigDecimal totOrdine = BigDecimal.ZERO;
+
+        if (getOrdineMissioneDettagli() != null && !getOrdineMissioneDettagli().isEmpty()) {
+            for (Iterator<OrdineMissioneDettagli> iterator = getOrdineMissioneDettagli().iterator(); iterator.hasNext(); ) {
+                OrdineMissioneDettagli dettagli = iterator.next();
+                totOrdine = totOrdine.add(dettagli.getImportoEuro());
+            }
+        }
+        return Utility.nvl(totOrdine);
     }
 }

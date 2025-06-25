@@ -21,23 +21,32 @@ package it.cnr.si.missioni.service;
 
 import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.flows.happySign.UtilTestRimborsoService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneDettagli;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissione;
+import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneDettagli;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.*;
 import it.cnr.si.missioni.util.proxy.json.service.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class PrintOrdineMissioneService {
@@ -72,6 +81,9 @@ public class PrintOrdineMissioneService {
 
     @Autowired
     private VoceService voceService;
+
+    private static final Log logger = LogFactory.getLog(PrintOrdineMissioneService.class);
+
 
     //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
     public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
@@ -179,6 +191,35 @@ public class PrintOrdineMissioneService {
 
         printOrdineMissione.setPersonaleAlSeguito(ordineMissione.decodePersonaleAlSeguito());
         printOrdineMissione.setNoteUtilizzoTaxiNoleggio(Utility.nvl(ordineMissione.getNoteUtilizzoTaxiNoleggio()));
+        BigDecimal totMissione = BigDecimal.ZERO;
+
+        ordineMissioneService.retrieveDetails(ordineMissione);
+
+        if (ordineMissione.getOrdineMissioneDettagli() != null && !ordineMissione.getOrdineMissioneDettagli().isEmpty()) {
+            List<PrintOrdineMissioneDettagli> listDettagliPrint = new ArrayList<PrintOrdineMissioneDettagli>();
+            for (Iterator<OrdineMissioneDettagli> iterator = ordineMissione.getOrdineMissioneDettagli().iterator(); iterator.hasNext(); ) {
+                OrdineMissioneDettagli dettagli = iterator.next();
+                PrintOrdineMissioneDettagli dettagliPrint = new PrintOrdineMissioneDettagli();
+                String dsSpesa = "";
+                if (dettagli.getDsSpesa() != null) {
+                    dsSpesa = dettagli.getDsTiSpesa() + " - " + dettagli.getDsSpesa();
+                } else {
+                    dsSpesa = dettagli.getDsTiSpesa();
+                }
+                dettagliPrint.setDsSpesa(dsSpesa);
+                if (dettagli.getImportoEuro() != null) {
+                    dettagliPrint.setImporto(Utility.numberFormat(dettagli.getImportoEuro()));
+                } else {
+                    dettagliPrint.setImporto("");
+                }
+                totMissione = totMissione.add(dettagli.getImportoEuro());
+
+                listDettagliPrint.add(dettagliPrint);
+            }
+            printOrdineMissione.setPrintDettagliSpeseOrdineMissione(listDettagliPrint);
+        }
+        
+        printOrdineMissione.setTotMissione(Utility.numberFormat(totMissione));
         printOrdineMissione.setCup(ordineMissione.getCup() == null ? "" : ordineMissione.getCup());
         return printOrdineMissione;
     }

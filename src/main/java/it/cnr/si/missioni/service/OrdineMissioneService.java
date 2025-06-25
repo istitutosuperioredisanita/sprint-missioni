@@ -20,7 +20,6 @@
 package it.cnr.si.missioni.service;
 
 import it.cnr.jada.criteria.Order;
-import it.cnr.jada.criteria.restrictions.Conjunction;
 import it.cnr.jada.criteria.restrictions.Disjunction;
 import it.cnr.jada.criteria.restrictions.Restrictions;
 import it.cnr.jada.criterion.CriterionList;
@@ -60,10 +59,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -156,6 +157,9 @@ public class OrdineMissioneService {
     @Autowired
     private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
+    @Autowired
+    private OrdineMissioneDettagliService ordineMissioneDettagliService;
+
     @Value("${spring.mail.messages.invioResponsabileGruppo.oggetto}")
     private String subjectSendToManagerOrdine;
 
@@ -196,10 +200,8 @@ public class OrdineMissioneService {
     }
 
 
-
-
     //TODO capire gestione degli stati della missione per la visualizzazione degli stati delle autorizz. agg. (SI/NO)
-    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDataFromFlows)
+    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows)
             throws ComponentException {
         MissioneFilter filter = new MissioneFilter();
         filter.setDaId(idMissione);
@@ -208,6 +210,9 @@ public class OrdineMissioneService {
         List<OrdineMissione> listaOrdiniMissione = getOrdiniMissione(filter, false, true);
         if (listaOrdiniMissione != null && !listaOrdiniMissione.isEmpty()) {
             ordineMissione = listaOrdiniMissione.get(0);
+            if (retrieveDetail) {
+                retrieveDetails(ordineMissione);
+            }
             if (retrieveDataFromFlows) {
                 OrdineMissioneAutoPropria autoPropria = getAutoPropria(ordineMissione);
                 if (autoPropria != null && autoPropria.getOrdineMissione().checkStatiFlussoTrue()) {
@@ -239,17 +244,20 @@ public class OrdineMissioneService {
     }
 
 
-    public OrdineMissione getOrdineMissione(Long idMissione) throws ComponentException {
-        return getOrdineMissione(idMissione, false);
+    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail) throws ComponentException {
+        return getOrdineMissione(idMissione, retrieveDetail, true);
     }
+
 
     public Map<String, byte[]> printOrdineMissione(Long idMissione) throws ComponentException {
         String username = securityService.getCurrentUserLogin();
-        OrdineMissione ordineMissione = getOrdineMissione(idMissione);
+        OrdineMissione ordineMissione = getOrdineMissione(idMissione, true);
         if (ordineMissione != null) {
             Map<String, byte[]> map = new HashMap<String, byte[]>();
             byte[] printOrdineMissione = null;
             String fileName = null;
+            retrieveDetails(ordineMissione);
+
             if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
                     && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
                 StorageObject storage = null;
@@ -296,12 +304,19 @@ public class OrdineMissioneService {
         return null;
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void retrieveDetails(OrdineMissione ordineMissione) throws NumberFormatException, ComponentException {
+        List<OrdineMissioneDettagli> list = ordineMissioneDettagliService.getOrdineMissioneDettagli(Long.valueOf(ordineMissione.getId().toString()));
+        ordineMissione.setOrdineMissioneDettagli(list);
+    }
+
     private boolean isDevProfile() {
         return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT);
     }
 
     public String jsonForPrintOrdineMissione(Long idMissione) throws ComponentException {
-        OrdineMissione ordineMissione = getOrdineMissione(idMissione);
+        OrdineMissione ordineMissione = getOrdineMissione(idMissione, true);
         return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, securityService.getCurrentUserLogin());
     }
 
@@ -408,6 +423,7 @@ public class OrdineMissioneService {
     }
 
     private void aggiornaOrdineMissioneFirmato(OrdineMissione ordineMissioneDaAggiornare) {
+        retrieveDetails(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
         gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
@@ -526,7 +542,7 @@ public class OrdineMissioneService {
                 : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo);
 
         // Invia una singola email a tutti i destinatari
-        if (utentiUnici.size()>0) {
+        if (utentiUnici.size() > 0) {
             List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
             mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
         }
@@ -926,6 +942,7 @@ public class OrdineMissioneService {
         controlloDatiObbligatoriDaGUI(ordineMissione);
         inizializzaCampiPerInserimento(ordineMissione);
         boolean updateOrdineMissione = false;
+        calcSpeseTotOrdine(ordineMissione, null);
         validaCRUD(ordineMissione, updateOrdineMissione);
         ordineMissione = (OrdineMissione) crudServiceBean.creaConBulk(ordineMissione);
         // autoPropriaRepository.save(autoPropria);
@@ -1144,6 +1161,7 @@ public class OrdineMissioneService {
 
         boolean isValidatore = accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissioneDB.getUoSpesa()) && Utility.nvl(ordineMissione.getDaChron(), "N").equals("N");
 
+        calcSpeseTotOrdine(ordineMissione, ordineMissioneDB);
         // try {
         // crudServiceBean.lockBulk(ordineMissioneDB);
         // } catch (OptimisticLockException | PersistencyException |
@@ -1250,7 +1268,7 @@ public class OrdineMissioneService {
             }*/
 
         } else {
-            validaCRUD(ordineMissione,true);
+            validaCRUD(ordineMissione, true);
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
         }
 
@@ -1359,6 +1377,26 @@ public class OrdineMissioneService {
         }
         return ordineMissioneDB;
     }
+
+    private void calcSpeseTotOrdine(OrdineMissione ordineMissione, @Nullable OrdineMissione ordineMissioneDB) {
+        BigDecimal dbTotOrdine = ordineMissioneDB != null
+                ? Utility.nvl(ordineMissioneDB.getTotaleSpesePresComplessivo())
+                : BigDecimal.ZERO;
+
+        BigDecimal calcTotOrdine = Utility.nvl(ordineMissione.getTotaleSpeseOrdine());
+        BigDecimal toUpdateTotOrdine = Utility.nvl(ordineMissione.getTotaleSpesePresComplessivo());
+
+        BigDecimal totaleSpesaOrdine = calcolaTot(dbTotOrdine, calcTotOrdine, toUpdateTotOrdine);
+
+        if (ordineMissioneDB != null) {
+            ordineMissioneDB.setTotaleSpesePresComplessivo(totaleSpesaOrdine);
+        } else {
+            ordineMissione.setTotaleSpesePresComplessivo(totaleSpesaOrdine);
+        }
+    }
+
+
+
 
     private void aggiornaDatiOrdineMissione(OrdineMissione ordineMissione, Boolean confirm,
                                             OrdineMissione ordineMissioneDB) {
@@ -1501,6 +1539,8 @@ public class OrdineMissioneService {
             ordineMissioneTaxiService.deleteTaxi(ordineMissione);
             ordineMissioneAutoNoleggioService.deleteAutoNoleggio(ordineMissione);
 
+            ordineMissioneDettagliService.cancellaOrdineMissioneDettagli(ordineMissione, false);
+
             // effettuo controlli di validazione operazione CRUD
             ordineMissione.setStato(Costanti.STATO_ANNULLATO);
             ordineMissione.setToBeUpdated();
@@ -1596,7 +1636,7 @@ public class OrdineMissioneService {
 
     private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
 
-        if ( !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
+        if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
             if (!String.valueOf(ordineMissione.getEsercizioOriginaleObbligazione()).matches("\\d{4}")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "L'anno dell' impegno deve essere composto da 4 cifre");
             }
@@ -1701,6 +1741,29 @@ public class OrdineMissioneService {
                         + ": La data di inizio missione non può essere precedente alla data di oggi");
             }
         }
+
+        if (ordineMissione.getImportoPresunto() != null && ordineMissione.getImportoPresunto().compareTo(BigDecimal.ZERO) < 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto non può essere negativo");
+        }
+
+        if (ordineMissione.getImportoPresunto() != null) {
+            BigDecimal totaleSpesePresComp = ordineMissione.getTotaleSpesePresComplessivo();
+
+            if (totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.ITALY);
+                currencyFormatter.setMinimumFractionDigits(2);
+                currencyFormatter.setMaximumFractionDigits(2);
+
+                String totaleSpeseFormattato = currencyFormatter.format(totaleSpesePresComp);
+                String importoPresuntoFormattato = currencyFormatter.format(ordineMissione.getImportoPresunto());
+
+                throw new AwesomeException(CodiciErrore.ERRGEN,
+                        "Il totale delle spese (" + totaleSpeseFormattato + ") non può superare l'importo presunto ("
+                                + importoPresuntoFormattato + ").");
+            }
+        }
+
+
     }
 
     private void controlloDatiFinanziari(OrdineMissione ordineMissione) {
@@ -1828,6 +1891,7 @@ public class OrdineMissioneService {
 
     private void validaCRUD(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
         if (ordineMissione != null) {
+
             controlloCampiObbligatori(ordineMissione);
             controlloCongruenzaDatiInseriti(ordineMissione, updateOrdineMissione);
             controlloDatiFinanziari(ordineMissione);
@@ -2036,4 +2100,15 @@ public class OrdineMissioneService {
                 + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
+    // Se il valore attuale è zero, prova con i valori aggiornati; altrimenti mantiene o aggiorna se disponibile.
+    private BigDecimal calcolaTot(BigDecimal dbTotOrdine, BigDecimal calcTotOrdine, BigDecimal toUpdateTotOrdine) {
+
+        if (dbTotOrdine.compareTo(BigDecimal.ZERO) == 0) {
+            return calcTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? calcTotOrdine :
+                    toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine :
+                            BigDecimal.ZERO;
+        } else {
+            return toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine : dbTotOrdine;
+        }
+    }
 }

@@ -436,6 +436,17 @@
                      </span>
                             </p>
                         </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-auto">
+                                        <ul class="pager" ng-show="showEsisteOrdineMissione">
+                                            <li><a ng-click="goDettagliSpesaPresunta()" translate="ordine-missione.button.dettagli-presunti"></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                         <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
                             <p class="col-md-12">
                      <span class="input-group">
@@ -483,29 +494,6 @@
                      </span>
                         </p>
                     </form>
-                    <!--
-                       <form class="form-inline" role="form" id="missioni">
-                           <div class="col-md-3">
-                        <span class="input-group">
-                        <span class="input-group-addon" translate="ordine-missione.form.utilizzo-auto-noleggio">auto noleggio</span>
-                        <label class="checkbox">
-                        <input ng-disabled="validazione || disabilitaOrdineMissione" type="checkbox" ng-model="ordineMissioneModel.utilizzoAutoNoleggio" ng-true-value="S" ng-false-value="N">
-                        </label>
-                        </span>
-                           </div>
-                       </form>
-                       <form class="form-inline" role="form" id="missioni">
-                           <p class="col-md-12">
-                        <span class="input-group">
-                        <span class="input-group-addon" translate="ordine-missione.form.note-utilizzo-taxi-noleggio">note</span>
-                        <textarea ng-disabled="validazione || disabilitaOrdineMissione"
-                                  class="input-sm form-control" placeholder="{{'ordine-missione.form.note-utilizzo-taxi-noleggio.placeholder' | translate}}" name="note" ng-model="ordineMissioneModel.noteUtilizzoTaxiNoleggio" rows = "2">
-                        </textarea>
-                        </span>
-                           </p>
-                       </form>
-                       -->
-
 
                     <div class="col-md-12">
                         <ul class="pager" ng-show="showEsisteOrdineMissione">
@@ -537,9 +525,7 @@
                             <cnr-modal-history id-missione="ordineMissioneModel.id" tipo-missione="'OR'"> </cnr-modal-history>
                         </ul>
                     </div>
-
-
-                </div>
+                    <b>{{'ordine-missione-dettagli.form.dettaglio-spese.totale-dettagli' | translate}}</b> {{getTotaleSpesePresMissione() | currency : "€"}}                </div>
             </div>
             <form class="form-inline col-md-12" role="form" id="missioni" >
                 <div class="panel panel-default" ng-if="ordineMissioneModel.id && (ordineMissioneModel.isFireSearchAttachments == true || ordineMissioneModel.isFireSearchAttachments == false )">
@@ -551,8 +537,8 @@
                             <ul class="list-unstyled ordineMissioneModel.attachments" ng-show="ordineMissioneModel.attachmentsExists=true">
                                 <li ng-repeat="attachment in ordineMissioneModel.attachments">
                                     <span class="glyphicon glyphicon-download-alt"></span>
-                                    <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
-                                    <button ng-show="!disabilitaOrdineMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'rimborso-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
+                                    <a target="_blank" href="api/rest/public/getAttachment?id={{attachment.id}}&token={{accessToken}}" data-toggle="tooltip" title="{{'ordine-missione-dettagli.form.dettaglio-spese.download-file' | translate}}">{{attachment.nomeFile}}</a>
+                                    <button ng-show="!disabilitaOrdineMissione  && (!validazione || validazione == 'N')" class="btn btn-sm btn-link" ng-click="confirmDeleteAttachment(attachment)" data-toggle="tooltip" title="{{'ordine-missione-dettagli.form.dettaglio-spese.remove-file' | translate}}"><span class="glyphicon glyphicon-trash" style="color:red"></span></button>
                                 </li>
                             </ul>
                             <h4 >

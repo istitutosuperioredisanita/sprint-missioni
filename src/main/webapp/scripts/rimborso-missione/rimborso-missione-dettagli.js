@@ -20,7 +20,7 @@ missioniApp.factory('RimborsoMissioneDettagliService', function (DateUtils, $htt
     });
 
 missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils, DateService) {
-    
+
     $scope.validazione = $routeParams.validazione;
     $scope.inizioMissione = $routeParams.inizioMissione;
     $scope.fineMissione = $routeParams.fineMissione;
@@ -189,6 +189,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
 
+       $scope.cambioSpesaTracciata = function (spesaTracciata) {
+            if (spesaTracciata == "S"){
+                ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta con strumenti di pagamento tracciabili (carta di credito, bonifico, ecc.).");
+            }
+        }
+
     var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
             recuperoTipiSpesa($scope.newDettaglioSpesa.dataSpesa);
@@ -243,7 +249,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                   $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
                                   if (attachments && Object.keys(attachments).length > 0){
-                                    $scope.dettagliSpese[i].attachmentsExists = true;  
+                                    $scope.dettagliSpese[i].attachmentsExists = true;
                                   } else {
                                     $scope.dettagliSpese[i].attachmentsExists = false;
                                   }
@@ -283,7 +289,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
                         $scope.newDettaglioSpesa.dsTiSpesa = tipo_spesa.ds_ti_spesa;
                         if (tipo_spesa.fl_giustificativo_richiesto == true){
-                            $scope.newDettaglioSpesa.giustificativo = 'S';    
+                            $scope.newDettaglioSpesa.giustificativo = 'S';
                         } else {
                             $scope.newDettaglioSpesa.giustificativo = 'N';
                         }
@@ -373,7 +379,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                         }
                                     });
                                 }
-                                break;        
+                                break;
                             }
                         }
                     }
@@ -492,7 +498,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     var impostadisabilitaRimborsoMissione = function() {
-        if ($scope.rimborsoMissione && ($scope.rimborsoMissione.stato === 'DEF' || $scope.rimborsoMissione.statoFlusso === 'APP' || ($scope.rimborsoMissione.stato === 'CON' && 
+        if ($scope.rimborsoMissione && ($scope.rimborsoMissione.stato === 'DEF' || $scope.rimborsoMissione.statoFlusso === 'APP' || ($scope.rimborsoMissione.stato === 'CON' &&
             ($scope.rimborsoMissione.stateFlows === 'ANNULLATO' ||
                 $scope.rimborsoMissione.stateFlows === 'FIRMA SPESA RIMBORSO' ||
                 $scope.rimborsoMissione.stateFlows === 'FIRMA UO RIMBORSO' ||

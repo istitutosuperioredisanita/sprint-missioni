@@ -296,7 +296,7 @@ public class RimborsoMissioneService {
         }
 
         // Invia una singola email a tutti i destinatari
-        if (utentiUnici.size()>0) {
+        if (utentiUnici.size() > 0) {
             List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
             mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
         }
@@ -395,6 +395,9 @@ public class RimborsoMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare il rimborso della missione. E' già stato avviato il flusso di approvazione.");
             }
         }
+
+        calcSpeseTotRimborso(rimborsoMissione, rimborsoMissioneDB);
+        calcSpeseTotNoAntRimborso(rimborsoMissione,rimborsoMissioneDB);
 
         if (Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("S")) {
             if (!rimborsoMissioneDB.getStato().equals(Costanti.STATO_CONFERMATO)) {
@@ -499,8 +502,9 @@ public class RimborsoMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile confermare un rimborso missione con dettagli e ad importo 0.");
             }
         }
-//		//effettuo controlli di validazione operazione CRUD
+		//effettuo controlli di validazione operazione CRUD
         if (!Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("R") && !fromFlows) {
+
             validaCRUD(rimborsoMissioneDB);
         }
 
@@ -547,6 +551,24 @@ public class RimborsoMissioneService {
         }
 
         return rimborsoMissioneDB;
+    }
+
+    private void calcSpeseTotRimborso(RimborsoMissione rimborsoMissione, RimborsoMissione rimborsoMissioneDB) {
+        BigDecimal dbTotRimborso = Utility.nvl(rimborsoMissioneDB.getTotaleRimborsoComplessivo());
+        BigDecimal calcTotRimborso = Utility.nvl(rimborsoMissione.getTotaleRimborso());
+        BigDecimal toUpdateTotRimborso = Utility.nvl(rimborsoMissione.getTotaleRimborsoComplessivo());
+
+        BigDecimal totSpeseRimborso = calcolaTot(dbTotRimborso, calcTotRimborso, toUpdateTotRimborso);
+        rimborsoMissioneDB.setTotaleRimborsoComplessivo(totSpeseRimborso);
+    }
+
+    private void calcSpeseTotNoAntRimborso(RimborsoMissione rimborsoMissione, RimborsoMissione rimborsoMissioneDB) {
+        BigDecimal dbTotRimborso = Utility.nvl(rimborsoMissioneDB.getTotaleRimborsoComplessivo());
+        BigDecimal calcTotRimborso = Utility.nvl(rimborsoMissione.getTotaleRimborso());
+        BigDecimal toUpdateTotRimborso = Utility.nvl(rimborsoMissione.getTotaleRimborsoComplessivo());
+
+        BigDecimal totSpeseRimborso = calcolaTot(dbTotRimborso, calcTotRimborso, toUpdateTotRimborso);
+        rimborsoMissioneDB.setTotaleRimborsoSenzaAnticipi(totSpeseRimborso);
     }
 
     private void gestioneMailResponsabileGruppo(RimborsoMissione rimborsoMissione) {
@@ -1885,5 +1907,19 @@ public class RimborsoMissioneService {
                 + rimborsoMissione.getOggetto() + "</u> è stato inviato per la verifica/completamento dei dati finanziari.</p>"
                 + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
+
+
+    // Se il valore attuale è zero, prova con i valori aggiornati; altrimenti mantiene o aggiorna se disponibile.
+    private BigDecimal calcolaTot(BigDecimal valoreAttuale, BigDecimal calcTotRimborso, BigDecimal toUpdateTotRimborso) {
+        if (valoreAttuale.compareTo(BigDecimal.ZERO) == 0) {
+            return calcTotRimborso.compareTo(BigDecimal.ZERO) > 0 ? calcTotRimborso :
+                    toUpdateTotRimborso.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotRimborso :
+                            BigDecimal.ZERO;
+        } else {
+            return toUpdateTotRimborso.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotRimborso : valoreAttuale;
+        }
+    }
+
+
 }
 
