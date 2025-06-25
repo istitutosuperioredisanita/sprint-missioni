@@ -112,6 +112,13 @@ public class MissioneBulk implements Cloneable, Serializable {
     private BigDecimal imNettoPecepiente;
     @JsonProperty("im_spese_anticipate")
     private BigDecimal imSpeseAnticipate;
+
+    @JsonProperty("im_spese_tracc")
+    private BigDecimal imSpeseTracc;
+
+    @JsonProperty("im_spese_no_tracc")
+    private BigDecimal imSpeseNoTracc;
+
     @JsonProperty("im_diaria_lorda")
     private BigDecimal imDiariaLorda;
     @JsonProperty("im_quota_esente")
@@ -990,4 +997,20 @@ public class MissioneBulk implements Cloneable, Serializable {
 //	}
     // fine rem per multi impegno
 
+
+    public BigDecimal getImSpeseTracc() {
+        return imSpeseTracc;
+    }
+
+    public void setImSpeseTracc(BigDecimal imSpeseTracc) {
+        this.imSpeseTracc = imSpeseTracc;
+    }
+
+    public BigDecimal getImSpeseNoTracc() {
+        return imSpeseNoTracc;
+    }
+
+    public void setImSpeseNoTracc(BigDecimal imSpeseNoTracc) {
+        this.imSpeseNoTracc = imSpeseNoTracc;
+    }
 }

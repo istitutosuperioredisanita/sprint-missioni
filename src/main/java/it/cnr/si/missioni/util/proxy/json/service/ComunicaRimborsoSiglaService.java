@@ -148,7 +148,12 @@ public class ComunicaRimborsoSiglaService {
         oggettoBulk.setImRimborso(BigDecimal.ZERO);
         oggettoBulk.setImSpese(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
         oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getTotaleSpeseAnticipate()));
+
+        oggettoBulk.setImSpeseTracc(Utility.nvl(rimborsoApprovato.getTotaleSpeseTracciate()));
+        oggettoBulk.setImSpeseNoTracc(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseTracciate()));
+
         oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate());
+        //considerare anche il totale delle spese tracciate (?)
         oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
         if (!rimborsoApprovato.isTrattamentoAlternativoMissione()) {
             oggettoBulk.setImLordoPercepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
