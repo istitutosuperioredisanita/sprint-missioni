@@ -41,6 +41,8 @@ import java.util.Map;
         "im_lordo_percepiente",
         "im_netto_pecepiente",
         "im_spese_anticipate",
+        "im_spese_tracc",
+        "im_spese_no_tracc",
         "im_diaria_lorda",
         "im_quota_esente",
         "im_rimborso",
