@@ -96,7 +96,7 @@ public class ComunicaRimborsoSiglaService {
         RimborsoMissione rimborsoApprovato = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, rimborsoApprovatoId);
         try {
             rimborsoMissioneService.retrieveDetails(rimborsoApprovato);
-            if ((rimborsoApprovato.isTrattamentoAlternativoMissione() && !Utility.nvl(rimborsoApprovato.getRimborso0(), "N").equals("S")) || rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip().compareTo(BigDecimal.ZERO) > 0) {
+            if ((rimborsoApprovato.isTrattamentoAlternativoMissione() && !Utility.nvl(rimborsoApprovato.getRimborso0(), "N").equals("S")) || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0) {
                 comunicaRimborso(rimborsoApprovato);
             }
             return null;
@@ -146,19 +146,20 @@ public class ComunicaRimborsoSiglaService {
         oggettoBulk.setImDiariaNetto(BigDecimal.ZERO);
         oggettoBulk.setImQuotaEsente(BigDecimal.ZERO);
         oggettoBulk.setImRimborso(BigDecimal.ZERO);
-        oggettoBulk.setImSpese(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip()));
+        oggettoBulk.setImSpese(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
         oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getTotaleSpeseAnticipate()));
 
         oggettoBulk.setImSpeseTracc(Utility.nvl(rimborsoApprovato.getTotaleSpeseTracciate()));
         oggettoBulk.setImSpeseNoTracc(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseTracciate()));
 
-//TODO da testare (anche nei vari punti in cui vengono settati i totali)
-        oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip());
-        oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
+        //TODO da testare e approvare il metodo getTotaleRimborsoSpeseTraccNoSpeseAnticip ed eventualmente sostituirlo al calcolo dei totali
+        // im_totale_missione è il parametro che andrà a finire su SIGLA e che verrà mostrato al click crea/ricerca impegno al quale viene sottratto (se presente) l'anticipo
+        oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate());
+        oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
 
         if (!rimborsoApprovato.isTrattamentoAlternativoMissione()) {
-            oggettoBulk.setImLordoPercepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip()));
-            oggettoBulk.setImNettoPecepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip()));
+            oggettoBulk.setImLordoPercepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
+            oggettoBulk.setImNettoPecepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
         } else {
             oggettoBulk.setImLordoPercepiente(BigDecimal.ZERO);
             oggettoBulk.setImNettoPecepiente(BigDecimal.ZERO);
@@ -204,7 +205,7 @@ public class ComunicaRimborsoSiglaService {
 
 // inizio aggiunta per multi impegno			
         if (!rimborsoApprovato.isTrattamentoAlternativoMissione() &&
-                Utility.nvl(rimborsoApprovato.getTotaleRimborsoSpeseTraccNoSpeseAnticip()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())).compareTo(BigDecimal.ZERO) > 0) {
+                Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())).compareTo(BigDecimal.ZERO) > 0) {
             if (StringUtils.hasLength(rimborsoApprovato.getCdCdsObbligazione())) {
                 oggettoBulk.setCdsObblGeMis(rimborsoApprovato.getCdCdsObbligazione());
             }

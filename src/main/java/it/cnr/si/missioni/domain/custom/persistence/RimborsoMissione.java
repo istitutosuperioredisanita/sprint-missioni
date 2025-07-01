@@ -1219,20 +1219,20 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     }
 
 
-    //TODO da testare
-    @Transient
-    public BigDecimal getTotaleRimborsoSpeseTraccNoSpeseAnticip() {
-        BigDecimal totRimborso = BigDecimal.ZERO;
-        if (getRimborsoMissioneDettagli() != null && !getRimborsoMissioneDettagli().isEmpty()) {
-            for (Iterator<RimborsoMissioneDettagli> iterator = getRimborsoMissioneDettagli().iterator(); iterator.hasNext(); ) {
-                RimborsoMissioneDettagli dettagli = iterator.next();
-                if (!dettagli.isSpesaAnticipata() && dettagli.isSpesaTracciata()) {
-                    totRimborso = totRimborso.add(dettagli.getImportoEuro());
-                }
-            }
-        }
-        return Utility.nvl(totRimborso);
-    }
+//    //TODO da testare e approvare
+//    @Transient
+//    public BigDecimal getTotaleRimborsoSpeseTraccNoSpeseAnticip() {
+//        BigDecimal totRimborso = BigDecimal.ZERO;
+//        if (getRimborsoMissioneDettagli() != null && !getRimborsoMissioneDettagli().isEmpty()) {
+//            for (Iterator<RimborsoMissioneDettagli> iterator = getRimborsoMissioneDettagli().iterator(); iterator.hasNext(); ) {
+//                RimborsoMissioneDettagli dettagli = iterator.next();
+//                if (!dettagli.isSpesaAnticipata() && dettagli.isSpesaTracciata()) {
+//                    totRimborso = totRimborso.add(dettagli.getImportoEuro());
+//                }
+//            }
+//        }
+//        return Utility.nvl(totRimborso);
+//    }
 
     public String getMatricola() {
         return matricola;
