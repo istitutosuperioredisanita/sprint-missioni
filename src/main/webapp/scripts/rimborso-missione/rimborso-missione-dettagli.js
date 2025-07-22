@@ -182,12 +182,6 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
             ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta direttamente dall'Ente(tramite agenzia viaggi o altro), quindi non riguarda anticipi ricevuti per la missione. Per questo la spesa non verrà conteggiata nella missione.");
         }
     }
-    $scope.cambioSpesaTracciata = function (spesaTracciata) {
-        if (spesaTracciata == "S"){
-            ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta con strumenti di pagamento tracciabili (carta di credito, bonifico, ecc.).");
-        }
-    }
-
 
        $scope.cambioSpesaTracciata = function (spesaTracciata) {
             if (spesaTracciata == "S"){

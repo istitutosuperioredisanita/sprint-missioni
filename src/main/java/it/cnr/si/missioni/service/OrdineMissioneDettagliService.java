@@ -66,6 +66,7 @@ public class OrdineMissioneDettagliService {
 
     @Autowired
     private CRUDComponentSession crudServiceBean;
+    // Removed Environment env as it's no longer used for profile checking or print name config here
 
     @Autowired
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
@@ -76,6 +77,8 @@ public class OrdineMissioneDettagliService {
     @Autowired
     private OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
 
+    // Removed uploadAllegato method
+    // Removed getAttachments method
 
     @Transactional(readOnly = true)
     public List<OrdineMissioneDettagli> getOrdineMissioneDettagli(Long idOrdineMissione)
@@ -93,11 +96,108 @@ public class OrdineMissioneDettagliService {
 
 
     private void validaCRUD(OrdineMissioneDettagli ordineMissioneDettagli) throws ComponentException {
+        // Removed kmPercorsi validation as kmPercorsi is not in the entity
+        // Removed validaDettaglioOrdineService.valida call
 
         if (StringUtils.isEmpty(ordineMissioneDettagli.getDsSpesa())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Indicare una descrizione per la spesa.");
         }
     }
+
+    // Removed controlliPasto method and its helper methods (recuperoLivelloEquivalente, controlloCongruenzaPasto)
+    // as they rely on fields/methods not present in the provided OrdineMissioneDettagli entity (like cdTiPasto, isDettaglioPasto)
+
+//    private void controlliSpeseMezzi(OrdineMissioneDettagli ordineMissioneDettagli, OrdineMissione ordineMissione) {
+//        Long idMissione = Long.valueOf(ordineMissione.getId().toString());
+//
+//        boolean isTaxiUsed = ordineMissioneTaxiService.getTaxi(idMissione) != null;
+//        boolean isAutoNoleggioUsed = ordineMissioneAutoNoleggioService.getAutoNoleggio(idMissione) != null;
+//        boolean isAutoPropriaUsed = ordineMissioneAutoPropriaService.getAutoPropria(idMissione) != null;
+//
+//        // This check for tassaSoggiorno is based on cdTiSpesa which IS in the entity
+//        boolean tassaSoggiorno = ordineMissioneDettagliRepository
+//                .getOrdineMissioneDettagli(ordineMissione)
+//                .stream()
+//                .anyMatch(dettaglio -> dettaglio.getImportoEuro() != null && dettaglio.getImportoEuro().compareTo(BigDecimal.ZERO) != 0
+//                        && dettaglio.getCdTiSpesa() != null && dettaglio.getCdTiSpesa().equalsIgnoreCase(Costanti.SPESA_PERNOTTAMENTO));
+//
+//        String cdTiSpesa = ordineMissioneDettagli.getCdTiSpesa();
+//        String messaggioErrore = "ATTENZIONE! Voce non selezionabile in quanto NON preventivamente autorizzata";
+//
+//        String utilizzoMotiviIspettivi = null;
+//        String utilizzoMotiviSediDisagiate = null;
+//        if (isAutoPropriaUsed) {
+//            OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(idMissione);
+//            if (autoPropria != null) { // Added null check for autoPropria
+//                utilizzoMotiviIspettivi = Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N");
+//                utilizzoMotiviSediDisagiate = Utility.nvl(autoPropria.getUtilizzoMotiviSediDisagiate(), "N");
+//            }
+//        }
+//
+//        // Gestione delle spese in base al codice di spesa - uses cdTiSpesa which is in the entity
+//        if (cdTiSpesa != null) {
+//            switch (cdTiSpesa) {
+//                case Costanti.SPESA_INDENNITA_KM:
+//                    if (!isAutoPropriaUsed || (utilizzoMotiviIspettivi != null && utilizzoMotiviIspettivi.equals("N") && utilizzoMotiviSediDisagiate != null && utilizzoMotiviSediDisagiate.equals("S"))) { // Added null checks for motivi
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//                case Costanti.SPESA_IND_AUTO_PROPRIA:
+//                    if (!isAutoPropriaUsed || (utilizzoMotiviIspettivi != null && utilizzoMotiviIspettivi.equals("S") && utilizzoMotiviSediDisagiate != null && utilizzoMotiviSediDisagiate.equals("N"))) { // Added null checks for motivi
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//                case Costanti.SPESA_NOLEGGIO_AUTO:
+//                    if (!isAutoNoleggioUsed) {
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//                case Costanti.SPESA_TAXI:
+//                    if (!isTaxiUsed) {
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//                case Costanti.SPESA_PEDAGGIO_AUTOSTRADA:
+//                    if (!isAutoPropriaUsed && !isAutoNoleggioUsed) {
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//                case Costanti.SPESA_PARCHEGGIO:
+//                    if (!isAutoNoleggioUsed && !isAutoPropriaUsed) {
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//                case Costanti.SPESA_ACC_DISABILE:
+//                    if (!isTaxiUsed) {
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//
+//                    OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(idMissione);
+//                    if (taxi == null || StringUtils.isEmpty(taxi.getMotiviHandicap())) { // Added null check for taxi
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//
+//                case Costanti.SPESE_VISTO_VIAGGI_ESTERO:
+//                    if (ordineMissione != null && ordineMissione.getTipoMissione() != null && ordineMissione.getTipoMissione().equals("I")) { // Added null checks
+//                        throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+//                    }
+//                    break;
+//
+//                default:
+//                    // Consider adding a check here if the expense type is not recognized/allowed by default
+//                    break;
+//            }
+//        }
+//    }
+
+    // Removed aggiornaDatiImpegni method
 
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -105,6 +205,7 @@ public class OrdineMissioneDettagliService {
             OrdineMissioneDettagli ordineMissioneDettagli) throws AwesomeException, ComponentException,
             OptimisticLockException, PersistencyException, BusyResourceException {
         ordineMissioneDettagli.setUid(securityService.getCurrentUserLogin());
+        // Removed setting the 'user' field as it's not in the provided entity
         ordineMissioneDettagli.setStato(Costanti.STATO_INSERITO);
         if (ordineMissioneDettagli.getTiSpesaDiaria() == null) {
             ordineMissioneDettagli.setTiSpesaDiaria("S");
@@ -127,6 +228,11 @@ public class OrdineMissioneDettagliService {
         controlloDatiObbligatoriDaGui(ordineMissioneDettagli);
         impostaImportoDivisa(ordineMissioneDettagli);
         validaCRUD(ordineMissioneDettagli);
+        // Removed call to controlliPasto
+
+        //controlliSpeseMezzi(ordineMissioneDettagli, ordineMissione);
+
+        // Removed call to aggiornaDatiImpegni
 
         ordineMissioneDettagli = (OrdineMissioneDettagli) crudServiceBean.creaConBulk(ordineMissioneDettagli);
         log.debug("Created Information for OrdineMissioneDettagli: {}", ordineMissioneDettagli);
@@ -136,9 +242,9 @@ public class OrdineMissioneDettagliService {
 
     private void controlloDatiObbligatoriDaGui(OrdineMissioneDettagli dettaglio) {
         if (dettaglio != null) {
-            if (dettaglio.getCdTiSpesa() == null) {
+            if (dettaglio.getCdTiSpesa() == null) { // Check for null LocalDate
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Dettaglio Spesa");
-            } else if (dettaglio.getImportoEuro() == null) {
+            } else if (dettaglio.getImportoEuro() == null) { // Check for null BigDecimal
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Euro");
             }
         }
@@ -211,6 +317,8 @@ public class OrdineMissioneDettagliService {
 
         controlloDatiObbligatoriDaGui(ordineMissioneDettagli);
 
+        // Update only fields present in the OrdineMissioneDettagli entity
+        // Removed: setCdTiPasto, setNote, setFlSpesaAnticipata, setKmPercorsi, setDsNoGiustificativo, setLocalitaSpostamento, setIdRimborsoImpegni
         ordineMissioneDettagliDB.setCdTiSpesa(ordineMissioneDettagli.getCdTiSpesa());
         ordineMissioneDettagliDB.setTiCdTiSpesa(ordineMissioneDettagli.getTiCdTiSpesa());
         ordineMissioneDettagliDB.setDsSpesa(ordineMissioneDettagli.getDsSpesa());
@@ -221,11 +329,18 @@ public class OrdineMissioneDettagliService {
         ordineMissioneDettagliDB.setCdDivisa(ordineMissioneDettagli.getCdDivisa());
         ordineMissioneDettagliDB.setImportoEuro(ordineMissioneDettagli.getImportoEuro());
 
+
         impostaImportoDivisa(ordineMissioneDettagliDB);
 
         ordineMissioneDettagliDB.setToBeUpdated();
 
         validaCRUD(ordineMissioneDettagliDB);
+        // Removed call to controlliPasto
+
+        //controlliSpeseMezzi(ordineMissioneDettagli, ordineMissione);
+
+        // Removed call to aggiornaDatiImpegni
+
 
         ordineMissioneDettagliDB = (OrdineMissioneDettagli) crudServiceBean.modificaConBulk(ordineMissioneDettagliDB);
 
