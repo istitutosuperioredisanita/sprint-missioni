@@ -7,8 +7,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
     name: missioni
-    username: MISSIONISVIL
-    password: MISSIONISVILPSW
+    username: MISSIONICOLL
+    password: ***REMOVED***
   jpa:
     database-platform: org.hibernate.dialect.Oracle12cDialect
     database: ORACLE
@@ -34,7 +34,7 @@ spring:
     attrMail:
   proxy:
     SIGLA:
-      url: http://localhost:8080/SIGLA/
+      url: http://sigla-t:8080/SIGLA/
       username: ***REMOVED***
       password: ***REMOVED***
       context:
@@ -127,40 +127,40 @@ user:
 flows:
   test: true
   type: HAPPPYSIGN
-  url: https://isscol.happysign.it:8443/HappySignRest/rest/HappySignRest/
+  url: https://isspre.happysign.it:8443/HappySignRest/rest/HappySignRest/
   username: auto@iss
   password: ***REMOVED***
   organizzation: iss
   keystore:
-    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\isscol_client.p12
+    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\iss_pre_client.p12
     password: password
   templateFirme:
-    1firma: duilioapp
-    2Firme: duilioapp
-    3Firme: duilioapp
-    4Firme: duilioapp
-    5Firme: duilioapp
+    1firma: duilio_app
+    2Firme: duilio_app
+    3Firme: duilio_app
+    4Firme: duilio_app
+    5Firme: duilio_app
 
   autorizzazione:
-    progdifuo: duilioapp
-    progstessauo: duilioapp
-    noprogdifuo: duilioapp
-    dirgae: duilioapp
-    gae: duilioapp
-    dirgen: duilioapp
-    nocaricoente: duilioapp
-    dirigentiIfascia: duilioapp
-    dirigentiIIfascia: duilioapp
-    presidente: duilioapp
-    vocipresidente: duilioapp
-    cns_cnt: duilioapp
+    progdifuo: duilio_app
+    progstessauo: duilio_app
+    noprogdifuo: duilio_app
+    dirgae: duilio_app
+    gae: duilio_app
+    dirgen: duilio_app
+    nocaricoente: duilio_app
+    dirigentiIfascia: duilio_app
+    dirigentiIIfascia: duilio_app
+    presidente: duilio_app
+    vocipresidente: duilio_app
+    cns_cnt: duilio_app
   rimborso:
     default:
-      template : duilioapp
+      template : duilio_app
       signSiglaUo : DRUE
   annullo:
     default:
-      template: duilioapp
+      template: duilio_app
       signSiglaUo: DRUE
 codiciUo:
   presidenza: 000.033
@@ -280,7 +280,7 @@ cnr:
     driver: AZURE
     azure:
       connectionString: cnr.azure.connectionString=DefaultEndpointsProtocol=http;AccountName=siglatest;AccountKey=***REMOVED***;EndpointSuffix=core.windows.net
-      containerName: sigla-main-storage
+      containerName: sigla-coll-main-storage
     path:
       comunicazioni:
         dal: /Comunicazioni da ISS
@@ -292,4 +292,3 @@ admin:
   usernames:
     - ciro.salvio@iss.it
     - davide.mirra@iss.it
-
