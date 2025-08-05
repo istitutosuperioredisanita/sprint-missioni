@@ -132,7 +132,7 @@ flows:
   password: ***REMOVED***
   organizzation: iss
   keystore:
-    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\iss_pre_client.p12
+    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\happysign_coll.p12
     password: password
   templateFirme:
     1firma: duilio_app
