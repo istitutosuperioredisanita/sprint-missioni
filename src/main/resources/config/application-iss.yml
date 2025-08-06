@@ -34,7 +34,7 @@ spring:
     attrMail:
   proxy:
     SIGLA:
-      url: http://sigla-t:8080/SIGLA/
+      url: http://siglacoll.iss.it:8080/SIGLA/
       username: ***REMOVED***
       password: ***REMOVED***
       context:
