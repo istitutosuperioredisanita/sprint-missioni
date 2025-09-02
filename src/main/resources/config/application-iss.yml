@@ -103,7 +103,7 @@ spring:
     auth: true
     send.error.to: ciro.salvio@iss.it
   print:
-    endpoint: http://sigla-t:8082/api/v1/get/print
+    endpoint: http://siglacoll.iss.it:8082/api/v1/get/print
     rimborso: /missioni/iss/RimborsoMissione.jrxml
     ordine: /missioni/iss/OrdineMissione.jrxml
     anticipo: /missioni/iss/OrdineMissioneAnticipo.jrxml
