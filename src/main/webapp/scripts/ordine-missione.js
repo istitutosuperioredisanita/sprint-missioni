@@ -979,6 +979,10 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     $scope.onChangeDuplica = function(duplica) {
         if (duplica == 'S') {
             $scope.restOrdiniMissioneDaDuplicare($sessionStorage.accountWork);
+        } else {
+            $scope.accountModel = $sessionStorage.account;
+            $sessionStorage.accountWork = $scope.accountModel;
+            $scope.inizializzaFormPerInserimento($scope.accountModel, true);
         }
     }
 
