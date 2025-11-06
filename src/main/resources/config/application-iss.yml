@@ -2,7 +2,7 @@
 spring:
   config:
     file:
-      pathFileConfigJson: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config
+      pathFileConfigJson: C:\Users\mirra_davide\IdeaProjects\ISS\sprint-missioni-config\sprint-missioni-config
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
@@ -25,7 +25,7 @@ spring:
     enabled: true
     userSearchBase: Dc=iss,dc=it
     userSearchFilter: (&(objectCategory=Person)(userPrincipalName={0}))
-    url: ldap://iss.it:389
+    url: ldap://iss-dc1.iss.it:389
     managerDn: ldapuser@iss.it
     managerPassword: ***REMOVED***
     change.password.url: https://utenti.iss.it
@@ -132,7 +132,7 @@ flows:
   password: ***REMOVED***
   organizzation: iss
   keystore:
-    path: C:\Users\mirra_davide\Desktop\JAVA\ISS\sprint-missioni-config\sprint-missioni-config\happysign_coll.p12
+    path: C:\Users\mirra_davide\IdeaProjects\ISS\sprint-missioni-config\sprint-missioni-config\happysign_coll.p12
     password: password
   templateFirme:
     1firma: duilio_app
@@ -201,7 +201,7 @@ logging.config: classpath:logback-local.xml
 aceiss:
   url: https://webapi.iss.it/anag/
   keystore:
-    path: C:/Users/mirra_davide/Desktop/JAVA/ISS/sprint-missioni-config/sprint-missioni-config/webapi-iss-it.p12
+    path: C:/Users/mirra_davide/IdeaProjects/ISS/sprint-missioni-config/sprint-missioni-config/webapi-iss-it.p12
     password: ***REMOVED***
 authJWT:
   urlToken: https://login.microsoftonline.com/cf30c7fd-6616-4b62-ad83-b574b27d5912/
