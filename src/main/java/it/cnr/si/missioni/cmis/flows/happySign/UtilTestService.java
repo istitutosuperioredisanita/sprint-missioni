@@ -47,7 +47,7 @@ public class UtilTestService {
 
     public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
         StartWorflowDto startInfo = new StartWorflowDto();
-        startInfo.setTemplateName("duilio_app");
+        startInfo.setTemplateName("Missioni_doppia_firma");
 
         //TODO aspettare conferma per impostare 1 sola firma per chi inserisce l'ordine
         startInfo.addSigner(ordineMissione.getUidInsert());
