@@ -135,32 +135,32 @@ flows:
     path: C:\Users\mirra_davide\IdeaProjects\ISS\sprint-missioni-config\sprint-missioni-config\happysign_coll.p12
     password: password
   templateFirme:
-    1firma: Missioni_doppia_firma
-    2Firme: Missioni_doppia_firma
-    3Firme: Missioni_doppia_firma
-    4Firme: Missioni_doppia_firma
-    5Firme: Missioni_doppia_firma
+    1firma: Missioni_doppia_firma_sequenziale
+    2Firme: Missioni_doppia_firma_sequenziale
+    3Firme: Missioni_doppia_firma_sequenziale
+    4Firme: Missioni_doppia_firma_sequenziale
+    5Firme: Missioni_doppia_firma_sequenziale
 
   autorizzazione:
-    progdifuo: Missioni_doppia_firma
-    progstessauo: Missioni_doppia_firma
-    noprogdifuo: Missioni_doppia_firma
-    dirgae: Missioni_doppia_firma
-    gae: Missioni_doppia_firma
-    dirgen: Missioni_doppia_firma
-    nocaricoente: Missioni_doppia_firma
-    dirigentiIfascia: Missioni_doppia_firma
-    dirigentiIIfascia: Missioni_doppia_firma
-    presidente: Missioni_doppia_firma
-    vocipresidente: Missioni_doppia_firma
-    cns_cnt: Missioni_doppia_firma
+    progdifuo: Missioni_doppia_firma_sequenziale
+    progstessauo: Missioni_doppia_firma_sequenziale
+    noprogdifuo: Missioni_doppia_firma_sequenziale
+    dirgae: Missioni_doppia_firma_sequenziale
+    gae: Missioni_doppia_firma_sequenziale
+    dirgen: Missioni_doppia_firma_sequenziale
+    nocaricoente: Missioni_doppia_firma_sequenziale
+    dirigentiIfascia: Missioni_doppia_firma_sequenziale
+    dirigentiIIfascia: Missioni_doppia_firma_sequenziale
+    presidente: Missioni_doppia_firma_sequenziale
+    vocipresidente: Missioni_doppia_firma_sequenziale
+    cns_cnt: Missioni_doppia_firma_sequenziale
   rimborso:
     default:
-      template : Missioni_doppia_firma
+      template : Missioni_doppia_firma_sequenziale
       signSiglaUo : DRUE
   annullo:
     default:
-      template: Missioni_doppia_firma
+      template: Missioni_doppia_firma_sequenziale
       signSiglaUo: DRUE
 codiciUo:
   presidenza: 000.033
