@@ -22,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -207,9 +204,34 @@ public class CronHappySignService {
         }
     }
 
-    private void setNoteMissioneRespinta (GetDocumentDetailResponse documentDetails, FlowResult flowResult){
-        Optional<SignersDocumentDetails> firstSigner = Arrays.stream(documentDetails.getSigners()).findFirst();
-        String noteRespinta = firstSigner.map(SignersDocumentDetails::getNote).orElse("Respinta da firma su HappySign");
+
+
+    /**
+     * Imposta nel FlowResult la nota del primo firmatario che ha rifiutato la firma.
+     * Controlla il campo "operation" dei firmatari per individuare chi ha rifiutato
+     * (REFUSED o contiene "ha rifiutato in firma") e usa la sua nota se presente,
+     * altrimenti imposta un messaggio di default.
+     */
+    private void setNoteMissioneRespinta(
+            GetDocumentDetailResponse documentDetails,
+            FlowResult flowResult) {
+
+        String noteRespinta = Arrays.stream(documentDetails.getSigners())
+                .filter(signer -> {
+                    String operation = signer.getOperation();
+                    return operation != null && (
+                            operation.equalsIgnoreCase(EnumEsitoFlowDocumentStatus.REFUSED.name())
+                                    || operation.toLowerCase().contains("ha rifiutato in firma")
+                    );
+                })
+                .map(SignersDocumentDetails::getNote)
+                .filter(Objects::nonNull)
+                .filter(note -> !note.isEmpty())
+                .findFirst()
+                .orElse("Respinta da firma su HappySign");
+
         flowResult.setCommento(noteRespinta);
     }
+
+
 }
