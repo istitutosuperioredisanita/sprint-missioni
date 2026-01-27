@@ -220,70 +220,28 @@ public class AnnullamentoRimborsoMissioneService {
         return annullamentoDB;
     }
 
-    private String getTextMail(AnnullamentoRimborsoMissione annullamento, boolean perRichiedente) {
-        StringBuilder testoMail = new StringBuilder();
-
-        if (perRichiedente) {
-            // Email per il richiedente
-            testoMail.append("Il tuo rimborso missione approvato ");
-        } else {
-            // Email per validatori/amministrativi
-            testoMail.append("Il rimborso missione approvato ");
-        }
-
-        testoMail.append(annullamento.getRimborsoMissione().getAnno()).append("-")
-                .append(annullamento.getRimborsoMissione().getNumero());
-
-        if (!perRichiedente) {
-            testoMail.append(" di ").append(getNominativo(annullamento.getRimborsoMissione().getUid()));
-        }
-
-        testoMail.append(" per la missione a ").append(annullamento.getRimborsoMissione().getDestinazione())
-                .append(" dal ").append(DateUtils.getDefaultDateAsString(annullamento.getRimborsoMissione().getDataInizioMissione()))
-                .append(" al ").append(DateUtils.getDefaultDateAsString(annullamento.getRimborsoMissione().getDataFineMissione()))
-                .append(" avente per oggetto ").append(annullamento.getRimborsoMissione().getOggetto())
-                .append(" è stato annullato da ").append(getNominativo(securityService.getCurrentUserLogin()));
-
-        return testoMail.toString();
-    }
-
     private String getTextMail(AnnullamentoRimborsoMissione annullamento) {
-        return getTextMail(annullamento, false);
+        return "Il rimborso missione approvato " + annullamento.getRimborsoMissione().getAnno() + "-" + annullamento.getRimborsoMissione().getNumero() + " di " + getNominativo(annullamento.getRimborsoMissione().getUid()) + " per la missione a " + annullamento.getRimborsoMissione().getDestinazione() + " dal " + DateUtils.getDefaultDateAsString(annullamento.getRimborsoMissione().getDataInizioMissione()) + " al " + DateUtils.getDefaultDateAsString(annullamento.getRimborsoMissione().getDataFineMissione()) + " avente per oggetto " + annullamento.getRimborsoMissione().getOggetto() + " è stato annullato da " + getNominativo(securityService.getCurrentUserLogin());
     }
 
     private void sendMail(AnnullamentoRimborsoMissione annullamento) {
         DatiIstituto dati = datiIstitutoService.getDatiIstituto(annullamento.getRimborsoMissione().getUoSpesa(), annullamento.getRimborsoMissione().getAnno());
         String subjectMail = subjectUndo + " " + getNominativo(annullamento.getUid());
+        String testoMail = getTextMail(annullamento);
 
         Account account = accountService.loadAccountFromUsername(annullamento.getRimborsoMissione().getUid());
         LocalDate data = LocalDate.now();
         int anno = data.getYear();
 
-        String emailRichiedente = annullamento.getRimborsoMissione().getUid();
-
-        // Email personalizzata per il richiedente
-        String testoRichiedente = getTextMail(annullamento, true);
-        String testoValidatori = getTextMail(annullamento, false);
-
-        List<String> listaMailValidatori = new ArrayList<>();
-
-        // Invia sempre email personalizzata al richiedente
-        if (account != null && account.getEmail_comunicazioni() != null) {
-            mailService.sendEmail(subjectMail, testoRichiedente, false, true, account.getEmail_comunicazioni());
-        }
-
-        // Prepara lista validatori
+        List<String> listaMail = new ArrayList<>();
+        listaMail.add(account.getEmail_comunicazioni());
         if (dati != null && dati.getMailNotificheRimborso() != null && !dati.getMailNotificheRimborso().equals("N")) {
-            listaMailValidatori.add(dati.getMailNotificheRimborso());
+            listaMail.add(dati.getMailNotificheRimborso());
         } else {
             List<UsersSpecial> lista = accountService.getUserSpecialForUoPerValidazione(annullamento.getRimborsoMissione().getUoSpesa());
-            // Rimuovi il richiedente dalla lista validatori
-            lista.removeIf(user -> user.getUid().equals(emailRichiedente));
-            listaMailValidatori.addAll(mailService.preparaListaMail(lista));
+            listaMail.addAll(mailService.preparaListaMail(lista));
         }
-
-        // Invia email ai validatori (esclude il richiedente)
-        sendMail(listaMailValidatori, testoValidatori, subjectMail);
+        sendMail(listaMail, testoMail, subjectMail);
     }
 
     private void sendMail(List<String> lista, String testoMail, String oggetto) {

@@ -367,7 +367,8 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
      * Verifica se la missione non è a carico dell'ente
      */
     public Boolean isMissioneNoCaricoEnte(OrdineMissione ordineMissione) {
-        return ordineMissione != null && ordineMissione.isMissioneGratuita();
+        return ordineMissione != null &&
+                Optional.ofNullable(ordineMissione.getMissioneGratuita()).isPresent();
     }
 
     /**

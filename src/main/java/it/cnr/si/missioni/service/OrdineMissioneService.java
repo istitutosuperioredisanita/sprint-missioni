@@ -475,6 +475,26 @@ public class OrdineMissioneService {
             ordineMissioneAnticipoService.updateAnticipo(anticipo, false);
             missioneConAnticipo = true;
         }
+//            DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
+//                    ordineMissioneDaAggiornare.getAnno());
+//            if (dati != null && dati.getMailNotifiche() != null) {
+//                if (!dati.getMailNotifiche().equals("N")) {
+//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
+//                            true, dati.getMailNotifiche());
+//                }
+//            } else {
+//                Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
+//                UsersSpecial richiedente = accountService.getUoForUsersSpecial(account.getUid());
+//                List<UsersSpecial> lista = accountService
+//                        .getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
+//                aggiuntaRichMailList(lista,richiedente);
+//                if (lista != null && lista.size() > 0) {
+//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo),
+//                            false, true, mailService.prepareTo(lista));
+//                }
+//            }
+//        }
+
 
         if (account != null && account.getCodice_sede() != null) {
             datiSede = datiSedeService.getDatiSede(account.getCodice_sede(), LocalDate.now());
@@ -488,71 +508,64 @@ public class OrdineMissioneService {
                     ordineMissioneDaAggiornare.getAnno());
         }
 
-        Set<UsersSpecial> validatoriUnici = new HashSet<>();
+        Set<UsersSpecial> utentiUnici = new HashSet<>();
 
-        // Aggiungi utenti della UO richiedente (solo validatori, non il richiedente)
+        // Aggiungi utenti della UO richiedente
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("U")) {
-            validatoriUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), false));
+            utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), false));
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("V")) {
-            validatoriUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), true));
+            utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), true));
+        }
+
+        // Aggiungi il richiedente direttamente
+        if (emailRich != null) {
+            UsersSpecial richiedente = accountService.findOrCreateUserSpecial(emailRich);
+            if (richiedente != null) {
+                utentiUnici.add(richiedente);
+            }
         }
 
         // Aggiungi utenti della UO spesa
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("V")) {
-                validatoriUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true));
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("U")) {
-                validatoriUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), false));
             }
         }
-
-        // Rimuovi il richiedente dalla lista validatori se presente
-        validatoriUnici.removeIf(user -> user.getUid().equals(emailRich));
 
 
         String oggetto = isAnnullamento ? approvazioneAnnullamentoOrdineMissione : approvazioneOrdineMissione;
+        String testo = isAnnullamento ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare)
+                : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo);
 
-        // Email personalizzata per il richiedente
-        if (emailRich != null) {
-            String testoRichiedente = isAnnullamento
-                    ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare, true)
-                    : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo, true);
-
-            mailService.sendEmail(oggetto, testoRichiedente, false, true, accountService.getEmail(emailRich));
+        // Invia una singola email a tutti i destinatari
+        if (utentiUnici.size() > 0) {
+            List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
+            mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
         }
-
-        // Email per i validatori
-        String testoValidatori = isAnnullamento
-                ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare, false)
-                : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo, false);
-
-        if (validatoriUnici.size() > 0) {
-            List<UsersSpecial> listaValidatori = new ArrayList<>(validatoriUnici);
-            mailService.sendEmail(oggetto, testoValidatori, false, true, mailService.prepareTo(listaValidatori));
-        }
-
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("E")
                 && !StringUtils.isEmpty(datiIstituto.getMailNotifiche()) && !datiIstituto.getMailNotifiche().equals("N")) {
-            mailService.sendEmail(oggetto, testoValidatori, false, true, datiIstituto.getMailNotifiche());
+            mailService.sendEmail(oggetto, testo, false, true, datiIstituto.getMailNotifiche());
         }
         if (datiSede != null && Utility.nvl(datiSede.getTipoMailDopoOrdine(), "N").equals("A")
                 && !StringUtils.isEmpty(datiSede.getMailDopoOrdine())) {
-            mailService.sendEmail(oggetto, testoValidatori, false, true, datiSede.getMailDopoOrdine());
+            mailService.sendEmail(oggetto, testo, false, true, datiSede.getMailDopoOrdine());
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("A")
                 && !StringUtils.isEmpty(datiIstituto.getMailDopoOrdine())) {
-            mailService.sendEmail(oggetto, testoValidatori, false, true, datiIstituto.getMailDopoOrdine());
+            mailService.sendEmail(oggetto, testo, false, true, datiIstituto.getMailDopoOrdine());
         }
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("E")
                     && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotifiche()) && !datiIstitutoSpesa.getMailNotifiche().equals("N")) {
-                mailService.sendEmail(oggetto, testoValidatori, false, true, datiIstitutoSpesa.getMailNotifiche());
+                mailService.sendEmail(oggetto, testo, false, true, datiIstitutoSpesa.getMailNotifiche());
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("A")
                     && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoOrdine())) {
-                mailService.sendEmail(oggetto, testoValidatori, false, true, datiIstitutoSpesa.getMailDopoOrdine());
+                mailService.sendEmail(oggetto, testo, false, true, datiIstitutoSpesa.getMailDopoOrdine());
             }
         }
     }
@@ -1113,7 +1126,7 @@ public class OrdineMissioneService {
             if (StringUtils.isEmpty(ordineMissione.getVoce()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
 
-            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !(ordineMissione.getMissioneGratuita()).equals("S"))
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
         }
         if (!sendToSign) {
@@ -1616,7 +1629,7 @@ public class OrdineMissioneService {
                             CodiciErrore.CAMPO_OBBLIGATORIO + ": Indirizzo di Residenza del Richiedente");
                 }*/
             }
-            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !(ordineMissione.getMissioneGratuita()).equals("S"))
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
         }
     }
@@ -2025,33 +2038,19 @@ public class OrdineMissioneService {
     }
 
     private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione, boolean missioneConAnticipo) {
-        return getTextMailApprovazioneOrdine(ordineMissione, missioneConAnticipo, false);
-    }
-
-    private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione, boolean missioneConAnticipo, boolean perRichiedente) {
         OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo((Long) ordineMissione.getId());
         StringBuilder testoMail = new StringBuilder();
 
-        if (perRichiedente) {
-            testoMail.append("<p>Il tuo ordine di missione ");
-        } else {
-            testoMail.append("<p>L'ordine di missione ");
-        }
-
-        testoMail.append("<b>").append(ordineMissione.getAnno()).append("-").append(ordineMissione.getNumero()).append("</b>");
-
-        if (!perRichiedente) {
-            testoMail.append(" di ").append(getNominativo(ordineMissione.getUid()));
-        }
-
-        testoMail.append(" per la missione a <b>").append(ordineMissione.getDestinazione()).append("</b>")
+        testoMail.append("<p>L'ordine di missione ")
+                .append("<b>").append(ordineMissione.getAnno()).append("-").append(ordineMissione.getNumero()).append("</b>")
+                .append(" di ").append(getNominativo(ordineMissione.getUid()))
+                .append(" per la missione a <b>").append(ordineMissione.getDestinazione()).append("</b>")
                 .append(" dal ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()))
                 .append(" al ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()))
                 .append(" avente per oggetto: <u>").append(ordineMissione.getOggetto()).append("</u>");
 
         if (missioneConAnticipo) {
-            testoMail.append(" è stata approvata")
-                    .append(" con una richiesta di anticipo di € ")
+            testoMail.append(" è stata approvata con una richiesta di anticipo di € ")
                     .append(Utility.numberFormat(anticipo.getImporto())).append(".</p>");
         } else {
             testoMail.append(" è stata approvata.</p>");
@@ -2059,33 +2058,12 @@ public class OrdineMissioneService {
         return testoMail.toString();
     }
 
-    private String getTextMailApprovazioneAnnullamentoOrdine(OrdineMissione ordineMissione, boolean perRichiedente) {
-        StringBuilder testoMail = new StringBuilder();
-
-        if (perRichiedente) {
-            testoMail.append("<p>Il tuo ordine di missione ");
-        } else {
-            testoMail.append("<p>L'ordine di missione ");
-        }
-
-        testoMail.append("<b>").append(ordineMissione.getAnno()).append("-").append(ordineMissione.getNumero()).append("</b>");
-
-        if (!perRichiedente) {
-            testoMail.append(" di ").append(getNominativo(ordineMissione.getUid()));
-        }
-
-        testoMail.append(" per la missione a <b>").append(ordineMissione.getDestinazione()).append("</b>")
-                .append(" dal ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()))
-                .append(" al ").append(DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()))
-                .append(" avente per oggetto: <u>").append(ordineMissione.getOggetto()).append("</u>")
-                .append(" è stato annullato.</p>");
-
-        return testoMail.toString();
-    }
-
-    // Mantieni la firma originale per retrocompatibilità
     private String getTextMailApprovazioneAnnullamentoOrdine(OrdineMissione ordineMissione) {
-        return getTextMailApprovazioneAnnullamentoOrdine(ordineMissione, false);
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto: <u>"
+                + ordineMissione.getOggetto() + "</u> è stato annullato.</p>";
     }
 
 // private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {

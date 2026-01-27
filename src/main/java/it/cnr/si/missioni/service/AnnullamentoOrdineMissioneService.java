@@ -714,12 +714,12 @@ public class AnnullamentoOrdineMissioneService {
 
     private String getTextMailReturnToSender(String basePath, AnnullamentoOrdineMissione annullamento) {
         String url = basePath + "/#/annullamento-ordine-missione/" + annullamento.getId();
-        return "<p>Il tuo annullamento ordine di missione <b>" + annullamento.getAnno() + "-" + annullamento.getNumero()
-                + "</b> per la missione a <b>"
+        return "<p>L'annullamento ordine di missione <b>" + annullamento.getAnno() + "-" + annullamento.getNumero() + "</b> di "
+                + getNominativo(annullamento.getUid()) + " per la missione a <b>"
                 + annullamento.getOrdineMissione().getDestinazione() + "</b> dal "
                 + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al "
                 + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto: <u>"
-                + annullamento.getOrdineMissione().getOggetto() + "</u> è stato respinto da "
+                + annullamento.getOrdineMissione().getOggetto() + "</u> le è stata respinto da "
                 + getNominativo(securityService.getCurrentUserLogin()) + ".</p>"
                 + "<p><a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
