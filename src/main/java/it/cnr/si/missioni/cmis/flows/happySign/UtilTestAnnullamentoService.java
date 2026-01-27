@@ -43,8 +43,8 @@ public class UtilTestAnnullamentoService {
         startInfo.setTemplateName("Missioni_doppia_firma_sequenziale");
 
         //TODO aspettare conferma per impostare 1 sola firma per chi inserisce l'annullamento
-        startInfo.addSigner("davide.mirra@iss.it");
-        startInfo.addSigner("davide.mirra@iss.it");
+        startInfo.addSigner(annullamentoOrdineMissione.getUidInsert());
+        startInfo.addSigner(annullamentoOrdineMissione.getUidInsert());
 
         File f = new File();
         f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
