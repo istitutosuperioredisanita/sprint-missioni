@@ -295,26 +295,36 @@ public class RimborsoMissioneService {
             }
         }
 
-        // Invia una singola email a tutti i destinatari
+        utentiUnici.removeIf(user -> user.getUid().equals(emailRich));
+
+        if (emailRich != null) {
+            String testoRichiedente = getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare, true);
+            mailService.sendEmail(approvazioneRimborsoMissione, testoRichiedente, false, true, accountService.getEmail(emailRich));
+        }
+
+        // Email che include tutti i validatori, anche il richiedente se è validatore
+        String testoValidatori = getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare, false);
+
         if (utentiUnici.size() > 0) {
             List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
-            mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
+            mailService.sendEmail(approvazioneRimborsoMissione, testoValidatori, false, true, mailService.prepareTo(listaUtenti));
         }
 
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso()) && !datiIstituto.getMailNotificheRimborso().equals("N")) {
-            mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailNotificheRimborso());
+            mailService.sendEmail(approvazioneRimborsoMissione, testoValidatori, false, true, datiIstituto.getMailNotificheRimborso());
         }
         if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("A") && !StringUtils.isEmpty(datiIstituto.getMailDopoRimborso())) {
-            mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailDopoRimborso());
+            mailService.sendEmail(approvazioneRimborsoMissione, testoValidatori, false, true, datiIstituto.getMailDopoRimborso());
         }
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso()) && !datiIstitutoSpesa.getMailNotificheRimborso().equals("N")) {
-                mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailNotificheRimborso());
+                mailService.sendEmail(approvazioneRimborsoMissione, testoValidatori, false, true, datiIstitutoSpesa.getMailNotificheRimborso());
             }
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("A") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoRimborso())) {
-                mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailDopoRimborso());
+                mailService.sendEmail(approvazioneRimborsoMissione, testoValidatori, false, true, datiIstitutoSpesa.getMailDopoRimborso());
             }
         }
+
         rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
         RimborsoMissione rimborso = updateRimborsoMissione(rimborsoMissioneDaAggiornare, true, null);
@@ -1869,12 +1879,32 @@ public class RimborsoMissioneService {
                 + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
+    private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione, boolean perRichiedente) {
+        StringBuilder testoMail = new StringBuilder();
+
+        if (perRichiedente) {
+            testoMail.append("<p>Il tuo rimborso missione ");
+        } else {
+            testoMail.append("<p>Il rimborso missione ");
+        }
+
+        testoMail.append("<b>").append(rimborsoMissione.getAnno()).append("-").append(rimborsoMissione.getNumero()).append("</b>");
+
+        if (!perRichiedente) {
+            testoMail.append(" di ").append(getNominativo(rimborsoMissione.getUid()));
+        }
+
+        testoMail.append(" per la missione a <b>").append(rimborsoMissione.getDestinazione()).append("</b>")
+                .append(" dal ").append(DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()))
+                .append(" al ").append(DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()))
+                .append(" avente per oggetto: <u>").append(rimborsoMissione.getOggetto()).append("</u>")
+                .append(perRichiedente ? " è stato approvato.</p>" : " è stata approvato.</p>");
+
+        return testoMail.toString();
+    }
+
     private String getTextMailApprovazioneRimborso(RimborsoMissione rimborsoMissione) {
-        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + "</b> di "
-                + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
-                + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
-                + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
-                + rimborsoMissione.getOggetto() + "</u> è stata approvato.</p>";
+        return getTextMailApprovazioneRimborso(rimborsoMissione, false);
     }
 
     private String getTextMailReturnToSender(String basePath, RimborsoMissione rimborsoMissione) {
