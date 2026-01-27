@@ -50,8 +50,8 @@ public class UtilTestService {
         startInfo.setTemplateName("Missioni_doppia_firma_sequenziale");
 
         //TODO aspettare conferma per impostare 1 sola firma per chi inserisce l'ordine
-        startInfo.addSigner(ordineMissione.getUidInsert());
-        startInfo.addSigner(ordineMissione.getUidInsert());
+        startInfo.addSigner("davide.mirra@iss.it");
+        startInfo.addSigner("davide.mirra@iss.it");
 
         File f = new File();
         f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
