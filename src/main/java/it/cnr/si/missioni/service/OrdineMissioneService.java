@@ -1127,9 +1127,7 @@ public class OrdineMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
 
             String missioneGratuita = ordineMissione.getMissioneGratuita();
-
-            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !(StringUtils.isEmpty(missioneGratuita)) && !"S".equals(missioneGratuita)) {
-
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !"S".equals(missioneGratuita)) {
                 throw new AwesomeException(
                         CodiciErrore.ERRGEN,
                         CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto"
@@ -1637,16 +1635,14 @@ public class OrdineMissioneService {
                             CodiciErrore.CAMPO_OBBLIGATORIO + ": Indirizzo di Residenza del Richiedente");
                 }*/
             }
+
             String missioneGratuita = ordineMissione.getMissioneGratuita();
-
-            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !(StringUtils.isEmpty(missioneGratuita)) && !"S".equals(missioneGratuita)) {
-
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !"S".equals(missioneGratuita)) {
                 throw new AwesomeException(
                         CodiciErrore.ERRGEN,
                         CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto"
                 );
             }
-
 
         }
     }
