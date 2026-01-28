@@ -1126,8 +1126,17 @@ public class OrdineMissioneService {
             if (StringUtils.isEmpty(ordineMissione.getVoce()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
 
-            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !(ordineMissione.getMissioneGratuita()).equals("S"))
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
+            String missioneGratuita = ordineMissione.getMissioneGratuita();
+
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && StringUtils.isEmpty(missioneGratuita) ||
+                    !(StringUtils.isEmpty(missioneGratuita)) && !"S".equals(missioneGratuita)) {
+
+                throw new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto"
+                );
+            }
+
         }
         if (!sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getGae()))
@@ -1629,8 +1638,17 @@ public class OrdineMissioneService {
                             CodiciErrore.CAMPO_OBBLIGATORIO + ": Indirizzo di Residenza del Richiedente");
                 }*/
             }
-            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !(ordineMissione.getMissioneGratuita()).equals("S"))
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
+            String missioneGratuita = ordineMissione.getMissioneGratuita();
+
+            if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && StringUtils.isEmpty(missioneGratuita) ||
+                    !(StringUtils.isEmpty(missioneGratuita)) && !"S".equals(missioneGratuita)) {
+
+                throw new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto"
+                );
+            }
+
         }
     }
 
