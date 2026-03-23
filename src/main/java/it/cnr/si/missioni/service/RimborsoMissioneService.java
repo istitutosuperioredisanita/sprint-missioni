@@ -262,6 +262,9 @@ public class RimborsoMissioneService {
         Account account = accountService.loadAccountFromUsername(rimborsoMissioneDaAggiornare.getUid());
         String emailRich = rimborsoMissioneDaAggiornare.getUid();
 
+//        //todo x i test setto l'utente che crea il rimborso
+//        String emailRich = rimborsoMissioneDaAggiornare.getUidInsert();
+
         if (!rimborsoMissioneDaAggiornare.getUoRich().equals(rimborsoMissioneDaAggiornare.getUoSpesa())) {
             datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoSpesa(), rimborsoMissioneDaAggiornare.getAnno());
         }

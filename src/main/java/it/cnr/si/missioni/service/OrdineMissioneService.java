@@ -468,6 +468,10 @@ public class OrdineMissioneService {
         DatiSede datiSede = null;
         Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
         String emailRich = ordineMissioneDaAggiornare.getUid();
+
+//        //todo x i test setto l'utente che crea l'ordine
+//        String emailRich = ordineMissioneDaAggiornare.getUidInsert();
+
         boolean missioneConAnticipo = false;
         OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissioneDaAggiornare);
         if (anticipo != null) {

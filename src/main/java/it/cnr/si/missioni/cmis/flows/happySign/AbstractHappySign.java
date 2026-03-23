@@ -309,6 +309,10 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         EmployeeDetails dirIFascia = getPersonaByUsmFromAce(ordineMissione.getUid());
         EmployeeDetails dirDip = getResponsabile(ordineMissione.getUoSpesa());
 
+//        /* x fare i test con direttori dip e dirigenti I/II fascia gli passo la uo del richiedente
+//        perchè ho le voci di bilancio solo su DRUE in collaudo*/
+//        EmployeeDetails dirDip = getResponsabile(ordineMissione.getUoRich());
+
         return ordineMissione.getUid().equals(getEmailFromEmployee(dirDip)) &&
                 hasQualifica(dirIFascia, keyUoDirIFascia, null);
     }
@@ -328,6 +332,9 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         EmployeeDetails richDetails = getPersonaByUsmFromAce(ordineMissione.getUid());
         EmployeeDetails respDetails = getResponsabile(ordineMissione.getUoSpesa());
 
+//        /* x fare i test con direttori dip e dirigenti I/II fascia gli passo la uo del richiedente
+//        perchè ho le voci di bilancio solo su DRUE in collaudo*/
+//        EmployeeDetails respDetails = getResponsabile(ordineMissione.getUoRich());
         return getEmailFromEmployee(richDetails).equals(getEmailFromEmployee(respDetails)) &&
                 !hasQualifica(richDetails, keyUoDirIFascia, null);
     }
@@ -351,6 +358,9 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
         EmployeeDetails richiedente = getPersonaByUsmFromAce(ordineMissione.getUid());
         EmployeeDetails dirUoRich = getResponsabile(ordineMissione.getUoSpesa());
 
+//        /* x fare i test con direttori dip e dirigenti I/II fascia gli passo la uo del richiedente
+//        perchè ho le voci di bilancio solo su DRUE in collaudo*/
+//        EmployeeDetails dirUoRich = getResponsabile(ordineMissione.getUoRich());
         if (!getEmailFromEmployee(richiedente).equals(getEmailFromEmployee(dirUoRich))) {
             startInfo.addSigner(getEmailFromEmployee(dirUoRich));
         }
