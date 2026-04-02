@@ -19,7 +19,7 @@
 
 package it.cnr.si.missioni.cmis;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.DatiFlusso;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
@@ -39,22 +39,22 @@ public interface CMISRimborsoMissioneService {
     public static final String PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
 
 
-    public List<CMISFileAttachment> getAttachmentsDetail(Long idDettagliorimborso) throws ComponentException ;
+    public List<CMISFileAttachment> getAttachmentsDetail(Long idDettagliorimborso) throws AwesomeException ;
 
     public List<StorageObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio) ;
 
     public List<StorageObject> getChildrenDettaglio(RimborsoMissioneDettagli dettaglio, Boolean recuperoFileEliminati);
 
-    public StorageObject getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws ComponentException ;
+    public StorageObject getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws AwesomeException ;
 
     public DatiFlusso recuperoDatiFlusso(RimborsoMissione rimborsoMissione, Integer anno, Account account);
 
-    public CMISRimborsoMissione create(RimborsoMissione rimborsoMissione) throws ComponentException;
+    public CMISRimborsoMissione create(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
 
 
     @Transactional(readOnly = true)
-    public StorageObject salvaStampaRimborsoMissioneSuCMIS(byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException;
+    public StorageObject salvaStampaRimborsoMissioneSuCMIS(byte[] stampa, RimborsoMissione rimborsoMissione) throws AwesomeException;
 
 
 
@@ -66,7 +66,7 @@ public interface CMISRimborsoMissioneService {
 
 
 
-    public StorageObject getObjectRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException;
+    public StorageObject getObjectRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
     public String getNodeRefFolderDettaglioRimborso(RimborsoMissioneDettagli dettagliorimborso);
 
@@ -76,20 +76,20 @@ public interface CMISRimborsoMissioneService {
 
 
     @Transactional(readOnly = true)
-    public void avviaFlusso(RimborsoMissione rimborsoMissione) throws ComponentException;
+    public void avviaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
     public void controlloEsitenzaGiustificativoDettaglio(RimborsoMissione rimborsoMissione);
 
-    public String getNodeRefRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException ;
+    public String getNodeRefRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException ;
 
-    public StorageObject recuperoFolderRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException;
+    public StorageObject recuperoFolderRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
     public void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException ;
 
 
 
 
-    public InputStream getStreamRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException;
+    public InputStream getStreamRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
     public StoragePath buildFolderRimborsoMissione(RimborsoMissione rimborsoMissione);
     public CMISFileAttachment uploadAttachmentRimborsoMissione(RimborsoMissione rimborsoMissione, Long idRimborsoMissione,
@@ -107,9 +107,9 @@ public interface CMISRimborsoMissioneService {
     public List<StorageObject> getDocumentsAllegatiAnnullamentoRimborsoMissione(RimborsoMissione rimborsoMissione) ;
 
     public Map<String, byte[]> getFileRimborsoMissione(RimborsoMissione rimborsoMissione) ;
-    public StorageObject getStorageRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException;
+    public StorageObject getStorageRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
-    public List<StorageObject> getDocumentsRimborsoMissione(RimborsoMissione missione) throws ComponentException;
+    public List<StorageObject> getDocumentsRimborsoMissione(RimborsoMissione missione) throws AwesomeException;
 
     public InputStream getResource(StorageObject so);
 }

@@ -19,9 +19,8 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.flows.happySign.UtilTestRimborsoService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -74,6 +74,7 @@ public class PrintOrdineMissioneService {
     private GaeService gaeService;
 
     @Autowired
+    
     private OrdineMissioneService ordineMissioneService;
 
     @Autowired
@@ -85,8 +86,8 @@ public class PrintOrdineMissioneService {
     private static final Log logger = LogFactory.getLog(PrintOrdineMissioneService.class);
 
 
-    //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
-    public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
+    //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, AwesomeException {
+    public PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, AwesomeException, AwesomeException {
         Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
         Nazione nazione = nazioneService.loadNazione(ordineMissione);
         LocalDate data = LocalDate.now();
@@ -240,18 +241,18 @@ public class PrintOrdineMissioneService {
         return "";
     }
 
-    public byte[] printOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, ComponentException {
+    public byte[] printOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException, AwesomeException {
         String myJson = createJsonPrintOrdineMissione(ordineMissione, currentLogin);
         String nomeStampa = "";
         if (env != null && env.getProperty("spring.print." + Costanti.NOME_STAMPA_ORDINE) != null) {
             nomeStampa = env.getProperty("spring.print." + Costanti.NOME_STAMPA_ORDINE);
         } else {
-            throw new ComponentException("Configurare il nome stampa dell'ordine");
+            throw new AwesomeException("Configurare il nome stampa dell'ordine");
         }
         return printService.print(myJson, nomeStampa, ordineMissione.getId());
     }
 
-    public String createJsonPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws ComponentException {
+    public String createJsonPrintOrdineMissione(OrdineMissione ordineMissione, String currentLogin) throws AwesomeException {
         PrintOrdineMissione printOrdineMissione = getPrintOrdineMissione(ordineMissione, currentLogin);
         return printService.createJsonForPrint(printOrdineMissione);
     }

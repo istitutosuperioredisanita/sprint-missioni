@@ -19,11 +19,14 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.domain.custom.User;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +36,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
-import javax.mail.internet.MimeMessage;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 
 @Profile("!showcase")
@@ -121,7 +124,7 @@ public class MailService {
                 log.debug("Sent e-mail to User '{}'", to);
             } catch (Exception e) {
                 log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
-                throw new ComponentException("Errore nell'invio dell'e-mail: " + Utility.getMessageException(e), e);
+                throw new AwesomeException("Errore nell'invio dell'e-mail: " + Utility.getMessageException(e), e);
             }
         }
     }
@@ -148,5 +151,12 @@ public class MailService {
 
     private boolean isDevProfile() {
         return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT) || env.acceptsProfiles(Costanti.SPRING_PROFILE_SHOWCASE);
+    }
+
+    @Async
+    public void sendCreationEmail(User user, String baseUrl) {
+        log.debug("Sending creation e-mail to '{}'", user.getEmail());
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        throw new UnsupportedOperationException("creationEmail");
     }
 }

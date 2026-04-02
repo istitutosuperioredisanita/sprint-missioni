@@ -35,8 +35,8 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +46,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * REST controller for proxy to different application.
@@ -140,7 +140,7 @@ public class ProxyResource {
                 }
                 result = proxyService.process(httpMethod, body, app, url, request.getQueryString(), request.getHeader(Costanti.HEADER_FOR_PROXY_AUTHORIZATION));
             }
-            if (result.getStatus().compareTo(HttpStatus.OK) != 0) {
+            if (!result.getStatus().isSameCodeAs(HttpStatus.OK)) {
                 return JSONResponseEntity.getResponse(result.getStatus(), "");
             }
             response.setContentType(result.getType());

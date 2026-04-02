@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

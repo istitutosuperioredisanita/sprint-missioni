@@ -17,22 +17,15 @@
  *
  */
 
-package it.cnr.si.missioni.config;
+package it.cnr.si.missioni.config.db;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+public final class Constants {
 
-@Configuration
-@Profile("!keycloak")
-@Order(1)
-public class MissioniResourceServerConfigurerAdapter extends ResourceServerConfigurerAdapter {
+    public static final String SPRING_PROFILE_DEVELOPMENT = "dev";
+    public static final String SPRING_PROFILE_PRODUCTION  = "prod";
+    public static final String SPRING_PROFILE_NO_LIQUIBASE = "no-liquibase";
+    public static final String SPRING_PROFILE_HEROKU = "heroku";
 
-    @Override
-    public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.tokenExtractor(new CustomTokenExtractor());
+    private Constants() {
     }
-
 }

@@ -23,9 +23,8 @@ import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.MissioneRespinta;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.MissioneRespintaRepository;
-import it.cnr.si.service.SecurityService;
+import it.cnr.si.missioni.service.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,9 +36,6 @@ import java.util.List;
 
 @Service
 public class MissioneRespintaService {
-
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     @Autowired
     private MissioneRespintaRepository missioneRespintaRepository;
@@ -57,7 +53,7 @@ public class MissioneRespintaService {
         missioneRespinta.setUidInsert(flowResult.getUser());
         missioneRespinta.setTipoOperazioneMissione(FlowResult.TIPO_FLUSSO_MISSIONE.get(flowResult.getTipologiaMissione()));
         missioneRespinta.setToBeCreated();
-        crudServiceBean.creaConBulk(missioneRespinta);
+        missioneRespintaRepository.save(missioneRespinta);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -70,7 +66,7 @@ public class MissioneRespintaService {
         missioneRespinta.setUidInsert(securityService.getCurrentUserLogin());
         missioneRespinta.setTipoOperazioneMissione(MissioneRespinta.OPERAZIONE_MISSIONE_ORDINE);
         missioneRespinta.setToBeCreated();
-        crudServiceBean.creaConBulk(missioneRespinta);
+        missioneRespintaRepository.save(missioneRespinta);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -83,7 +79,7 @@ public class MissioneRespintaService {
         missioneRespinta.setUidInsert(securityService.getCurrentUserLogin());
         missioneRespinta.setTipoOperazioneMissione(MissioneRespinta.OPERAZIONE_MISSIONE_RIMBORSO);
         missioneRespinta.setToBeCreated();
-        crudServiceBean.creaConBulk(missioneRespinta);
+        missioneRespintaRepository.save(missioneRespinta);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

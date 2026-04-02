@@ -10,7 +10,7 @@ spring:
     username: MISSIONICOLL
     password: ***REMOVED***
   jpa:
-    database-platform: org.hibernate.dialect.Oracle12cDialect
+    database-platform: org.hibernate.dialect.OracleDialect
     database: ORACLE
     show-sql: false
     properties:
@@ -34,7 +34,7 @@ spring:
     attrMail:
   proxy:
     SIGLA:
-      url: http://siglacoll.iss.it:8080/SIGLA/
+      url: http://localhost:8080/SIGLA/
       username: ***REMOVED***
       password: ***REMOVED***
       context:
@@ -103,7 +103,7 @@ spring:
     auth: true
     send.error.to: ciro.salvio@iss.it
   print:
-    endpoint: http://siglacoll.iss.it:8082/api/v1/get/print
+    endpoint: http://localhost:8082/api/v1/get/print
     rimborso: /missioni/iss/RimborsoMissione.jrxml
     ordine: /missioni/iss/OrdineMissione.jrxml
     anticipo: /missioni/iss/OrdineMissioneAnticipo.jrxml

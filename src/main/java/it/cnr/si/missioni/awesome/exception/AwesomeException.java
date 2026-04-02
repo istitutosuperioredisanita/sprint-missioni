@@ -51,6 +51,11 @@ public class AwesomeException extends RuntimeException {
         this.code = code;
     }
 
+    public AwesomeException(String message, Throwable cause) {
+        super(message, cause);          // chiama RuntimeException(message, cause)
+        this.code = CodiciErrore.ERRGEN; // assegna un codice generico
+    }
+
     public int getCode() {
         return code;
     }

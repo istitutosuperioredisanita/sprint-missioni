@@ -19,7 +19,7 @@
 
 package it.cnr.si.missioni.web.rest;
 
-import it.cnr.si.web.rest.errors.ErrorVM;
+import it.cnr.si.missioni.web.rest.errors.ErrorVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;

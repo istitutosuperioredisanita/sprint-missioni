@@ -21,6 +21,7 @@ package it.cnr.si.missioni.config;
 
 import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
+import jakarta.servlet.http.HttpServletRequest;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 import java.util.stream.Collectors;
 

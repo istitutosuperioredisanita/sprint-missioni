@@ -20,7 +20,7 @@
 package it.cnr.si.missioni.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.SimpleClientHttpRequestWithGetBodyFactory;
@@ -56,17 +56,17 @@ public class PrintService {
         try {
             myJson = mapper.writeValueAsString(object);
         } catch (Exception ex) {
-            throw new ComponentException("Errore nella generazione del file JSON per l'esecuzione della stampa (" + Utility.getMessageException(ex) + ").", ex);
+            throw new AwesomeException("Errore nella generazione del file JSON per l'esecuzione della stampa (" + Utility.getMessageException(ex) + ").", ex);
         }
         return myJson;
     }
 
-    public ResponseEntity<byte[]> processForPrint(HttpMethod httpMethod, Params params) throws ComponentException {
+    public ResponseEntity<byte[]> processForPrint(HttpMethod httpMethod, Params params) throws AwesomeException {
         String url = "";
         if (env != null && env.getProperty("spring.print." + "endpoint") != null) {
             url = env.getProperty("spring.print." + "endpoint");
         } else {
-            throw new ComponentException("Configurare l'EndPoint per le stampe");
+            throw new AwesomeException("Configurare l'EndPoint per le stampe");
         }
         log.info("Base Print Url is: " + url);
         try {
@@ -82,12 +82,12 @@ public class PrintService {
             return rest.exchange(url, httpMethod, requestEntity, byte[].class);
         } catch (HttpClientErrorException _ex) {
             log.error(_ex.getMessage(), _ex);
-            throw new ComponentException("Errore nella registrazione degli allegati. " + _ex.getMessage());
+            throw new AwesomeException("Errore nella registrazione degli allegati. " + _ex.getMessage());
         }
     }
 
 
-    public byte[] print(String myJson, String printNameJasper, Serializable id) throws AwesomeException, ComponentException {
+    public byte[] print(String myJson, String printNameJasper, Serializable id) throws AwesomeException, AwesomeException {
         try {
             Params params = createParamsForPrint(myJson, printNameJasper, id);
             ResponseEntity<byte[]> response = processForPrint(HttpMethod.POST, params);
@@ -95,7 +95,7 @@ public class PrintService {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new ComponentException("Error in JASPER (" + e + ").", e);
+            throw new AwesomeException("Error in JASPER (" + e + ").", e);
         }
     }
 

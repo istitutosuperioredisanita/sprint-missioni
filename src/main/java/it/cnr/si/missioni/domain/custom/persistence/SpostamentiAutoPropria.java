@@ -20,8 +20,9 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import it.cnr.si.missioni.config.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -30,7 +31,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "SPOSTAMENTI_AUTO_PROPRIA")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_SPOSTAMENTI", allocationSize = 0)
-public class SpostamentiAutoPropria extends OggettoBulkXmlTransient implements Serializable {
+public class SpostamentiAutoPropria extends BaseEntity {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false, length = 20)

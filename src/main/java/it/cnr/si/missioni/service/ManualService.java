@@ -19,7 +19,8 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachmentComplete;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.spring.storage.StorageObject;
@@ -38,7 +39,7 @@ public class ManualService {
     @Autowired
     private MissioniCMISService missioniCMISService;
 
-    public List<CMISFileAttachmentComplete> getManuals() throws ComponentException {
+    public List<CMISFileAttachmentComplete> getManuals() throws AwesomeException {
         StorageObject folder = missioniCMISService.getStorageObjectByPath(missioniCMISService.getBasePath().getPathManual());
         if (folder != null) {
             List<StorageObject> children = missioniCMISService.getChildren(folder);

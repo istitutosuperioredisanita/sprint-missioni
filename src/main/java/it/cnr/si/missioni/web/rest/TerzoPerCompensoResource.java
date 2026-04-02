@@ -22,10 +22,13 @@ package it.cnr.si.missioni.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.service.TerzoPerCompensoService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
 import it.cnr.si.missioni.util.*;
 import it.cnr.si.missioni.util.proxy.json.JSONBody;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoPerCompensoJson;
-import it.cnr.si.security.AuthoritiesConstants;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 /**

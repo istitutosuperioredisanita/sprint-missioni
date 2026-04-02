@@ -19,8 +19,9 @@
 
 package it.cnr.si.missioni.domain.custom.persistence;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import it.cnr.si.missioni.config.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -29,7 +30,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "RIMBORSO_IMPEGNI")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_RIMBORSO_IMPEGNI", allocationSize = 0)
-public class RimborsoImpegni extends OggettoBulkXmlTransient implements Serializable {
+public class RimborsoImpegni extends BaseEntity {
 
     @Size(min = 0, max = 30)
     @Column(name = "CD_CDS_OBBLIGAZIONE", length = 30, nullable = false)

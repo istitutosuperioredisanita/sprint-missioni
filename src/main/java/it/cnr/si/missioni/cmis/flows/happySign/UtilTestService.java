@@ -3,10 +3,7 @@ package it.cnr.si.missioni.cmis.flows.happySign;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
-import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OggettoBulkXmlTransient;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.MailService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.spring.storage.StorageObject;
@@ -87,7 +84,6 @@ public class UtilTestService {
     }
 
 
-
     public void sendMailForOrdineMissione(OrdineMissione ordineMissione, List<String> signers, AutorizzazioneMissione autorizzazione) {
         List<String> destinatari = new ArrayList<>();
         destinatari.add("davide.mirra@iss.it");
@@ -123,18 +119,15 @@ public class UtilTestService {
     private String getClasseImplementazione(AutorizzazioneMissione autorizzazione) {
 
         String className = autorizzazione.getClass().getSimpleName();
-        if (className.equals(Costanti.CLASS_AUTORIZZ_MISS_GAE)){
+        if (className.equals(Costanti.CLASS_AUTORIZZ_MISS_GAE)) {
             return Costanti.TIPO_MISS_GAE;
-        } else if(className.equals(Costanti.CLASS_AUTORIZZ_MISS_DIR_GAE)) {
-            return  Costanti.TIPO_MISS_DIR_GAE;
-        }
-        else {
+        } else if (className.equals(Costanti.CLASS_AUTORIZZ_MISS_DIR_GAE)) {
+            return Costanti.TIPO_MISS_DIR_GAE;
+        } else {
             return className;
         }
 
     }
-
-
 
 
 }

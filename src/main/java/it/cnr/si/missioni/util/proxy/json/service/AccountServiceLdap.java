@@ -22,12 +22,15 @@ package it.cnr.si.missioni.util.proxy.json.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
-import it.cnr.si.domain.CNRUser;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
+import it.cnr.si.missioni.domain.custom.CNRUser;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
+import it.cnr.si.missioni.model.UserInfoDto;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.service.showcase.ACEService;
 import it.cnr.si.missioni.util.*;
 import it.cnr.si.missioni.util.data.Uo;
@@ -39,21 +42,18 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
-import it.cnr.si.model.UserInfoDto;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
+
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,12 +61,13 @@ import java.util.stream.Collectors;
 @SpringBootApplication(scanBasePackages = {
         "it.cnr.si.service"})
 @Service
-@Profile("!keyclock")
-public class AccountServiceLdap extends AbstractAccountService{
+@Profile("!keycloak")
+public class AccountServiceLdap extends AbstractAccountService {
     private static final Log logger = LogFactory.getLog(AccountServiceLdap.class);
     @Autowired
     private ProxyService proxyService;
     @Autowired
+    @Lazy
     private ConfigService configService;
     @Autowired
     private DatiSedeService datiSedeService;
@@ -75,6 +76,7 @@ public class AccountServiceLdap extends AbstractAccountService{
     @Autowired
     private DatiIstitutoService datiIstitutoService;
     @Autowired
+    
     private UoService uoService;
     @Autowired(required = false)
     private ACEService aceServiceShowcase;
@@ -243,15 +245,16 @@ public class AccountServiceLdap extends AbstractAccountService{
         }
         return account;
     }
-    private it.cnr.si.service.dto.anagrafica.UserInfoDto getUserInfo(String username){
-        if ( Optional.ofNullable(missioniAceService).isPresent())
+
+    private it.cnr.si.service.dto.anagrafica.UserInfoDto getUserInfo(String username) {
+        if (Optional.ofNullable(missioniAceService).isPresent())
             return missioniAceService.getAccountFromSiper(username);
         return null;
     }
 
     public String getAccount(Boolean loadSpecialUserData) {
         logger.info("CHIAMATA 2 securityService.getUserInfo()");
-        Optional<UserInfoDto> userInfo= null;
+        Optional<UserInfoDto> userInfo = null;
         if (userInfo.isPresent()) {
             UserInfoDto userInfoDto = userInfo.get();
             if (userInfoDto != null && userInfoDto.getCognome() != null) {
@@ -279,7 +282,7 @@ public class AccountServiceLdap extends AbstractAccountService{
                 return getResponseAccountWithoutRole(loadSpecialUserData);
             }
         }
-       return null;
+        return null;
     }
 
     public String getAccountFromUsername(String username, Boolean loadSpecialUserData) {
@@ -348,7 +351,7 @@ public class AccountServiceLdap extends AbstractAccountService{
                 );
             }
 /*
-            Optional<CNRUser> user = securityService.getUser();
+            Optional<ISSUser> user = securityService.getUser();
             user.ifPresent(utente -> {
                 account.setEmail_comunicazioni(utente.getEmail());
                 account.setNome(utente.getFirstName());
@@ -560,8 +563,8 @@ public class AccountServiceLdap extends AbstractAccountService{
     // TODO Fine da eliminare-
 
     public String getDirettore(String uo) {
-            return missioniAceService.getDirettore(uo);
-            }
+        return missioniAceService.getDirettore(uo);
+    }
 
     public Boolean isUserEnableToWorkUo(String uo) {
         UsersSpecial userSpecial = getUoForUsersSpecial(securityService.getCurrentUserLogin());
@@ -610,11 +613,11 @@ public class AccountServiceLdap extends AbstractAccountService{
             if (account != null) {
                 return nuovo;
             } else {
-                logger.error("Impossibile creare UsersSpecial: Account non trovato per uid: "+uid );
+                logger.error("Impossibile creare UsersSpecial: Account non trovato per uid: " + uid);
                 return null;
             }
         } catch (Exception e) {
-            logger.error("Errore durante la ricerca o creazione di UsersSpecial per uid: "+uid);
+            logger.error("Errore durante la ricerca o creazione di UsersSpecial per uid: " + uid);
             return null;
         }
     }

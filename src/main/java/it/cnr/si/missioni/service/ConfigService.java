@@ -41,9 +41,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -68,7 +70,10 @@ public class ConfigService {
     @Autowired
     private DatiSedeService datiSedeService;
     @Autowired(required = false)
+    
     private MissioniAceService missioniAceService;
+
+    @Lazy
     @Autowired
     private AccountService accountService;
 

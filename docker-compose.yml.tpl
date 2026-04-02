@@ -1,24 +1,39 @@
-version: '2'
+version: '3.8'
 
 services:
 
   missioni:
+
     image: docker.si.cnr.it/##{CONTAINER_ID}##
+    container_name: missioni
+
+    restart: unless-stopped  # riavvio automatico
+
     volumes:
-    - /tmp
-    - /logs
-    network_mode: bridge
-    command: java
-      -Xmx512m
+      - /data/sprint-missioni-config:/opt/config
+      # Config esterna per Spring Boot
+
+    command: >
+      java
+      -Xmx1g
       -Xss512k
-      -Dserver.port=8080
-      -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787
-      -Dkeycloak.credentials.secret=20ca9914-f235-412c-a80d-43ce30a97798
-      -Dmaven.wagon.http.ssl.insecure=true
-      -Dmaven.wagon.http.ssl.allowall=true
-      -Dace.signing.key='NDh5dm5vcTQ2Nm41b2tud3ZqcDU='
-      -Djava.security.egd=file:/dev/./urandom -jar /opt/missioni.war --spring.config.location=classpath:config/application.yml,file:/opt/application-cnr.yml,classpath:config/application-keycloak.yml --spring.profiles.active=dev,cnr,keycloak,swagger
-    volumes:
-    - ./application-dev.yml:/opt/application-cnr.yml
+      -Duser.language=it
+      -Dspring.profiles.active=prod,cnr,iss
+      -Dspring.config.additional-location=file:/opt/config/
+      -Djava.security.egd=file:/dev/./urandom
+      -jar /opt/missioni.war
+
+    ports:
+      - "8088:8088"
+
+    # Debug DISABILITATO (attivalo solo se serve)
+    # - "8787:8787"
+
     labels:
       SERVICE_NAME: "##{SERVICE_NAME}##"
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8088"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

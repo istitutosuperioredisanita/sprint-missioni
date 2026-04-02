@@ -22,8 +22,8 @@ package it.cnr.si.missioni.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.missioni.domain.custom.persistence.MissioneRespinta;
 import it.cnr.si.missioni.service.MissioneRespintaService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
 import java.util.List;
 
 /**

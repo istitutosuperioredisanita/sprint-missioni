@@ -19,7 +19,8 @@
 
 package it.cnr.si.missioni.cmis;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.spring.storage.StorageObject;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,9 @@ import java.util.Map;
 public interface CMISOrdineMissioneService {
 
 
-    public CMISOrdineMissione create(OrdineMissione ordineMissione) throws ComponentException;
+    public CMISOrdineMissione create(OrdineMissione ordineMissione) throws AwesomeException;
 
-    public CMISOrdineMissione create(OrdineMissione ordineMissione, Integer annoGestione) throws ComponentException;
+    public CMISOrdineMissione create(OrdineMissione ordineMissione, Integer annoGestione) throws AwesomeException;
 
 
     @Transactional(readOnly = true)
@@ -58,40 +59,40 @@ public interface CMISOrdineMissioneService {
 
 
 
-    public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException;
+    public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException;
 
 
-    public InputStream getStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException ;
+    public InputStream getStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException ;
 
-    public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException;
+    public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException;
 
-    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException;
+    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException;
 
-    public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException ;
+    public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException ;
 
-    public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException;
+    public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException;
 
-    public StorageObject getObjectAnticipoOrdineMissione(OrdineMissioneAnticipo anticipo) throws ComponentException;
+    public StorageObject getObjectAnticipoOrdineMissione(OrdineMissioneAnticipo anticipo) throws AwesomeException;
 
-    public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException ;
+    public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException ;
 
-    public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException;
+    public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException;
 
-    public StorageObject getStorageAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException ;
+    public StorageObject getStorageAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException ;
 
-    public StorageObject getStorageOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException;
+    public StorageObject getStorageOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException;
 
-    public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException;
+    public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException;
 
-    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException;
-    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, Boolean erroreSeNonTrovato) throws ComponentException;
+    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException;
+    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, Boolean erroreSeNonTrovato) throws AwesomeException;
 
-    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws ComponentException;
+    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws AwesomeException;
 
     public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo);
 
-    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, Boolean erroreSeNonTrovato) throws ComponentException;
-    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException;
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, Boolean erroreSeNonTrovato) throws AwesomeException;
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException;
 
     public StorageObject recuperoFolderOrdineMissione(OrdineMissione ordineMissione);
 
@@ -109,18 +110,18 @@ public interface CMISOrdineMissioneService {
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaAutoPropriaSuCMIS(String currentLogin, byte[] stampa,
-                                                      OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException ;
+                                                      OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException ;
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaAnticipoSuCMIS(String currentLogin, byte[] stampa,
-                                                   OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException ;
+                                                   OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException ;
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaTaxiSuCMIS(String currentLogin, byte[] stampa,
-                                                   OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException ;
+                                                   OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException ;
     @Transactional(readOnly = true)
     public StorageObject salvaStampaAutoNoleggioSuCMIS(String currentLogin, byte[] stampa,
-                                               OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException ;
+                                               OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException ;
 
 
     public List<CMISFileAttachment> getAttachmentsOrdineMissione(OrdineMissione ordineMissione, Long idOrdineMissione) ;
@@ -153,6 +154,6 @@ public interface CMISOrdineMissioneService {
 
     public Map<String, byte[]> getFileOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria);
 
-    public List<StorageObject> getAllDocumentsOrdineMissione(OrdineMissione missione) throws ComponentException;
+    public List<StorageObject> getAllDocumentsOrdineMissione(OrdineMissione missione) throws AwesomeException;
 
 }

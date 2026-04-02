@@ -19,7 +19,7 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
@@ -57,8 +57,8 @@ public class PrintOrdineMissioneTaxiService {
     @Autowired
     private AccountService accountService;
 
-    //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
-    private PrintOrdineMissioneTaxi getPrintOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, String currentLogin) throws AwesomeException, ComponentException {
+    //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, AwesomeException {
+    private PrintOrdineMissioneTaxi getPrintOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, String currentLogin) throws AwesomeException, AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneTaxi.getOrdineMissione();
         Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
         PrintOrdineMissioneTaxi printOrdineMissioneTaxi = new PrintOrdineMissioneTaxi();
@@ -107,18 +107,18 @@ public class PrintOrdineMissioneTaxiService {
         return printOrdineMissioneTaxi;
     }
 
-    public byte[] printOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, String currentLogin) throws AwesomeException, ComponentException {
+    public byte[] printOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, String currentLogin) throws AwesomeException, AwesomeException {
         String myJson = createJsonPrintOrdineMissioneTaxi(ordineMissioneTaxi, currentLogin);
         String nomeStampa = "";
         if (env != null && env.getProperty("spring.print." + Costanti.NOME_STAMPA_TAXI) != null) {
             nomeStampa = env.getProperty("spring.print." + Costanti.NOME_STAMPA_TAXI);
         } else {
-            throw new ComponentException("Configurare il nome stampa del taxi");
+            throw new AwesomeException("Configurare il nome stampa del taxi");
         }
         return printService.print(myJson, nomeStampa, ordineMissioneTaxi.getId());
     }
 
-    public String createJsonPrintOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, String currentLogin) throws ComponentException {
+    public String createJsonPrintOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, String currentLogin) throws AwesomeException {
         PrintOrdineMissioneTaxi printOrdineMissioneTaxi = getPrintOrdineMissioneTaxi(ordineMissioneTaxi, currentLogin);
         return printService.createJsonForPrint(printOrdineMissioneTaxi);
     }

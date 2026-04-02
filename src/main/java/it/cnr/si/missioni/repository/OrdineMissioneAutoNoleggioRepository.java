@@ -23,6 +23,7 @@ import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoNoleggio;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -31,7 +32,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 
-public interface OrdineMissioneAutoNoleggioRepository extends JpaRepository<OrdineMissioneAutoNoleggio, Long> {
+public interface OrdineMissioneAutoNoleggioRepository extends JpaRepository<OrdineMissioneAutoNoleggio, Long>,
+        JpaSpecificationExecutor<OrdineMissioneAutoNoleggio> {
 
 
     @Query("select a from OrdineMissioneAutoNoleggio a where a.ordineMissione = ?1 and a.stato != 'ANN'")

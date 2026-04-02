@@ -19,7 +19,7 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.missioni.domain.custom.print.PrintOrdineMissioneAutoNoleggio;
@@ -53,7 +53,7 @@ public class PrintOrdineMissioneAutoNoleggioService {
     @Autowired
     private AccountService accountService;
 
-    private PrintOrdineMissioneAutoNoleggio getPrintOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, String currentLogin) throws AwesomeException, ComponentException {
+    private PrintOrdineMissioneAutoNoleggio getPrintOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, String currentLogin) throws AwesomeException, AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAutoNoleggio.getOrdineMissione();
         Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
         PrintOrdineMissioneAutoNoleggio printOrdineMissioneAutoNoleggio = new PrintOrdineMissioneAutoNoleggio();
@@ -100,18 +100,18 @@ public class PrintOrdineMissioneAutoNoleggioService {
         return printOrdineMissioneAutoNoleggio;
     }
 
-    public byte[] printOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, String currentLogin) throws AwesomeException, ComponentException {
+    public byte[] printOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, String currentLogin) throws AwesomeException, AwesomeException {
         String myJson = createJsonPrintOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio, currentLogin);
         String nomeStampa = "";
         if (env != null && env.getProperty("spring.print." + Costanti.NOME_STAMPA_AUTO_NOLEGGIO) != null) {
             nomeStampa = env.getProperty("spring.print." + Costanti.NOME_STAMPA_AUTO_NOLEGGIO);
         } else {
-            throw new ComponentException("Configurare il nome stampa del AutoNoleggio");
+            throw new AwesomeException("Configurare il nome stampa del AutoNoleggio");
         }
         return printService.print(myJson, nomeStampa, ordineMissioneAutoNoleggio.getId());
     }
 
-    public String createJsonPrintOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, String currentLogin) throws ComponentException {
+    public String createJsonPrintOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, String currentLogin) throws AwesomeException {
         PrintOrdineMissioneAutoNoleggio printOrdineMissioneAutoNoleggio = getPrintOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio, currentLogin);
         return printService.createJsonForPrint(printOrdineMissioneAutoNoleggio);
     }

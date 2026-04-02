@@ -21,13 +21,11 @@ package it.cnr.si.missioni.cmis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoNoleggio;
 import it.cnr.si.missioni.service.MessageForFlowsService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -49,7 +47,7 @@ import java.util.Optional;
 
 @Service
 @Profile("cnr")
-public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneService{
+public class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneService {
 
     @Autowired(required = false)
     protected MessageForFlowsService messageForFlowsService;
@@ -79,7 +77,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
 
     protected void sendAnnullamentoOrdineMissioneToSign(AnnullamentoOrdineMissione annullamento, CMISOrdineMissione cmisOrdineMissione,
                                                         Map<String, StorageObject> mapDocumentiAnnulloMissione,
-                                                        List<StorageObject> allegati){
+                                                        List<StorageObject> allegati) {
         MessageForFlowAnnullamento messageForFlows = new MessageForFlowAnnullamento();
         try {
 
@@ -165,7 +163,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
         });
         parameters.setAll(maps);
 
-        messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiAnnulloMissione.get( Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY), annullamento.getStatoFlusso());
+        messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiAnnulloMissione.get(Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY), annullamento.getStatoFlusso());
 
         if (annullamento.isStatoNonInviatoAlFlusso()) {
             parameters.add("commento", "");
@@ -328,7 +326,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
         }
     }
 
-    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo) {
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati, OrdineMissioneAnticipo anticipo) {
         MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
         try {
 
@@ -408,8 +406,8 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             });
             parameters.setAll(maps);
 
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiMissione.get( Costanti.DOCUMENTO_MISSIONE_KEY), ordineMissione.getStatoFlusso());
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapDocumentiMissione.get( Costanti.DOCUMENTO_ANTICIPO_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiMissione.get(Costanti.DOCUMENTO_MISSIONE_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapDocumentiMissione.get(Costanti.DOCUMENTO_ANTICIPO_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_TAXI, mapDocumentiMissione.get(Costanti.DOCUMENTO_TAXI_KEY), ordineMissione.getStatoFlusso());
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_NOLEGGIO, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_NOLEGGIO_KEY), ordineMissione.getStatoFlusso());
@@ -450,7 +448,6 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }
     }
-
 
 
     protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapAllegati, OrdineMissioneAnticipo anticipo) {
@@ -530,7 +527,8 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
 
             MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {
+            });
             parameters.setAll(maps);
 
             messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapAllegati.get("documento"), ordineMissione.getStatoFlusso());

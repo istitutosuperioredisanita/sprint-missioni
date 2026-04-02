@@ -20,54 +20,20 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.paranamer.ParanamerModule;
-import it.cnr.si.domain.CNRUser;
-import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
-import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
-import it.cnr.si.missioni.service.*;
-import it.cnr.si.missioni.service.showcase.ACEService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
-import it.cnr.si.missioni.util.proxy.ResultProxy;
-import it.cnr.si.missioni.util.proxy.cache.CallCache;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
-import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
-import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
-import it.cnr.si.model.UserInfoDto;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 
 public interface AccountService {
 
 
-    public UsersSpecial getUoForUsersSpecial(String uid) ;
+    public UsersSpecial getUoForUsersSpecial(String uid);
 
-    public List<UsersSpecial> getUserSpecialForUo(String uo, Boolean isPerValidazione) ;
+    public List<UsersSpecial> getUserSpecialForUo(String uo, Boolean isPerValidazione);
 
     public Boolean isUserSpecialEnableToValidateOrder(String user, String uo);
 
@@ -78,7 +44,7 @@ public interface AccountService {
     public String manageResponseForAccountRest(String body);
 
 
-    public String createResponseForAccountRest(Account account, UsersSpecial user) ;
+    public String createResponseForAccountRest(Account account, UsersSpecial user);
 
     public Account loadAccountFromUsername(String currentLogin);
 
@@ -88,6 +54,7 @@ public interface AccountService {
     public String getAccount(Boolean loadSpecialUserData);
 
     public String getAccountFromUsername(String username, Boolean loadSpecialUserData);
+
     public String getResponseAccountWithoutRole();
 
     public String getResponseAccountWithoutRole(Boolean loadDataFromUserSpecial);
@@ -107,8 +74,9 @@ public interface AccountService {
 
     public String recuperoDirettore(Integer anno, String uo, Boolean isMissioneEstera, Account account, ZonedDateTime data, Boolean isUoRich);
 
-    public Boolean isUserEnableToWorkUo(String uo) ;
-    public String getDirettore(String uo) ;
+    public Boolean isUserEnableToWorkUo(String uo);
+
+    public String getDirettore(String uo);
 
     public String getEmail(String user);
 

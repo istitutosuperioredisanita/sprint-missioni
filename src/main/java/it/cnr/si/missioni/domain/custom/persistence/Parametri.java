@@ -20,8 +20,9 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import it.cnr.si.missioni.config.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -30,7 +31,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "PARAMETRI")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_PARAMETRI", allocationSize = 0)
-public class Parametri extends OggettoBulkXmlTransient implements Serializable {
+public class Parametri extends BaseEntity {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false, length = 20)

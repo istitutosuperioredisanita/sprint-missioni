@@ -18,11 +18,8 @@
  */
 
 package it.cnr.si.missioni.web.rest.vm;
-
-import it.cnr.si.web.rest.vm.ManagedUserVM;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * View Model object for storing a user's credentials.

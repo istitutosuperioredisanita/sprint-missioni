@@ -20,12 +20,12 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import org.hibernate.annotations.Type;
+import it.cnr.si.missioni.config.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * A user.
@@ -33,7 +33,7 @@ import java.util.Date;
 @Entity
 @Table(name = "DATI_PATENTE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_DATI_PATENTE", allocationSize = 0)
-public class DatiPatente extends OggettoBulkXmlTransient implements Serializable {
+public class DatiPatente extends BaseEntity {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false, length = 20)
@@ -45,13 +45,11 @@ public class DatiPatente extends OggettoBulkXmlTransient implements Serializable
     @Column(name = "NUMERO", length = 50, nullable = false)
     private String numero;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_RILASCIO", nullable = false)
-    private Date dataRilascio;
+    private LocalDateTime dataRilascio;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_SCADENZA", nullable = false)
-    private Date dataScadenza;
+    private LocalDateTime dataScadenza;
 
     @Size(min = 0, max = 100)
     @Column(name = "ENTE", length = 100, nullable = false)
@@ -111,19 +109,19 @@ public class DatiPatente extends OggettoBulkXmlTransient implements Serializable
         this.numero = numero;
     }
 
-    public Date getDataRilascio() {
+    public LocalDateTime getDataRilascio() {
         return dataRilascio;
     }
 
-    public void setDataRilascio(Date dataRilascio) {
+    public void setDataRilascio(LocalDateTime dataRilascio) {
         this.dataRilascio = dataRilascio;
     }
 
-    public Date getDataScadenza() {
+    public LocalDateTime getDataScadenza() {
         return dataScadenza;
     }
 
-    public void setDataScadenza(Date dataScadenza) {
+    public void setDataScadenza(LocalDateTime dataScadenza) {
         this.dataScadenza = dataScadenza;
     }
 

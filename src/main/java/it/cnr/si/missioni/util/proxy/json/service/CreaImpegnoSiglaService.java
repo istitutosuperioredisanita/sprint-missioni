@@ -21,14 +21,14 @@ package it.cnr.si.missioni.util.proxy.json.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -52,9 +52,6 @@ public class CreaImpegnoSiglaService {
     private final Logger log = LoggerFactory.getLogger(CreaImpegnoSiglaService.class);
     @Autowired
     private CommonService commonService;
-
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
@@ -301,7 +298,7 @@ public class CreaImpegnoSiglaService {
                 MissioneBulk missioneBulk = mapper.readValue(risposta, MissioneBulk.class);
                 return missioneBulk;
             } catch (Exception ex) {
-                throw new ComponentException("Errore nella lettura del file di risposta.", ex);
+                throw new AwesomeException("Errore nella lettura del file di risposta.", ex);
             }
         }
         return null;
@@ -314,7 +311,7 @@ public class CreaImpegnoSiglaService {
             body = mapper.writeValueAsString(missione);
             return body;
         } catch (Exception ex) {
-            throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST (" + Utility.getMessageException(ex) + ").", ex);
+            throw new AwesomeException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST (" + Utility.getMessageException(ex) + ").", ex);
         }
     }
 
@@ -328,7 +325,7 @@ public class CreaImpegnoSiglaService {
     }
 
     private void impostaTappe(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk)
-            throws ComponentException {
+            throws AwesomeException {
         List<TappeMissioneColl> tappeMissioneColl = new ArrayList<TappeMissioneColl>();
         TappeMissioneColl tappa = new TappeMissioneColl();
         impostaDivisaTappa(tappa);
@@ -365,11 +362,11 @@ public class CreaImpegnoSiglaService {
         oggettoBulk.setTappeMissioneColl(tappeMissioneColl);
     }
 
-    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws ComponentException {
+    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws AwesomeException {
         return impostaTappeDaDate(daData, aData, tappa, tappeMissioneColl, null, null);
     }
 
-    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws ComponentException {
+    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws AwesomeException {
         ZonedDateTime ultimaDataInizioUsata = null;
         if (dataInizioMissione != null && !DateUtils.truncate(daData).equals(DateUtils.truncate(dataInizioMissione))) {
             for (ZonedDateTime data = dataInizioMissione; DateUtils.truncate(data).isBefore(DateUtils.truncate(daData)); data = data.plusDays(1)) {
@@ -379,7 +376,7 @@ public class CreaImpegnoSiglaService {
                     newDayTappa = (TappeMissioneColl) tappa.clone();
                 } catch (CloneNotSupportedException e) {
                     log.error("Errore", e);
-                    throw new ComponentException("Errore nel clone.", e);
+                    throw new AwesomeException("Errore nel clone.", e);
                 }
                 impostaNazione(Costanti.NAZIONE_ITALIA_SIGLA, newDayTappa);
                 ZonedDateTime dataFine = data.plusDays(1);
@@ -400,7 +397,7 @@ public class CreaImpegnoSiglaService {
                 newDayTappa = (TappeMissioneColl) tappa.clone();
             } catch (CloneNotSupportedException e) {
                 log.error("Errore", e);
-                throw new ComponentException("Errore nel clone.", e);
+                throw new AwesomeException("Errore nel clone.", e);
             }
             ZonedDateTime dataFine = data.plusDays(1);
             if (dataFine.isAfter(aData)) {
@@ -429,7 +426,7 @@ public class CreaImpegnoSiglaService {
 //					newDayTappa = (TappeMissioneColl)tappa.clone();
 //				} catch (CloneNotSupportedException e) {
 //					log.error("Errore",e);
-//					throw new ComponentException("Errore nel clone.",e);
+//					throw new AwesomeException("Errore nel clone.",e);
 //				}
 //				ZonedDateTime dataFine = dataInizio.plusDays(1);
 //				if (dataFine.isAfter(dataFineMissione)){

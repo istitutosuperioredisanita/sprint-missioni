@@ -20,20 +20,20 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneDettagli;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -46,9 +46,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,7 +92,7 @@ public class OrdineMissioneResource {
                     impostaTotaliSpesePres(ordine);
                 }
             }
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -126,7 +123,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaRimborsare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -154,7 +151,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaAnnullare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -179,7 +176,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaConfermare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -194,7 +191,7 @@ public class OrdineMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getOrdiniMissioneDaInviareAllaFirma(HttpServletRequest request,
-                                                          MissioneFilter filter) {
+                                                                 MissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione da Inviare Alla Firma");
         filter.setGiaRimborsato("N");
         filter.setValidato("N");
@@ -208,7 +205,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaInviareAllaFirma", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -237,7 +234,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaApprovare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -264,7 +261,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaDuplicare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -285,7 +282,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneToFinal", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -327,7 +324,7 @@ public class OrdineMissioneResource {
             OrdineMissione ordineMissione = ordineMissioneService.getOrdineMissione(idMissione, true);
             impostaTotaliSpesePres(ordineMissione);
             return JSONResponseEntity.ok(ordineMissione);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdineMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -439,27 +436,27 @@ public class OrdineMissioneResource {
         if (user != null && !StringUtils.isEmpty(idMissione)) {
             try {
                 Long idMissioneLong = Long.valueOf(idMissione);
-                    Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(idMissioneLong);
-                    if (map != null) {
-                        res.setContentType("application/pdf");
-                        try {
-                            String headerValue = "attachment";
-                            for (String key : map.keySet()) {
-                                log.debug("Lunghezza " + map.get(key).length);
-                                headerValue += "; filename=\"" + key + "\"";
-                                OutputStream outputStream = res.getOutputStream();
-                                res.setHeader("Content-Disposition", headerValue);
-                                InputStream inputStream = new ByteArrayInputStream(map.get(key));
-                                IOUtils.copy(inputStream, outputStream);
-                                outputStream.flush();
-                                inputStream.close();
-                                outputStream.close();
-                            }
-                        } catch (IOException e) {
-                            log.error("ERRORE printOrdineMissione", e);
-                            throw new AwesomeException(Utility.getMessageException(e));
+                Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(idMissioneLong);
+                if (map != null) {
+                    res.setContentType("application/pdf");
+                    try {
+                        String headerValue = "attachment";
+                        for (String key : map.keySet()) {
+                            log.debug("Lunghezza " + map.get(key).length);
+                            headerValue += "; filename=\"" + key + "\"";
+                            OutputStream outputStream = res.getOutputStream();
+                            res.setHeader("Content-Disposition", headerValue);
+                            InputStream inputStream = new ByteArrayInputStream(map.get(key));
+                            IOUtils.copy(inputStream, outputStream);
+                            outputStream.flush();
+                            inputStream.close();
+                            outputStream.close();
                         }
+                    } catch (IOException e) {
+                        log.error("ERRORE printOrdineMissione", e);
+                        throw new AwesomeException(Utility.getMessageException(e));
                     }
+                }
             } catch (Exception e) {
                 String exc = ExceptionUtils.getStackTrace(e);
                 log.error("ERRORE printOrdineMissione", exc);
@@ -478,7 +475,7 @@ public class OrdineMissioneResource {
         try {
             String json = ordineMissioneService.jsonForPrintOrdineMissione(idMissione);
             return JSONResponseEntity.ok(json);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE jsonForPrintOrdineMissione", e);
             throw new AwesomeException(Utility.getMessageException(e));
         }
@@ -494,7 +491,7 @@ public class OrdineMissioneResource {
         try {
             List<CMISFileAttachment> lista = ordineMissioneService.getAttachments(idOrdineMissione);
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getAttachments", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -551,7 +548,7 @@ public class OrdineMissioneResource {
             method = RequestMethod.DELETE)
     @Timed
     public ResponseEntity<?> deleteAttachment(HttpServletRequest request,
-                                              @RequestParam(value = "id") String id, @RequestParam(value = "idOrdine")  Long idOrdine) {
+                                              @RequestParam(value = "id") String id, @RequestParam(value = "idOrdine") Long idOrdine) {
         log.debug("REST request per il downlaod degli allegati ");
 
         if (!StringUtils.isEmpty(id)) {

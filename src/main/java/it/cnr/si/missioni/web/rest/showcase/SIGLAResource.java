@@ -20,7 +20,8 @@
 package it.cnr.si.missioni.web.rest.showcase;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.service.showcase.SIGLAService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
@@ -36,8 +37,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * REST controller for managing config.
@@ -62,7 +63,7 @@ public class SIGLAResource {
         try {
             TerzoPerCompensoJson dati = siglaService.getTerziPerCompenso();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getTerziPerCompensoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -78,7 +79,7 @@ public class SIGLAResource {
         try {
             NazioneJson dati = siglaService.getNazioni();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getNazioniShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -94,7 +95,7 @@ public class SIGLAResource {
         try {
             CdsJson dati = siglaService.getCds();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getCdsShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -110,7 +111,7 @@ public class SIGLAResource {
         try {
             UnitaOrganizzativaJson dati = siglaService.getUo();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getuoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -126,7 +127,7 @@ public class SIGLAResource {
         try {
             CdrJson dati = siglaService.getCdr();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getCDRShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -142,7 +143,7 @@ public class SIGLAResource {
         try {
             VoceJson dati = siglaService.getVoci();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getVociShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -158,7 +159,7 @@ public class SIGLAResource {
         try {
             ProgettoJson dati = siglaService.getProgetti();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getProgettoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -174,7 +175,7 @@ public class SIGLAResource {
         try {
             GaeJson dati = siglaService.getGae();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getGaeShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -190,7 +191,7 @@ public class SIGLAResource {
         try {
             ImpegnoJson dati = siglaService.getImpegno();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getImpegnoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -206,7 +207,7 @@ public class SIGLAResource {
         try {
             ImpegnoGaeJson dati = siglaService.getImpegnoGae();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getImpegnoGaeShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -222,7 +223,7 @@ public class SIGLAResource {
         try {
             TerzoJson dati = siglaService.getTerzo();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getTerzoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -238,7 +239,7 @@ public class SIGLAResource {
         try {
             BancaJson dati = siglaService.getBanca();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getBancaShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -254,7 +255,7 @@ public class SIGLAResource {
         try {
             InquadramentoJson dati = siglaService.getInquadramento();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getInquadramentoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -270,7 +271,7 @@ public class SIGLAResource {
         try {
             ModalitaPagamentoJson dati = siglaService.getModpag();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getModpagShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -286,7 +287,7 @@ public class SIGLAResource {
         try {
             TipoSpesaJson dati = siglaService.getTipoSpesa();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getTipoSpesaShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -302,7 +303,7 @@ public class SIGLAResource {
         try {
             DivisaJson dati = siglaService.getDivisa();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getTipoSpesaShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -318,7 +319,7 @@ public class SIGLAResource {
         try {
             StatoPagamentoJson dati = siglaService.getStatoPagamento();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getMandatoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -335,7 +336,7 @@ public class SIGLAResource {
         try {
             TipoPastoJson dati = siglaService.getTipoPasto();
             return JSONResponseEntity.ok(dati);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getTipoPastoShowcase", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }

@@ -19,7 +19,7 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
@@ -50,8 +50,8 @@ public class PrintOrdineMissioneAnticipoService {
     @Autowired
     private AccountService accountService;
 
-    //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, ComponentException {
-    private PrintOrdineMissioneAnticipo getPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, ComponentException {
+    //    private PrintOrdineMissione getPrintOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException, AwesomeException {
+    private PrintOrdineMissioneAnticipo getPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
         Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
         PrintOrdineMissioneAnticipo printOrdineMissioneAnticipo = new PrintOrdineMissioneAnticipo();
@@ -85,18 +85,18 @@ public class PrintOrdineMissioneAnticipoService {
         return printOrdineMissioneAnticipo;
     }
 
-    public byte[] printOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, ComponentException {
+    public byte[] printOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException, AwesomeException {
         String myJson = createJsonPrintOrdineMissioneAnticipo(ordineMissioneAnticipo, currentLogin);
         String nomeStampa = "";
         if (env != null && env.getProperty("spring.print." + Costanti.NOME_STAMPA_ANTICIPO) != null) {
             nomeStampa = env.getProperty("spring.print." + Costanti.NOME_STAMPA_ANTICIPO);
         } else {
-            throw new ComponentException("Configurare il nome stampa dell'anticipo");
+            throw new AwesomeException("Configurare il nome stampa dell'anticipo");
         }
         return printService.print(myJson, nomeStampa, ordineMissioneAnticipo.getId());
     }
 
-    public String createJsonPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws ComponentException {
+    public String createJsonPrintOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo, String currentLogin) throws AwesomeException {
         PrintOrdineMissioneAnticipo printOrdineMissioneAnticipo = getPrintOrdineMissioneAnticipo(ordineMissioneAnticipo, currentLogin);
         return printService.createJsonForPrint(printOrdineMissioneAnticipo);
     }

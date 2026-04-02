@@ -22,7 +22,7 @@
 	<changeSet author="missioni" id="20250508000002">
 		<addColumn
 				tableName="RIMBORSO_MISSIONE_DETTAGLI">
-			<column name="FL_SPESA_TRACCIATA" type="character varying(1)" defaultValue="N" afterColumn="FL_SPESA_ANTICIPATA">
+			<column name="FL_SPESA_TRACCIATA" type="character varying(1)" defaultValue="N">
 				<constraints nullable="false"/>
 			</column>
 		</addColumn>

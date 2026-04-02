@@ -20,10 +20,11 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Utility;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -33,7 +34,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "DATI_SEDE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_DATI_SEDE", allocationSize = 0)
-public class DatiSede extends OggettoBulkXmlTransient implements Serializable {
+public class DatiSede extends BaseEntity {
 
     @Column(name = "DATA_INIZIO", nullable = false)
     public LocalDate dataInizio;

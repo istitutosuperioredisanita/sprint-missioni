@@ -20,21 +20,20 @@
 package it.cnr.si.missioni.config;
 
 import it.cnr.si.missioni.util.SecurityUtils;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 
 @Component
-public class MissioniLoggingGet extends HandlerInterceptorAdapter {
+public class MissioniLoggingGet implements HandlerInterceptor {
     private final Logger log = LoggerFactory.getLogger("Log Request");
 
     @Override
@@ -42,19 +41,24 @@ public class MissioniLoggingGet extends HandlerInterceptorAdapter {
                              HttpServletResponse response,
                              Object handler) {
 
-
         if (DispatcherType.REQUEST.name().equals(request.getDispatcherType().name())
                 && request.getMethod().equals(HttpMethod.GET.name()) && SecurityUtils.getCurrentUser() != null) {
             String uri = request.getRequestURI();
-            if (!uri.startsWith("/styles") && !uri.startsWith("/scripts") && !uri.startsWith("/fonts") && !uri.startsWith("/images") && !uri.contains("authentication_check.gif") && !uri.endsWith("ico") && !uri.endsWith("png") && SecurityUtils.getCurrentUser() != null) {
+            if (!uri.startsWith("/styles") && !uri.startsWith("/scripts") && !uri.startsWith("/fonts")
+                    && !uri.startsWith("/images") && !uri.contains("authentication_check.gif")
+                    && !uri.endsWith("ico") && !uri.endsWith("png") && SecurityUtils.getCurrentUser() != null) {
+
                 Object principal = SecurityUtils.getCurrentUser().getPrincipal();
                 if (principal instanceof KeycloakPrincipal) {
-                    KeycloakPrincipal<KeycloakSecurityContext> kPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) principal;
+                    KeycloakPrincipal<KeycloakSecurityContext> kPrincipal =
+                            (KeycloakPrincipal<KeycloakSecurityContext>) principal;
                     String username = "";
-                    if (kPrincipal != null && kPrincipal.getKeycloakSecurityContext() != null && kPrincipal.getKeycloakSecurityContext().getIdToken() != null) {
+                    if (kPrincipal.getKeycloakSecurityContext() != null
+                            && kPrincipal.getKeycloakSecurityContext().getIdToken() != null) {
                         username = kPrincipal.getKeycloakSecurityContext().getIdToken().getPreferredUsername();
                     }
-                    log.info("{} {} {} {} {} ", username, request.getMethod(), request.getRequestURI(), request.getQueryString(), request.getRemoteAddr());
+                    log.info("{} {} {} {} {} ", username, request.getMethod(),
+                            request.getRequestURI(), request.getQueryString(), request.getRemoteAddr());
                 }
             }
         }

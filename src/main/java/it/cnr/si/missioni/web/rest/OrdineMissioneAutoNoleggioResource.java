@@ -20,7 +20,7 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
@@ -29,8 +29,8 @@ import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoNoleggio;
 import it.cnr.si.missioni.service.OrdineMissioneAutoNoleggioService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +42,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +86,7 @@ public class OrdineMissioneAutoNoleggioResource {
         try {
             OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(idMissione);
             return JSONResponseEntity.ok(ordineMissioneAutoNoleggio);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdineMissioneAutoNoleggio", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -149,7 +149,7 @@ public class OrdineMissioneAutoNoleggioResource {
         try {
             List<CMISFileAttachment> lista = ordineMissioneAutoNoleggioService.getAttachments(idAutoNoleggio);
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getAttachments", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -293,7 +293,7 @@ public class OrdineMissioneAutoNoleggioResource {
         try {
             List<SpostamentiAutoNoleggio> spostamentiAutoNoleggio = ordineMissioneAutoNoleggioService.getSpostamentiAutoNoleggio(idAutoNoleggio);
             return JSONResponseEntity.ok(spostamentiAutoNoleggio);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getSpostamenti", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -340,7 +340,7 @@ public class OrdineMissioneAutoNoleggioResource {
                         }
                     }
                 }
-            } catch (ComponentException e) {
+            } catch (AwesomeException e) {
                 log.error("ERRORE printOrdineMissioneAutoNoleggio", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }

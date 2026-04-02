@@ -22,8 +22,6 @@ package it.cnr.si.missioni.util.proxy.cache.service;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.util.Introspector;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.service.ConfigService;
 import it.cnr.si.missioni.service.ProxyService;
@@ -41,6 +39,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.CommonJsonRest;
 import it.cnr.si.missioni.util.proxy.json.object.RestServiceBean;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.Context;
+import it.cnr.si.util.Introspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +52,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -71,6 +71,7 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
     private TaskExecutor taskExecutor;
 
     @Autowired
+    
     private ConfigService configService;
 
     private Environment environment;
@@ -163,7 +164,7 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
                         }
                     } catch (Exception ex) {
                         log.error("Errore nella lettura del servizio REST: " + rest.getUrl(), ex);
-                        throw new ComponentException("Errore", ex);
+                        throw new AwesomeException("Errore", ex);
                     }
                 }
             }
@@ -343,7 +344,7 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
                                 isValid = false;
                                 break;
                             }
-                            Class type = Introspector.getPropertyType(Class.forName(restService.getClasse()), clause.getFieldName());
+                            Class<?> type = value.getClass();
                             switch (type.getName()) {
                                 case "java.lang.String":
                                     isValid = isValidRowForClauseString(clause, bean, value);
@@ -622,8 +623,10 @@ public class CacheService implements EnvironmentAware, ApplicationListener<Appli
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        log.error("loading data from SIGLA rest after event: {}", event.getClass().getCanonicalName());
+        log.info("loading data from SIGLA rest after event: {}", event.getClass().getCanonicalName());
 //		loadInCache();
         log.info("loading data from SIGLA rest finished.");
     }
+
+
 }

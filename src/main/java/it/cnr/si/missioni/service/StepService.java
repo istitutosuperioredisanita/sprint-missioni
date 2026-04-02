@@ -19,9 +19,11 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
+import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class StepService {
     private RimborsoMissioneService rimborsoMissioneService;
 
     @Autowired
-    private CRUDComponentSession crudServiceBean;
+    private OrdineMissioneRepository ordineMissioneRepository;
 
     public void verifyStep() {
         MissioneFilter filtro = new MissioneFilter();
@@ -60,20 +62,32 @@ public class StepService {
     }
 
 
-    public void verifyStepAmministrativo(Serializable idOrdineMissione)
-            throws Exception {
-        if (idOrdineMissione != null) {
-            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, idOrdineMissione);
-            ordineMissioneService.verifyStepAmministrativo(ordineMissione);
+    public void verifyStepAmministrativo(Serializable idOrdineMissione) throws Exception {
+        if (idOrdineMissione == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Id Ordine Missione non può essere null");
         }
+
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById((Long) idOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Ordine Missione non trovato per id " + idOrdineMissione
+                ));
+
+        ordineMissioneService.verifyStepAmministrativo(ordineMissione);
     }
 
-    public void verifyStepRespGruppo(Serializable idOrdineMissione)
-            throws Exception {
-        if (idOrdineMissione != null) {
-            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, idOrdineMissione);
-            ordineMissioneService.verifyStepRespGruppo(ordineMissione);
+    public void verifyStepRespGruppo(Serializable idOrdineMissione) throws Exception {
+        if (idOrdineMissione == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Id Ordine Missione non può essere null");
         }
+
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById((Long) idOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Ordine Missione non trovato per id " + idOrdineMissione
+                ));
+
+        ordineMissioneService.verifyStepRespGruppo(ordineMissione);
     }
 
 }

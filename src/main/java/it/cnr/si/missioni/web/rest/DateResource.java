@@ -20,9 +20,9 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.JSONResponseEntity;
-import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
 import java.time.ZonedDateTime;
 
 /**

@@ -24,7 +24,9 @@ import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.AnnullamentoOrdineMissioneRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
+import it.cnr.si.missioni.repository.RimborsoMissioneRepository;
 import it.cnr.si.missioni.util.CodiciErrore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,16 @@ public class FlowService {
     private MailService mailService;
     @Autowired
     private ComunicaMissioneSiglaService comunicaMissioneSiglaService;
+
+    @Autowired
+    OrdineMissioneRepository ordineMissioneRepository;
+
+    @Autowired
+    RimborsoMissioneRepository rimborsoMissioneRepository;
+
+    @Autowired
+    AnnullamentoOrdineMissioneRepository annOrdMissioneRespository;
+
     @Value("${spring.mail.messages.erroreLetturaFlussoOrdine.oggetto}")
     private String subjectErrorFlowsOrdine;
 
@@ -61,50 +73,70 @@ public class FlowService {
     @Value("${spring.mail.messages.erroreGenerico.oggetto}")
     private String subjectGenericError;
 
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     public void aggiornaMissioneFlows(FlowResult flowResult) {
+
         log.info(flowResult.toString());
         String errore = "";
+
         if (flowResult.getIdMissione() != null) {
+
             switch (flowResult.getTipologiaMissione()) {
+
                 case FlowResult.TIPO_FLUSSO_ORDINE:
-                    OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, Long.valueOf(flowResult.getIdMissione()));
-                    if (ordineMissione != null) {
-                        ordineMissioneService.aggiornaOrdineMissione(ordineMissione, flowResult);
-                    } else {
-                        errore = "L'ordine di missione con ID " + flowResult.getIdMissione() + " indicato dal flusso con ID " + flowResult.getProcessInstanceId() + " non è presente";
-                        log.info(errore);
-                        throw new AwesomeException(CodiciErrore.ERRGEN, errore);
-                    }
-                    break;
-                case FlowResult.TIPO_FLUSSO_RIMBORSO:
-                    RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, Long.valueOf(flowResult.getIdMissione()));
-                    if (rimborsoMissione != null) {
-                        final RimborsoMissione rimborsoMissioneDaComunicare = rimborsoMissioneService.aggiornaRimborsoMissione(rimborsoMissione, flowResult);
-                        if (rimborsoMissioneDaComunicare != null) {
-                            taskExecutor.execute(new Runnable() {
-                                public void run() {
-                                    comunicaMissioneSiglaService.comunicaRimborsoSigla(rimborsoMissioneDaComunicare.getId());
-                                }
+
+                    OrdineMissione ordineMissione = ordineMissioneRepository
+                            .findById(Long.valueOf(flowResult.getIdMissione()))
+                            .orElseThrow(() -> {
+                                String err = "L'ordine di missione con ID " + flowResult.getIdMissione() +
+                                        " indicato dal flusso con ID " + flowResult.getProcessInstanceId() + " non è presente";
+                                log.info(err);
+                                return new AwesomeException(CodiciErrore.ERRGEN, err);
                             });
-                        }
-                    } else {
-                        errore = "Il rimborso missione con ID " + flowResult.getIdMissione() + " indicato dal flusso con ID " + flowResult.getProcessInstanceId() + " non è presente";
-                        log.info(errore);
-                        throw new AwesomeException(CodiciErrore.ERRGEN, errore);
-                    }
+
+                    ordineMissioneService.aggiornaOrdineMissione(ordineMissione, flowResult);
                     break;
-                case FlowResult.TIPO_FLUSSO_REVOCA:
-                    AnnullamentoOrdineMissione annullamento = (AnnullamentoOrdineMissione) crudServiceBean.findById(AnnullamentoOrdineMissione.class, Long.valueOf(flowResult.getIdMissione()));
-                    if (annullamento != null) {
-                        annullamentoOrdineMissioneService.aggiornaAnnullamentoOrdineMissione(annullamento, flowResult);
-                    } else {
-                        errore = "L'annullamento ordine di missione con ID " + flowResult.getIdMissione() + " indicato dal flusso con ID " + flowResult.getProcessInstanceId() + " non è presente";
-                        log.info(errore);
-                        throw new AwesomeException(CodiciErrore.ERRGEN, errore);
+
+
+                case FlowResult.TIPO_FLUSSO_RIMBORSO:
+
+                    RimborsoMissione rimborsoMissione = rimborsoMissioneRepository
+                            .findById(Long.valueOf(flowResult.getIdMissione()))
+                            .orElseThrow(() -> {
+                                String err = "Il rimborso missione con ID " + flowResult.getIdMissione() +
+                                        " indicato dal flusso con ID " + flowResult.getProcessInstanceId() + " non è presente";
+                                log.info(err);
+                                return new AwesomeException(CodiciErrore.ERRGEN, err);
+                            });
+
+                    final RimborsoMissione rimborsoMissioneDaComunicare =
+                            rimborsoMissioneService.aggiornaRimborsoMissione(rimborsoMissione, flowResult);
+
+                    if (rimborsoMissioneDaComunicare != null) {
+                        taskExecutor.execute(() ->
+                                comunicaMissioneSiglaService.comunicaRimborsoSigla(
+                                        rimborsoMissioneDaComunicare.getId()
+                                )
+                        );
                     }
+
+                    break;
+
+
+                case FlowResult.TIPO_FLUSSO_REVOCA:
+
+                    AnnullamentoOrdineMissione annullamento = annOrdMissioneRespository
+                            .findById(Long.valueOf(flowResult.getIdMissione()))
+                            .orElseThrow(() -> {
+                                String err = "L'annullamento ordine di missione con ID " + flowResult.getIdMissione() +
+                                        " indicato dal flusso con ID " + flowResult.getProcessInstanceId() + " non è presente";
+                                log.info(err);
+                                return new AwesomeException(CodiciErrore.ERRGEN, err);
+                            });
+
+                    annullamentoOrdineMissioneService
+                            .aggiornaAnnullamentoOrdineMissione(annullamento, flowResult);
+
                     break;
             }
 

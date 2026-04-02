@@ -19,8 +19,12 @@
 
 package it.cnr.si.missioni.repository;
 
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -28,9 +32,10 @@ import java.util.List;
 /**
  * Spring Data JPA repository for the AutoPropria entity.
  */
-public interface RimborsoMissioneRepository extends JpaRepository<RimborsoMissione, Long> {
+public interface RimborsoMissioneRepository extends JpaRepository<RimborsoMissione, Long>, JpaSpecificationExecutor<RimborsoMissione> {
 
     @Query("select a from RimborsoMissione a where a.uid = ?1")
     List<RimborsoMissione> getRimborsiMissione(String user);
+
 
 }

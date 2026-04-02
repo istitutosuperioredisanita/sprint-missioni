@@ -20,7 +20,6 @@
 package it.cnr.si.missioni.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.bulk.OggettoBulk;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.util.proxy.json.object.sigla.ErrorRestSigla;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -52,20 +51,6 @@ public class Utility {
             return false;
         else if (object1 != null && object2 != null)
             return object1.equals(object2);
-        return false;
-    }
-
-    /**
-     * Restituisce true se i due oggetti sono uguali o sono entrambi null
-     * false altrimenti
-     */
-    public static boolean equalsBulkNull(OggettoBulk object1, OggettoBulk object2) {
-        if (object1 == null && object2 == null)
-            return true;
-        else if ((object1 == null && object2 != null) || (object1 != null && object2 == null))
-            return false;
-        else if (object1 != null && object2 != null)
-            return object1.equalsByPrimaryKey(object2);
         return false;
     }
 

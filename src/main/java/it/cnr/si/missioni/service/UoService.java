@@ -1,22 +1,3 @@
-/*
- *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
- *
- *      This program is free software: you can redistribute it and/or modify
- *      it under the terms of the GNU Affero General Public License as
- *      published by the Free Software Foundation, either version 3 of the
- *      License, or (at your option) any later version.
- *
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU Affero General Public License for more details.
- *
- *      You should have received a copy of the GNU Affero General Public License
- *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *
- */
-
 package it.cnr.si.missioni.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -55,7 +38,8 @@ public class UoService {
     ConfigService configService;
 
     @Autowired
-    AccountService accountService;
+    @Lazy
+    private AccountService accountService;
 
     @Autowired(required = false)
     MissioniAceService missioniAceService;
@@ -72,17 +56,6 @@ public class UoService {
         }
         return null;
     }
-
-    /*
-    @Transactional(propagation = Propagation.REQUIRED)
-    public Account getDirettoreFromUsername(String username) {
-        String direttore = null;
-        direttore = missioniAceService.getDirettore(username);
-        if (direttore != null) {
-            return accountService.loadAccountFromUsername(direttore);
-        }
-        return null;
-    }*/
 
     private boolean isDevProfile() {
         return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT);
@@ -149,5 +122,4 @@ public class UoService {
         }
         return risposta;
     }
-
 }

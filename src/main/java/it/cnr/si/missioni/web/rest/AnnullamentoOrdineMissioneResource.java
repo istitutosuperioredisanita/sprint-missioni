@@ -20,15 +20,15 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.service.AnnullamentoOrdineMissioneService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +39,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +82,7 @@ public class AnnullamentoOrdineMissioneResource {
         List<AnnullamentoOrdineMissione> annullamenti;
         try {
             annullamenti = annullamentoOrdineMissioneService.getAnnullamenti(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsoMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -260,7 +260,7 @@ public class AnnullamentoOrdineMissioneResource {
                         }
                     }
                 }
-            } catch (ComponentException e) {
+            } catch (AwesomeException e) {
                 log.error("ERRORE printRimborsoMissione", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }

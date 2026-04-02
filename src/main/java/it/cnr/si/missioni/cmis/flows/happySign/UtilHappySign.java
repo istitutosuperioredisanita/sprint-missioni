@@ -1,10 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
-import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OggettoBulkXmlTransient;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +26,7 @@ public class UtilHappySign {
     private MailService mailService;
     @Value("${spring.mail.messages.firmatariMissioneInProd.oggetto}")
     private String firmatariMissioneInProd;
-    
+
 
     protected static String formatUoCode(String uoCode) {
         if (uoCode == null) {
@@ -66,12 +62,12 @@ public class UtilHappySign {
         return new ArrayList<>(new LinkedHashSet<>(signers));
     }
 
-    protected static void setTemplateFirme(StartWorflowDto startWorflowDto){
+    protected static void setTemplateFirme(StartWorflowDto startWorflowDto) {
         int numFirmatari = startWorflowDto.getSigners().size();
         switch (numFirmatari) {
             case 1:
-               startWorflowDto.setTemplateName(template1Firma);
-               break;
+                startWorflowDto.setTemplateName(template1Firma);
+                break;
             case 2:
                 startWorflowDto.setTemplateName(template2Firme);
                 break;

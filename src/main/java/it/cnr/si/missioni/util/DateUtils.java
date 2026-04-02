@@ -25,6 +25,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -256,6 +257,10 @@ public class DateUtils {
         return timestamp;
     }
 
+    public static LocalDateTime getCurrentLocalDateTime() {
+        return LocalDateTime.now(ZoneId.of(ZONE_ID_DEFAULT));
+    }
+
     public static Date getCurrentDate(String pattern) throws AwesomeException {
 
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
@@ -437,6 +442,10 @@ public class DateUtils {
                 .ofInstant(data.toInstant(), getDefaultZoneId())
                 .format(formatter);
 
+    }
+
+    public static String getDateAsString(LocalDateTime data, String pattern) {
+        return data != null ? data.format(DateTimeFormatter.ofPattern(pattern)) : null;
     }
 
     public static ZonedDateTime getDateWithDefaultZoneId(ZonedDateTime data) {

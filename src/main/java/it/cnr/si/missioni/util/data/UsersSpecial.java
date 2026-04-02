@@ -22,7 +22,7 @@ package it.cnr.si.missioni.util.data;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;

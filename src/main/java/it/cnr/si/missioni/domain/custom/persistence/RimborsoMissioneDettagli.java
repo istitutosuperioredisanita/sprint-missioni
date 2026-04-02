@@ -20,12 +20,13 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,7 +37,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "RIMBORSO_MISSIONE_DETTAGLI")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_RIMBORSO_DETTAGLI", allocationSize = 0)
-public class RimborsoMissioneDettagli extends OggettoBulkXmlTransient implements Serializable {
+public class RimborsoMissioneDettagli extends BaseEntity {
 
     public final static String CMIS_PROPERTY_ID_DETTAGLIO_RIMBORSO = "missioni_rimborso_dettaglio:id",
             CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE = "missioni_rimborso_dettaglio:riga",

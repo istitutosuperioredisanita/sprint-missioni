@@ -20,14 +20,17 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -35,7 +38,7 @@ import java.util.Date;
  */
 //@Entity
 //@Inheritance
-public abstract class Missione extends OggettoBulkXmlTransient implements Serializable {
+public abstract class Missione extends BaseEntity {
 
     @Size(min = 0, max = 256)
     @Column(name = "UID_INSERT", length = 256, nullable = false)
@@ -47,9 +50,8 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
     public Integer anno;
     @Column(name = "NUMERO", length = 50, nullable = false)
     public Long numero;
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_INSERIMENTO", nullable = false)
-    public Date dataInserimento;
+    public LocalDateTime dataInserimento;
     @Size(min = 0, max = 40)
     @Column(name = "COMUNE_RESIDENZA_RICH", length = 40, nullable = false)
     public String comuneResidenzaRich;
@@ -84,12 +86,10 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
     @Size(min = 0, max = 3)
     @Column(name = "TRATTAMENTO", length = 3, nullable = false)
     public String trattamento;
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_INIZIO_MISSIONE", nullable = false)
-    public Date dataInizioMissione;
-    @Type(type = "java.util.Date")
+    public LocalDateTime dataInizioMissione;
     @Column(name = "DATA_FINE_MISSIONE", nullable = false)
-    public Date dataFineMissione;
+    public LocalDateTime dataFineMissione;
     @Size(min = 0, max = 1)
     @Column(name = "VALIDATO", length = 1, nullable = false)
     public String validato;
@@ -192,11 +192,11 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
         this.numero = numero;
     }
 
-    public Date getDataInserimento() {
+    public LocalDateTime getDataInserimento() {
         return dataInserimento;
     }
 
-    public void setDataInserimento(Date dataInserimento) {
+    public void setDataInserimento(LocalDateTime dataInserimento) {
         this.dataInserimento = dataInserimento;
     }
 
@@ -272,19 +272,19 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
         this.trattamento = trattamento;
     }
 
-    public Date getDataInizioMissione() {
+    public LocalDateTime getDataInizioMissione() {
         return dataInizioMissione;
     }
 
-    public void setDataInizioMissione(Date dataInizioMissione) {
+    public void setDataInizioMissione(LocalDateTime dataInizioMissione) {
         this.dataInizioMissione = dataInizioMissione;
     }
 
-    public Date getDataFineMissione() {
+    public LocalDateTime getDataFineMissione() {
         return dataFineMissione;
     }
 
-    public void setDataFineMissione(Date dataFineMissione) {
+    public void setDataFineMissione(LocalDateTime dataFineMissione) {
         this.dataFineMissione = dataFineMissione;
     }
 
@@ -504,14 +504,16 @@ public abstract class Missione extends OggettoBulkXmlTransient implements Serial
 
 
     @Transient
-    public Boolean isMissioneConGiorniDivervi() {
+    public Boolean isMissioneConGiorniDiversi() {
         if (getDataFineMissione() != null && getDataInizioMissione() != null) {
-            Date dataInizioSenzaOre = Utility.getDateWithoutHours(getDataInizioMissione());
-            Date dataFineSenzaOre = Utility.getDateWithoutHours(getDataFineMissione());
-            return dataFineSenzaOre.after(dataInizioSenzaOre);
+            // tronca le ore e minuti
+            LocalDate dataInizioSenzaOre = getDataInizioMissione().toLocalDate();
+            LocalDate dataFineSenzaOre = getDataFineMissione().toLocalDate();
+            return dataFineSenzaOre.isAfter(dataInizioSenzaOre);
         }
         return false;
     }
+
 
     public String getNoteUtilizzoTaxiNoleggio() {
         return noteUtilizzoTaxiNoleggio;

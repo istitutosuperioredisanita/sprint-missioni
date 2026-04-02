@@ -20,7 +20,8 @@
 package it.cnr.si.missioni.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
@@ -55,7 +56,7 @@ public class TerzoPerCompensoService {
     private CacheService cacheService;
 
     @Cacheable(value = Costanti.NOME_CACHE_TERZO_COMPENSO_SERVICE, key = "#key")
-    public TerzoPerCompensoJson getTerzi(String key, JSONBody body, String url, String query, String auth) throws ComponentException {
+    public TerzoPerCompensoJson getTerzi(String key, JSONBody body, String url, String query, String auth) throws AwesomeException {
 
         String app = Costanti.APP_SIGLA;
         cacheService.setContext(body, app);
@@ -65,13 +66,13 @@ public class TerzoPerCompensoService {
             terzoJson = new ObjectMapper().readValue(res.getBody(), TerzoPerCompensoJson.class);
         } catch (IOException e) {
             log.error("Errore", e);
-            throw new ComponentException(Utility.getMessageException(e), e);
+            throw new AwesomeException(Utility.getMessageException(e), e);
         }
         return terzoJson;
 
     }
 
-    public TerzoPerCompensoJson getTerzi(String codiceFiscale, ZonedDateTime daData, ZonedDateTime aData) throws ComponentException {
+    public TerzoPerCompensoJson getTerzi(String codiceFiscale, ZonedDateTime daData, ZonedDateTime aData) throws AwesomeException {
         String key = codiceFiscale;
 
         if (!StringUtils.isEmpty(daData)) {

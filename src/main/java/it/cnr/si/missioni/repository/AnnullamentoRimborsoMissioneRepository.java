@@ -22,13 +22,15 @@ package it.cnr.si.missioni.repository;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 /**
  * Spring Data JPA repository for the AutoPropria entity.
  */
 public interface AnnullamentoRimborsoMissioneRepository extends
-        JpaRepository<AnnullamentoRimborsoMissione, Long> {
+        JpaRepository<AnnullamentoRimborsoMissione, Long>,
+        JpaSpecificationExecutor<AnnullamentoRimborsoMissione> {
 
     @Query("select a from AnnullamentoRimborsoMissione a where a.rimborsoMissione = ?1 and a.stato != 'ANN'")
     AnnullamentoRimborsoMissione getAnnullamentoRimborsoMissione(RimborsoMissione rimborsoMissione);

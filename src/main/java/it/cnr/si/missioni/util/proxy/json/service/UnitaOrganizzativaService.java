@@ -20,15 +20,18 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
+
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativaJson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +41,10 @@ import java.util.Optional;
 public class UnitaOrganizzativaService {
 
     @Autowired
+    @Lazy
     private CommonService commonService;
 
-    public UnitaOrganizzativa loadUoBySiglaEnteInt(String siglaEnteInt,Integer anno) throws ComponentException {
+    public UnitaOrganizzativa loadUoBySiglaEnteInt(String siglaEnteInt,Integer anno) throws AwesomeException {
         if (Optional.ofNullable(siglaEnteInt).isPresent()) {
             List<JSONClause> clauses = prepareJSONClause(siglaEnteInt, anno);
             String app = Costanti.APP_SIGLA;
@@ -56,7 +60,7 @@ public class UnitaOrganizzativaService {
                     }
                 }
             } catch (Exception ex) {
-                throw new ComponentException("Errore nella lettura del file JSON per le Unità Organizzative (" + Utility.getMessageException(ex) + ").", ex);
+                throw new AwesomeException("Errore nella lettura del file JSON per le Unità Organizzative (" + Utility.getMessageException(ex) + ").", ex);
             }
         }
         return null;
@@ -64,7 +68,7 @@ public class UnitaOrganizzativaService {
 
 
 
-    public UnitaOrganizzativa loadUo(String uo, String cds, Integer anno) throws ComponentException {
+    public UnitaOrganizzativa loadUo(String uo, String cds, Integer anno) throws AwesomeException {
         if (uo != null) {
             List<JSONClause> clauses = prepareJSONClause(uo, cds, anno);
             String app = Costanti.APP_SIGLA;
@@ -80,7 +84,7 @@ public class UnitaOrganizzativaService {
                     }
                 }
             } catch (Exception ex) {
-                throw new ComponentException("Errore nella lettura del file JSON per le Unità Organizzative (" + Utility.getMessageException(ex) + ").", ex);
+                throw new AwesomeException("Errore nella lettura del file JSON per le Unità Organizzative (" + Utility.getMessageException(ex) + ").", ex);
             }
         }
         return null;

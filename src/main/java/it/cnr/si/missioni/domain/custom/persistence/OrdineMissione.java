@@ -19,20 +19,17 @@
 
 package it.cnr.si.missioni.domain.custom.persistence;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import it.cnr.jada.criteria.Projection;
-import it.cnr.jada.criteria.projections.Projections;
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Cds;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,7 +43,7 @@ import java.util.List;
 @Entity
 @Table(name = "ORDINE_MISSIONE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_ORDINE_MISSIONE", allocationSize = 0)
-public class OrdineMissione extends OggettoBulkXmlTransient implements Serializable {
+public class OrdineMissione extends BaseEntity {
 
     public static final String CMIS_PROPERTY_MAIN = "F:missioni:main";
     public static final String CMIS_PROPERTY_NAME_ANNO = "missioni:anno";
@@ -134,23 +131,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
     public static final String CMIS_PROPERTY_FLOW_TOTALE_ORDINE_MISSIONE = "cnrmissioni:totaleOrdineMissione";
 
-    public static final Projection PROJECTIONLIST_ELENCO_MISSIONI = Projections.projectionList().
-            add(Projections.property("id")).
-            add(Projections.property("anno")).
-            add(Projections.property("numero")).
-            add(Projections.property("dataInserimento")).
-            add(Projections.property("uid")).
-            add(Projections.property("stato")).
-            add(Projections.property("statoFlusso")).
-            add(Projections.property("idFlusso")).
-            add(Projections.property("destinazione")).
-            add(Projections.property("oggetto")).
-            add(Projections.property("dataInizioMissione")).
-            add(Projections.property("dataFineMissione")).
-            add(Projections.property("validato")).
-            add(Projections.property("responsabileGruppo")).
-            add(Projections.property("uoRich")).
-            add(Projections.property("trattamento"));
     @Size(min = 0, max = 256)
     @Column(name = "UID_INSERT", length = 256, nullable = false)
     public String uidInsert;
@@ -363,7 +343,8 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Transient
     private String statoFlussoRitornoHome;
     @Transient
-    @JsonManagedReference //  Indica che questo è il lato "proprietario" della relazione. Jackson serializzerà questa lista e i suoi contenuti.
+    @JsonManagedReference
+    //  Indica che questo è il lato "proprietario" della relazione. Jackson serializzerà questa lista e i suoi contenuti.
     private List<OrdineMissioneDettagli> ordineMissioneDettagli;
 
     @Transient
@@ -395,10 +376,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
         super();
     }
 
-    @XmlTransient
-    public static Projection getProjectionForElencoMissioni() {
-        return PROJECTIONLIST_ELENCO_MISSIONI;
-    }
 
     public String getCommentoFlusso() {
         return commentoFlusso;
@@ -1361,14 +1338,17 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public Boolean isOrdineMissioneVecchiaScrivania() {
         return getIdFlusso() != null && getIdFlusso().startsWith("activiti");
     }
+
     @Transient
     public Boolean checkStatiFlussoTrue() {
         return isStatoInviatoAlFlusso() || isStatoRespintoFlusso() || isStatoNonInviatoAlFlusso() || isStatoFlussoApprovato();
     }
+
     @Transient
     public List<OrdineMissioneDettagli> getOrdineMissioneDettagli() {
         return ordineMissioneDettagli;
     }
+
     @Transient
     public void setOrdineMissioneDettagli(List<OrdineMissioneDettagli> ordineMissioneDettagli) {
         this.ordineMissioneDettagli = ordineMissioneDettagli;

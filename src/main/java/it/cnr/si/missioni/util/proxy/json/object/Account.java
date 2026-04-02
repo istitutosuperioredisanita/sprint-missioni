@@ -20,12 +20,12 @@
 package it.cnr.si.missioni.util.proxy.json.object;
 
 import com.fasterxml.jackson.annotation.*;
+import it.cnr.si.missioni.model.UserInfoDto;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
-import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -129,7 +129,7 @@ public class Account extends UserInfoDto implements Serializable {
 
     }
 
-    public Account(it.cnr.si.model.UserInfoDto userInfoDto) {
+    public Account(UserInfoDto userInfoDto) {
         setData_cessazione(userInfoDto.getData_cessazione());
         setArea_scientifica(userInfoDto.getArea_scientifica());
         setCap_comunicazioni(userInfoDto.getCap_comunicazioni());

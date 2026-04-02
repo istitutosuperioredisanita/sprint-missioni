@@ -19,14 +19,6 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.criteria.Order;
-import it.cnr.jada.criteria.restrictions.Disjunction;
-import it.cnr.jada.criteria.restrictions.Restrictions;
-import it.cnr.jada.criterion.CriterionList;
-import it.cnr.jada.criterion.Subqueries;
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
 import it.cnr.si.missioni.amq.domain.TypeTipoMissione;
@@ -36,31 +28,40 @@ import it.cnr.si.missioni.cmis.*;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.missioni.repository.*;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.repository.specification.RimborsoSpecification;
+import it.cnr.si.missioni.repository.specification.SecuritySpecification;
+import it.cnr.si.missioni.repository.specification.SpecificationBuilder;
+import it.cnr.si.missioni.service.security.SecurityService;
+import it.cnr.si.missioni.util.*;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
 import it.cnr.si.missioni.util.proxy.json.object.*;
 import it.cnr.si.missioni.util.proxy.json.service.*;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
-import it.cnr.si.service.SecurityService;
+import it.cnr.si.missioni.web.filter.MissioneFilterMapper;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Nullable;
-import javax.persistence.OptimisticLockException;
+
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -71,6 +72,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static it.cnr.si.missioni.util.SecurityUtils.getCurrentUser;
+
 /**
  * Service class for managing users.
  */
@@ -78,6 +81,9 @@ import java.util.*;
 public class OrdineMissioneService {
 
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneService.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     SecurityService securityService;
@@ -98,8 +104,10 @@ public class OrdineMissioneService {
     @Autowired
     private DatiIstitutoService datiIstitutoService;
     @Autowired
+    @Lazy
     private PrintOrdineMissioneService printOrdineMissioneService;
     @Autowired
+    @Lazy
     private CMISOrdineMissioneService cmisOrdineMissioneService;
     @Autowired
     private UoService uoService;
@@ -125,22 +133,23 @@ public class OrdineMissioneService {
     private ImpegnoGaeService impegnoGaeService;
 
     @Autowired
+    @Lazy
     private OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
     @Autowired
+    @Lazy
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
     @Autowired
+    @Lazy
     private OrdineMissioneTaxiService ordineMissioneTaxiService;
     @Autowired
+    @Lazy
     private OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
     @Autowired
     private ConfigService configService;
 
     @Autowired(required = false)
     private MailService mailService;
-
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     @Autowired(required = false)
     private RabbitMQService rabbitMQService;
@@ -155,9 +164,11 @@ public class OrdineMissioneService {
     private MissioneRespintaService missioneRespintaService;
 
     @Autowired
+    @Lazy
     private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
     @Autowired
+    @Lazy
     private OrdineMissioneDettagliService ordineMissioneDettagliService;
 
     @Value("${spring.mail.messages.invioResponsabileGruppo.oggetto}")
@@ -202,7 +213,7 @@ public class OrdineMissioneService {
 
     //TODO capire gestione degli stati della missione per la visualizzazione degli stati delle autorizz. agg. (SI/NO)
     public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows)
-            throws ComponentException {
+            throws AwesomeException {
         MissioneFilter filter = new MissioneFilter();
         filter.setDaId(idMissione);
         filter.setaId(idMissione);
@@ -244,69 +255,80 @@ public class OrdineMissioneService {
     }
 
 
-    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail) throws ComponentException {
+    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail) throws AwesomeException {
         return getOrdineMissione(idMissione, retrieveDetail, true);
     }
 
 
-    public Map<String, byte[]> printOrdineMissione(Long idMissione) throws ComponentException {
+    public Map<String, byte[]> printOrdineMissione(Long idMissione) throws AwesomeException {
         String username = securityService.getCurrentUserLogin();
         OrdineMissione ordineMissione = getOrdineMissione(idMissione, true);
-        if (ordineMissione != null) {
-            Map<String, byte[]> map = new HashMap<String, byte[]>();
-            byte[] printOrdineMissione = null;
-            String fileName = null;
-            retrieveDetails(ordineMissione);
 
-            if ((ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
-                    && !ordineMissione.isMissioneDaValidare()) || (ordineMissione.isStatoFlussoApprovato())) {
-                StorageObject storage = null;
-                try {
-                    storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
-                } catch (ComponentException e1) {
-                    throw new ComponentException("Errore nel recupero del contenuto del file sul documentale ("
-                            + Utility.getMessageException(e1) + ")", e1);
-                }
-                if (storage != null) {
-                    fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
-                    InputStream is = null;
-                    try {
-                        is = missioniCMISService.getResource(storage);
-                    } catch (Exception e) {
-                        throw new ComponentException("Errore nel recupero dello stream del file sul documentale ("
-                                + Utility.getMessageException(e) + ")", e);
-                    }
-                    if (is != null) {
-                        try {
-                            printOrdineMissione = IOUtils.toByteArray(is);
-                            is.close();
-                        } catch (IOException e) {
-                            throw new ComponentException("Errore nella conversione dello stream in byte del file ("
-                                    + Utility.getMessageException(e) + ")", e);
-                        }
-                    }
-                } else {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Errore nel recupero del contenuto del file sul documentale");
-                }
-                map.put(fileName, printOrdineMissione);
-            } else {
-                fileName = "OrdineMissione" + idMissione + ".pdf";
-                printOrdineMissione = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
-                if (ordineMissione.isMissioneInserita()) {
-                    cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(printOrdineMissione,
-                            ordineMissione);
-                }
-                map.put(fileName, printOrdineMissione);
-            }
-            return map;
+        if (ordineMissione == null) {
+            return Collections.emptyMap();
         }
-        return null;
+
+        Map<String, byte[]> map = new HashMap<>();
+        retrieveDetails(ordineMissione);
+
+        byte[] fileContent;
+        String fileName;
+
+        boolean stampaDaCMIS = (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneInserita()
+                && !ordineMissione.isMissioneDaValidare()) || ordineMissione.isStatoFlussoApprovato();
+
+        if (stampaDaCMIS) {
+            StorageObject storage;
+            try {
+                storage = cmisOrdineMissioneService.getStorageObjectOrdineMissione(ordineMissione);
+            } catch (AwesomeException e) {
+                throw new AwesomeException(
+                        "Errore nel recupero del contenuto del file sul documentale (" + Utility.getMessageException(e) + ")",
+                        e
+                );
+            }
+
+            if (storage == null) {
+                throw new AwesomeException(CodiciErrore.ERRGEN,
+                        "Errore nel recupero del contenuto del file sul documentale");
+            }
+
+            fileName = storage.getPropertyValue(StoragePropertyNames.NAME.value());
+
+            try (InputStream is = missioniCMISService.getResource(storage)) {
+                if (is == null) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN,
+                            "Errore nel recupero dello stream del file sul documentale");
+                }
+                fileContent = IOUtils.toByteArray(is);
+            } catch (IOException e) {
+                throw new AwesomeException(
+                        "Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")",
+                        e
+                );
+            } catch (Exception e) {
+                throw new AwesomeException(
+                        "Errore nel recupero dello stream del file sul documentale (" + Utility.getMessageException(e) + ")",
+                        e
+                );
+            }
+
+        } else {
+            // stampa locale
+            fileName = "OrdineMissione" + idMissione + ".pdf";
+            fileContent = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
+
+            if (ordineMissione.isMissioneInserita()) {
+                cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(fileContent, ordineMissione);
+            }
+        }
+
+        map.put(fileName, fileContent);
+        return map;
     }
 
-
     @Transactional(propagation = Propagation.REQUIRED)
-    public void retrieveDetails(OrdineMissione ordineMissione) throws NumberFormatException, ComponentException {
+    public void retrieveDetails(OrdineMissione ordineMissione) throws NumberFormatException, AwesomeException {
         List<OrdineMissioneDettagli> list = ordineMissioneDettagliService.getOrdineMissioneDettagli(Long.valueOf(ordineMissione.getId().toString()));
         ordineMissione.setOrdineMissioneDettagli(list);
     }
@@ -315,13 +337,13 @@ public class OrdineMissioneService {
         return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT);
     }
 
-    public String jsonForPrintOrdineMissione(Long idMissione) throws ComponentException {
+    public String jsonForPrintOrdineMissione(Long idMissione) throws AwesomeException {
         OrdineMissione ordineMissione = getOrdineMissione(idMissione, true);
         return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, securityService.getCurrentUserLogin());
     }
 
     public List<OrdineMissione> getOrdiniMissioneForValidateFlows(MissioneFilter filter,
-                                                                  Boolean isServiceRest) throws ComponentException {
+                                                                  Boolean isServiceRest) throws AwesomeException {
         List<OrdineMissione> lista = getOrdiniMissione(filter, isServiceRest, true);
         if (lista != null) {
             List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
@@ -348,7 +370,7 @@ public class OrdineMissioneService {
     }
 
     public void aggiornaOrdineMissioneRespinto(FlowResult result,
-                                               OrdineMissione ordineMissioneDaAggiornare) throws ComponentException {
+                                               OrdineMissione ordineMissioneDaAggiornare) throws AwesomeException {
         aggiornaValidazione(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
         ordineMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
@@ -368,7 +390,7 @@ public class OrdineMissioneService {
         missioneRespintaService.inserisciMissioneRespinta(result);
     }
 
-    public OrdineMissioneAnticipo getAnticipo(OrdineMissione ordineMissioneDaAggiornare) throws ComponentException {
+    public OrdineMissioneAnticipo getAnticipo(OrdineMissione ordineMissioneDaAggiornare) throws AwesomeException {
         return ordineMissioneAnticipoService.getAnticipo(ordineMissioneDaAggiornare, false);
     }
 
@@ -575,22 +597,33 @@ public class OrdineMissioneService {
     }
 
     public void popolaCoda(OrdineMissione ordineMissione) {
-        if (Optional.ofNullable(rabbitMQService).isPresent()) {
-            if (Optional.ofNullable(rabbitMQService).isPresent()) {
-                if (ordineMissione.getMatricola() != null && !isDevProfile()) {
-                    Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
-                    String idSede = null;
-                    if (account != null) {
-                        idSede = account.getCodice_sede();
-                    }
-                    Missione missione = new Missione(TypeMissione.ORDINE, Long.valueOf(ordineMissione.getId().toString()), idSede,
-                            ordineMissione.getMatricola(), ordineMissione.getDataInizioMissione(),
-                            ordineMissione.getDataFineMissione(), null,
-                            ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
-                            ordineMissione.getAnno(), ordineMissione.getNumero());
-                    rabbitMQService.send(missione);
-                }
-            }
+        if (ordineMissione == null) {
+            log.warn("OrdineMissione nullo, niente da inviare in coda");
+            return;
+        }
+
+        if (rabbitMQService == null) {
+            log.warn("rabbitMQService non inizializzato");
+            return;
+        }
+
+        if (ordineMissione.getMatricola() != null && !isDevProfile()) {
+            Account account = accountService.loadAccountFromUsername(ordineMissione.getUid());
+            String idSede = account != null ? account.getCodice_sede() : null;
+
+            Missione missione = new Missione(
+                    TypeMissione.ORDINE,
+                    (Long) ordineMissione.getId(), // Long già
+                    idSede,
+                    ordineMissione.getMatricola(),
+                    ordineMissione.getDataInizioMissione(),
+                    ordineMissione.getDataFineMissione(),
+                    null,
+                    ordineMissione.isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+                    ordineMissione.getAnno(),
+                    ordineMissione.getNumero()
+            );
+            rabbitMQService.send(missione);
         }
     }
 
@@ -607,325 +640,277 @@ public class OrdineMissioneService {
     }
 
     public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter, Boolean isServiceRest)
-            throws ComponentException {
+            throws AwesomeException {
         return getOrdiniMissione(filter, isServiceRest, false);
     }
 
-    public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter, Boolean isServiceRest,
-                                                  Boolean isForValidateFlows) throws ComponentException {
-        CriterionList criterionList = new CriterionList();
-        List<OrdineMissione> ordineMissioneList = null;
+    public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter,
+                                                  Boolean isServiceRest,
+                                                  Boolean isForValidateFlows) throws AwesomeException {
+
+        Specification<OrdineMissione> spec = MissioneFilterMapper.mapBaseFilters(filter);
+
         if (filter != null) {
+
+            // Se impostati sia user che uoRich, resetta uoRich
             if (filter.getUoRich() != null && filter.getUser() != null) {
                 filter.setUoRich(null);
             }
-            if (filter.getAnno() != null) {
-                criterionList.add(Restrictions.eq("anno", filter.getAnno()));
-            }
-            if (filter.getDaId() != null) {
-                criterionList.add(Restrictions.ge("id", filter.getDaId()));
-            }
-            if (filter.getStato() != null) {
-                criterionList.add(Restrictions.eq("stato", filter.getStato()));
-            }
-            if (filter.getStatoFlusso() != null) {
-                criterionList.add(Restrictions.eq("statoFlusso", filter.getStatoFlusso()));
-            }
-            if (filter.getValidato() != null) {
-                criterionList.add(Restrictions.eq("validato", filter.getValidato()));
-            }
-            if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()) {
-                criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
-            }
-            if (filter.getListaStatiFlussoMissione() != null && !filter.getListaStatiFlussoMissione().isEmpty()) {
-                criterionList.add(Restrictions.in("statoFlusso", filter.getListaStatiFlussoMissione()));
+
+            // --- Ramo daCron ---
+            if ("S".equals(Utility.nvl(filter.getDaCron(), "N"))) {
+                // Nessun filtro utente aggiuntivo
             }
 
-            if (filter.getaId() != null) {
-                criterionList.add(Restrictions.le("id", filter.getaId()));
-            }
-            if (filter.getDaNumero() != null) {
-                criterionList.add(Restrictions.ge("numero", filter.getDaNumero()));
-            }
-            if (filter.getaNumero() != null) {
-                criterionList.add(Restrictions.le("numero", filter.getaNumero()));
-            }
-            if (filter.getDaData() != null) {
-                criterionList.add(Restrictions.ge("dataInserimento",
-                        DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
-            }
-            if (filter.getaData() != null) {
-                criterionList.add(Restrictions.le("dataInserimento",
-                        DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
-            }
-            if (filter.getDaDataMissione() != null) {
-                Disjunction condizioneOr = Restrictions.disjunction();
-                condizioneOr.add(Restrictions.conjunction().add(Restrictions.ge("dataInizioMissione",
-                        DateUtils.parseLocalDate(filter.getDaDataMissione(), DateUtils.PATTERN_DATE).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
-                condizioneOr.add(Restrictions.conjunction().add(Restrictions.ge("dataFineMissione",
-                        DateUtils.parseLocalDate(filter.getDaDataMissione(), DateUtils.PATTERN_DATE).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
-                criterionList.add(condizioneOr);
-            }
-            if (filter.getaDataMissione() != null) {
-                Disjunction condizioneOr = Restrictions.disjunction();
-                condizioneOr.add(Restrictions.conjunction().add(Restrictions.lt("dataInizioMissione",
-                        DateUtils.parseLocalDate(filter.getaDataMissione(), DateUtils.PATTERN_DATE).plusDays(1).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
-                condizioneOr.add(Restrictions.conjunction().add(Restrictions.lt("dataFineMissione",
-                        DateUtils.parseLocalDate(filter.getaDataMissione(), DateUtils.PATTERN_DATE).plusDays(1).atStartOfDay(ZoneId.of(DateUtils.ZONE_ID_DEFAULT)))));
-                criterionList.add(condizioneOr);
-            }
-            if (filter.getCdsRich() != null) {
-                criterionList.add(Restrictions.eq("cdsRich", filter.getCdsRich()));
-            }
-            if (filter.getUoRich() != null) {
-                if (accountService.isUserEnableToWorkUo(filter.getUoRich()) && !filter.isDaCron()) {
-                    Disjunction condizioneOr = Restrictions.disjunction();
-                    condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoRich", filter.getUoRich())));
-                    condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uoSpesa", filter.getUoRich())));
-                    condizioneOr
-                            .add(Restrictions.conjunction().add(Restrictions.eq("uoCompetenza", filter.getUoRich())));
-                    criterionList.add(condizioneOr);
-                } else {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente " + securityService.getCurrentUserLogin()
-                            + "  non è abilitato a vedere i dati della uo " + filter.getUoRich());
+            // --- Ramo toFinal ---
+            else if ("S".equals(Utility.nvl(filter.getToFinal(), "N"))) {
+                if (StringUtils.isEmpty(filter.getUoRich())) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN,
+                            "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
                 }
-            }
-            if (filter.getSoloMissioniNonGratuite()) {
-                criterionList.add(Restrictions.disjunction().add(Restrictions.isNull("missioneGratuita"))
-                        .add(Restrictions.eq("missioneGratuita", "N")));
-            }
-            if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("N")) {
-                criterionList.add(Subqueries.notExists(
-                        "select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
-            } else if (Utility.nvl(filter.getGiaRimborsato(), "A").equals("R")) {
-                criterionList.add(Subqueries.exists(
-                        "select rim.id from RimborsoMissione AS rim where rim.ordineMissione.id = this.id and rim.stato != 'ANN' and rim.stato != 'ANA' "));
-            }
-            if (Utility.nvl(filter.getDaAnnullare(), "N").equals("S")) {
-                String notExists = "select ann.id from AnnullamentoOrdineMissione AS ann where ann.ordineMissione.id = this.id and ann.stato != 'ANN' and ann.stato != 'ANA' and ann.stato != 'DEF' ";
-                criterionList.add(Subqueries.notExists(notExists));
-            }
-            if (filter.getCup() != null) {
-                criterionList.add(Restrictions.eq("cup", filter.getCup()));
-            }
-        }
-        if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")) {
-            return crudServiceBean.findByCriterion(OrdineMissione.class, criterionList,
-                    Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
-        } else if (filter != null && Utility.nvl(filter.getToFinal(), "N").equals("S")) {
-            if (StringUtils.isEmpty(filter.getUoRich())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
-            }
-            // criterionList.add(Restrictions.isNull("pgObbligazione"));
-            UsersSpecial userSpecial = accountService.getUoForUsersSpecial(securityService.getCurrentUserLogin());
-            boolean uoAbilitata = false;
-            if (userSpecial != null) {
-                if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")) {
-                    if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
-                        for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
-                            if (uoService.getUoSigla(uoUser).equals(filter.getUoRich())) {
-                                uoAbilitata = true;
-                                if (!Utility.nvl(uoUser.getRendi_definitivo(), "N").equals("S")) {
-                                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                                            "L'utente non è abilitato a rendere definitivi ordini di missione.");
+                UsersSpecial userSpecial = accountService.getUoForUsersSpecial(SecurityUtils.getCurrentUser().getName());
+                boolean uoAbilitata = false;
+                if (userSpecial != null) {
+                    if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")) {
+                        if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
+                            for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
+                                if (uoService.getUoSigla(uoUser).equals(filter.getUoRich())) {
+                                    uoAbilitata = true;
+                                    if (!"S".equals(Utility.nvl(uoUser.getRendi_definitivo(), "N"))) {
+                                        throw new AwesomeException(CodiciErrore.ERRGEN,
+                                                "L'utente non è abilitato a rendere definitivi ordini di missione.");
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (!uoAbilitata) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "L'utente non è abilitato a rendere definitivi ordini di missione.");
-            }
-            criterionList.add(Restrictions.eq("statoFlusso", Costanti.STATO_APPROVATO_FLUSSO));
-            criterionList.add(Restrictions.eq("stato", Costanti.STATO_CONFERMATO));
-            criterionList.add(Restrictions.eq("validato", "S"));
-            ordineMissioneList = crudServiceBean.findByProjection(OrdineMissione.class,
-                    OrdineMissione.getProjectionForElencoMissioni(), criterionList, true, Order.desc("dataInserimento"),
-                    Order.desc("anno"), Order.desc("numero"));
-            if (Utility.nvl(filter.getRecuperoAutoPropria()).equals("S")) {
-                for (OrdineMissione ordineMissione : ordineMissioneList) {
-                    OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()));
-                    if (autoPropria != null) {
-                        ordineMissione.setUtilizzoAutoPropria("S");
-                    } else {
-                        ordineMissione.setUtilizzoAutoPropria("N");
-                    }
+                if (!uoAbilitata) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN,
+                            "L'utente non è abilitato a rendere definitivi ordini di missione.");
                 }
-            }
-            if (Utility.nvl(filter.getRecuperoTaxi()).equals("S")) {
-                for (OrdineMissione ordineMissione : ordineMissioneList) {
-                    OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
-                    if (taxi != null) {
-                        ordineMissione.setUtilizzoTaxi("S");
-                    } else {
-                        ordineMissione.setUtilizzoTaxi("N");
-                    }
-                }
+                spec = new SpecificationBuilder<OrdineMissione>()
+                        .and(spec)
+                        .and((root, query, cb) -> cb.equal(root.get("statoFlusso"), Costanti.STATO_APPROVATO_FLUSSO))
+                        .and((root, query, cb) -> cb.equal(root.get("stato"), Costanti.STATO_CONFERMATO))
+                        .and((root, query, cb) -> cb.equal(root.get("validato"), "S"))
+                        .build();
             }
 
-            if (Utility.nvl(filter.getRecuperoAutoNoleggio()).equals("S")) {
-                for (OrdineMissione ordineMissione : ordineMissioneList) {
-                    OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()));
-                    if (autoNoleggio != null) {
-                        ordineMissione.setUtilizzoAutoNoleggio("S");
+            // --- Ramo normale ---
+            else {
+                if (!isForValidateFlows) {
+                    if (!StringUtils.isEmpty(filter.getUser())) {
+                        spec = new SpecificationBuilder<OrdineMissione>()
+                                .and(spec)
+                                .and(SecuritySpecification.forUser(filter.getUser()))
+                                .build();
                     } else {
-                        ordineMissione.setUtilizzoAutoNoleggio("N");
-                    }
-                }
-            }
-
-            return ordineMissioneList;
-
-        } else {
-            if (!isForValidateFlows) {
-                if (!StringUtils.isEmpty(filter.getUser())) {
-                    criterionList.add(Restrictions.eq("uid", filter.getUser()));
-                } else {
-                    if (StringUtils.isEmpty(filter.getUoRich())) {
-                        if (Utility.nvl(filter.getRespGruppo(), "N").equals("S")) {
-                            criterionList.add(Restrictions.disjunction()
-                                    .add(Restrictions.conjunction()
-                                            .add(Restrictions.eq("responsabileGruppo", securityService.getCurrentUserLogin()))
-                                            .add(Restrictions.not(Restrictions.eq("stato", "INS")))));
-                        } else {
-                            criterionList.add(Restrictions.eq("uid", securityService.getCurrentUserLogin()));
-                        }
-                    }
-                }
-            } else {
-                UsersSpecial userSpecial = accountService.getUoForUsersSpecial(securityService.getCurrentUserLogin());
-                if (userSpecial != null) {
-                    if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")) {
-                        if (userSpecial.getUoForUsersSpecials() != null
-                                && !userSpecial.getUoForUsersSpecials().isEmpty()) {
-                            boolean esisteUoConValidazioneConUserNonAbilitato = false;
-                            Disjunction condizioneOr = Restrictions.disjunction();
-                            List<String> listaUoUtente = new ArrayList<String>();
-                            for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
-                                // Uo uo =
-                                // uoService.recuperoUo(uoUser.getCodice_uo());
-                                // if (uo != null){
-                                condizioneOr.add(Restrictions.conjunction()
-                                        .add(Restrictions.eq("uoRich", uoService.getUoSigla(uoUser))));
-                                // if
-                                // (Utility.nvl(uo.getOrdineDaValidare(),"N").equals("S")){
-                                // if
-                                // (Utility.nvl(uoUser.getOrdine_da_validare(),"N").equals("S")){
-                                condizioneOr.add(Restrictions.conjunction()
-                                        .add(Restrictions.eq("uoSpesa", uoService.getUoSigla(uoUser))));
-                                condizioneOr.add(Restrictions.conjunction()
-                                        .add(Restrictions.eq("uoCompetenza", uoService.getUoSigla(uoUser))));
-                                // }
-                                // }
-                                // }
+                        if (StringUtils.isEmpty(filter.getUoRich())) {
+                            if ("S".equals(Utility.nvl(filter.getRespGruppo(), "N"))) {
+                                // Solo responsabile gruppo (stato != INS)
+                                String currentUser = SecurityUtils.getCurrentUser().getName();
+                                spec = new SpecificationBuilder<OrdineMissione>()
+                                        .and(spec)
+                                        .and((root, query, cb) -> cb.and(
+                                                cb.equal(root.get("responsabileGruppo"), currentUser),
+                                                cb.notEqual(root.get("stato"), "INS")
+                                        ))
+                                        .build();
+                            } else {
+                                spec = new SpecificationBuilder<OrdineMissione>()
+                                        .and(spec)
+                                        .and(SecuritySpecification.forUser(SecurityUtils.getCurrentUser().getName()))
+                                        .build();
                             }
-                            condizioneResponsabileGruppo(condizioneOr, filter);
-                            criterionList.add(condizioneOr);
-                        } else {
-                            condizioneOrdineDellUtenteConResponsabileGruppo(criterionList, filter);
                         }
                     }
                 } else {
-                    condizioneOrdineDellUtenteConResponsabileGruppo(criterionList, filter);
-                }
-            }
-            if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S") && (!(filter.getDaId() != null
-                    && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0))) {
-                criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
-                criterionList
-                        .add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE)));
-                if (StringUtils.isEmpty(filter.getGiaRimborsato())) {
-                    criterionList
-                            .add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO)));
-                }
-            }
+                    String currentUser = SecurityUtils.getCurrentUser().getName();
+                    UsersSpecial userSpecial = accountService.getUoForUsersSpecial(currentUser);
+                    SpecificationBuilder<OrdineMissione> sb = new SpecificationBuilder<OrdineMissione>().and(spec);
 
-            if (isServiceRest) {
-                if (isForValidateFlows) {
-                    List<String> listaStatiFlusso = new ArrayList<String>();
-                    listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
-                    listaStatiFlusso.add(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
-                    listaStatiFlusso.add(Costanti.STATO_INSERITO);
-                    listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_FLUSSO);
-                    listaStatiFlusso.add(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-                    criterionList.add(Restrictions.disjunction().add(Restrictions.disjunction()
-                            .add(Restrictions.in("statoFlusso", listaStatiFlusso))
-                            .add(Restrictions.conjunction().add(Restrictions.eq("stato", Costanti.STATO_INSERITO)))));
-                }
-                ordineMissioneList = crudServiceBean.findByProjection(OrdineMissione.class,
-                        OrdineMissione.getProjectionForElencoMissioni(), criterionList, true,
-                        Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
-                if (isServiceRest && !isForValidateFlows) {
-                    for (OrdineMissione ordineMissione : ordineMissioneList) {
-                        OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
-                                .getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
-                        if (anticipo != null) {
-                            ordineMissione.setRichiestaAnticipo(Costanti.SI_NO.get("S"));
+                    if (userSpecial != null && !"S".equals(userSpecial.getAll())) {
+                        if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
+                            // OR tra tutte le UO + responsabileGruppo
+                            List<Specification<OrdineMissione>> uoSpecs = new ArrayList<>();
+                            for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
+                                final String uoSigla = uoService.getUoSigla(uoUser);
+                                uoSpecs.add((root, query, cb) -> cb.equal(root.get("uoRich"), uoSigla));
+                                uoSpecs.add((root, query, cb) -> cb.equal(root.get("uoSpesa"), uoSigla));
+                                uoSpecs.add((root, query, cb) -> cb.equal(root.get("uoCompetenza"), uoSigla));
+                            }
+                            // Aggiunge responsabileGruppo alla disgiunzione (come in condizioneResponsabileGruppo)
+                            uoSpecs.add(buildResponsabileGruppoSpec(filter, currentUser));
+
+                            Specification<OrdineMissione> uoDisjunction = uoSpecs.stream()
+                                    .reduce(Specification::or)
+                                    .orElse(null);
+                            if (uoDisjunction != null) {
+                                sb.and(uoDisjunction);
+                            }
                         } else {
-                            ordineMissione.setRichiestaAnticipo(Costanti.SI_NO.get("N"));
+                            sb.and(buildUtenteConResponsabileGruppoSpec(filter, currentUser));
                         }
-                    }
-                }
-            } else
-                ordineMissioneList = crudServiceBean.findByCriterion(OrdineMissione.class, criterionList,
-                        Order.desc("dataInserimento"), Order.desc("anno"), Order.desc("numero"));
-
-            if (Utility.nvl(filter.getRecuperoAutoPropria()).equals("S")) {
-                for (OrdineMissione ordineMissione : ordineMissioneList) {
-                    OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()));
-                    if (autoPropria != null) {
-                        ordineMissione.setUtilizzoAutoPropria("S");
                     } else {
-                        ordineMissione.setUtilizzoAutoPropria("N");
+                        sb.and(buildUtenteConResponsabileGruppoSpec(filter, currentUser));
                     }
+                    spec = sb.build();
+                }
+
+                // Escludi stati annullati (a meno che includiMissioniAnnullate o daId==aId)
+                if (!"S".equals(Utility.nvl(filter.getIncludiMissioniAnnullate()))
+                        && !(filter.getDaId() != null && filter.getaId() != null
+                        && filter.getDaId().compareTo(filter.getaId()) == 0)) {
+                    SpecificationBuilder<OrdineMissione> sb = new SpecificationBuilder<OrdineMissione>().and(spec)
+                            .and((root, query, cb) -> cb.notEqual(root.get("stato"), Costanti.STATO_ANNULLATO))
+                            .and((root, query, cb) -> cb.notEqual(root.get("stato"), Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE));
+                    if (StringUtils.isEmpty(filter.getGiaRimborsato())) {
+                        sb.and((root, query, cb) -> cb.notEqual(root.get("stato"),
+                                Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO));
+                    }
+                    spec = sb.build();
+                }
+
+                // Filtro statoFlusso per REST + validateFlows
+                if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
+                    List<String> listaStatiFlusso = Arrays.asList(
+                            Costanti.STATO_INVIATO_FLUSSO,
+                            Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO,
+                            Costanti.STATO_INSERITO,
+                            Costanti.STATO_RESPINTO_UO_FLUSSO,
+                            Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO
+                    );
+                    spec = new SpecificationBuilder<OrdineMissione>()
+                            .and(spec)
+                            .and((root, query, cb) -> cb.or(
+                                    root.get("statoFlusso").in(listaStatiFlusso),
+                                    cb.equal(root.get("stato"), Costanti.STATO_INSERITO)
+                            ))
+                            .build();
                 }
             }
 
-            if (Utility.nvl(filter.getRecuperoTaxi()).equals("S")) {
-                for (OrdineMissione ordineMissione : ordineMissioneList) {
-                    OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()));
-                    if (taxi != null) {
-                        ordineMissione.setUtilizzoTaxi("S");
-                    } else {
-                        ordineMissione.setUtilizzoTaxi("N");
-                    }
+            // Filtro UO (comune, escluso daCron)
+            if (filter.getUoRich() != null && !"S".equals(filter.getDaCron())) {
+                if (accountService.isUserEnableToWorkUo(filter.getUoRich())) {
+                    Specification<OrdineMissione> s = (root, query, cb) -> cb.or(
+                            cb.equal(root.get("uoRich"), filter.getUoRich()),
+                            cb.equal(root.get("uoSpesa"), filter.getUoRich()),
+                            cb.equal(root.get("uoCompetenza"), filter.getUoRich())
+                    );
+                    spec = new SpecificationBuilder<OrdineMissione>().and(spec).and(s).build();
+                } else {
+                    throw new AwesomeException(CodiciErrore.ERRGEN,
+                            "L'utente " + SecurityUtils.getCurrentUser().getName()
+                                    + " non è abilitato a vedere i dati della uo " + filter.getUoRich());
                 }
             }
 
-            if (Utility.nvl(filter.getRecuperoAutoNoleggio()).equals("S")) {
-                for (OrdineMissione ordineMissione : ordineMissioneList) {
-                    OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()));
-                    if (autoNoleggio != null) {
-                        ordineMissione.setUtilizzoAutoNoleggio("S");
-                    } else {
-                        ordineMissione.setUtilizzoAutoNoleggio("N");
-                    }
-                }
+            // Solo missioni non gratuite
+            if (Boolean.TRUE.equals(filter.getSoloMissioniNonGratuite())) {
+                spec = new SpecificationBuilder<OrdineMissione>()
+                        .and(spec)
+                        .and((root, query, cb) -> cb.or(
+                                cb.isNull(root.get("missioneGratuita")),
+                                cb.equal(root.get("missioneGratuita"), "N")
+                        ))
+                        .build();
             }
 
-            return ordineMissioneList;
+            // Filtro giaRimborsato
+            if ("N".equals(Utility.nvl(filter.getGiaRimborsato(), "A"))) {
+                spec = new SpecificationBuilder<OrdineMissione>()
+                        .and(spec)
+                        .and(RimborsoSpecification.nonRimborsato())
+                        .build();
+            } else if ("R".equals(Utility.nvl(filter.getGiaRimborsato(), "A"))) {
+                spec = new SpecificationBuilder<OrdineMissione>()
+                        .and(spec)
+                        .and(RimborsoSpecification.giaRimborsato())
+                        .build();
+            }
+
+            // Filtro daAnnullare
+            if ("S".equals(Utility.nvl(filter.getDaAnnullare(), "N"))) {
+                spec = new SpecificationBuilder<OrdineMissione>()
+                        .and(spec)
+                        .and((root, query, cb) -> {
+                            Subquery<Long> sub = query.subquery(Long.class);
+                            var ann = sub.from(AnnullamentoOrdineMissione.class);
+                            sub.select(ann.get("id"))
+                                    .where(
+                                            cb.equal(ann.get("ordineMissione").get("id"), root.get("id")),
+                                            cb.notEqual(ann.get("stato"), "ANN"),
+                                            cb.notEqual(ann.get("stato"), "ANA"),
+                                            cb.notEqual(ann.get("stato"), "DEF")
+                                    );
+                            return cb.not(cb.exists(sub));
+                        })
+                        .build();
+            }
         }
+
+        Sort sort = Sort.by(Sort.Order.desc("dataInserimento"))
+                .and(Sort.by(Sort.Order.desc("anno")))
+                .and(Sort.by(Sort.Order.desc("numero")));
+
+        List<OrdineMissione> ordineMissioneList = ordineMissioneRepository.findAll(spec, sort);
+
+        // Recupero anticipo (solo isServiceRest senza validateFlows)
+        if (Boolean.TRUE.equals(isServiceRest) && !Boolean.TRUE.equals(isForValidateFlows) && ordineMissioneList != null) {
+            for (OrdineMissione ordineMissione : ordineMissioneList) {
+                OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
+                        .getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
+                ordineMissione.setRichiestaAnticipo(anticipo != null ? Costanti.SI_NO.get("S") : Costanti.SI_NO.get("N"));
+            }
+        }
+
+        // Recupero auto propria, taxi, noleggio
+        if (ordineMissioneList != null && filter != null) {
+            if ("S".equals(Utility.nvl(filter.getRecuperoAutoPropria()))) {
+                for (OrdineMissione o : ordineMissioneList) {
+                    o.setUtilizzoAutoPropria(
+                            ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(o.getId().toString())) != null ? "S" : "N");
+                }
+            }
+            if ("S".equals(Utility.nvl(filter.getRecuperoTaxi()))) {
+                for (OrdineMissione o : ordineMissioneList) {
+                    o.setUtilizzoTaxi(
+                            ordineMissioneTaxiService.getTaxi(Long.valueOf(o.getId().toString())) != null ? "S" : "N");
+                }
+            }
+            if ("S".equals(Utility.nvl(filter.getRecuperoAutoNoleggio()))) {
+                for (OrdineMissione o : ordineMissioneList) {
+                    o.setUtilizzoAutoNoleggio(
+                            ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(o.getId().toString())) != null ? "S" : "N");
+                }
+            }
+        }
+
+        return ordineMissioneList;
     }
 
-    private void condizioneOrdineDellUtenteConResponsabileGruppo(CriterionList criterionList,
-                                                                 MissioneFilter filter) {
-        Disjunction condizioneOr = Restrictions.disjunction();
-        condizioneResponsabileGruppo(condizioneOr, filter);
-        condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("uid", securityService.getCurrentUserLogin())));
-        criterionList.add(condizioneOr);
-    }
-
-    private void condizioneResponsabileGruppo(Disjunction condizioneOr, MissioneFilter filter) {
-        if (filter.getaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0) {
-            condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", securityService.getCurrentUserLogin()))
-                    .add(Restrictions.not(Restrictions.eq("stato", "INS"))));
+    // Equivalente di condizioneResponsabileGruppo
+    private Specification<OrdineMissione> buildResponsabileGruppoSpec(MissioneFilter filter, String currentUser) {
+        if (filter.getDaId() != null && filter.getaId() != null
+                && filter.getDaId().compareTo(filter.getaId()) == 0) {
+            return (root, query, cb) -> cb.and(
+                    cb.equal(root.get("responsabileGruppo"), currentUser),
+                    cb.notEqual(root.get("stato"), "INS")
+            );
         } else {
-            condizioneOr.add(Restrictions.conjunction().add(Restrictions.eq("responsabileGruppo", securityService.getCurrentUserLogin()))
-                    .add(Restrictions.eq("stato", "INR")));
+            return (root, query, cb) -> cb.and(
+                    cb.equal(root.get("responsabileGruppo"), currentUser),
+                    cb.equal(root.get("stato"), "INR")
+            );
         }
+    }
+
+    // Equivalente di condizioneOrdineDellUtenteConResponsabileGruppo
+    private Specification<OrdineMissione> buildUtenteConResponsabileGruppoSpec(MissioneFilter filter, String currentUser) {
+        Specification<OrdineMissione> respGruppoSpec = buildResponsabileGruppoSpec(filter, currentUser);
+        return respGruppoSpec.or((root, query, cb) -> cb.equal(root.get("uid"), currentUser));
     }
 
     public OrdineMissioneAutoPropria getAutoPropria(OrdineMissione ordineMissione) {
@@ -942,20 +927,20 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione createOrdineMissione(OrdineMissione ordineMissione)
-            throws ComponentException {
+            throws AwesomeException {
         controlloDatiObbligatoriDaGUI(ordineMissione);
         inizializzaCampiPerInserimento(ordineMissione);
         boolean updateOrdineMissione = false;
         calcSpeseTotOrdine(ordineMissione, null);
         validaCRUD(ordineMissione, updateOrdineMissione);
-        ordineMissione = (OrdineMissione) crudServiceBean.creaConBulk(ordineMissione);
+        ordineMissione = ordineMissioneRepository.save(ordineMissione);
         // autoPropriaRepository.save(autoPropria);
         log.debug("Created Information for User: {}", ordineMissione);
         return ordineMissione;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void verifyStepRespGruppo(OrdineMissione ordineMissione) throws ComponentException {
+    public void verifyStepRespGruppo(OrdineMissione ordineMissione) throws AwesomeException {
         log.info("Start 2 Resp gruppo");
         DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
                 ordineMissione.getAnno());
@@ -994,7 +979,7 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void verifyStepAmministrativo(OrdineMissione ordineMissione) throws ComponentException {
+    public void verifyStepAmministrativo(OrdineMissione ordineMissione) throws AwesomeException {
         log.info("Start 2 Amm");
         DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
                 ordineMissione.getAnno());
@@ -1037,7 +1022,7 @@ public class OrdineMissioneService {
     }
 
     private void inizializzaCampiPerInserimento(OrdineMissione ordineMissione)
-            throws ComponentException {
+            throws AwesomeException {
         ordineMissione.setUidInsert(securityService.getCurrentUserLogin());
         ordineMissione.setUser(securityService.getCurrentUserLogin());
         Integer anno = recuperoAnno(ordineMissione);
@@ -1100,12 +1085,12 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione)
-            throws ComponentException {
+            throws AwesomeException {
         return updateOrdineMissione(ordineMissione, false);
     }
 
     private OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows)
-            throws ComponentException {
+            throws AwesomeException {
         return updateOrdineMissione(ordineMissione, fromFlows, false);
     }
 
@@ -1153,11 +1138,15 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     "Non Autorizzato");
         }
-        OrdineMissione ordineMissioneDB = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class,
-                ordineMissione.getId());
+        OrdineMissione ordineMissioneDB = ordineMissioneRepository.findById((Long) ordineMissione.getId()).orElse(null);
+
+        if (ordineMissioneDB == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
+        }
+
         try {
-            crudServiceBean.lockBulk(ordineMissioneDB);
-        } catch (ComponentException | OptimisticLockException | PersistencyException | BusyResourceException e) {
+            entityManager.lock(ordineMissioneDB, LockModeType.OPTIMISTIC);
+        } catch (OptimisticLockException e) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     "Ordine in modifica. Ripetere l'operazione. ID: " + ordineMissioneDB.getId());
         }
@@ -1364,7 +1353,7 @@ public class OrdineMissioneService {
 
         }
 
-        ordineMissioneDB = (OrdineMissione) crudServiceBean.modificaConBulk(ordineMissioneDB);
+        ordineMissioneDB = ordineMissioneRepository.save(ordineMissioneDB);
 
         // autoPropriaRepository.save(autoPropria);
         log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
@@ -1404,8 +1393,6 @@ public class OrdineMissioneService {
             ordineMissione.setTotaleSpesePresComplessivo(totaleSpesaOrdine);
         }
     }
-
-
 
 
     private void aggiornaDatiOrdineMissione(OrdineMissione ordineMissione, Boolean confirm,
@@ -1540,8 +1527,7 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteOrdineMissione(Long idOrdineMissione) {
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class,
-                idOrdineMissione);
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
         if (ordineMissione != null && isUserEnabledToViewMissione(ordineMissione)) {
             controlloOperazioniCRUDDaGui(ordineMissione);
             ordineMissioneAnticipoService.deleteAnticipo(ordineMissione);
@@ -1557,7 +1543,7 @@ public class OrdineMissioneService {
             if (ordineMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
                 cmisOrdineMissioneService.annullaFlusso(ordineMissione);
             }
-            crudServiceBean.modificaConBulk(ordineMissione);
+            ordineMissioneRepository.save(ordineMissione);
         }
     }
 
@@ -1952,10 +1938,9 @@ public class OrdineMissioneService {
     }
 
     public List<CMISFileAttachment> getAttachments(Long idOrdineMissione)
-            throws ComponentException {
+            throws AwesomeException {
         if (idOrdineMissione != null) {
-            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class,
-                    idOrdineMissione);
+            OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
             if (ordineMissione != null && isUserEnabledToViewMissione(ordineMissione)) {
                 List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsOrdineMissione(ordineMissione,
                         idOrdineMissione);
@@ -1966,9 +1951,8 @@ public class OrdineMissioneService {
     }
 
     public CMISFileAttachment uploadAllegato(Long idOrdineMissione, InputStream inputStream,
-                                             String name, MimeTypes mimeTypes) throws ComponentException {
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class,
-                idOrdineMissione);
+                                             String name, MimeTypes mimeTypes) throws AwesomeException {
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
         if (ordineMissione != null && isUserEnabledToViewMissione(ordineMissione)) {
             return cmisOrdineMissioneService.uploadAttachmentOrdineMissione(ordineMissione, idOrdineMissione,
                     inputStream, name, mimeTypes);
@@ -1978,8 +1962,7 @@ public class OrdineMissioneService {
 
     public void gestioneCancellazioneAllegati(String idNodo, Long idOrdineMissione) {
         if (idOrdineMissione != null) {
-            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class,
-                    idOrdineMissione);
+            OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
             if (ordineMissione != null && StringUtils.hasLength(ordineMissione.getIdFlusso()) && isUserEnabledToViewMissione(ordineMissione)) {
                 StorageObject folderOrdineMissione = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
                 missioniCMISService.eliminaFilePresenteNelFlusso(idNodo, folderOrdineMissione);
@@ -1990,7 +1973,7 @@ public class OrdineMissioneService {
     }
 
     public void popolaCoda(String id) {
-        OrdineMissione missione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, Long.valueOf(id));
+        OrdineMissione missione = ordineMissioneRepository.findById(Long.valueOf(id)).orElse(null);
         popolaCoda(missione);
     }
 
@@ -2025,7 +2008,7 @@ public class OrdineMissioneService {
         popolaCoda(ordineMissioneDaAggiornare);
     }
 
-    public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione missione) throws ComponentException {
+    public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione missione) throws AwesomeException {
         return cmisOrdineMissioneService.getAllDocumentsOrdineMissione(missione);
     }
 

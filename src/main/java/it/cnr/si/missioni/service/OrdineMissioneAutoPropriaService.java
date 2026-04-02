@@ -18,33 +18,29 @@
  */
 
 package it.cnr.si.missioni.service;
-
-
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoPropria;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
 import it.cnr.si.missioni.repository.SpostamentiAutoPropriaRepository;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,76 +64,96 @@ public class OrdineMissioneAutoPropriaService {
     private PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
 
     @Autowired
+    @Lazy
     private OrdineMissioneService ordineMissioneService;
-
 
     @Autowired
     private MissioniCMISService missioniCMISService;
 
     @Autowired
+    @Lazy
     private CMISOrdineMissioneService cmisOrdineMissioneService;
-
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    private OrdineMissioneRepository ordineMissioneRepository;
+
+
     @Transactional(readOnly = true)
-    public OrdineMissioneAutoPropria getAutoPropria(Long idMissione) throws ComponentException {
+    public OrdineMissioneAutoPropria getAutoPropria(Long idMissione) throws AwesomeException {
         return getAutoPropria(idMissione, false);
     }
 
     @Transactional(readOnly = true)
-    public OrdineMissioneAutoPropria getAutoPropria(Long idMissione, Boolean valorizzaDatiCollegati) throws ComponentException {
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, idMissione);
+    public OrdineMissioneAutoPropria getAutoPropria(Long idMissione, Boolean valorizzaDatiCollegati) throws AwesomeException {
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idMissione)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "OrdineMissione con ID " + idMissione + " non trovato"
+                ));
 
-        if (ordineMissione != null) {
-            OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
+        OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
 
-            if (valorizzaDatiCollegati && ordineMissioneAutoPropria != null) {
-                List<SpostamentiAutoPropria> list = spostamentiAutoPropriaRepository.getSpostamenti(ordineMissioneAutoPropria);
-                ordineMissioneAutoPropria.setOrdineMissione(ordineMissione);
-                ordineMissioneAutoPropria.setListSpostamenti(list);
-            }
-            return ordineMissioneAutoPropria;
+        if (valorizzaDatiCollegati && ordineMissioneAutoPropria != null) {
+            List<SpostamentiAutoPropria> list = spostamentiAutoPropriaRepository.getSpostamenti(ordineMissioneAutoPropria);
+            ordineMissioneAutoPropria.setOrdineMissione(ordineMissione);
+            ordineMissioneAutoPropria.setListSpostamenti(list);
         }
-        return null;
+
+        return ordineMissioneAutoPropria;
     }
 
     @Transactional(readOnly = true)
-    public List<SpostamentiAutoPropria> getSpostamentiAutoPropria(Long idAutoPropriaOrdineMissione) throws ComponentException {
-        OrdineMissioneAutoPropria autoPropriaOrdineMissione = (OrdineMissioneAutoPropria) crudServiceBean.findById(OrdineMissioneAutoPropria.class, idAutoPropriaOrdineMissione);
+    public List<SpostamentiAutoPropria> getSpostamentiAutoPropria(Long idAutoPropriaOrdineMissione) throws AwesomeException {
+        OrdineMissioneAutoPropria autoPropriaOrdineMissione = ordineMissioneAutoPropriaRepository.findById(idAutoPropriaOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "OrdineMissioneAutoPropria con ID " + idAutoPropriaOrdineMissione + " non trovato"
+                ));
 
-        if (autoPropriaOrdineMissione != null) {
-            List<SpostamentiAutoPropria> lista = spostamentiAutoPropriaRepository.getSpostamenti(autoPropriaOrdineMissione);
-            return lista;
-        }
-        return null;
+        return spostamentiAutoPropriaRepository.getSpostamenti(autoPropriaOrdineMissione);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissioneAutoPropria createAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException,
-            ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public OrdineMissioneAutoPropria createAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria)
+            throws AwesomeException, OptimisticLockException {
+
         ordineMissioneAutoPropria.setUid(securityService.getCurrentUserLogin());
         ordineMissioneAutoPropria.setUser(securityService.getCurrentUserLogin());
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, ordineMissioneAutoPropria.getOrdineMissione().getId());
-        if (ordineMissione != null) {
-            ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
-        }
+
+        // Recupera l'OrdineMissione dal repository e lancia eccezione se non trovato
+        OrdineMissioneAutoPropria finalOrdineMissioneAutoPropria = ordineMissioneAutoPropria;
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(
+                (Long) ordineMissioneAutoPropria.getOrdineMissione().getId()
+        ).orElseThrow(() -> new AwesomeException(
+                CodiciErrore.ERRGEN,
+                "OrdineMissione con ID " + finalOrdineMissioneAutoPropria.getOrdineMissione().getId() + " non trovato"
+        ));
+
+        // Controlli CRUD sulla GUI
+        ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
+
         ordineMissioneAutoPropria.setOrdineMissione(ordineMissione);
         ordineMissioneAutoPropria.setStato(Costanti.STATO_INSERITO);
         ordineMissioneAutoPropria.setToBeCreated();
+
+        // Verifica se esiste già un record auto propria per questo ordine
         OrdineMissioneAutoPropria otherAuto = ordineMissioneAutoPropriaRepository.getAutoPropria(ordineMissione);
         if (otherAuto != null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati dell'auto propria già inseriti.");
         }
 
         validaCRUD(ordineMissioneAutoPropria);
-        ordineMissioneAutoPropria = (OrdineMissioneAutoPropria) crudServiceBean.creaConBulk(ordineMissioneAutoPropria);
+
+        // Salva l'entità
+        ordineMissioneAutoPropria = ordineMissioneAutoPropriaRepository.save(ordineMissioneAutoPropria);
         log.debug("Created Information for OrdineMissioneAutoPropria: {}", ordineMissioneAutoPropria);
+
         return ordineMissioneAutoPropria;
     }
+
 
     private void validaCRUD(OrdineMissioneAutoPropria ordineMissioneAutoPropria) {
         // Verifica se i dati dell'auto propria sono completi
@@ -178,43 +194,61 @@ public class OrdineMissioneAutoPropriaService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public SpostamentiAutoPropria createSpostamentoAutoPropria(SpostamentiAutoPropria spostamentoAutoPropria) throws AwesomeException,
-            ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public SpostamentiAutoPropria createSpostamentoAutoPropria(SpostamentiAutoPropria spostamentoAutoPropria)
+            throws AwesomeException, OptimisticLockException {
+
         spostamentoAutoPropria.setUid(securityService.getCurrentUserLogin());
         spostamentoAutoPropria.setUser(securityService.getCurrentUserLogin());
         spostamentoAutoPropria.setStato(Costanti.STATO_INSERITO);
-        OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria) crudServiceBean.findById(OrdineMissioneAutoPropria.class, spostamentoAutoPropria.getOrdineMissioneAutoPropria().getId());
-        if (ordineMissioneAutoPropria != null) {
-            ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropria.getOrdineMissione());
-        }
+
+        // Recupera l'OrdineMissioneAutoPropria dal repository, lancia eccezione se non trovato
+        SpostamentiAutoPropria finalSpostamentoAutoPropria = spostamentoAutoPropria;
+        OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaRepository.findById(
+                (Long) spostamentoAutoPropria.getOrdineMissioneAutoPropria().getId()
+        ).orElseThrow(() -> new AwesomeException(
+                CodiciErrore.ERRGEN,
+                "OrdineMissioneAutoPropria con ID " + finalSpostamentoAutoPropria.getOrdineMissioneAutoPropria().getId() + " non trovato"
+        ));
+
+        // Controlli CRUD sulla GUI dell'ordine missione collegato
+        ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropria.getOrdineMissione());
 
         spostamentoAutoPropria.setOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+
+        // Calcolo della riga successiva
         Long maxRiga = spostamentiAutoPropriaRepository.getMaxRigaSpostamenti(ordineMissioneAutoPropria);
-        if (maxRiga == null) {
-            maxRiga = Long.valueOf(0);
-        }
-        maxRiga = maxRiga + 1;
+        maxRiga = (maxRiga != null ? maxRiga : 0L) + 1;
         spostamentoAutoPropria.setRiga(maxRiga);
+
         spostamentoAutoPropria.setToBeCreated();
         validaCRUD(spostamentoAutoPropria);
-        spostamentoAutoPropria = (SpostamentiAutoPropria) crudServiceBean.creaConBulk(spostamentoAutoPropria);
-//    	autoPropriaRepository.save(autoPropria);
-        log.debug("Created Information for OrdineMissioneAutoPropria: {}", ordineMissioneAutoPropria);
+
+        // Salvataggio
+        spostamentoAutoPropria = spostamentiAutoPropriaRepository.save(spostamentoAutoPropria);
+
+        log.debug("Created Information for SpostamentiAutoPropria: {}", spostamentoAutoPropria);
+
         return spostamentoAutoPropria;
     }
 
+
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissioneAutoPropria updateAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException,
-            ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public OrdineMissioneAutoPropria updateAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria)
+            throws AwesomeException, OptimisticLockException {
 
-        OrdineMissioneAutoPropria ordineMissioneAutoPropriaDB = (OrdineMissioneAutoPropria) crudServiceBean.findById(OrdineMissioneAutoPropria.class, ordineMissioneAutoPropria.getId());
+        // Recupera l'entità dal repository, lancia eccezione se non esiste
+        OrdineMissioneAutoPropria ordineMissioneAutoPropriaDB = ordineMissioneAutoPropriaRepository.findById((Long) ordineMissioneAutoPropria.getId())
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Auto Propria Ordine di Missione da aggiornare inesistente."
+                ));
 
-        if (ordineMissioneAutoPropriaDB == null)
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Auto Propria Ordine di Missione da aggiornare inesistente.");
-
+        // Controllo operazioni CRUD sulla missione collegata
         if (ordineMissioneAutoPropriaDB.getOrdineMissione() != null) {
             ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissioneAutoPropriaDB.getOrdineMissione());
         }
+
+        // Aggiorna i campi dell'auto propria
         ordineMissioneAutoPropriaDB.setTarga(ordineMissioneAutoPropria.getTarga());
         ordineMissioneAutoPropriaDB.setMarca(ordineMissioneAutoPropria.getMarca());
         ordineMissioneAutoPropriaDB.setModello(ordineMissioneAutoPropria.getModello());
@@ -222,31 +256,37 @@ public class OrdineMissioneAutoPropriaService {
         ordineMissioneAutoPropriaDB.setEntePatente(ordineMissioneAutoPropria.getEntePatente());
         ordineMissioneAutoPropriaDB.setUtilizzoMotiviIspettivi(ordineMissioneAutoPropria.getUtilizzoMotiviIspettivi());
         ordineMissioneAutoPropriaDB.setUtilizzoMotiviSediDisagiate(ordineMissioneAutoPropria.getUtilizzoMotiviSediDisagiate());
-        /*ordineMissioneAutoPropriaDB.setUtilizzoMotiviTrasporto(ordineMissioneAutoPropria.getUtilizzoMotiviTrasporto());
-        ordineMissioneAutoPropriaDB.setUtilizzoMotiviUrgenza(ordineMissioneAutoPropria.getUtilizzoMotiviUrgenza());*/
         ordineMissioneAutoPropriaDB.setUtilizzoAltriMotivi(ordineMissioneAutoPropria.getUtilizzoAltriMotivi());
 
         ordineMissioneAutoPropriaDB.setToBeUpdated();
 
-
+        // Validazione e salvataggio
         validaCRUD(ordineMissioneAutoPropriaDB);
-        ordineMissioneAutoPropriaDB = (OrdineMissioneAutoPropria) crudServiceBean.modificaConBulk(ordineMissioneAutoPropriaDB);
+        ordineMissioneAutoPropriaDB = ordineMissioneAutoPropriaRepository.save(ordineMissioneAutoPropriaDB);
 
         log.debug("Updated Information for Auto Propria Ordine di Missione: {}", ordineMissioneAutoPropriaDB);
-        return ordineMissioneAutoPropria;
+        return ordineMissioneAutoPropriaDB;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteAutoPropria(Long idAutoPropriaOrdineMissione) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
-        OrdineMissioneAutoPropria ordineMissioneAutoPropria = (OrdineMissioneAutoPropria) crudServiceBean.findById(OrdineMissioneAutoPropria.class, idAutoPropriaOrdineMissione);
+    public void deleteAutoPropria(Long idAutoPropriaOrdineMissione)
+            throws AwesomeException, OptimisticLockException {
 
-        if (ordineMissioneAutoPropria != null) {
-            String nodeRef = cmisOrdineMissioneService.getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria, false);
-            if (nodeRef != null) {
-                missioniCMISService.deleteNode(nodeRef);
-            }
-            cancellaOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
+        // Recupera l'OrdineMissioneAutoPropria dal repository, lancia eccezione se non trovato
+        OrdineMissioneAutoPropria ordineMissioneAutoPropria = ordineMissioneAutoPropriaRepository.findById(idAutoPropriaOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "OrdineMissioneAutoPropria con ID " + idAutoPropriaOrdineMissione + " non trovato"
+                ));
+
+        // Recupera il nodo CMIS e lo elimina se presente
+        String nodeRef = cmisOrdineMissioneService.getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria, false);
+        if (nodeRef != null) {
+            missioniCMISService.deleteNode(nodeRef);
         }
+
+        // Cancella l'ordine auto propria
+        cancellaOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -260,22 +300,22 @@ public class OrdineMissioneAutoPropriaService {
 
     private void cancellaOrdineMissioneAutoPropria(
             OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-            throws ComponentException {
+            throws AwesomeException {
         cancellaSpostamenti(ordineMissioneAutoPropria);
         cancellaDatiAutoPropriaOrdineMissione(ordineMissioneAutoPropria);
     }
 
     private void cancellaDatiAutoPropriaOrdineMissione(
             OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-            throws ComponentException {
+            throws AwesomeException {
         ordineMissioneAutoPropria.setToBeUpdated();
         ordineMissioneAutoPropria.setStato(Costanti.STATO_ANNULLATO);
-        crudServiceBean.modificaConBulk(ordineMissioneAutoPropria);
+        ordineMissioneAutoPropriaRepository.save(ordineMissioneAutoPropria);
     }
 
     private void cancellaSpostamenti(
             OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-            throws ComponentException {
+            throws AwesomeException {
         List<SpostamentiAutoPropria> listaSpostamenti = spostamentiAutoPropriaRepository.getSpostamenti(ordineMissioneAutoPropria);
         if (listaSpostamenti != null && !listaSpostamenti.isEmpty()) {
             for (Iterator<SpostamentiAutoPropria> iterator = listaSpostamenti.iterator(); iterator.hasNext(); ) {
@@ -286,47 +326,56 @@ public class OrdineMissioneAutoPropriaService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteSpostamenti(Long idSpostamenti) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
-        SpostamentiAutoPropria spostamentiAutoPropria = (SpostamentiAutoPropria) crudServiceBean.findById(SpostamentiAutoPropria.class, idSpostamenti);
+    public void deleteSpostamenti(Long idSpostamenti) throws AwesomeException, OptimisticLockException {
+        // Recupera lo spostamento dal repository, lancia eccezione se non esiste
+        SpostamentiAutoPropria spostamento = spostamentiAutoPropriaRepository.findById(idSpostamenti)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Spostamento Auto Propria con id " + idSpostamenti + " inesistente."
+                ));
 
-        //effettuo controlli di validazione operazione CRUD
-        if (spostamentiAutoPropria != null) {
-            cancellaSpostamento(spostamentiAutoPropria);
-        }
+        // Effettua controlli di validazione operazione CRUD se necessario
+        cancellaSpostamento(spostamento);
     }
 
-    private void cancellaSpostamento(SpostamentiAutoPropria spostamentiAutoPropria) throws ComponentException {
+    private void cancellaSpostamento(SpostamentiAutoPropria spostamentiAutoPropria) throws AwesomeException {
         spostamentiAutoPropria.setToBeUpdated();
         spostamentiAutoPropria.setStato(Costanti.STATO_ANNULLATO);
-        crudServiceBean.modificaConBulk(spostamentiAutoPropria);
+        spostamentiAutoPropriaRepository.save(spostamentiAutoPropria);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public SpostamentiAutoPropria updateSpostamenti(SpostamentiAutoPropria spostamentiAutoPropria) throws AwesomeException,
-            ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+    public SpostamentiAutoPropria updateSpostamenti(SpostamentiAutoPropria spostamentiAutoPropria)
+            throws AwesomeException, OptimisticLockException {
 
-        SpostamentiAutoPropria spostamentiAutoPropriaDB = (SpostamentiAutoPropria) crudServiceBean.findById(SpostamentiAutoPropria.class, spostamentiAutoPropria.getId());
+        // Recupera lo spostamento dal repository, lancia eccezione se non esiste
+        SpostamentiAutoPropria spostamentiDB = spostamentiAutoPropriaRepository.findById((Long) spostamentiAutoPropria.getId())
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Spostamenti Auto Propria Ordine di Missione da aggiornare inesistente."
+                ));
 
-        if (spostamentiAutoPropriaDB == null)
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Spostamenti Auto Propria Ordine di Missione da aggiornare inesistente.");
-
-        if (spostamentiAutoPropriaDB.getOrdineMissioneAutoPropria().getOrdineMissione() != null) {
-            ordineMissioneService.controlloOperazioniCRUDDaGui(spostamentiAutoPropriaDB.getOrdineMissioneAutoPropria().getOrdineMissione());
+        // Controllo operazioni CRUD sull'ordine di missione collegato
+        if (spostamentiDB.getOrdineMissioneAutoPropria().getOrdineMissione() != null) {
+            ordineMissioneService.controlloOperazioniCRUDDaGui(
+                    spostamentiDB.getOrdineMissioneAutoPropria().getOrdineMissione()
+            );
         }
-        spostamentiAutoPropriaDB.setPercorsoDa(spostamentiAutoPropria.getPercorsoDa());
-        spostamentiAutoPropriaDB.setPercorsoA(spostamentiAutoPropria.getPercorsoA());
 
-        spostamentiAutoPropriaDB.setToBeUpdated();
+        // Aggiornamento campi modificabili
+        spostamentiDB.setPercorsoDa(spostamentiAutoPropria.getPercorsoDa());
+        spostamentiDB.setPercorsoA(spostamentiAutoPropria.getPercorsoA());
+        spostamentiDB.setToBeUpdated();
 
+        // Salvataggio aggiornamento
+        spostamentiDB = spostamentiAutoPropriaRepository.save(spostamentiDB);
 
-        spostamentiAutoPropriaDB = (SpostamentiAutoPropria) crudServiceBean.modificaConBulk(spostamentiAutoPropriaDB);
-
-        log.debug("Updated Information for Spostamenti: {}", spostamentiAutoPropriaDB);
-        return spostamentiAutoPropria;
+        log.debug("Updated Information for Spostamenti: {}", spostamentiDB);
+        return spostamentiDB;
     }
 
     @Transactional(readOnly = true)
-    public Map<String, byte[]> printOrdineMissioneAutoPropria(Long idMissione) throws AwesomeException, ComponentException {
+    public Map<String, byte[]> printOrdineMissioneAutoPropria(Long idMissione) throws AwesomeException {
         String username = securityService.getCurrentUserLogin();
         OrdineMissioneAutoPropria ordineMissioneAutoPropria = getAutoPropria(idMissione, true);
         OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
@@ -348,7 +397,7 @@ public class OrdineMissioneAutoPropriaService {
 
     private byte[] printAutoPropria(String username,
                                     OrdineMissioneAutoPropria ordineMissioneAutoPropria)
-            throws ComponentException {
+            throws AwesomeException {
         byte[] print = printOrdineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(ordineMissioneAutoPropria, username);
         return print;
     }

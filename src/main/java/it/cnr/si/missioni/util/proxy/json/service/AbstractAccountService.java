@@ -22,16 +22,18 @@ package it.cnr.si.missioni.util.proxy.json.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
-import it.cnr.si.domain.CNRUser;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
+import it.cnr.si.missioni.domain.custom.CNRUser;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
+import it.cnr.si.missioni.model.UserInfoDto;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.service.showcase.ACEService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
@@ -42,19 +44,14 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.DatiDirettore;
 import it.cnr.si.missioni.util.proxy.json.object.DatiGruppoSAC;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
-import it.cnr.si.model.UserInfoDto;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -64,13 +61,14 @@ import java.util.stream.Collectors;
 @SpringBootApplication(scanBasePackages = {
         "it.cnr.si.service"})
 
-public abstract class AbstractAccountService implements AccountService{
+public abstract class AbstractAccountService implements AccountService {
     private static final Log logger = LogFactory.getLog(AbstractAccountService.class);
     @Autowired(required = false)
     MissioniAceService missioniAceService;
     @Autowired
     private ProxyService proxyService;
     @Autowired
+    
     private ConfigService configService;
     @Autowired
     private DatiSedeService datiSedeService;
@@ -79,6 +77,7 @@ public abstract class AbstractAccountService implements AccountService{
     @Autowired
     private DatiIstitutoService datiIstitutoService;
     @Autowired
+    
     private UoService uoService;
     @Autowired(required = false)
     private ACEService aceServiceShowcase;
@@ -184,7 +183,7 @@ public abstract class AbstractAccountService implements AccountService{
         return createResponseForAccountRest(account, user);
     }
 
-     private String getResponseAccount(Account account, Boolean loadSpecialUserData) {
+    private String getResponseAccount(Account account, Boolean loadSpecialUserData) {
         UsersSpecial user = null;
         if (loadSpecialUserData) {
             user = loadUserSpecial(account.getUid());
@@ -231,7 +230,7 @@ public abstract class AbstractAccountService implements AccountService{
         return account;
     }
 
-    abstract public String getAccount(Boolean loadSpecialUserData) ;
+    abstract public String getAccount(Boolean loadSpecialUserData);
 
     public String getAccountFromUsername(String username, Boolean loadSpecialUserData) {
         it.cnr.si.service.dto.anagrafica.UserInfoDto userInfoDto = null;
@@ -271,7 +270,7 @@ public abstract class AbstractAccountService implements AccountService{
         return null;
     }
 
-    abstract protected Account getAccountWithoutRole() ;
+    abstract protected Account getAccountWithoutRole();
 
     public String getResponseAccountWithoutRole() {
         return getResponseAccountWithoutRole(false);
@@ -523,11 +522,11 @@ public abstract class AbstractAccountService implements AccountService{
             if (account != null) {
                 return nuovo;
             } else {
-                logger.error("Impossibile creare UsersSpecial: Account non trovato per uid: "+uid );
+                logger.error("Impossibile creare UsersSpecial: Account non trovato per uid: " + uid);
                 return null;
             }
         } catch (Exception e) {
-            logger.error("Errore durante la ricerca o creazione di UsersSpecial per uid: "+uid);
+            logger.error("Errore durante la ricerca o creazione di UsersSpecial per uid: " + uid);
             return null;
         }
     }

@@ -22,10 +22,9 @@ package it.cnr.si.missioni.service;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.DatiPatente;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.DatiPatenteRepository;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Service class for managing users.
@@ -46,8 +45,6 @@ public class DatiPatenteService {
     @Autowired
     private DatiPatenteRepository datiPatenteRepository;
 
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     @Autowired
     private SecurityService securityService;
@@ -59,22 +56,24 @@ public class DatiPatenteService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public DatiPatente createDatiPatente(DatiPatente datiPatente) {
-        datiPatente.setUser(securityService.getCurrentUserLogin());
+        datiPatente.setUid(securityService.getCurrentUserLogin());
         datiPatente.setToBeCreated();
-        //effettuo controlli di validazione operazione CRUD
         validaCRUD(datiPatente);
-        datiPatente = (DatiPatente) crudServiceBean.creaConBulk(datiPatente);
+        datiPatente = datiPatenteRepository.save(datiPatente);
         log.debug("Created Information for Dati Patente: {}", datiPatente);
+
         return datiPatente;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public DatiPatente updateDatiPatente(DatiPatente datiPatente) {
 
-        DatiPatente datiPatenteDB = (DatiPatente) crudServiceBean.findById(DatiPatente.class, datiPatente.getId());
-
-        if (datiPatenteDB == null)
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Dati patente da aggiornare inesistente.");
+        DatiPatente datiPatenteDB = datiPatenteRepository
+                .findById((Long) datiPatente.getId())
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Dati patente da aggiornare inesistente."
+                ));
 
         datiPatenteDB.setNumero(datiPatente.getNumero());
         datiPatenteDB.setDataRilascio(datiPatente.getDataRilascio());
@@ -82,25 +81,32 @@ public class DatiPatenteService {
         datiPatenteDB.setEnte(datiPatente.getEnte());
         datiPatenteDB.setToBeUpdated();
 
-        //effettuo controlli di validazione operazione CRUD
         validaCRUD(datiPatenteDB);
 
-        datiPatente = (DatiPatente) crudServiceBean.modificaConBulk(datiPatenteDB);
+        datiPatenteDB = datiPatenteRepository.save(datiPatenteDB);
 
-//    	autoPropriaRepository.save(autoPropria);
-        log.debug("Updated Information for Dati Patente: {}", datiPatente);
-        return datiPatente;
+        log.debug("Updated Information for Dati Patente: {}", datiPatenteDB);
+        return datiPatenteDB;
     }
 
     private void validaCRUD(DatiPatente datiPatente) {
-        Date oggi = new Date(System.currentTimeMillis());
+
+        LocalDateTime oggi = LocalDateTime.now();
         if (datiPatente.getDataRilascio() != null) {
-            if (oggi.before(datiPatente.getDataRilascio())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data odierna.");
+            // oggi prima della data rilascio = errore
+            if (oggi.isBefore(datiPatente.getDataRilascio())) {
+                throw new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "La data di rilascio della patente non può essere successiva alla data odierna."
+                );
             }
             if (datiPatente.getDataScadenza() != null) {
-                if (datiPatente.getDataScadenza().before(datiPatente.getDataRilascio())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "La data di rilascio della patente non può essere successiva alla data di scadenza.");
+                // scadenza prima di rilascio = errore
+                if (datiPatente.getDataScadenza().isBefore(datiPatente.getDataRilascio())) {
+                    throw new AwesomeException(
+                            CodiciErrore.ERRGEN,
+                            "La data di rilascio della patente non può essere successiva alla data di scadenza."
+                    );
                 }
             }
         }

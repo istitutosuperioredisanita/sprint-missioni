@@ -20,15 +20,13 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import it.cnr.jada.criteria.Projection;
-import it.cnr.jada.criteria.projections.Projections;
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -38,21 +36,10 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "ANNULLAMENTO_ORDINE_MISSIONE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_ANNULLAMENTO", allocationSize = 0)
-public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
+public class AnnullamentoOrdineMissione extends BaseEntity {
 
     public final static String CMIS_PROPERTY_NAME_DOC_ANNULLAMENTO = "Principale";
     public final static String CMIS_PROPERTY_NAME_TIPODOC_ANNULLAMENTO = "Annullamento Ordine di Missione";
-    public static final Projection PROJECTIONLIST_ELENCO_MISSIONI = Projections.projectionList().
-            add(Projections.property("id")).
-            add(Projections.property("anno")).
-            add(Projections.property("numero")).
-            add(Projections.property("dataInserimento")).
-            add(Projections.property("uid")).
-            add(Projections.property("stato")).
-            add(Projections.property("statoFlusso")).
-            add(Projections.property("idFlusso")).
-            add(Projections.property("motivo")).
-            add(Projections.property("validato"));
     @Size(min = 0, max = 256)
     @Column(name = "UID_INSERT", length = 256, nullable = false)
     public String uidInsert;
@@ -146,11 +133,6 @@ public class AnnullamentoOrdineMissione extends OggettoBulkXmlTransient {
 
     public AnnullamentoOrdineMissione() {
         super();
-    }
-
-    @XmlTransient
-    public static Projection getProjectionForElencoMissioni() {
-        return PROJECTIONLIST_ELENCO_MISSIONI;
     }
 
     public String getCommentoFlusso() {

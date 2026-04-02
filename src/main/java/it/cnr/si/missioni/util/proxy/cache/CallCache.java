@@ -133,18 +133,17 @@ public class CallCache implements DataSerializable {
             m.update(objectToString.getBytes(), 0, objectToString.length());
             return new BigInteger(1, m.digest()).toString(16);
         } catch (NoSuchAlgorithmException e) {
-            new AwesomeException("Errore nel recupero dell'algoritmo MD5 " + e.getMessage());
+            throw new AwesomeException("Errore nel recupero dell'algoritmo MD5 " + e.getMessage());
         }
-        return "";
     }
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeUTF(toString());
+        out.writeString(toString());
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        in.readData();
+        in.readString();
     }
 }

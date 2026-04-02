@@ -20,7 +20,6 @@
 package it.cnr.si.missioni.util.proxy.json.object.impegno;
 
 import com.fasterxml.jackson.annotation.*;
-import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.HashMap;
 import java.util.Map;

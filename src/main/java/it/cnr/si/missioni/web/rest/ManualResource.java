@@ -19,13 +19,14 @@
 
 package it.cnr.si.missioni.web.rest;
 
+
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachmentComplete;
 import it.cnr.si.missioni.service.ManualService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -61,7 +62,7 @@ public class ManualResource {
         try {
             List<CMISFileAttachmentComplete> lista = manualService.getManuals();
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getManuals", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }

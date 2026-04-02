@@ -32,8 +32,8 @@
 //import org.springframework.web.bind.annotation.*;
 //import org.springframework.web.multipart.MultipartFile;
 //
-//import javax.annotation.security.RolesAllowed;
-//import javax.servlet.http.HttpServletRequest;
+//import jakarta.annotation.security.RolesAllowed;
+//import jakarta.servlet.http.HttpServletRequest;
 //
 //@RolesAllowed({AuthoritiesConstants.USER})
 //@RestController

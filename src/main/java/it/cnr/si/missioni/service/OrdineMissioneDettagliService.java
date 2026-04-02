@@ -19,20 +19,15 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneDettagli;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.OrdineMissioneDettagliRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.service.SecurityService;
+import jakarta.persistence.OptimisticLockException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +36,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.OptimisticLockException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for managing users.
@@ -56,6 +50,9 @@ public class OrdineMissioneDettagliService {
     private final Logger log = LoggerFactory.getLogger(OrdineMissioneDettagliService.class);
 
     @Autowired
+    private OrdineMissioneRepository ordineMissioneRepository;
+
+    @Autowired
     private OrdineMissioneDettagliRepository ordineMissioneDettagliRepository;
 
     @Autowired
@@ -63,10 +60,6 @@ public class OrdineMissioneDettagliService {
 
     @Autowired
     private SecurityService securityService;
-
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
-    // Removed Environment env as it's no longer used for profile checking or print name config here
 
     @Autowired
     private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
@@ -82,20 +75,20 @@ public class OrdineMissioneDettagliService {
 
     @Transactional(readOnly = true)
     public List<OrdineMissioneDettagli> getOrdineMissioneDettagli(Long idOrdineMissione)
-            throws ComponentException {
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(
-                OrdineMissione.class, idOrdineMissione);
+            throws AwesomeException {
 
-        if (ordineMissione != null) {
-            List<OrdineMissioneDettagli> lista = ordineMissioneDettagliRepository
-                    .getOrdineMissioneDettagli(ordineMissione);
-            return lista;
-        }
-        return null;
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN,
+                        "Ordine Missione non trovato con ID: " + idOrdineMissione));
+
+        List<OrdineMissioneDettagli> lista = ordineMissioneDettagliRepository
+                .getOrdineMissioneDettagli(ordineMissione);
+
+        return lista != null ? lista : List.of(); // restituisce lista vuota se null
     }
 
 
-    private void validaCRUD(OrdineMissioneDettagli ordineMissioneDettagli) throws ComponentException {
+    private void validaCRUD(OrdineMissioneDettagli ordineMissioneDettagli) throws AwesomeException {
         // Removed kmPercorsi validation as kmPercorsi is not in the entity
         // Removed validaDettaglioOrdineService.valida call
 
@@ -202,41 +195,54 @@ public class OrdineMissioneDettagliService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissioneDettagli createOrdineMissioneDettagli(
-            OrdineMissioneDettagli ordineMissioneDettagli) throws AwesomeException, ComponentException,
-            OptimisticLockException, PersistencyException, BusyResourceException {
+            OrdineMissioneDettagli ordineMissioneDettagli) throws AwesomeException {
+
+        if (ordineMissioneDettagli == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "OrdineMissioneDettagli non può essere nullo.");
+        }
+
+        // Imposto utente e stato
         ordineMissioneDettagli.setUid(securityService.getCurrentUserLogin());
-        // Removed setting the 'user' field as it's not in the provided entity
         ordineMissioneDettagli.setStato(Costanti.STATO_INSERITO);
         if (ordineMissioneDettagli.getTiSpesaDiaria() == null) {
             ordineMissioneDettagli.setTiSpesaDiaria("S");
         }
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(
-                OrdineMissione.class, ordineMissioneDettagli.getOrdineMissione().getId());
-        if (ordineMissione != null) {
-            ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
-        } else {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non trovato.");
+
+        // Recupero OrdineMissione in modo sicuro
+        Long idOrdineMissione = ordineMissioneDettagli.getOrdineMissione() != null
+                ? (Long) ordineMissioneDettagli.getOrdineMissione().getId()
+                : null;
+
+        if (idOrdineMissione == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non specificato.");
         }
+
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non trovato."));
+
+        // Controlli CRUD su OrdineMissione
+        ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
+
+        // Associo l'ordine al dettaglio
         ordineMissioneDettagli.setOrdineMissione(ordineMissione);
+
+        // Calcolo la riga successiva
         Long maxRiga = ordineMissioneDettagliRepository.getMaxRigaDettaglio(ordineMissione);
-        if (maxRiga == null) {
-            maxRiga = Long.valueOf(0);
-        }
-        maxRiga = maxRiga + 1;
-        ordineMissioneDettagli.setRiga(maxRiga);
+        ordineMissioneDettagli.setRiga((maxRiga != null ? maxRiga : 0L) + 1);
+
+        // Imposto flag di creazione
         ordineMissioneDettagli.setToBeCreated();
+
+        // Validazioni
         controlloDatiObbligatoriDaGui(ordineMissioneDettagli);
         impostaImportoDivisa(ordineMissioneDettagli);
         validaCRUD(ordineMissioneDettagli);
-        // Removed call to controlliPasto
 
-        //controlliSpeseMezzi(ordineMissioneDettagli, ordineMissione);
+        // Salvataggio tramite repository
+        OrdineMissioneDettagli saved = ordineMissioneDettagliRepository.save(ordineMissioneDettagli);
 
-        // Removed call to aggiornaDatiImpegni
-
-        ordineMissioneDettagli = (OrdineMissioneDettagli) crudServiceBean.creaConBulk(ordineMissioneDettagli);
-        log.debug("Created Information for OrdineMissioneDettagli: {}", ordineMissioneDettagli);
-        return ordineMissioneDettagli;
+        log.debug("Created OrdineMissioneDettagli: {}", saved);
+        return saved;
     }
 
 
@@ -252,7 +258,7 @@ public class OrdineMissioneDettagliService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void cancellaOrdineMissioneDettagli(OrdineMissione ordineMissione,
-                                               Boolean deleteDocument) throws ComponentException {
+                                               Boolean deleteDocument) throws AwesomeException {
         List<OrdineMissioneDettagli> listaOrdineMissioneDettagli = ordineMissioneDettagliRepository
                 .getOrdineMissioneDettagli(ordineMissione);
         if (listaOrdineMissioneDettagli != null && !listaOrdineMissioneDettagli.isEmpty()) {
@@ -266,8 +272,7 @@ public class OrdineMissioneDettagliService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteOrdineMissioneDettagli(Long idOrdineMissioneDettagli)
-            throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException,
-            BusyResourceException {
+            throws AwesomeException, OptimisticLockException {
         OrdineMissioneDettagli ordineMissioneDettagli = getOrdineMissioneDettaglio(idOrdineMissioneDettagli);
 
         // effettuo controlli di validazione operazione CRUD
@@ -277,18 +282,40 @@ public class OrdineMissioneDettagliService {
         }
     }
 
-    public OrdineMissioneDettagli getOrdineMissioneDettaglio(Long idOrdineMissioneDettagli) {
-        OrdineMissioneDettagli ordineMissioneDettagli = (OrdineMissioneDettagli) crudServiceBean
-                .findById(OrdineMissioneDettagli.class, idOrdineMissioneDettagli);
-        return ordineMissioneDettagli;
+    /**
+     * Recupera un dettaglio OrdineMissioneDettagli per ID in modo sicuro.
+     */
+    public OrdineMissioneDettagli getOrdineMissioneDettaglio(Long idOrdineMissioneDettagli) throws AwesomeException {
+        if (idOrdineMissioneDettagli == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "ID OrdineMissioneDettagli non può essere nullo.");
+        }
+
+        return ordineMissioneDettagliRepository.findById(idOrdineMissioneDettagli)
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN,
+                        "Dettaglio Ordine Missione con ID " + idOrdineMissioneDettagli + " non trovato."));
     }
 
+    /**
+     * Annulla un dettaglio OrdineMissioneDettagli.
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
     private void cancellaOrdineMissioneDettagli(
-            OrdineMissioneDettagli ordineMissioneDettagli, Boolean deleteDocument) throws ComponentException {
+            OrdineMissioneDettagli ordineMissioneDettagli, Boolean deleteDocument) throws AwesomeException {
+
+        if (ordineMissioneDettagli == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "OrdineMissioneDettagli da cancellare non può essere nullo.");
+        }
+
+        // Imposto flag di update e stato
         ordineMissioneDettagli.setToBeUpdated();
         ordineMissioneDettagli.setStato(Costanti.STATO_ANNULLATO);
-        crudServiceBean.modificaConBulk(ordineMissioneDettagli);
-        // Removed CMIS attachment deletion logic as methods are removed
+
+        // Salvo direttamente con il repository
+        ordineMissioneDettagliRepository.save(ordineMissioneDettagli);
+
+        log.debug("OrdineMissioneDettagli annullato: {}", ordineMissioneDettagli);
+
+        // deleteDocument non gestito: la logica CMIS è stata rimossa
     }
 
     private void impostaImportoDivisa(OrdineMissioneDettagli ordineMissioneDettagli) {
@@ -299,26 +326,34 @@ public class OrdineMissioneDettagliService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public OrdineMissioneDettagli updateOrdineMissioneDettagli(
-            OrdineMissioneDettagli ordineMissioneDettagli) throws AwesomeException, ComponentException,
-            OptimisticLockException, PersistencyException, BusyResourceException {
+            OrdineMissioneDettagli ordineMissioneDettagli) throws AwesomeException, OptimisticLockException {
 
-        OrdineMissioneDettagli ordineMissioneDettagliDB = (OrdineMissioneDettagli) crudServiceBean
-                .findById(OrdineMissioneDettagli.class, ordineMissioneDettagli.getId());
-        if (ordineMissioneDettagliDB == null)
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Ordine Missione da aggiornare inesistente.");
-        OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(
-                OrdineMissione.class, ordineMissioneDettagli.getOrdineMissione().getId());
-        if (ordineMissione != null && !ordineMissioneDettagli.isModificaSoloDatiFinanziari(ordineMissioneDettagliDB)) {
-            ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
-        } else if (ordineMissione == null) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non trovato.");
+        if (ordineMissioneDettagli == null || ordineMissioneDettagli.getId() == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Dettaglio Ordine Missione da aggiornare non valido.");
         }
-        ordineMissioneDettagli.setOrdineMissione(ordineMissione);
 
+        // Recupero il dettaglio dal repository
+        OrdineMissioneDettagli ordineMissioneDettagliDB = ordineMissioneDettagliRepository
+                .findById((Long) ordineMissioneDettagli.getId())
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN,
+                        "Dettaglio Ordine Missione da aggiornare inesistente."));
+
+        // Recupero l'ordine missione associato
+        OrdineMissione ordineMissione = Optional.ofNullable(ordineMissioneDettagli.getOrdineMissione())
+                .flatMap(o -> ordineMissioneRepository.findById((Long) o.getId()))
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non trovato."));
+
+        // Controllo operazioni CRUD solo se non è modifica solo dati finanziari
+        if (!ordineMissioneDettagli.isModificaSoloDatiFinanziari(ordineMissioneDettagliDB)) {
+            ordineMissioneService.controlloOperazioniCRUDDaGui(ordineMissione);
+        }
+
+        ordineMissioneDettagliDB.setOrdineMissione(ordineMissione);
+
+        // Validazione dati obbligatori
         controlloDatiObbligatoriDaGui(ordineMissioneDettagli);
 
-        // Update only fields present in the OrdineMissioneDettagli entity
-        // Removed: setCdTiPasto, setNote, setFlSpesaAnticipata, setKmPercorsi, setDsNoGiustificativo, setLocalitaSpostamento, setIdRimborsoImpegni
+        // Aggiorno solo i campi gestiti nell'entità
         ordineMissioneDettagliDB.setCdTiSpesa(ordineMissioneDettagli.getCdTiSpesa());
         ordineMissioneDettagliDB.setTiCdTiSpesa(ordineMissioneDettagli.getTiCdTiSpesa());
         ordineMissioneDettagliDB.setDsSpesa(ordineMissioneDettagli.getDsSpesa());
@@ -329,23 +364,18 @@ public class OrdineMissioneDettagliService {
         ordineMissioneDettagliDB.setCdDivisa(ordineMissioneDettagli.getCdDivisa());
         ordineMissioneDettagliDB.setImportoEuro(ordineMissioneDettagli.getImportoEuro());
 
-
+        // Imposta importo in divisa se necessario
         impostaImportoDivisa(ordineMissioneDettagliDB);
 
         ordineMissioneDettagliDB.setToBeUpdated();
 
+        // Validazione CRUD
         validaCRUD(ordineMissioneDettagliDB);
-        // Removed call to controlliPasto
 
-        //controlliSpeseMezzi(ordineMissioneDettagli, ordineMissione);
-
-        // Removed call to aggiornaDatiImpegni
-
-
-        ordineMissioneDettagliDB = (OrdineMissioneDettagli) crudServiceBean.modificaConBulk(ordineMissioneDettagliDB);
+        // Salvataggio diretto tramite repository
+        ordineMissioneDettagliDB = ordineMissioneDettagliRepository.save(ordineMissioneDettagliDB);
 
         log.debug("Updated Information for Dettaglio Ordine Missione: {}", ordineMissioneDettagliDB);
         return ordineMissioneDettagliDB;
     }
-
 }

@@ -19,15 +19,12 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.BusyResourceException;
-import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.jada.ejb.session.PersistencyException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.AutoPropria;
 import it.cnr.si.missioni.repository.AutoPropriaRepository;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +33,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 import java.util.List;
 
 /**
@@ -49,9 +46,6 @@ public class AutoPropriaService {
 
     @Autowired
     private AutoPropriaRepository autoPropriaRepository;
-
-    @Autowired
-    private CRUDComponentSession<AutoPropria> crudServiceBean;
 
     @Autowired
     private SecurityService securityService;
@@ -68,21 +62,21 @@ public class AutoPropriaService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public AutoPropria createAutoPropria(String user, AutoPropria autoPropria) throws AwesomeException,
-            ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+            AwesomeException, OptimisticLockException {
         autoPropria.setUid(user);
         autoPropria.setUser(securityService.getCurrentUserLogin());
         autoPropria.setToBeCreated();
         validaCRUD(autoPropria);
-        autoPropria = crudServiceBean.creaConBulk(autoPropria);
+        autoPropria = autoPropriaRepository.save(autoPropria);
         log.debug("Created Information for User: {}", autoPropria);
         return autoPropria;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public AutoPropria updateAutoPropria(AutoPropria autoPropria) throws AwesomeException,
-            ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
+            AwesomeException, OptimisticLockException {
 
-        AutoPropria autoPropriaDB = crudServiceBean.findById(AutoPropria.class, autoPropria.getId());
+        AutoPropria autoPropriaDB = autoPropriaRepository.findById((Long) autoPropria.getId()).orElse(null);
 
         if (autoPropriaDB == null)
             throw new AwesomeException(CodiciErrore.ERRGEN, "Auto Propria da aggiornare inesistente.");
@@ -97,20 +91,20 @@ public class AutoPropriaService {
 //		//effettuo controlli di validazione operazione CRUD
         validaCRUD(autoPropriaDB);
 
-        autoPropria = crudServiceBean.modificaConBulk(autoPropriaDB);
+        autoPropria = autoPropriaRepository.save(autoPropriaDB);
 
         log.debug("Updated Information for Dati Patente: {}", autoPropria);
         return autoPropria;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteAutoPropria(Long idAutoPropria) throws AwesomeException, ComponentException, OptimisticLockException, PersistencyException, BusyResourceException {
-        AutoPropria autoPropria = crudServiceBean.findById(AutoPropria.class, idAutoPropria);
+    public void deleteAutoPropria(Long idAutoPropria) throws AwesomeException, AwesomeException, OptimisticLockException {
+        AutoPropria autoPropria = autoPropriaRepository.findById(idAutoPropria).orElse(null);
 
         //effettuo controlli di validazione operazione CRUD
         if (autoPropria != null) {
             autoPropria.setToBeDeleted();
-            crudServiceBean.eliminaConBulk(autoPropria);
+            autoPropriaRepository.delete(autoPropria);
         }
     }
 

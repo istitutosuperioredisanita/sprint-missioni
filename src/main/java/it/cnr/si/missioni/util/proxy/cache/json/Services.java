@@ -27,7 +27,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializable;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -81,11 +81,11 @@ public class Services implements DataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeUTF(toString());
+        out.writeString(toString()); // writeUTF → writeString in Hazelcast 5
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        in.readData();
+        in.readString(); // leggi la stringa scritta sopra
     }
 }

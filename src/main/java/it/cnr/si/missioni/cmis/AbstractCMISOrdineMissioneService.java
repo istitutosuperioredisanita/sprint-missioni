@@ -19,11 +19,12 @@
 
 package it.cnr.si.missioni.cmis;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -31,7 +32,6 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.*;
 import it.cnr.si.missioni.util.proxy.json.service.*;
-import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageDriver;
 import it.cnr.si.spring.storage.StorageException;
 import it.cnr.si.spring.storage.StorageObject;
@@ -40,9 +40,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -61,23 +63,42 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     @Autowired
     protected DatiIstitutoService datiIstitutoService;
 
-
     @Autowired
     protected Environment env;
 
     @Autowired
+    @Lazy
     protected PrintOrdineMissioneService printOrdineMissioneService;
 
     @Autowired
+    @Lazy
     protected PrintAnnullamentoOrdineMissioneService printAnnullamentoOrdineMissioneService;
 
     @Autowired
+    @Lazy
+    protected PrintOrdineMissioneAnticipoService printOrdineMissioneAnticipoService;
+
+    @Autowired
+    @Lazy
+    protected PrintOrdineMissioneTaxiService printOrdineMissioneTaxiService;
+
+    @Autowired
+    @Lazy
+    protected PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
+
+    @Autowired
+    @Lazy
+    protected PrintOrdineMissioneAutoNoleggioService printOrdineMissioneAutoNoleggioService;
+
+    @Autowired
+    @Lazy
     protected OrdineMissioneService ordineMissioneService;
 
     @Autowired
     protected ParametriService parametriService;
 
     @Autowired
+    @Lazy
     protected AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
 
     @Autowired
@@ -102,30 +123,22 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected UoService uoService;
 
     @Autowired
-    protected PrintOrdineMissioneAnticipoService printOrdineMissioneAnticipoService;
-
-    @Autowired
-    protected PrintOrdineMissioneTaxiService printOrdineMissioneTaxiService;
-
-    @Autowired
     protected UtentiPresidenteSpecialiService utentiPresidenteSpecialeService;
 
     @Autowired
-    protected PrintOrdineMissioneAutoPropriaService printOrdineMissioneAutoPropriaService;
-
-    @Autowired
-    protected PrintOrdineMissioneAutoNoleggioService printOrdineMissioneAutoNoleggioService;
-
-    @Autowired
+    @Lazy
     protected OrdineMissioneAnticipoService ordineMissioneAnticipoService;
 
     @Autowired
+    @Lazy
     protected OrdineMissioneTaxiService ordineMissioneTaxiService;
 
     @Autowired
+    @Lazy
     protected OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
 
     @Autowired
+    @Lazy
     protected OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
 
     @Autowired
@@ -137,11 +150,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     @Autowired
     protected AccountService accountService;
 
-    public CMISOrdineMissione create(OrdineMissione ordineMissione) throws ComponentException {
+    public CMISOrdineMissione create(OrdineMissione ordineMissione) throws AwesomeException {
         return create(ordineMissione, ordineMissione.getAnno());
     }
 
-    public CMISOrdineMissione create(OrdineMissione ordineMissione, Integer annoGestione) throws ComponentException {
+    public CMISOrdineMissione create(OrdineMissione ordineMissione, Integer annoGestione) throws AwesomeException {
         if (ordineMissione != null) {
             CMISOrdineMissione cmisOrdineMissione = new CMISOrdineMissione();
             cmisOrdineMissione.setIdMissioneOrdine(Long.valueOf(ordineMissione.getId().toString()));
@@ -445,8 +458,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
     
@@ -560,9 +573,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return so;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + annullamento.getFileName()
+                throw new AwesomeException("File [" + annullamento.getFileName()
                         + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale ("
                     + Utility.getMessageException(e) + ")", e);
         }
     }
@@ -739,7 +752,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo);
 
 
-    public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {
+    public StorageObject getStorageObjectOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException {
         String id = getNodeRefOrdineMissione(ordineMissione);
         if (id != null) {
             return missioniCMISService.recuperoContentFileFromObjectID(id);
@@ -748,7 +761,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     }
 
 
-    public InputStream getStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
+    public InputStream getStreamOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException {
         String id = getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
@@ -756,7 +769,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return null;
     }
 
-    public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException {
+    public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException {
         String id = getNodeRefOrdineMissioneAnticipo(ordineMissioneAnticipo);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
@@ -764,7 +777,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return null;
     }
 
-    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException {
         String id = getNodeRefOrdineMissioneTaxi(ordineMissioneTaxi);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
@@ -772,7 +785,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return null;
     }
 
-    public InputStream getStreamOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+    public InputStream getStreamOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException {
         String id = getNodeRefOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
@@ -780,7 +793,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return null;
     }
 
-    public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {
+    public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException {
         StorageObject fo = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> ordine = missioniCMISService.recuperoDocumento(fo, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
         if (ordine.size() == 0)
@@ -793,7 +806,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException {
+    public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException {
         StorageObject node = recuperoFolderOrdineMissione(annullamento.getOrdineMissione());
         List<StorageObject> ordine = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
         if (ordine.size() == 0)
@@ -806,7 +819,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public StorageObject getObjectAnticipoOrdineMissione(OrdineMissioneAnticipo anticipo) throws ComponentException {
+    public StorageObject getObjectAnticipoOrdineMissione(OrdineMissioneAnticipo anticipo) throws AwesomeException {
         StorageObject node = recuperoFolderOrdineMissione(anticipo.getOrdineMissione());
         List<StorageObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
         if (ant.size() == 0)
@@ -819,7 +832,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public StorageObject getObjectTaxiOrdineMissione(OrdineMissioneTaxi taxi) throws ComponentException {
+    public StorageObject getObjectTaxiOrdineMissione(OrdineMissioneTaxi taxi) throws AwesomeException {
         StorageObject node = recuperoFolderOrdineMissione(taxi.getOrdineMissione());
         List<StorageObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value());
         if (ant.size() == 0)
@@ -832,7 +845,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public StorageObject getObjectAutoNoleggioOrdineMissione(OrdineMissioneAutoNoleggio autoNoleggio) throws ComponentException {
+    public StorageObject getObjectAutoNoleggioOrdineMissione(OrdineMissioneAutoNoleggio autoNoleggio) throws AwesomeException {
         StorageObject node = recuperoFolderOrdineMissione(autoNoleggio.getOrdineMissione());
         List<StorageObject> ant = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO.value());
         if (ant.size() == 0)
@@ -845,16 +858,16 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws ComponentException {
+    public String getNodeRefOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException {
         return getObjectOrdineMissione(ordineMissione).getKey();
     }
 
-    public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException {
+    public String getNodeRefAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException {
         StorageObject nodeFile = getStorageAnnullamentoOrdineMissione(annullamento);
         return nodeFile.getKey();
     }
 
-    public StorageObject getStorageAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException {
+    public StorageObject getStorageAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException {
         OrdineMissione ordineMissione = annullamento.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
@@ -868,7 +881,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public StorageObject getStorageOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException {
+    public StorageObject getStorageOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAnticipo.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value());
@@ -883,7 +896,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     }
 
 
-    public StorageObject getStorageOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+    public StorageObject getStorageOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneTaxi.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value());
@@ -897,7 +910,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public StorageObject getStorageOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+    public StorageObject getStorageOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAutoNoleggio.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO.value());
@@ -912,7 +925,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     }
 
 
-    public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
+    public StorageObject getStorageOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
@@ -926,11 +939,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         }
     }
 
-    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
+    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException {
         return getNodeRefOrdineMissioneAutoPropria(ordineMissioneAutoPropria, true);
     }
 
-    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, Boolean erroreSeNonTrovato) throws ComponentException {
+    public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, Boolean erroreSeNonTrovato) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAutoPropria.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value());
@@ -945,11 +958,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return null;
     }
 
-    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException {
         return getNodeRefOrdineMissioneTaxi(ordineMissioneTaxi, true);
     }
 
-    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws ComponentException {
+    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneTaxi.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_TAXI.value());
@@ -964,11 +977,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return null;
     }
 
-    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException {
         return getNodeRefOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio, true);
     }
 
-    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, Boolean erroreSeNonTrovato) throws ComponentException {
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, Boolean erroreSeNonTrovato) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneAutoNoleggio.getOrdineMissione();
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_NOLEGGIO.value());
@@ -1112,7 +1125,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaAutoPropriaSuCMIS(String currentLogin, byte[] stampa,
-                                                      OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException {
+                                                      OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException {
         InputStream streamStampa = new ByteArrayInputStream(stampa);
         String path = createFolderOrdineMissione(ordineMissioneAutoPropria.getOrdineMissione());
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAutoPropria(currentLogin, ordineMissioneAutoPropria);
@@ -1127,14 +1140,14 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + ordineMissioneAutoPropria.getFileName() + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + ordineMissioneAutoPropria.getFileName() + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaAnticipoSuCMIS(String currentLogin, byte[] stampa,
-                                                   OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException {
+                                                   OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException {
         InputStream streamStampa = new ByteArrayInputStream(stampa);
         String path = createFolderOrdineMissione(ordineMissioneAnticipo.getOrdineMissione());
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAnticipo(currentLogin, ordineMissioneAnticipo);
@@ -1155,16 +1168,16 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + ordineMissioneAnticipo.getFileName()
+                throw new AwesomeException("File [" + ordineMissioneAnticipo.getFileName()
                         + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale ("
                     + Utility.getMessageException(e) + ")", e);
         }
     }
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaTaxiSuCMIS(String currentLogin, byte[] stampa,
-                                               OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException {
+                                               OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException {
         InputStream streamStampa = new ByteArrayInputStream(stampa);
         String path = createFolderOrdineMissione(ordineMissioneTaxi.getOrdineMissione());
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneTaxi(currentLogin, ordineMissioneTaxi);
@@ -1185,9 +1198,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + ordineMissioneTaxi.getFileName()
+                throw new AwesomeException("File [" + ordineMissioneTaxi.getFileName()
                         + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale ("
                     + Utility.getMessageException(e) + ")", e);
         }
     }
@@ -1195,7 +1208,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     @Transactional(readOnly = true)
     public StorageObject salvaStampaAutoNoleggioSuCMIS(String currentLogin, byte[] stampa,
-                                               OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException {
+                                               OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException {
         InputStream streamStampa = new ByteArrayInputStream(stampa);
         String path = createFolderOrdineMissione(ordineMissioneAutoNoleggio.getOrdineMissione());
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAutoNoleggio(currentLogin, ordineMissioneAutoNoleggio);
@@ -1216,29 +1229,29 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + ordineMissioneAutoNoleggio.getFileName()
+                throw new AwesomeException("File [" + ordineMissioneAutoNoleggio.getFileName()
                         + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale ("
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale ("
                     + Utility.getMessageException(e) + ")", e);
         }
     }
 
-    protected StorageObject creaDocumentoAnticipo(String username, OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException, ComponentException {
+    protected StorageObject creaDocumentoAnticipo(String username, OrdineMissioneAnticipo ordineMissioneAnticipo) throws AwesomeException, AwesomeException {
         byte[] print = printOrdineMissioneAnticipoService.printOrdineMissioneAnticipo(ordineMissioneAnticipo, username);
         return salvaStampaAnticipoSuCMIS(username, print, ordineMissioneAnticipo);
     }
 
-    protected StorageObject creaDocumentoTaxi(String username, OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException, ComponentException {
+    protected StorageObject creaDocumentoTaxi(String username, OrdineMissioneTaxi ordineMissioneTaxi) throws AwesomeException, AwesomeException {
         byte[] print = printOrdineMissioneTaxiService.printOrdineMissioneTaxi(ordineMissioneTaxi, username);
         return salvaStampaTaxiSuCMIS(username, print, ordineMissioneTaxi);
     }
 
-    protected StorageObject creaDocumentoAutoPropria(String username, OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException, ComponentException {
+    protected StorageObject creaDocumentoAutoPropria(String username, OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws AwesomeException, AwesomeException {
         byte[] print = printOrdineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(ordineMissioneAutoPropria, username);
         return salvaStampaAutoPropriaSuCMIS(username, print, ordineMissioneAutoPropria);
     }
 
-    protected StorageObject creaDocumentoAutoNoleggio(String username, OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException, ComponentException {
+    protected StorageObject creaDocumentoAutoNoleggio(String username, OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws AwesomeException, AwesomeException {
         byte[] print = printOrdineMissioneAutoNoleggioService.printOrdineMissioneAutoNoleggio(ordineMissioneAutoNoleggio, username);
         return salvaStampaAutoNoleggioSuCMIS(username, print, ordineMissioneAutoNoleggio);
     }
@@ -1370,8 +1383,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return so;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -1393,8 +1406,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return so;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -1415,8 +1428,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return so;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -1461,8 +1474,8 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return so;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -1478,7 +1491,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     printAnnullamentoMissione = IOUtils.toByteArray(is);
                     is.close();
                 } catch (IOException e) {
-                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                    throw new AwesomeException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
@@ -1502,7 +1515,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     printAnticipo = IOUtils.toByteArray(is);
                     is.close();
                 } catch (IOException e) {
-                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                    throw new AwesomeException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
@@ -1527,7 +1540,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     printTaxi = IOUtils.toByteArray(is);
                     is.close();
                 } catch (IOException e) {
-                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                    throw new AwesomeException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
@@ -1551,7 +1564,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     printAutoNoleggio = IOUtils.toByteArray(is);
                     is.close();
                 } catch (IOException e) {
-                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                    throw new AwesomeException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
@@ -1576,7 +1589,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     printAutoPropria = IOUtils.toByteArray(is);
                     is.close();
                 } catch (IOException e) {
-                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                    throw new AwesomeException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
@@ -1588,7 +1601,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
     }
 
-    public List<StorageObject> getAllDocumentsOrdineMissione(OrdineMissione missione) throws ComponentException {
+    public List<StorageObject> getAllDocumentsOrdineMissione(OrdineMissione missione) throws AwesomeException {
         StorageObject node = recuperoFolderOrdineMissione(missione);
         return Optional.ofNullable(node)
                 .map(storageObject -> missioniCMISService.getChildren(storageObject.getKey()))

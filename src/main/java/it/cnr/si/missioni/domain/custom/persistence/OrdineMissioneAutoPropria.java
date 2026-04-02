@@ -20,13 +20,15 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +38,7 @@ import java.util.List;
 @Entity
 @Table(name = "ORDINE_MISSIONE_AUTO_PROPRIA")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_ORDINE_AUTO_PROPRIA", allocationSize = 0)
-public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implements Serializable {
+public class OrdineMissioneAutoPropria extends BaseEntity {
 
     public final static String CMIS_PROPERTY_NAME_DOC_AUTO_PROPRIA = "Allegato";
     public final static String CMIS_PROPERTY_NAME_TIPODOC_AUTO_PROPRIA = "Richiesta Auto Propria";
@@ -80,12 +82,10 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
     @Size(min = 0, max = 50)
     @Column(name = "NUMERO_PATENTE", length = 50, nullable = false)
     private String numeroPatente;
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_RILASCIO_PATENTE", nullable = false)
-    private Date dataRilascioPatente;
-    @Type(type = "java.util.Date")
+    private LocalDateTime dataRilascioPatente;
     @Column(name = "DATA_SCADENZA_PATENTE", nullable = false)
-    private Date dataScadenzaPatente;
+    private LocalDateTime dataScadenzaPatente;
     @Size(min = 0, max = 100)
     @Column(name = "ENTE_PATENTE", length = 100, nullable = false)
     private String entePatente;
@@ -163,19 +163,19 @@ public class OrdineMissioneAutoPropria extends OggettoBulkXmlTransient implement
         this.numeroPatente = numeroPatente;
     }
 
-    public Date getDataRilascioPatente() {
+    public LocalDateTime getDataRilascioPatente() {
         return dataRilascioPatente;
     }
 
-    public void setDataRilascioPatente(Date dataRilascioPatente) {
+    public void setDataRilascioPatente(LocalDateTime dataRilascioPatente) {
         this.dataRilascioPatente = dataRilascioPatente;
     }
 
-    public Date getDataScadenzaPatente() {
+    public LocalDateTime getDataScadenzaPatente() {
         return dataScadenzaPatente;
     }
 
-    public void setDataScadenzaPatente(Date dataScadenzaPatente) {
+    public void setDataScadenzaPatente(LocalDateTime dataScadenzaPatente) {
         this.dataScadenzaPatente = dataScadenzaPatente;
     }
 

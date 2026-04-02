@@ -21,7 +21,7 @@ package it.cnr.si.missioni.domain.custom.print;
 
 import com.fasterxml.jackson.annotation.*;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -20,11 +20,12 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ import java.util.Map;
 @Entity
 @Table(name = "MISSIONE_RESPINTA")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_MISSIONE_RESPINTA", allocationSize = 0)
-public class MissioneRespinta extends OggettoBulkXmlTransient {
+public class MissioneRespinta extends BaseEntity {
 
     public final static String OPERAZIONE_MISSIONE_ORDINE = "OR";
     public final static String OPERAZIONE_MISSIONE_RIMBORSO = "RI";

@@ -20,11 +20,12 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
@@ -35,7 +36,7 @@ import java.util.List;
 @Entity
 @Table(name = "ORDINE_MISSIONE_AUTO_NOLEGGIO")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_AUTO_NOLEGGIO", allocationSize = 0)
-public class OrdineMissioneAutoNoleggio extends OggettoBulkXmlTransient implements Serializable {
+public class OrdineMissioneAutoNoleggio extends BaseEntity {
 
     public final static String CMIS_PROPERTY_NAME_DOC_AUTO_NOLEGGIO = "Principale";
     public final static String CMIS_PROPERTY_NAME_TIPODOC_AUTO_NOLEGGIO = "Richiesta Auto A Noleggio";

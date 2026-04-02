@@ -31,6 +31,7 @@ import it.cnr.si.missioni.util.proxy.json.object.TerzoInfo;
 import it.cnr.si.missioni.util.proxy.json.object.TerzoJson;
 import it.cnr.si.service.dto.anagrafica.UserInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,9 @@ import java.util.List;
 
 @Service
 public class TerzoService {
+
     @Autowired
+    @Lazy
     private CommonService commonService;
 
     public TerzoInfo loadUserInfo(String cf) {

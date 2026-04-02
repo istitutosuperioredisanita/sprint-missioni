@@ -19,7 +19,7 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,7 +48,8 @@ import java.util.List;
 public class PrintRimborsoMissioneService {
     private final Logger log = LoggerFactory.getLogger(PrintRimborsoMissioneService.class);
     @Autowired
-    RimborsoImpegniService rimborsoImpegniService;
+    
+    private RimborsoImpegniService rimborsoImpegniService;
     @Autowired
     private Environment env;
     @Autowired
@@ -72,7 +74,7 @@ public class PrintRimborsoMissioneService {
     @Autowired
     private VoceService voceService;
 
-    private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
+    private PrintRimborsoMissione getPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, AwesomeException {
         Account account = accountService.loadAccountFromUsername(rimborsoMissione.getUid());
         Nazione nazione = nazioneService.loadNazione(rimborsoMissione.getNazione());
         LocalDate data = LocalDate.now();
@@ -270,19 +272,19 @@ public class PrintRimborsoMissioneService {
         return "";
     }
 
-    public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, ComponentException {
+    public byte[] printRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException, AwesomeException {
         String myJson = createJsonPrintRimborsoMissione(rimborsoMissione, currentLogin);
         String nomeStampa = "";
         if (env != null && env.getProperty("spring.print." + Costanti.NOME_STAMPA_RIMBORSO) != null) {
             nomeStampa = env.getProperty("spring.print." + Costanti.NOME_STAMPA_RIMBORSO);
         } else {
-            throw new ComponentException("Configurare il nome stampa del rimborso");
+            throw new AwesomeException("Configurare il nome stampa del rimborso");
         }
 
         return printService.print(myJson, nomeStampa, rimborsoMissione.getId());
     }
 
-    public String createJsonPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws ComponentException {
+    public String createJsonPrintRimborsoMissione(RimborsoMissione rimborsoMissione, String currentLogin) throws AwesomeException {
         PrintRimborsoMissione printRimborsoMissione = getPrintRimborsoMissione(rimborsoMissione, currentLogin);
         return printService.createJsonForPrint(printRimborsoMissione);
     }

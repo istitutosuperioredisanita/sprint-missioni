@@ -20,15 +20,14 @@
 package it.cnr.si.missioni.service;
 
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
 import it.cnr.si.missioni.repository.DatiIstitutoRepository;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
-import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +44,6 @@ import java.util.List;
 public class DatiIstitutoService {
 
     private final Logger log = LoggerFactory.getLogger(DatiIstitutoService.class);
-
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
 
     @Autowired
     private DatiIstitutoRepository datiIstitutoRepository;
@@ -70,7 +66,7 @@ public class DatiIstitutoService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Long getNextPG(String istituto, Integer anno, String tipo) throws ComponentException {
+    public Long getNextPG(String istituto, Integer anno, String tipo) throws AwesomeException {
         DatiIstituto datiIstituto = null;
         datiIstituto = getDatiIstitutoAndLock(istituto, anno);
         Long pgCorrente = null;
@@ -90,7 +86,7 @@ public class DatiIstitutoService {
             }
             datiIstituto.setUser(securityService.getCurrentUserLogin());
             datiIstituto.setToBeUpdated();
-            datiIstituto = (DatiIstituto) crudServiceBean.modificaConBulk(datiIstituto);
+            datiIstituto = datiIstitutoRepository.save(datiIstituto);
             log.debug("Updated Information for Dati Istituto: {}", datiIstituto);
         } else {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati uo non presenti per il codice " + istituto + " nell'anno " + anno);
@@ -107,7 +103,7 @@ public class DatiIstitutoService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void ribaltaDatiIstituti() throws ComponentException {
+    public void ribaltaDatiIstituti() throws AwesomeException {
         List<DatiIstituto> lista = getDatiIstituti();
         if (lista != null) {
             for (DatiIstituto datiIstituto : lista) {
@@ -122,14 +118,14 @@ public class DatiIstitutoService {
                         datiIstitutoInsert.setProgressivoAnnullamento(Long.valueOf(0));
                         datiIstitutoInsert.setProgressivoRimborso(Long.valueOf(0));
                         datiIstitutoInsert.setUser(securityService.getCurrentUserLogin());
-                        datiIstitutoInsert.setPg_ver_rec(Long.valueOf(1));
+                        datiIstitutoInsert.setPgVerRec(Long.valueOf(1));
                         datiIstitutoInsert.setId(null);
                         datiIstitutoInsert.setDataBloccoRimborsi(null);
                         datiIstitutoInsert.setDataBloccoRimborsiTam(null);
                         datiIstitutoInsert.setDataBloccoInsRimborsi(null);
                         datiIstitutoInsert.setDataBloccoInsRimborsiTam(null);
                         datiIstitutoInsert.setToBeCreated();
-                        datiIstitutoInsert = (DatiIstituto) crudServiceBean.creaConBulk(datiIstitutoInsert);
+                        datiIstitutoInsert = datiIstitutoRepository.save(datiIstitutoInsert);
                     }
                 } catch (CloneNotSupportedException e) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel clone di Dati Istituto.");
@@ -143,7 +139,7 @@ public class DatiIstitutoService {
         return lista;
     }
 
-    private DatiIstituto creaDatiIstituto(String istituto, Integer anno, String tipo) throws ComponentException {
+    private DatiIstituto creaDatiIstituto(String istituto, Integer anno, String tipo) throws AwesomeException {
         DatiIstituto datiIstitutoInsert = new DatiIstituto();
         datiIstitutoInsert.setAnno(anno);
         datiIstitutoInsert.setDescrIstituto("Descrizione CDS:" + istituto);
@@ -155,24 +151,24 @@ public class DatiIstitutoService {
         datiIstitutoInsert.setGestioneRespModulo("N");
         datiIstitutoInsert.setUser(securityService.getCurrentUserLogin());
         datiIstitutoInsert.setToBeCreated();
-        datiIstitutoInsert = (DatiIstituto) crudServiceBean.creaConBulk(datiIstitutoInsert);
+        datiIstitutoInsert = datiIstitutoRepository.save(datiIstitutoInsert);
         return datiIstitutoInsert;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public DatiIstituto creaDatiIstituto(DatiIstituto datiIstituto) throws ComponentException {
+    public DatiIstituto creaDatiIstituto(DatiIstituto datiIstituto) throws AwesomeException {
         datiIstituto.setProgressivoOrdine(Long.valueOf(0));
         datiIstituto.setProgressivoRimborso(Long.valueOf(0));
         datiIstituto.setUser(securityService.getCurrentUserLogin());
         datiIstituto.setToBeCreated();
-        datiIstituto = (DatiIstituto) crudServiceBean.creaConBulk(datiIstituto);
+        datiIstituto = datiIstitutoRepository.save(datiIstituto);
         return datiIstituto;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public DatiIstituto updateDatiIstituto(DatiIstituto datiIstituto) throws ComponentException {
+    public DatiIstituto updateDatiIstituto(DatiIstituto datiIstituto) throws AwesomeException {
 
-        DatiIstituto datiIstitutoDB = (DatiIstituto) crudServiceBean.findById(DatiIstituto.class, datiIstituto.getId());
+        DatiIstituto datiIstitutoDB = datiIstitutoRepository.findById((Long) datiIstituto.getId()).orElse(null);
 
         if (datiIstitutoDB == null)
             throw new AwesomeException(CodiciErrore.ERRGEN, "Dati istituto da aggiornare inesistenti.");
@@ -183,7 +179,7 @@ public class DatiIstitutoService {
         datiIstitutoDB.setProgressivoRimborso(datiIstituto.getProgressivoRimborso());
         datiIstitutoDB.setToBeUpdated();
 
-        datiIstituto = (DatiIstituto) crudServiceBean.modificaConBulk(datiIstitutoDB);
+        datiIstituto = datiIstitutoRepository.save(datiIstitutoDB);
 
         //	autoPropriaRepository.save(autoPropria);
         log.debug("Updated Information for DatiIstituto: {}", datiIstituto);
@@ -191,8 +187,8 @@ public class DatiIstitutoService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteDatiIstituto(Long idDatiIstituto) throws ComponentException {
-        DatiIstituto datiIstituto = (DatiIstituto) crudServiceBean.findById(DatiIstituto.class, idDatiIstituto);
+    public void deleteDatiIstituto(Long idDatiIstituto) throws AwesomeException {
+        DatiIstituto datiIstituto = datiIstitutoRepository.findById(idDatiIstituto).orElse(null);
 
         //effettuo controlli di validazione operazione CRUD
         if (datiIstituto != null) {
@@ -201,7 +197,7 @@ public class DatiIstitutoService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Dati istituto già utilizzati, impossibile effettuare la cancellazione.");
             }
             datiIstituto.setToBeDeleted();
-            crudServiceBean.eliminaConBulk(datiIstituto);
+            datiIstitutoRepository.delete(datiIstituto);
         }
     }
 }

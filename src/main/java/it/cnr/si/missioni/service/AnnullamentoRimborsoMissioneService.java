@@ -19,13 +19,7 @@
 
 package it.cnr.si.missioni.service;
 
-import it.cnr.jada.criteria.Criteria;
-import it.cnr.jada.criteria.Order;
-import it.cnr.jada.criteria.restrictions.Disjunction;
-import it.cnr.jada.criteria.restrictions.Restrictions;
-import it.cnr.jada.criterion.CriterionList;
-import it.cnr.jada.criterion.Subqueries;
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
@@ -35,7 +29,9 @@ import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.repository.AnnullamentoRimborsoMissioneRepository;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.RimborsoMissioneRepository;
+import it.cnr.si.missioni.repository.specification.BaseSpecification;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -48,12 +44,16 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.CommonService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.service.SecurityService;
+import it.cnr.si.missioni.web.filter.RimborsoMissioneFilterMapper;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -80,8 +80,7 @@ public class AnnullamentoRimborsoMissioneService {
     CronService cronService;
     @Autowired
     CMISRimborsoMissioneService cmisRimborsoMissioneService;
-    @Autowired
-    private CRUDComponentSession crudServiceBean;
+
     @Autowired
     private Environment env;
     @Autowired
@@ -90,6 +89,9 @@ public class AnnullamentoRimborsoMissioneService {
     private RimborsoMissioneService rimborsoMissioneService;
     @Autowired
     private AnnullamentoRimborsoMissioneRepository annullamentoRimborsoMissioneRepository;
+    @Autowired
+    private RimborsoMissioneRepository rimborsoMissioneRepository;
+
     @Autowired
     private MissioniCMISService missioniCMISService;
 
@@ -118,7 +120,7 @@ public class AnnullamentoRimborsoMissioneService {
     private SecurityService securityService;
 
     @Transactional(readOnly = true)
-    public AnnullamentoRimborsoMissione getAnnullamentoRimborsoMissione(Long idAnnullamento) throws ComponentException {
+    public AnnullamentoRimborsoMissione getAnnullamentoRimborsoMissione(Long idAnnullamento) throws AwesomeException {
         RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
         filter.setDaId(idAnnullamento);
         filter.setaId(idAnnullamento);
@@ -126,7 +128,7 @@ public class AnnullamentoRimborsoMissioneService {
         List<AnnullamentoRimborsoMissione> listaAnnullamentiMissione = getAnnullamenti(filter, false, true);
         if (listaAnnullamentiMissione != null && !listaAnnullamentiMissione.isEmpty()) {
             annullamento = listaAnnullamentiMissione.get(0);
-            RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, annullamento.getRimborsoMissione().getId());
+            RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById((Long) annullamento.getRimborsoMissione().getId()).orElse(null);
             if (rimborsoMissione != null) {
                 Uo datiUo = uoService.recuperoUoSigla(annullamento.getRimborsoMissione().getUoSpesa());
                 if (datiUo != null && Utility.nvl(datiUo.getOrdineDaValidare(), "N").equals("N")) {
@@ -139,7 +141,7 @@ public class AnnullamentoRimborsoMissioneService {
         return annullamento;
     }
 
-    public List<AnnullamentoRimborsoMissione> getAnnullamentiForValidateFlows(RimborsoMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
+    public List<AnnullamentoRimborsoMissione> getAnnullamentiForValidateFlows(RimborsoMissioneFilter filter, Boolean isServiceRest) throws AwesomeException {
         filter.setStato(Costanti.STATO_INSERITO);
         List<AnnullamentoRimborsoMissione> lista = getAnnullamenti(filter, isServiceRest, true);
         if (lista != null) {
@@ -155,18 +157,18 @@ public class AnnullamentoRimborsoMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, String basePath) throws ComponentException {
+    public AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, String basePath) throws AwesomeException {
         return updateAnnullamentoRimborsoMissione(annullamento, false, basePath);
     }
 
-    private AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, Boolean fromFlows, String basePath) throws ComponentException {
+    private AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, Boolean fromFlows, String basePath) throws AwesomeException {
         return updateAnnullamentoRimborsoMissione(annullamento, fromFlows, false, basePath);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, Boolean fromFlows, Boolean confirm, String basePath) throws ComponentException {
+    public AnnullamentoRimborsoMissione updateAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento, Boolean fromFlows, Boolean confirm, String basePath) throws AwesomeException {
 
-        AnnullamentoRimborsoMissione annullamentoDB = (AnnullamentoRimborsoMissione) crudServiceBean.findById(AnnullamentoRimborsoMissione.class, annullamento.getId());
+        AnnullamentoRimborsoMissione annullamentoDB = annullamentoRimborsoMissioneRepository.findById((Long) annullamento.getId()).orElse(null);
         boolean isRitornoMissioneMittente = false;
 
         if (annullamentoDB == null) {
@@ -174,7 +176,7 @@ public class AnnullamentoRimborsoMissioneService {
         }
 
         if (annullamentoDB.getRimborsoMissione() != null) {
-            RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, annullamentoDB.getRimborsoMissione().getId());
+            RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById((Long) annullamentoDB.getRimborsoMissione().getId()).orElse(null);
             if (rimborsoMissione != null) {
                 annullamento.setRimborsoMissione(rimborsoMissione);
             }
@@ -195,14 +197,14 @@ public class AnnullamentoRimborsoMissioneService {
         }
         aggiornaDatiAnnullamentoRimborsoMissione(annullamento, confirm, annullamentoDB);
         annullamentoDB.setToBeUpdated();
-        annullamentoDB = (AnnullamentoRimborsoMissione) crudServiceBean.modificaConBulk(annullamentoDB);
+        annullamentoDB = annullamentoRimborsoMissioneRepository.save(annullamentoDB);
 
         if (confirm) {
             RimborsoMissione rimborsoMissione = annullamento.getRimborsoMissione();
             rimborsoMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
             rimborsoMissione.setStatoFlusso(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
             rimborsoMissione.setToBeUpdated();
-            rimborsoMissione = (RimborsoMissione) crudServiceBean.modificaConBulk(rimborsoMissione);
+            rimborsoMissione = rimborsoMissioneRepository.save(rimborsoMissione);
             if (rimborsoMissione.getPgMissioneSigla() != null) {
                 JSONBody body = new JSONBody();
 
@@ -266,8 +268,8 @@ public class AnnullamentoRimborsoMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void deleteAnnullamento(Long idAnnullamento) throws ComponentException {
-        AnnullamentoRimborsoMissione annullamento = (AnnullamentoRimborsoMissione) crudServiceBean.findById(AnnullamentoRimborsoMissione.class, idAnnullamento);
+    public void deleteAnnullamento(Long idAnnullamento) throws AwesomeException {
+        AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneRepository.findById(idAnnullamento).orElse(null);
         if (annullamento != null) {
             controlloOperazioniCRUDDaGui(annullamento);
             annullamento.setStato(Costanti.STATO_ANNULLATO);
@@ -275,7 +277,7 @@ public class AnnullamentoRimborsoMissioneService {
 //			if (annullamento.isStatoInviatoAlFlusso() && !StringUtils.isEmpty(annullamento.getIdFlusso())){
 //				cmisRimborsoMissioneService.annullaFlusso(annullamento);
 //			}
-            crudServiceBean.modificaConBulk(annullamento);
+            annullamentoRimborsoMissioneRepository.save(annullamento);
         }
     }
 
@@ -287,150 +289,105 @@ public class AnnullamentoRimborsoMissioneService {
 
 
     @Transactional(readOnly = true)
-    public AnnullamentoRimborsoMissione getAnnullamentoMissione(Long idMissione) throws ComponentException {
+    public AnnullamentoRimborsoMissione getAnnullamentoMissione(Long idMissione) throws AwesomeException {
         return getAnnullamentoRimborsoMissione(idMissione);
     }
 
     @Transactional(readOnly = true)
-    public List<AnnullamentoRimborsoMissione> getAnnullamenti(RimborsoMissioneFilter filter, Boolean isServiceRest) throws ComponentException {
+    public List<AnnullamentoRimborsoMissione> getAnnullamenti(RimborsoMissioneFilter filter, Boolean isServiceRest) throws AwesomeException {
         return getAnnullamenti(filter, isServiceRest, false);
     }
 
     @Transactional(readOnly = true)
-    public List<AnnullamentoRimborsoMissione> getAnnullamenti(RimborsoMissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws ComponentException {
-        CriterionList criterionList = new CriterionList();
-        List<AnnullamentoRimborsoMissione> annullamentiList = null;
-        String aliasRimborsoMissione = "rimborso";
+    public List<AnnullamentoRimborsoMissione> getAnnullamenti(RimborsoMissioneFilter filter,
+                                                              Boolean isServiceRest,
+                                                              Boolean isForValidateFlows) throws AwesomeException {
+
+        Specification<AnnullamentoRimborsoMissione> spec = Specification.where(null);
+
         if (filter != null) {
-            if (filter.getAnno() != null) {
-                criterionList.add(Restrictions.eq("anno", filter.getAnno()));
-            }
-            if (filter.getDaId() != null) {
-                criterionList.add(Restrictions.ge("id", filter.getDaId()));
-            }
-            if (filter.getStato() != null) {
-                criterionList.add(Restrictions.eq("stato", filter.getStato()));
-            }
-            if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()) {
-                criterionList.add(Restrictions.in("stato", filter.getListaStatiMissione()));
-            }
 
-            if (filter.getaId() != null) {
-                criterionList.add(Restrictions.le("id", filter.getaId()));
-            }
-            if (filter.getDaNumero() != null) {
-                criterionList.add(Restrictions.ge("numero", filter.getDaNumero()));
-            }
-            if (filter.getDaData() != null) {
-                criterionList.add(Restrictions.ge("dataInserimento", DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE)));
-            }
-            if (filter.getaData() != null) {
-                criterionList.add(Restrictions.le("dataInserimento", DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE)));
-            }
-            if (filter.getUoRich() != null) {
-                if (accountService.isUserEnableToWorkUo(filter.getUoRich()) && !filter.isDaCron()) {
-                    criterionList.add(Subqueries.exists("select rim.id from RimborsoMissione AS rim where rim.id = this.rimborsoMissione.id and (rim.uoRich = '" + filter.getUoRich() + "' or rim.uoSpesa = '" + filter.getUoRich() + "') "));
-                } else {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente " + securityService.getCurrentUserLogin() + "  non è abilitato a vedere i dati della uo " + filter.getUoRich());
-                }
-            }
-            if (filter.getAnnoOrdine() != null) {
-                criterionList.add(Restrictions.eq(aliasRimborsoMissione + ".anno", filter.getAnnoOrdine()));
-            }
-            if (filter.getDaNumeroOrdine() != null) {
-                criterionList.add(Restrictions.ge(aliasRimborsoMissione + ".numero", filter.getDaNumeroOrdine()));
-            }
-            if (filter.getaNumeroOrdine() != null) {
-                criterionList.add(Restrictions.le(aliasRimborsoMissione + ".numero", filter.getaNumeroOrdine()));
-            }
-            if (filter.getStatoInvioSigla() != null) {
-                criterionList.add(Restrictions.eq("statoInvioSigla", filter.getStatoInvioSigla()));
-            }
-        }
-        if (filter != null && Utility.nvl(filter.getDaCron(), "N").equals("S")) {
-            Criteria criteria = crudServiceBean.preparaCriteria(AnnullamentoRimborsoMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-            return crudServiceBean.eseguiQuery(criteria);
-        } else {
-            if (!isForValidateFlows) {
-                if (!StringUtils.isEmpty(filter.getUser())) {
-                    criterionList.add(Restrictions.eq("uid", filter.getUser()));
-                } else {
-                    if (StringUtils.isEmpty(filter.getUoRich())) {
-                        criterionList.add(Restrictions.eq("uid", securityService.getCurrentUserLogin()));
-                    }
-                }
+            // --- Filtri base su RimborsoMissione tramite mapper ---
+            Specification<RimborsoMissione> rimSpec = RimborsoMissioneFilterMapper.mapBaseFilters(filter);
+
+            // Join tra AnnullamentoRimborsoMissione e RimborsoMissione
+            spec = spec.and((root, query, cb) -> {
+                Subquery<Long> sub = query.subquery(Long.class);
+                Root<RimborsoMissione> rim = sub.from(RimborsoMissione.class);  // Root<RimborsoMissione> ✓
+                sub.select(rim.get("id"))
+                        .where(cb.and(
+                                cb.equal(rim.get("id"), root.get("rimborsoMissione").get("id")),
+                                rimSpec.toPredicate(rim, query, cb)  // ora funziona
+                        ));
+                return cb.exists(sub);
+            });
+
+            // --- Filtri specifici AnnullamentoRimborsoMissione ---
+            spec = spec
+                    .and(BaseSpecification.eq("statoInvioSigla", filter.getStatoInvioSigla()));
+
+            // --- Logica utente / UO ---
+            String currentUser = securityService.getCurrentUserLogin();
+
+            if ("S".equals(Utility.nvl(filter.getDaCron(), "N"))) {
+                // Nessun filtro utente aggiuntivo
             } else {
-                UsersSpecial userSpecial = accountService.getUoForUsersSpecial(securityService.getCurrentUserLogin());
-                if (userSpecial != null) {
-                    if (userSpecial.getAll() == null || !userSpecial.getAll().equals("S")) {
-                        if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
-                            boolean esisteUoConValidazioneConUserNonAbilitato = false;
-                            Disjunction condizioneOr = Restrictions.disjunction();
-                            List<String> listaUoUtente = new ArrayList<String>();
-                            boolean primoGiro = true;
-                            String subQuery = "";
-                            for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
-                                Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
-                                if (uo != null) {
-                                    String uoFilter = uoService.getUoSigla(uoUser);
-                                    if (primoGiro) {
-                                        subQuery = "select rim.id from RimborsoMissione AS rim where rim.id = this.rimborsoMissione.id and (rim.uoRich = '" + uoFilter + "' ";
-                                        primoGiro = false;
-                                    } else {
-                                        subQuery += " or rim.uoRich = '" + uoFilter + "' ";
-                                    }
-                                    if (Utility.nvl(uo.getOrdineDaValidare(), "N").equals("S")) {
-                                        if (Utility.nvl(uoUser.getOrdine_da_validare(), "N").equals("S")) {
-                                            subQuery += " or rim.uoSpesa = '" + uoFilter + "' ";
-                                        }
-                                    }
-                                }
-                            }
-                            if (!subQuery.isEmpty()) {
-                                subQuery += " )";
-                                criterionList.add(Subqueries.exists(subQuery));
-                            }
-                        } else {
-                            criterionList.add(Restrictions.eq("uid", securityService.getCurrentUserLogin()));
+                if (!isForValidateFlows) {
+                    if (!StringUtils.isEmpty(filter.getUser())) {
+                        spec = spec.and(BaseSpecification.eq("uid", filter.getUser()));
+                    } else if (StringUtils.isEmpty(filter.getUoRich())) {
+                        spec = spec.and(BaseSpecification.eq("uid", currentUser));
+                    }
+                } else {
+                    UsersSpecial userSpecial = accountService.getUoForUsersSpecial(currentUser);
+                    Specification<AnnullamentoRimborsoMissione> uoSpec = Specification.where(null);
+
+                    if (userSpecial != null && !"S".equals(userSpecial.getAll()) &&
+                            userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
+
+                        for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
+                            String uoSigla = uoService.getUoSigla(uoUser);
+                            uoSpec = uoSpec.or((root, query, cb) -> cb.equal(root.join("rimborsoMissione").get("uoRich"), uoSigla));
+                            uoSpec = uoSpec.or((root, query, cb) -> cb.equal(root.join("rimborsoMissione").get("uoSpesa"), uoSigla));
                         }
+                        spec = spec.and(uoSpec);
+                    } else {
+                        spec = spec.and(BaseSpecification.eq("uid", currentUser));
                     }
-                } else {
-                    criterionList.add(Restrictions.eq("uid", securityService.getCurrentUserLogin()));
                 }
             }
-            if (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S") && (!(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0))) {
-                criterionList.add(Restrictions.not(Restrictions.eq("stato", Costanti.STATO_ANNULLATO)));
+
+            // --- Escludi missioni annullate, salvo override ---
+            if (!"S".equals(Utility.nvl(filter.getIncludiMissioniAnnullate())) &&
+                    !(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0)) {
+                spec = spec.and((root, query, cb) -> cb.notEqual(root.get("stato"), Costanti.STATO_ANNULLATO));
             }
 
-            if (isServiceRest) {
-                if (isForValidateFlows) {
-                    criterionList.add(Restrictions.eq("stato", Costanti.STATO_INSERITO));
-                }
-
-
-                Criteria criteria = crudServiceBean.preparaCriteria(AnnullamentoRimborsoMissione.class, criterionList, AnnullamentoRimborsoMissione.getProjectionForElencoMissioni(), Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-                annullamentiList = crudServiceBean.eseguiQuery(criteria);
-            } else {
-                Criteria criteria = crudServiceBean.preparaCriteria(AnnullamentoRimborsoMissione.class, criterionList, null, Order.asc("dataInserimento"), Order.asc("anno"), Order.asc("numero"));
-                annullamentiList = crudServiceBean.eseguiQuery(criteria);
+            // --- Filtro REST + validateFlows ---
+            if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("stato"), Costanti.STATO_INSERITO));
             }
-            return annullamentiList;
         }
+
+        Sort sort = Sort.by(Sort.Order.asc("dataInserimento"))
+                .and(Sort.by(Sort.Order.asc("anno")))
+                .and(Sort.by(Sort.Order.asc("numero")));
+
+        return annullamentoRimborsoMissioneRepository.findAll(spec, sort);
     }
 
-
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnnullamentoRimborsoMissione createAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento) throws ComponentException {
+    public AnnullamentoRimborsoMissione createAnnullamentoRimborsoMissione(AnnullamentoRimborsoMissione annullamento) throws AwesomeException {
         controlloDatiObbligatoriDaGUI(annullamento);
         inizializzaCampiPerInserimento(annullamento);
         validaCRUD(annullamento);
-        annullamento = (AnnullamentoRimborsoMissione) crudServiceBean.creaConBulk(annullamento);
+        annullamento = annullamentoRimborsoMissioneRepository.save(annullamento);
         log.info("Creato Annullamento Rimborso Missione", annullamento.getId());
         return annullamento;
     }
 
     private void inizializzaCampiPerInserimento(
-            AnnullamentoRimborsoMissione annullamento) throws ComponentException {
+            AnnullamentoRimborsoMissione annullamento) throws AwesomeException {
         annullamento.setUidInsert(securityService.getCurrentUserLogin());
         annullamento.setUser(securityService.getCurrentUserLogin());
         Integer anno = recuperoAnno(annullamento);
@@ -439,7 +396,9 @@ public class AnnullamentoRimborsoMissioneService {
 
         annullamento.setStato(Costanti.STATO_INSERITO);
         if (annullamento.getRimborsoMissione() != null) {
-            RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, annullamento.getRimborsoMissione().getId());
+            RimborsoMissione rimborsoMissione = rimborsoMissioneRepository
+                    .findById((Long) annullamento.getRimborsoMissione().getId())
+                    .orElse(null);
             if (rimborsoMissione != null) {
                 AnnullamentoRimborsoMissione ann = annullamentoRimborsoMissioneRepository.getAnnullamentoRimborsoMissione(rimborsoMissione);
                 if (ann != null) {
@@ -498,11 +457,11 @@ public class AnnullamentoRimborsoMissioneService {
     }
 
     public List<CMISFileAttachment> getAttachments(Long idAnnullamentoRimborsoMissione)
-            throws ComponentException {
+            throws AwesomeException {
         if (idAnnullamentoRimborsoMissione != null) {
-            AnnullamentoRimborsoMissione annullamento = (AnnullamentoRimborsoMissione) crudServiceBean.findById(AnnullamentoRimborsoMissione.class, idAnnullamentoRimborsoMissione);
+            AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneRepository.findById(idAnnullamentoRimborsoMissione).orElse(null);
             if (annullamento != null) {
-                RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, annullamento.getRimborsoMissione().getId());
+                RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById((Long) annullamento.getRimborsoMissione().getId()).orElse(null);
                 if (rimborsoMissione != null) {
                     List<CMISFileAttachment> lista = cmisRimborsoMissioneService.getAttachmentsAnnullamentoRimborsoMissione(rimborsoMissione, idAnnullamentoRimborsoMissione);
                     return lista;
@@ -513,8 +472,8 @@ public class AnnullamentoRimborsoMissioneService {
     }
 
     public List<CMISFileAttachment> getAttachmentsFromRimborso(Long idRimborsoMissione)
-            throws ComponentException {
-        RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, idRimborsoMissione);
+            throws AwesomeException {
+        RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById(idRimborsoMissione).orElse(null);
         if (rimborsoMissione != null) {
             AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneRepository.getAnnullamentoRimborsoMissione(rimborsoMissione);
             return getAttachments(Long.valueOf(annullamento.getId().toString()));
@@ -523,11 +482,11 @@ public class AnnullamentoRimborsoMissioneService {
     }
 
     public CMISFileAttachment uploadAllegato(Long idAnnullamentoRimborsoMissione,
-                                             InputStream inputStream, String name, MimeTypes mimeTypes) throws ComponentException {
+                                             InputStream inputStream, String name, MimeTypes mimeTypes) throws AwesomeException {
         if (idAnnullamentoRimborsoMissione != null) {
-            AnnullamentoRimborsoMissione annullamento = (AnnullamentoRimborsoMissione) crudServiceBean.findById(AnnullamentoRimborsoMissione.class, idAnnullamentoRimborsoMissione);
+            AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneRepository.findById(idAnnullamentoRimborsoMissione).orElse(null);
             if (annullamento != null) {
-                RimborsoMissione rimborsoMissione = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, annullamento.getRimborsoMissione().getId());
+                RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById((Long) annullamento.getRimborsoMissione().getId()).orElse(null);
                 if (rimborsoMissione != null) {
                     return cmisRimborsoMissioneService.uploadAttachmentAnnullamentoRimborsoMissione(rimborsoMissione, idAnnullamentoRimborsoMissione,
                             inputStream, name, mimeTypes);
@@ -539,7 +498,7 @@ public class AnnullamentoRimborsoMissioneService {
 
     public void gestioneCancellazioneAllegati(String idNodo, Long idAnnullamentoRimborsoMissione) {
         if (idAnnullamentoRimborsoMissione != null) {
-            AnnullamentoRimborsoMissione annullamento = (AnnullamentoRimborsoMissione) crudServiceBean.findById(AnnullamentoRimborsoMissione.class, idAnnullamentoRimborsoMissione);
+            AnnullamentoRimborsoMissione annullamento = annullamentoRimborsoMissioneRepository.findById(idAnnullamentoRimborsoMissione).orElse(null);
             if (annullamento != null) {
                 if (annullamento.isMissioneConfermata()) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione già annullato.");

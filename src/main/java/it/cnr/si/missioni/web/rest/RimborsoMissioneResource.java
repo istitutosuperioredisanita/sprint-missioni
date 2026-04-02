@@ -20,25 +20,24 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.DetailedRuntimeException;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
-import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +49,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,7 +98,7 @@ public class RimborsoMissioneResource {
                     impostaTotaliRimborso(rimborso);
                 }
             }
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsoMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -123,7 +119,7 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione = null;
         try {
             rimborsoMissioneService.getRimborsiMissione(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsoMissioneToFinal", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -145,7 +141,7 @@ public class RimborsoMissioneResource {
         filter.setStato("DEF");
         try {
             rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filter, false);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsoMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -160,7 +156,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getRimborsiMissioneDaAnnullare(HttpServletRequest request,
-                                                          RimborsoMissioneFilter filter) {
+                                                            RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare");
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         filter.setGiaRimborsato("N");
@@ -172,7 +168,7 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione;
         try {
             rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filter, false);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsiMissioneDaAnnullare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -187,7 +183,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getRimborsiMissioneDaConfermare(HttpServletRequest request,
-                                                           RimborsoMissioneFilter filter) {
+                                                             RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Rimborsi di Missione da Confermare");
         filter.setGiaRimborsato("N");
         filter.setDaAnnullare("N");
@@ -197,7 +193,7 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione;
         try {
             rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsiMissioneDaConfermare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -212,7 +208,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getRimborsiMissioneDaInviareAllaFirma(HttpServletRequest request,
-                                                                 RimborsoMissioneFilter filter) {
+                                                                   RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Rimborsi di Missione da Inviare Alla Firma");
         filter.setGiaRimborsato("N");
         filter.setValidato("N");
@@ -226,7 +222,7 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione;
         try {
             rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsiMissioneDaInviareAllaFirma", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -241,7 +237,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getRimborsiMissioneDaApprovare(HttpServletRequest request,
-                                                          RimborsoMissioneFilter filter) {
+                                                            RimborsoMissioneFilter filter) {
         log.debug("REST request per visualizzare i dati degli Rimborsi di Missione da Approvare");
         filter.setGiaRimborsato("N");
         filter.setValidato("S");
@@ -255,7 +251,7 @@ public class RimborsoMissioneResource {
         List<RimborsoMissione> rimborsiMissione;
         try {
             rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsiMissioneDaApprovare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -440,7 +436,7 @@ public class RimborsoMissioneResource {
                         throw new AwesomeException(Utility.getMessageException(e));
                     }
                 }
-            } catch (ComponentException e) {
+            } catch (AwesomeException e) {
                 log.error("ERRORE printRimborsoMissione", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }
@@ -457,7 +453,7 @@ public class RimborsoMissioneResource {
         try {
             List<CMISFileAttachment> lista = rimborsoMissioneService.getAttachments(idRimborsoMissione);
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getAttachments", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -542,7 +538,7 @@ public class RimborsoMissioneResource {
                             } catch (ZipException e) {
                                 log.warn("Cannot add entry to zip file", e);
                             } catch (IOException e) {
-                                throw new DetailedRuntimeException(e);
+                                throw new AwesomeException(Utility.getMessageException(e));
                             }
 
                         });
@@ -566,7 +562,7 @@ public class RimborsoMissioneResource {
         try {
             final MissioneBulk missioneBulk = comunicaRimborsoSiglaService.comunicaRimborsoSigla(idRimborsoMissione);
             return JSONResponseEntity.ok(missioneBulk);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("Comunica rimborso SIGLA", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }

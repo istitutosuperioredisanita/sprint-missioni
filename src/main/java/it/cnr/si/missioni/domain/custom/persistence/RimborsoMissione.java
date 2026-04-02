@@ -20,18 +20,16 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
-import it.cnr.jada.criteria.Projection;
-import it.cnr.jada.criteria.projections.Projections;
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Cdr;
 import it.cnr.si.missioni.util.proxy.json.object.Cds;
 import it.cnr.si.missioni.util.proxy.json.object.UnitaOrganizzativa;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,7 +44,7 @@ import java.util.Optional;
 @Entity
 @Table(name = "RIMBORSO_MISSIONE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_RIMBORSO_MISSIONE", allocationSize = 0)
-public class RimborsoMissione extends OggettoBulkXmlTransient {
+public class RimborsoMissione extends BaseEntity {
     public static final String CMIS_PROPERTY_NAME_DOC_RIMBORSO = "Principale";
     public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegati";
     public static final String CMIS_PROPERTY_VALUE_TIPODOC_RIMBORSO = "Rimborso Missione";
@@ -67,23 +65,6 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
     public static final String CMIS_PROPERTY_NAME_DATA_FINE_MISSIONE_ESTERO = "missioni:dataFineMissioneEstero";
     public static final String CMIS_PROPERTY_FLOW_DIFFERENZE_ORDINE_RIMBORSO = "cnrmissioni:differenzeOrdineRimborso";
     public static final String CMIS_PROPERTY_RIMBORSO_ATTACHMENT_ELIMINATO = "missioni_rimborso_attachment:eliminato";
-    public static final Projection PROJECTIONLIST_ELENCO_MISSIONI = Projections.projectionList().
-            add(Projections.property("id")).
-            add(Projections.property("anno")).
-            add(Projections.property("numero")).
-            add(Projections.property("dataInserimento")).
-            add(Projections.property("uid")).
-            add(Projections.property("stato")).
-            add(Projections.property("statoFlusso")).
-            add(Projections.property("idFlusso")).
-            add(Projections.property("destinazione")).
-            add(Projections.property("oggetto")).
-            add(Projections.property("dataInizioMissione")).
-            add(Projections.property("dataFineMissione")).
-            add(Projections.property("validato")).
-            add(Projections.property("uoRich")).
-            add(Projections.property("trattamento")).
-            add(Projections.property("validaAmm"));
     @Column(name = "PG_BANCA", length = 4, nullable = true)
     public Integer pgBanca;
     @Size(min = 0, max = 256)
@@ -359,11 +340,6 @@ public class RimborsoMissione extends OggettoBulkXmlTransient {
 
     public RimborsoMissione() {
         super();
-    }
-
-    @XmlTransient
-    public static Projection getProjectionForElencoMissioni() {
-        return PROJECTIONLIST_ELENCO_MISSIONI;
     }
 
     public String getCommentoFlusso() {

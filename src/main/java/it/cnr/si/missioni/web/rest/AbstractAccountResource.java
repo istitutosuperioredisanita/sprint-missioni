@@ -20,12 +20,10 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.config.KeycloakRole;
-import it.cnr.si.domain.CNRUser;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.service.showcase.ACEService;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -36,8 +34,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -113,7 +113,7 @@ abstract public class AbstractAccountResource {
         }
     }
 
-    abstract  protected boolean isUserWithRole();
+    abstract protected boolean isUserWithRole();
 
     @RequestMapping(value = "/account-info",
             method = RequestMethod.GET,
@@ -137,7 +137,7 @@ abstract public class AbstractAccountResource {
 
         profiles
                 .stream()
-                .filter(profile -> profile.equalsIgnoreCase(env.getProperty("jhipster.ribbon.displayOnActiveProfiles","dev")))
+                .filter(profile -> profile.equalsIgnoreCase(env.getProperty("jhipster.ribbon.displayOnActiveProfiles", "dev")))
                 .findAny()
                 .ifPresent(profile -> map.put("ribbonEnv", profile));
 

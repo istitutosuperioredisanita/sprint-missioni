@@ -20,19 +20,19 @@
 package it.cnr.si.missioni.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneTaxi;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiTaxi;
 import it.cnr.si.missioni.service.OrdineMissioneTaxiService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +44,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,7 +85,7 @@ public class OrdineMissioneTaxiResource {
         try {
             OrdineMissioneTaxi ordineMissioneTaxi = ordineMissioneTaxiService.getTaxi(idMissione);
             return JSONResponseEntity.ok(ordineMissioneTaxi);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getOrdineMissioneTaxi", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -99,7 +96,7 @@ public class OrdineMissioneTaxiResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> createTaxiOrdineMissione(@RequestBody OrdineMissioneTaxi ordineMissioneTaxi, HttpServletRequest request,
-                                                             HttpServletResponse response) {
+                                                      HttpServletResponse response) {
         if (ordineMissioneTaxi.getId() == null) {
             try {
                 ordineMissioneTaxi = ordineMissioneTaxiService.createTaxi(ordineMissioneTaxi);
@@ -123,7 +120,7 @@ public class OrdineMissioneTaxiResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> modifyTaxiOrdineMissione(@RequestBody OrdineMissioneTaxi ordineMissioneTaxi, HttpServletRequest request,
-                                                             HttpServletResponse response) {
+                                                      HttpServletResponse response) {
         if (ordineMissioneTaxi.getId() != null) {
             try {
                 ordineMissioneTaxi = ordineMissioneTaxiService.updateTaxi(ordineMissioneTaxi);
@@ -151,14 +148,11 @@ public class OrdineMissioneTaxiResource {
         try {
             List<CMISFileAttachment> lista = ordineMissioneTaxiService.getAttachments(idTaxi);
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getAttachments", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
     }
-
-
-
 
 
     @RequestMapping(value = "/rest/public/ordineMissione/taxi/uploadAllegati",
@@ -226,7 +220,7 @@ public class OrdineMissioneTaxiResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> createSpostamentotaxi(@RequestBody SpostamentiTaxi spostamentotaxi, HttpServletRequest request,
-                                                          HttpServletResponse response) {
+                                                   HttpServletResponse response) {
         if (spostamentotaxi.getId() == null) {
             try {
                 spostamentotaxi = ordineMissioneTaxiService.createSpostamentoTaxi(spostamentotaxi);
@@ -298,12 +292,11 @@ public class OrdineMissioneTaxiResource {
         try {
             List<SpostamentiTaxi> SpostamentiTaxi = ordineMissioneTaxiService.getSpostamentiTaxi(idTaxi);
             return JSONResponseEntity.ok(SpostamentiTaxi);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getSpostamenti", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
     }
-
 
 
     @RequestMapping(value = "/rest/public/printOrdineMissioneTaxi",
@@ -311,7 +304,7 @@ public class OrdineMissioneTaxiResource {
     @ExceptionHandler(RuntimeException.class)
     @Timed
     public @ResponseBody void printOrdineMissioneTaxi(HttpServletRequest request,
-                                                          @RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
+                                                      @RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'Ordine di Missione");
 
         if (!StringUtils.isEmpty(idMissione)) {
@@ -346,7 +339,7 @@ public class OrdineMissioneTaxiResource {
                         }
                     }
                 }
-            } catch (ComponentException e) {
+            } catch (AwesomeException e) {
                 log.error("ERRORE printOrdineMissioneTaxi", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }

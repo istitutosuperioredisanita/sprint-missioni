@@ -19,15 +19,16 @@
 
 package it.cnr.si.missioni.cmis;
 
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.DatiFlusso;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
 import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
@@ -35,7 +36,6 @@ import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.*;
 import it.cnr.si.missioni.util.proxy.json.service.*;
-import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageDriver;
 import it.cnr.si.spring.storage.StorageException;
 import it.cnr.si.spring.storage.StorageObject;
@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -85,9 +86,10 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
     protected MissioniCMISService missioniCMISService;
     @Autowired
     private AccountService accountService;
+//    @Autowired
+//    protected CRUDComponentSession<OrdineMissione> crudServiceBean;
     @Autowired
-    protected CRUDComponentSession<OrdineMissione> crudServiceBean;
-    @Autowired
+    
     protected PrintRimborsoMissioneService printRimborsoMissioneService;
     @Autowired
     protected RimborsoMissioneService rimborsoMissioneService;
@@ -95,8 +97,10 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
     protected UtentiPresidenteSpecialiService utentiPresidenteSpecialeService;
     @Autowired
     protected RimborsoMissioneDettagliService rimborsoMissioneDettagliService;
+    @Autowired
+    private OrdineMissioneRepository ordineMissioneRepository;
 
-    public List<CMISFileAttachment> getAttachmentsDetail(Long idDettagliorimborso) throws ComponentException {
+    public List<CMISFileAttachment> getAttachmentsDetail(Long idDettagliorimborso) throws AwesomeException {
         RimborsoMissioneDettagli dettaglio = rimborsoMissioneDettagliService.getRimborsoMissioneDettaglio(idDettagliorimborso);
         List<StorageObject> children = getChildrenDettaglio(dettaglio);
         if (children != null) {
@@ -127,7 +131,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         return null;
     }
 
-    public StorageObject getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws ComponentException {
+    public StorageObject getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws AwesomeException {
         StorageObject folderRimborso = recuperoFolderRimborsoMissione(dettaglio.getRimborsoMissione());
         if (folderRimborso != null) {
             StorageObject folderDettaglio = null;
@@ -157,14 +161,14 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         return datiFlusso;
     }
 
-    public CMISRimborsoMissione create(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public CMISRimborsoMissione create(RimborsoMissione rimborsoMissione) throws AwesomeException {
         CMISRimborsoMissione cmisRimborsoMissione = new CMISRimborsoMissione();
         cmisRimborsoMissione.setIdMissioneRimborso(Long.valueOf(rimborsoMissione.getId().toString()));
         caricaDatiDerivati(rimborsoMissione);
 
         if (rimborsoMissione != null && rimborsoMissione.getOrdineMissione() != null) {
             OrdineMissione ordineMissione = rimborsoMissione.getOrdineMissione();
-            OrdineMissione ordineMissioneDB = crudServiceBean.findById(OrdineMissione.class, ordineMissione.getId());
+            OrdineMissione ordineMissioneDB = ordineMissioneRepository.findById((Long) ordineMissione.getId()).orElse(null);
             if (ordineMissioneDB != null) {
                 ordineMissione = ordineMissioneDB;
             }
@@ -293,7 +297,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         return "si";
     }
 
-    private void caricaDatiDerivati(RimborsoMissione rimborsoMissione) throws ComponentException {
+    private void caricaDatiDerivati(RimborsoMissione rimborsoMissione) throws AwesomeException {
         if (rimborsoMissione != null) {
             DatiIstituto dati = datiIstitutoService.getDatiIstituto(rimborsoMissione.getUoSpesa(), rimborsoMissione.getAnno());
             if (dati == null) {
@@ -307,7 +311,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
     }
 
     @Transactional(readOnly = true)
-    public StorageObject salvaStampaRimborsoMissioneSuCMIS(byte[] stampa, RimborsoMissione rimborsoMissione) throws ComponentException {
+    public StorageObject salvaStampaRimborsoMissioneSuCMIS(byte[] stampa, RimborsoMissione rimborsoMissione) throws AwesomeException {
         CMISRimborsoMissione cmisRimborsoMissione = create(rimborsoMissione);
         return salvaStampaRimborsoMissioneSuCMIS(stampa, rimborsoMissione, cmisRimborsoMissione);
     }
@@ -414,12 +418,12 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + rimborsoMissione.getFileName() + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + rimborsoMissione.getFileName() + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
-    public StorageObject getObjectRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public StorageObject getObjectRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
         StorageObject node = recuperoFolderRimborsoMissione(rimborsoMissione);
         List<StorageObject> rimborso = missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
         if (rimborso.size() == 0)
@@ -477,8 +481,8 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -572,7 +576,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
                                                    StorageObject documento,
                                                    List<StorageObject> allegati, List<StorageObject> giustificativi);
 
-    public void avviaFlusso(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public void avviaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException {
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
         CMISRimborsoMissione cmisRimborsoMissione = create(rimborsoMissione);
@@ -633,7 +637,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
     }
 
     public void controlloEsitenzaGiustificativoDettaglio(RimborsoMissione rimborsoMissione)
-            throws ComponentException {
+            throws AwesomeException {
         if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()) {
             for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()) {
                 List<StorageObject> children = getChildrenDettaglio(dettaglio);
@@ -661,7 +665,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         }
     }
 
-    public String getNodeRefRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public String getNodeRefRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
         StorageObject node = recuperoFolderRimborsoMissione(rimborsoMissione);
         List<StorageObject> rimborso = missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
         if (rimborso.size() == 0)
@@ -674,7 +678,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         }
     }
 
-    public StorageObject recuperoFolderRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public StorageObject recuperoFolderRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
         final String path = Arrays.asList(
                 missioniCMISService.getBasePath().getPath(),
                 Optional.ofNullable(rimborsoMissione)
@@ -707,7 +711,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         return rimborso;
     }
 
-    public InputStream getStreamRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public InputStream getStreamRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
         String id = getNodeRefRimborsoMissione(rimborsoMissione);
         if (id != null) {
             return missioniCMISService.recuperoStreamFileFromObjectID(id);
@@ -778,8 +782,8 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -788,7 +792,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
 
         StoragePath cmisPath = searchFolderRimborsoMissione(rimborsoMissione);
         if (cmisPath == null) {
-            throw new ComponentException("Errore nel salvataggio del file sul Documentale. Cartella del rimborso non trovata");
+            throw new AwesomeException("Errore nel salvataggio del file sul Documentale. Cartella del rimborso non trovata");
         }
 
         Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANNULLAMENTO);
@@ -803,8 +807,8 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
             return node;
         } catch (Exception e) {
             if (e.getCause() instanceof StorageException)
-                throw new ComponentException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
-            throw new ComponentException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
+                throw new AwesomeException("File [" + fileName + "] già presente o non completo di tutte le proprietà obbligatorie. Inserimento non possibile!", e);
+            throw new AwesomeException("Errore nella registrazione del file XML sul Documentale (" + Utility.getMessageException(e) + ")", e);
         }
     }
 
@@ -868,7 +872,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
                     printRimborsoMissione = IOUtils.toByteArray(is);
                     is.close();
                 } catch (IOException e) {
-                    throw new ComponentException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
+                    throw new AwesomeException("Errore nella conversione dello stream in byte del file (" + Utility.getMessageException(e) + ")", e);
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
@@ -880,7 +884,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nel recupero del contenuto del file di annullamento sul documentale");
     }
 
-    public StorageObject getStorageRimborsoMissione(RimborsoMissione rimborsoMissione) throws ComponentException {
+    public StorageObject getStorageRimborsoMissione(RimborsoMissione rimborsoMissione) throws AwesomeException {
         StorageObject node = recuperoFolderRimborsoMissione(rimborsoMissione);
         List<StorageObject> objs = missioniCMISService.recuperoDocumento(node, CMISRimborsoMissioneAspect.RIMBORSO_MISSIONE_ATTACHMENT_RIMBORSO.value());
 
@@ -893,7 +897,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         }
     }
 
-    public List<StorageObject> getDocumentsRimborsoMissione(RimborsoMissione missione) throws ComponentException {
+    public List<StorageObject> getDocumentsRimborsoMissione(RimborsoMissione missione) throws AwesomeException {
         StorageObject node = recuperoFolderRimborsoMissione(missione);
         return Optional.ofNullable(node)
                 .map(storageObject -> missioniCMISService.getChildren(storageObject.getKey(), -1))

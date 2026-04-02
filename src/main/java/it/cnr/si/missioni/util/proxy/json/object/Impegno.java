@@ -22,7 +22,7 @@ package it.cnr.si.missioni.util.proxy.json.object;
 import com.fasterxml.jackson.annotation.*;
 import it.cnr.si.missioni.util.Utility;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashMap;

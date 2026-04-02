@@ -21,6 +21,7 @@ package it.cnr.si.missioni.repository;
 
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -28,8 +29,9 @@ import java.util.List;
 /**
  * Spring Data JPA repository for the AutoPropria entity.
  */
-public interface OrdineMissioneRepository extends
-        JpaRepository<OrdineMissione, Long> {
+public interface OrdineMissioneRepository
+        extends JpaRepository<OrdineMissione, Long>,
+        JpaSpecificationExecutor<OrdineMissione> {
 
     @Query("select a from OrdineMissione a where a.uid = ?1")
     List<OrdineMissione> getOrdiniMissione(String user);

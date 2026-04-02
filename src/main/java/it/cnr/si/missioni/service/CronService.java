@@ -21,9 +21,8 @@ package it.cnr.si.missioni.service;
 
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ILock;
 import com.hazelcast.cp.lock.FencedLock;
-import it.cnr.jada.ejb.session.ComponentException;
+import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
@@ -149,71 +148,73 @@ public class CronService {
 
 
     @CacheEvict(value = Costanti.NOME_CACHE_PROXY, allEntries = true)
-    public void evictCache() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyEvictCache);
-        LOGGER.info("requested lock: " + lock.getPartitionKey());
+    public void evictCache() throws AwesomeException {
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyEvictCache);
+        LOGGER.info("requested lock: {}", lockKeyEvictCache);
 
         try {
             if (lock.tryLock(2, TimeUnit.SECONDS)) {
-
-                LOGGER.info("got lock {}", lockKeyEvictCache);
-                LOGGER.info("Cron per Svuotare la Cache");
+                try {
+                    LOGGER.info("got lock {}", lockKeyEvictCache);
+                    LOGGER.info("Cron per Svuotare la Cache");
+                } finally {
+                    LOGGER.info("unlocking {}", lockKeyEvictCache);
+                    lock.unlock();
+                }
+            } else {
+                LOGGER.warn("unable to get lock {}", lockKeyEvictCache);
             }
-
-
         } catch (Exception e) {
             LOGGER.error("Errore", e);
-            throw new ComponentException(e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_TERZO_COMPENSO_SERVICE, allEntries = true)
-    public void evictCacheTerzoCompenso() throws ComponentException {
+    public void evictCacheTerzoCompenso() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Terzo Compenso");
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_DATI_PERSONE, allEntries = true)
-    public void evictCachePersone() throws ComponentException {
+    public void evictCachePersone() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Persone");
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_RUOLI, allEntries = true)
-    public void evictCacheRuoli() throws ComponentException {
+    public void evictCacheRuoli() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Ruoli");
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_GRANT, allEntries = true)
-    public void evictCacheGrant() throws ComponentException {
+    public void evictCacheGrant() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Grant");
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_DATI_ACCOUNT, allEntries = true)
-    public void evictCacheAccount() throws ComponentException {
+    public void evictCacheAccount() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Account");
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_DATI_DIRETTORE, allEntries = true)
-    public void evictCacheDirettore() throws ComponentException {
+    public void evictCacheDirettore() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Direttore");
     }
 
     @CacheEvict(value = Costanti.NOME_CACHE_ID_SEDE, allEntries = true)
-    public void evictCacheIdSede() throws ComponentException {
+    public void evictCacheIdSede() throws AwesomeException {
         LOGGER.info("Cron per Svuotare la Cache Id Sede");
     }
 
     @Transactional
-    public void loadCache() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyEvictCache);
+    public void loadCache() throws AwesomeException {
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyLoadCache);
 
-        LOGGER.info("requested lock: " + lock.getPartitionKey());
+        LOGGER.info("requested lock: {}", lockKeyLoadCache);
 
         try {
             if (lock.tryLock(2, TimeUnit.SECONDS)) {
-
-                LOGGER.info("got lock {}", lockKeyLoadCache);
-
                 try {
+                    LOGGER.info("got lock {}", lockKeyLoadCache);
                     LOGGER.info("Cron per Caricare la Cache");
 
                     cacheService.loadInCache();
@@ -223,30 +224,25 @@ public class CronService {
                     LOGGER.info("unlocking {}", lockKeyLoadCache);
                     lock.unlock();
                 }
-
             } else {
                 LOGGER.warn("unable to get lock {}", lockKeyLoadCache);
             }
         } catch (Exception e) {
             LOGGER.error("Errore", e);
-            throw new ComponentException(e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
-
-
     }
 
 
     @Transactional
-    public void comunicaDatiRimborsoSigla() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDati);
-        LOGGER.info("requested lock: " + lock.getPartitionKey());
+    public void comunicaDatiRimborsoSigla() throws AwesomeException {
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyComunicaDati);
+        LOGGER.info("requested lock: {}", lockKeyComunicaDati);
 
         try {
             if (lock.tryLock(2, TimeUnit.SECONDS)) {
-
-                LOGGER.info("got lock {}", lockKeyComunicaDati);
-
                 try {
+                    LOGGER.info("got lock {}", lockKeyComunicaDati);
                     LOGGER.info("Cron per Aggiornamenti Ordine Missione");
 
                     comunicaRimborsoSigla(false);
@@ -256,17 +252,16 @@ public class CronService {
                     LOGGER.info("unlocking {}", lockKeyComunicaDati);
                     lock.unlock();
                 }
-
             } else {
                 LOGGER.warn("unable to get lock {}", lockKeyComunicaDati);
             }
         } catch (Exception e) {
             LOGGER.error("Errore", e);
-            throw new ComponentException(e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
 
-    public void aggiornaRimborsiMissioneFlows() throws ComponentException {
+    public void aggiornaRimborsiMissioneFlows() throws AwesomeException {
         LOGGER.info("Cron per Aggiornamenti Rimborso Missione");
         RimborsoMissioneFilter filtroRimborso = new RimborsoMissioneFilter();
         filtroRimborso.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -304,7 +299,7 @@ public class CronService {
         List<RimborsoMissione> listaRimborsiMissione = null;
         try {
             listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filtroRimborso, false, true);
-        } catch (ComponentException e2) {
+        } catch (AwesomeException e2) {
             String error = Utility.getMessageException(e2);
             LOGGER.error(error + " " + e2);
             try {
@@ -362,7 +357,7 @@ public class CronService {
         List<OrdineMissione> listaOrdiniMissione = null;
         try {
             listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, true);
-        } catch (ComponentException e2) {
+        } catch (AwesomeException e2) {
             String error = Utility.getMessageException(e2);
             LOGGER.error(error + " " + e2);
             try {
@@ -399,7 +394,7 @@ public class CronService {
         List<AnnullamentoOrdineMissione> listaAnnullamenti = null;
         try {
             listaAnnullamenti = annullamentoOrdineMissioneService.getAnnullamenti(filtro, false, true);
-        } catch (ComponentException e2) {
+        } catch (AwesomeException e2) {
             String error = Utility.getMessageException(e2);
             LOGGER.error(error + " " + e2);
             try {
@@ -458,32 +453,31 @@ public class CronService {
     }
 
     @Transactional
-    public void verifyStep() throws ComponentException {
+    public void verifyStep() throws AwesomeException {
         FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyLoadCache);
-        LOGGER.info("requested lock: " + lock.getPartitionKey());
+        LOGGER.info("requested lock: {}", lockKeyLoadCache);
 
         try {
             if (lock.tryLock(2, TimeUnit.SECONDS)) {
-
-                LOGGER.info("got lock {}", lockKeyLoadCache);
-
                 try {
+                    LOGGER.info("got lock {}", lockKeyLoadCache);
                     LOGGER.info("Cron per Verificare gli step da eseguire");
+
                     verifyStepRespGruppo();
                     LOGGER.info("Fine Cron Resp Gruppo");
+
                     verifyStepAmministrativo();
                     LOGGER.info("Cron per Verificare gli step da eseguire terminato");
                 } finally {
                     LOGGER.info("unlocking {}", lockKeyLoadCache);
                     lock.unlock();
                 }
-
             } else {
                 LOGGER.warn("unable to get lock {}", lockKeyLoadCache);
             }
         } catch (Exception e) {
             LOGGER.error("Errore", e);
-            throw new ComponentException(e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
 
@@ -572,17 +566,15 @@ public class CronService {
     }
 
     @Transactional
-    public void verificaFlussoEComunicaDatiRimborsoSigla() throws ComponentException {
-        ILock lock = hazelcastInstance.getLock(lockKeyComunicaDatiVecchiaScrivania);
+    public void verificaFlussoEComunicaDatiRimborsoSigla() throws AwesomeException {
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(lockKeyComunicaDatiVecchiaScrivania);
 
-        LOGGER.info("requested lock: " + lock.getPartitionKey());
+        LOGGER.info("requested lock: {}", lockKeyComunicaDatiVecchiaScrivania);
 
         try {
             if (lock.tryLock(2, TimeUnit.SECONDS)) {
-
-                LOGGER.info("got lock {}", lockKeyComunicaDatiVecchiaScrivania);
-
                 try {
+                    LOGGER.info("got lock {}", lockKeyComunicaDatiVecchiaScrivania);
                     LOGGER.info("Cron per Aggiornamenti Ordine Missione Da Vecchia Scrivania");
 
                     aggiornaOrdiniMissioneFlows();
@@ -591,8 +583,6 @@ public class CronService {
 
                     aggiornaRimborsiMissioneFlows();
 
-//						ribaltaMissione(principal);
-
                     comunicaRimborsoSigla(true);
 
                     LOGGER.info("work done.");
@@ -600,17 +590,18 @@ public class CronService {
                     LOGGER.info("unlocking {}", lockKeyComunicaDatiVecchiaScrivania);
                     lock.unlock();
                 }
-
             } else {
                 LOGGER.warn("unable to get lock {}", lockKeyComunicaDatiVecchiaScrivania);
             }
         } catch (Exception e) {
             LOGGER.error("Errore", e);
-            throw new ComponentException(e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
+
+
     @Transactional
-    public void verificaFirmeHappySign() throws ComponentException {
+    public void verificaFirmeHappySign() throws AwesomeException {
         if (java.lang.management.ManagementFactory.getRuntimeMXBean().
                 getInputArguments().toString().contains("-agentlib:jdwp")) {
             LOGGER.debug("verificaFirmeHappySign");

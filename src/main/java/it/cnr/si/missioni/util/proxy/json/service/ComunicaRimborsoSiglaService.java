@@ -20,23 +20,24 @@
 package it.cnr.si.missioni.util.proxy.json.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
+import it.cnr.si.missioni.repository.RimborsoMissioneRepository;
 import it.cnr.si.missioni.service.MailService;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.*;
-import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.StorageObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +65,6 @@ public class ComunicaRimborsoSiglaService {
     private MailService mailService;
 
     @Autowired
-    private CRUDComponentSession crudServiceBean;
-
-    @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
 
     @Autowired
@@ -90,10 +88,18 @@ public class ComunicaRimborsoSiglaService {
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    private RimborsoMissioneRepository rimborsoMissioneRepository;
+
+    @Autowired
+    private OrdineMissioneRepository ordineMissioneRepository;
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MissioneBulk comunicaRimborsoSigla(Serializable rimborsoApprovatoId) {
 
-        RimborsoMissione rimborsoApprovato = (RimborsoMissione) crudServiceBean.findById(RimborsoMissione.class, rimborsoApprovatoId);
+        RimborsoMissione rimborsoApprovato = rimborsoMissioneRepository.findById((Long) rimborsoApprovatoId)
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN,
+                        "RimborsoMissione non trovato per ID: " + rimborsoApprovatoId));
         try {
             rimborsoMissioneService.retrieveDetails(rimborsoApprovato);
             if ((rimborsoApprovato.isTrattamentoAlternativoMissione() && !Utility.nvl(rimborsoApprovato.getRimborso0(), "N").equals("S")) || rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) > 0) {
@@ -191,15 +197,21 @@ public class ComunicaRimborsoSiglaService {
             oggettoBulk.setIdFolderRimborsoMissione(folder.getKey());
         }
         if (rimborsoApprovato.getOrdineMissione() != null && rimborsoApprovato.getOrdineMissione().getId() != null) {
-            OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, rimborsoApprovato.getOrdineMissione().getId());
-            if (ordineMissione != null) {
-                if (ordineMissione.getIdFlusso() != null) {
-                    oggettoBulk.setIdFlussoOrdineMissione(ordineMissione.getIdFlusso());
-                }
-                StorageObject folderOrdine = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
-                if (folderOrdine != null) {
-                    oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getKey());
-                }
+            OrdineMissione ordineMissione = ordineMissioneRepository
+                    .findById((Long) rimborsoApprovato.getOrdineMissione().getId())
+                    .orElseThrow(() -> new AwesomeException(
+                            CodiciErrore.ERRGEN,
+                            "OrdineMissione con ID " + rimborsoApprovato.getOrdineMissione().getId() + " non trovato per il rimborso missione " + rimborsoApprovato.getId()
+                    ));
+
+            // Se siamo arrivati qui, ordineMissione non è null
+            if (ordineMissione.getIdFlusso() != null) {
+                oggettoBulk.setIdFlussoOrdineMissione(ordineMissione.getIdFlusso());
+            }
+
+            StorageObject folderOrdine = cmisOrdineMissioneService.recuperoFolderOrdineMissione(ordineMissione);
+            if (folderOrdine != null) {
+                oggettoBulk.setIdFolderOrdineMissione(folderOrdine.getKey());
             }
         }
 
@@ -391,7 +403,7 @@ public class ComunicaRimborsoSiglaService {
                 MissioneBulk missioneBulk = mapper.readValue(risposta, MissioneBulk.class);
                 return missioneBulk;
             } catch (Exception ex) {
-                throw new ComponentException("Errore nella lettura del file di risposta.", ex);
+                throw new AwesomeException("Errore nella lettura del file di risposta.", ex);
             }
         }
         return null;
@@ -404,7 +416,7 @@ public class ComunicaRimborsoSiglaService {
             body = mapper.writeValueAsString(missione);
             return body;
         } catch (Exception ex) {
-            throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST (" + Utility.getMessageException(ex) + ").", ex);
+            throw new AwesomeException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST (" + Utility.getMessageException(ex) + ").", ex);
         }
     }
 
@@ -418,7 +430,7 @@ public class ComunicaRimborsoSiglaService {
     }
 
     private void impostaTappe(RimborsoMissione rimborsoApprovato, MissioneBulk oggettoBulk)
-            throws ComponentException {
+            throws AwesomeException {
         List<TappeMissioneColl> tappeMissioneColl = new ArrayList<TappeMissioneColl>();
         TappeMissioneColl tappa = new TappeMissioneColl();
         impostaDivisaTappa(tappa);
@@ -454,11 +466,11 @@ public class ComunicaRimborsoSiglaService {
         oggettoBulk.setTappeMissioneColl(tappeMissioneColl);
     }
 
-    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws ComponentException {
+    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl) throws AwesomeException {
         return impostaTappeDaDate(daData, aData, tappa, tappeMissioneColl, null, null);
     }
 
-    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws ComponentException {
+    private List<TappeMissioneColl> impostaTappeDaDate(ZonedDateTime daData, ZonedDateTime aData, TappeMissioneColl tappa, List<TappeMissioneColl> tappeMissioneColl, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione) throws AwesomeException {
         ZonedDateTime ultimaDataInizioUsata = null;
         if (dataInizioMissione != null && !DateUtils.truncate(daData).equals(DateUtils.truncate(dataInizioMissione))) {
             for (ZonedDateTime data = dataInizioMissione; DateUtils.truncate(data).isBefore(DateUtils.truncate(daData)); data = data.plusDays(1)) {
@@ -468,7 +480,7 @@ public class ComunicaRimborsoSiglaService {
                     newDayTappa = (TappeMissioneColl) tappa.clone();
                 } catch (CloneNotSupportedException e) {
                     log.error("Errore", e);
-                    throw new ComponentException("Errore nel clone.", e);
+                    throw new AwesomeException("Errore nel clone.", e);
                 }
                 impostaNazioneItalia(newDayTappa);
                 ZonedDateTime dataFine = data.plusDays(1);
@@ -495,7 +507,7 @@ public class ComunicaRimborsoSiglaService {
                 newDayTappa = (TappeMissioneColl) tappa.clone();
             } catch (CloneNotSupportedException e) {
                 log.error("Errore", e);
-                throw new ComponentException("Errore nel clone.", e);
+                throw new AwesomeException("Errore nel clone.", e);
             }
             ZonedDateTime dataFine = data.plusDays(1);
             if (dataFine.isAfter(aData)) {
@@ -517,7 +529,7 @@ public class ComunicaRimborsoSiglaService {
                     newDayTappa = (TappeMissioneColl) tappa.clone();
                 } catch (CloneNotSupportedException e) {
                     log.error("Errore", e);
-                    throw new ComponentException("Errore nel clone.", e);
+                    throw new AwesomeException("Errore nel clone.", e);
                 }
                 ZonedDateTime dataFine = dataInizio.plusDays(1);
                 if (dataFine.isAfter(dataFineMissione)) {

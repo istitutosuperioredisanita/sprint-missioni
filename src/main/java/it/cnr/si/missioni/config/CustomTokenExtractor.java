@@ -1,35 +1,38 @@
-/*
- *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
- *
- *      This program is free software: you can redistribute it and/or modify
- *      it under the terms of the GNU Affero General Public License as
- *      published by the Free Software Foundation, either version 3 of the
- *      License, or (at your option) any later version.
- *
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU Affero General Public License for more details.
- *
- *      You should have received a copy of the GNU Affero General Public License
- *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *
- */
-
 package it.cnr.si.missioni.config;
 
-import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
+/**
+ * Custom token resolver:
+ * - legge il token da Authorization header (Bearer ...)
+ * - fallback su parametro query ?token=
+ */
+public class CustomTokenExtractor implements BearerTokenResolver {
 
-public class CustomTokenExtractor extends BearerTokenExtractor {
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String TOKEN_PARAMETER = "token";
+
     @Override
-    protected String extractToken(HttpServletRequest request) {
-        return Optional.ofNullable(super.extractToken(request))
-                .orElseGet(() -> {
-                    return request.getParameter("token");
-                });
+    public String resolve(HttpServletRequest request) {
+        String token = resolveFromHeader(request);
+
+        if (!StringUtils.hasText(token)) {
+            token = request.getParameter(TOKEN_PARAMETER);
+        }
+
+        return token;
+    }
+
+    private String resolveFromHeader(HttpServletRequest request) {
+        String authorization = request.getHeader(AUTHORIZATION_HEADER);
+
+        if (StringUtils.hasText(authorization) && authorization.startsWith(BEARER_PREFIX)) {
+            return authorization.substring(BEARER_PREFIX.length());
+        }
+
+        return null;
     }
 }

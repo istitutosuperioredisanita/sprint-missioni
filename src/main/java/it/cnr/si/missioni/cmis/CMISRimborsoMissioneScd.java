@@ -21,42 +21,24 @@ package it.cnr.si.missioni.cmis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
-import it.cnr.si.missioni.cmis.*;
-import it.cnr.si.missioni.domain.custom.DatiFlusso;
-import it.cnr.si.missioni.domain.custom.persistence.*;
-import it.cnr.si.missioni.repository.CRUDComponentSession;
-import it.cnr.si.missioni.service.*;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissioneDettagli;
+import it.cnr.si.missioni.service.MessageForFlowsService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
-import it.cnr.si.missioni.util.data.Uo;
-import it.cnr.si.missioni.util.proxy.json.object.*;
-import it.cnr.si.missioni.util.proxy.json.service.*;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.spring.storage.StorageDriver;
-import it.cnr.si.spring.storage.StorageException;
 import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Profile("cnr")
@@ -92,7 +74,6 @@ public class CMISRimborsoMissioneScd extends AbstractCMISRimborsoMissioneService
             messageForFlow = (MessageForFlowRimborso) messageForFlowsService.impostaGruppiFirmatari(cmisRimborsoMissione, messageForFlow);
 
             messageForFlow.setPathFascicoloDocumenti(rimborsoMissione.getStringBasePath());
-
 
 
             if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()) {
@@ -203,9 +184,6 @@ public class CMISRimborsoMissioneScd extends AbstractCMISRimborsoMissioneService
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }
     }
-
-
-
 
 
 }

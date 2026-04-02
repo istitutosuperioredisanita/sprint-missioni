@@ -22,7 +22,7 @@ package it.cnr.si.missioni.domain.custom.print;
 import com.fasterxml.jackson.annotation.*;
 import it.cnr.si.missioni.domain.custom.persistence.SpostamentiAutoNoleggio;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

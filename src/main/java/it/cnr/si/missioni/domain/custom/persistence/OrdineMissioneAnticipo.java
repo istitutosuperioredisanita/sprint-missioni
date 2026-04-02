@@ -20,14 +20,16 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -36,7 +38,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ORDINE_MISSIONE_ANTICIPO")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_ANTICIPO", allocationSize = 0)
-public class OrdineMissioneAnticipo extends OggettoBulkXmlTransient implements Serializable {
+public class OrdineMissioneAnticipo extends BaseEntity {
 
     public final static String CMIS_PROPERTY_NAME_DOC_ANTICIPO = "Principale";
     public final static String CMIS_PROPERTY_NAME_TIPODOC_ANTICIPO = "Richiesta Anticipo";
@@ -57,9 +59,8 @@ public class OrdineMissioneAnticipo extends OggettoBulkXmlTransient implements S
     @Column(name = "NOTE", length = 3, nullable = true)
     private String note;
 
-    @Type(type = "java.util.Date")
     @Column(name = "DATA_RICHIESTA", nullable = false)
-    private Date dataRichiesta;
+    private LocalDateTime dataRichiesta;
 
     @ManyToOne
     @JoinColumn(name = "ID_ORDINE_MISSIONE", nullable = false)
@@ -151,11 +152,11 @@ public class OrdineMissioneAnticipo extends OggettoBulkXmlTransient implements S
         this.note = note;
     }
 
-    public Date getDataRichiesta() {
+    public LocalDateTime getDataRichiesta() {
         return dataRichiesta;
     }
 
-    public void setDataRichiesta(Date dataRichiesta) {
+    public void setDataRichiesta(LocalDateTime dataRichiesta) {
         this.dataRichiesta = dataRichiesta;
     }
 

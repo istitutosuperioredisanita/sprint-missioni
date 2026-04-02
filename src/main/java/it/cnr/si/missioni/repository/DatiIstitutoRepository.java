@@ -21,17 +21,18 @@ package it.cnr.si.missioni.repository;
 
 import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 
 /**
  * Spring Data JPA repository for the AutoPropria entity.
  */
 public interface DatiIstitutoRepository extends
-        JpaRepository<DatiIstituto, Long> {
+        JpaRepository<DatiIstituto, Long>, JpaSpecificationExecutor<DatiIstituto> {
     @Lock(LockModeType.WRITE)
     @Query("select a from DatiIstituto a where a.istituto = ?1 and a.anno = ?2")
     DatiIstituto getDatiIstitutoAndLock(String istituto, Integer anno);

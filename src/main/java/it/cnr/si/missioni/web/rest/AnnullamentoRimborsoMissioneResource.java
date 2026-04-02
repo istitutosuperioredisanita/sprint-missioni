@@ -21,17 +21,17 @@ package it.cnr.si.missioni.web.rest;
 
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.ejb.session.ComponentException;
+
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoRimborsoMissione;
 import it.cnr.si.missioni.service.AnnullamentoRimborsoMissioneService;
+import it.cnr.si.missioni.service.security.AuthoritiesConstants;
+import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +42,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,7 +80,7 @@ public class AnnullamentoRimborsoMissioneResource {
         List<AnnullamentoRimborsoMissione> annullamenti;
         try {
             annullamenti = annullamentoRimborsoMissioneService.getAnnullamenti(filter, true);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("ERRORE getRimborsoMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -231,7 +231,7 @@ public class AnnullamentoRimborsoMissioneResource {
         try {
             List<CMISFileAttachment> lista = annullamentoRimborsoMissioneService.getAttachments(idAnnullamentoRimborsoMissione);
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getAttachments", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
@@ -247,7 +247,7 @@ public class AnnullamentoRimborsoMissioneResource {
         try {
             List<CMISFileAttachment> lista = annullamentoRimborsoMissioneService.getAttachmentsFromRimborso(idRimborsoMissione);
             return JSONResponseEntity.ok(lista);
-        } catch (ComponentException e) {
+        } catch (AwesomeException e) {
             log.error("getAttachments", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }

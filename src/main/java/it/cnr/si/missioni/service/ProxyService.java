@@ -20,7 +20,6 @@
 package it.cnr.si.missioni.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.ExternalProblem;
 import it.cnr.si.missioni.util.Costanti;
@@ -95,14 +94,14 @@ public class ProxyService implements EnvironmentAware {
                 clazzJson = Class.forName(callCache.getClasseJson());
             } catch (ClassNotFoundException e) {
                 log.error("Errore", e);
-                throw new ComponentException(Utility.getMessageException(e), e);
+                throw new AwesomeException(Utility.getMessageException(e), e);
             }
             CommonJsonRest commonJson = null;
             try {
                 commonJson = (CommonJsonRest) new ObjectMapper().readValue(resultProxy.getBody(), clazzJson);
             } catch (IOException e) {
                 log.error("Errore", e);
-                throw new ComponentException(Utility.getMessageException(e), e);
+                throw new AwesomeException(Utility.getMessageException(e), e);
             }
             resultProxy.setCommonJsonResponse(commonJson);
             resultProxy.setBody("");
@@ -121,7 +120,7 @@ public class ProxyService implements EnvironmentAware {
             ObjectMapper mapper = new ObjectMapper();
             body = mapper.writeValueAsString(jsonBody);
         } catch (Exception ex) {
-            throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST (" + Utility.getMessageException(ex) + ").", ex);
+            throw new AwesomeException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST (" + Utility.getMessageException(ex) + ").", ex);
         }
         return process(httpMethod, body, app, url, queryString, authorization, restContextHeader);
     }
@@ -157,8 +156,8 @@ public class ProxyService implements EnvironmentAware {
         } catch (HttpServerErrorException _ex) {
             String errResponse = _ex.getResponseBodyAsString();
             log.error(_ex.getMessage(), _ex.getResponseBodyAsString());
-            if (_ex.getStatusCode().compareTo(HttpStatus.SERVICE_UNAVAILABLE) == 0) {
-                throw new ComponentException(app + " temporaneamente non disponibile");
+            if (_ex.getStatusCode().isSameCodeAs(HttpStatus.SERVICE_UNAVAILABLE)) {
+                throw new AwesomeException(app + " temporaneamente non disponibile");
             }
             throw new ApplicationContextException(errResponse, _ex);
         } catch (Exception _ex) {

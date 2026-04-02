@@ -20,11 +20,12 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Utility;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -34,7 +35,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "DATI_ISTITUTO")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_DATI_ISTITUTO", allocationSize = 0)
-public class DatiIstituto extends OggettoBulkXmlTransient implements Serializable, Cloneable {
+public class DatiIstituto extends BaseEntity implements Cloneable {
 
     @Column(name = "DATA_BLOCCO_RIMBORSI_TAM", nullable = true)
     public LocalDate dataBloccoRimborsiTam;
