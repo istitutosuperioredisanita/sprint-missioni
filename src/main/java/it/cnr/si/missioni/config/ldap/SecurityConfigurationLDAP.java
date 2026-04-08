@@ -1,19 +1,20 @@
 package it.cnr.si.missioni.config.ldap;
 
-import it.cnr.si.missioni.config.ldap.CustomAuthoritiesPopulator;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
 import java.util.Properties;
@@ -28,6 +29,11 @@ public class SecurityConfigurationLDAP {
     @Inject
     private Environment env;
 
+    // Iniettato solo se il profilo "iss" è attivo (CustomAuthoritiesIssPopulator è @Profile("iss"))
+    // Se il profilo non è "iss", questo sarà null e useremo il populator base
+    @Autowired(required = false)
+    private LdapAuthoritiesPopulator ldapAuthoritiesPopulator;
+
     private Properties ldapProperties() {
         return Binder.get(env)
                 .bind("spring.ldap", Properties.class)
@@ -36,7 +42,14 @@ public class SecurityConfigurationLDAP {
 
     @Bean
     public UserDetailsContextMapper userDetailsContextMapper() {
-        return new LdapUserDetailsMapper();
+        // Legge attrName/attrSurname/attrMail da application-iss.yml
+        // e produce un CNRUser come principal (necessario per LdapSecurityServiceImpl)
+        Properties props = ldapProperties();
+        return new IssLdapUserDetailsContextMapper(
+                props.getProperty("attrName", "givenname"),
+                props.getProperty("attrSurname", "sn"),
+                props.getProperty("attrMail", "mail")
+        );
     }
 
     @Bean
@@ -48,8 +61,6 @@ public class SecurityConfigurationLDAP {
             throw new IllegalStateException("No LDAP configuration found: spring.ldap.url is missing");
         }
 
-        log.info("ldap server: {}", url);
-
         LdapContextSource contextSource = new LdapContextSource();
         contextSource.setUrl(url);
         contextSource.setUserDn(properties.getProperty("managerDn"));
@@ -59,6 +70,7 @@ public class SecurityConfigurationLDAP {
     }
 
     @Bean(name = "ldapAuthenticationManager")
+    @Primary
     public AuthenticationManager ldapAuthenticationManager(
             LdapContextSource ldapContextSource,
             UserDetailsContextMapper userDetailsContextMapper) {
@@ -71,7 +83,13 @@ public class SecurityConfigurationLDAP {
         factory.setUserSearchBase(properties.getProperty("userSearchBase"));
         factory.setUserSearchFilter(properties.getProperty("userSearchFilter"));
         factory.setUserDetailsContextMapper(userDetailsContextMapper);
-        factory.setLdapAuthoritiesPopulator(new CustomAuthoritiesPopulator());
+
+        // Fix Gap 1: usa IssPopulator se disponibile (profilo iss), altrimenti il base
+        if (ldapAuthoritiesPopulator != null) {
+            factory.setLdapAuthoritiesPopulator(ldapAuthoritiesPopulator);
+        } else {
+            factory.setLdapAuthoritiesPopulator(new CustomAuthoritiesPopulator());
+        }
 
         return factory.createAuthenticationManager();
     }

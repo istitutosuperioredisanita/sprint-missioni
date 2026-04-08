@@ -19,6 +19,7 @@
 
 package it.cnr.si.missioni.domain.custom.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
@@ -40,7 +41,8 @@ import java.util.List;
 /**
  * A user.
  */
-@Entity
+
+@Entity @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "ORDINE_MISSIONE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_ORDINE_MISSIONE", allocationSize = 0)
 public class OrdineMissione extends BaseEntity {

@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +54,7 @@ import java.util.Map;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@Secured({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class OrdineMissioneAutoPropriaResource {
 
@@ -231,10 +232,11 @@ public class OrdineMissioneAutoPropriaResource {
 
     @RequestMapping(value = "/rest/public/printOrdineMissioneAutoPropria",
             method = RequestMethod.GET)
-    @ExceptionHandler(RuntimeException.class)
     @Timed
     public @ResponseBody void printOrdineMissioneAutoPropria(HttpServletRequest request,
-                                                             @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
+                                                             @RequestParam(value = "idMissione") String idMissione,
+                                                             @RequestParam(value = "token") String token,
+                                                             HttpServletResponse res) {
         log.debug("REST request per la stampa della richiesta di auto propria per l'Ordine di Missione ");
 
         if (!StringUtils.isEmpty(idMissione)) {
@@ -245,31 +247,25 @@ public class OrdineMissioneAutoPropriaResource {
                     Map<String, byte[]> map = ordineMissioneAutoPropriaService.printOrdineMissioneAutoPropria(idMissioneLong);
                     if (map != null) {
                         res.setContentType("application/pdf");
-                        try {
-                            String headerValue = "attachment";
-                            for (String key : map.keySet()) {
-                                headerValue += "; filename=\"" + key + "\"";
-                                res.setHeader("Content-Disposition", headerValue);
-                                OutputStream outputStream = res.getOutputStream();
-                                InputStream inputStream = new ByteArrayInputStream(map.get(key));
+                        String headerValue = "attachment";
 
+                        for (String key : map.keySet()) {
+                            headerValue += "; filename=\"" + key + "\"";
+                            res.setHeader("Content-Disposition", headerValue);
+
+                            try (OutputStream outputStream = res.getOutputStream();
+                                 InputStream inputStream = new ByteArrayInputStream(map.get(key))) {
                                 IOUtils.copy(inputStream, outputStream);
-
                                 outputStream.flush();
-
-                                inputStream.close();
-                                outputStream.close();
                             }
-                        } catch (IOException e) {
-                            log.error("ERRORE printOrdineMissioneAutoPropria", e);
-                            throw new AwesomeException(Utility.getMessageException(e));
                         }
                     }
                 }
-            } catch (AwesomeException e) {
+            } catch (Exception e) {
                 log.error("ERRORE printOrdineMissioneAutoPropria", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }
         }
     }
+
 }

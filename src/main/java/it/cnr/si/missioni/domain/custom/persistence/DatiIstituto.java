@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Utility;
 import org.springframework.util.StringUtils;
@@ -32,7 +33,7 @@ import java.time.LocalDate;
 /**
  * A user.
  */
-@Entity
+@Entity @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "DATI_ISTITUTO")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_DATI_ISTITUTO", allocationSize = 0)
 public class DatiIstituto extends BaseEntity implements Cloneable {

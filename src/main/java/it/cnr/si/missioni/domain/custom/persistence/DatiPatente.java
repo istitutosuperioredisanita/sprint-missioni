@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.cnr.si.missioni.config.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -30,7 +31,7 @@ import java.time.LocalDateTime;
 /**
  * A user.
  */
-@Entity
+@Entity @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "DATI_PATENTE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_DATI_PATENTE", allocationSize = 0)
 public class DatiPatente extends BaseEntity {

@@ -59,9 +59,8 @@ import java.util.stream.Collectors;
 /**
  * REST controller for managing the current user's account.
  */
-@RestControllerAdvice
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@RolesAllowed("USER")
 @RequestMapping("/api")
 public class OrdineMissioneResource {
 
@@ -427,7 +426,6 @@ public class OrdineMissioneResource {
     @RequestMapping(value = "/rest/public/printOrdineMissione",
             method = RequestMethod.GET)
     @Timed
-    @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printOrdineMissione(HttpServletRequest request,
                                                   @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'Ordine di Missione ");

@@ -35,7 +35,7 @@
 //import jakarta.annotation.security.RolesAllowed;
 //import jakarta.servlet.http.HttpServletRequest;
 //
-//@RolesAllowed({AuthoritiesConstants.USER})
+//@Secured({AuthoritiesConstants.USER})
 //@RestController
 //@RequestMapping("/api")
 //public class HelpdeskResource {

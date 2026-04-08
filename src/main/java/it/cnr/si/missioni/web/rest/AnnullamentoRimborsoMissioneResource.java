@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@Secured({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class AnnullamentoRimborsoMissioneResource {
 

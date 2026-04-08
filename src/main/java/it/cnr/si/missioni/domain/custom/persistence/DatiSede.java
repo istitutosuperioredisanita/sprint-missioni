@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Utility;
 
@@ -31,7 +32,7 @@ import java.time.LocalDate;
 /**
  * A user.
  */
-@Entity
+@Entity @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "DATI_SEDE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_DATI_SEDE", allocationSize = 0)
 public class DatiSede extends BaseEntity {

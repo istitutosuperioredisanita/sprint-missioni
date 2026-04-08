@@ -1,22 +1,3 @@
-/*
- *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
- *
- *      This program is free software: you can redistribute it and/or modify
- *      it under the terms of the GNU Affero General Public License as
- *      published by the Free Software Foundation, either version 3 of the
- *      License, or (at your option) any later version.
- *
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU Affero General Public License for more details.
- *
- *      You should have received a copy of the GNU Affero General Public License
- *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *
- */
-
 package it.cnr.si.missioni.web.rest;
 
 import it.cnr.si.missioni.web.rest.errors.ErrorVM;
@@ -25,30 +6,38 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalDefaultExceptionHandler {
-    private final Logger log = LoggerFactory.getLogger(GlobalDefaultExceptionHandler.class);
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalDefaultExceptionHandler.class);
+
+    @ExceptionHandler({AuthorizationDeniedException.class, AccessDeniedException.class})
+    public ResponseEntity<ErrorVM> handleAccessDenied(Exception ex) {
+        log.warn("Access denied handled by {}", GlobalDefaultExceptionHandler.class.getCanonicalName(), ex);
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorVM("error.403", "Access Denied"));
+    }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorVM> processRuntimeException(Exception ex) throws Exception {
-        ResponseEntity.BodyBuilder builder;
-        ErrorVM errorVM;
-
-        log.error("exception handled by " + GlobalDefaultExceptionHandler.class.getCanonicalName(), ex);
+    public ResponseEntity<ErrorVM> processRuntimeException(RuntimeException ex) {
+        log.error("Exception handled by {}", GlobalDefaultExceptionHandler.class.getCanonicalName(), ex);
 
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
         if (responseStatus != null) {
-            builder = ResponseEntity.status(responseStatus.value());
-            errorVM = new ErrorVM("error." + responseStatus.value().value(), responseStatus.reason());
-        } else {
-            builder = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            errorVM = new ErrorVM(ex.getLocalizedMessage());
+            return ResponseEntity
+                    .status(responseStatus.value())
+                    .body(new ErrorVM("error." + responseStatus.value().value(), responseStatus.reason()));
         }
-        return builder.body(errorVM);
-    }
 
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorVM(ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() : "Errore interno"));
+    }
 }

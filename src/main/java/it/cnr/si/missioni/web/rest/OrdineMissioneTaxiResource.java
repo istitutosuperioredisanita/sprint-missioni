@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +56,7 @@ import java.util.Map;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@Secured({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class OrdineMissioneTaxiResource {
 
@@ -298,13 +299,12 @@ public class OrdineMissioneTaxiResource {
         }
     }
 
-
     @RequestMapping(value = "/rest/public/printOrdineMissioneTaxi",
             method = RequestMethod.GET)
-    @ExceptionHandler(RuntimeException.class)
     @Timed
     public @ResponseBody void printOrdineMissioneTaxi(HttpServletRequest request,
-                                                      @RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
+                                                      @RequestParam(value = "idMissione") String idMissione,
+                                                      HttpServletResponse res) {
         log.debug("REST request per la stampa dell'Ordine di Missione");
 
         if (!StringUtils.isEmpty(idMissione)) {
@@ -315,35 +315,24 @@ public class OrdineMissioneTaxiResource {
                     Map<String, byte[]> map = ordineMissioneTaxiService.printOrdineMissioneTaxi(idMissioneLong);
                     if (map != null) {
                         res.setContentType("application/pdf");
-                        try {
-                            String headerValue = "attachment";
-                            for (String key : map.keySet()) {
-                                headerValue += "; filename=\"" + key + "\"";
+                        String headerValue = "attachment";
 
+                        for (String key : map.keySet()) {
+                            headerValue += "; filename=\"" + key + "\"";
+                            res.setHeader("Content-Disposition", headerValue);
 
-                                res.setHeader("Content-Disposition", headerValue);
-                                OutputStream outputStream = res.getOutputStream();
-                                InputStream inputStream = new ByteArrayInputStream(map.get(key));
-
+                            try (OutputStream outputStream = res.getOutputStream();
+                                 InputStream inputStream = new ByteArrayInputStream(map.get(key))) {
                                 IOUtils.copy(inputStream, outputStream);
-
                                 outputStream.flush();
-
-                                inputStream.close();
-                                outputStream.close();
-
                             }
-                        } catch (IOException e) {
-                            log.error("ERRORE printOrdineMissioneTaxi", e);
-                            throw new AwesomeException(Utility.getMessageException(e));
                         }
                     }
                 }
-            } catch (AwesomeException e) {
+            } catch (Exception e) {
                 log.error("ERRORE printOrdineMissioneTaxi", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }
         }
     }
-
 }

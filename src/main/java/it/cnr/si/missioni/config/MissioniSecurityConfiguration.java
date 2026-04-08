@@ -8,15 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
@@ -24,16 +21,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @Profile("!keycloak")
 public class MissioniSecurityConfiguration {
-
-    @Inject
-    private UserDetailsService userDetailsService;
 
     @Inject
     private TokenProvider tokenProvider;
@@ -47,23 +40,7 @@ public class MissioniSecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(HttpFirewall httpFirewall) {
-        return web -> {
-            web.httpFirewall(httpFirewall);
-            web.ignoring()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**")
-                    .requestMatchers(new AntPathRequestMatcher("/app/**/*.js"))
-                    .requestMatchers(new AntPathRequestMatcher("/app/**/*.html"))
-                    .requestMatchers("/bower_components/**")
-                    .requestMatchers("/i18n/**")
-                    .requestMatchers("/content/**")
-                    .requestMatchers("/swagger-ui/index.html")
-                    .requestMatchers("/h2-console/**")
-                    .requestMatchers("/test/**")
-                    .requestMatchers("/views/**")
-                    .requestMatchers("/SIGLA/**")
-                    .requestMatchers("/api/profile/info")
-                    .requestMatchers("/api/rest/flows");
-        };
+        return web -> web.httpFirewall(httpFirewall);
     }
 
     @Bean
@@ -74,8 +51,7 @@ public class MissioniSecurityConfiguration {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new JWTFilter(tokenProvider),
-                        UsernamePasswordAuthenticationFilter.class)  // <-- aggiunto
+                .addFilterBefore(new JWTFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(
@@ -85,8 +61,31 @@ public class MissioniSecurityConfiguration {
                         )
                 )
                 .authorizeHttpRequests(authorize -> authorize
+
+                        // richieste preflight
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // risorse pubbliche/statiche
                         .requestMatchers(
-                                "/oauth/token",          // <-- aggiunto
+                                "/app/**",
+                                "/bower_components/**",
+                                "/api/rest/public/**",
+                                "/i18n/**",
+                                "/content/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/h2-console/**",
+                                "/test/**",
+                                "/views/**",
+                                "/SIGLA/**",
+                                "/api/profile/info",
+                                "/api/rest/flows",
+                                "/error"
+                        ).permitAll()
+
+                        // endpoint pubblici di autenticazione/account
+                        .requestMatchers(
+                                "/oauth/token",
                                 "/api/register",
                                 "/api/activate",
                                 "/api/authenticate",
@@ -95,22 +94,24 @@ public class MissioniSecurityConfiguration {
                                 "/api/account/reset_password/init",
                                 "/api/account/reset_password/finish"
                         ).permitAll()
+
+                        // actuator
                         .requestMatchers("/management/health", "/management/info").permitAll()
                         .requestMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+
+                        // api protette
                         .requestMatchers("/api/**").authenticated()
+
+                        // tutto il resto
                         .anyRequest().permitAll()
                 );
+
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 
     @Bean

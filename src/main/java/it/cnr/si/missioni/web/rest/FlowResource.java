@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,7 +42,7 @@ import jakarta.annotation.security.RolesAllowed;
  */
 @RestController
 @RequestMapping("/api")
-@RolesAllowed(Costanti.ROLE_FLOWS)
+@Secured(Costanti.ROLE_FLOWS)
 public class FlowResource {
 
     private final Logger log = LoggerFactory.getLogger(FlowResource.class);

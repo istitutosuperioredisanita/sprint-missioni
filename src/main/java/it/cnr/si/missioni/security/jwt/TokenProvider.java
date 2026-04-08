@@ -68,8 +68,14 @@ public class TokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
+        Object authClaim = claims.get(AUTHORITIES_KEY);
+
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                authClaim == null || authClaim.toString().isBlank()
+                        ? java.util.List.of()
+                        : Arrays.stream(authClaim.toString().split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isBlank())
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
@@ -82,7 +88,6 @@ public class TokenProvider {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            log.info("JWT non valido: {}", e.getMessage());
             return false;
         }
     }

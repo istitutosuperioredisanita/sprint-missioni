@@ -1055,11 +1055,17 @@ public class RimborsoMissioneService {
         rimborsoMissione.setStato(Costanti.STATO_INSERITO);
         rimborsoMissione.setStatoFlusso(Costanti.STATO_INSERITO);
         if (rimborsoMissione.getOrdineMissione() != null) {
-            OrdineMissione ordineMissione = ordineMissioneRepository.findById((Long) rimborsoMissione.getOrdineMissione().getId()).orElse(null);
-            if (ordineMissione != null) {
-                rimborsoMissione.setOrdineMissione(ordineMissione);
-            } else {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione con ID: " + rimborsoMissione.getOrdineMissione().getId() + " non esiste");
+            OrdineMissione ordineMissione = ordineMissioneRepository
+                    .findById((Long) rimborsoMissione.getOrdineMissione().getId())
+                    .orElseThrow(() -> new AwesomeException(
+                            CodiciErrore.ERRGEN,
+                            "L'ordine di missione con ID: " + rimborsoMissione.getOrdineMissione().getId() + " non esiste"
+                    ));
+
+            rimborsoMissione.setOrdineMissione(ordineMissione);
+
+            if (!StringUtils.hasLength(rimborsoMissione.getPartenzaDa())) {
+                rimborsoMissione.setPartenzaDa(ordineMissione.getPartenzaDa());
             }
         }
         if (StringUtils.isEmpty(rimborsoMissione.getMatricola()) && StringUtils.isEmpty(rimborsoMissione.getQualificaRich())) {
@@ -1152,6 +1158,9 @@ public class RimborsoMissioneService {
             }
             if (StringUtils.isEmpty(rimborsoMissione.getInquadramento())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Per la data della missione indicata non è stato possibile recuperare l'inquadramento.");
+            }
+            else if (StringUtils.isEmpty(rimborsoMissione.getPartenzaDa())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Partenza Da");
             }
             if (rimborsoMissione.isMissioneEstera()) {
                 if (StringUtils.isEmpty(rimborsoMissione.getNazione()) || Costanti.NAZIONE_ITALIA_SIGLA.compareTo(rimborsoMissione.getNazione()) == 0) {

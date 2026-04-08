@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +44,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * REST controller for managing config.
  */
-@RolesAllowed({Costanti.ROLE_ADMIN})
+@Secured({Costanti.ROLE_ADMIN})
 @RestController
 @RequestMapping("/api")
 public class ConfigResource {
@@ -56,7 +57,7 @@ public class ConfigResource {
     @Autowired
     private ConfigService configService;
 
-    @RolesAllowed({AuthoritiesConstants.USER})
+    @Secured({AuthoritiesConstants.USER})
     @RequestMapping(value = "/rest/config/message",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,7 +69,7 @@ public class ConfigResource {
     }
 
 
-    @RolesAllowed({AuthoritiesConstants.USER})
+    @Secured({AuthoritiesConstants.USER})
     @RequestMapping(value = "/rest/config/releaseNotes",
             method = RequestMethod.GET)
     @Timed
@@ -78,7 +79,7 @@ public class ConfigResource {
         return JSONResponseEntity.ok(content);
     }
 
-    @RolesAllowed({AuthoritiesConstants.USER})
+    @Secured({AuthoritiesConstants.USER})
     @RequestMapping(value = "/rest/config/faq",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

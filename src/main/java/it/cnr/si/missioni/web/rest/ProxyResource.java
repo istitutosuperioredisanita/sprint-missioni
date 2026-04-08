@@ -44,6 +44,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -54,8 +55,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * REST controller for proxy to different application.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
-@RequestMapping("api/proxy/{app}")
+@Secured({AuthoritiesConstants.USER})
+@RequestMapping({"api/proxy/{app}", "api/proxy/{app}/"})
 public class ProxyResource {
 
     public final static String PROXY_URL = "proxyURL";
@@ -74,7 +75,7 @@ public class ProxyResource {
 
     @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<String> get(@PathVariable String app, @RequestParam(value = PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
         if (log.isDebugEnabled())
             log.debug("GET from app: " + app + " with proxyURL: " + url);
@@ -84,7 +85,7 @@ public class ProxyResource {
     @RequestMapping(method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    @RolesAllowed(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<String> post(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value = PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
         if (log.isDebugEnabled())
             log.debug("POST from app: " + app + " with proxyURL: " + url);
@@ -98,7 +99,7 @@ public class ProxyResource {
 
     @RequestMapping(method = RequestMethod.PUT,
             produces = MediaType.ALL_VALUE)
-    @RolesAllowed(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<String> put(@RequestBody JSONBody body, @PathVariable String app, @RequestParam(value = PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
         if (log.isDebugEnabled())
             log.debug("PUT from app: " + app + " with proxyURL: " + url);
@@ -114,7 +115,7 @@ public class ProxyResource {
 
     @RequestMapping(method = RequestMethod.DELETE,
             produces = MediaType.ALL_VALUE)
-    @RolesAllowed(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<String> delete(@PathVariable String app, @RequestParam(value = PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
         if (log.isDebugEnabled())
             log.debug("DELETE from app: " + app + " with proxyURL: " + url);

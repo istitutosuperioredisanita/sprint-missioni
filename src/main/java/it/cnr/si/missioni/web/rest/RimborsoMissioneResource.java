@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +64,7 @@ import java.util.zip.ZipOutputStream;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@Secured({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class RimborsoMissioneResource {
 
@@ -405,41 +406,38 @@ public class RimborsoMissioneResource {
     @RequestMapping(value = "/rest/public/printRimborsoMissione",
             method = RequestMethod.GET)
     @Timed
-    @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printRimborsoMissione(HttpServletRequest request,
-                                                    @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
-        log.debug("REST request per la stampa dell'rimborso di Missione ");
+                                                    @RequestParam(value = "idMissione") String idMissione,
+                                                    @RequestParam(value = "token") String token,
+                                                    HttpServletResponse res) {
+        log.debug("REST request per la stampa del rimborso di Missione");
 
-        String user = securityService.getCurrentUserLogin();
-        if (user != null && !StringUtils.isEmpty(idMissione)) {
-            try {
-                Long idMissioneLong = Long.valueOf(idMissione);
-                Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(idMissioneLong);
-                if (map != null) {
-                    res.setContentType("application/pdf");
-                    try {
-                        String headerValue = "attachment";
-                        for (String key : map.keySet()) {
-                            System.out.println(map.get(key).length);
-                            log.debug("Lunghezza " + map.get(key).length);
-                            headerValue += "; filename=\"" + key + "\"";
-                            OutputStream outputStream = res.getOutputStream();
-                            res.setHeader("Content-Disposition", headerValue);
-                            InputStream inputStream = new ByteArrayInputStream(map.get(key));
-                            IOUtils.copy(inputStream, outputStream);
-                            outputStream.flush();
-                            inputStream.close();
-                            outputStream.close();
-                        }
-                    } catch (IOException e) {
-                        log.error("ERRORE deleteRimborsoMissione", e);
-                        throw new AwesomeException(Utility.getMessageException(e));
-                    }
-                }
-            } catch (AwesomeException e) {
-                log.error("ERRORE printRimborsoMissione", e);
-                throw new AwesomeException(Utility.getMessageException(e));
+        try {
+            String user = securityService.getCurrentUserLogin();
+            if (user == null || StringUtils.isEmpty(idMissione)) {
+                return;
             }
+
+            Long idMissioneLong = Long.valueOf(idMissione);
+            Map<String, byte[]> map = rimborsoMissioneService.printRimborsoMissione(idMissioneLong);
+
+            if (map == null || map.isEmpty()) {
+                return;
+            }
+
+            Map.Entry<String, byte[]> entry = map.entrySet().iterator().next();
+
+            res.setContentType("application/pdf");
+            res.setHeader("Content-Disposition", "attachment; filename=\"" + entry.getKey() + "\"");
+
+            try (OutputStream outputStream = res.getOutputStream();
+                 InputStream inputStream = new ByteArrayInputStream(entry.getValue())) {
+                IOUtils.copy(inputStream, outputStream);
+                outputStream.flush();
+            }
+        } catch (Exception e) {
+            log.error("ERRORE printRimborsoMissione", e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
 
@@ -503,55 +501,64 @@ public class RimborsoMissioneResource {
     @RequestMapping(value = "/rest/public/zipDocumentiRimborsoMissione",
             method = RequestMethod.GET)
     @Timed
-    @ExceptionHandler(Exception.class)
     @SuppressWarnings("unchecked")
     public @ResponseBody void scaricaZip(HttpServletRequest request,
-                                         @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse response) {
-        Long idMissioneLong = Long.valueOf(idMissione);
-        String user = securityService.getCurrentUserLogin();
-        if (user != null && idMissioneLong != null) {
-            final ZipOutputStream zos;
-            try {
-                zos = new ZipOutputStream(response.getOutputStream());
-            } catch (IOException e) {
-                throw new AwesomeException(Utility.getMessageException(e));
-            }
-            response.setContentType("application/zip");
-            response.setDateHeader("Expires", 0);
-            RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione(idMissioneLong, false, false);
-            response.setHeader("Content-disposition", "attachment; filename=DocumentiRimborsoMissione" + Utility.getUoSiper(rimborsoMissione.getUoSpesa()) + "_" + rimborsoMissione.getAnno() + "_" + rimborsoMissione.getNumero() + ".zip");
-            try {
-                String headerValue = "attachment";
+                                         @RequestParam(value = "idMissione") String idMissione,
+                                         @RequestParam(value = "token") String token,
+                                         HttpServletResponse response) {
+        try {
+            Long idMissioneLong = Long.valueOf(idMissione);
+            String user = securityService.getCurrentUserLogin();
+
+            if (user != null) {
+                response.setContentType("application/zip");
+                response.setDateHeader("Expires", 0);
+
+                RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione(idMissioneLong, false, false);
+
+                response.setHeader(
+                        "Content-disposition",
+                        "attachment; filename=DocumentiRimborsoMissione"
+                                + Utility.getUoSiper(rimborsoMissione.getUoSpesa())
+                                + "_"
+                                + rimborsoMissione.getAnno()
+                                + "_"
+                                + rimborsoMissione.getNumero()
+                                + ".zip"
+                );
+
                 List<StorageObject> documenti = rimborsoMissioneService.getAllDocumentsMissione(rimborsoMissione);
 
+                try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
+                    documenti.stream()
+                            .filter(storageObject -> !Optional.ofNullable(storageObject.getPropertyValue(StoragePropertyNames.BASE_TYPE_ID.value()))
+                                    .map(String.class::cast)
+                                    .filter(s -> s.equals(StoragePropertyNames.CMIS_FOLDER.value()))
+                                    .isPresent())
+                            .forEach(documento -> {
+                                try {
+                                    ZipEntry zipEntryFile = new ZipEntry((String) documento.getPropertyValue(StoragePropertyNames.NAME.value()));
+                                    zos.putNextEntry(zipEntryFile);
+                                    IOUtils.copyLarge(rimborsoMissioneService.getResource(documento), zos);
+                                    zos.closeEntry();
+                                } catch (ZipException e) {
+                                    log.warn("Cannot add entry to zip file", e);
+                                } catch (IOException e) {
+                                    throw new AwesomeException(Utility.getMessageException(e));
+                                }
+                            });
 
-                documenti.stream()
-                        .filter(storageObject -> !Optional.ofNullable(storageObject.getPropertyValue(StoragePropertyNames.BASE_TYPE_ID.value()))
-                                .map(String.class::cast)
-                                .filter(s -> s.equals(StoragePropertyNames.CMIS_FOLDER.value()))
-                                .isPresent())
-                        .forEach(documento -> {
-                            try {
-                                ZipEntry zipEntryFile = new ZipEntry((String) documento.getPropertyValue(StoragePropertyNames.NAME.value()));
-                                zos.putNextEntry(zipEntryFile);
-                                IOUtils.copyLarge(rimborsoMissioneService.getResource(documento), zos);
-                            } catch (ZipException e) {
-                                log.warn("Cannot add entry to zip file", e);
-                            } catch (IOException e) {
-                                throw new AwesomeException(Utility.getMessageException(e));
-                            }
-
-                        });
-                zos.close();
-                response.getOutputStream().flush();
-            } catch (IOException e) {
-                log.error("ERRORE scaricaZip", e);
-                throw new AwesomeException(Utility.getMessageException(e));
+                    zos.flush();
+                }
             }
+        } catch (Exception e) {
+            log.error("ERRORE scaricaZip", e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
 
-    @RolesAllowed(Costanti.ROLE_ADMIN)
+
+    @Secured(Costanti.ROLE_ADMIN)
     @RequestMapping(value = "/rest/rimborsoMissione/comunica/sigla/{idRimborsoMissione}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +42,7 @@ import java.util.List;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@Secured({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class MissioneRespintaResource {
 

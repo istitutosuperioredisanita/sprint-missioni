@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +56,7 @@ import java.util.stream.Collectors;
  * REST controller for managing the current user's account.
  */
 @RestController
-@RolesAllowed({AuthoritiesConstants.USER})
+@Secured({AuthoritiesConstants.USER})
 @RequestMapping("/api")
 public class AnnullamentoOrdineMissioneResource {
 
@@ -227,43 +228,41 @@ public class AnnullamentoOrdineMissioneResource {
     @RequestMapping(value = "/rest/public/printAnnullamentoMissione",
             method = RequestMethod.GET)
     @Timed
-    @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printAnnullamentoMissione(HttpServletRequest request,
-                                                        @RequestParam(value = "idMissione") String idMissione, HttpServletResponse res) {
-        log.debug("REST request per la stampa dell'rimborso di Missione ");
+                                                        @RequestParam(value = "idMissione") String idMissione,
+                                                        HttpServletResponse res) {
+        log.debug("REST request per la stampa dell'annullamento di Missione");
 
         if (!StringUtils.isEmpty(idMissione)) {
             try {
                 Long idMissioneLong = Long.valueOf(idMissione);
                 String user = securityService.getCurrentUserLogin();
+
                 if (user != null) {
                     Map<String, byte[]> map = annullamentoOrdineMissioneService.printAnnullamentoMissione(idMissioneLong);
-                    if (map != null) {
+                    if (map != null && !map.isEmpty()) {
                         res.setContentType("application/pdf");
-                        try {
-                            String headerValue = "attachment";
-                            for (String key : map.keySet()) {
-                                System.out.println(map.get(key).length);
-                                log.debug("Lunghezza " + map.get(key).length);
-                                headerValue += "; filename=\"" + key + "\"";
-                                OutputStream outputStream = res.getOutputStream();
-                                res.setHeader("Content-Disposition", headerValue);
-                                InputStream inputStream = new ByteArrayInputStream(map.get(key));
+
+                        for (Map.Entry<String, byte[]> entry : map.entrySet()) {
+                            String fileName = entry.getKey();
+                            byte[] content = entry.getValue();
+
+                            log.debug("Lunghezza {}", content.length);
+                            res.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+                            try (OutputStream outputStream = res.getOutputStream();
+                                 InputStream inputStream = new ByteArrayInputStream(content)) {
                                 IOUtils.copy(inputStream, outputStream);
                                 outputStream.flush();
-                                inputStream.close();
-                                outputStream.close();
                             }
-                        } catch (IOException e) {
-                            log.error("ERRORE deleteRimborsoMissione", e);
-                            throw new AwesomeException(Utility.getMessageException(e));
                         }
                     }
                 }
-            } catch (AwesomeException e) {
-                log.error("ERRORE printRimborsoMissione", e);
+            } catch (Exception e) {
+                log.error("ERRORE printAnnullamentoMissione", e);
                 throw new AwesomeException(Utility.getMessageException(e));
             }
         }
     }
+
 }

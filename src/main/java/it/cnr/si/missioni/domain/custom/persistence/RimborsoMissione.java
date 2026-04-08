@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.cnr.si.missioni.config.BaseEntity;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
@@ -41,7 +42,7 @@ import java.util.Optional;
 /**
  * A user.
  */
-@Entity
+@Entity @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "RIMBORSO_MISSIONE")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_RIMBORSO_MISSIONE", allocationSize = 0)
 public class RimborsoMissione extends BaseEntity {
@@ -282,6 +283,9 @@ public class RimborsoMissione extends BaseEntity {
     @Size(min = 0, max = 20)
     @Column(name = "UO_CONTR_AMM", length = 20, nullable = true)
     private String uoContrAmm;
+    @Size(min = 0, max = 1)
+    @Column(name = "PARTENZA_DA", length = 1, nullable = false)
+    private String partenzaDa;
     @Transient
     private String daValidazione;
     @Transient
@@ -1402,6 +1406,14 @@ public class RimborsoMissione extends BaseEntity {
         this.uoContrAmm = uoContrAmm;
     }
 
+    public String getPartenzaDa() {
+        return partenzaDa;
+    }
+
+    public void setPartenzaDa(String partenzaDa) {
+        this.partenzaDa = partenzaDa;
+    }
+
     public Boolean isAssociato() {
         return getCdTipoRapporto() != null && getInquadramento() != null && (getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_ASS) ||
                 getCdTipoRapporto().equals(Costanti.TIPO_RAPPORTO_EXDIP) ||
@@ -1506,6 +1518,7 @@ public class RimborsoMissione extends BaseEntity {
                 ", annoIniziale=" + annoIniziale +
                 ", numeroIniziale=" + numeroIniziale +
                 ", uoContrAmm='" + uoContrAmm + '\'' +
+                ", partenzaDa='" + partenzaDa + '\'' +
                 '}';
     }
 }

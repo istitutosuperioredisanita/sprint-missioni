@@ -254,8 +254,9 @@ public class AccountServiceLdap extends AbstractAccountService {
 
     public String getAccount(Boolean loadSpecialUserData) {
         logger.info("CHIAMATA 2 securityService.getUserInfo()");
-        Optional<UserInfoDto> userInfo = null;
-        if (userInfo.isPresent()) {
+        Optional<UserInfoDto> userInfo = securityService.getUserInfo();
+
+        if (userInfo != null && userInfo.isPresent()) {
             UserInfoDto userInfoDto = userInfo.get();
             if (userInfoDto != null && userInfoDto.getCognome() != null) {
                 if (!Optional.ofNullable(userInfoDto.getDipendente()).orElse(Boolean.TRUE)) {
@@ -278,11 +279,11 @@ public class AccountServiceLdap extends AbstractAccountService {
                     return resp;
                 }
                 return "";
-            } else {
-                return getResponseAccountWithoutRole(loadSpecialUserData);
             }
         }
-        return null;
+
+        // Fallback per LDAP ISS: getUserInfo() ritorna empty → legge da ACE ISS
+        return getResponseAccountWithoutRole(loadSpecialUserData);
     }
 
     public String getAccountFromUsername(String username, Boolean loadSpecialUserData) {

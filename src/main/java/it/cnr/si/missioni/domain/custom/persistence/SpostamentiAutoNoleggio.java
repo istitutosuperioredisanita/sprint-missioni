@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.domain.custom.persistence;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.cnr.si.missioni.config.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -28,7 +29,7 @@ import java.io.Serializable;
 /**
  * A user.
  */
-@Entity
+@Entity @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "SPOSTAMENTI_AUTO_NOLEGGIO")
 @SequenceGenerator(name = "SEQUENZA", sequenceName = "SEQ_SPOSTAMENTI_AUTO_NOLEGGIO", allocationSize = 0)
 public class SpostamentiAutoNoleggio extends BaseEntity  {

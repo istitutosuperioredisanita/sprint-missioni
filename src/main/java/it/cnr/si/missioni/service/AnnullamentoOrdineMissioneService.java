@@ -444,8 +444,10 @@ public class AnnullamentoOrdineMissioneService {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
                             "Non è stata selezionata la uo per rendere definitivo l'annullamento dell'ordine di missione.");
                 }
+
                 UsersSpecial userSpecial = accountService.getUoForUsersSpecial(SecurityUtils.getCurrentUser().getName());
                 boolean uoAbilitata = false;
+
                 if (userSpecial != null && !"S".equals(userSpecial.getAll())) {
                     if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
                         for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
@@ -459,10 +461,12 @@ public class AnnullamentoOrdineMissioneService {
                         }
                     }
                 }
+
                 if (!uoAbilitata) {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
                             "L'utente non è abilitato a rendere definitivi rimborsi di missione.");
                 }
+
                 spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
                         .and(spec)
                         .and((root, query, cb) -> cb.equal(root.get("statoFlusso"), Costanti.STATO_APPROVATO_FLUSSO))
@@ -480,7 +484,6 @@ public class AnnullamentoOrdineMissioneService {
                                 .and(SecuritySpecification.forUser(filter.getUser()))
                                 .build();
                     } else {
-                        // Solo se non c'è nemmeno uoRich si filtra per currentUser (logica originale)
                         if (StringUtils.isEmpty(filter.getUoRich())) {
                             spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
                                     .and(spec)
@@ -490,46 +493,53 @@ public class AnnullamentoOrdineMissioneService {
                     }
                 } else {
                     UsersSpecial userSpecial = accountService.getUoForUsersSpecial(SecurityUtils.getCurrentUser().getName());
-                    SpecificationBuilder<AnnullamentoOrdineMissione> sb = new SpecificationBuilder<AnnullamentoOrdineMissione>().and(spec);
+                    SpecificationBuilder<AnnullamentoOrdineMissione> sb =
+                            new SpecificationBuilder<AnnullamentoOrdineMissione>().and(spec);
 
                     if (userSpecial != null && !"S".equals(userSpecial.getAll())) {
                         if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
-                            // OR tra tutte le UO abilitate (con logica ordineDaValidare come nell'originale)
                             List<Specification<AnnullamentoOrdineMissione>> uoSpecs = new ArrayList<>();
+
                             for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
                                 Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
                                 if (uo != null) {
                                     final String uoSigla = uoService.getUoSigla(uoUser);
+
                                     if ("S".equals(Utility.nvl(uo.getOrdineDaValidare(), "N"))
                                             && "S".equals(Utility.nvl(uoUser.getOrdine_da_validare(), "N"))) {
                                         uoSpecs.add((root, query, cb) -> cb.or(
-                                                cb.equal(root.get("uoRich"), uoSigla),
-                                                cb.equal(root.get("uoSpesa"), uoSigla)
+                                                cb.equal(root.get("ordineMissione").get("uoRich"), uoSigla),
+                                                cb.equal(root.get("ordineMissione").get("uoSpesa"), uoSigla)
                                         ));
                                     } else {
                                         uoSpecs.add((root, query, cb) ->
-                                                cb.equal(root.get("uoRich"), uoSigla));
+                                                cb.equal(root.get("ordineMissione").get("uoRich"), uoSigla));
                                     }
                                 }
                             }
+
                             if (!uoSpecs.isEmpty()) {
                                 Specification<AnnullamentoOrdineMissione> uoDisjunction = uoSpecs.stream()
                                         .reduce(Specification::or)
                                         .orElse(null);
+
                                 if (uoDisjunction != null) {
                                     sb.and(uoDisjunction);
                                 }
                             }
                         } else {
-                            sb.and((root, query, cb) -> cb.equal(root.get("uid"), SecurityUtils.getCurrentUser().getName()));
+                            sb.and((root, query, cb) ->
+                                    cb.equal(root.get("uid"), SecurityUtils.getCurrentUser().getName()));
                         }
                     } else {
-                        sb.and((root, query, cb) -> cb.equal(root.get("uid"), SecurityUtils.getCurrentUser().getName()));
+                        sb.and((root, query, cb) ->
+                                cb.equal(root.get("uid"), SecurityUtils.getCurrentUser().getName()));
                     }
+
                     spec = sb.build();
                 }
 
-                // Escludi annullati (logica originale: a meno che non includi annullati o daId==aId)
+                // Escludi annullati
                 if (!"S".equals(Utility.nvl(filter.getIncludiMissioniAnnullate()))
                         && !(filter.getDaId() != null && filter.getaId() != null
                         && filter.getDaId().compareTo(filter.getaId()) == 0)) {
@@ -539,7 +549,7 @@ public class AnnullamentoOrdineMissioneService {
                             .build();
                 }
 
-                // Filtro statoFlusso per REST + validateFlows (logica originale)
+                // Filtro statoFlusso per REST + validateFlows
                 if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
                     List<String> listaStatiFlusso = Arrays.asList(
                             Costanti.STATO_INVIATO_FLUSSO,
@@ -548,6 +558,7 @@ public class AnnullamentoOrdineMissioneService {
                             Costanti.STATO_RESPINTO_UO_FLUSSO,
                             Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO
                     );
+
                     spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
                             .and(spec)
                             .and((root, query, cb) -> cb.or(
@@ -558,15 +569,19 @@ public class AnnullamentoOrdineMissioneService {
                 }
             }
 
-            // Filtro per UO (comune a tutti i rami tranne daCron)
+            // Filtro per UO
             if (filter.getUoRich() != null && !"S".equals(filter.getDaCron())) {
                 if (accountService.isUserEnableToWorkUo(filter.getUoRich())) {
                     Specification<AnnullamentoOrdineMissione> s = (root, query, cb) -> cb.or(
-                            cb.equal(root.get("uoRich"), filter.getUoRich()),
-                            cb.equal(root.get("uoSpesa"), filter.getUoRich()),
-                            cb.equal(root.get("uoCompetenza"), filter.getUoRich())
+                            cb.equal(root.get("ordineMissione").get("uoRich"), filter.getUoRich()),
+                            cb.equal(root.get("ordineMissione").get("uoSpesa"), filter.getUoRich()),
+                            cb.equal(root.get("ordineMissione").get("uoCompetenza"), filter.getUoRich())
                     );
-                    spec = new SpecificationBuilder<AnnullamentoOrdineMissione>().and(spec).and(s).build();
+
+                    spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
+                            .and(spec)
+                            .and(s)
+                            .build();
                 } else {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
                             "L'utente non è abilitato a vedere i dati della UO " + filter.getUoRich());
@@ -578,8 +593,8 @@ public class AnnullamentoOrdineMissioneService {
                 spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
                         .and(spec)
                         .and((root, query, cb) -> cb.or(
-                                cb.isNull(root.get("missioneGratuita")),
-                                cb.equal(root.get("missioneGratuita"), "N")
+                                cb.isNull(root.get("ordineMissione").get("missioneGratuita")),
+                                cb.equal(root.get("ordineMissione").get("missioneGratuita"), "N")
                         ))
                         .build();
             }
