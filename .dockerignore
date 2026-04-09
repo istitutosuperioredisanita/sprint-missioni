@@ -1,12 +1,4 @@
-# Esclude tutta la cartella target...
-target/*
-
-# ...MA include i file WAR (fondamentale!)
+target/
+src/
 !target/*.war
-
-# Altri file inutili nel container
 node_modules/
-.git
-.gitignore
-Dockerfile
-docker-compose.yml

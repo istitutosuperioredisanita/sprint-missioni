@@ -65,6 +65,7 @@
         <h2.version>2.2.224</h2.version>
         <happysign.version>2.0-SNAPSHOT</happysign.version>
         <java.version>21</java.version>
+        <jjwt.version>0.12.5</jjwt.version>
         <json-path.version>2.9.0</json-path.version>
         <keycloak.version>24.0.4</keycloak.version>
         <liquibase.version>4.27.0</liquibase.version>
@@ -81,11 +82,28 @@
         <spring.session.version>3.2.2</spring.session.version>
         <start-class>it.cnr.si.missioni.MissioniApplication</start-class>
         <storage.cloud.version>3.0.1</storage.cloud.version>
-        <jjwt.version>0.12.5</jjwt.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
             <dependency>
                 <groupId>jakarta.persistence</groupId>
                 <artifactId>jakarta.persistence-api</artifactId>
@@ -112,24 +130,6 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-api</artifactId>
-                <version>${jjwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-impl</artifactId>
-                <version>${jjwt.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jjwt.version}</version>
-                <scope>runtime</scope>
             </dependency>
 
         </dependencies>
@@ -242,8 +242,8 @@
             <exclusions>
                 <!-- AGGIUNTO -->
                 <exclusion>
-                    <groupId>io.jsonwebtoken</groupId>
                     <artifactId>jjwt</artifactId>
+                    <groupId>io.jsonwebtoken</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -254,17 +254,17 @@
             <version>${flows.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
+                    <groupId>org.springframework.boot</groupId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.springframework.security.oauth</groupId>
                     <artifactId>spring-security-oauth2</artifactId>
+                    <groupId>org.springframework.security.oauth</groupId>
                 </exclusion>
                 <!-- AGGIUNTO -->
                 <exclusion>
-                    <groupId>io.jsonwebtoken</groupId>
                     <artifactId>jjwt</artifactId>
+                    <groupId>io.jsonwebtoken</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -433,10 +433,10 @@
             <artifactId>spring-security-ldap</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.security</groupId>-->
-<!--            <artifactId>spring-security-oauth2-authorization-server</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.security</groupId>-->
+        <!--            <artifactId>spring-security-oauth2-authorization-server</artifactId>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.session</groupId>
