@@ -89,7 +89,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
 //    @Autowired
 //    protected CRUDComponentSession<OrdineMissione> crudServiceBean;
     @Autowired
-    
+
     protected PrintRimborsoMissioneService printRimborsoMissioneService;
     @Autowired
     protected RimborsoMissioneService rimborsoMissioneService;
@@ -138,7 +138,15 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
     }
 
     public StorageObject getFolderDettaglioRimborso(RimborsoMissioneDettagli dettaglio) throws AwesomeException {
+        if (dettaglio == null || dettaglio.getRimborsoMissione() == null) {
+            return null;
+        }
+
         StorageObject folderRimborso = recuperoFolderRimborsoMissione(dettaglio.getRimborsoMissione());
+        if (folderRimborso == null || folderRimborso.getPath() == null) {
+            return null;
+        }
+
         String path = folderRimborso.getPath() + "/" + dettaglio.constructCMISNomeFile();
         try {
             return missioniCMISService.getStorageObjectByPath(path);
@@ -609,23 +617,28 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         byte[] stampa = printRimborsoMissioneService.printRimborsoMissione(rimborsoMissione, username);
         CMISRimborsoMissione cmisRimborsoMissione = create(rimborsoMissione);
         StorageObject documento = salvaStampaRimborsoMissioneSuCMIS(stampa, rimborsoMissione, cmisRimborsoMissione);
-        StringBuilder nodeRefs = new StringBuilder();
+
         List<StorageObject> allegati = getDocumentsAllegatiRimborsoMissione(rimborsoMissione, true);
-        List<StorageObject> giustificativi = new ArrayList<StorageObject>();
+        List<StorageObject> giustificativi = new ArrayList<>();
+
         if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()) {
             for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()) {
                 List<StorageObject> children = getChildrenDettaglio(dettaglio, true);
-                if (children != null && missioniCMISService.esisteAlmenoUnDocumentoValido(children)) {
+
+                if (!children.isEmpty() && missioniCMISService.esisteAlmenoUnDocumentoValido(children)) {
                     giustificativi.addAll(children);
-                } else {
-                    if (dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa " + dettaglio.getDsTiSpesa() + " del " + DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa()) + " è obbligatorio allegare almeno un giustificativo.");
-                    }
+                } else if (dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())) {
+                    throw new AwesomeException(
+                            CodiciErrore.ERRGEN,
+                            "Per il dettaglio spesa " + dettaglio.getDsTiSpesa()
+                                    + " del " + DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())
+                                    + " è obbligatorio allegare almeno un giustificativo."
+                    );
                 }
             }
         }
-        sendRimborsoOrdineMissioneToSign(rimborsoMissione, cmisRimborsoMissione, documento, allegati, giustificativi);
 
+        sendRimborsoOrdineMissioneToSign(rimborsoMissione, cmisRimborsoMissione, documento, allegati, giustificativi);
     }
 
     private void aggiungiAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs) {
@@ -664,14 +677,36 @@ public abstract class AbstractCMISRimborsoMissioneService implements CMISRimbors
         }
     }
 
-    public void controlloEsitenzaGiustificativoDettaglio(RimborsoMissione rimborsoMissione)
-            throws AwesomeException {
-        if (rimborsoMissione.getRimborsoMissioneDettagli() != null && !rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()) {
+    public void controlloEsitenzaGiustificativoDettaglio(RimborsoMissione rimborsoMissione) throws AwesomeException {
+        if (rimborsoMissione.getRimborsoMissioneDettagli() == null || rimborsoMissione.getRimborsoMissioneDettagli().isEmpty()) {
+            return;
+        }
+
+        StorageObject folderRimborso = recuperoFolderRimborsoMissione(rimborsoMissione);
+
+        if (folderRimborso == null) {
             for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()) {
-                List<StorageObject> children = getChildrenDettaglio(dettaglio);
-                if (children == null && dettaglio.isGiustificativoObbligatorio() && StringUtils.isEmpty(dettaglio.getDsNoGiustificativo())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Per il dettaglio spesa " + dettaglio.getDsTiSpesa() + " del " + DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa()) + " è obbligatorio allegare almeno un giustificativo.");
+                if (dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())) {
+                    throw new AwesomeException(
+                            CodiciErrore.ERRGEN,
+                            "Per il dettaglio spesa " + dettaglio.getDsTiSpesa()
+                                    + " del " + DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())
+                                    + " è obbligatorio allegare almeno un giustificativo."
+                    );
                 }
+            }
+            return;
+        }
+
+        for (RimborsoMissioneDettagli dettaglio : rimborsoMissione.getRimborsoMissioneDettagli()) {
+            List<StorageObject> children = getChildrenDettaglio(dettaglio);
+            if (children.isEmpty() && dettaglio.isGiustificativoObbligatorio() && !StringUtils.hasLength(dettaglio.getDsNoGiustificativo())) {
+                throw new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Per il dettaglio spesa " + dettaglio.getDsTiSpesa()
+                                + " del " + DateUtils.getDefaultDateAsString(dettaglio.getDataSpesa())
+                                + " è obbligatorio allegare almeno un giustificativo."
+                );
             }
         }
     }
