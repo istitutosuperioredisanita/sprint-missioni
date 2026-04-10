@@ -28,3 +28,10 @@ bower_components/
 /DB-H2/*.*
 /package-lock.json
 /.run/*.*
+
+.env
+.env.*
+!.env.example
+/certs/*.p12
+/certs/*.jks
+/certs/*.pfx
