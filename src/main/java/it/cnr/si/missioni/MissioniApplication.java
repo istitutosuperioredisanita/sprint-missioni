@@ -1,6 +1,5 @@
 package it.cnr.si.missioni;
 
-
 import it.cnr.si.missioni.config.Constants;
 import it.cnr.si.missioni.config.DefaultProfileUtil;
 import it.cnr.si.missioni.config.JHipsterProperties;
@@ -9,18 +8,15 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
-
 
 @SpringBootApplication(
         scanBasePackages = {
@@ -41,14 +37,24 @@ public class MissioniApplication {
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
 
-        log.info("\n----------------------------------------------------------\n\t" +
+        String applicationName = env.getProperty("spring.application.name", "application");
+        String serverPort = env.getProperty("server.port", "8080");
+
+        String localUrl = "http://127.0.0.1:" + serverPort;
+        String detectedExternalUrl = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + serverPort;
+
+        String externalUrl = env.getProperty("app.public-url", detectedExternalUrl);
+
+        log.info(
+                "\n----------------------------------------------------------\n\t" +
                         "Application '{}' is running! Access URLs:\n\t" +
-                        "Local: \t\thttp://127.0.0.1:{}\n\t" +
-                        "External: \thttp://{}:{}\n----------------------------------------------------------",
-                env.getProperty("spring.application.name"),
-                env.getProperty("server.port"),
-                InetAddress.getLocalHost().getHostAddress(),
-                env.getProperty("server.port"));
+                        "Local: \t\t{}\n\t" +
+                        "External: \t{}\n" +
+                        "----------------------------------------------------------",
+                applicationName,
+                localUrl,
+                externalUrl
+        );
     }
 
     @PostConstruct
