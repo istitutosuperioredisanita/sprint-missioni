@@ -123,14 +123,14 @@ public class MissioniCMISService extends StoreService {
     }
 
     public String parseFilename(String file) {
-        StringTokenizer fileName = new StringTokenizer(file,StorageDriver.SUFFIX,false);
+        StringTokenizer fileName = new StringTokenizer(file, StorageDriver.SUFFIX, false);
         String newFileName = null;
 
-        while (fileName.hasMoreTokens()){
+        while (fileName.hasMoreTokens()) {
             newFileName = fileName.nextToken();
         }
 
-        if (newFileName != null){
+        if (newFileName != null) {
             return super.sanitizeFilename(newFileName);
         }
         return super.sanitizeFilename(file);
@@ -163,7 +163,6 @@ public class MissioniCMISService extends StoreService {
     }
 
     public String createFolderIfNotPresent(String path, String folderName, Map<String, Object> metadataProperties) {
-        StorageObject parentObject = getStorageObjectByPath(path, true, true);
         return super.createFolderIfNotPresent(path, folderName, metadataProperties);
     }
 
@@ -189,24 +188,36 @@ public class MissioniCMISService extends StoreService {
     }
 
     @Transactional(readOnly = true)
-    public StorageObject restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name,
-                                               StoragePath path, String objectTypeName, boolean makeVersionable, Permission... permissions) {
+    public StorageObject restoreSimpleDocument(Map<String, Object> metadataProperties, InputStream inputStream, String contentType, String name, StoragePath path, String objectTypeName, boolean makeVersionable, Permission... permissions) {
+
         StorageObject storage = null;
-        Optional<StorageObject> optStorageObject = Optional.ofNullable(getStorageObjectByPath(path.getPath().concat(StorageDriver.SUFFIX).concat(sanitizeFilename(name))));
+
         List<String> lista = new ArrayList<>();
         lista.add(MissioniCMISService.ASPECT_FLUSSO);
         lista.add(MissioniCMISService.ASPECT_AUTHOR);
         lista.add(MissioniCMISService.ASPECT_TITLED);
         lista.add(MissioniCMISService.ASPECT_FLUSSO_MISSIONI);
         metadataProperties.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), lista);
-        if (optStorageObject.isPresent()) {
-            storage = updateStream(optStorageObject.get().getKey(), inputStream, contentType);
-            addPropertyForExistingDocument(metadataProperties, storage);
-            return storage;
-        } else {
-            return storeSimpleDocument(inputStream, contentType, path.getPath(), metadataProperties);
+
+        String fullPath = path.getPath()
+                .concat(StorageDriver.SUFFIX)
+                .concat(sanitizeFilename(name));
+
+        StorageObject existingObject = null;
+        try {
+            existingObject = getStorageObjectByPath(fullPath);
+        } catch (StorageException e) {
+            logger.debug("item " + fullPath + " does not exist");
+            existingObject = null;
         }
 
+        if (existingObject != null) {
+            storage = updateStream(existingObject.getKey(), inputStream, contentType);
+            addPropertyForExistingDocument(metadataProperties, storage);
+            return storage;
+        }
+
+        return storeSimpleDocument(inputStream, contentType, path.getPath(), metadataProperties);
     }
 
     public void addPropertyForExistingDocument(Map<String, Object> metadataProperties, StorageObject node) {
