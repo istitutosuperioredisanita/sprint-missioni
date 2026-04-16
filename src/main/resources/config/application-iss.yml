@@ -1,14 +1,15 @@
-
 spring:
   config:
     file:
-      pathFileConfigJson: C:\Users\mirra_davide\IdeaProjects\ISS\sprint-missioni-config\sprint-missioni-config
+      pathFileConfigJson: C:\Users\mirra_davide\ISS\sprint-missioni-config
+
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@oracledb-coll.iss.it:1521/COLL.ISS.IT
     name: missioni
     username: MISSIONICOLL
     password: ***REMOVED***
+
   jpa:
     database-platform: org.hibernate.dialect.OracleDialect
     database: ORACLE
@@ -32,15 +33,17 @@ spring:
     attrName: givenname
     attrSurname: sn
     attrMail:
+
   proxy:
     SIGLA:
-      url: http://sigla-svil.iss.it/SIGLA/
+      url: http://sigla-test.iss.it/SIGLA/
       username: ***REMOVED***
       password: ***REMOVED***
       context:
         cd_unita_organizzativa: "999.000"
         cd_cds: "999"
         cd_cdr: "999.000.000"
+
   mail:
     messages:
       erroreGenerico:
@@ -102,8 +105,9 @@ spring:
     tls: true
     auth: true
     send.error.to: ciro.salvio@iss.it
+
   print:
-    endpoint: http://10.236.1.68:8082/api/v1/get/print
+    endpoint: http://sigla-test.iss.it:8082/api/v1/get/print
     rimborso: /missioni/iss/RimborsoMissione.jrxml
     ordine: /missioni/iss/OrdineMissione.jrxml
     anticipo: /missioni/iss/OrdineMissioneAnticipo.jrxml
@@ -122,8 +126,6 @@ user:
     username: ${spring.proxy.vecchiaScrivania.username}
     password: ${spring.proxy.vecchiaScrivania.password}
 
-
-
 flows:
   test: true
   type: HAPPPYSIGN
@@ -132,7 +134,7 @@ flows:
   password: ***REMOVED***
   organizzation: iss
   keystore:
-    path: C:\Users\mirra_davide\IdeaProjects\ISS\sprint-missioni-config\sprint-missioni-config\happysign_coll.p12
+    path: C:\Users\mirra_davide\ISS\sprint-missioni-config\happysign_coll.p12
     password: password
   templateFirme:
     1firma: Missioni_doppia_firma_sequenziale
@@ -154,14 +156,17 @@ flows:
     presidente: Missioni_doppia_firma_sequenziale
     vocipresidente: Missioni_doppia_firma_sequenziale
     cns_cnt: Missioni_doppia_firma_sequenziale
+
   rimborso:
     default:
-      template : Missioni_doppia_firma_sequenziale
-      signSiglaUo : DRUE
+      template: Missioni_doppia_firma_sequenziale
+      signSiglaUo: DRUE
+
   annullo:
     default:
       template: Missioni_doppia_firma_sequenziale
       signSiglaUo: DRUE
+
 codiciUo:
   presidenza: 000.033
   direzioneGenerale: 000.031
@@ -182,11 +187,6 @@ codiciCds:
 idUo:
   dirUffEcoGiur: 1412
 
-
-#vociPresidenza:
-#  voce2089: 2089
-#  voce2090: 2090
-
 storage:
   maxItemsPerPage: 10
   folder_path: /Comunicazioni a ISS/Missioni
@@ -201,14 +201,14 @@ logging.config: classpath:logback-local.xml
 aceiss:
   url: https://webapi.iss.it/anag/
   keystore:
-    path: C:/Users/mirra_davide/IdeaProjects/ISS/sprint-missioni-config/sprint-missioni-config/webapi-iss-it.p12
+    path: C:/Users/mirra_davide/ISS/sprint-missioni-config/webapi-iss-it.p12
     password: ***REMOVED***
+
 authJWT:
   urlToken: https://login.microsoftonline.com/cf30c7fd-6616-4b62-ad83-b574b27d5912/
   scopes: api://anag.iss.it/.default
   clientId: 0603aa0e-ce6f-48f3-9e67-b0783b22e8e3
   secret: F2p8Q~43jZ_d_K3jlN7.RsC_AOEzhdni3obt7bjy
-
 
 cron:
   comunicaDati:
@@ -241,11 +241,6 @@ cron:
     active: true
     cronExpression: "0 */1 * ? * *"
 
-#  happysignGC:
-#    name: happysignGC
-#    active: true
-#    cronExpression: "0 */10 * ? * *"
-
 jhipster:
   mail:
     from: missioni@cnr.it
@@ -254,13 +249,9 @@ jhipster:
       oauth:
         clientid: sprintapp
         secret: ***REMOVED***
-        # Token is valid 30 minutes
         tokenValidityInSeconds: 1800
   ribbon:
-    # comma seperated list of profiles to show a ribbon on the GUI
     displayOnActiveProfiles: test
-
-
 
 cache.hazelcast:
   name: sprint-missioni
@@ -288,6 +279,7 @@ cnr:
 
 keycloak:
   enabled: false
+
 admin:
   usernames:
     - ciro.salvio@iss.it

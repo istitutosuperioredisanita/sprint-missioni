@@ -43,7 +43,10 @@ public class MissioniApplication {
         String localUrl = "http://127.0.0.1:" + serverPort;
         String detectedExternalUrl = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + serverPort;
 
-        String externalUrl = env.getProperty("app.public-url", detectedExternalUrl);
+        String externalUrl = env.getProperty("app.public-url");
+        if (externalUrl == null || externalUrl.isBlank()) {
+            externalUrl = detectedExternalUrl;
+        }
 
         log.info(
                 "\n----------------------------------------------------------\n\t" +
