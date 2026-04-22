@@ -30,7 +30,7 @@ public class TokenProvider {
     private final long tokenValidityInMillisecondsForRememberMe;
 
     public TokenProvider(
-            @Value("${jhipster.security.authentication.oauth.secret:***REMOVED***}") String secret,
+            @Value("${jhipster.security.authentication.oauth.secret:mySecretOAuthSecret}") String secret,
             @Value("${jhipster.security.authentication.oauth.tokenValidityInSeconds:1800}") long tokenValidityInSeconds
     ) {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);

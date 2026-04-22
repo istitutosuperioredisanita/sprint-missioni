@@ -429,7 +429,7 @@ missioniApp.factory('AuthenticationSharedService', function (ProxyService, $root
                     }
                     if (!$rootScope.isUserKeycloak){
                       if (param && param.username){
-                        var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=***REMOVED***&client_id=sprintapp";
+                        var data = "username=" + param.username.toLowerCase() + "&password=" + param.password + "&grant_type=password&scope=read%20write&client_secret=mySecretOAuthSecret&client_id=sprintapp";
                         $http.post('oauth/token', data, {
                             headers: {
                                 "Content-Type": "application/x-www-form-urlencoded",

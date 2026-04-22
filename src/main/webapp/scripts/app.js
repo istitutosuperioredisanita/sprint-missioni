@@ -90,12 +90,12 @@ missioniApp
             login: function(credentials) {
                 var data = "username=" + credentials.username + "&password="
                     + credentials.password + "&grant_type=password&scope=read%20write&" +
-                    "client_secret=***REMOVED***&client_id=missioniApp";
+                    "client_secret=mySecretOAuthSecret&client_id=missioniApp";
                 return $http.post('oauth/token', data, {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                         "Accept": "application/json",
-                        "Authorization": "Basic " + Base64.encode("sprintapp" + ':' + "***REMOVED***")
+                        "Authorization": "Basic " + Base64.encode("sprintapp" + ':' + "mySecretOAuthSecret")
                     }
                 }).success(function (response) {
                     var expiredAt = new Date();
