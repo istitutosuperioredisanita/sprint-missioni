@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.cmis;
 
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
+import it.cnr.si.missioni.cmis.flows.happySign.AutorizzazioneAnnulloService;
 import it.cnr.si.missioni.cmis.flows.happySign.AutorizzazioneService;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
@@ -42,6 +43,10 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -50,14 +55,33 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
     @Autowired
     AutorizzazioneService autorizzazioneService;
-    private static final Log logger = LogFactory.getLog(CMISOrdineMissioneServiceHappySign.class);
-    public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
-        String username = securityService.getCurrentUserLogin();
-        byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
-        CMISOrdineMissione cmisOrdineMissione = create(annullamento.getOrdineMissione(), annullamento.getAnno());
-        StorageObject so = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
 
-        logger.info("da implementare Annullamento");
+    @Autowired
+    AutorizzazioneAnnulloService autorizzazioneAnnulloService;
+    private static final Log logger = LogFactory.getLog(CMISOrdineMissioneServiceHappySign.class);
+    protected void sendAnnullamentoOrdineMissioneToSign(AnnullamentoOrdineMissione annullamentoOrdineMissione, CMISOrdineMissione cmisOrdineMissione,
+                                                                  Map<String, StorageObject> mapDocumentiAnnulloMissione,
+                                                                  List<StorageObject> allegati){
+
+        try {
+            if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(annullamentoOrdineMissione.getOrdineMissione().getUoSpesa(),
+                    annullamentoOrdineMissione.getOrdineMissione().getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                annullamentoOrdineMissioneService.popolaCoda(annullamentoOrdineMissione);
+            } else {
+
+                String idFlusso = autorizzazioneAnnulloService.sendAutorizzazione(annullamentoOrdineMissione, mapDocumentiAnnulloMissione.get(Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY), getAllAllegati( null,allegati,true));
+
+                if (!StringUtils.isEmpty(idFlusso)) {
+                    annullamentoOrdineMissione.setIdFlusso(idFlusso);
+
+                }
+                annullamentoOrdineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+            }
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
+        logger.info("sendOrdineMissioneToSign");
+
     }
 
     @Override
@@ -70,34 +94,86 @@ public  class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissi
 
     }
 
-    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria) {
+    //metodo riscrito con l'oggetto Map
+
+    private List<StorageObject> getAllAllegati( Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati, boolean annullamento){
+        List<StorageObject> allAllegati= new ArrayList<StorageObject>();
+        if ( allegati!=null && allAllegati.size()>0)
+            allAllegati.addAll(allegati);
+        boolean addAllegato=false;
+        if ( mapDocumentiMissione!=null && mapDocumentiMissione.size()>0) {
+            for (String s : mapDocumentiMissione.keySet()) {
+                addAllegato=true;
+                if ( !annullamento && Costanti.DOCUMENTO_MISSIONE_KEY.equalsIgnoreCase(s))
+                    addAllegato=false;
+                if ( annullamento && Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY.equalsIgnoreCase(s))
+                    addAllegato=false;
+                if (addAllegato)
+                    allAllegati.add(mapDocumentiMissione.get(s));
+            }
+        }
+        return allAllegati;
+    }
+
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo) {
+        try {
+            if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                ordineMissioneService.popolaCoda(ordineMissione);
+            } else {
+
+                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione, mapDocumentiMissione.get(Costanti.DOCUMENTO_MISSIONE_KEY), getAllAllegati( mapDocumentiMissione,allegati,false));
+
+                if (!StringUtils.isEmpty(idFlusso)) {
+                    ordineMissione.setIdFlusso(idFlusso);
+                    if (anticipo != null) {
+                        anticipo.setIdFlusso(idFlusso);
+                    }
+                }
+                ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+            }
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
+        logger.info("sendOrdineMissioneToSign");
+    }
+
+
+
+
+
+
+/*
+protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documentoOrdineMissione, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria,StorageObject documentoTaxi) {
 
         try {
 
-                if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
-                    ordineMissioneService.popolaCoda(ordineMissione);
-                } else {
-                    List<StorageObject> allegatiMissione= new ArrayList<StorageObject>();
-                    if ( anticipo!=null)
-                        allegatiMissione.add( documentoAnticipo);
-                    if ( documentoAutoPropria!=null)
-                        allegatiMissione.add( documentoAutoPropria);
-                    String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
+            if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                ordineMissioneService.popolaCoda(ordineMissione);
+            } else {
+                List<StorageObject> allegatiMissione= new ArrayList<StorageObject>();
+                if ( anticipo!=null)
+                    allegatiMissione.add( documentoAnticipo);
+                if ( documentoAutoPropria!=null)
+                    allegatiMissione.add( documentoAutoPropria);
+                if ( documentoTaxi!=null)
+                    allegatiMissione.add( documentoTaxi);
+                String idFlusso = autorizzazioneService.sendAutorizzazione(ordineMissione,documentoOrdineMissione,allegatiMissione);
 
-                    if (!StringUtils.isEmpty(idFlusso)) {
-                        ordineMissione.setIdFlusso(idFlusso);
-                        if (anticipo != null) {
-                            anticipo.setIdFlusso(idFlusso);
-                        }
+                if (!StringUtils.isEmpty(idFlusso)) {
+                    ordineMissione.setIdFlusso(idFlusso);
+                    if (anticipo != null) {
+                        anticipo.setIdFlusso(idFlusso);
                     }
-                    ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
-
                 }
+                ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+            }
         } catch (Exception e) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
         }
         logger.info("sendOrdineMissioneToSign");
 
     }
+    */
 
 }

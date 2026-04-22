@@ -20,13 +20,29 @@ missioniApp.factory('RimborsoMissioneDettagliService', function (DateUtils, $htt
     });
 
 missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $rootScope, $location, $routeParams, $sessionStorage, $http, $filter, AccessToken, RimborsoMissioneDettagliService, ProxyService, ElencoRimborsiMissioneService, ui, COSTANTI, DateUtils, DateService) {
-    
+
     $scope.validazione = $routeParams.validazione;
     $scope.inizioMissione = $routeParams.inizioMissione;
     $scope.fineMissione = $routeParams.fineMissione;
     $scope.idRimborsoMissione = $routeParams.idRimborsoMissione;
     $scope.accessToken = AccessToken.get();
     $scope.accountModel = $sessionStorage.accountWork;
+
+    $scope.backupDettagliSpesa = {}; // Oggetto per salvare i backup
+
+    $scope.salvaStatoDettaglio = function(dettaglioSpesa) {
+        if (dettaglioSpesa.id) {
+            $scope.backupDettagliSpesa[dettaglioSpesa.id] = angular.copy(dettaglioSpesa);
+        }
+    };
+
+    $scope.ripristinaStatoDettaglio = function(dettaglioSpesa) {
+        if (dettaglioSpesa.id && $scope.backupDettagliSpesa[dettaglioSpesa.id]) {
+            angular.copy($scope.backupDettagliSpesa[dettaglioSpesa.id], dettaglioSpesa);
+            delete $scope.backupDettagliSpesa[dettaglioSpesa.id]; // Pulisce il backup dopo il ripristino
+        }
+    };
+
 
     var recuperoImpegni = function(idRimborsoMissione){
         $scope.impegni = [];
@@ -43,6 +59,8 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
       $scope.addDettaglioSpesa = true;
       $scope.newDettaglioSpesa = {};
       inizializzaNuovaRiga($scope.newDettaglioSpesa);
+      // Resetta il modello per il pasto
+      resetPastoState();
     }
 
     var caricaImpegnoSingolo = function (dettaglioSpesa){
@@ -58,6 +76,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     var inizializzaNuovaRiga = function(dettaglioSpesa){
         $scope.newDettaglioSpesa.flSpesaAnticipata = "N";
+        $scope.newDettaglioSpesa.flSpesaTracciata = "N";
         $scope.newDettaglioSpesa.cdDivisa = "EURO";
         $scope.newDettaglioSpesa.cambio = 1;
         $scope.tipi_pasto = [];
@@ -74,15 +93,28 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         var dettaglioSpesaDaEliminare = $scope.dettagliSpese[index];
         $rootScope.salvataggio = true;
         $http.delete('api/rest/rimborsoMissione/dettagli/' + dettaglioSpesaDaEliminare.id).success(
-                    function (data) {
-                        $rootScope.salvataggio = false;
-                        $scope.dettagliSpese.splice(index,1);
-                    }).error(
-                    function (data) {
-                        $rootScope.salvataggio = false;
-                    }
-            );
-    }
+            function (data) {
+                $rootScope.salvataggio = false;
+                $scope.dettagliSpese.splice(index, 1);
+
+                // Resetta il modello per il pasto, rimuovendo il menu a tendina
+                resetPastoState();
+            }).error(
+            function (data) {
+                $rootScope.salvataggio = false;
+            }
+        );
+    };
+
+    var resetPastoState = function() {
+        $scope.pasto = false;
+        $scope.tipi_pasto = [];
+        if ($scope.newDettaglioSpesa) {
+            $scope.newDettaglioSpesa.cdTiPasto = null;
+        }
+    };
+
+
 
     $scope.confirmDeleteAttachment = function (attachment) {
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
@@ -151,6 +183,12 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         }
     }
 
+       $scope.cambioSpesaTracciata = function (spesaTracciata) {
+            if (spesaTracciata == "S"){
+                ui.message("Questa opzione selezionata indica che la spesa è stata sostenuta con strumenti di pagamento tracciabili (carta di credito, bonifico, ecc.).");
+            }
+        }
+
     var onChangeDataDettaglio = function () {
         if ($scope.newDettaglioSpesa && $scope.newDettaglioSpesa.dataSpesa){
             recuperoTipiSpesa($scope.newDettaglioSpesa.dataSpesa);
@@ -205,7 +243,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                   $scope.dettagliSpese[i].isFireSearchAttachments = true;
                                   var attachments = data.data;
                                   if (attachments && Object.keys(attachments).length > 0){
-                                    $scope.dettagliSpese[i].attachmentsExists = true;  
+                                    $scope.dettagliSpese[i].attachmentsExists = true;
                                   } else {
                                     $scope.dettagliSpese[i].attachmentsExists = false;
                                   }
@@ -245,7 +283,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                     if (tipo_spesa.cd_ti_spesa === cdTipoSpesa){
                         $scope.newDettaglioSpesa.dsTiSpesa = tipo_spesa.ds_ti_spesa;
                         if (tipo_spesa.fl_giustificativo_richiesto == true){
-                            $scope.newDettaglioSpesa.giustificativo = 'S';    
+                            $scope.newDettaglioSpesa.giustificativo = 'S';
                         } else {
                             $scope.newDettaglioSpesa.giustificativo = 'N';
                         }
@@ -275,6 +313,13 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                     $scope.tipi_pasto = [];
                                 }
                             });
+                        } else {
+                            $scope.newDettaglioSpesa.tiCdTiSpesa = tipo_spesa.fl_rimborso_km ? "R" :
+                            tipo_spesa.fl_trasporto ? "T" :
+                            tipo_spesa.fl_alloggio ? "A" : "N";
+                            // Resetta lo stato del pasto se non richiesto
+                            $scope.tipi_pasto = [];
+                            $scope.newDettaglioSpesa.cdTiPasto = null;
                         }
                         if ($scope.rimborso){
                             var dataFormatted = $filter('date')($scope.newDettaglioSpesa.dataSpesa, "dd/MM/yyyy");
@@ -328,7 +373,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                                         }
                                     });
                                 }
-                                break;        
+                                break;
                             }
                         }
                     }
@@ -337,18 +382,22 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
         }
     }
 
-    $scope.editDettaglioSpesa= function (dettaglioSpesa) {
-      dettaglioSpesa.editing = true;
-      $scope.reloadFromTipoSpesa(dettaglioSpesa);
-    }
+    $scope.editDettaglioSpesa = function(dettaglioSpesa) {
+        $scope.salvaStatoDettaglio(dettaglioSpesa); // Salva lo stato iniziale
+        dettaglioSpesa.editing = true; // Attiva la modalità di modifica
+        $scope.reloadFromTipoSpesa(dettaglioSpesa);
+    };
+
 
     var undoEditingDettaglioSpesa = function (dettaglioSpesa) {
       delete dettaglioSpesa.editing;
     }
 
-    $scope.undoDettaglioSpesa = function (dettaglioSpesa) {
-      undoEditingDettaglioSpesa(dettaglioSpesa);
-    }
+    $scope.undoDettaglioSpesa = function(dettaglioSpesa) {
+        $scope.ripristinaStatoDettaglio(dettaglioSpesa); // Ripristina lo stato iniziale
+        dettaglioSpesa.editing = false; // Esce dalla modalità di modifica
+    };
+
 
     var annullaDatiNuovaRiga = function () {
       delete $scope.addDettaglioSpesa;
@@ -357,6 +406,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.undoAddDettaglioSpesa = function () {
         annullaDatiNuovaRiga();
+        resetPastoState();
     }
 
     $scope.insertDettaglioSpesa = function (newDettaglioSpesa) {
@@ -396,21 +446,22 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
 
 
-    $scope.modifyDettaglioSpesa = function (dettaglioSpesa) {
+    $scope.modifyDettaglioSpesa = function(dettaglioSpesa) {
         $rootScope.salvataggio = true;
         dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateToServer(dettaglioSpesa.dataSpesa);
-        $http.put('api/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa).success(function(data){
-            $rootScope.salvataggio = false;
-            dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateFromServer(dettaglioSpesa.dataSpesa);
-            dettaglioSpesa.esercizioOriginaleObbligazione = data.esercizioOriginaleObbligazione;
-            dettaglioSpesa.pgObbligazione = data.pgObbligazione;
-            dettaglioSpesa.voce = data.voce;
-            dettaglioSpesa.dsVoce = data.dsVoce;
-            undoEditingDettaglioSpesa(dettaglioSpesa);
-        }).error(function (data) {
-            $rootScope.salvataggio = false;
-        });
-    }
+
+        $http.put('api/rest/rimborsoMissione/dettagli/modify', dettaglioSpesa)
+            .success(function(data) {
+                $rootScope.salvataggio = false;
+                dettaglioSpesa.dataSpesa = DateUtils.convertLocalDateFromServer(data.dataSpesa);
+                dettaglioSpesa.editing = false;
+                delete $scope.backupDettagliSpesa[dettaglioSpesa.id]; // Pulisce il backup dopo il salvataggio
+            })
+            .error(function(data) {
+                $rootScope.salvataggio = false;
+            });
+    };
+
 
     $scope.getTotaleDettagliSpesa = function(){
         var totale = 0;
@@ -441,7 +492,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
     }
 
     var impostadisabilitaRimborsoMissione = function() {
-        if ($scope.rimborsoMissione && ($scope.rimborsoMissione.stato === 'DEF' || $scope.rimborsoMissione.statoFlusso === 'APP' || ($scope.rimborsoMissione.stato === 'CON' && 
+        if ($scope.rimborsoMissione && ($scope.rimborsoMissione.stato === 'DEF' || $scope.rimborsoMissione.statoFlusso === 'APP' || ($scope.rimborsoMissione.stato === 'CON' &&
             ($scope.rimborsoMissione.stateFlows === 'ANNULLATO' ||
                 $scope.rimborsoMissione.stateFlows === 'FIRMA SPESA RIMBORSO' ||
                 $scope.rimborsoMissione.stateFlows === 'FIRMA UO RIMBORSO' ||

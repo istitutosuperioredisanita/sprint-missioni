@@ -98,6 +98,25 @@ missioniApp.controller('AutoPropriaController', function ($scope, AutoProprieSer
 //        deleteAutoPropria(index);
     }
 
+    $scope.targaError = false;
+
+    $scope.validateTarga = function(targa) {
+        const targaItalianaRegex = /^[A-Z]{2}[0-9]{3}[A-Z]{2}$|^[A-Z]{2}[0-9]{5}$/; // AA123BB o AA12345
+        const targaEsteraRegex = /^[A-Z0-9]{1,7}$/; // Formato generico per targhe estere (1-7 caratteri alfanumerici)
+
+        // Resetta eventuali errori precedenti
+        $scope.targaError = false;
+
+        if (!targa || !(targaItalianaRegex.test(targa) || targaEsteraRegex.test(targa))) {
+            // Mostra il messaggio di errore
+            $scope.targaError = true;
+            ui.error("La targa deve rispettare lo standard italiano o estero.");
+            return false;
+        }
+        return true;
+    };
+
+
     $scope.edit= function (autoPropria) {
       autoPropria.editing = true;
       $scope.success = null;

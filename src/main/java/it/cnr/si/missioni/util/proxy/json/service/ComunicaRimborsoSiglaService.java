@@ -148,8 +148,15 @@ public class ComunicaRimborsoSiglaService {
         oggettoBulk.setImRimborso(BigDecimal.ZERO);
         oggettoBulk.setImSpese(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
         oggettoBulk.setImSpeseAnticipate(Utility.nvl(rimborsoApprovato.getTotaleSpeseAnticipate()));
+
+        oggettoBulk.setImSpeseTracc(Utility.nvl(rimborsoApprovato.getTotaleSpeseTracciate()));
+        oggettoBulk.setImSpeseNoTracc(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseTracciate()));
+
+        //TODO da testare e approvare il metodo getTotaleRimborsoSpeseTraccNoSpeseAnticip ed eventualmente sostituirlo al calcolo dei totali
+        // im_totale_missione è il parametro che andrà a finire su SIGLA e che verrà mostrato al click crea/ricerca impegno al quale viene sottratto (se presente) l'anticipo
         oggettoBulk.setImTotaleMissione(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate());
         oggettoBulk.setImportoDaRimborsare(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()).subtract(Utility.nvl(rimborsoApprovato.getAnticipoImporto())));
+
         if (!rimborsoApprovato.isTrattamentoAlternativoMissione()) {
             oggettoBulk.setImLordoPercepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
             oggettoBulk.setImNettoPecepiente(Utility.nvl(rimborsoApprovato.getTotaleRimborsoSenzaSpeseAnticipate()));
@@ -254,6 +261,7 @@ public class ComunicaRimborsoSiglaService {
 
                 spesaMissione.setFlDiariaManuale(false);
                 spesaMissione.setFlSpesaAnticipata(dettaglio.getFlSpesaAnticipata().equals("S"));
+                spesaMissione.setFlSpesaTracciata(dettaglio.getFlSpesaTracciata().equals("S"));
                 spesaMissione.setImBaseMaggiorazione(BigDecimal.ZERO);
                 spesaMissione.setImDiariaLorda(BigDecimal.ZERO);
                 spesaMissione.setImDiariaNetto(BigDecimal.ZERO);

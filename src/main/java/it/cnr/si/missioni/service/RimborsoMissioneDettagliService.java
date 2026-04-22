@@ -53,6 +53,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Service class for managing users.
@@ -96,6 +97,15 @@ public class RimborsoMissioneDettagliService {
     private CRUDComponentSession crudServiceBean;
     @Autowired
     private Environment env;
+
+    @Autowired
+    private OrdineMissioneAutoPropriaService ordineMissioneAutoPropriaService;
+
+    @Autowired
+    private OrdineMissioneTaxiService ordineMissioneTaxiService;
+
+    @Autowired
+    private OrdineMissioneAutoNoleggioService ordineMissioneAutoNoleggioService;
 
     @Transactional(readOnly = true)
     public CMISFileAttachment uploadAllegato(Long idRimborsoMissioneDettagli,
@@ -155,8 +165,8 @@ public class RimborsoMissioneDettagliService {
                 OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
                 if (ordineMissione != null) {
                     OrdineMissioneAutoPropria autoPropria = ordineMissioneService.getAutoPropria(ordineMissione);
-                    if (autoPropria != null && !Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S")) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso kilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione, verifica e controlli.");
+                    if (autoPropria != null && (!Utility.nvl(autoPropria.utilizzoMotiviIspettivi, "N").equals("S"))) {
+                        throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile utilizzare il rimborso chilometrico perchè in fase d'ordine di missione non è stata scelta per la richiesta auto propria il motivo di ispezione, verifica e controlli.");
                     }
                 }
             }
@@ -191,19 +201,103 @@ public class RimborsoMissioneDettagliService {
         }
     }
 
+    private void controlliSpeseMezzi(RimborsoMissioneDettagli rimborsoMissioneDettagli, RimborsoMissione rimborsoMissione) {
+        Long idMissione = Long.valueOf(rimborsoMissione.getOrdineMissione().getId().toString());
+
+        boolean isTaxiUsed = ordineMissioneTaxiService.getTaxi(idMissione) != null;
+        boolean isAutoNoleggioUsed = ordineMissioneAutoNoleggioService.getAutoNoleggio(idMissione) != null;
+        boolean isAutoPropriaUsed = ordineMissioneAutoPropriaService.getAutoPropria(idMissione) != null;
+
+        boolean tassaSoggiorno = rimborsoMissioneDettagliRepository
+                .getRimborsoMissioneDettagli(rimborsoMissione)
+                .stream()
+                .anyMatch(dettaglio -> dettaglio.getImportoEuro().compareTo(BigDecimal.ZERO) != 0
+                        && dettaglio.getCdTiSpesa().equalsIgnoreCase(Costanti.SPESA_PERNOTTAMENTO));
+
+        String cdTiSpesa = rimborsoMissioneDettagli.getCdTiSpesa();
+        String messaggioErrore = "ATTENZIONE! Voce non selezionabile in quanto NON preventivamente autorizzata";
+
+        String utilizzoMotiviIspettivi = null;
+        String utilizzoMotiviSediDisagiate = null;
+        if (isAutoPropriaUsed) {
+            OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(idMissione);
+            utilizzoMotiviIspettivi = Utility.nvl(autoPropria.getUtilizzoMotiviIspettivi(), "N");
+            utilizzoMotiviSediDisagiate = Utility.nvl(autoPropria.getUtilizzoMotiviSediDisagiate(), "N");
+        }
+
+        // Gestione delle spese in base al codice di spesa
+        switch (cdTiSpesa) {
+            case Costanti.SPESA_INDENNITA_KM:
+                if (!isAutoPropriaUsed || utilizzoMotiviIspettivi.equals("N") && utilizzoMotiviSediDisagiate.equals("S")) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+
+            case Costanti.SPESA_IND_AUTO_PROPRIA:
+                if(!isAutoPropriaUsed || utilizzoMotiviIspettivi.equals("S") && utilizzoMotiviSediDisagiate.equals("N")) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+
+            case Costanti.SPESA_NOLEGGIO_AUTO:
+                if (!isAutoNoleggioUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+
+            case Costanti.SPESA_TAXI:
+                if (!isTaxiUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+
+            case Costanti.SPESA_PEDAGGIO_AUTOSTRADA:
+                if (!isAutoPropriaUsed && !isAutoNoleggioUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+            case Costanti.SPESA_PARCHEGGIO:
+                if (!isAutoNoleggioUsed && !isAutoPropriaUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+
+            case Costanti.SPESA_ACC_DISABILE:
+                if (!isTaxiUsed) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+
+                OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(idMissione);
+                if (StringUtils.isEmpty(taxi.getMotiviHandicap())) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+                break;
+
+
+            case Costanti.SPESE_VISTO_VIAGGI_ESTERO:
+                if(rimborsoMissione.getOrdineMissione().getTipoMissione().equals("I")){
+                    throw new AwesomeException(CodiciErrore.ERRGEN, messaggioErrore);
+                }
+
+            default:
+                break;
+        }
+    }
+
+
     protected Integer recuperoLivelloEquivalente(RimborsoMissioneDettagli rimborsoMissioneDettagli,
                                                  RimborsoMissione rimborsoMissione, Integer livelloRich) {
         List<TipoPasto> lista = tipoPastoService.loadTipoPasto(rimborsoMissioneDettagli.getCdTiPasto(), rimborsoMissione.getNazione(), rimborsoMissione.getInquadramento(), rimborsoMissioneDettagli.getDataSpesa());
         if (lista != null && !lista.isEmpty()) {
             TipoPasto tipoPasto = lista.get(0);
             if (rimborsoMissioneDettagli.getCdTiPasto().startsWith("G")) {
-                if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(50)) > 0) {
+                if (tipoPasto.getLimiteMaxPasto().compareTo(Double.valueOf(50)) > 0) {
                     livelloRich = 1;
                 } else {
                     livelloRich = 4;
                 }
             } else {
-                if (tipoPasto.getLimiteMaxPasto().compareTo(new Double(30)) > 0) {
+                if (tipoPasto.getLimiteMaxPasto().compareTo(Double.valueOf(30)) > 0) {
                     livelloRich = 1;
                 } else {
                     livelloRich = 4;
@@ -219,7 +313,7 @@ public class RimborsoMissioneDettagliService {
         if (rimborsoMissione.getOrdineMissione().getId() != null) {
             OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(
                     OrdineMissione.class, rimborsoMissione.getOrdineMissione().getId());
-            if (ordineMissione != null && Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S") && (!rimborsoMissione.isAssociato() || (rimborsoMissione.getInquadramento() != null && rimborsoMissione.getInquadramento().compareTo(Long.valueOf(47)) < 0))) {
+            if (ordineMissione != null /*&& Utility.nvl(ordineMissione.getPersonaleAlSeguito()).equals("S")*/ && (!rimborsoMissione.isAssociato() || (rimborsoMissione.getInquadramento() != null && rimborsoMissione.getInquadramento().compareTo(Long.valueOf(47)) < 0))) {
                 livello = 3;
             }
         }
@@ -261,6 +355,8 @@ public class RimborsoMissioneDettagliService {
         impostaImportoDivisa(rimborsoMissioneDettagli);
         validaCRUD(rimborsoMissioneDettagli);
         controlliPasto(rimborsoMissioneDettagli, rimborsoMissione);
+
+        controlliSpeseMezzi(rimborsoMissioneDettagli, rimborsoMissione);
 
         aggiornaDatiImpegni(rimborsoMissioneDettagli);
 
@@ -381,6 +477,7 @@ public class RimborsoMissioneDettagliService {
         rimborsoMissioneDettagliDB.setDsTiSpesa(rimborsoMissioneDettagli.getDsTiSpesa());
         rimborsoMissioneDettagliDB.setNote(rimborsoMissioneDettagli.getNote());
         rimborsoMissioneDettagliDB.setFlSpesaAnticipata(rimborsoMissioneDettagli.getFlSpesaAnticipata());
+        rimborsoMissioneDettagliDB.setFlSpesaTracciata(rimborsoMissioneDettagli.getFlSpesaTracciata());
         rimborsoMissioneDettagliDB.setKmPercorsi(rimborsoMissioneDettagli.getKmPercorsi());
         rimborsoMissioneDettagliDB.setCambio(rimborsoMissioneDettagli.getCambio());
         rimborsoMissioneDettagliDB.setCdDivisa(rimborsoMissioneDettagli.getCdDivisa());
@@ -394,6 +491,8 @@ public class RimborsoMissioneDettagliService {
 
         validaCRUD(rimborsoMissioneDettagliDB);
         controlliPasto(rimborsoMissioneDettagli, rimborsoMissione);
+
+        controlliSpeseMezzi(rimborsoMissioneDettagli, rimborsoMissione);
 
         aggiornaDatiImpegni(rimborsoMissioneDettagliDB);
 

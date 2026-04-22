@@ -25,6 +25,7 @@ import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.util.Costanti;
@@ -32,6 +33,7 @@ import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
+import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.SecurityService;
@@ -55,10 +57,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -85,7 +84,7 @@ public class RimborsoMissioneResource {
     private ComunicaRimborsoSiglaService comunicaRimborsoSiglaService;
 
     /**
-     * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
+     * GET  /rest/rimborsoMissione -> get Rimborsi di missione per l'utente
      */
     @RequestMapping(value = "/rest/rimborsoMissione/list",
             method = RequestMethod.GET,
@@ -111,7 +110,7 @@ public class RimborsoMissioneResource {
     }
 
     /**
-     * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
+     * GET  /rest/rimborsoMissione -> get Rimborsi di missione per l'utente
      */
     @RequestMapping(value = "/rest/rimborsoMissione/listToFinal",
             method = RequestMethod.GET,
@@ -119,7 +118,7 @@ public class RimborsoMissioneResource {
     @Timed
     public ResponseEntity<?> getRimborsoMissioneToFinal(HttpServletRequest request,
                                                         RimborsoMissioneFilter filter) {
-        log.debug("REST request per visualizzare i dati degli Ordini di Missione ");
+        log.debug("REST request per visualizzare i dati degli Rimborsi di Missione ");
         filter.setToFinal("S");
         List<RimborsoMissione> rimborsiMissione = null;
         try {
@@ -132,7 +131,7 @@ public class RimborsoMissioneResource {
     }
 
     /**
-     * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
+     * GET  /rest/rimborsoMissione -> get Rimborsi di missione per l'utente
      */
     @RequestMapping(value = "/rest/rimborsoMissione/listToBeDeleted",
             method = RequestMethod.GET,
@@ -154,7 +153,117 @@ public class RimborsoMissioneResource {
     }
 
     /**
-     * GET  /rest/rimborsoMissione -> get Ordini di missione per l'utente
+     * GET  /rest/rimborsiMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/rimborsiMissione/listDaAnnullare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getRimborsiMissioneDaAnnullare(HttpServletRequest request,
+                                                          RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare");
+        filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+        filter.setGiaRimborsato("N");
+        filter.setValidato("S");
+        filter.setDaAnnullare("S");
+        List<String> listaStati = new ArrayList<>();
+        listaStati.add(Costanti.STATO_DEFINITIVO);
+        filter.setListaStatiMissione(listaStati);
+        List<RimborsoMissione> rimborsiMissione;
+        try {
+            rimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filter, false);
+        } catch (ComponentException e) {
+            log.error("ERRORE getRimborsiMissioneDaAnnullare", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(rimborsiMissione);
+    }
+
+    /**
+     * GET  /rest/RimborsoMissione -> get Rimborsi di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/rimborsiMissione/listDaConfermare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getRimborsiMissioneDaConfermare(HttpServletRequest request,
+                                                           RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Rimborsi di Missione da Confermare");
+        filter.setGiaRimborsato("N");
+        filter.setDaAnnullare("N");
+        List<String> listaStati = new ArrayList<>();
+        listaStati.add(Costanti.STATO_INSERITO);
+        filter.setListaStatiMissione(listaStati);
+        List<RimborsoMissione> rimborsiMissione;
+        try {
+            rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getRimborsiMissioneDaConfermare", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(rimborsiMissione);
+    }
+
+    /**
+     * GET  /rest/RimborsoMissione -> get Rimborsi di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/rimborsiMissione/listDaInviareAllaFirma",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getRimborsiMissioneDaInviareAllaFirma(HttpServletRequest request,
+                                                                 RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Rimborsi di Missione da Inviare Alla Firma");
+        filter.setGiaRimborsato("N");
+        filter.setValidato("N");
+        filter.setDaAnnullare("N");
+        List<String> listaStati = new ArrayList<>();
+        List<String> listaStatiFlusso = new ArrayList<>();
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        listaStatiFlusso.add(Costanti.STATO_INSERITO);
+        filter.setListaStatiMissione(listaStati);
+        filter.setListaStatiFlussoMissione(listaStatiFlusso);
+        List<RimborsoMissione> rimborsiMissione;
+        try {
+            rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getRimborsiMissioneDaInviareAllaFirma", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(rimborsiMissione);
+    }
+
+    /**
+     * GET  /rest/RimborsoMissione -> get Rimborsi di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/rimborsiMissione/listDaApprovare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getRimborsiMissioneDaApprovare(HttpServletRequest request,
+                                                          RimborsoMissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Rimborsi di Missione da Approvare");
+        filter.setGiaRimborsato("N");
+        filter.setValidato("S");
+        filter.setDaAnnullare("N");
+        List<String> listaStati = new ArrayList<>();
+        List<String> listaStatiFlusso = new ArrayList<>();
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+        filter.setListaStatiMissione(listaStati);
+        filter.setListaStatiFlussoMissione(listaStatiFlusso);
+        List<RimborsoMissione> rimborsiMissione;
+        try {
+            rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getRimborsiMissioneDaApprovare", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(rimborsiMissione);
+    }
+
+    /**
+     * GET  /rest/rimborsoMissione -> get Rimborsi di missione per l'utente
      *
      * @throws Exception
      */
@@ -163,7 +272,7 @@ public class RimborsoMissioneResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> getRimborsoMissioneDaValidare(HttpServletRequest request, RimborsoMissioneFilter filter) {
-        log.debug("REST request per visualizzare i dati degli Ordini di Missione ");
+        log.debug("REST request per visualizzare i dati degli Rimborsi di Missione ");
         List<RimborsoMissione> rimborsiMissione;
         try {
             rimborsiMissione = rimborsoMissioneService.getRimborsiMissioneForValidateFlows(filter, true);
@@ -183,7 +292,7 @@ public class RimborsoMissioneResource {
     @Timed
     public ResponseEntity<?> getRimborsoMissione(HttpServletRequest request,
                                                  @RequestParam(value = "id") Long idMissione) {
-        log.debug("REST request per visualizzare i dati degli Ordini di Missione ");
+        log.debug("REST request per visualizzare i dati degli Rimborsi di Missione ");
         try {
             RimborsoMissione rimborsoMissione = rimborsoMissioneService.getRimborsoMissione(idMissione, true, true);
             impostaTotaliRimborso(rimborsoMissione);

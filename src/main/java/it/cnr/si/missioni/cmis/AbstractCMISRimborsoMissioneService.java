@@ -55,7 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimborsoMissioneService{
+public abstract class AbstractCMISRimborsoMissioneService implements CMISRimborsoMissioneService {
     public static final String PROPERTY_TIPOLOGIA_DOC = "wfcnr:tipologiaDOC";
     public static final String PROPERTY_TIPOLOGIA_DOC_SPECIFICA = "wfcnr:tipologiaDocSpecifica";
     public static final String PROPERTY_TIPOLOGIA_DOC_MISSIONI = "cnrmissioni:tipologiaDocumentoMissione";
@@ -465,7 +465,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
 
         path = createFolderRimborsoMissioneDettaglio(dettaglio, path);
 
-        Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO);
+        Map<String, Object> metadataProperties = createMetadataForFileRimborsoDettaglioMissioneAllegati(securityService.getCurrentUserLogin(), fileName, RimborsoMissione.CMIS_PROPERTY_NAME_TIPODOC_SCONTRINO,dettaglio);
         try {
             StorageObject node = missioniCMISService.restoreSimpleDocument(
                     metadataProperties,
@@ -494,7 +494,12 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
         return null;
     }
 
+    private Map<String, Object> createMetadataForFileRimborsoDettaglioMissioneAllegati(String currentLogin, String fileName, String tipoDocumento,RimborsoMissioneDettagli rimborsoMissioneDettagli) {
+        Map<String, Object> metadataProperties = createMetadataForFileRimborsoMissioneAllegati( currentLogin,fileName,tipoDocumento);
+        metadataProperties.put(RimborsoMissioneDettagli.CMIS_PROPERTY_RIGA_DETTAGLIO_RIMBORSO_MISSIONE,rimborsoMissioneDettagli.getRiga());
 
+        return metadataProperties;
+    }
     private Map<String, Object> createMetadataForFileRimborsoMissioneAllegati(String currentLogin, String fileName, String tipoDocumento) {
         Map<String, Object> metadataProperties = new HashMap<String, Object>();
         metadataProperties.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), RimborsoMissione.CMIS_PROPERTY_ATTACHMENT_DOCUMENT);
@@ -537,8 +542,8 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
 
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_NUMERO_IMPEGNO, cmisRimborsoMissione.getImpegnoNumero());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TAXI, cmisRimborsoMissione.getTaxiFlag().equals("true"));
-        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisRimborsoMissione.getAutoServizioFlag().equals("true"));
-        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisRimborsoMissione.getPersonaSeguitoFlag().equals("true"));
+        /*metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_AUTO_SERVIZIO, cmisRimborsoMissione.getAutoServizioFlag().equals("true"));
+        metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_PERSONA_SEGUITO, cmisRimborsoMissione.getPersonaSeguitoFlag().equals("true"));*/
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DESTINAZIONE, cmisRimborsoMissione.getDestinazione());
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_ESTERA_FLAG, cmisRimborsoMissione.getMissioneEsteraFlag().equals("true"));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_DATA_INIZIO_MISSIONE, cmisRimborsoMissione.getDataInizioMissione());
@@ -547,7 +552,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
         metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_ANTICIPO_RICEVUTO, cmisRimborsoMissione.getAnticipoRicevuto().equals("true"));
         metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_ANNO_MANDATO, cmisRimborsoMissione.getAnnoMandato().equals("") ? null : Integer.valueOf(cmisRimborsoMissione.getAnnoMandato()));
         metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_NUMERO_MANDATO, cmisRimborsoMissione.getNumeroMandato().equals("") ? null : Integer.valueOf(cmisRimborsoMissione.getNumeroMandato()));
-        metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_IMPORTO_MANDATO, cmisRimborsoMissione.getImportoMandato().equals("") ? null : new Float(cmisRimborsoMissione.getImportoMandato()));
+        metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_IMPORTO_MANDATO, cmisRimborsoMissione.getImportoMandato().equals("") ? null : Float.parseFloat(cmisRimborsoMissione.getImportoMandato()));
         metadataProperties.put(OrdineMissione.CMIS_PROPERTY_FLOW_TRATTAMENTO, cmisRimborsoMissione.getTrattamento());
         metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_TOTALE_RIMBORSO_MISSIONE, cmisRimborsoMissione.getTotaleRimborsoMissione());
         metadataProperties.put(RimborsoMissione.CMIS_PROPERTY_FLOW_DIFFERENZE_ORDINE_RIMBORSO, cmisRimborsoMissione.getDifferenzeOrdineRimborso());
@@ -563,10 +568,9 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
     }
 
 
-
-    abstract void  sendRimborsoOrdineMissioneToSign(RimborsoMissione rimborsoMissione, CMISRimborsoMissione cmisRimborsoMissione,
-                                                        StorageObject documento,
-                                                        List<StorageObject> allegati, List<StorageObject> giustificativi);
+    abstract void sendRimborsoOrdineMissioneToSign(RimborsoMissione rimborsoMissione, CMISRimborsoMissione cmisRimborsoMissione,
+                                                   StorageObject documento,
+                                                   List<StorageObject> allegati, List<StorageObject> giustificativi);
 
     public void avviaFlusso(RimborsoMissione rimborsoMissione) throws ComponentException {
         String username = securityService.getCurrentUserLogin();
@@ -588,9 +592,10 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
                 }
             }
         }
-        sendRimborsoOrdineMissioneToSign( rimborsoMissione,cmisRimborsoMissione,documento,allegati,giustificativi);
+        sendRimborsoOrdineMissioneToSign(rimborsoMissione, cmisRimborsoMissione, documento, allegati, giustificativi);
 
     }
+
     private void aggiungiAllegatiRimborsoMissione(RimborsoMissione rimborsoMissione, StringBuilder nodeRefs) {
         List<CMISFileAttachment> allegatiRimborsoMissione = getAttachmentsRimborsoMissione(rimborsoMissione, Long.valueOf(rimborsoMissione.getId().toString()));
         List<String> list = new ArrayList<>();
@@ -695,7 +700,7 @@ public abstract class AbstractCMISRimborsoMissioneService implements  CMISRimbor
         }
     }
 
-    public abstract  void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException;
+    public abstract void annullaFlusso(RimborsoMissione rimborsoMissione) throws AwesomeException;
 
     private MessageForFlowRimborso createJsonForAbortFlowOrdineMissione() {
         MessageForFlowRimborso rimborso = new MessageForFlowRimborso();

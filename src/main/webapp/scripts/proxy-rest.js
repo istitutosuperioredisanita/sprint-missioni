@@ -111,6 +111,22 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
        {priorita:'Media', value: '1'}
     ];
 
+    var valoriFiltroStati = [
+        { stato: 'Tutti', value: 'T' },
+        { stato: 'Da annullare', value: 'DA ANN'},
+        { stato: 'Da inviare alla firma', value: 'DA INV' },
+        { stato: 'Da confermare', value: 'DA CONF' },
+        { stato: 'Da approvare', value: 'DA APP' }
+    ];
+
+    var valoriFiltroStatiRimb = [
+        { stato: 'Tutti', value: 'T' },
+        { stato: 'Da annullare', value: 'DA ANN'},
+        { stato: 'Da inviare alla firma', value: 'DA INV' },
+        { stato: 'Da confermare', value: 'DA CONF' },
+        { stato: 'Da approvare', value: 'DA APP' }
+    ];
+
     var trattamenti = [
        {trattamento:'Rimborso Documentato', value: 'R'},
        {trattamento:'Trattamento Alternativo di Missione', value: 'T'}
@@ -418,28 +434,48 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
     }
 
     var recuperoTipoSpesa = function(inquadramento, data, nazione, trattamento){
+        // Default values
+        if (typeof inquadramento === 'undefined' || inquadramento === null) {
+            inquadramento = 0;
+        }
+
+        if (typeof data === 'undefined' || data === null) {
+            data = new Date().toLocaleDateString('it-IT'); // Get today's date in Italian format (dd/mm/yyyy)
+        }
+
         var urlRestProxy = URL_REST.STANDARD;
         var tipiSpesa = [];
         var app = APP_FOR_REST.SIGLA;
         var url = SIGLA_REST.TIPO_SPESA;
         var ammissibileRimborso = false;
-        if (trattamento === 'T'){
+        if (trattamento === 'T') {
             ammissibileRimborso = true;
         }
-        var objectPostTipoSpesaClauses = [{condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue:nazione},
-                                    {condition: 'AND', fieldName: 'condizioneTipiSpesaMissione', operator: "=", fieldValue:"S"},
-                                    {condition: 'AND', fieldName: 'inquadramento', operator: "=", fieldValue:inquadramento},
-                                    {condition: 'AND', fieldName: 'data', operator: "=", fieldValue:data},
-                                    {condition: 'AND', fieldName: 'ammissibileRimborso', operator: "=", fieldValue:ammissibileRimborso}];
-        var objectPostTipoSpesa = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, clauses:objectPostTipoSpesaClauses}
-        return $http.post(urlRestProxy + app+'/', objectPostTipoSpesa, {params: {proxyURL: url}}).success(function (data) {
-            if (data){
-                tipiSpesa = data.elements;
-            }
-            return tipiSpesa;
-        }).error(function (data) {
-        });
-    }
+
+        var objectPostTipoSpesaClauses = [
+            { condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue: nazione },
+            { condition: 'AND', fieldName: 'condizioneTipiSpesaMissione', operator: "=", fieldValue: "S" },
+            { condition: 'AND', fieldName: 'inquadramento', operator: "=", fieldValue: inquadramento },
+            { condition: 'AND', fieldName: 'data', operator: "=", fieldValue: data },
+            { condition: 'AND', fieldName: 'ammissibileRimborso', operator: "=", fieldValue: ammissibileRimborso }
+        ];
+
+        var objectPostTipoSpesa = {
+            activePage: 0,
+            maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
+            clauses: objectPostTipoSpesaClauses
+        };
+
+        return $http.post(urlRestProxy + app + '/', objectPostTipoSpesa, { params: { proxyURL: url } })
+            .success(function (data) {
+                if (data) {
+                    tipiSpesa = data.elements;
+                }
+                return tipiSpesa;
+            })
+            .error(function (data) {
+            });
+    };
 
     var recuperoTipoPasto = function(inquadramento, data, nazione){
         var urlRestProxy = URL_REST.STANDARD;
@@ -586,6 +622,8 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
              valuePriorita: valoriPriorita,
              valueTrattamenti: trattamenti,
              valueFondi: fondi,
-             valueObblighiRientro: obblighiRientro };
+             valueObblighiRientro: obblighiRientro,
+             valueFiltroStati: valoriFiltroStati,
+             valueFiltroStatiRimb: valoriFiltroStatiRimb};
 });
 

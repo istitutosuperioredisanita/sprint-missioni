@@ -53,7 +53,8 @@
             "confirmpassword": "New password confirmation",
             "confirmpassword.placeholder": "Confirm the new password",
             "email": "E-mail",
-            "email.placeholder": "Your e-mail"
+            "email.placeholder": "Your e-mail",
+            "items-per-page": "Elementi per pagina:"
         },
         "button": {
             "search": "Ricerca",
@@ -67,7 +68,11 @@
             "validate": "Valida",
             "close": "Chiudi",
             "print": "Stampa",
-            "download": "Scarica"
+            "download": "Scarica",
+            "indietro": "Indietro",
+            "inizio": "Inizio",
+            "avanti": "Avanti",
+            "fine": "Fine"
         },
         "messages": {
             "info": {
@@ -201,15 +206,18 @@
     },
     "ordine-missione-auto-propria": {
         "title": "UTILIZZO AUTO PROPRIA PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "NB-title" : "NB: ",
+        "NB-text" : "non è consentito l’uso del mezzo proprio per il personale non dipendente e per il raggiungimento della località di missione estera.",
         "form": {
             "dati-patente": "Dati Patente",
             "auto-propria": "Dati Auto Propria",
             "percorso-da": "Percorso Da",
             "percorso-a": "Percorso A",
-            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo",
-            "motivi-urgenza": "Per Attività caratterizzata da emergenza, urgenza, indifferibilità",
+            "motivi-ispettivi": "Per lo svolgimento di funzioni istituzionali relative a compiti ispettivi, di verifica e controllo",
+            "motivi-sedi-disagiate" : "Nei casi di accertata convenienza economica per l’ISS, anche per lo svolgimento di funzioni diverse da quelle istituzionali relative a compiti ispettivi,</br> di verifica e controllo, in caso di oggettive situazioni di disagio o di difficoltà all’uso dei mezzi di trasporto ordinari",
+            "motivi-urgenza": "L’attività sia caratterizzata da emergenza, urgenza, indifferibilità, tra cui i casi di mancanza assoluta di mezzi di trasporto",
             "motivi-trasporto": "Per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione",
-            "altri-motivi": "Altri motivi (specificare)",
+            "altri-motivi": "NOTE",
             "addSpostamento": "Aggiungi Spostamento",
             "box-dati": "Dati Generali",
             "box-spostamenti": "Spostamenti"
@@ -230,6 +238,49 @@
             "print": "Stampa Richiesta Anticipo"
         }
     },
+    "ordine-missione-taxi": {
+        "title": "RICHIESTA TAXI PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "NB-title" : "NB: ",
+        "NB-text" : "ai fini del rimborso le ricevute rilasciate dai taxi devono indicare obbligatoriamente l’importo, il nominativo del beneficiario, il percorso effettuato, la data e l’orario.",
+        "form": {
+            "dati-patente": "Dati Patente",
+            "taxi": "Dati Taxi",
+            "percorso-da": "Percorso Da",
+            "percorso-a": "Percorso A",
+            "mancanza-assoluta-mezzi-pubblici": "Inadeguatezza dei mezzi ordinari di linea per raggiungere il luogo della missione nei tempi necessari",
+            "mancanza-non-assoluta-mezzi-pubblici": "Mancanza assoluta di mezzi pubblici nel luogo di missione, anche per sospensione del servizio per sciopero e/o per eventi eccezionali </br> opportunamente documentati",
+            "necessità-trasporto-materiale": "Necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva </br> ed elenco dettagliato del materiale trasportato)",
+            "motivi-handicap-disabilità": "Personale con disabilità/portatore di handicap",
+            "altri-motivi": "NOTE",
+            "addSpostamento": "Aggiungi Spostamento",
+            "box-dati": "Dati Generali",
+            "box-spostamenti": "Spostamenti"
+        },
+        "button": {
+            "print": "Stampa Richiesta Taxi"
+        }
+    },
+
+    "ordine-missione-auto-noleggio": {
+        "title": "RICHIESTA NOLEGGIO AUTO/CAR SHARING PER ORDINE DI MISSIONE NUMERO {{numeroOrdineMissione}} DEL {{dataOrdineMissione}} ",
+        "NB-title" : "NB: ",
+        "NB-text" : "non è consentito l’uso del mezzo a noleggio per il personale non dipendente e per il raggiungimento della località di missione estera.",
+        "form": {
+            "taxi": "Dati Auto A Noleggio",
+            "percorso-da": "Percorso Da",
+            "percorso-a": "Percorso A",
+            "motivo-esigenze-di-servizio": "Per motivate esigenze di servizio, attestate da apposita autodichiarazione del soggetto incaricato",
+            "motivo-motivata-eccezionalità": "In casi di motivata eccezionalità, attestate da apposita autodichiarazione del soggetto incaricato",
+            "note": "NOTE",
+            "addSpostamento": "Aggiungi Spostamento",
+            "box-dati": "Dati Generali",
+            "box-spostamenti": "Spostamenti"
+        },
+        "button": {
+            "print": "Stampa Richiesta Auto A Noleggio"
+        }
+    },
+
     "datiPatente": {
         "title": "Dati Patente di {{lastname}} {{firstname}} ",
         "form": {
@@ -300,39 +351,45 @@
             "partenza-da-altro": "Luogo di Partenza*",
             "distanza": "Km. di distanza dalla sede",
             "distanza.placeholder": "Distanza dalla Sede di Servizio: Km.",
-            "data-inizio-obbligatoria": "Data Inizio Missione (Presunta)*",
-            "data-inizio": "Data Inizio (Presunta)",
+            "data-inizio-obbligatoria": "Data Inizio Missione*",
+            "data-inizio": "Data Inizio",
             "data-inizio.placeholder": "Data di Inizio della Missione",
-            "data-fine": "Data Fine (Presunta)",
-            "data-fine-obbligatoria": "Data Fine (Presunta)*",
-            "data-fine.placeholder": "Data presunta di Fine della Missione",
-            "note-utilizzo-taxi-noleggio": "Note Taxi/Auto a Noleggio/Auto di Servizio",
-            "note-utilizzo-taxi-noleggio.placeholder": "Motivazione per l'Utilizzo del Taxi/Auto a Noleggio/Auto di Servizio e per il Personale al Seguito .",
+            "data-fine": "Data Fine",
+            "data-fine-obbligatoria": "Data Fine Missione*",
+            "data-fine.placeholder": "Data di Fine della Missione",
+            "note-utilizzo-taxi-noleggio": "NOTE",
+            "note-utilizzo-taxi-noleggio.placeholder": "Dettagliare il caso di motivata eccezionalità.",
             "note-segreteria": "Note per il direttore",
             "note-segreteria.placeholder": "Inserire eventuali note che il direttore può visualizzare in fase di autorizzazione",
-            "importo-presunto": "Importo Presunto €",
+            "importo-presunto": "Importo Presunto €*",
             "uso-auto-propria": "Utilizzo Auto Propria",
             "utilizzo-auto-noleggio": "Utilizzo Auto Noleggio",
             "utilizzo-taxi": "Utilizzo Taxi",
             "utilizzo-auto-servizio": "Utilizzo Auto Servizio",
             "persona-seguito": "Personale al Seguito",
-            "fondi": "Fondi",
+            "fondi": "Fondi*",
             "missione-gratuita": "Spese non a carico Ente",
             "responsabile-gruppo": "Responsabile del Gruppo*",
             "duplica-ordine": "Duplica Ordine di Missione"
         },
         "button": {
             "sendToFinal": "Rendi Definitivo l'Ordine di Missione",
-            "confirm": "Conferma l'Ordine di Missione",
+            "confirm": "Invia l'Ordine di Missione",
             "print": "Stampa Ordine di Missione",
             "auto-propria-si": "Richiesta Utilizzo Auto Propria: Sì",
             "auto-propria-no": "Richiesta Utilizzo Auto Propria: No",
+            "taxi-si": "Richiesta Utilizzo Taxi: Sì",
+            "taxi-no": "Richiesta Utilizzo Taxi: No",
+            "auto-noleggio-si": "Richiesta Utilizzo Auto Noleggio/CAR SHARING: Sì",
+            "auto-noleggio-no": "Richiesta Utilizzo Auto Noleggio/CAR SHARING: No",
             "sendToManager": "Invia al Responsabile del gruppo",
             "sendToManagerShort": "Invia al Responsabile",
             "anticipo-si": "Richiesta Anticipo: Sì",
             "anticipo-no": "Richiesta Anticipo: No",
             "savedraft" : "Salva in Bozza",
-            "invia" : "Invia"
+            "invia" : "Invia",
+            "sendToValidate" : "Invia per la Validazione",
+            "dettagli-presunti": "Dettagli Spese Presunte"
         },
         "messages": {
             "error": {
@@ -367,6 +424,20 @@
                     "maxlength": "Il numero della Polizza Assicurativa può essere lungo al massimo 50 caratteri"
                 }
             }
+        }
+    },
+    "ordine-missione-dettagli": {
+        "title": "ORDINE MISSIONE  {{numeroOrdineMissione}} DEL {{dataOrdineMissione}}  ({{destinazioneOrdineMissione}})  - DETTAGLI SPESE PRESUNTE",
+        "form": {
+            "box-dettaglio-spese": "Dettaglio Spese Presunte",
+            "dettaglio-spese": {
+                "totale-dettagli" : "Totale Spese Presunte",
+                "tipologia-spesa" : "Tipologia di Spesa*",
+                "ds-spesa" : "Descrizione Spesa*",
+                "importo": "Importo €*",
+                "importoSenzaSimbolo": "Importo"
+            },
+            "add-dettaglio-spesa": "Aggiungi Dettaglio Spese Presunte"
         }
     },
     "missione": {
@@ -416,10 +487,10 @@
             "trattamentoView": "Trattamento",
             "note": "Note",
             "note.placeholder": "Annotazioni. Altre Disposizioni.",
-            "voce": "Voce di Bilancio",
-            "voce.placeholder": "Voce di Bilancio.",
-            "gae": "GAE",
-            "gae.placeholder": "GAE",
+            "voce": "Voce di Bilancio*",
+            "voce.placeholder": "Voce di Bilancio*",
+            "gae": "GAE*",
+            "gae.placeholder": "GAE*",
             "cdr": "CDR",
             "cdr.placeholder": "CDR",
             "uo": "UO",
@@ -441,20 +512,23 @@
             "modulo.placeholder": "Progetto",
             "anno-impegno": "Anno Impegno",
             "numero-impegno": "Numero Impegno",
+            "anno-impegno-obbl": "Anno Impegno*",
+            "numero-impegno-obbl": "Numero Impegno*",
             "info-disponibilita": "Informazioni sulla Disponibilità",
             "history-respingi": "Cronologia Operazioni 'Respingi'",
             "no-history-respingi": "Non esistono Operazioni 'Respingi' registrate",
             "fase-respingi": "Fase Respingi",
             "cup": "Codice CUP",
-            "motivo-respingi-mittente": "Motivo Respingi al mittente",
+            "motivo-respingi-mittente": "Motivo Respingi al mittente*",
             "motivo-respingi-mittente.placeholder": "Indicare il Motivo per cui si sta respingendo al mittente",
             "cug": "Comitato Garanzia",
             "presidenza": "Presidenza",
             "ordine-missione.placeholder": "Selezionare l'Ordine di Missione",
             "rimborso-missione.placeholder": "Selezionare il Rimborso Missione"
-		},
+        },
         "button": {
-            "sendToSign": "Invia alla Firma",
+            "sendToValidate": "Invia per la Validazione",
+            "sendToSign": "Invia in Firma",
             "returnToSender": "Respingi al Mittente",
             "returnToSenderShort": "Respingi"
         }
@@ -472,7 +546,9 @@
             "a-data-missione": "A Data Missione",
             "anno": "Anno",
             "annullati": "Includi Annullati",
-            "ordini-missione": "Ordini di Missione"
+            "ordini-missione": "Ordini di Missione",
+            "stati": "Stati",
+            "stati-placeholder": "Seleziona Stato"
         },
         "form": {
             "anticipo": "Anticipo",
@@ -488,7 +564,7 @@
         "form": {
             "numero": "Progressivo di Annullamento",
             "motivo-annullamento.placeholder": "Indicare il Motivo di Annullamento dell'ordine di missione approvato",
-            "motivo-annullamento": "Motivo di Annullamento",
+            "motivo-annullamento": "Motivo di Annullamento*",
             "consenti-rimborso": "Consentire la richiesta di rimborso delle spese di missione già sostenute"
         },
         "button": {
@@ -532,9 +608,9 @@
             "importo-mandato": "Importo Mandato €",
             "altre-spese": "Altre spese anticipate dall'agenzia di Viaggi",
             "altre-spese.placeholder": "Indicare ad esempio Albergo, Biglietti Aerei / Ferroviari, ecc.",
-            "altre-spese-importo": "Importo €",
+            "altre-spese-importo": "Altre Spese Importo €",
             "rimborso-spese-terzi": "Rimborso o concorso spese da terzi",
-            "rimborso-spese-terzi-importo": "Importo €",
+            "rimborso-spese-terzi-importo": "Spese Terzi Importo €",
             "stato-invio-sigla": "Stato Sigla",
             "id-sigla": "Id. SIGLA",
             "stato-pagamento-sigla": "Stato Pagamento Missione: ",
@@ -548,7 +624,7 @@
             "print": "Stampa Rimborso",
             "download": "Scarica ZIP Documenti",
             "sendToFinal": "Rendi Definitivo il Rimborso Missione",
-            "confirm": "Conferma il Rimborso Missione",
+            "confirm": "Invia il Rimborso Missione",
             "dettagli": "Dettagli Spesa",
             "savedraft" : "Salva in Bozza",
             "invia" : "Invia"
@@ -559,22 +635,23 @@
         "form": {
             "box-dettaglio-spese": "Dettaglio Spese",
             "dettaglio-spese": {
-                    "data": "Data*",
-                    "totale-dettagli" : "Totale Dettagli Spesa",
-                    "totale-dettagli-non-anticipati" : "Totale Dettagli Spesa Non Anticipati",
-                    "tipologia-spesa" : "Tipologia di Spesa*",
-                    "ds-spesa" : "Descrizione Spesa*",
-                    "tipologia-pasto" : "Tipo Pasto*",
-                    "importo": "Importo €*",
-                    "importoSenzaSimbolo": "Importo",
-                    "spesa-anticipata": "Spesa Anticipata dall'ente",
-                    "download-file": "Download File",
-                    "remove-file": "Elimina File",
-                    "km": "Km percorsi*",
-                    "impegno": "Impegno",
-                    "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
-                    "localita-spostamento": "Località Spostamento*"
-                },
+                "data": "Data*",
+                "totale-dettagli" : "Totale Dettagli Spesa",
+                "totale-dettagli-non-anticipati" : "Totale Dettagli Spesa Non Anticipati",
+                "tipologia-spesa" : "Tipologia di Spesa*",
+                "ds-spesa" : "Descrizione Spesa*",
+                "tipologia-pasto" : "Tipo Pasto*",
+                "importo": "Importo €*",
+                "importoSenzaSimbolo": "Importo",
+                "spesa-anticipata": "Spesa Anticipata dall'ente",
+                "download-file": "Download File",
+                "remove-file": "Elimina File",
+                "km": "Km percorsi*",
+                "impegno": "Impegno",
+                "mancanza-giustificativo": "Motivo Mancanza Giustificativo",
+                "localita-spostamento": "Località Spostamento*",
+                "spesa-tracciata": "Spesa Tracciata"
+            },
             "add-dettaglio-spesa": "Aggiungi Dettaglio Spese"
         }
     },
@@ -902,3 +979,6 @@
     },
     "footer": "This is your footer"
 }
+
+
+

@@ -99,9 +99,9 @@ public class GaeService {
         clauses.add(clause);
         clause = new JSONClause();
         clause.setFieldName("ti_gestione");
-        clause.setFieldValue("S");
+        clause.setFieldValue("E");
         clause.setCondition("AND");
-        clause.setOperator("=");
+        clause.setOperator("!=");
         clauses.add(clause);
         clause = new JSONClause();
         clause.setFieldName("cd_centro_responsabilita");

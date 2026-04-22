@@ -223,6 +223,10 @@ public class PrintRimborsoMissioneService {
                 } else {
                     totMissione = totMissione.add(dettagli.getImportoEuro());
                 }
+                if (dettagli.isSpesaTracciata()) {
+                    dsSpesa = dsSpesa + " - SPESA TRACCIATA";
+                    dettagliPrint.setSpesaTracc("S");
+                }
                 dettagliPrint.setDsSpesa(dsSpesa);
                 dettagliPrint.setData(DateUtils.getDateAsString(dettagli.getDataSpesa(), DateUtils.PATTERN_DATE));
                 if (dettagli.getImportoEuro() != null) {

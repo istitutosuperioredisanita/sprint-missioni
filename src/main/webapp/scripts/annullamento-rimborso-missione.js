@@ -97,7 +97,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                 $scope.annullamentoModel.rimborsoMissione.cup = rimborsoMissioneSelected.cup;
                 if ($scope.annullamentoModel.rimborsoMissione.uoSpesa){
                     $scope.restUo($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.cdsSpesa, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
-                    $scope.restModuli($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
+                    //$scope.restModuli($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                     $scope.restGae($scope.annullamentoModel.rimborsoMissione.anno, $scope.annullamentoModel.rimborsoMissione.pgProgetto, $scope.annullamentoModel.rimborsoMissione.cdrSpesa, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                 }
                 if ($scope.annullamentoModel.rimborsoMissione.cdsCompetenza){
@@ -121,21 +121,45 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         }
     }
 
-    $scope.recuperoDatiModalitaPagamento = function(terzoSigla){
-        ProxyService.getModalitaPagamento(terzoSigla).then(function(ret){
-            if (ret && ret.data && ret.data.elements){
+   $scope.recuperoDatiModalitaPagamento = function (terzoSigla) {
+        ProxyService.getModalitaPagamento(terzoSigla).then(function (ret) {
+            if (ret && ret.data && ret.data.elements) {
                 $scope.modalitaPagamentos = ret.data.elements;
-            }
-        });
-    }
 
-    $scope.recuperoDatiTerzoModalitaPagamento = function(terzoSigla, tipoPagamento){
-        ProxyService.getTerzoModalitaPagamento(terzoSigla, tipoPagamento).then(function(ret){
-            if (ret && ret.data && ret.data.elements){
-                $scope.terzoModalitaPagamentos = ret.data.elements;
+                if ($scope.annullamentoModel.rimborsoMissione.modpag) {
+                    var selectedPayment = $scope.modalitaPagamentos.find(function (item) {
+                        return item.cd_modalita_pag === $scope.annullamentoModel.rimborsoMissione.modpag;
+                    });
+                    if (selectedPayment) {
+                        $scope.annullamentoModel.rimborsoMissione.modpag = selectedPayment.cd_modalita_pag;
+                    }
+                }
+            } else {
+                $scope.modalitaPagamentos = [];
             }
         });
-    }
+    };
+
+
+    $scope.recuperoDatiTerzoModalitaPagamento = function (terzoSigla, tipoPagamento) {
+        ProxyService.getTerzoModalitaPagamento(terzoSigla, tipoPagamento).then(function (ret) {
+            if (ret && ret.data && ret.data.elements) {
+                $scope.terzoModalitaPagamentos = ret.data.elements;
+
+                if ($scope.annullamentoModel.rimborsoMissione.pgBanca) {
+                    var selectedPayment = $scope.terzoModalitaPagamentos.find(function (item) {
+                        return item.pg_banca === $scope.annullamentoModel.rimborsoMissione.pgBanca;
+                    });
+                    if (selectedPayment) {
+                        $scope.annullamentoModel.rimborsoMissione.pgBanca = selectedPayment.pg_banca;
+                    }
+                }
+            } else {
+                $scope.terzoModalitaPagamentos = [];
+            }
+        });
+    };
+
 
     $scope.restRimborsiMissioneDaAnnullare = function(userWork){
         ElencoRimborsiMissioneService.findRimborsiMissioneDaAnnullare(userWork.login).then(function(data){
@@ -276,7 +300,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                         if (data.elements.length === 1){
                             $scope.annullamentoModel.rimborsoMissione.cdrSpesa = data.elements[0].cd_centro_responsabilita;
                             if (daQuery != 'S'){
-                                $scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
+                                //$scope.restModuli($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                                 $scope.restGae($scope.annullamentoModel.anno, $scope.annullamentoModel.rimborsoMissione.pgProgetto, $scope.annullamentoModel.rimborsoMissione.cdrSpesa, $scope.annullamentoModel.rimborsoMissione.uoSpesa);
                             }
                         }
@@ -358,54 +382,72 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
             $scope.impegnoSelected = [];
         }
     }
-    
-    $scope.restGae = function(anno, modulo, cdr, uo){
-        if (cdr || modulo || uo){
+
+    $scope.restGae = function(anno, modulo, cdr, uo) {
+        if (cdr || modulo || uo) {
             $scope.elencoGae = [];
             var app = APP_FOR_REST.SIGLA;
             var url = SIGLA_REST.GAE;
-            var varOrderBy = [{name: 'cd_linea_attivita', type: 'ASC'}];
+            var varOrderBy = [{ name: 'cd_linea_attivita', type: 'ASC' }];
             var varClauses = [];
-            if (modulo){
-                if (cdr){
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
+
+            if (modulo) {
+                if (cdr) {
+                    varClauses = [
+                        { condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue: anno },
+                        { condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue: modulo },
+                        { condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue: cdr },
+                        { condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue: "E" },
+                        { condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue: cdr.substring(0, 3) + "%" }
+                    ];
                 } else if (uo) {
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue:modulo},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:uo.substring(0,3)+"%"}];
+                    varClauses = [
+                        { condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue: anno },
+                        { condition: 'AND', fieldName: 'pg_progetto', operator: "=", fieldValue: modulo },
+                        { condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue: "E" },
+                        { condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue: uo.substring(0, 3) + "%" }
+                    ];
                 }
-            } else if (cdr){
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue:cdr},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
-            }  else if (uo) {
-                     varClauses = [{condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue:anno},
-                              {condition: 'AND', fieldName: 'ti_gestione', operator: "=", fieldValue:"S"},
-                              {condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue:cdr.substring(0,3)+"%"}];
+            } else if (cdr) {
+                varClauses = [
+                    { condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue: anno },
+                    { condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "=", fieldValue: cdr },
+                    { condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue: "E" },
+                    { condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue: cdr.substring(0, 3) + "%" }
+                ];
+            } else if (uo) {
+                varClauses = [
+                    { condition: 'AND', fieldName: 'esercizio', operator: "=", fieldValue: anno },
+                    { condition: 'AND', fieldName: 'ti_gestione', operator: "!=", fieldValue: "E" },
+                    { condition: 'AND', fieldName: 'cd_centro_responsabilita', operator: "LIKE", fieldValue: uo.substring(0, 3) + "%" }
+                ];
             }
-            var postGae = {activePage:0, maxItemsPerPage:COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST, orderBy:varOrderBy, clauses:varClauses}
+
+            var postGae = {
+                activePage: 0,
+                maxItemsPerPage: COSTANTI.DEFAULT_VALUE_MAX_ITEM_FOR_PAGE_SIGLA_REST,
+                orderBy: varOrderBy,
+                clauses: varClauses
+            };
+
             $scope.workingRestGae = true;
-            $http.post(urlRestProxy + app+'/', postGae, {params: {proxyURL: url}}).success(function (data) {
-            $scope.workingRestGae = false;
-                if (data){
-                    if (data.elements){
-                        $scope.elencoGae = data.elements;
-                        if (data.elements.length === 1){
-                            $scope.annullamentoModel.rimborsoMissione.gae = data.elements[0].cd_linea_attivita;
+            $http.post(urlRestProxy + app + '/', postGae, { params: { proxyURL: url } })
+                .success(function(data) {
+                    $scope.workingRestGae = false;
+                    if (data) {
+                        if (data.elements) {
+                            $scope.elencoGae = data.elements;
+                            if (data.elements.length === 1) {
+                                $scope.annullamentoModel.rimborsoMissione.gae = data.elements[0].cd_linea_attivita;
+                            }
+                        } else {
+                            $scope.elencoGae = [];
                         }
-                    } else {
-                        $scope.elencoGae = [];
                     }
-                }
-            }).error(function (data) {
-                $scope.workingRestGae = false;
-            });
+                })
+                .error(function(data) {
+                    $scope.workingRestGae = false;
+                });
         } else {
             $scope.elencoGae = [];
         }
@@ -654,6 +696,8 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                         $scope.idMissione = null;
                         $scope.annullamentoModel = {}
                         $scope.inizializzaFormPerInserimento($sessionStorage.account);
+                        // Redirect alla home dopo il completamento dell'operazione
+                        $location.path('/');
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;
@@ -722,8 +766,8 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         }
     }
 
-    $scope.previousPage = function () {
-      parent.history.back();
+    $scope.previousPage = function() {
+        $location.path('/');
     }
 
     $scope.confirmDeleteAttachment = function (attachment) {
@@ -833,12 +877,13 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                                 $scope.restUo(model.anno, model.rimborsoMissione.cdsSpesa, model.rimborsoMissione.uoSpesa);
                                 $scope.restUoCompetenza(model.anno, model.rimborsoMissione.cdsCompetenza, model.rimborsoMissione.uoCompetenza);
                                 $scope.restCdr(model.rimborsoMissione.uoSpesa, "S");
-                                $scope.restModuli(model.anno, model.rimborsoMissione.uoSpesa);
+                                //$scope.restModuli(model.anno, model.rimborsoMissione.uoSpesa);
                                 $scope.restGae(model.anno, model.rimborsoMissione.pgProgetto, model.rimborsoMissione.cdrSpesa, model.rimborsoMissione.uoSpesa);
                                 $scope.restCapitoli(model.anno);
                                 $scope.annullamentoModel = model;
                                 $scope.viewAttachments($scope.annullamentoModel.id);
                                 $scope.inizializzaFormPerModifica();
+                                $scope.inizializzaModalitaPagamento();
                                 $scope.today();
                                 $scope.gestioneUtenteAbilitatoValidare(model.rimborsoMissione.uoSpesa, model);
                             }
@@ -880,4 +925,18 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
             $scope.today();
         }
     }
+
+
+    $scope.inizializzaModalitaPagamento = function() {
+        if ($scope.annullamentoModel.rimborsoMissione && $scope.annullamentoModel.rimborsoMissione.cdTerzoSigla) {
+            $scope.recuperoDatiModalitaPagamento($scope.annullamentoModel.rimborsoMissione.cdTerzoSigla);
+
+            if ($scope.annullamentoModel.rimborsoMissione.tipoPagamento) {
+                $scope.recuperoDatiTerzoModalitaPagamento(
+                    $scope.annullamentoModel.rimborsoMissione.cdTerzoSigla,
+                    $scope.annullamentoModel.rimborsoMissione.tipoPagamento
+                );
+            }
+        }
+    };
 });

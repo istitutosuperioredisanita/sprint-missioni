@@ -29,10 +29,7 @@ import it.cnr.si.missioni.domain.custom.persistence.DatiIstituto;
 import it.cnr.si.missioni.domain.custom.persistence.DatiSede;
 import it.cnr.si.missioni.service.*;
 import it.cnr.si.missioni.service.showcase.ACEService;
-import it.cnr.si.missioni.util.CodiciErrore;
-import it.cnr.si.missioni.util.Costanti;
-import it.cnr.si.missioni.util.SecurityUtils;
-import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.*;
 import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.data.UoForUsersSpecial;
 import it.cnr.si.missioni.util.data.UsersSpecial;
@@ -86,6 +83,10 @@ public class AccountServiceLdap extends AbstractAccountService{
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired
+    ExternalUserAdminService externalUserAdminService;
+
 
     public UsersSpecial getUoForUsersSpecial(String uid) {
         if (configService.getDataUsersSpecial() != null && configService.getDataUsersSpecial().getUsersSpecials() != null) {
@@ -147,7 +148,7 @@ public class AccountServiceLdap extends AbstractAccountService{
             UoForUsersSpecial uoForUsersSpecial = iteratorUo.next();
             if (uoForUsersSpecial.getCodice_uo() != null && getUoSigla(uoForUsersSpecial).equals(uo)) {
                 if (isPerValidazione) {
-                    return Utility.nvl(uoForUsersSpecial.getOrdine_da_validare()).equals("S");
+                    return Utility.nvl(uoForUsersSpecial.getOrdine_da_validare(), "N").equals("S");
                 } else {
                     return true;
                 }
@@ -325,11 +326,9 @@ public class AccountServiceLdap extends AbstractAccountService{
             Account account = new Account(getUserInfo(currentUser));
             List ruolo = new ArrayList<String>();
             ruolo.add(AuthoritiesConstants.USER);
-            if ( "ciro.salvio@iss.it".equalsIgnoreCase(currentUser)) {
-                ruolo.add( AuthoritiesConstants.ADMIN);
-                ruolo.add( Costanti.ROLE_ADMIN);
+            if (externalUserAdminService.isExternalUserAdmin(currentUser))
+                ruolo.add(AuthoritiesConstants.ADMIN);
 
-            }
             account.setInternalRoles(ruolo);
             account.setUid(securityService.getCurrentUserLogin());
 
@@ -459,6 +458,7 @@ public class AccountServiceLdap extends AbstractAccountService{
         }
     }
 
+
     public String getEmail(String user) {
         Account utente = loadAccountFromUsername(user);
         if (utente != null) {
@@ -584,6 +584,39 @@ public class AccountServiceLdap extends AbstractAccountService{
             uoAbilitata = false;
         }
         return uoAbilitata;
+    }
+
+
+    /**
+     * Trova un UsersSpecial esistente per un determinato UID o ne crea uno nuovo se non esiste.
+     *
+     * @param uid L'identificativo utente da cercare o utilizzare per creare un nuovo UsersSpecial
+     * @return Un oggetto UsersSpecial per l'uid specificato o null se non è possibile crearlo
+     */
+    public UsersSpecial findOrCreateUserSpecial(String uid) {
+        if (uid == null || uid.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            UsersSpecial esistente = getUoForUsersSpecial(uid);
+            if (esistente != null) {
+                return esistente;
+            }
+
+            UsersSpecial nuovo = new UsersSpecial();
+            nuovo.setUid(uid);
+            Account account = loadAccountFromUsername(uid);
+
+            if (account != null) {
+                return nuovo;
+            } else {
+                logger.error("Impossibile creare UsersSpecial: Account non trovato per uid: "+uid );
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Errore durante la ricerca o creazione di UsersSpecial per uid: "+uid);
+            return null;
+        }
     }
 
 }

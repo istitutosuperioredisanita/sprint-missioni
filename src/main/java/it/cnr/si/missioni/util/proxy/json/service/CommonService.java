@@ -53,7 +53,7 @@ public class CommonService {
     public String process(List<JSONClause> clauses, String app, String url, List<JSONClause> clausesToAdd) {
         String risposta = null;
         RestService restInCache = cacheService.getBasicRest(app, url);
-        if (restInCache != null) {
+        if (restInCache != null  && (!"S".equalsIgnoreCase(restInCache.getSkipLoadStartup()))) {
             List<JSONClause> listaNewClauses = null;
             if (restInCache.getClauseFixed() != null && !restInCache.getClauseFixed().isEmpty()) {
                 listaNewClauses = new ArrayList<JSONClause>();

@@ -25,6 +25,8 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneDettagli;
+import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.JSONResponseEntity;
@@ -87,6 +89,12 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, true);
+            if (Utility.nvl(filter.getRecuperoTotali(), "N").equals("S")) {
+                for (OrdineMissione ordine : ordiniMissione) {
+                    ordineMissioneService.retrieveDetails(ordine);
+                    impostaTotaliSpesePres(ordine);
+                }
+            }
         } catch (ComponentException e) {
             log.error("ERRORE getOrdiniMissione", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -108,6 +116,9 @@ public class OrdineMissioneResource {
         filter.setValidato("S");
         filter.setDaAnnullare("S");
         filter.setRecuperoAutoPropria("S");
+        filter.setRecuperoTaxi("S");
+        filter.setRecuperoAutoNoleggio("S");
+//        filter.setGiaRimborsato("N");
         List<String> listaStati = new ArrayList<>();
         listaStati.add(Costanti.STATO_DEFINITIVO);
         listaStati.add(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);
@@ -131,8 +142,9 @@ public class OrdineMissioneResource {
     @Timed
     public ResponseEntity<?> getOrdiniMissioneDaAnnullare(HttpServletRequest request,
                                                           MissioneFilter filter) {
-        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Rimborsare");
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Annullare");
         filter.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
+//        filter.setGiaRimborsato("S");
         filter.setGiaRimborsato("N");
         filter.setValidato("S");
         filter.setDaAnnullare("S");
@@ -143,7 +155,90 @@ public class OrdineMissioneResource {
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
         } catch (ComponentException e) {
-            log.error("ERRORE getOrdiniMissioneDaRimborsare", e);
+            log.error("ERRORE getOrdiniMissioneDaAnnullare", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(ordiniMissione);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/ordiniMissione/listDaConfermare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getOrdiniMissioneDaConfermare(HttpServletRequest request,
+                                                           MissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Confermare");
+        filter.setGiaRimborsato("N");
+        filter.setDaAnnullare("N");
+        List<String> listaStati = new ArrayList<>();
+        listaStati.add(Costanti.STATO_INSERITO);
+        filter.setListaStatiMissione(listaStati);
+        List<OrdineMissione> ordiniMissione;
+        try {
+            ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getOrdiniMissioneDaConfermare", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(ordiniMissione);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/ordiniMissione/listDaInviareAllaFirma",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getOrdiniMissioneDaInviareAllaFirma(HttpServletRequest request,
+                                                          MissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Inviare Alla Firma");
+        filter.setGiaRimborsato("N");
+        filter.setValidato("N");
+        filter.setDaAnnullare("N");
+        List<String> listaStati = new ArrayList<>();
+        List<String> listaStatiFlusso = new ArrayList<>();
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        listaStatiFlusso.add(Costanti.STATO_INSERITO);
+        filter.setListaStatiMissione(listaStati);
+        filter.setListaStatiFlussoMissione(listaStatiFlusso);
+        List<OrdineMissione> ordiniMissione;
+        try {
+            ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getOrdiniMissioneDaInviareAllaFirma", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(ordiniMissione);
+    }
+
+    /**
+     * GET  /rest/ordineMissione -> get Ordini di missione per l'utente
+     */
+    @RequestMapping(value = "/rest/ordiniMissione/listDaApprovare",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> getOrdiniMissioneDaApprovare(HttpServletRequest request,
+                                                          MissioneFilter filter) {
+        log.debug("REST request per visualizzare i dati degli Ordini di Missione da Approvare");
+        filter.setGiaRimborsato("N");
+        filter.setValidato("S");
+        filter.setDaAnnullare("N");
+        List<String> listaStati = new ArrayList<>();
+        List<String> listaStatiFlusso = new ArrayList<>();
+        listaStati.add(Costanti.STATO_CONFERMATO);
+        listaStatiFlusso.add(Costanti.STATO_INVIATO_FLUSSO);
+        filter.setListaStatiMissione(listaStati);
+        filter.setListaStatiFlussoMissione(listaStatiFlusso);
+        List<OrdineMissione> ordiniMissione;
+        try {
+            ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
+        } catch (ComponentException e) {
+            log.error("ERRORE getOrdiniMissioneDaApprovare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
         }
         return JSONResponseEntity.ok(ordiniMissione);
@@ -230,6 +325,7 @@ public class OrdineMissioneResource {
         log.debug("REST request per visualizzare i dati degli Ordini di Missione ");
         try {
             OrdineMissione ordineMissione = ordineMissioneService.getOrdineMissione(idMissione, true);
+            impostaTotaliSpesePres(ordineMissione);
             return JSONResponseEntity.ok(ordineMissione);
         } catch (ComponentException e) {
             log.error("ERRORE getOrdineMissione", e);
@@ -334,15 +430,15 @@ public class OrdineMissioneResource {
     @RequestMapping(value = "/rest/public/printOrdineMissione",
             method = RequestMethod.GET)
     @Timed
+    @ExceptionHandler(RuntimeException.class)
     public @ResponseBody void printOrdineMissione(HttpServletRequest request,
                                                   @RequestParam(value = "idMissione") String idMissione, @RequestParam(value = "token") String token, HttpServletResponse res) {
         log.debug("REST request per la stampa dell'Ordine di Missione ");
 
-        if (!StringUtils.isEmpty(idMissione)) {
+        String user = securityService.getCurrentUserLogin();
+        if (user != null && !StringUtils.isEmpty(idMissione)) {
             try {
-                String user = securityService.getCurrentUserLogin();
                 Long idMissioneLong = Long.valueOf(idMissione);
-                if (user != null) {
                     Map<String, byte[]> map = ordineMissioneService.printOrdineMissione(idMissioneLong);
                     if (map != null) {
                         res.setContentType("application/pdf");
@@ -364,7 +460,6 @@ public class OrdineMissioneResource {
                             throw new AwesomeException(Utility.getMessageException(e));
                         }
                     }
-                }
             } catch (Exception e) {
                 String exc = ExceptionUtils.getStackTrace(e);
                 log.error("ERRORE printOrdineMissione", exc);
@@ -471,6 +566,12 @@ public class OrdineMissioneResource {
             String error = "Id Allegato non valorizzato";
             log.error("deleteAttachment", error);
             return JSONResponseEntity.badRequest(error);
+        }
+    }
+
+    protected void impostaTotaliSpesePres(OrdineMissione ordineMissione) {
+        if (ordineMissione != null) {
+            ordineMissione.setTotaleSpesePresComplessivo(ordineMissione.getTotaleSpeseOrdine());
         }
     }
 

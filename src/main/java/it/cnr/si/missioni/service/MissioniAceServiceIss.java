@@ -57,7 +57,7 @@ import java.util.*;
         "it.iss.si.*"})
 @Profile("iss")
 @Service
-public class MissioniAceServiceIss implements MissioniAceService{
+public class MissioniAceServiceIss implements MissioniAceService {
     private static final Log logger = LogFactory.getLog(MissioniAceServiceIss.class);
 
     @Autowired
@@ -68,7 +68,8 @@ public class MissioniAceServiceIss implements MissioniAceService{
 
     @Autowired(required = false)
     TerzoService terzoService;
-    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data){
+
+    public List<SimpleEntitaOrganizzativaWebDto> recuperoSediByTerm(String term, LocalDate data) {
         logger.info("MissioniAceServiceIss->recuperoSediByTerm");
         return Collections.emptyList();
     }
@@ -95,21 +96,24 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return null;
     }
 
-    protected UnitaOrganizzativa findUnitaOrganizzativaBySigla(String siglaUo){
-         return unitaOrganizzativaService.loadUoBySiglaEnteInt(siglaUo,DateUtils.getCurrentYear());
+    protected UnitaOrganizzativa findUnitaOrganizzativaBySigla(String siglaUo) {
+        return unitaOrganizzativaService.loadUoBySiglaEnteInt(siglaUo, DateUtils.getCurrentYear());
     }
-    protected UnitaOrganizzativa findUnitaOrganizzativaByUo(String uoSigla){
-        return unitaOrganizzativaService.loadUo(uoSigla,null,DateUtils.getCurrentYear());
+
+    protected UnitaOrganizzativa findUnitaOrganizzativaByUo(String uoSigla) {
+        return unitaOrganizzativaService.loadUo(uoSigla, null, DateUtils.getCurrentYear());
     }
-    protected  String getCodiceUo( UnitaOrganizzativa uo){
+
+    protected String getCodiceUo(UnitaOrganizzativa uo) {
         return Optional.ofNullable(uo).map(unitaOrganizzativa -> uo.getCd_unita_organizzativa()).orElse("");
     }
-    protected  String getCdUnitaPadre( UnitaOrganizzativa uo ){
+
+    protected String getCdUnitaPadre(UnitaOrganizzativa uo) {
         return Optional.ofNullable(uo).map(unitaOrganizzativa -> uo.getCd_unita_padre()).orElse("");
     }
 
-    private Destinazione getUbicazione (EmployeeDetails userDetail){
-        if ( Optional.ofNullable(userDetail.getDestinazione()).isPresent()){
+    private Destinazione getUbicazione(EmployeeDetails userDetail) {
+        if (Optional.ofNullable(userDetail.getDestinazione()).isPresent()) {
             return userDetail.getDestinazione();
         }
         return new Destinazione();
@@ -117,11 +121,12 @@ public class MissioniAceServiceIss implements MissioniAceService{
     }
 
 
-    private ResidenzaDomicilio getResidenza(Integer idAnagrafe){
+    private ResidenzaDomicilio getResidenza(Integer idAnagrafe) {
         return aceService.getResidenza(idAnagrafe);
     }
-    protected UserInfoDto getUserInfo(EmployeeDetails userDetail){
-        if ( Optional.ofNullable(userDetail).isPresent()){
+
+    protected UserInfoDto getUserInfo(EmployeeDetails userDetail) {
+        if (Optional.ofNullable(userDetail).isPresent()) {
 
             UserInfoDto userInfoDto = new UserInfoDto();
             userInfoDto.setDipendente(Boolean.TRUE);
@@ -133,40 +138,41 @@ public class MissioniAceServiceIss implements MissioniAceService{
             userInfoDto.setSesso(userDetail.getSesso());
             userInfoDto.setSigla_sede(userDetail.getDestinazione().getSigla());
             userInfoDto.setCodice_fiscale(userDetail.getCodiceFiscale());
-            UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaBySigla(getUbicazione( userDetail).getSigla());
-            userInfoDto.setCodice_uo(Utility.getUoSiper(getCodiceUo(unitaOrganizzativa )));
+            UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaBySigla(getUbicazione(userDetail).getSigla());
+            userInfoDto.setCodice_uo(Utility.getUoSiper(getCodiceUo(unitaOrganizzativa)));
             userInfoDto.setStruttura_appartenenza(getCodiceUo(unitaOrganizzativa));
             userInfoDto.setComune_nascita(userDetail.getLuogoNascita());
-            userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)),DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+            userInfoDto.setData_nascita(DateUtils.getDateAsString(Date.from(userDetail.getDataNascita().toInstant(ZoneOffset.UTC)), DateUtils.PATTERN_DATE_FOR_DOCUMENTALE));
+            userInfoDto.setProfilo(userDetail.getRapporto().getQualifica().getValue());
+            userInfoDto.setLivello_profilo(String.valueOf(userDetail.getRapporto().getLivello()));
+
             TerzoInfo terzoInfo = terzoService.loadUserInfo(userInfoDto.getCodice_fiscale());
-            if ( Optional.ofNullable(terzoInfo).isPresent()) {
+            if (Optional.ofNullable(terzoInfo).isPresent()) {
                 userInfoDto.setComune_residenza(terzoInfo.getComune_residenza());
                 userInfoDto.setIndirizzo_residenza(terzoInfo.getIndirizzo_residenza());
-                userInfoDto.setCap_residenza( terzoInfo.getCap_residenza());
+                userInfoDto.setCap_residenza(terzoInfo.getCap_residenza());
                 userInfoDto.setProvincia_residenza(terzoInfo.getProvincia_residenza());
+                userInfoDto.setComune_nascita(terzoInfo.getComune_nascita());
             }
-            /*
-            Sull'anagrafica ISS per molte persone non c'è il comune di residenza presente invece nei dati provenienti da NOIPA degli stipendi
+/*
+            //Sull'anagrafica ISS per molte persone non c'è il comune di residenza presente invece nei dati provenienti da NOIPA degli stipendi
             ResidenzaDomicilio residenzaDomicilio
                     = getResidenza(userDetail.getIdAnagrafe());
-            if ( Optional.ofNullable(residenzaDomicilio).isPresent()) {
+            if (Optional.ofNullable(residenzaDomicilio).isPresent()) {
                 userInfoDto.setComune_residenza(residenzaDomicilio.getComune());
                 userInfoDto.setIndirizzo_residenza(residenzaDomicilio.getIndirizzo());
-                userInfoDto.setCap_residenza( residenzaDomicilio.getCap());
-                userInfoDto.setProvincia_residenza( residenzaDomicilio.getProvincia());
-            }
-
-             */
-
-
+                userInfoDto.setCap_residenza(residenzaDomicilio.getCap());
+                userInfoDto.setProvincia_residenza(residenzaDomicilio.getProvincia());
+            }*/
 
             return userInfoDto;
         }
         return null;
     }
-    //@Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
+
+    @Cacheable(value = Costanti.NOME_CACHE_DATI_ACCOUNT)
     public UserInfoDto getAccountFromSiper(String currentLogin) {
-        EmployeeDetails userDetail =aceService.getPersonaByUsername(currentLogin);
+        EmployeeDetails userDetail = aceService.getPersonaByUsername(currentLogin);
         logger.info("MissioniAceServiceIss->getAccountFromSiper");
         return getUserInfo(userDetail);
     }
@@ -180,32 +186,33 @@ public class MissioniAceServiceIss implements MissioniAceService{
     @Cacheable(value = Costanti.NOME_CACHE_DATI_DIRETTORE)
     public String getDirettore(String uo) {
         logger.info("MissioniAceServiceIss->getDirettore");
-        UnitaOrganizzativa unitaOrganizzativa =findUnitaOrganizzativaByUo(uo);
-        if ( Optional.ofNullable(unitaOrganizzativa).isPresent()) {
+        UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaByUo(uo);
+        if (Optional.ofNullable(unitaOrganizzativa).isPresent()) {
             EmployeeDetails employeeDetails = aceService.findResponsabileBySigla(unitaOrganizzativa.getSigla_int_ente());
             if (Optional.ofNullable(employeeDetails).isPresent())
-                return UtilAce.getEmail( employeeDetails);
+                return UtilAce.getEmail(employeeDetails);
         }
 
         return null;
     }
 
-    protected SimpleEntitaOrganizzativaWebDto getSimpleEntitaOrganizzativaWebDto( Integer idUo) {
+    protected SimpleEntitaOrganizzativaWebDto getSimpleEntitaOrganizzativaWebDto(Integer idUo) {
         UoDetails uoDetails = aceService.getUo(idUo);
-        if ( Optional.ofNullable(uoDetails).isPresent()){
+        if (Optional.ofNullable(uoDetails).isPresent()) {
             SimpleEntitaOrganizzativaWebDto simpleEntitaOrganizzativaWebDto = new SimpleEntitaOrganizzativaWebDto();
 
             simpleEntitaOrganizzativaWebDto.setId(uoDetails.getId());
-            simpleEntitaOrganizzativaWebDto.setSigla( uoDetails.getSigla());
-            simpleEntitaOrganizzativaWebDto.setDenominazione( uoDetails.getNome());
-            Optional.ofNullable(findUnitaOrganizzativaBySigla( uoDetails.getSigla())).ifPresent(uorg->simpleEntitaOrganizzativaWebDto.setCdsuo(uorg.getCd_unita_organizzativa()));
+            simpleEntitaOrganizzativaWebDto.setSigla(uoDetails.getSigla());
+            simpleEntitaOrganizzativaWebDto.setDenominazione(uoDetails.getNome());
+            Optional.ofNullable(findUnitaOrganizzativaBySigla(uoDetails.getSigla())).ifPresent(uorg -> simpleEntitaOrganizzativaWebDto.setCdsuo(uorg.getCd_unita_organizzativa()));
 
             return simpleEntitaOrganizzativaWebDto;
         }
         return null;
     }
-    protected SimplePersonaWebDto getSimplePersonaWebDto(EmployeeDetails userDetail){
-        if ( Optional.ofNullable(userDetail).isPresent()){
+
+    protected SimplePersonaWebDto getSimplePersonaWebDto(EmployeeDetails userDetail) {
+        if (Optional.ofNullable(userDetail).isPresent()) {
 
             SimplePersonaWebDto simplePersonaWebDto = new SimplePersonaWebDto();
 
@@ -213,7 +220,7 @@ public class MissioniAceServiceIss implements MissioniAceService{
             simplePersonaWebDto.setMatricola(userDetail.getMatricola());
             simplePersonaWebDto.setCognome(userDetail.getCognome());
             simplePersonaWebDto.setNome(userDetail.getNome());
-            simplePersonaWebDto.setSede( getSimpleEntitaOrganizzativaWebDto(userDetail.getDestinazione().getIdUo()));
+            simplePersonaWebDto.setSede(getSimpleEntitaOrganizzativaWebDto(userDetail.getDestinazione().getIdUo()));
             simplePersonaWebDto.setLastSede(simplePersonaWebDto.getSede());
             simplePersonaWebDto.setCodiceFiscale(userDetail.getCodiceFiscale());
 
@@ -222,9 +229,9 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return null;
     }
 
-    protected SimpleUtenteWebDto getSimpleUtenteWebDto(EmployeeDetails userDetail){
-        if ( Optional.ofNullable(userDetail).isPresent()){
-            SimpleUtenteWebDto simpleUtenteWebDto= new SimpleUtenteWebDto();
+    protected SimpleUtenteWebDto getSimpleUtenteWebDto(EmployeeDetails userDetail) {
+        if (Optional.ofNullable(userDetail).isPresent()) {
+            SimpleUtenteWebDto simpleUtenteWebDto = new SimpleUtenteWebDto();
             simpleUtenteWebDto.setId(userDetail.getIdAnagrafe());
             simpleUtenteWebDto.setEmail(UtilAce.getEmail(userDetail));
             simpleUtenteWebDto.setUsername(simpleUtenteWebDto.getEmail());
@@ -235,9 +242,10 @@ public class MissioniAceServiceIss implements MissioniAceService{
         }
         return null;
     }
+
     public SimplePersonaWebDto getPersona(String user) {
-        EmployeeDetails userDetail =aceService.getPersonaByUsername(user);
-        return getSimplePersonaWebDto( userDetail);
+        EmployeeDetails userDetail = aceService.getPersonaByUsername(user);
+        return getSimplePersonaWebDto(userDetail);
     }
 
     public List<SimpleUtenteWebDto> findUtentiIstituto(String cds, LocalDate data) {
@@ -245,26 +253,31 @@ public class MissioniAceServiceIss implements MissioniAceService{
         return Collections.emptyList();
     }
 
-    private List<SimpleUtenteWebDto> getListSimpleUtenteWebDto(List<EmployeeDetails> employeeDetails ){
-        if ( Optional.ofNullable(employeeDetails).isPresent()
-                && Optional.ofNullable(employeeDetails).get().size()>0){
+    private List<SimpleUtenteWebDto> getListSimpleUtenteWebDto(List<EmployeeDetails> employeeDetails) {
+        if (Optional.ofNullable(employeeDetails).isPresent()
+                && Optional.ofNullable(employeeDetails).get().size() > 0) {
             List<SimpleUtenteWebDto> s = new ArrayList<SimpleUtenteWebDto>();
-            for ( EmployeeDetails employeeDetail:employeeDetails) {
-                if ( Optional.ofNullable(UtilAce.getEmail(employeeDetail)).isPresent())
-                    s.add( getSimpleUtenteWebDto(employeeDetail));
+            for (EmployeeDetails employeeDetail : employeeDetails) {
+                if (Optional.ofNullable(UtilAce.getEmail(employeeDetail)).isPresent())
+                    s.add(getSimpleUtenteWebDto(employeeDetail));
             }
             return s;
         }
         return Collections.emptyList();
     }
+
     public List<SimpleUtenteWebDto> findUtentiCdsuo(String uo, LocalDate data) {
         logger.info("MissioniAceServiceIss->findUtentiCdsuo");
 
-        String uoSigla=Utility.getUoSigla(uo);
-        UnitaOrganizzativa unitaOrganizzativa =findUnitaOrganizzativaByUo(uoSigla);
-        if ( !Optional.ofNullable(unitaOrganizzativa).isPresent())
+        String uoSigla = uo.matches("\\d{3}\\.\\d{3}") ? uo : Utility.getUoSigla(uo);
+
+        UnitaOrganizzativa unitaOrganizzativa = findUnitaOrganizzativaByUo(uoSigla);
+
+        if (unitaOrganizzativa == null) {
             return Collections.emptyList();
-        return getListSimpleUtenteWebDto(aceService.getPersoneDetailUo( unitaOrganizzativa.getSigla_int_ente(), true ));
+        }
+
+        return getListSimpleUtenteWebDto(aceService.getPersoneDetailUo(unitaOrganizzativa.getSigla_int_ente(), true));
     }
 
     public Integer getSedeResponsabileUtente(String user) {
@@ -281,7 +294,7 @@ public class MissioniAceServiceIss implements MissioniAceService{
 
     public void importPersonaleEsterno() throws IOException {
         logger.info("MissioniAceServiceIss->importPersonaleEsterno");
-        return ;
+        return;
     }
 }
 

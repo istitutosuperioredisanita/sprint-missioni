@@ -1,17 +1,15 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
 import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.dto.happysign.request.UploadToComplexRequest;
-import it.iss.si.dto.happysign.response.UploadToComplexResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,21 +35,33 @@ public class AutorizzazioneRimborsoService {
     }
 
 
-    public String sendAutorizzazione(RimborsoMissione rimborsoMissione, StorageObject modulo,List<StorageObject> allegati) throws Exception {
+    public String sendAutorizzazione(RimborsoMissione rimborsoMissione, StorageObject modulo, List<StorageObject> allegati) throws Exception {
         AutorizzazioneRimborsoMissione autorizzazioneRimborso = Optional.ofNullable(getFlowAutorizzazione(rimborsoMissione)).
                 orElse(null).stream().findFirst().orElse(null);
-        if ( Optional.ofNullable(autorizzazioneRimborso).isPresent()){
-           logger.info(autorizzazioneRimborso);
+        if (Optional.ofNullable(autorizzazioneRimborso).isPresent()) {
+            logger.info(autorizzazioneRimborso);
         }
-        StartWorflowDto startWorflowDto= autorizzazioneRimborso.createUStartWorfloDto(rimborsoMissione, modulo,allegati);;
-        if ( Optional.ofNullable(utilTestRimborsoService).isPresent())
-            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione,modulo,allegati);
 
-       return autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
-                                            startWorflowDto.getSigners(),
-                                            startWorflowDto.getApprovers(),
-                                            startWorflowDto.getFileToSign());
+        StartWorflowDto startWorflowDto = autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo, allegati);
+        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
+        startWorflowDto.setSigners(signersDef);
+        UtilHappySign.setTemplateFirme(startWorflowDto);
 
+        if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
+            UtilTestService.showSigned(startWorflowDto);
+            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione, modulo, allegati);
+        }
+
+        String result = autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
+                startWorflowDto.getSigners(),
+                startWorflowDto.getApprovers(),
+                startWorflowDto.getFileToSign());
+
+        if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
+            utilTestRimborsoService.sendMailForRimborsoMissione(rimborsoMissione, signersDef);
+        }
+
+        return result;
     }
 
 }

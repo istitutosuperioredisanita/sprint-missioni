@@ -19,6 +19,8 @@
 
 package it.cnr.si.missioni.domain.custom.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.cnr.jada.criteria.Projection;
 import it.cnr.jada.criteria.projections.Projections;
 import it.cnr.si.missioni.util.Costanti;
@@ -35,6 +37,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A user.
@@ -62,6 +66,10 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String CMIS_PROPERTY_NAME_DOC_ALLEGATO = "Allegato";
     public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO = "Allegati";
     public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO = "Allegati Anticipo";
+
+    public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_TAXI = "Allegati Taxi";
+    public static final String CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_AUTO_NOLEGGIO = "Allegati Auto Noleggio";
+
     public static final String CMIS_PROPERTY_NAME_TIPODOC_ORDINE = "Ordine di Missione";
     public static final String CMIS_PROPERTY_FLOW_DESCRIZIONE = "cnrmissioni:descrizioneOrdine";
     public static final String CMIS_PROPERTY_FLOW_NOTE = "cnrmissioni:note";
@@ -81,6 +89,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String CMIS_PROPERTY_AUTO_PROPRIA_PRIMO_MOTIVO = "cnrmissioni:autoPropriaPrimoMotivo";
     public static final String CMIS_PROPERTY_AUTO_PROPRIA_SECONDO_MOTIVO = "cnrmissioni:autoPropriaSecondoMotivo";
     public static final String CMIS_PROPERTY_AUTO_PROPRIA_TERZO_MOTIVO = "cnrmissioni:autoPropriaTerzoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_PRIMO_MOTIVO = "cnrmissioni:taxiPrimoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_SECONDO_MOTIVO = "cnrmissioni:taxiSecondoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_TERZO_MOTIVO = "cnrmissioni:taxiTerzoMotivo";
+    public static final String CMIS_PROPERTY_TAXI_QUARTO_MOTIVO = "cnrmissioni:taxiQuartoMotivo";
+
+    public static final String CMIS_PROPERTY_AUTO_NOLEGGIO_PRIMO_MOTIVO = "cnrmissioni:autoNoleggioPrimoMotivo";
+    public static final String CMIS_PROPERTY_AUTO_NOLEGGIO_SECONDO_MOTIVO = "cnrmissioni:autoNoleggioSecondoMotivo";
+
     public static final String CMIS_PROPERTY_FLOW_USERNAME_FIRMA_UO = "cnrmissioni:userNamePrimoFirmatario";
     public static final String CMIS_PROPERTY_FLOW_USERNAME_FIRMA_SPESA = "cnrmissioni:userNameFirmatarioSpesa";
     public static final String CMIS_PROPERTY_FLOW_UO_ORDINE = "cnrmissioni:uoOrdine";
@@ -115,6 +131,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public static final String ATTACHMENT_ALLEGATO_ANTICIPO = ":allegati_anticipo";
     public static final String ATTACHMENT_ALLEGATO_ORDINE_MISSIONE = ":allegati";
     public static final String CMIS_PROPERTY_ORDINE_ATTACHMENT_ELIMINATO = "missioni_ordine_attachment:eliminato";
+
+    public static final String CMIS_PROPERTY_FLOW_TOTALE_ORDINE_MISSIONE = "cnrmissioni:totaleOrdineMissione";
+
     public static final Projection PROJECTIONLIST_ELENCO_MISSIONI = Projections.projectionList().
             add(Projections.property("id")).
             add(Projections.property("anno")).
@@ -200,9 +219,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Size(min = 0, max = 1)
     @Column(name = "VALIDATO", length = 1, nullable = false)
     public String validato;
-    @Size(min = 0, max = 1)
-    @Column(name = "UTILIZZO_TAXI", length = 1, nullable = false)
-    public String utilizzoTaxi;
     @Size(min = 0, max = 1)
     @Column(name = "UTILIZZO_AUTO_NOLEGGIO", length = 1, nullable = false)
     public String utilizzoAutoNoleggio;
@@ -321,6 +337,9 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String daChron;
     @Transient
     private String utilizzoAutoPropria;
+    @Size(min = 0, max = 1)
+    @Column(name = "UTILIZZO_TAXI", length = 1, nullable = false)
+    private String utilizzoTaxi;
     @Transient
     private DatiIstituto datiIstituto;
     @Transient
@@ -343,6 +362,12 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     private String commentFlows;
     @Transient
     private String statoFlussoRitornoHome;
+    @Transient
+    @JsonManagedReference //  Indica che questo è il lato "proprietario" della relazione. Jackson serializzerà questa lista e i suoi contenuti.
+    private List<OrdineMissioneDettagli> ordineMissioneDettagli;
+
+    @Transient
+    private BigDecimal totaleSpesePresComplessivo;
 
     public OrdineMissione(Long id, Integer anno, Long numero, LocalDate dataInserimento, String uid, String stato, String statoFlusso, String idFlusso, String destinazione,
                           String oggetto, ZonedDateTime dataInizioMissione, ZonedDateTime dataFineMissione, String validato, String responsabileGruppo, String uoRich,
@@ -494,6 +519,14 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
 
     public void setUtilizzoAutoPropria(String utilizzoAutoPropria) {
         this.utilizzoAutoPropria = utilizzoAutoPropria;
+    }
+
+    public String getUtilizzoTaxi() {
+        return utilizzoTaxi;
+    }
+
+    public void setUtilizzoTaxi(String utilizzoTaxi) {
+        this.utilizzoTaxi = utilizzoTaxi;
     }
 
     public String getRichiestaAnticipo() {
@@ -949,7 +982,7 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Transient
     public String getDecodeTrattamentoShort() {
         if (!StringUtils.isEmpty(getTrattamento())) {
-            return Costanti.TRATTAMENTO_SHORT.get(getTrattamento());
+            return Costanti.TRATTAMENTO_SHORT_O.get(getTrattamento());
         }
         return "";
     }
@@ -957,14 +990,6 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     @Transient
     public Boolean isMissioneEstera() {
         return getTipoMissione() != null && getTipoMissione().equals(Costanti.MISSIONE_ESTERA);
-    }
-
-    public String getUtilizzoTaxi() {
-        return utilizzoTaxi;
-    }
-
-    public void setUtilizzoTaxi(String utilizzoTaxi) {
-        this.utilizzoTaxi = utilizzoTaxi;
     }
 
     public String getUtilizzoAutoNoleggio() {
@@ -1336,5 +1361,37 @@ public class OrdineMissione extends OggettoBulkXmlTransient implements Serializa
     public Boolean isOrdineMissioneVecchiaScrivania() {
         return getIdFlusso() != null && getIdFlusso().startsWith("activiti");
     }
+    @Transient
+    public Boolean checkStatiFlussoTrue() {
+        return isStatoInviatoAlFlusso() || isStatoRespintoFlusso() || isStatoNonInviatoAlFlusso() || isStatoFlussoApprovato();
+    }
+    @Transient
+    public List<OrdineMissioneDettagli> getOrdineMissioneDettagli() {
+        return ordineMissioneDettagli;
+    }
+    @Transient
+    public void setOrdineMissioneDettagli(List<OrdineMissioneDettagli> ordineMissioneDettagli) {
+        this.ordineMissioneDettagli = ordineMissioneDettagli;
+    }
 
+    public BigDecimal getTotaleSpesePresComplessivo() {
+        return totaleSpesePresComplessivo;
+    }
+
+    public void setTotaleSpesePresComplessivo(BigDecimal totaleSpesePresComplessivo) {
+        this.totaleSpesePresComplessivo = totaleSpesePresComplessivo;
+    }
+
+    @Transient
+    public BigDecimal getTotaleSpeseOrdine() {
+        BigDecimal totOrdine = BigDecimal.ZERO;
+
+        if (getOrdineMissioneDettagli() != null && !getOrdineMissioneDettagli().isEmpty()) {
+            for (Iterator<OrdineMissioneDettagli> iterator = getOrdineMissioneDettagli().iterator(); iterator.hasNext(); ) {
+                OrdineMissioneDettagli dettagli = iterator.next();
+                totOrdine = totOrdine.add(dettagli.getImportoEuro());
+            }
+        }
+        return Utility.nvl(totOrdine);
+    }
 }

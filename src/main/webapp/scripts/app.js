@@ -278,6 +278,13 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+                .when('/ordine-missione/ordine-missione-dettagli/:idOrdineMissione/:validazione?/:inizioMissione/:fineMissione', {
+                    templateUrl: 'views/ordine-missione/ordine-missione-dettagli.html',
+                    controller: 'OrdineMissioneDettagliController',
+                    access: {
+                        authorizedRoles: [USER_ROLES.user]
+                    }
+                })
                 .when('/ordine-missione/auto-propria/:idOrdineMissione/:validazione?', {
                     templateUrl: 'views/ordine-missione/auto-propria.html',
                     controller: 'AutoPropriaOrdineMissioneController',
@@ -292,6 +299,20 @@ missioniApp
                         authorizedRoles: [USER_ROLES.user]
                     }
                 })
+               .when('/ordine-missione/taxi/:idOrdineMissione/:validazione?', {
+                   templateUrl: 'views/ordine-missione/taxi.html',
+                   controller: 'TaxiOrdineMissioneController',
+                   access: {
+                       authorizedRoles: [USER_ROLES.user]
+                   }
+               })
+               .when('/ordine-missione/autoNoleggio/:idOrdineMissione/:validazione?', {
+                   templateUrl: 'views/ordine-missione/auto-noleggio.html',
+                   controller: 'AutoNoleggioOrdineMissioneController',
+                   access: {
+                       authorizedRoles: [USER_ROLES.user]
+                   }
+               })
                 .when('/password', {
                     templateUrl: 'views/password.html',
                     controller: 'PasswordController',

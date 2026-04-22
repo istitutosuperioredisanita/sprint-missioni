@@ -21,11 +21,13 @@ package it.cnr.si.missioni.cmis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.awesome.exception.TaskIdNonTrovatoException;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoNoleggio;
 import it.cnr.si.missioni.service.MessageForFlowsService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
@@ -75,7 +77,123 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
         }
     }
 
+    protected void sendAnnullamentoOrdineMissioneToSign(AnnullamentoOrdineMissione annullamento, CMISOrdineMissione cmisOrdineMissione,
+                                                        Map<String, StorageObject> mapDocumentiAnnulloMissione,
+                                                        List<StorageObject> allegati){
+        MessageForFlowAnnullamento messageForFlows = new MessageForFlowAnnullamento();
+        try {
 
+            messageForFlows.setIdMissione(annullamento.getId().toString());
+            messageForFlows.setIdMissioneOrdine(annullamento.getOrdineMissione().getId().toString());
+
+            messageForFlows.setIdMissioneRevoca(annullamento.getId().toString());
+            messageForFlows.setTitolo("Annullamento " + cmisOrdineMissione.getWfDescription());
+            messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
+            messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_REVOCA);
+            messageForFlows = (MessageForFlowAnnullamento) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
+
+            messageForFlows.setPathFascicoloDocumenti(createFolderOrdineMissione(annullamento.getOrdineMissione()));
+            messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
+            messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
+            messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
+            messageForFlows.setNote(cmisOrdineMissione.getNote());
+            messageForFlows.setNoteSegreteria(Utility.nvl(annullamento.getConsentiRimborso(), "N").equals("S") ? Costanti.TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO : cmisOrdineMissione.getNoteSegreteria());
+            messageForFlows.setBpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
+            messageForFlows.setBpm_workflowPriority(cmisOrdineMissione.getPriorita());
+            messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
+            messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
+            messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no" : "si");
+            messageForFlows.setUserNameUtenteMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
+            messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
+            messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
+            messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
+            messageForFlows.setUserNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
+            messageForFlows.setUserNameAmministrativo1("");
+            messageForFlows.setUserNameAmministrativo2("");
+            messageForFlows.setUserNameAmministrativo3("");
+            messageForFlows.setUoRich(cmisOrdineMissione.getUoRich());
+            messageForFlows.setDescrizioneUoRich(cmisOrdineMissione.getDescrizioneUoRich());
+            messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
+            messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
+            messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
+            messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
+            messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+            messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
+            messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+            messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+            messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+            messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
+            messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
+            messageForFlows.setProgetto(cmisOrdineMissione.getModulo());
+            messageForFlows.setDescrizioneProgetto(cmisOrdineMissione.getDescrizioneModulo());
+            messageForFlows.setGae(cmisOrdineMissione.getGae());
+            messageForFlows.setDescrizioneGae(cmisOrdineMissione.getDescrizioneGae());
+            messageForFlows.setImpegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "" : cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
+            messageForFlows.setImpegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "" : cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
+            messageForFlows.setImpegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "" : cmisOrdineMissione.getImpegnoNumero().toString());
+            messageForFlows.setDescrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
+            messageForFlows.setImportoMissione(cmisOrdineMissione.getImportoMissione() == null ? "" : cmisOrdineMissione.getImportoMissione().toString());
+            messageForFlows.setDisponibilita(cmisOrdineMissione.getDisponibilita() == null ? "" : cmisOrdineMissione.getDisponibilita().toString());
+            messageForFlows.setMissioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
+            messageForFlows.setDestinazione(cmisOrdineMissione.getDestinazione());
+            messageForFlows.setDataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
+            messageForFlows.setDataFineMissione(cmisOrdineMissione.getDataFineMissione());
+            messageForFlows.setTrattamento(cmisOrdineMissione.getTrattamento());
+            messageForFlows.setCompetenzaResiduo(cmisOrdineMissione.getFondi());
+            messageForFlows.setAutoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
+            messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
+            messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
+            messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
+
+            if (!annullamento.getOrdineMissione().isOrdineMissioneVecchiaScrivania()) {
+                messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().getIdFlusso());
+            }
+            messageForFlows.setValidazioneSpesaFlag("si");
+
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
+        MultiValueMap parameters = new LinkedMultiValueMap<String, String>();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {
+        });
+        parameters.setAll(maps);
+
+        messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiAnnulloMissione.get( Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY), annullamento.getStatoFlusso());
+
+        if (annullamento.isStatoNonInviatoAlFlusso()) {
+            parameters.add("commento", "");
+        } else {
+            if ((annullamento.isStatoInviatoAlFlusso() || annullamento.isStatoRespintoFlusso()) && !StringUtils.isEmpty(annullamento.getIdFlusso())) {
+                parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, annullamento.getIdFlusso());
+            } else {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Annullamento " + annullamento.getId());
+            }
+        }
+
+
+        try {
+            String idFlusso = messageForFlowsService.avviaFlusso(parameters);
+            if (StringUtils.isEmpty(annullamento.getIdFlusso())) {
+                annullamento.setIdFlusso(idFlusso);
+            }
+            annullamento.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+        } catch (AwesomeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+        }
+
+    }
+
+    /*
     public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
@@ -146,6 +264,13 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
             messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
             messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
+
             if (!annullamento.getOrdineMissione().isOrdineMissioneVecchiaScrivania()) {
                 messageForFlows.setLinkToOtherWorkflows(annullamento.getOrdineMissione().getIdFlusso());
             }
@@ -186,6 +311,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
         }
     }
+    */
 
     @Override
     public Boolean isActiveSignFlow() {
@@ -202,7 +328,7 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
         }
     }
 
-    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, StorageObject documento, OrdineMissioneAnticipo anticipo, StorageObject documentoAnticipo, List<StorageObject> allegati, StorageObject documentoAutoPropria) {
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo) {
         MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
         try {
 
@@ -267,6 +393,12 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
             messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
             messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
 
             messageForFlows.setValidazioneSpesaFlag("si");
 
@@ -276,11 +408,146 @@ public  class CMISOrdineMissioneServiceScd extends AbstractCMISOrdineMissioneSer
             });
             parameters.setAll(maps);
 
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, documento, ordineMissione.getStatoFlusso());
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, documentoAnticipo, ordineMissione.getStatoFlusso());
-            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, documentoAutoPropria, ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapDocumentiMissione.get( Costanti.DOCUMENTO_MISSIONE_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapDocumentiMissione.get( Costanti.DOCUMENTO_ANTICIPO_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_TAXI, mapDocumentiMissione.get(Costanti.DOCUMENTO_TAXI_KEY), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_NOLEGGIO, mapDocumentiMissione.get(Costanti.DOCUMENTO_AUTO_NOLEGGIO_KEY), ordineMissione.getStatoFlusso());
 
             messageForFlowsService.aggiungiDocumentiMultipli(allegati, parameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
+
+            if (ordineMissione.isStatoNonInviatoAlFlusso()) {
+                parameters.add("commento", "");
+            } else {
+                if ((ordineMissione.isStatoInviatoAlFlusso() || ordineMissione.isStatoRespintoFlusso()) && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
+                    parameters = messageForFlowsService.aggiungiParametriRiavviaFlusso(parameters, ordineMissione.getIdFlusso());
+                } else {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Anomalia nei dati. Stato di invio al flusso non valido. Id Ordine " + ordineMissione.getId());
+                }
+            }
+
+            try {
+                if (isDevProfile() && Utility.nvl(datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno()).getTipoMailDopoOrdine(), "N").equals("C")) {
+                    ordineMissioneService.popolaCoda(ordineMissione);
+                } else {
+                    String idFlusso = messageForFlowsService.avviaFlusso(parameters);
+                    if (StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
+                        ordineMissione.setIdFlusso(idFlusso);
+                        if (anticipo != null) {
+                            anticipo.setIdFlusso(idFlusso);
+                        }
+                    }
+                    ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
+
+                }
+            } catch (AwesomeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase avvio flusso documentale. Errore: " + Utility.getMessageException(e) + ".");
+            }
+
+        } catch (Exception e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in fase di preparazione del flusso documentale. Errore: " + e);
+        }
+    }
+
+
+
+    protected void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapAllegati, OrdineMissioneAnticipo anticipo) {
+        MessageForFlowOrdine messageForFlows = new MessageForFlowOrdine();
+        try {
+
+            messageForFlows.setIdMissione(cmisOrdineMissione.getIdMissioneOrdine().toString());
+            messageForFlows.setIdMissioneOrdine(cmisOrdineMissione.getIdMissioneOrdine().toString());
+            messageForFlows.setTitolo(cmisOrdineMissione.getWfDescription());
+            messageForFlows.setDescrizione(cmisOrdineMissione.getWfDescriptionComplete());
+            messageForFlows.setTipologiaMissione(MessageForFlow.TIPOLOGIA_MISSIONE_ORDINE);
+            messageForFlows = (MessageForFlowOrdine) messageForFlowsService.impostaGruppiFirmatari(cmisOrdineMissione, messageForFlows);
+            messageForFlows.setPathFascicoloDocumenti(ordineMissione.getStringBasePath());
+            messageForFlows.setNoteAutorizzazioniAggiuntive(cmisOrdineMissione.getNoteAutorizzazioniAggiuntive());
+            messageForFlows.setMissioneGratuita(cmisOrdineMissione.getMissioneGratuita());
+            messageForFlows.setDescrizioneOrdine(cmisOrdineMissione.getOggetto());
+            messageForFlows.setNote(cmisOrdineMissione.getNote());
+            messageForFlows.setOggetto(cmisOrdineMissione.getOggetto());
+            messageForFlows.setAnnoMissione(cmisOrdineMissione.getAnno());
+            messageForFlows.setNumeroMissione(cmisOrdineMissione.getNumero());
+            messageForFlows.setNoteSegreteria(cmisOrdineMissione.getNoteSegreteria());
+            messageForFlows.setBpm_workflowDueDate(cmisOrdineMissione.getWfDueDate());
+            messageForFlows.setBpm_workflowPriority(cmisOrdineMissione.getPriorita());
+            messageForFlows.setValidazioneSpesaFlag(cmisOrdineMissione.getValidazioneSpesa());
+            messageForFlows.setMissioneConAnticipoFlag(cmisOrdineMissione.getAnticipo());
+            messageForFlows.setValidazioneModuloFlag(StringUtils.isEmpty(cmisOrdineMissione.getUserNameResponsabileModulo()) ? "no" : "si");
+            messageForFlows.setUserNameUtenteMissione(cmisOrdineMissione.getUsernameUtenteOrdine());
+            messageForFlows.setUserNameRichiedente(cmisOrdineMissione.getUsernameRichiedente());
+            messageForFlows.setUserNameResponsabileModulo(cmisOrdineMissione.getUserNameResponsabileModulo());
+            messageForFlows.setUserNamePrimoFirmatario(cmisOrdineMissione.getUserNamePrimoFirmatario());
+            messageForFlows.setUserNameFirmatarioSpesa(cmisOrdineMissione.getUserNameFirmatarioSpesa());
+            messageForFlows.setUserNameAmministrativo1("");
+            messageForFlows.setUserNameAmministrativo2("");
+            messageForFlows.setUserNameAmministrativo3("");
+            messageForFlows.setUoRich(cmisOrdineMissione.getUoRich());
+            messageForFlows.setDescrizioneUoRich(cmisOrdineMissione.getDescrizioneUoRich());
+            messageForFlows.setUoSpesa(cmisOrdineMissione.getUoSpesa());
+            messageForFlows.setDescrizioneUoSpesa(cmisOrdineMissione.getDescrizioneUoSpesa());
+            messageForFlows.setUoCompetenza(cmisOrdineMissione.getUoCompetenza());
+            messageForFlows.setDescrizioneUoCompetenza(cmisOrdineMissione.getDescrizioneUoCompetenza());
+            messageForFlows.setAutoPropriaFlag(cmisOrdineMissione.getAutoPropriaFlag());
+            messageForFlows.setNoleggioFlag(cmisOrdineMissione.getNoleggioFlag());
+            messageForFlows.setTaxiFlag(cmisOrdineMissione.getTaxiFlag());
+            messageForFlows.setServizioFlagOk(cmisOrdineMissione.getAutoServizioFlag());
+            messageForFlows.setPersonaSeguitoFlagOk(cmisOrdineMissione.getPersonaSeguitoFlag());
+            messageForFlows.setCapitolo(cmisOrdineMissione.getCapitolo());
+            messageForFlows.setDescrizioneCapitolo(cmisOrdineMissione.getDescrizioneCapitolo());
+            messageForFlows.setProgetto(cmisOrdineMissione.getModulo());
+            messageForFlows.setDescrizioneProgetto(cmisOrdineMissione.getDescrizioneModulo());
+            messageForFlows.setGae(cmisOrdineMissione.getGae());
+            messageForFlows.setDescrizioneGae(cmisOrdineMissione.getDescrizioneGae());
+            messageForFlows.setImpegnoAnnoResiduo(cmisOrdineMissione.getImpegnoAnnoResiduo() == null ? "" : cmisOrdineMissione.getImpegnoAnnoResiduo().toString());
+            messageForFlows.setImpegnoAnnoCompetenza(cmisOrdineMissione.getImpegnoAnnoCompetenza() == null ? "" : cmisOrdineMissione.getImpegnoAnnoCompetenza().toString());
+            messageForFlows.setImpegnoNumeroOk(cmisOrdineMissione.getImpegnoNumero() == null ? "" : cmisOrdineMissione.getImpegnoNumero().toString());
+            messageForFlows.setDescrizioneImpegno(cmisOrdineMissione.getDescrizioneImpegno());
+            messageForFlows.setImportoMissione(cmisOrdineMissione.getImportoMissione() == null ? "" : cmisOrdineMissione.getImportoMissione().toString());
+            messageForFlows.setDisponibilita(cmisOrdineMissione.getDisponibilita() == null ? "" : cmisOrdineMissione.getDisponibilita().toString());
+            messageForFlows.setMissioneEsteraFlag(cmisOrdineMissione.getMissioneEsteraFlag());
+            messageForFlows.setDestinazione(cmisOrdineMissione.getDestinazione());
+            messageForFlows.setDataInizioMissione(cmisOrdineMissione.getDataInizioMissione());
+            messageForFlows.setDataFineMissione(cmisOrdineMissione.getDataFineMissione());
+            messageForFlows.setTrattamento(cmisOrdineMissione.getTrattamento());
+            messageForFlows.setCompetenzaResiduo(cmisOrdineMissione.getFondi());
+            messageForFlows.setAutoPropriaAltriMotivi(cmisOrdineMissione.getAltriMotiviAutoPropria());
+            messageForFlows.setAutoPropriaPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoPropria());
+            messageForFlows.setAutoPropriaSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoPropria());
+            messageForFlows.setAutoPropriaTerzoMotivo(cmisOrdineMissione.getTerzoMotivoAutoPropria());
+            messageForFlows.setTaxiPrimoMotivo(cmisOrdineMissione.getPrimoMotivoTaxi());
+            messageForFlows.setTaxiSecondoMotivo(cmisOrdineMissione.getSecondoMotivoTaxi());
+            messageForFlows.setTaxiTerzoMotivo(cmisOrdineMissione.getTerzoMotivoTaxi());
+            messageForFlows.setTaxiQuartoMotivo(cmisOrdineMissione.getQuartoMotivoTaxi());
+            messageForFlows.setAutoNoleggioPrimoMotivo(cmisOrdineMissione.getPrimoMotivoAutoNoleggio());
+            messageForFlows.setAutoNoleggioSecondoMotivo(cmisOrdineMissione.getSecondoMotivoAutoNoleggio());
+
+
+            messageForFlows.setValidazioneSpesaFlag("si");
+
+            MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> maps = mapper.convertValue(messageForFlows, new TypeReference<Map<String, Object>>() {});
+            parameters.setAll(maps);
+
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_MISSIONE, mapAllegati.get("documento"), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_ANTICIPO, mapAllegati.get("documentoAnticipo"), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_PROPRIA, mapAllegati.get("documentoAutoPropria"), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_TAXI, mapAllegati.get("documentoTaxi"), ordineMissione.getStatoFlusso());
+            messageForFlowsService.caricaDocumento(parameters, Costanti.TIPO_DOCUMENTO_AUTO_NOLEGGIO, mapAllegati.get("documentoAutoNoleggio"), ordineMissione.getStatoFlusso());
+
+            final MultiValueMap<String, Object> finalParameters = parameters;
+
+            Optional.ofNullable(mapAllegati.get("allegati"))
+                    .filter(List.class::isInstance)
+                    .map(list -> (List<StorageObject>) list)
+                    .ifPresent(allegati -> {
+                        messageForFlowsService.aggiungiDocumentiMultipli(allegati, finalParameters, Costanti.TIPO_DOCUMENTO_ALLEGATO);
+                    });
+
 
             if (ordineMissione.isStatoNonInviatoAlFlusso()) {
                 parameters.add("commento", "");

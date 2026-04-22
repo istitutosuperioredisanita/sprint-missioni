@@ -63,7 +63,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         },
         function(error){
             $scope.endSearchCmisAnnullamenti = true;
-        });        
+        });
 
         ElencoOrdiniMissioneService.findListToValidate(uo).then(function(response){
             $scope.listOrdiniMissioniToValidate = response.data;
@@ -100,7 +100,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         },
         function(error){
             $scope.endSearchCmisOrdine = true;
-        });        
+        });
 
         ElencoRimborsiMissioneService.findListToValidate(uo).then(function(response){
             $scope.listRimborsiMissioniToValidate = response.data;
@@ -132,8 +132,8 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         },
         function(error){
             $scope.endSearchCmisRimborso = true;
-        });        
-   
+        });
+
         ElencoRimborsiMissioneService.findListAnnullamentiToValidate(uo).then(function(response){
             $scope.listAnnullamentiRimborsiMissioniToValidate = response;
             $scope.esistonoAnnullamentiRimborsiDaConfermare = false;
@@ -146,7 +146,7 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
         },
         function(error){
             $scope.endSearchCmisAnnullamentiRimborso = true;
-        });        
+        });
     }
     $scope.uoWorkForSpecialUser = null;
     $scope.endSearchCmisAnnullamenti = false;

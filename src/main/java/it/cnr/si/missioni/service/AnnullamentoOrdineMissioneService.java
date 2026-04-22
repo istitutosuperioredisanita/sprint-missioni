@@ -61,10 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -232,18 +229,24 @@ public class AnnullamentoOrdineMissioneService {
         return annullamento;
     }
 
+
     public void popolaCoda(AnnullamentoOrdineMissione annullamento) {
-        if (annullamento.getMatricola() != null) {
-            Account account = accountService.loadAccountFromUsername(annullamento.getUid());
-            String idSede = null;
-            if (account != null) {
-                idSede = account.getCodice_sede();
+        if (Optional.ofNullable(rabbitMQService).isPresent()) {
+            if (!isDevProfile()) {
+                if (annullamento.getMatricola() != null) {
+                    Account account = accountService.loadAccountFromUsername(annullamento.getUid());
+
+                    String idSede = null;
+                    if (account != null) {
+                        idSede = account.getCodice_sede();
+                    }
+                    Missione missione = new Missione(TypeMissione.ANNULLAMENTO, Long.valueOf(annullamento.getId().toString()), idSede,
+                            annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(),
+                            annullamento.getOrdineMissione().getDataFineMissione(), Long.valueOf(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
+                            annullamento.getOrdineMissione().getAnno(), annullamento.getOrdineMissione().getNumero());
+                    rabbitMQService.send(missione);
+                }
             }
-            Missione missione = new Missione(TypeMissione.ANNULLAMENTO, Long.valueOf(annullamento.getId().toString()), idSede,
-                    annullamento.getOrdineMissione().getMatricola(), annullamento.getOrdineMissione().getDataInizioMissione(),
-                    annullamento.getOrdineMissione().getDataFineMissione(), Long.valueOf(annullamento.getOrdineMissione().getId().toString()), annullamento.getOrdineMissione().isMissioneEstera() ? TypeTipoMissione.ESTERA : TypeTipoMissione.ITALIA,
-                    annullamento.getOrdineMissione().getAnno(), annullamento.getOrdineMissione().getNumero());
-            rabbitMQService.send(missione);
         }
     }
 
@@ -326,10 +329,6 @@ public class AnnullamentoOrdineMissioneService {
         return annullamentoDB;
     }
 
-    private String getTextMailReturnToSender(String basePath, AnnullamentoOrdineMissione annullamento) {
-        return "L'annullamento ordine di missione " + annullamento.getAnno() + "-" + annullamento.getNumero() + " di " + getNominativo(annullamento.getUid()) + " per la missione a " + annullamento.getOrdineMissione().getDestinazione() + " dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto " + annullamento.getOrdineMissione().getOggetto() + " le è stata respinto da " + getNominativo(securityService.getCurrentUserLogin());
-    }
-
     private void sendMailToAdministrative(String basePath, AnnullamentoOrdineMissione annullamento) {
         DatiIstituto dati = datiIstitutoService.getDatiIstituto(annullamento.getOrdineMissione().getUoSpesa(), annullamento.getOrdineMissione().getAnno());
         String subjectMail = subjectSendToAdministrative + " " + getNominativo(annullamento.getUid());
@@ -351,11 +350,6 @@ public class AnnullamentoOrdineMissioneService {
                 mailService.sendEmail(oggetto, testoMail, false, true, elencoMail);
             }
         }
-    }
-
-    private String getTextMailSendToAdministrative(String basePath, AnnullamentoOrdineMissione annullamento) {
-        return "L'annullamento dell'ordine di missione " + annullamento.getOrdineMissione().getAnno() + "-" + annullamento.getOrdineMissione().getNumero() + " della uo " + annullamento.getOrdineMissione().getUoRich() + " " + annullamento.getOrdineMissione().getDatoreLavoroRich() + " di " + getNominativo(annullamento.getOrdineMissione().getUid()) + " per la missione a " + annullamento.getOrdineMissione().getDestinazione() + " dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto " + annullamento.getOrdineMissione().getOggetto() + "  è stato inviato per la verifica/completamento dei dati finanziari."
-                + "Si prega di verificarlo attraverso il link " + basePath + "/#/annullamentoOrdineMissione/" + annullamento.getOrdineMissione().getId() + "/S";
     }
 
     private void aggiornaDatiAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento, Boolean confirm,
@@ -674,7 +668,8 @@ public class AnnullamentoOrdineMissioneService {
     @Transactional(readOnly = true)
     public Map<String, byte[]> printAnnullamentoMissione(Long idMissione) throws ComponentException {
         AnnullamentoOrdineMissione annullamento = getAnnullamentoOrdineMissione(idMissione, true);
-        if (!annullamento.isStatoNonInviatoAlFlusso()) {
+        if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneInserita()
+                && !annullamento.isMissioneDaValidare()) {
             return cmisOrdineMissioneService.getFileAnnullamentoOrdineMissione(annullamento);
         } else {
             return stampaAnnullamento(annullamento);
@@ -716,5 +711,29 @@ public class AnnullamentoOrdineMissioneService {
         OrdineMissione ordineMissione = (OrdineMissione) crudServiceBean.findById(OrdineMissione.class, annullamentoOrdineMissione.getOrdineMissione().getId());
         return " con id " + annullamentoOrdineMissione.getId() + " relativo all'ordine di missione " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " di " + ordineMissione.getDatoreLavoroRich() + " collegato al flusso " + flow.getProcessInstanceId() + " con esito " + flow.getStato() + " è andato in errore per il seguente motivo: " + error;
     }
+
+    private String getTextMailReturnToSender(String basePath, AnnullamentoOrdineMissione annullamento) {
+        String url = basePath + "/#/annullamento-ordine-missione/" + annullamento.getId();
+        return "<p>L'annullamento ordine di missione <b>" + annullamento.getAnno() + "-" + annullamento.getNumero() + "</b> di "
+                + getNominativo(annullamento.getUid()) + " per la missione a <b>"
+                + annullamento.getOrdineMissione().getDestinazione() + "</b> dal "
+                + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto: <u>"
+                + annullamento.getOrdineMissione().getOggetto() + "</u> le è stata respinto da "
+                + getNominativo(securityService.getCurrentUserLogin()) + ".</p>"
+                + "<p><a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
+    private String getTextMailSendToAdministrative(String basePath, AnnullamentoOrdineMissione annullamento) {
+        String url = basePath + "/#/annullamentoOrdineMissione/" + annullamento.getOrdineMissione().getId() + "/S";
+        return "<p>L'annullamento dell'ordine di missione <b>" + annullamento.getOrdineMissione().getAnno() + "-" + annullamento.getOrdineMissione().getNumero()
+                + "</b> della uo " + annullamento.getOrdineMissione().getUoRich() + " " + annullamento.getOrdineMissione().getDatoreLavoroRich()
+                + " di " + getNominativo(annullamento.getOrdineMissione().getUid()) + " per la missione a <b>" + annullamento.getOrdineMissione().getDestinazione()
+                + "</b> dal " + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataInizioMissione()) + " al "
+                + DateUtils.getDefaultDateAsString(annullamento.getOrdineMissione().getDataFineMissione()) + " avente per oggetto: <u>"
+                + annullamento.getOrdineMissione().getOggetto() + "</u> è stato inviato per la tua validazione.</p>"
+                + "<p>Si prega di verificarlo attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
+    }
+
 }
 

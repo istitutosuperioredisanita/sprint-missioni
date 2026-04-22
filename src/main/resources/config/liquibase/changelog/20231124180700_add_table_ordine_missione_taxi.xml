@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+  ~
+  ~      This program is free software: you can redistribute it and/or modify
+  ~      it under the terms of the GNU Affero General Public License as
+  ~      published by the Free Software Foundation, either version 3 of the
+  ~      License, or (at your option) any later version.
+  ~
+  ~      This program is distributed in the hope that it will be useful,
+  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~      GNU Affero General Public License for more details.
+  ~
+  ~      You should have received a copy of the GNU Affero General Public License
+  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~
+  -->
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <changeSet id="20231123180700" author="missioni">
+        <createTable tableName="ORDINE_MISSIONE_TAXI">
+            <column name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ID_ORDINE_MISSIONE" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MANCANZA_ASS_MEZZI" type="character varying(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="MANCANZA_MEZZI" type="character varying(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TRASPORTO_MATERIALI" type="character varying(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="MOTIVI_HANDICAP" type="character varying(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="UTILIZZO_ALTRI_MOTIVI" type="character varying(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ID_FLUSSO" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="STATO_FLUSSO" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTCR" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DACR" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UTUV" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUVA" type="timestamp" defaultValueDate="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PG_VER_REC" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

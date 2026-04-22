@@ -88,6 +88,14 @@ public class MessageForFlow extends JSONBody implements Serializable {
     String autoPropriaPrimoMotivo;
     String autoPropriaSecondoMotivo;
     String autoPropriaTerzoMotivo;
+    String taxiAltriMotivi;
+    String taxiPrimoMotivo;
+    String taxiSecondoMotivo;
+    String taxiTerzoMotivo;
+    String taxiQuartoMotivo;
+    String autoNoleggioPrimoMotivo;
+    String autoNoleggioSecondoMotivo;
+
     String pathFascicoloDocumenti;
     String titolo;
     String descrizione;
@@ -584,6 +592,62 @@ public class MessageForFlow extends JSONBody implements Serializable {
 
     public void setAutoPropriaTerzoMotivo(String autoPropriaTerzoMotivo) {
         this.autoPropriaTerzoMotivo = autoPropriaTerzoMotivo;
+    }
+
+    public String getTaxiAltriMotivi() {
+        return taxiAltriMotivi;
+    }
+
+    public void setTaxiAltriMotivi(String taxiAltriMotivi) {
+        this.taxiAltriMotivi = taxiAltriMotivi;
+    }
+
+    public String getTaxiPrimoMotivo() {
+        return taxiPrimoMotivo;
+    }
+
+    public void setTaxiPrimoMotivo(String taxiPrimoMotivo) {
+        this.taxiPrimoMotivo = taxiPrimoMotivo;
+    }
+
+    public String getTaxiSecondoMotivo() {
+        return taxiSecondoMotivo;
+    }
+
+    public void setTaxiSecondoMotivo(String taxiSecondoMotivo) {
+        this.taxiSecondoMotivo = taxiSecondoMotivo;
+    }
+
+    public String getTaxiTerzoMotivo() {
+        return taxiTerzoMotivo;
+    }
+
+    public void setTaxiTerzoMotivo(String taxiTerzoMotivo) {
+        this.taxiTerzoMotivo = taxiTerzoMotivo;
+    }
+
+    public String getTaxiQuartoMotivo() {
+        return taxiQuartoMotivo;
+    }
+
+    public void setTaxiQuartoMotivo(String taxiQuartoMotivo) {
+        this.taxiQuartoMotivo = taxiQuartoMotivo;
+    }
+
+    public String getAutoNoleggioPrimoMotivo() {
+        return autoNoleggioPrimoMotivo;
+    }
+
+    public void setAutoNoleggioPrimoMotivo(String autoNoleggioPrimoMotivo) {
+        this.autoNoleggioPrimoMotivo = autoNoleggioPrimoMotivo;
+    }
+
+    public String getAutoNoleggioSecondoMotivo() {
+        return autoNoleggioSecondoMotivo;
+    }
+
+    public void setAutoNoleggioSecondoMotivo(String autoNoleggioSecondoMotivo) {
+        this.autoNoleggioSecondoMotivo = autoNoleggioSecondoMotivo;
     }
 
     public String getPathFascicoloDocumenti() {

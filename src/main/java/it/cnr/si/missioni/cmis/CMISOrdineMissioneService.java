@@ -20,10 +20,7 @@
 package it.cnr.si.missioni.cmis;
 
 import it.cnr.jada.ejb.session.ComponentException;
-import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAnticipo;
-import it.cnr.si.missioni.domain.custom.persistence.OrdineMissioneAutoPropria;
+import it.cnr.si.missioni.domain.custom.persistence.*;
 import it.cnr.si.spring.storage.StorageObject;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +65,8 @@ public interface CMISOrdineMissioneService {
 
     public InputStream getStreamOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException;
 
+    public InputStream getStreamOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException;
+
     public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws ComponentException ;
 
     public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws ComponentException;
@@ -87,7 +86,13 @@ public interface CMISOrdineMissioneService {
     public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria) throws ComponentException;
     public String getNodeRefOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria, Boolean erroreSeNonTrovato) throws ComponentException;
 
+    public String getNodeRefOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi, Boolean erroreSeNonTrovato) throws ComponentException;
+
     public String getNodeRefOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo);
+
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio, Boolean erroreSeNonTrovato) throws ComponentException;
+    public String getNodeRefOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException;
+
     public StorageObject recuperoFolderOrdineMissione(OrdineMissione ordineMissione);
 
     public void annullaFlusso(OrdineMissione ordineMissione);
@@ -110,16 +115,31 @@ public interface CMISOrdineMissioneService {
     public StorageObject salvaStampaAnticipoSuCMIS(String currentLogin, byte[] stampa,
                                                    OrdineMissioneAnticipo ordineMissioneAnticipo) throws ComponentException ;
 
+    @Transactional(readOnly = true)
+    public StorageObject salvaStampaTaxiSuCMIS(String currentLogin, byte[] stampa,
+                                                   OrdineMissioneTaxi ordineMissioneTaxi) throws ComponentException ;
+    @Transactional(readOnly = true)
+    public StorageObject salvaStampaAutoNoleggioSuCMIS(String currentLogin, byte[] stampa,
+                                               OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio) throws ComponentException ;
+
+
     public List<CMISFileAttachment> getAttachmentsOrdineMissione(OrdineMissione ordineMissione, Long idOrdineMissione) ;
 
     public List<CMISFileAttachment> getAttachmentsAnticipo(OrdineMissione ordineMissione, Long idAnticipo) ;
+    public List<CMISFileAttachment> getAttachmentsTaxi(OrdineMissione ordineMissione, Long idTaxi) ;
+    public List<StorageObject> getAttachmentsTaxi(OrdineMissione ordineMissione) ;
 
     public List<StorageObject> getAttachmentsAnticipo(OrdineMissione ordineMissione) ;
+
+    public List<CMISFileAttachment> getAttachmentsAutoNoleggio(OrdineMissione ordineMissione, Long idTaxi) ;
+    public List<StorageObject> getAttachmentsAutoNoleggio(OrdineMissione ordineMissione) ;
 
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione);
 
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione, Boolean recuperoFileEliminati);
     public CMISFileAttachment uploadAttachmentAnticipo(OrdineMissione ordineMissione, Long idAnticipo, InputStream inputStream, String name, MimeTypes mimeTypes) ;
+    public CMISFileAttachment uploadAttachmentTaxi(OrdineMissione ordineMissione, Long idTaxi, InputStream inputStream, String name, MimeTypes mimeTypes) ;
+    public CMISFileAttachment uploadAttachmentAutoNoleggio(OrdineMissione ordineMissione, Long idAutoNoleggio, InputStream inputStream, String name, MimeTypes mimeTypes) ;
 
     public CMISFileAttachment uploadAttachmentOrdineMissione(OrdineMissione ordineMissione, Long idOrdineMissione, InputStream inputStream, String name, MimeTypes mimeTypes);
 
@@ -128,6 +148,8 @@ public interface CMISOrdineMissioneService {
     public Map<String, byte[]> getFileAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento);
 
     public Map<String, byte[]> getFileOrdineMissioneAnticipo(OrdineMissioneAnticipo ordineMissioneAnticipo);
+    public Map<String, byte[]> getFileOrdineMissioneTaxi(OrdineMissioneTaxi ordineMissioneTaxi);
+    public Map<String, byte[]> getFileOrdineMissioneAutoNoleggio(OrdineMissioneAutoNoleggio ordineMissioneAutoNoleggio);
 
     public Map<String, byte[]> getFileOrdineMissioneAutoPropria(OrdineMissioneAutoPropria ordineMissioneAutoPropria);
 

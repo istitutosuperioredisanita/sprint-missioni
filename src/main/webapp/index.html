@@ -30,6 +30,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <!-- build:css(.tmp) styles/main.css -->
+        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="icon" type="image/png" href="/logoISS.png">
+
         <link rel="stylesheet" href="styles/bootstrap.css">
         <link rel="stylesheet" href="styles/font-awesome.css">
         <link rel="stylesheet" href="styles/selectize.default.css" />
@@ -62,7 +65,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand logo" style="padding-top: 6px;" href="#/">
-                        <img class="logo-img" src="images/logo_CNR_esteso40.png"/>
+                        <img class="logo-img" src="images/logoISS.png"/>
                         <span style="vertical-align: bottom;font-size: 1.2em;color: #012c54;" translate="global.title">Missioni</span>
                     </a>                </div>
                 <div class="collapse navbar-collapse" id="navbar-collapse" ng-switch="authenticated">
@@ -84,13 +87,13 @@
                                 <span class="glyphicon glyphicon-info-sign"></span>
                                 <span translate="global.menu.faq">FAQ</span>
                             </a>
-                        </li>
-                        <li ng-show="account.uoForUsersSpecial">
-                            <a href="#/helpdesk">
-                                <span class="glyphicon glyphicon-headphones"></span>
-                                <span translate="global.menu.helpdesk">HelpDesk</span>
-                            </a>
-                        </li>
+<!--                        </li>-->
+<!--                        <li ng-show="account.uoForUsersSpecial">-->
+<!--                            <a href="#/helpdesk">-->
+<!--                                <span class="glyphicon glyphicon-headphones"></span>-->
+<!--                                <span translate="global.menu.helpdesk">HelpDesk</span>-->
+<!--                            </a>-->
+<!--                        </li>-->
                         <li ng-switch-when="true" class="dropdown pointer" ng-show="isAuthorizedApp()">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
                                 <span>
@@ -133,20 +136,19 @@
                                     &nbsp;<span translate="global.menu.account.ordine-missione">Ordine di Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/elenco-ordini-missione"><span class="glyphicon glyphicon-list-alt"></span>
                                     &nbsp;<span translate="global.menu.account.elenco-ordini-missione">Ordine di Missione</span></a></li>
-                                <!--da verificare processo interno iss
-                                <li ng-switch-when="true"><a href="#/annullamento-ordine-missione"><span class="glyphicon glyphicon-floppy-remove"></span>
-                                    &nbsp;<span translate="global.menu.account.annullamento-ordine-approvato">Annullamento Ordine di Missione Approvato</span></a></li>
-                                    -->
                                 <li ng-switch-when="true" ng-show="account.abilitatoRendereDefinitivo"><a href="#/ordini-missione-da-rendere-definitivi"><span class="glyphicon glyphicon-ok"></span>
                                     &nbsp;<span translate="global.menu.account.elenco-ordini-missione-per-definitivo">Ordine di Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/rimborso-missione"><span class="glyphicon glyphicon-euro"></span>
                                     &nbsp;<span translate="global.menu.account.rimborso-missione">Rimborso Missione</span></a></li>
                                 <li ng-switch-when="true"><a href="#/elenco-rimborsi-missione"><span class="glyphicon glyphicon-list-alt"></span>
                                     &nbsp;<span translate="global.menu.account.elenco-rimborsi-missione">Elenco Rimborsi di Missione</span></a></li>
-                                <!--da verificare processo interno iss
+                                <!--da verificare processo interno iss-->
+                                <li ng-switch-when="true"><a href="#/annullamento-ordine-missione"><span class="glyphicon glyphicon-floppy-remove"></span>
+                                    &nbsp;<span translate="global.menu.account.annullamento-ordine-approvato">Annullamento Ordine di Missione Approvato</span></a></li>
+                                <!--da verificare processo interno iss-->
                                 <li ng-switch-when="true"><a href="#/annullamento-rimborso-missione"><span class="glyphicon glyphicon-remove"></span>
                                     &nbsp;<span translate="global.menu.account.annullamento-rimborso-approvato">Annullamento Rimborso Missione Approvato</span></a></li>
-                                   -->
+
                             </ul>
                         </li>
                         <li ng-switch-when="true" ng-show="isAuthorized(userRoles.admin)" class="dropdown pointer" ng-controller="AdminController">
@@ -264,7 +266,10 @@
         <script src="scripts/config.js"></script>
         <script src="scripts/release-notes.js"></script>
         <script src="scripts/ordine-missione/auto-propria.js"></script>
+        <script src="scripts/ordine-missione/taxi.js"></script>
         <script src="scripts/ordine-missione/richiesta-anticipo.js"></script>
+        <script src="scripts/ordine-missione/auto-noleggio.js"></script>
+        <script src="scripts/ordine-missione/ordine-missione-dettagli.js"></script>
         <script src="scripts/autoPropria.js"></script>
         <script src="scripts/datiPatente.js"></script>
         <script src="scripts/manual.js"></script>

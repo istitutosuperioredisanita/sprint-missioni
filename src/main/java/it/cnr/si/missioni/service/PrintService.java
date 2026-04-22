@@ -99,7 +99,7 @@ public class PrintService {
         }
     }
 
-    protected Params createParamsForPrint(String myJson, String printNameJasper, Serializable id) {
+    protected Params createParamsForPrint (String myJson, String printNameJasper, Serializable id) {
         Key key = new Key();
         key.setNomeParam(Costanti.PARAMETER_DATA_SOURCE_FOR_PRINT);
         Param param = new Param();

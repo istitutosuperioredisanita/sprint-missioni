@@ -1,4 +1,4 @@
-package it.cnr.si.missioni.cmis.flows.happySign;
+package it.cnr.si.missioni.cmis.flows.happySign.interfaces;
 
 import it.iss.si.dto.happysign.base.File;
 

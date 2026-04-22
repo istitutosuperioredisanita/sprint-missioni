@@ -19,10 +19,22 @@
 
 package it.cnr.si.missioni.cmis;
 
+import java.math.BigDecimal;
+
 public class CMISOrdineMissione extends CMISMissione {
     public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per lo svolgimento di funzioni istituzionali relativi a compiti ispettivi, di verifica e di controllo";
-    public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività caratterizzata da emergenza, urgenza, indifferibilità";
+    public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria nei casi di accertata la convenienza economica per l’ISS, anche per lo svolgimento di funzioni diverse da quelle istituzionali relative a compiti ispettivi, di verifica e controllo, in caso di oggettive situazioni di disagio o di difficoltà all’uso dei mezzi di trasporto ordinari";
+
+    //public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività caratterizzata da emergenza, urgenza, indifferibilità";
     public final static String TERZO_MOTIVO_UTILIZZO_AUTO_PROPRIA = "Richiesta auto propria per Attività che richiede necessariamente il trasporto di materiale, o attrezzature ingombranti, pesanti, o fragili in dotazione";
+    public final static String PRIMO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per l'inadeguatezza dei mezzi ordinari di linea per raggiungere il luogo della missione nei tempi necessari";
+    public final static String SECONDO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la mancanza assoluta di mezzi pubblici nel luogo di missione, anche per sospensione del servizio per sciopero e/o per eventi eccezionali opportunamente documentati";
+    public final static String TERZO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per la necessità di trasporto di materiale attinente al servizio avente dimensioni e peso rilevanti (solo se corredato da autorizzazione preventiva ed elenco dettagliato del materiale trasportato)";
+    public final static String QUARTO_MOTIVO_UTILIZZO_TAXI = "Richiesta taxi per il personale con disabilità/portatore di handicap.";
+
+    public final static String PRIMO_MOTIVO_UTILIZZO_AUTO_NOLEGGIO = "In casi di motivata eccezionalità, attestate da apposita autodichiarazione del soggetto incaricato ";
+    public final static String SECONDO_MOTIVO_UTILIZZO_AUTO_NOLEGGIO = "Per motivate esigenze di servizio, attestate da apposita autodichiarazione del soggetto incaricato. ";
+
     private Long idMissioneOrdine;
     private Long idMissioneRevoca;
     private String usernameFirmatarioAggiunto;
@@ -33,6 +45,14 @@ public class CMISOrdineMissione extends CMISMissione {
     private String primoMotivoAutoPropria;
     private String secondoMotivoAutoPropria;
     private String terzoMotivoAutoPropria;
+    private String altriMotiviTaxi;
+    private String primoMotivoTaxi;
+    private String secondoMotivoTaxi;
+    private String terzoMotivoTaxi;
+    private String quartoMotivoTaxi;
+
+    private String primoMotivoAutoNoleggio;
+    private String secondoMotivoAutoNoleggio;
     private String anticipo;
     private String validazioneModulo;
     private String modulo;
@@ -43,6 +63,9 @@ public class CMISOrdineMissione extends CMISMissione {
 
     private String descrizioneModulo;
     private String missioneGratuita;
+
+    private BigDecimal totaleOrdineMissione;
+
 
     public Long getIdMissioneRevoca() {
         return idMissioneRevoca;
@@ -132,6 +155,62 @@ public class CMISOrdineMissione extends CMISMissione {
         this.terzoMotivoAutoPropria = terzoMotivoAutoPropria;
     }
 
+    public String getAltriMotiviTaxi() {
+        return altriMotiviTaxi;
+    }
+
+    public void setAltriMotiviTaxi(String altriMotiviTaxi) {
+        this.altriMotiviTaxi = altriMotiviTaxi;
+    }
+
+    public String getPrimoMotivoTaxi() {
+        return primoMotivoTaxi;
+    }
+
+    public void setPrimoMotivoTaxi(String primoMotivoTaxi) {
+        this.primoMotivoTaxi = primoMotivoTaxi;
+    }
+
+    public String getSecondoMotivoTaxi() {
+        return secondoMotivoTaxi;
+    }
+
+    public void setSecondoMotivoTaxi(String secondoMotivoTaxi) {
+        this.secondoMotivoTaxi = secondoMotivoTaxi;
+    }
+
+    public String getTerzoMotivoTaxi() {
+        return terzoMotivoTaxi;
+    }
+
+    public void setTerzoMotivoTaxi(String terzoMotivoTaxi) {
+        this.terzoMotivoTaxi = terzoMotivoTaxi;
+    }
+
+    public String getQuartoMotivoTaxi() {
+        return quartoMotivoTaxi;
+    }
+
+    public void setQuartoMotivoTaxi(String quartoMotivoTaxi) {
+        this.quartoMotivoTaxi = quartoMotivoTaxi;
+    }
+
+    public String getPrimoMotivoAutoNoleggio() {
+        return primoMotivoAutoNoleggio;
+    }
+
+    public void setPrimoMotivoAutoNoleggio(String primoMotivoAutoNoleggio) {
+        this.primoMotivoAutoNoleggio = primoMotivoAutoNoleggio;
+    }
+
+    public String getSecondoMotivoAutoNoleggio() {
+        return secondoMotivoAutoNoleggio;
+    }
+
+    public void setSecondoMotivoAutoNoleggio(String secondoMotivoAutoNoleggio) {
+        this.secondoMotivoAutoNoleggio = secondoMotivoAutoNoleggio;
+    }
+
     public String getMissioneGratuita() {
         return missioneGratuita;
     }
@@ -178,5 +257,13 @@ public class CMISOrdineMissione extends CMISMissione {
 
     public void setCodiceFiscaleRespModulo(String codiceFiscaleRespModulo) {
         this.codiceFiscaleRespModulo = codiceFiscaleRespModulo;
+    }
+
+    public BigDecimal getTotaleOrdineMissione() {
+        return totaleOrdineMissione;
+    }
+
+    public void setTotaleOrdineMissione(BigDecimal totaleOrdineMissione) {
+        this.totaleOrdineMissione = totaleOrdineMissione;
     }
 }

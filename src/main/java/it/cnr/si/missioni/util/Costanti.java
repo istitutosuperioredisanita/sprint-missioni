@@ -19,8 +19,12 @@
 
 package it.cnr.si.missioni.util;
 
+import it.cnr.si.missioni.cmis.flows.happySign.AbstractHappySign;
+import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
+
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 
 
 /**
@@ -44,8 +48,8 @@ public class Costanti {
     public final static String REST_VALIDA_MASSIMALE_SPESA = "restapi/missioni/validaMassimaleSpesa";
     public final static String REST_COMUNICA_RIMBORSO_SIGLA = "restapi/missioni";
 
-    public final static String REST_TERZO_INFO_SIGLA = "restapi/terzo/info/";
     public final static String REST_USERINFO_SIGLA = "restapi/terzo/info/";
+    public final static String REST_USERINFO_BYCDTERZO_SIGLA = "restapi/terzo/infoByCdTerzo/";
     public final static String REST_ACCOUNT = "json/userinfo/";
     public final static String REST_UO_DIRECTOR = "json/sedi";
     public final static String REST_UO_TIT_CA = "titCa=";
@@ -53,7 +57,10 @@ public class Costanti {
     public final static String NOME_STAMPA_ORDINE = "ordine";
     public final static String NOME_STAMPA_RIMBORSO = "rimborso";
     public final static String NOME_STAMPA_AUTO_PROPRIA = "autoPropria";
+    public final static String NOME_STAMPA_TAXI = "taxi";
     public final static String NOME_STAMPA_ANTICIPO = "anticipo";
+    public final static String NOME_STAMPA_AUTO_NOLEGGIO = "autoNoleggio";
+
     public final static String PARAMETER_DATA_SOURCE_FOR_PRINT = "REPORT_DATA_SOURCE";
 
     public final static String NOME_CACHE_MESSAGGIO = "cacheMessaggio";
@@ -85,6 +92,11 @@ public class Costanti {
     public final static String USER_CRON_MISSIONI = "app.missioni";
     public final static String ACE_SIGLA_CUG = "CUG";
     public final static String ACE_SIGLA_PRESIDENTE = "PRESIDENZA";
+    public final static String ACE_SIGLA_DIR_I_FASCIA = "I fascia";
+    public final static String ACE_SIGLA_DIR_II_FASCIA = "I fascia";
+
+    public final static String ACE_SIGLA_DRUE = "DRUE";
+    public final static String ACE_SIGLA_PRESIDENTE_DESC = "Presidente";
 
     public final static String STRING_FOR_SANITIZE_FILE_NAME = "([\\/:@()&\u20AC<>?\"])";
     public final static String REST_OIL_NEW_PROBLEM = "pest/HDSiper";
@@ -118,6 +130,8 @@ public class Costanti {
     public final static String PRIORITA_MEDIA = "1";
     public final static String TAM = "T";
     public final static String RIMBORSO_DOCUMENTATO = "R";
+    public final static String ORDINE_DOCUMENTATO = "O";
+
     public final static String RESIDENZA_DOMICILIO = "R";
     public final static String SEDE_LAVORO = "S";
     public final static String ALTRO = "A";
@@ -168,6 +182,9 @@ public class Costanti {
     public final static String TIPO_DOCUMENTO_ANTICIPO = "anticipoMissione";
     public final static String TIPO_DOCUMENTO_AUTO_PROPRIA = "autoPropriaMissione";
     public final static String TIPO_DOCUMENTO_GIUSTIFICATIVO = "giustificativoMissione";
+    public final static String TIPO_DOCUMENTO_TAXI = "taxiMissione";
+    public final static String TIPO_DOCUMENTO_AUTO_NOLEGGIO = "autoNoleggioMissione";
+
     public final static String TIPO_PAGAMENTO_BONIFICO = "BO";
     public final static String TIPO_PAGAMENTO_BONIFICO_ESTERO = "BOEST";
     public final static String TESTO_RIMBORSO_CONSENTITO_SU_ORDINE_ANNULLATO = "Annullamento Ordine di missione con Rimborso missione Consentito";
@@ -177,17 +194,50 @@ public class Costanti {
     public final static String RUOLO_FIRMA_ESTERE = RUOLO_FIRMA + "-estere";
     public final static String RUOLO_FIRMA_PRESIDENTE = RUOLO_FIRMA + "-presidente";
     public final static String SIGLA_ACE_DIREZIONE_GENERALE = "DG";
+    public final static String SIGLA_ACE_DIR_GENERALE_VALUE = "Direttore Generale";
+    public final static String IS_INCARICO_VOCI_PRESIDENTE = "isIncarico_VociPresidente";
+    public final static String IS_DIR_I_FASCIA = "isDirIFascia";
+    public final static String IS_MISSIONE_NO_CARICO_ENTE = "isMissioneNoCaricoEnte";
+    public final static String IS_PRESIDENTE = "isPresidente";
+    public final static String CHECK_IS_DIR_DIPARTIMENTO = "checkIsDirDipartimento";
+    public final static String IS_DIR_GENERALE = "isDirGenerale";
+    public final static String IS_DIR_DRUE = "isDirDRUE";
+    public final static String IS_DIR_II_FASCIA = "isDirIIFascia";
+
+    public final static String CLASS_AUTORIZZ_MISS_GAE = "AutorizzazioneMissioneGae";
+    public final static String CLASS_AUTORIZZ_MISS_DIR_GAE = "AutorizzazioneMissioneDirGae";
+
+    public final static String TIPO_MISS_GAE = "AutorizzazioneMissione Uo Richiedente = (!=) Uo GAE";
+    public final static String TIPO_MISS_DIR_GAE = "AutorizzazioneMissione del Direttore del Dipartimento Uo Struttura = (!=) Uo GAE";
+
+
+    public final static String OLD_AUTH = "OLD_AUTH";
+
     public final static String AMMINISTRATORE_MISSIONI = "supervisore@missioni";
     public static final String ROLE_FLOWS = "USER_flows#missioni";
     public static final String ROLE_ADMIN = "ADMIN#missioni";
     public static final String ROLE_USER = "USER#missioni";
 
+    public static final String SPESA_INDENNITA_KM = "INDENNITA' KM";
+
+    public static final String SPESE_VISTO_VIAGGI_ESTERO = "SPESE VISTO";
+
+    public static final String SPESA_IND_AUTO_PROPRIA = "IND AUTO PROPRIA";
+
+    public static final String SPESA_TAXI = "TAXI";
+    public static final String SPESA_NOLEGGIO_AUTO = "NOLEGGIO AUTO";
+    public static final String SPESA_PEDAGGIO_AUTOSTRADA = "PEDAGGIO AUTOSTRADA";
+    public static final String SPESA_PARCHEGGIO = "PARCHEGGIO";
+    public static final String SPESA_ACC_DISABILE = "ALTRO MEZZO TRASPORT";
+    public static final String SPESA_CARB_AUTO_NOLL_ECC = "ALTRO";
+    public static final String SPESA_PERNOTTAMENTO = "ALBERGO";
 
     public final static Map<String, String> TIPO_DOCUMENTO_FLOWS;
     public final static List<String> TIPI_DOCUMENTO_FLOWS_DA_FIRMARE;
     public final static Map<String, String> PRIORITA;
     public final static Map<String, String> TRATTAMENTO;
     public final static Map<String, String> TRATTAMENTO_SHORT;
+    public final static Map<String, String> TRATTAMENTO_SHORT_O;
     public final static Map<String, String> PARTENZA_DA;
     public final static Map<String, String> STATO;
     public final static Map<String, String> TIPO_MISSIONE;
@@ -197,6 +247,15 @@ public class Costanti {
     public final static Map<String, String> STATO_FLUSSO_RIMBORSO_FROM_CMIS;
     public final static Map<String, String> STATO_INVIO_SIGLA;
     public final static Map<String, String> FONDI;
+
+    public final static String DOCUMENTO_MISSIONE_KEY = "documentoMissione";
+    public final static String DOCUMENTO_ANTICIPO_KEY = "documentoAnticipoMissione";
+    public final static String DOCUMENTO_AUTO_PROPRIA_KEY = "documentoAutoPropriaMissione";
+    public final static String DOCUMENTO_TAXI_KEY = "documentoTaxiMissione";
+    public final static String DOCUMENTO_AUTO_NOLEGGIO_KEY = "documentoAutoNoleggioMissione";
+
+    public final static String DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY = "documentoAnnulloMissione";
+
 
     static {
         Map<String, String> aMap = new HashMap<String, String>();
@@ -235,6 +294,13 @@ public class Costanti {
         aMap.put(TAM, "TAM");
         aMap.put(RIMBORSO_DOCUMENTATO, "Rimborso");
         TRATTAMENTO_SHORT = Collections.unmodifiableMap(aMap);
+    }
+
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put(TAM, "TAM");
+        aMap.put(ORDINE_DOCUMENTATO, "Ordine");
+        TRATTAMENTO_SHORT_O = Collections.unmodifiableMap(aMap);
     }
 
     static {

@@ -80,6 +80,13 @@ public class MessageForFlowOrdine extends MessageForFlow implements Serializable
                 ", autoPropriaPrimoMotivo='" + autoPropriaPrimoMotivo + '\'' +
                 ", autoPropriaSecondoMotivo='" + autoPropriaSecondoMotivo + '\'' +
                 ", autoPropriaTerzoMotivo='" + autoPropriaTerzoMotivo + '\'' +
+                ", taxiAltriMotivi='" + taxiAltriMotivi + '\'' +
+                ", taxiPrimoMotivo='" + taxiPrimoMotivo + '\'' +
+                ", taxiSecondoMotivo='" + taxiSecondoMotivo + '\'' +
+                ", taxiTerzoMotivo='" + taxiTerzoMotivo + '\'' +
+                ", taxiQuartoMotivo='" + taxiQuartoMotivo + '\'' +
+                ", autoNoleggioPrimoMotivo='" + autoNoleggioPrimoMotivo + '\'' +
+                ", autoNoleggioSecondoMotivo='" + autoNoleggioSecondoMotivo + '\'' +
                 ", pathFascicoloDocumenti='" + pathFascicoloDocumenti + '\'' +
                 ", titolo='" + titolo + '\'' +
                 ", descrizione='" + descrizione + '\'' +

@@ -583,4 +583,37 @@ public class AccountServiceOauth extends AbstractAccountService{
         return uoAbilitata;
     }
 
+
+    /**
+     * Trova un UsersSpecial esistente per un determinato UID o ne crea uno nuovo se non esiste.
+     *
+     * @param uid L'identificativo utente da cercare o utilizzare per creare un nuovo UsersSpecial
+     * @return Un oggetto UsersSpecial per l'uid specificato o null se non è possibile crearlo
+     */
+    public UsersSpecial findOrCreateUserSpecial(String uid) {
+        if (uid == null || uid.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            UsersSpecial esistente = getUoForUsersSpecial(uid);
+            if (esistente != null) {
+                return esistente;
+            }
+
+            UsersSpecial nuovo = new UsersSpecial();
+            nuovo.setUid(uid);
+            Account account = loadAccountFromUsername(uid);
+
+            if (account != null) {
+                return nuovo;
+            } else {
+                logger.error("Impossibile creare UsersSpecial: Account non trovato per uid: "+uid );
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Errore durante la ricerca o creazione di UsersSpecial per uid: "+uid);
+            return null;
+        }
+    }
+
 }

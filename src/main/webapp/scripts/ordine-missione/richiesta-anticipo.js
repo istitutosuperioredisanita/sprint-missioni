@@ -97,9 +97,10 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
         ui.confirmCRUD("Confermi l'eliminazione del file "+attachment.nomeFile+"?", deleteAttachment, attachment);
     }
 
+
     var deleteAttachment = function (attachment) {
         $rootScope.salvataggio = true;
-        var x = $http.get('api/rest/ordine/deleteAttachment/' + attachment.id+'/' + $routeParams.idOrdineMissione);
+        var x = $http.delete('api/rest/ordine/deleteAttachment?id=' + attachment.id+'&idOrdine=' + $routeParams.idOrdineMissione);
         var y = x.then(function (result) {
             var attachments = $scope.anticipoOrdineMissioneModel.attachments;
             if (attachments && Object.keys(attachments).length > 0){
@@ -118,6 +119,7 @@ missioniApp.controller('AnticipoOrdineMissioneController', function ($scope, $ro
             $rootScope.salvataggio = false;
         });
     }
+
 
     $scope.viewAttachments = function (idAnticipo) {
         if (!$scope.anticipoOrdineMissioneModel.isFireSearchAttachments){

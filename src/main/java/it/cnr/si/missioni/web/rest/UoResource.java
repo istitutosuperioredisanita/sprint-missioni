@@ -22,6 +22,7 @@ package it.cnr.si.missioni.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.missioni.service.UoService;
 import it.cnr.si.missioni.util.JSONResponseEntity;
+import it.cnr.si.missioni.util.data.Uo;
 import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.slf4j.Logger;
@@ -92,5 +93,20 @@ public class UoResource {
 
         String rest = uoService.getPersone(uo, null);
         return JSONResponseEntity.ok(rest);
+    }
+
+    /**
+     * GET  /rest/getDatiUO
+     */
+    @RequestMapping(value = "/rest/datiUO",
+            method = RequestMethod.GET,
+            params = {"uo"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity getDatiUO(@RequestParam(value = "uo") String uo) {
+        log.debug("REST request per recuperare i dati dell' uo");
+
+        Uo datiUo = uoService.recuperoUo(uo);
+        return JSONResponseEntity.ok(datiUo);
     }
 }
