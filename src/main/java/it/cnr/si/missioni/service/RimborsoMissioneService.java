@@ -62,7 +62,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -246,9 +245,12 @@ public class RimborsoMissioneService {
 
     public RimborsoMissione aggiornaRimborsoMissioneFirmato(RimborsoMissione rimborsoMissioneDaAggiornare)
             throws AwesomeException {
+
         retrieveDetails(rimborsoMissioneDaAggiornare);
+
         if (!rimborsoMissioneDaAggiornare.isTrattamentoAlternativoMissione()) {
-            if (rimborsoMissioneDaAggiornare.getTotaleRimborsoSenzaSpeseAnticipate().compareTo(BigDecimal.ZERO) == 0) {
+            if (rimborsoMissioneDaAggiornare.getTotaleRimborsoSenzaSpeseAnticipate()
+                    .compareTo(BigDecimal.ZERO) == 0) {
                 rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_DA_NON_COMUNICARE);
             } else {
                 rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
@@ -256,42 +258,55 @@ public class RimborsoMissioneService {
         } else {
             rimborsoMissioneDaAggiornare.setStatoInvioSigla(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE);
         }
+
         LocalDate data = LocalDate.now();
-        if (rimborsoMissioneDaAggiornare.getStatoInvioSigla().equals(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE) && data.getYear() > rimborsoMissioneDaAggiornare.getAnno()) {
+
+        if (rimborsoMissioneDaAggiornare.getStatoInvioSigla().equals(Costanti.STATO_INVIO_SIGLA_DA_COMUNICARE)
+                && data.getYear() > rimborsoMissioneDaAggiornare.getAnno()) {
             ribaltaMissione(rimborsoMissioneDaAggiornare, data.getYear());
         }
 
-        gestioneMailResponsabileGruppo(rimborsoMissioneDaAggiornare);
         DatiIstituto datiIstituto = datiIstitutoService.getDatiIstituto(
                 Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoRich())
                         .filter(s -> !s.equalsIgnoreCase("ZZZ.ZZZ"))
-                        .orElseGet(() -> Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoCompetenza()).orElse(rimborsoMissioneDaAggiornare.getUoSpesa())),
+                        .orElseGet(() -> Optional.ofNullable(rimborsoMissioneDaAggiornare.getUoCompetenza())
+                                .orElse(rimborsoMissioneDaAggiornare.getUoSpesa())),
                 rimborsoMissioneDaAggiornare.getAnno()
         );
+
         DatiIstituto datiIstitutoSpesa = null;
 
-        Account account = accountService.loadAccountFromUsername(rimborsoMissioneDaAggiornare.getUid());
         String emailRich = rimborsoMissioneDaAggiornare.getUid();
 
-//        //todo x i test setto l'utente che crea il rimborso
-//        String emailRich = rimborsoMissioneDaAggiornare.getUidInsert();
+        if (rimborsoMissioneDaAggiornare.getUoRich() != null
+                && rimborsoMissioneDaAggiornare.getUoSpesa() != null
+                && !rimborsoMissioneDaAggiornare.getUoRich()
+                .equals(rimborsoMissioneDaAggiornare.getUoSpesa())) {
 
-        if (!rimborsoMissioneDaAggiornare.getUoRich().equals(rimborsoMissioneDaAggiornare.getUoSpesa())) {
-            datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(rimborsoMissioneDaAggiornare.getUoSpesa(), rimborsoMissioneDaAggiornare.getAnno());
+            datiIstitutoSpesa = datiIstitutoService.getDatiIstituto(
+                    rimborsoMissioneDaAggiornare.getUoSpesa(),
+                    rimborsoMissioneDaAggiornare.getAnno()
+            );
         }
 
-        // Sostituisci la dichiarazione della lista con un Set
         Set<UsersSpecial> utentiUnici = new HashSet<>();
 
-        // Aggiungi utenti della UO richiedente
-        if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("U")) {
-            utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), false));
-        }
-        if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("V")) {
-            utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoRich(), true));
+        if (datiIstituto != null) {
+            if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("U")) {
+                utentiUnici.addAll(accountService.getUserSpecialForUo(
+                        rimborsoMissioneDaAggiornare.getUoRich(),
+                        false
+                ));
+            }
+
+            if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("V")) {
+                utentiUnici.addAll(accountService.getUserSpecialForUo(
+                        rimborsoMissioneDaAggiornare.getUoRich(),
+                        true
+                ));
+            }
         }
 
-        // Aggiungi il richiedente direttamente
         if (emailRich != null) {
             UsersSpecial richiedente = accountService.findOrCreateUserSpecial(emailRich);
             if (richiedente != null) {
@@ -299,40 +314,97 @@ public class RimborsoMissioneService {
             }
         }
 
-        // Aggiungi utenti della UO spesa
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("U")) {
-                utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), false));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(
+                        rimborsoMissioneDaAggiornare.getUoSpesa(),
+                        false
+                ));
             }
+
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("V")) {
-                utentiUnici.addAll(accountService.getUserSpecialForUo(rimborsoMissioneDaAggiornare.getUoSpesa(), true));
+                utentiUnici.addAll(accountService.getUserSpecialForUo(
+                        rimborsoMissioneDaAggiornare.getUoSpesa(),
+                        true
+                ));
             }
         }
 
-        // Invia una singola email a tutti i destinatari
-        if (utentiUnici.size() > 0) {
-            List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
-            mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, mailService.prepareTo(listaUtenti));
-        }
-
-        if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("E") && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso()) && !datiIstituto.getMailNotificheRimborso().equals("N")) {
-            mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailNotificheRimborso());
-        }
-        if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("A") && !StringUtils.isEmpty(datiIstituto.getMailDopoRimborso())) {
-            mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstituto.getMailDopoRimborso());
-        }
-        if (datiIstitutoSpesa != null) {
-            if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("E") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso()) && !datiIstitutoSpesa.getMailNotificheRimborso().equals("N")) {
-                mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailNotificheRimborso());
-            }
-            if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("A") && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoRimborso())) {
-                mailService.sendEmail(approvazioneRimborsoMissione, getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare), false, true, datiIstitutoSpesa.getMailDopoRimborso());
-            }
-        }
         rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         rimborsoMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-        RimborsoMissione rimborso = updateRimborsoMissione(rimborsoMissioneDaAggiornare, true, null);
+
+        RimborsoMissione rimborso =
+                updateRimborsoMissione(rimborsoMissioneDaAggiornare, true, null);
+
+        if (!utentiUnici.isEmpty()) {
+            List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
+
+            mailService.sendEmail(
+                    approvazioneRimborsoMissione,
+                    getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare),
+                    false,
+                    true,
+                    mailService.prepareTo(listaUtenti)
+            );
+        }
+
+        if (datiIstituto != null) {
+            if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("E")
+                    && !StringUtils.isEmpty(datiIstituto.getMailNotificheRimborso())
+                    && !datiIstituto.getMailNotificheRimborso().equals("N")) {
+
+                mailService.sendEmail(
+                        approvazioneRimborsoMissione,
+                        getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare),
+                        false,
+                        true,
+                        datiIstituto.getMailNotificheRimborso()
+                );
+            }
+
+            if (Utility.nvl(datiIstituto.getTipoMailDopoRimborso(), "N").equals("A")
+                    && !StringUtils.isEmpty(datiIstituto.getMailDopoRimborso())) {
+
+                mailService.sendEmail(
+                        approvazioneRimborsoMissione,
+                        getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare),
+                        false,
+                        true,
+                        datiIstituto.getMailDopoRimborso()
+                );
+            }
+        }
+
+        if (datiIstitutoSpesa != null) {
+            if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("E")
+                    && !StringUtils.isEmpty(datiIstitutoSpesa.getMailNotificheRimborso())
+                    && !datiIstitutoSpesa.getMailNotificheRimborso().equals("N")) {
+
+                mailService.sendEmail(
+                        approvazioneRimborsoMissione,
+                        getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare),
+                        false,
+                        true,
+                        datiIstitutoSpesa.getMailNotificheRimborso()
+                );
+            }
+
+            if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoRimborso(), "N").equals("A")
+                    && !StringUtils.isEmpty(datiIstitutoSpesa.getMailDopoRimborso())) {
+
+                mailService.sendEmail(
+                        approvazioneRimborsoMissione,
+                        getTextMailApprovazioneRimborso(rimborsoMissioneDaAggiornare),
+                        false,
+                        true,
+                        datiIstitutoSpesa.getMailDopoRimborso()
+                );
+            }
+        }
+
+        gestioneMailResponsabileGruppo(rimborsoMissioneDaAggiornare);
         popolaCoda(rimborso);
+
         return rimborso;
     }
 
@@ -1158,8 +1230,7 @@ public class RimborsoMissioneService {
             }
             if (StringUtils.isEmpty(rimborsoMissione.getInquadramento())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Per la data della missione indicata non è stato possibile recuperare l'inquadramento.");
-            }
-            else if (StringUtils.isEmpty(rimborsoMissione.getPartenzaDa())) {
+            } else if (StringUtils.isEmpty(rimborsoMissione.getPartenzaDa())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Partenza Da");
             }
             if (rimborsoMissione.isMissioneEstera()) {
@@ -1517,15 +1588,25 @@ public class RimborsoMissioneService {
         if (idRimborsoMissione == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Id Rimborso Missione non può essere null");
         }
+
         RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById(idRimborsoMissione)
                 .orElseThrow(() -> new AwesomeException(
                         CodiciErrore.ERRGEN,
                         "Rimborso Missione non trovato per id " + idRimborsoMissione
                 ));
+
+        if (rimborsoMissione.isMissioneInserita()) {
+            return Collections.emptyList();
+        }
+
         if (!isUserEnabledToViewMissione(rimborsoMissione)) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non autorizzato a visualizzare la missione.");
         }
-        return cmisRimborsoMissioneService.getAttachmentsRimborsoMissione(rimborsoMissione, idRimborsoMissione);
+
+        return cmisRimborsoMissioneService.getAttachmentsRimborsoMissione(
+                rimborsoMissione,
+                idRimborsoMissione
+        );
     }
 
     public CMISFileAttachment uploadAllegato(Long idRimborsoMissione,
@@ -1865,37 +1946,129 @@ public class RimborsoMissioneService {
     @Transactional(propagation = Propagation.REQUIRED)
     public RimborsoMissione aggiornaRimborsoMissione(RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
         try {
-            if (rimborsoMissioneDaAggiornare != null) {
-                if (rimborsoMissioneDaAggiornare.isStatoInviatoAlFlusso() && rimborsoMissioneDaAggiornare.isMissioneConfermata() &&
-                        !rimborsoMissioneDaAggiornare.isMissioneDaValidare()) {
-                    switch (flowResult.getStato()) {
-                        case FlowResult.ESITO_FLUSSO_FIRMATO:
-                            RimborsoMissione rimborsoMissione = aggiornaRimborsoMissioneFirmato(rimborsoMissioneDaAggiornare);
-                            if (isMissioneComunicabileSigla(rimborsoMissione)) {
-                                return rimborsoMissione;
-                            }
-                            break;
-                        case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                            aggiornaRimborsoMissionePrimaFirma(rimborsoMissioneDaAggiornare);
-                            break;
-                        case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
-                            aggiornaRimborsoMissioneRespinto(flowResult, rimborsoMissioneDaAggiornare);
-                            break;
-                        case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                            aggiornaRimborsoMissioneRespinto(flowResult, rimborsoMissioneDaAggiornare);
-                            break;
-                    }
-                } else {
-                    erroreRimborsoMissione(rimborsoMissioneDaAggiornare, flowResult);
-                }
+            if (rimborsoMissioneDaAggiornare == null) {
+                return null;
             }
+
+            if (rimborsoMissioneDaAggiornare.isStatoInviatoAlFlusso()
+                    && rimborsoMissioneDaAggiornare.isMissioneConfermata()
+                    && !rimborsoMissioneDaAggiornare.isMissioneDaValidare()) {
+
+                switch (flowResult.getStato()) {
+                    case FlowResult.ESITO_FLUSSO_FIRMATO:
+                        RimborsoMissione rimborsoMissione =
+                                aggiornaRimborsoMissioneFirmato(rimborsoMissioneDaAggiornare);
+
+                        if (isMissioneComunicabileSigla(rimborsoMissione)) {
+                            return rimborsoMissione;
+                        }
+                        break;
+
+                    case FlowResult.ESITO_FLUSSO_FIRMA_UO:
+                        aggiornaRimborsoMissionePrimaFirma(rimborsoMissioneDaAggiornare);
+                        break;
+
+                    case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
+                    case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
+                        aggiornaRimborsoMissioneRespinto(flowResult, rimborsoMissioneDaAggiornare);
+                        break;
+                }
+
+            } else {
+                erroreRimborsoMissione(rimborsoMissioneDaAggiornare, flowResult);
+            }
+
             return null;
+
         } catch (Exception e) {
-//			mailService.sendEmailError(subjectErrorFlowsRimborso, "Errore in aggiornaRimborsoMissione: "+e.getMessage(), false, true);
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in aggiornaRimborsoMissione:" + Utility.getMessageException(e));
+            String errore = Utility.getMessageException(e);
+
+            if (flowResult != null
+                    && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato())
+                    && rimborsoMissioneDaAggiornare != null
+                    && rimborsoMissioneDaAggiornare.getId() != null) {
+
+                gestisciErroreRimborsoFirmato(
+                        rimborsoMissioneDaAggiornare,
+                        flowResult,
+                        errore
+                );
+
+                return null;
+            }
+
+            throw new AwesomeException(
+                    CodiciErrore.ERRGEN,
+                    "Errore in aggiornaRimborsoMissione: " + errore
+            );
         }
     }
 
+    private void gestisciErroreRimborsoFirmato(
+            RimborsoMissione rimborso,
+            FlowResult flowResult,
+            String errore
+    ) {
+        String msgUtente = "Firma HappySign acquisita, ma aggiornamento rimborso non completato per incongruenze o dati mancanti.";
+
+        String msgTecnico = "Firma HappySign acquisita, ma aggiornamento rimborso non completato: <b>"
+                + errore + "</b>";
+
+        RimborsoMissione r = rimborsoMissioneRepository
+                .findById((Long) rimborso.getId())
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Rimborso Missione non trovato per id " + rimborso.getId()
+                ));
+
+        r.setCommentoFlusso(msgUtente.length() > 1000 ? msgUtente.substring(0, 1000) : msgUtente);
+        r.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+        r.setStateFlows(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+        r.setStato(Costanti.STATO_INSERITO);
+        r.setValidato("N");
+        r.setStatoInvioSigla(null);
+        r.setToBeUpdated();
+
+        rimborsoMissioneRepository.save(r);
+
+        if (mailService != null) {
+            try {
+                // email tecnica
+                String testoTecnico = getTextErrorRimborso(r, flowResult, msgTecnico);
+                mailService.sendEmailError(subjectErrorFlowsRimborso, testoTecnico, false, true);
+            } catch (Exception e) {
+                log.error("Errore invio email tecnica rimborso missione firmato", e);
+            }
+
+            try {
+                // email utente
+                String email = getEmail(r.getUid());
+                if (StringUtils.hasLength(email)) {
+                    String testoUtente = getTextMailErroreFirmaRimborso(r);
+                    mailService.sendEmail(
+                            "Firma acquisita – verifica rimborso missione " + r.getAnno() + "-" + r.getNumero(),
+                            testoUtente,
+                            false,
+                            true,
+                            email
+                    );
+                }
+            } catch (Exception e) {
+                log.error("Errore invio email utente rimborso missione firmato", e);
+            }
+        }
+    }
+
+    private String getTextMailErroreFirmaRimborso(RimborsoMissione r) {
+        return "<p>Gentile " + getNominativo(r.getUid()) + ",</p>" +
+                "<p>La firma digitale del rimborso <b>" + r.getAnno() + "-" + r.getNumero() +
+                "</b> (missione a <b>" + r.getDestinazione() + "</b>, dal " +
+                DateUtils.getDefaultDateAsString(r.getDataInizioMissione()) + " al " +
+                DateUtils.getDefaultDateAsString(r.getDataFineMissione()) +
+                ") è stata acquisita con successo.</p>" +
+                "<p>Tuttavia, per incongruenze o dati mancanti, la procedura non è stata completata. " +
+                "Il documento è tornato in stato INSERITO. L'assistenza è stata avvisata.</p>";
+    }
 
     private void erroreRimborsoMissione(RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
         String errore = "Esito flusso non corrispondente con lo stato del rimborso.";

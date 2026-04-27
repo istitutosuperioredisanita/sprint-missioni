@@ -71,10 +71,16 @@ public class MailService {
     @PostConstruct
     public void init() {
         this.from = env.getProperty("spring.mail.from");
+
         String s = env.getProperty("spring.mail.send.error.to");
-        if (s == null)
+        if (!StringUtils.hasText(s)) {
             s = "ciro.salvio@iss.it";
-        this.mailToError = Arrays.asList(s.split(","));
+        }
+
+        this.mailToError = Arrays.stream(s.split(","))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
+                .toList();
     }
 
     public String[] prepareTo(List<UsersSpecial> lista) {

@@ -411,32 +411,118 @@ public class OrdineMissioneService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void aggiornaOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
         try {
-            if (ordineMissioneDaAggiornare != null) {
-                if (ordineMissioneDaAggiornare.isStatoInviatoAlFlusso() && ordineMissioneDaAggiornare.isMissioneConfermata() &&
-                        !ordineMissioneDaAggiornare.isMissioneDaValidare()) {
-                    switch (flowResult.getStato()) {
-                        case FlowResult.ESITO_FLUSSO_FIRMATO:
-                            aggiornaOrdineMissioneFirmato(ordineMissioneDaAggiornare);
-                            break;
-                        case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                            aggiornaOrdineMissionePrimaFirma(ordineMissioneDaAggiornare);
-                            break;
-                        case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
-                            aggiornaOrdineMissioneRespinto(flowResult, ordineMissioneDaAggiornare);
-                            break;
-                        case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                            aggiornaOrdineMissioneRespinto(flowResult, ordineMissioneDaAggiornare);
-                            break;
-                    }
-                } else {
-                    erroreOrdineMissione(ordineMissioneDaAggiornare, flowResult);
-                }
+            if (ordineMissioneDaAggiornare == null) {
+                return;
             }
+
+            if (ordineMissioneDaAggiornare.isStatoInviatoAlFlusso()
+                    && ordineMissioneDaAggiornare.isMissioneConfermata()
+                    && !ordineMissioneDaAggiornare.isMissioneDaValidare()) {
+
+                switch (flowResult.getStato()) {
+                    case FlowResult.ESITO_FLUSSO_FIRMATO:
+                        aggiornaOrdineMissioneFirmato(ordineMissioneDaAggiornare);
+                        break;
+
+                    case FlowResult.ESITO_FLUSSO_FIRMA_UO:
+                        aggiornaOrdineMissionePrimaFirma(ordineMissioneDaAggiornare);
+                        break;
+
+                    case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
+                    case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
+                        aggiornaOrdineMissioneRespinto(flowResult, ordineMissioneDaAggiornare);
+                        break;
+                }
+
+            } else {
+                erroreOrdineMissione(ordineMissioneDaAggiornare, flowResult);
+            }
+
         } catch (Exception e) {
-//			mailService.sendEmailError(subjectErrorFlowsOrdine, "Errore in aggiornaOrdineMissione: "+e.getMessage(), false, true);
-            throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+            String errore = Utility.getMessageException(e);
+
+            if (flowResult != null
+                    && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato())
+                    && ordineMissioneDaAggiornare != null
+                    && ordineMissioneDaAggiornare.getId() != null) {
+
+                gestisciErroreOrdineFirmato(ordineMissioneDaAggiornare, flowResult, errore);
+                return;
+            }
+
+            throw new AwesomeException(CodiciErrore.ERRGEN, errore);
         }
     }
+
+    private void gestisciErroreOrdineFirmato(
+            OrdineMissione ordine,
+            FlowResult flowResult,
+            String errore
+    ) {
+        String msgUtente = "Firma HappySign acquisita, ma aggiornamento ordine non completato per incongruenze o dati mancanti.";
+
+        String msgTecnico = "Firma HappySign acquisita, ma aggiornamento ordine non completato: <b>"
+                + errore + "</b>";
+
+        OrdineMissione o = ordineMissioneRepository
+                .findById((Long) ordine.getId())
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Ordine di missione non trovato per id " + ordine.getId()
+                ));
+
+        o.setCommentoFlusso(msgUtente.length() > 1000 ? msgUtente.substring(0, 1000) : msgUtente);
+        o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+        o.setStato(Costanti.STATO_INSERITO);
+        o.setDataInvioFirma(null);
+        o.setDataInvioAmministrativo(null);
+        o.setDataInvioRespGruppo(null);
+        o.setBypassAmministrativo(null);
+        o.setBypassRespGruppo(null);
+        o.setToBeUpdated();
+
+        ordineMissioneRepository.save(o);
+
+        if (mailService != null) {
+            try {
+                // email tecnica
+                String testoTecnico = getTextErrorOrdine(o, flowResult, msgTecnico);
+                mailService.sendEmailError(subjectErrorFlowsOrdine, testoTecnico, false, true);
+            } catch (Exception e) {
+                log.error("Errore invio email tecnica ordine missione firmato", e);
+            }
+
+            try {
+                // email utente
+                Account acc = accountService.loadAccountFromUsername(o.getUid());
+                if (acc != null && StringUtils.hasLength(acc.getEmail_comunicazioni())) {
+                    String testoUtente = getTextMailErroreFirmaOrdine(o);
+                    mailService.sendEmail(
+                            "Firma acquisita – verifica ordine missione " + o.getAnno() + "-" + o.getNumero(),
+                            testoUtente,
+                            false,
+                            true,
+                            acc.getEmail_comunicazioni()
+                    );
+                }
+
+            } catch (Exception e) {
+                log.error("Errore invio email utente ordine missione firmato", e);
+            }
+        }
+    }
+
+    private String getTextMailErroreFirmaOrdine(OrdineMissione o) {
+        return "<p>Gentile " + getNominativo(o.getUid()) + ",</p>" +
+                "<p>La firma digitale dell'ordine <b>" + o.getAnno() + "-" + o.getNumero() +
+                "</b> (missione a <b>" + o.getDestinazione() + "</b>, dal " +
+                DateUtils.getDefaultDateAsString(o.getDataInizioMissione()) + " al " +
+                DateUtils.getDefaultDateAsString(o.getDataFineMissione()) +
+                ") è stata acquisita con successo.</p>" +
+                "<p>Tuttavia, per incongruenze o dati mancanti, la procedura non è stata completata. " +
+                "Il documento è tornato in stato INSERITO. L'assistenza è stata avvisata.</p>";
+    }
+
 
     private void erroreOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
         String errore = "Esito flusso non corrispondente con lo stato dell'ordine.";
@@ -448,32 +534,8 @@ public class OrdineMissioneService {
         retrieveDetails(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-        gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
-//        OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissioneDaAggiornare);
-//        if (anticipo != null) {
-//            anticipo.setStato(Costanti.STATO_DEFINITIVO);
-//            ordineMissioneAnticipoService.updateAnticipo(anticipo, false);
-//            DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
-//                    ordineMissioneDaAggiornare.getAnno());
-//            if (dati != null && dati.getMailNotifiche() != null) {
-//                if (!dati.getMailNotifiche().equals("N")) {
-//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
-//                            true, dati.getMailNotifiche());
-//                }
-//            } else {
-//                Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
-//                UsersSpecial richiedente = accountService.getUoForUsersSpecial(account.getUid());
-//                List<UsersSpecial> lista = accountService
-//                        .getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
-//                aggiuntaRichMailList(lista,richiedente);
-//                if (lista != null && lista.size() > 0) {
-//
-//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo),
-//                            false, true, mailService.prepareTo(lista));
-//                }
-//            }
-//        }
-        updateOrdineMissione(ordineMissioneDaAggiornare, true);
+        updateOrdineMissione(ordineMissioneDaAggiornare, true);    // ← PRIMA: salva (può lanciare eccezione)
+        gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare); // ← POI: email (solo se salvataggio ok)
         popolaCoda(ordineMissioneDaAggiornare);
     }
 
@@ -1937,17 +1999,30 @@ public class OrdineMissioneService {
 
     }
 
-    public List<CMISFileAttachment> getAttachments(Long idOrdineMissione)
-            throws AwesomeException {
-        if (idOrdineMissione != null) {
-            OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
-            if (ordineMissione != null && isUserEnabledToViewMissione(ordineMissione)) {
-                List<CMISFileAttachment> lista = cmisOrdineMissioneService.getAttachmentsOrdineMissione(ordineMissione,
-                        idOrdineMissione);
-                return lista;
-            }
+    public List<CMISFileAttachment> getAttachments(Long idOrdineMissione) throws AwesomeException {
+        if (idOrdineMissione == null) {
+            return Collections.emptyList();
         }
-        return null;
+
+        OrdineMissione ordineMissione =
+                ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
+
+        if (ordineMissione == null) {
+            return Collections.emptyList();
+        }
+
+        if (!isUserEnabledToViewMissione(ordineMissione)) {
+            return Collections.emptyList();
+        }
+
+        if (ordineMissione.isMissioneInserita()) {
+            return Collections.emptyList();
+        }
+
+        return cmisOrdineMissioneService.getAttachmentsOrdineMissione(
+                ordineMissione,
+                idOrdineMissione
+        );
     }
 
     public CMISFileAttachment uploadAllegato(Long idOrdineMissione, InputStream inputStream,

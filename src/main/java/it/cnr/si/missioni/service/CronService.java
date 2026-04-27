@@ -608,9 +608,9 @@ public class CronService {
         }
 
         if (Optional.ofNullable(cronHappySignService).isPresent()){
-            cronHappySignService.aggiornaEsistiMissioni();
-            cronHappySignService.aggiornaEsistiRimborsiMissioni();
-            cronHappySignService.aggiornaEsistiAnnullamentiMissioni();
+            cronHappySignService.aggiornaEsitiMissioni();
+            cronHappySignService.aggiornaEsitiRimborsiMissioni();
+            cronHappySignService.aggiornaEsitiAnnullamentiMissioni();
 
         }
     }
