@@ -270,38 +270,9 @@ public class AnnullamentoOrdineMissioneService {
             } catch (Exception e) {
                 log.error("Errore invio email tecnica annullamento ordine firmato", e);
             }
-
-            try {
-                // email utente
-                String email = getEmail(a.getUid());
-                if (StringUtils.hasLength(email)) {
-                    String testoUtente = getTextMailErroreFirmaAnnullamento(a);
-                    mailService.sendEmail(
-                            "Firma acquisita – verifica annullamento ordine missione " + a.getAnno() + "-" + a.getNumero(),
-                            testoUtente,
-                            false,
-                            true,
-                            email
-                    );
-                }
-            } catch (Exception e) {
-                log.error("Errore invio email utente annullamento ordine firmato", e);
-            }
         }
     }
 
-    private String getTextMailErroreFirmaAnnullamento(AnnullamentoOrdineMissione a) {
-        OrdineMissione o = a.getOrdineMissione();
-
-        return "<p>Gentile " + getNominativo(a.getUid()) + ",</p>" +
-                "<p>La firma digitale dell'annullamento <b>" + a.getAnno() + "-" + a.getNumero() +
-                "</b> (missione a <b>" + o.getDestinazione() + "</b>, dal " +
-                DateUtils.getDefaultDateAsString(o.getDataInizioMissione()) + " al " +
-                DateUtils.getDefaultDateAsString(o.getDataFineMissione()) +
-                ") è stata acquisita con successo.</p>" +
-                "<p>Tuttavia, per incongruenze o dati mancanti, la procedura non è stata completata. " +
-                "Il documento è tornato in stato INSERITO. L'assistenza è stata avvisata.</p>";
-    }
 
     private void aggiornaAnnullamentoOrdineMissionePrimaFirma(AnnullamentoOrdineMissione annullamentoOrdineMissione) {
         annullamentoOrdineMissione.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);

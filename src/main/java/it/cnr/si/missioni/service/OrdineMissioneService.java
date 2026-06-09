@@ -491,36 +491,7 @@ public class OrdineMissioneService {
             } catch (Exception e) {
                 log.error("Errore invio email tecnica ordine missione firmato", e);
             }
-
-            try {
-                // email utente
-                Account acc = accountService.loadAccountFromUsername(o.getUid());
-                if (acc != null && StringUtils.hasLength(acc.getEmail_comunicazioni())) {
-                    String testoUtente = getTextMailErroreFirmaOrdine(o);
-                    mailService.sendEmail(
-                            "Firma acquisita – verifica ordine missione " + o.getAnno() + "-" + o.getNumero(),
-                            testoUtente,
-                            false,
-                            true,
-                            acc.getEmail_comunicazioni()
-                    );
-                }
-
-            } catch (Exception e) {
-                log.error("Errore invio email utente ordine missione firmato", e);
-            }
         }
-    }
-
-    private String getTextMailErroreFirmaOrdine(OrdineMissione o) {
-        return "<p>Gentile " + getNominativo(o.getUid()) + ",</p>" +
-                "<p>La firma digitale dell'ordine <b>" + o.getAnno() + "-" + o.getNumero() +
-                "</b> (missione a <b>" + o.getDestinazione() + "</b>, dal " +
-                DateUtils.getDefaultDateAsString(o.getDataInizioMissione()) + " al " +
-                DateUtils.getDefaultDateAsString(o.getDataFineMissione()) +
-                ") è stata acquisita con successo.</p>" +
-                "<p>Tuttavia, per incongruenze o dati mancanti, la procedura non è stata completata. " +
-                "Il documento è tornato in stato INSERITO. L'assistenza è stata avvisata.</p>";
     }
 
 

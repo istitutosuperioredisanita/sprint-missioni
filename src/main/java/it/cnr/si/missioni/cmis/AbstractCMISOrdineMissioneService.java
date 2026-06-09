@@ -20,7 +20,6 @@
 package it.cnr.si.missioni.cmis;
 
 
-import feign.RetryableException;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
@@ -51,8 +50,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -362,17 +359,6 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return env.acceptsProfiles(Costanti.SPRING_PROFILE_DEVELOPMENT);
     }
 
-    protected boolean isTransientHappySignError(Throwable e) {
-        Throwable current = e;
-        while (current != null) {
-            if (current instanceof SocketTimeoutException || current instanceof ConnectException) {
-                return true;
-            }
-            current = current.getCause();
-        }
-        return e instanceof RetryableException;
-    }
-
     private String impostaValidazioneSpesa(String userNameFirmatario, String userNameFirmatarioSpesa) {
         if (userNameFirmatario != null && userNameFirmatario.equals(userNameFirmatarioSpesa)) {
             return "no";
@@ -408,23 +394,6 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                         .map(esercizio -> "Anno " + esercizio)
                         .orElse("Anno " + "0")
         );
-    }
-
-    private String getFolderOrdineMissionePath(OrdineMissione ordineMissione) {
-        return Arrays.asList(
-                missioniCMISService.getBasePath().getPath(),
-                Optional.ofNullable(ordineMissione)
-                        .map(OrdineMissione::getUoRich)
-                        .orElse(""),
-                "Ordini di Missione",
-                Optional.ofNullable(ordineMissione)
-                        .map(ordine -> "Anno " + ordine.getAnno())
-                        .orElse("Anno 0"),
-                Optional.ofNullable(ordineMissione)
-                        .map(OrdineMissione::constructCMISNomeFile)
-                        .map(missioniCMISService::sanitizeFilename)
-                        .orElse("")
-        ).stream().collect(Collectors.joining(StorageDriver.SUFFIX));
     }
 
     private String getPathStorage(OrdineMissione ordineMissione) {
@@ -696,33 +665,16 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     protected abstract  void sendAnnullamentoOrdineMissioneToSign(AnnullamentoOrdineMissione annullamento, CMISOrdineMissione cmisOrdineMissione,
                                                                   Map<String, StorageObject> mapDocumentiAnnulloMissione,
                                                                   List<StorageObject> allegati);
-
-    public void avviaFlusso(AnnullamentoOrdineMissione annullamento) {
+    public void avviaFlusso(AnnullamentoOrdineMissione annullamento){
         String username = securityService.getCurrentUserLogin();
         byte[] stampa = printAnnullamentoOrdineMissioneService.printOrdineMissione(annullamento, username);
         CMISOrdineMissione cmisOrdineMissione = create(annullamento.getOrdineMissione(), annullamento.getAnno());
         StorageObject documentoAnnulloMissione = salvaStampaAnnullamentoOrdineMissioneSuCMIS(stampa, annullamento);
-
+        // Creare un oggetto Map con tutti gli oggetti StorageObject
         Map<String, StorageObject> mapDocumentiAnnullamentoMissione = new HashMap<>();
         mapDocumentiAnnullamentoMissione.put(Costanti.DOCUMENTO_ANNULLAMENTO_MISSIONE_KEY, documentoAnnulloMissione);
 
-        try {
-            sendAnnullamentoOrdineMissioneToSign(
-                    annullamento,
-                    cmisOrdineMissione,
-                    mapDocumentiAnnullamentoMissione,
-                    null
-            );
-        } catch (Exception e) {
-            if (isTransientHappySignError(e)) {
-                logger.warn("HappySign non raggiungibile durante invio annullamento in firma. idAnnullamento=" + annullamento.getId());
-                throw new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        "Il servizio di firma non è al momento raggiungibile. Riprovare più tardi."
-                );
-            }
-            throw e;
-        }
+        sendAnnullamentoOrdineMissioneToSign( annullamento,cmisOrdineMissione,mapDocumentiAnnullamentoMissione,null);
     }
 
     public abstract Boolean isActiveSignFlow();
@@ -732,25 +684,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         byte[] stampa = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
         CMISOrdineMissione cmisOrdineMissione = create(ordineMissione);
         StorageObject documento = salvaStampaOrdineMissioneSuCMIS(stampa, ordineMissione, cmisOrdineMissione);
-
         OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
         OrdineMissioneAutoPropria autoPropria = ordineMissioneAutoPropriaService.getAutoPropria(Long.valueOf(ordineMissione.getId().toString()), true);
-        OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()), true);
-        OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()), true);
+        OrdineMissioneTaxi taxi = ordineMissioneTaxiService.getTaxi(Long.valueOf(ordineMissione.getId().toString()),true);
+        OrdineMissioneAutoNoleggio autoNoleggio = ordineMissioneAutoNoleggioService.getAutoNoleggio(Long.valueOf(ordineMissione.getId().toString()),true);
 
         StorageObject documentoAnticipo = null;
 
-        List<StorageObject> allegati = new ArrayList<>();
-        List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione, false);
-        if (!allegatiOrdineMissione.isEmpty() && missioniCMISService.esisteAlmenoUnDocumentoValido(allegatiOrdineMissione)) {
-            allegati.addAll(
-                    allegatiOrdineMissione.stream()
-                            .filter(Objects::nonNull)
-                            .filter(stor -> !missioniCMISService.isDocumentoEliminato(stor))
-                            .collect(Collectors.toList())
-            );
-        }
 
+        List<StorageObject> allegati = new ArrayList<>();
+        List<StorageObject> allegatiOrdineMissione = getDocumentsOrdineMissione(ordineMissione, true);
+        if (allegatiOrdineMissione != null && !allegatiOrdineMissione.isEmpty()) {
+            allegati.addAll(allegatiOrdineMissione);
+        }
         if (anticipo != null) {
             anticipo.setOrdineMissione(ordineMissione);
             documentoAnticipo = creaDocumentoAnticipo(username, anticipo);
@@ -759,24 +705,22 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                 allegati.addAll(allegatiAnticipo);
             }
         }
-
         StorageObject documentoAutoPropria = null;
         if (autoPropria != null) {
             autoPropria.setOrdineMissione(ordineMissione);
             documentoAutoPropria = creaDocumentoAutoPropria(username, autoPropria);
         }
-
         StorageObject documentoTaxi = null;
         if (taxi != null) {
             taxi.setOrdineMissione(ordineMissione);
             documentoTaxi = creaDocumentoTaxi(username, taxi);
         }
-
         StorageObject documentoAutoNoleggio = null;
         if (autoNoleggio != null) {
             autoNoleggio.setOrdineMissione(ordineMissione);
             documentoAutoNoleggio = creaDocumentoAutoNoleggio(username, autoNoleggio);
         }
+
 
         if (!isActiveSignFlow()) {
             ordineMissione.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
@@ -788,40 +732,21 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             return;
         }
 
+        // Creare un oggetto Map con tutti gli oggetti StorageObject
         Map<String, StorageObject> mapDocumentiMissione = new HashMap<>();
         mapDocumentiMissione.put(Costanti.DOCUMENTO_MISSIONE_KEY, documento);
-
-        if (documentoAnticipo != null) {
+        if ( documentoAnticipo!=null)
             mapDocumentiMissione.put(Costanti.DOCUMENTO_ANTICIPO_KEY, documentoAnticipo);
-        }
-        if (documentoAutoPropria != null) {
+        if ( documentoAutoPropria!=null)
             mapDocumentiMissione.put(Costanti.DOCUMENTO_AUTO_PROPRIA_KEY, documentoAutoPropria);
-        }
-        if (documentoTaxi != null) {
+        if ( documentoTaxi!=null)
             mapDocumentiMissione.put(Costanti.DOCUMENTO_TAXI_KEY, documentoTaxi);
-        }
-        if (documentoAutoNoleggio != null) {
+        if ( documentoAutoNoleggio!=null)
             mapDocumentiMissione.put(Costanti.DOCUMENTO_AUTO_NOLEGGIO_KEY, documentoAutoNoleggio);
-        }
 
-        try {
-            sendOrdineMissioneToSign(
-                    ordineMissione,
-                    cmisOrdineMissione,
-                    mapDocumentiMissione,
-                    allegati,
-                    anticipo
-            );
-        } catch (Exception e) {
-            if (isTransientHappySignError(e)) {
-                logger.warn("HappySign non raggiungibile durante invio ordine in firma. idOrdine=" + ordineMissione.getId());
-                throw new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        "Il servizio di firma non è al momento raggiungibile. Riprovare più tardi."
-                );
-            }
-            throw e;
-        }
+        // la parte che sta nel rimborso che si setta i giustificativi non mi serve perche in fase di ordine non li inserisco
+        sendOrdineMissioneToSign(ordineMissione, cmisOrdineMissione, mapDocumentiMissione, allegati,anticipo);
+
     }
 
     protected abstract void sendOrdineMissioneToSign(OrdineMissione ordineMissione, CMISOrdineMissione cmisOrdineMissione, Map<String, StorageObject> mapDocumentiMissione, List<StorageObject> allegati,OrdineMissioneAnticipo anticipo);
@@ -870,74 +795,27 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     public StorageObject getObjectOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException {
         StorageObject fo = recuperoFolderOrdineMissione(ordineMissione);
-
-        if (fo == null) {
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Cartella documentale non trovata per Ordine di Missione. ID Ordine di Missione:"
-                            + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno()
-                            + ", Numero:" + ordineMissione.getNumero()
-            );
-        }
-
-        List<StorageObject> ordine = missioniCMISService.recuperoDocumento(
-                fo,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value()
-        );
-
-        if (ordine == null || ordine.isEmpty()) {
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Non esistono documenti collegati all'Ordine di Missione. ID Ordine di Missione:"
-                            + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno()
-                            + ", Numero:" + ordineMissione.getNumero()
-            );
-        } else if (ordine.size() > 1) {
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :"
-                            + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno()
-                            + ", Numero:" + ordineMissione.getNumero()
-            );
+        List<StorageObject> ordine = missioniCMISService.recuperoDocumento(fo, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value());
+        if (ordine.size() == 0)
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Ordine di Missione. ID Ordine di Missione:" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
+        else if (ordine.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files ordini di missione aventi l'ID :" + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno() + ", Numero:" + ordineMissione.getNumero());
         } else {
-            return ordine.get(0);
+            StorageObject storageObject = ordine.get(0);
+            return storageObject;
         }
     }
 
     public StorageObject getObjectAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento) throws AwesomeException {
         StorageObject node = recuperoFolderOrdineMissione(annullamento.getOrdineMissione());
-
-        if (node == null) {
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Cartella documentale non trovata per Annullamento Ordine di Missione. ID Ordine di Missione:"
-                            + annullamento.getOrdineMissione().getId()
-                            + ", Anno:" + annullamento.getAnno()
-                            + ", Numero:" + annullamento.getNumero()
-            );
-        }
-
-        List<StorageObject> ordine = missioniCMISService.recuperoDocumento(
-                node,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value()
-        );
-
-        if (ordine == null || ordine.isEmpty()) {
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Non esistono documenti collegati all'Annullamento Ordine di Missione. ID Ordine di Missione:"
-                            + annullamento.getId() + ", Anno:" + annullamento.getAnno()
-                            + ", Numero:" + annullamento.getNumero()
-            );
-        } else if (ordine.size() > 1) {
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Errore di sistema, esistono sul documentale piu' files Annullamento ordini di missione aventi l'ID :"
-                            + annullamento.getId() + ", Anno:" + annullamento.getAnno()
-                            + ", Numero:" + annullamento.getNumero()
-            );
+        List<StorageObject> ordine = missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ANNULLAMENTO_ORDINE.value());
+        if (ordine.size() == 0)
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non esistono documenti collegati all'Annullamento Ordine di Missione. ID Ordine di Missione:" + annullamento.getId() + ", Anno:" + annullamento.getAnno() + ", Numero:" + annullamento.getNumero());
+        else if (ordine.size() > 1) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore di sistema, esistono sul documentale piu' files Annullamento ordini di missione aventi l'ID :" + annullamento.getId() + ", Anno:" + annullamento.getAnno() + ", Numero:" + annullamento.getNumero());
         } else {
-            return ordine.get(0);
+            StorageObject nodeFile = ordine.get(0);
+            return nodeFile;
         }
     }
 
@@ -1135,12 +1013,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     }
 
     public StorageObject recuperoFolderOrdineMissione(OrdineMissione ordineMissione) {
-        if (ordineMissione == null) {
-            return null;
-        }
-
-        final String path = getFolderOrdineMissionePath(ordineMissione);
-
+        final String path = Arrays.asList(
+                missioniCMISService.getBasePath().getPath(),
+                Optional.ofNullable(ordineMissione)
+                        .map(OrdineMissione::getUoRich)
+                        .orElse(""),
+                "Ordini di Missione",
+                Optional.ofNullable(ordineMissione)
+                        .map(ordine -> "Anno " + ordine.getAnno())
+                        .orElse("0"),
+                String.valueOf(missioniCMISService.sanitizeFilename(ordineMissione.constructCMISNomeFile()))
+        ).stream().collect(
+                Collectors.joining("/")
+        );
 
         try {
             return Optional.ofNullable(missioniCMISService.getStorageObjectByPath(path))
@@ -1148,18 +1033,11 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                     .map(StorageObject.class::cast)
                     .orElse(null);
         } catch (StorageException e) {
-            return null;
+            String pathFolder = createFolderOrdineMissione(ordineMissione);
+            return missioniCMISService.getStorageObjectByPath(pathFolder);
         }
     }
 
-    private StorageObject recuperoOCreoFolderOrdineMissione(OrdineMissione ordineMissione) {
-        StorageObject folder = recuperoFolderOrdineMissione(ordineMissione);
-        if (folder != null) {
-            return folder;
-        }
-        String pathFolder = createFolderOrdineMissione(ordineMissione);
-        return missioniCMISService.getStorageObjectByPath(pathFolder);
-    }
 
     private MessageForFlowOrdine createJsonForAbortFlowOrdineMissione() {
         MessageForFlowOrdine message = new MessageForFlowOrdine();
@@ -1415,47 +1293,17 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     public List<StorageObject> getAttachmentsAnticipo(OrdineMissione ordineMissione) {
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
-
-        if (node == null) {
-            return Collections.emptyList();
-        }
-
-        List<StorageObject> result = missioniCMISService.recuperoDocumento(
-                node,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value()
-        );
-
-        return result != null ? result : Collections.emptyList();
+        return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
     }
 
     public List<StorageObject> getAttachmentsTaxi(OrdineMissione ordineMissione) {
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
-
-        if (node == null) {
-            return Collections.emptyList();
-        }
-
-        List<StorageObject> result = missioniCMISService.recuperoDocumento(
-                node,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value()
-        );
-
-        return result != null ? result : Collections.emptyList();
+        return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value());
     }
 
     public List<StorageObject> getAttachmentsAutoNoleggio(OrdineMissione ordineMissione) {
         StorageObject node = recuperoFolderOrdineMissione(ordineMissione);
-
-        if (node == null) {
-            return Collections.emptyList();
-        }
-
-        List<StorageObject> result = missioniCMISService.recuperoDocumento(
-                node,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO.value()
-        );
-
-        return result != null ? result : Collections.emptyList();
+        return missioniCMISService.recuperoDocumento(node, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO.value());
     }
 
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione) {
@@ -1464,18 +1312,9 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione ordineMissione, Boolean recuperoFileEliminati) {
         StorageObject folder = recuperoFolderOrdineMissione(ordineMissione);
+        List<StorageObject> objs = missioniCMISService.recuperoDocumento(folder, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value(), recuperoFileEliminati);
 
-        if (folder == null) {
-            return Collections.emptyList();
-        }
-
-        List<StorageObject> objs = missioniCMISService.recuperoDocumento(
-                folder,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value(),
-                recuperoFileEliminati
-        );
-
-        return objs != null ? objs : Collections.emptyList();
+        return objs;
     }
 
     public CMISFileAttachment uploadAttachmentAnticipo(OrdineMissione ordineMissione, Long idAnticipo, InputStream inputStream, String name, MimeTypes mimeTypes) {
@@ -1596,14 +1435,14 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
 
 
     private StoragePath buildFolderOrdineMissione(OrdineMissione ordineMissione) {
-        StorageObject folder = recuperoOCreoFolderOrdineMissione(ordineMissione);
-        if (folder == null || folder.getPath() == null) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Impossibile recuperare o creare la cartella documentale dell'Ordine di Missione. ID:"
-                            + ordineMissione.getId() + ", Anno:" + ordineMissione.getAnno()
-                            + ", Numero:" + ordineMissione.getNumero());
+        StorageObject folder = recuperoFolderOrdineMissione(ordineMissione);
+        String path = null;
+        if (folder == null) {
+            path = createFolderOrdineMissione(ordineMissione);
+        } else {
+            path = folder.getPath();
         }
-        return StoragePath.construct(folder.getPath());
+        return StoragePath.construct(path);
     }
 
     public CMISFileAttachment uploadAttachmentOrdineMissione(OrdineMissione ordineMissione, Long idOrdineMissione, InputStream inputStream, String name, MimeTypes mimeTypes) {
@@ -1767,45 +1606,6 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         return Optional.ofNullable(node)
                 .map(storageObject -> missioniCMISService.getChildren(storageObject.getKey()))
                 .orElse(null);
-    }
-
-
-    public List<StorageObject> getChildrenDettaglio(OrdineMissioneDettagli dettaglio) {
-        return getChildrenDettaglio(dettaglio, false);
-    }
-
-    public List<StorageObject> getChildrenDettaglio(OrdineMissioneDettagli dettaglio, Boolean recuperoFileEliminati) {
-        StorageObject folderDettaglio = getFolderDettaglioOrdineMissione(dettaglio);
-
-        if (folderDettaglio == null) {
-            return Collections.emptyList();
-        }
-
-        List<StorageObject> children = missioniCMISService.recuperoDocumento(
-                folderDettaglio,
-                CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value(),
-                recuperoFileEliminati
-        );
-
-        return children != null ? children : Collections.emptyList();
-    }
-
-    public StorageObject getFolderDettaglioOrdineMissione(OrdineMissioneDettagli dettaglio) throws AwesomeException {
-        if (dettaglio == null || dettaglio.getOrdineMissione() == null) {
-            return null;
-        }
-
-        StorageObject folderOrdine = recuperoFolderOrdineMissione(dettaglio.getOrdineMissione());
-        if (folderOrdine == null || folderOrdine.getPath() == null) {
-            return null;
-        }
-
-        String path = folderOrdine.getPath() + "/" + dettaglio.constructCMISNomeFile();
-        try {
-            return missioniCMISService.getStorageObjectByPath(path);
-        } catch (StorageException e) {
-            return null;
-        }
     }
 
 }

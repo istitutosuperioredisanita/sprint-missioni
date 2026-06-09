@@ -277,7 +277,7 @@
 
         <dependency>
             <groupId>it.iss.si</groupId>
-            <artifactId>ace-client-iss</artifactId>
+            <artifactId>ace-iss-client</artifactId>
             <version>${ace-iss.version}</version>
         </dependency>
 

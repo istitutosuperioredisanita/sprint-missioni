@@ -2039,35 +2039,7 @@ public class RimborsoMissioneService {
             } catch (Exception e) {
                 log.error("Errore invio email tecnica rimborso missione firmato", e);
             }
-
-            try {
-                // email utente
-                String email = getEmail(r.getUid());
-                if (StringUtils.hasLength(email)) {
-                    String testoUtente = getTextMailErroreFirmaRimborso(r);
-                    mailService.sendEmail(
-                            "Firma acquisita – verifica rimborso missione " + r.getAnno() + "-" + r.getNumero(),
-                            testoUtente,
-                            false,
-                            true,
-                            email
-                    );
-                }
-            } catch (Exception e) {
-                log.error("Errore invio email utente rimborso missione firmato", e);
-            }
         }
-    }
-
-    private String getTextMailErroreFirmaRimborso(RimborsoMissione r) {
-        return "<p>Gentile " + getNominativo(r.getUid()) + ",</p>" +
-                "<p>La firma digitale del rimborso <b>" + r.getAnno() + "-" + r.getNumero() +
-                "</b> (missione a <b>" + r.getDestinazione() + "</b>, dal " +
-                DateUtils.getDefaultDateAsString(r.getDataInizioMissione()) + " al " +
-                DateUtils.getDefaultDateAsString(r.getDataFineMissione()) +
-                ") è stata acquisita con successo.</p>" +
-                "<p>Tuttavia, per incongruenze o dati mancanti, la procedura non è stata completata. " +
-                "Il documento è tornato in stato INSERITO. L'assistenza è stata avvisata.</p>";
     }
 
     private void erroreRimborsoMissione(RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
