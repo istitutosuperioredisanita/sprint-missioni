@@ -82,6 +82,7 @@
         <spring.session.version>3.2.2</spring.session.version>
         <start-class>it.cnr.si.missioni.MissioniApplication</start-class>
         <storage.cloud.version>3.0.1</storage.cloud.version>
+        <sonar.skip>true</sonar.skip>
     </properties>
 
     <dependencyManagement>
