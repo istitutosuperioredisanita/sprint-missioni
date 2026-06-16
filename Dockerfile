@@ -1,6 +1,5 @@
-# DOCKER-VERSION 1.10
 FROM eclipse-temurin:21-jdk-alpine
-MAINTAINER Davide Mirra <davide.mirra@iss.it>
+LABEL maintainer="Davide Mirra <davide.mirra@iss.it>"
 
 COPY target/*.war /opt/missioni.war
 
