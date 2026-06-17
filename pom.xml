@@ -77,12 +77,12 @@
         <profile.swagger />
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
+        <sonar.skip>true</sonar.skip>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-boot.version>3.3.2</spring-boot.version>
         <spring.session.version>3.2.2</spring.session.version>
         <start-class>it.cnr.si.missioni.MissioniApplication</start-class>
         <storage.cloud.version>3.0.1</storage.cloud.version>
-        <sonar.skip>true</sonar.skip>
     </properties>
 
     <dependencyManagement>

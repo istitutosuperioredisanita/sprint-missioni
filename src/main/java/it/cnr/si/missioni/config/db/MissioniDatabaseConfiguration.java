@@ -1,10 +1,12 @@
 package it.cnr.si.missioni.config.db;
 
+import it.cnr.si.missioni.config.AuditorAwareImpl;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -32,5 +34,10 @@ public class MissioniDatabaseConfiguration extends DatabaseConfiguration {
             LiquibaseProperties liquibaseProperties
     ) {
         return buildLiquibase(dataSource, liquibaseProperties, MISSIONI_CHANGELOG, false);
+    }
+
+    @Bean(name = "springSecurityAuditorAware")
+    public AuditorAware<String> springSecurityAuditorAware() {
+        return new AuditorAwareImpl();
     }
 }
