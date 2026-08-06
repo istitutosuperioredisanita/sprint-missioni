@@ -84,7 +84,6 @@
         <start-class>it.cnr.si.missioni.MissioniApplication</start-class>
         <storage.cloud.version>3.0.1</storage.cloud.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
 
@@ -452,6 +451,32 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>github-happysign</id>
+            <name>GitHub Packages - happysign-client</name>
+            <url>https://maven.pkg.github.com/istitutosuperioredisanita/happysign-client</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>github-ace</id>
+            <name>GitHub Packages - ace-iss-client</name>
+            <url>https://maven.pkg.github.com/istitutosuperioredisanita/ace-iss-client</url>
+        </repository>
+
+    </repositories>
 
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
