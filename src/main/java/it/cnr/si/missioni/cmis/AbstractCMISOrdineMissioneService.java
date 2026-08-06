@@ -1608,5 +1608,4 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
                 .map(storageObject -> missioniCMISService.getChildren(storageObject.getKey()))
                 .orElse(null);
     }
-
 }
