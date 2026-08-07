@@ -573,6 +573,7 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+
                 </configuration>
             </plugin>
 
@@ -681,6 +682,13 @@
                 <version>3.4.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <webResources>
+                        <resource>
+                            <!-- Modifica questo percorso indicando dove si trova la cartella bower_components originale nei tuoi sorgenti (es. src/main/webapp/bower_components) -->
+                            <directory>${project.basedir}/src/main/webapp/bower_components</directory>
+                            <targetPath>bower_components</targetPath>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
 
