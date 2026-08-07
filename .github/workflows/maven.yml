@@ -22,7 +22,7 @@ jobs:
         run: |
           mvn clean deploy \
             -s .m2/settings.xml \
-            -P AZURE \
+            -P AZURE prod \
             -DskipTests \
             --batch-mode --errors --fail-at-end --show-version
         env:
