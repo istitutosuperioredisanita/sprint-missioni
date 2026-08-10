@@ -1588,21 +1588,14 @@ public class RimborsoMissioneService {
         if (idRimborsoMissione == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Id Rimborso Missione non può essere null");
         }
-
         RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById(idRimborsoMissione)
                 .orElseThrow(() -> new AwesomeException(
                         CodiciErrore.ERRGEN,
                         "Rimborso Missione non trovato per id " + idRimborsoMissione
                 ));
-
-        if (rimborsoMissione.isMissioneInserita()) {
-            return Collections.emptyList();
-        }
-
         if (!isUserEnabledToViewMissione(rimborsoMissione)) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non autorizzato a visualizzare la missione.");
         }
-
         return cmisRimborsoMissioneService.getAttachmentsRimborsoMissione(
                 rimborsoMissione,
                 idRimborsoMissione

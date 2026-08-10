@@ -1971,23 +1971,19 @@ public class OrdineMissioneService {
     }
 
     public List<CMISFileAttachment> getAttachments(Long idOrdineMissione) throws AwesomeException {
+
         if (idOrdineMissione == null) {
-            return Collections.emptyList();
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Id Ordine Missione non può essere null");
         }
 
-        OrdineMissione ordineMissione =
-                ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
-
-        if (ordineMissione == null) {
-            return Collections.emptyList();
-        }
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(
+                        CodiciErrore.ERRGEN,
+                        "Ordine Missione non trovato per id " + idOrdineMissione
+                ));
 
         if (!isUserEnabledToViewMissione(ordineMissione)) {
-            return Collections.emptyList();
-        }
-
-        if (ordineMissione.isMissioneInserita()) {
-            return Collections.emptyList();
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non autorizzato a visualizzare la missione.");
         }
 
         return cmisOrdineMissioneService.getAttachmentsOrdineMissione(
@@ -1995,6 +1991,7 @@ public class OrdineMissioneService {
                 idOrdineMissione
         );
     }
+
 
     public CMISFileAttachment uploadAllegato(Long idOrdineMissione, InputStream inputStream,
                                              String name, MimeTypes mimeTypes) throws AwesomeException {
