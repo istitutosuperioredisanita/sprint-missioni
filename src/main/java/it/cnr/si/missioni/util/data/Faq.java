@@ -66,11 +66,10 @@ public class Faq implements Serializable {
     }
 
     /**
-     * @param uo The uo
+     * @param elencoFaq The elencoFaq
      */
     @JsonProperty("elencoFaq")
     public void setElencoFaq(List<ElencoFaq> elencoFaq) {
         this.elencoFaq = elencoFaq;
     }
-
 }

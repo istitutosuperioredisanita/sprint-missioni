@@ -385,7 +385,7 @@ public class DateUtils {
     /**
      * Metodo che torna la data di sistema in base al pattern passato
      *
-     * @param <i>aPattern</i> pattern da utilizzare per il formato della data
+     * @param aPattern pattern da utilizzare per il formato della data
      * @return la data di sistema in formato stringa con pattern definito da
      * <i>aPattern</i>
      */
@@ -507,7 +507,7 @@ public class DateUtils {
      * Metodo che calcola la data dell'ultimo giorno del mese, a partire da una
      * data.
      *
-     * @param data di cui si vuole calcolare l'ultimo giorno.
+     * @param date la data di cui si vuole calcolare l'ultimo giorno.
      * @return la data dell'ultimo giorno del mese.
      */
     public static Date getLastDateOfMonth(Date date) {
@@ -776,7 +776,7 @@ public class DateUtils {
     /**
      * Metodo che calcola l&apos;ultimo secondo del giorno indicato.
      *
-     * @param data di cui si vuole calcolare l&apos;ultimo giorno.
+     * @param date la data di cui si vuole calcolare l&apos;ultimo giorno.
      * @return la data impostata all&apos;ultimo secondo del giorno.
      */
     public static Date getLastTimeOfDate(Date date) {

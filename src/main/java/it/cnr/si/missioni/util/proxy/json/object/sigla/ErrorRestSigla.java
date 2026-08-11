@@ -30,11 +30,10 @@ public class ErrorRestSigla {
     }
 
     /**
-     * @param codiceSede The codice_sede
+     * @param error The error
      */
     @JsonProperty("ERROR")
     public void setError(String error) {
         this.error = error;
     }
-
 }

@@ -66,7 +66,7 @@ public class DataQueue implements Serializable {
     }
 
     /**
-     * @param uo The uo
+     * @param queues The queues
      */
     @JsonProperty("queues")
     public void setQueues(List<Queue> queues) {

@@ -127,7 +127,7 @@ public class MailService {
                 if (!isDevProfile()) {
                     javaMailSender.send(mimeMessage);
                 }
-                log.debug("Sent e-mail to User '{}'", to);
+                log.debug("Sent e-mail to User '{}'", String.join(", ", to));
             } catch (Exception e) {
                 log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
                 throw new AwesomeException("Errore nell'invio dell'e-mail: " + Utility.getMessageException(e), e);

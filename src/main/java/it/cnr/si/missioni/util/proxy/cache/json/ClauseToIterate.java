@@ -145,7 +145,7 @@ public class ClauseToIterate implements Serializable {
     }
 
     /**
-     * @param fieldValue The fieldValue
+     * @param fromValue The fromValue
      */
     @JsonProperty("fromValue")
     public void setFromValue(String fromValue) {
