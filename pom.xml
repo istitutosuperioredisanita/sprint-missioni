@@ -452,6 +452,7 @@
 
     </dependencies>
 
+    <repositories>
         <repository>
             <releases>
                 <enabled>true</enabled>
