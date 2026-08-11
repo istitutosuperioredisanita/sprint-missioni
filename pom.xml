@@ -452,28 +452,6 @@
 
     </dependencies>
 
-    <repositories>
-        <repository>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>cnr</id>
-            <url>https://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>cnr-snapshots</id>
-            <url>https://repo1.maven.org/maven2</url>
-        </repository>
-
         <repository>
             <releases>
                 <enabled>true</enabled>
