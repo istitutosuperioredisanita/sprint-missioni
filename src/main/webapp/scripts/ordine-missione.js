@@ -1414,9 +1414,11 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
 
 
     $scope.getTotaleSpesePresMissione = function () {
-        return $scope.ordineMissioneModel.totaleSpesePresComplessivo;
+        if ($scope.ordineMissioneModel) {
+            return $scope.ordineMissioneModel.totaleSpesePresComplessivo;
+        }
+        return 0;
     };
-
 
     var confirmOrdineMissione = function() {
         $rootScope.salvataggio = true;
