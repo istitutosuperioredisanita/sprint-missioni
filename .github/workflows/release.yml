@@ -31,7 +31,7 @@ jobs:
             --batch-mode --errors --fail-at-end --show-version
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.ISS_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Set next SNAPSHOT version
         run: |
           mvn -B versions:set \
