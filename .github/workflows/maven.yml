@@ -27,8 +27,7 @@ jobs:
             --batch-mode --errors --fail-at-end --show-version
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MAVEN_USERNAME_PCKG: ${{ secrets.MAVEN_USERNAME_PCKG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
           MAVEN_TOKEN_PCKG: ${{ secrets.MAVEN_TOKEN_PCKG }}
 
       - name: Log in to GitHub Container Registry
