@@ -60,9 +60,8 @@ import org.springframework.util.StringUtils;
 
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.*;
-
-import static it.cnr.si.missioni.util.SecurityUtils.getCurrentUser;
 
 
 /**
@@ -183,96 +182,58 @@ public class AnnullamentoOrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void aggiornaAnnullamentoOrdineMissione(
-            AnnullamentoOrdineMissione annullamentoDaAggiornare,
-            FlowResult flowResult
-    ) {
+    public void aggiornaAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento, FlowResult flowResult) {
+        if (annullamento == null) return;
         try {
-            if (annullamentoDaAggiornare == null) {
-                return;
-            }
-
-            if (annullamentoDaAggiornare.isStatoInviatoAlFlusso()
-                    && annullamentoDaAggiornare.isMissioneConfermata()
-                    && !annullamentoDaAggiornare.isMissioneDaValidare()) {
-
+            if (annullamento.isStatoInviatoAlFlusso() && annullamento.isMissioneConfermata() && !annullamento.isMissioneDaValidare()) {
                 switch (flowResult.getStato()) {
                     case FlowResult.ESITO_FLUSSO_FIRMATO:
-                        aggiornaAnnullamentoOrdineMissioneFirmato(annullamentoDaAggiornare);
+                        aggiornaAnnullamentoOrdineMissioneFirmato(annullamento);
                         break;
-
                     case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                        aggiornaAnnullamentoOrdineMissionePrimaFirma(annullamentoDaAggiornare);
+                        aggiornaAnnullamentoOrdineMissionePrimaFirma(annullamento);
                         break;
-
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                        aggiornaAnnullamentoOrdineMissioneRespinto(flowResult, annullamentoDaAggiornare);
+                        aggiornaAnnullamentoOrdineMissioneRespinto(flowResult, annullamento);
                         break;
                 }
-
             } else {
-                erroreAnnullamentoOrdineMissione(annullamentoDaAggiornare, flowResult);
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Esito flusso non corrispondente con lo stato dell'annullamento.");
             }
-
         } catch (Exception e) {
-            String errore = Utility.getMessageException(e);
+            gestisciEccezioneFlusso(annullamento, flowResult, e);
+        }
+    }
 
-            if (flowResult != null
-                    && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato())
-                    && annullamentoDaAggiornare != null
-                    && annullamentoDaAggiornare.getId() != null) {
+    private void gestisciEccezioneFlusso(AnnullamentoOrdineMissione annullamento, FlowResult flowResult, Exception e) {
+        String errore = Utility.getMessageException(e);
+        if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && annullamento.getId() != null) {
 
-                gestisciErroreAnnullamentoFirmato(
-                        annullamentoDaAggiornare,
-                        flowResult,
-                        errore
-                );
+            AnnullamentoOrdineMissione a = annOrdMissioneRepository.findById((Long) annullamento.getId()).orElseThrow();
+            a.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento annullamento non completato per incongruenze o dati mancanti.");
+            a.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+            a.setStato(Costanti.STATO_INSERITO);
+            a.setValidato("N");
+            a.setToBeUpdated();
+            annOrdMissioneRepository.save(a);
 
-                return;
-            }
+            String identificativo = a.getAnno() + "-" + a.getNumero();
 
+            mailService.inviaNotificheErroreFirma(
+                    a.getUid(),
+                    identificativo,
+                    "Annullamento Ordine Missione",
+                    a.getOrdineMissione().getDestinazione(),
+                    a.getOrdineMissione().getDataInizioMissione(),
+                    a.getOrdineMissione().getDataFineMissione(),
+                    e,
+                    subjectErrorFlowsAnnullamento
+            );
+        } else {
             throw new AwesomeException(CodiciErrore.ERRGEN, errore);
         }
     }
-
-    private void gestisciErroreAnnullamentoFirmato(
-            AnnullamentoOrdineMissione annullamento,
-            FlowResult flowResult,
-            String errore
-    ) {
-        String msgUtente = "Firma HappySign acquisita, ma aggiornamento annullamento non completato per incongruenze o dati mancanti.";
-
-        String msgTecnico = "Firma HappySign acquisita, ma aggiornamento annullamento ordine non completato: <b>"
-                + errore + "</b>";
-
-        AnnullamentoOrdineMissione a = annOrdMissioneRepository
-                .findById((Long) annullamento.getId())
-                .orElseThrow(() -> new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        "Annullamento Ordine Missione non trovato per id " + annullamento.getId()
-                ));
-
-        a.setCommentoFlusso(msgUtente.length() > 1000 ? msgUtente.substring(0, 1000) : msgUtente);
-        a.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-        a.setStato(Costanti.STATO_INSERITO);
-        a.setValidato("N");
-        a.setToBeUpdated();
-
-        annOrdMissioneRepository.save(a);
-
-        if (mailService != null) {
-            try {
-                // email tecnica
-                String testoTecnico = textErrorFlowsAnnullamento +
-                        getTextErrorAnnullamentoOrdineMissione(a, flowResult, msgTecnico);
-                mailService.sendEmailError(subjectErrorFlowsAnnullamento, testoTecnico, false, true);
-            } catch (Exception e) {
-                log.error("Errore invio email tecnica annullamento ordine firmato", e);
-            }
-        }
-    }
-
 
     private void aggiornaAnnullamentoOrdineMissionePrimaFirma(AnnullamentoOrdineMissione annullamentoOrdineMissione) {
         annullamentoOrdineMissione.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);

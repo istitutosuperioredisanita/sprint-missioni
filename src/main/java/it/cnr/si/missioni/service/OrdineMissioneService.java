@@ -409,91 +409,62 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void aggiornaOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
+    public void aggiornaOrdineMissione(OrdineMissione ordine, FlowResult flowResult) {
+        if (ordine == null) return;
         try {
-            if (ordineMissioneDaAggiornare == null) {
-                return;
-            }
-
-            if (ordineMissioneDaAggiornare.isStatoInviatoAlFlusso()
-                    && ordineMissioneDaAggiornare.isMissioneConfermata()
-                    && !ordineMissioneDaAggiornare.isMissioneDaValidare()) {
-
+            if (ordine.isStatoInviatoAlFlusso() && ordine.isMissioneConfermata() && !ordine.isMissioneDaValidare()) {
                 switch (flowResult.getStato()) {
                     case FlowResult.ESITO_FLUSSO_FIRMATO:
-                        aggiornaOrdineMissioneFirmato(ordineMissioneDaAggiornare);
+                        aggiornaOrdineMissioneFirmato(ordine);
                         break;
-
                     case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                        aggiornaOrdineMissionePrimaFirma(ordineMissioneDaAggiornare);
+                        aggiornaOrdineMissionePrimaFirma(ordine);
                         break;
-
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                        aggiornaOrdineMissioneRespinto(flowResult, ordineMissioneDaAggiornare);
+                        aggiornaOrdineMissioneRespinto(flowResult, ordine);
                         break;
                 }
-
             } else {
-                erroreOrdineMissione(ordineMissioneDaAggiornare, flowResult);
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Esito flusso non corrispondente con lo stato dell'ordine. " + getTextErrorOrdine(ordine, flowResult, ""));
             }
-
         } catch (Exception e) {
-            String errore = Utility.getMessageException(e);
+            gestisciEccezioneFlusso(ordine, flowResult, e);
+        }
+    }
 
-            if (flowResult != null
-                    && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato())
-                    && ordineMissioneDaAggiornare != null
-                    && ordineMissioneDaAggiornare.getId() != null) {
+    private void gestisciEccezioneFlusso(OrdineMissione ordine, FlowResult flowResult, Exception e) {
+        String errore = Utility.getMessageException(e);
+        if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && ordine.getId() != null) {
 
-                gestisciErroreOrdineFirmato(ordineMissioneDaAggiornare, flowResult, errore);
-                return;
-            }
+            OrdineMissione o = ordineMissioneRepository.findById((Long) ordine.getId()).orElseThrow();
+            o.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento non completato per incongruenze o dati mancanti.");
+            o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+            o.setStato(Costanti.STATO_INSERITO);
+            o.setDataInvioFirma(null);
+            o.setDataInvioAmministrativo(null);
+            o.setDataInvioRespGruppo(null);
+            o.setBypassAmministrativo(null);
+            o.setBypassRespGruppo(null);
+            o.setToBeUpdated();
+            ordineMissioneRepository.save(o);
 
+            String identificativo = o.getAnno() + "-" + o.getNumero();
+
+            mailService.inviaNotificheErroreFirma(
+                    o.getUid(),
+                    identificativo,
+                    "Ordine Missione",
+                    o.getDestinazione(),
+                    o.getDataInizioMissione(),
+                    o.getDataFineMissione(),
+                    e,
+                    subjectErrorFlowsOrdine
+            );
+        } else {
             throw new AwesomeException(CodiciErrore.ERRGEN, errore);
         }
     }
-
-    private void gestisciErroreOrdineFirmato(
-            OrdineMissione ordine,
-            FlowResult flowResult,
-            String errore
-    ) {
-        String msgUtente = "Firma HappySign acquisita, ma aggiornamento ordine non completato per incongruenze o dati mancanti.";
-
-        String msgTecnico = "Firma HappySign acquisita, ma aggiornamento ordine non completato: <b>"
-                + errore + "</b>";
-
-        OrdineMissione o = ordineMissioneRepository
-                .findById((Long) ordine.getId())
-                .orElseThrow(() -> new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        "Ordine di missione non trovato per id " + ordine.getId()
-                ));
-
-        o.setCommentoFlusso(msgUtente.length() > 1000 ? msgUtente.substring(0, 1000) : msgUtente);
-        o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-        o.setStato(Costanti.STATO_INSERITO);
-        o.setDataInvioFirma(null);
-        o.setDataInvioAmministrativo(null);
-        o.setDataInvioRespGruppo(null);
-        o.setBypassAmministrativo(null);
-        o.setBypassRespGruppo(null);
-        o.setToBeUpdated();
-
-        ordineMissioneRepository.save(o);
-
-        if (mailService != null) {
-            try {
-                // email tecnica
-                String testoTecnico = getTextErrorOrdine(o, flowResult, msgTecnico);
-                mailService.sendEmailError(subjectErrorFlowsOrdine, testoTecnico, false, true);
-            } catch (Exception e) {
-                log.error("Errore invio email tecnica ordine missione firmato", e);
-            }
-        }
-    }
-
 
     private void erroreOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
         String errore = "Esito flusso non corrispondente con lo stato dell'ordine.";

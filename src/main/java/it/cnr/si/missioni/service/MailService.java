@@ -1,31 +1,33 @@
 /*
- *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+ * Copyright (C) 2023 Consiglio Nazionale delle Ricerche
  *
- *      This program is free software: you can redistribute it and/or modify
- *      it under the terms of the GNU Affero General Public License as
- *      published by the Free Software Foundation, either version 3 of the
- *      License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
  *
- *      You should have received a copy of the GNU Affero General Public License
- *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
  *
  */
 
 package it.cnr.si.missioni.service;
 
-
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.domain.custom.User;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.UsersSpecial;
+import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
@@ -41,7 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.annotation.PostConstruct;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Profile("!showcase")
@@ -88,7 +90,7 @@ public class MailService {
         return preparaElencoMail(listaEmail);
     }
 
-//no duplicati nella group-list dei destinatari
+    // no duplicati nella group-list dei destinatari
     public List<String> preparaListaMail(List<UsersSpecial> lista) {
         Set<String> emailSet = new HashSet<>();
         List<String> listaEmail = new ArrayList<>();
@@ -113,7 +115,7 @@ public class MailService {
 
     private void sendEmail(String subject, String content, MultipartFile multipartFile, boolean isMultipart, boolean isHtml, String... to) {
         log.info("Send e-mail[to '{}' with subject '{}'", to, subject);
-        if (to != null) {
+        if (to != null && to.length > 0) {
             // Prepare message using a Spring helper
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             try {
@@ -127,9 +129,9 @@ public class MailService {
                 if (!isDevProfile()) {
                     javaMailSender.send(mimeMessage);
                 }
-                log.debug("Sent e-mail to User '{}'", String.join(", ", to));
+                log.debug("Sent e-mail to Users '{}'", String.join(", ", to));
             } catch (Exception e) {
-                log.error("E-mail could not be sent to user '{}', exception is: {}", to, e);
+                log.error("E-mail could not be sent to users '{}', exception is: {}", to, e);
                 throw new AwesomeException("Errore nell'invio dell'e-mail: " + Utility.getMessageException(e), e);
             }
         }
@@ -147,11 +149,38 @@ public class MailService {
         sendEmail(subject, content, multipartFile, true, isHtml, to);
     }
 
+    /**
+     * Invia un'unica e-mail cumulativa con tutti gli indirizzi di errore in destinazione.
+     */
     public void sendEmailError(String subject, String content, boolean isMultipart, boolean isHtml) {
-        if (!isDevProfile()) {
-            for (String emailTo : mailToError)
-                sendEmail(subject, content, isMultipart, isHtml, emailTo);
+        if (!isDevProfile() && mailToError != null && !mailToError.isEmpty()) {
+            String[] errorRecipients = mailToError.toArray(new String[0]);
+            sendEmail(subject, content, isMultipart, isHtml, errorRecipients);
+        }
+    }
 
+    public void inviaNotificheErroreFirma(String uid, String identificativo, String tipoDoc, String destinazione,
+                                          ZonedDateTime dataInizio, ZonedDateTime dataFine,
+                                          Exception ex, String subjectTecnico) {
+        try {
+            String error = Utility.getMessageException(ex);
+            String testoErrore = "Identificativo: " + identificativo + " - Dettaglio errore: " + error;
+            sendEmailError(subjectTecnico, testoErrore, false, true);
+        } catch (Exception e) {
+            log.error("Errore invio email tecnica errore firma {}", tipoDoc, e);
+        }
+
+        try {
+            Account acc = accountService.loadAccountFromUsername(uid);
+            if (acc != null && StringUtils.hasLength(acc.getEmail_comunicazioni())) {
+                String articolo = (tipoDoc != null && (tipoDoc.startsWith("O") || tipoDoc.startsWith("A"))) ? "dell'" : "del ";
+                String testoUtente = "<p>Gentile " + acc.getCognome() + " " + acc.getNome() + ",</p>" +
+                        "<p>La firma digitale " + articolo + tipoDoc + " <b>" + identificativo + "</b> (missione a <b>" + destinazione + "</b>, dal " + DateUtils.getDefaultDateAsString(dataInizio) + " al " + DateUtils.getDefaultDateAsString(dataFine) + ") è stata acquisita con successo.</p>" +
+                        "<p>Tuttavia, per incongruenze o dati mancanti, la procedura non è stata completata. Il documento è tornato in stato INSERITO. L'assistenza è stata avvisata.</p>";
+                sendEmail("Firma acquisita – verifica " + tipoDoc + " missione " + identificativo, testoUtente, false, true, acc.getEmail_comunicazioni());
+            }
+        } catch (Exception e) {
+            log.error("Errore invio email utente errore firma {}", tipoDoc, e);
         }
     }
 

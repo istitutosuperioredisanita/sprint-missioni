@@ -1937,101 +1937,61 @@ public class RimborsoMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public RimborsoMissione aggiornaRimborsoMissione(RimborsoMissione rimborsoMissioneDaAggiornare, FlowResult flowResult) {
+    public RimborsoMissione aggiornaRimborsoMissione(RimborsoMissione rimborso, FlowResult flowResult) {
+        if (rimborso == null) return null;
         try {
-            if (rimborsoMissioneDaAggiornare == null) {
-                return null;
-            }
-
-            if (rimborsoMissioneDaAggiornare.isStatoInviatoAlFlusso()
-                    && rimborsoMissioneDaAggiornare.isMissioneConfermata()
-                    && !rimborsoMissioneDaAggiornare.isMissioneDaValidare()) {
-
+            if (rimborso.isStatoInviatoAlFlusso() && rimborso.isMissioneConfermata() && !rimborso.isMissioneDaValidare()) {
                 switch (flowResult.getStato()) {
                     case FlowResult.ESITO_FLUSSO_FIRMATO:
-                        RimborsoMissione rimborsoMissione =
-                                aggiornaRimborsoMissioneFirmato(rimborsoMissioneDaAggiornare);
-
-                        if (isMissioneComunicabileSigla(rimborsoMissione)) {
-                            return rimborsoMissione;
-                        }
-                        break;
-
+                        RimborsoMissione rimb = aggiornaRimborsoMissioneFirmato(rimborso);
+                        return isMissioneComunicabileSigla(rimb) ? rimb : null;
                     case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                        aggiornaRimborsoMissionePrimaFirma(rimborsoMissioneDaAggiornare);
+                        aggiornaRimborsoMissionePrimaFirma(rimborso);
                         break;
-
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                        aggiornaRimborsoMissioneRespinto(flowResult, rimborsoMissioneDaAggiornare);
+                        aggiornaRimborsoMissioneRespinto(flowResult, rimborso);
                         break;
                 }
-
             } else {
-                erroreRimborsoMissione(rimborsoMissioneDaAggiornare, flowResult);
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Esito flusso non corrispondente con lo stato del rimborso.");
             }
-
             return null;
-
         } catch (Exception e) {
-            String errore = Utility.getMessageException(e);
-
-            if (flowResult != null
-                    && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato())
-                    && rimborsoMissioneDaAggiornare != null
-                    && rimborsoMissioneDaAggiornare.getId() != null) {
-
-                gestisciErroreRimborsoFirmato(
-                        rimborsoMissioneDaAggiornare,
-                        flowResult,
-                        errore
-                );
-
-                return null;
-            }
-
-            throw new AwesomeException(
-                    CodiciErrore.ERRGEN,
-                    "Errore in aggiornaRimborsoMissione: " + errore
-            );
+            return gestisciEccezioneFlusso(rimborso, flowResult, e);
         }
     }
 
-    private void gestisciErroreRimborsoFirmato(
-            RimborsoMissione rimborso,
-            FlowResult flowResult,
-            String errore
-    ) {
-        String msgUtente = "Firma HappySign acquisita, ma aggiornamento rimborso non completato per incongruenze o dati mancanti.";
+    private RimborsoMissione gestisciEccezioneFlusso(RimborsoMissione rimborso, FlowResult flowResult, Exception e) {
+        String errore = Utility.getMessageException(e);
+        if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && rimborso.getId() != null) {
 
-        String msgTecnico = "Firma HappySign acquisita, ma aggiornamento rimborso non completato: <b>"
-                + errore + "</b>";
+            RimborsoMissione r = rimborsoMissioneRepository.findById((Long) rimborso.getId()).orElseThrow();
+            r.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento rimborso non completato per incongruenze o dati mancanti.");
+            r.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+            r.setStateFlows(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+            r.setStato(Costanti.STATO_INSERITO);
+            r.setValidato("N");
+            r.setStatoInvioSigla(null);
+            r.setToBeUpdated();
+            rimborsoMissioneRepository.save(r);
 
-        RimborsoMissione r = rimborsoMissioneRepository
-                .findById((Long) rimborso.getId())
-                .orElseThrow(() -> new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        "Rimborso Missione non trovato per id " + rimborso.getId()
-                ));
+            String identificativo = r.getAnno() + "-" + r.getNumero();
 
-        r.setCommentoFlusso(msgUtente.length() > 1000 ? msgUtente.substring(0, 1000) : msgUtente);
-        r.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-        r.setStateFlows(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-        r.setStato(Costanti.STATO_INSERITO);
-        r.setValidato("N");
-        r.setStatoInvioSigla(null);
-        r.setToBeUpdated();
+            mailService.inviaNotificheErroreFirma(
+                    r.getUid(),
+                    identificativo,
+                    "Rimborso Missione",
+                    r.getDestinazione(),
+                    r.getDataInizioMissione(),
+                    r.getDataFineMissione(),
+                    e,
+                    subjectErrorFlowsRimborso
+            );
 
-        rimborsoMissioneRepository.save(r);
-
-        if (mailService != null) {
-            try {
-                // email tecnica
-                String testoTecnico = getTextErrorRimborso(r, flowResult, msgTecnico);
-                mailService.sendEmailError(subjectErrorFlowsRimborso, testoTecnico, false, true);
-            } catch (Exception e) {
-                log.error("Errore invio email tecnica rimborso missione firmato", e);
-            }
+            return null;
+        } else {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in aggiornaRimborsoMissione: " + errore);
         }
     }
 

@@ -446,7 +446,7 @@ missioniApp.factory('ProxyService', function($http, COSTANTI, APP_FOR_REST, SIGL
       var tipoSpesaClauses = [
           { condition: 'AND', fieldName: 'nazione', operator: "=", fieldValue: nazione },
           { condition: 'AND', fieldName: 'condizioneTipiSpesaMissione', operator: "=", fieldValue: "S" },
-          { condition: 'AND', fieldName: 'ammissibileRimborso', operator: "=", fieldValue: ammissibileRimborso }
+          { condition: 'AND', fieldName: 'fl_ammissibile_con_rimborso', operator: "=", fieldValue: ammissibileRimborso }
       ];
 
       // Aggiungi la clausola dell'inquadramento solo se è effettivamente valorizzato e valido
