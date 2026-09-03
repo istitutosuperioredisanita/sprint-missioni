@@ -76,7 +76,7 @@ public class MailService {
 
         String s = env.getProperty("spring.mail.send.error.to");
         if (!StringUtils.hasText(s)) {
-            s = "ciro.salvio@iss.it";
+            s = "davide.mirra@iss.it";
         }
 
         this.mailToError = Arrays.stream(s.split(","))

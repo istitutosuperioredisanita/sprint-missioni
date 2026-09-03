@@ -19,7 +19,6 @@
 
 package it.cnr.si.missioni.service;
 
-
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.cp.lock.FencedLock;
 import it.cnr.si.missioni.awesome.exception.AwesomeException;
@@ -135,17 +134,14 @@ public class CronService {
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
 
-
-
     @Autowired
     private FlowService flowService;
+
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
 
     @Autowired
     private CronHappySignService cronHappySignService;
-
-
 
     @CacheEvict(value = Costanti.NOME_CACHE_PROXY, allEntries = true)
     public void evictCache() throws AwesomeException {
@@ -232,7 +228,6 @@ public class CronService {
             throw new AwesomeException(Utility.getMessageException(e));
         }
     }
-
 
     @Transactional
     public void comunicaDatiRimborsoSigla() throws AwesomeException {
@@ -371,7 +366,6 @@ public class CronService {
             List<OrdineMissione> listaOrdiniMissioneVecchiaScrivania = listaOrdiniMissione.stream()
                     .filter(ordineMissione -> ordineMissione.getIdFlusso().startsWith(Costanti.INITIAL_NAME_OLD_FLOWS))
                     .collect(Collectors.toList());
-
 
             for (OrdineMissione ordineMissione : listaOrdiniMissioneVecchiaScrivania) {
                 try {
@@ -515,7 +509,6 @@ public class CronService {
                             }
                         }
                     }
-
                 }
             }
         }
@@ -560,7 +553,6 @@ public class CronService {
                         }
                     }
                 }
-
             }
         }
     }

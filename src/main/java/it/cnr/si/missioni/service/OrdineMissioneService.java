@@ -27,7 +27,10 @@ import it.cnr.si.missioni.awesome.exception.AwesomeException;
 import it.cnr.si.missioni.cmis.*;
 import it.cnr.si.missioni.domain.custom.FlowResult;
 import it.cnr.si.missioni.domain.custom.persistence.*;
-import it.cnr.si.missioni.repository.*;
+import it.cnr.si.missioni.repository.OrdineMissioneAutoNoleggioRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneAutoPropriaRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneRepository;
+import it.cnr.si.missioni.repository.OrdineMissioneTaxiRepository;
 import it.cnr.si.missioni.repository.specification.RimborsoSpecification;
 import it.cnr.si.missioni.repository.specification.SecuritySpecification;
 import it.cnr.si.missioni.repository.specification.SpecificationBuilder;
@@ -41,11 +44,12 @@ import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.MissioneFilterMapper;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Subquery;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,19 +64,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-
-import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-
-import static it.cnr.si.missioni.util.SecurityUtils.getCurrentUser;
 
 /**
  * Service class for managing users.
@@ -1149,7 +1148,7 @@ public class OrdineMissioneService {
         }
 
         try {
-            entityManager.lock(ordineMissioneDB, LockModeType.OPTIMISTIC);
+            entityManager.lock(ordineMissioneDB, LockModeType.PESSIMISTIC_WRITE);
         } catch (OptimisticLockException e) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     "Ordine in modifica. Ripetere l'operazione. ID: " + ordineMissioneDB.getId());
@@ -2125,4 +2124,21 @@ public class OrdineMissioneService {
             return toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine : dbTotOrdine;
         }
     }
+
+    private void logOrdineUpdate(String fase, OrdineMissione ordine) {
+        if (ordine == null) {
+            log.info("[DIAG][ORDINE] {} - ordine null", fase);
+            return;
+        }
+
+        log.info(
+                "[DIAG][ORDINE] {} - id={}, pgVerRec={}, stato={}, statoFlusso={}",
+                fase,
+                ordine.getId(),
+                ordine.getPgVerRec(),
+                ordine.getStato(),
+                ordine.getStatoFlusso()
+        );
+    }
+
 }

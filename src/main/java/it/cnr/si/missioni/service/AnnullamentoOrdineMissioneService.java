@@ -45,6 +45,10 @@ import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.MissioneFilterMapper;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +62,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 
@@ -121,6 +123,9 @@ public class AnnullamentoOrdineMissioneService {
     private AnnullamentoOrdineMissioneRepository annOrdMissioneRepository;
     @Autowired
     private OrdineMissioneRepository ordineMissioneRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     @Transactional(readOnly = true)
@@ -303,11 +308,13 @@ public class AnnullamentoOrdineMissioneService {
                         "Annullamento Ordine Missione da aggiornare inesistente."
                 ));
 
-        boolean isRitornoMissioneMittente = false;
-
-        if (annullamentoDB == null) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Annullamento Ordine Missione da aggiornare inesistente.");
+        try {
+            entityManager.lock(annullamentoDB, LockModeType.PESSIMISTIC_WRITE);
+        } catch (OptimisticLockException e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "Annullamento in modifica. Ripetere l'operazione. ID: " + annullamentoDB.getId());
         }
+        boolean isRitornoMissioneMittente = false;
 
         if (annullamentoDB.getOrdineMissione() != null) {
             OrdineMissione ordineMissione = ordineMissioneRepository

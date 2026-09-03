@@ -45,6 +45,10 @@ import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.CommonService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilterMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.slf4j.Logger;
@@ -119,6 +123,9 @@ public class AnnullamentoRimborsoMissioneService {
     @Autowired
     private SecurityService securityService;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional(readOnly = true)
     public AnnullamentoRimborsoMissione getAnnullamentoRimborsoMissione(Long idAnnullamento) throws AwesomeException {
         RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -173,6 +180,13 @@ public class AnnullamentoRimborsoMissioneService {
 
         if (annullamentoDB == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Annullamento Rimborso Missione da aggiornare inesistente.");
+        }
+
+        try {
+            entityManager.lock(annullamentoDB, LockModeType.PESSIMISTIC_WRITE);
+        } catch (OptimisticLockException e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "Annullamento rimborso in modifica. Ripetere l'operazione. ID: " + annullamentoDB.getId());
         }
 
         if (annullamentoDB.getRimborsoMissione() != null) {
