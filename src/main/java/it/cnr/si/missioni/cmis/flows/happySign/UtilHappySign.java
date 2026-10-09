@@ -10,18 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class UtilHappySign {
-
-    @Value("${flows.templateFirme.1Firma:#{null}}")
-    private static String template1Firma;
-    @Value("${flows.templateFirme.2Firme:#{null}}")
-    private static String template2Firme;
-    @Value("${flows.templateFirme.3Firme:#{null}}")
-    private static String template3Firme;
-    @Value("${flows.templateFirme.4Firme:#{null}}")
-    private static String template4Firme;
-    @Value("${flows.templateFirme.5Firme:#{null}}")
-    private static String template5Firme;
-
     @Autowired(required = false)
     private MailService mailService;
     @Value("${spring.mail.messages.firmatariMissioneInProd.oggetto}")
@@ -61,29 +49,4 @@ public class UtilHappySign {
     protected static List<String> getNoDoubleSigners(List<String> signers) {
         return new ArrayList<>(new LinkedHashSet<>(signers));
     }
-
-    protected static void setTemplateFirme(StartWorflowDto startWorflowDto) {
-        int numFirmatari = startWorflowDto.getSigners().size();
-        switch (numFirmatari) {
-            case 1:
-                startWorflowDto.setTemplateName(template1Firma);
-                break;
-            case 2:
-                startWorflowDto.setTemplateName(template2Firme);
-                break;
-            case 3:
-                startWorflowDto.setTemplateName(template3Firme);
-                break;
-            case 4:
-                startWorflowDto.setTemplateName(template4Firme);
-                break;
-            case 5:
-                startWorflowDto.setTemplateName(template5Firme);
-                break;
-            default:
-                break;
-        }
-    }
-
-
 }
