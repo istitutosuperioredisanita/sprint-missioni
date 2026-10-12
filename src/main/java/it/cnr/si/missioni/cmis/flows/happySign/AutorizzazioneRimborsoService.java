@@ -45,7 +45,6 @@ public class AutorizzazioneRimborsoService {
         StartWorflowDto startWorflowDto = autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo, allegati);
         List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
         startWorflowDto.setSigners(signersDef);
-        UtilHappySign.setTemplateFirme(startWorflowDto);
 
         if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
             UtilTestService.showSigned(startWorflowDto);

@@ -96,7 +96,6 @@ public class ComunicaRimborsoSiglaService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MissioneBulk comunicaRimborsoSigla(Serializable rimborsoApprovatoId) {
-
         RimborsoMissione rimborsoApprovato = rimborsoMissioneRepository.findById((Long) rimborsoApprovatoId)
                 .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN,
                         "RimborsoMissione non trovato per ID: " + rimborsoApprovatoId));
@@ -115,7 +114,10 @@ public class ComunicaRimborsoSiglaService {
             } catch (Exception e1) {
                 log.error("Errore durante l'invio dell'e-mail: " + e1);
             }
-            throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+
+            // MODIFICA QUI: Non rilanciare l'eccezione, altrimenti uccidi il Thread del Cron.
+            // throw new AwesomeException(CodiciErrore.ERRGEN, Utility.getMessageException(e));
+            return null;
         }
     }
 
@@ -396,7 +398,7 @@ public class ComunicaRimborsoSiglaService {
             String app = Costanti.APP_SIGLA;
             String url = Costanti.REST_COMUNICA_RIMBORSO_SIGLA;
             String body = prepareBody(missione);
-
+            log.info("Payload JSON inviato a SIGLA: {}", body);
             String risposta = commonService.process(body, app, url, true, HttpMethod.PUT);
             try {
                 ObjectMapper mapper = new ObjectMapper();

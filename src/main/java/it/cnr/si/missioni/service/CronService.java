@@ -592,18 +592,11 @@ public class CronService {
     }
 
 
-    @Transactional
+
     public void verificaFirmeHappySign() throws AwesomeException {
-        if (java.lang.management.ManagementFactory.getRuntimeMXBean().
-                getInputArguments().toString().contains("-agentlib:jdwp")) {
-            LOGGER.debug("verificaFirmeHappySign");
-        }
 
         if (Optional.ofNullable(cronHappySignService).isPresent()){
-            cronHappySignService.aggiornaEsitiMissioni();
-            cronHappySignService.aggiornaEsitiRimborsiMissioni();
-            cronHappySignService.aggiornaEsitiAnnullamentiMissioni();
-
+            cronHappySignService.aggiornaTuttiEsitiHappySign();
         }
     }
 

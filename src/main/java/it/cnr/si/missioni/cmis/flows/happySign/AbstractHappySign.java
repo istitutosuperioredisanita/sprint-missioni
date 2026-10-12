@@ -64,10 +64,6 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     private String codeCdsCnt;
     @Value("${idUo.dirUffEcoGiur:#{null}}")
     private String dirUffEcoGiur;
-    @Value("${vociPresidenza.voce2089:#{null}}")
-    private String voce2089;
-    @Value("${vociPresidenza.voce2090:#{null}}")
-    private String voce2090;
 
     @Autowired
     protected HappySignService happySignService;

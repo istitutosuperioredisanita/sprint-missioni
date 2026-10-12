@@ -223,7 +223,7 @@ public class RimborsoMissioneService {
         }
         return lista;
     }
-
+    @Transactional(propagation = Propagation.REQUIRED)
     private void aggiornaRimborsoMissioneRespinto(FlowResult result,
                                                   RimborsoMissione rimborsoMissioneDaAggiornare) throws AwesomeException {
         aggiornaValidazione(rimborsoMissioneDaAggiornare);
@@ -243,6 +243,7 @@ public class RimborsoMissioneService {
         updateRimborsoMissione(rimborsoMissioneDaAggiornare, true, null);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public RimborsoMissione aggiornaRimborsoMissioneFirmato(RimborsoMissione rimborsoMissioneDaAggiornare)
             throws AwesomeException {
 
@@ -408,6 +409,7 @@ public class RimborsoMissioneService {
         return rimborso;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     private RimborsoMissione aggiornaRimborsoMissionePrimaFirma(RimborsoMissione rimborsoMissioneDaAggiornare)
             throws AwesomeException {
         rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
@@ -466,12 +468,15 @@ public class RimborsoMissioneService {
         if (rimborsoMissioneDB == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
         }
+        // 1. Ripristina il lock ottimistico in updateRimborsoMissione
+        /*
         try {
-            em.lock(rimborsoMissioneDB, LockModeType.PESSIMISTIC_WRITE);
+            em.lock(rimborsoMissioneDB, LockModeType.OPTIMISTIC);
         } catch (OptimisticLockException e) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Rimborso missione in modifica. Ripetere l'operazione. Id " + rimborsoMissioneDB.getId());
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione. Id " + rimborsoMissioneDB.getId());
         }
+
+         */
         retrieveDetails(rimborsoMissioneDB);
         if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")) {
             rimborsoMissioneDB.setNoteRespingi(null);
@@ -1936,25 +1941,34 @@ public class RimborsoMissioneService {
         rimborsoMissioneRepository.findById(Long.valueOf(id)).ifPresent(this::popolaCoda);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RimborsoMissione aggiornaRimborsoMissione(RimborsoMissione rimborso, FlowResult flowResult) {
         if (rimborso == null) return null;
         try {
-            if (rimborso.isStatoInviatoAlFlusso() && rimborso.isMissioneConfermata() && !rimborso.isMissioneDaValidare()) {
+            RimborsoMissione rimborsoDb = rimborsoMissioneRepository.findById((Long) rimborso.getId())
+                    .orElse(rimborso);
+
+            if (rimborsoDb.isStatoFlussoApprovato()) {
+                log.debug("Rimborso {} già DEFINITIVO. Skip.", rimborsoDb.getId());
+                return null;
+            }
+
+            if (rimborsoDb.isStatoInviatoAlFlusso() && rimborsoDb.isMissioneConfermata() && !rimborsoDb.isMissioneDaValidare()) {
                 switch (flowResult.getStato()) {
                     case FlowResult.ESITO_FLUSSO_FIRMATO:
-                        RimborsoMissione rimb = aggiornaRimborsoMissioneFirmato(rimborso);
+                        RimborsoMissione rimb = aggiornaRimborsoMissioneFirmato(rimborsoDb);
                         return isMissioneComunicabileSigla(rimb) ? rimb : null;
                     case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                        aggiornaRimborsoMissionePrimaFirma(rimborso);
+                        aggiornaRimborsoMissionePrimaFirma(rimborsoDb);
                         break;
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                        aggiornaRimborsoMissioneRespinto(flowResult, rimborso);
+                        aggiornaRimborsoMissioneRespinto(flowResult, rimborsoDb);
                         break;
                 }
             } else {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "Esito flusso non corrispondente con lo stato del rimborso.");
+                log.warn("Rimborso {} stato anomalo: Stato={}, StatoFlusso={}, Esito={}. Skip.",
+                        rimborsoDb.getId(), rimborsoDb.getStato(), rimborsoDb.getStatoFlusso(), flowResult.getStato());
             }
             return null;
         } catch (Exception e) {
@@ -1962,33 +1976,31 @@ public class RimborsoMissioneService {
         }
     }
 
+    // 2. Sostituisci il metodo gestisciEccezioneFlusso:
     private RimborsoMissione gestisciEccezioneFlusso(RimborsoMissione rimborso, FlowResult flowResult, Exception e) {
         String errore = Utility.getMessageException(e);
         if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && rimborso.getId() != null) {
+            try {
+                RimborsoMissione r = rimborsoMissioneRepository.findById((Long) rimborso.getId()).orElseThrow();
+                r.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento non completato. Dettaglio: " + errore);
+                r.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+                r.setStateFlows(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                r.setStato(Costanti.STATO_INSERITO);
+                r.setValidato("N");
+                r.setStatoInvioSigla(null);
+                r.setToBeUpdated();
+                rimborsoMissioneRepository.save(r);
 
-            RimborsoMissione r = rimborsoMissioneRepository.findById((Long) rimborso.getId()).orElseThrow();
-            r.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento rimborso non completato per incongruenze o dati mancanti.");
-            r.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-            r.setStateFlows(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-            r.setStato(Costanti.STATO_INSERITO);
-            r.setValidato("N");
-            r.setStatoInvioSigla(null);
-            r.setToBeUpdated();
-            rimborsoMissioneRepository.save(r);
-
-            String identificativo = r.getAnno() + "-" + r.getNumero();
-
-            mailService.inviaNotificheErroreFirma(
-                    r.getUid(),
-                    identificativo,
-                    "Rimborso Missione",
-                    r.getDestinazione(),
-                    r.getDataInizioMissione(),
-                    r.getDataFineMissione(),
-                    e,
-                    subjectErrorFlowsRimborso
-            );
-
+                if (mailService != null) {
+                    String errorTrace = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);
+                    String body = "<h3>Errore Post-Firma HappySign</h3>" +
+                            "<p>Il rimborso <b>" + r.getAnno() + "-" + r.getNumero() + "</b> è stato firmato ma l'aggiornamento a DEFINITIVO è fallito.</p>" +
+                            "<h4>Stack Trace:</h4><pre>" + errorTrace + "</pre>";
+                    mailService.sendEmailError(subjectErrorFlowsRimborso, body, false, true);
+                }
+            } catch (Exception ex) {
+                log.error("Errore durante il fallback di gestisciEccezioneFlusso per rimborso " + rimborso.getId(), ex);
+            }
             return null;
         } else {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Errore in aggiornaRimborsoMissione: " + errore);

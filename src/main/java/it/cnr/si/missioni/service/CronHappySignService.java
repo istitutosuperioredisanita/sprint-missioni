@@ -16,11 +16,14 @@ import it.iss.si.dto.happysign.base.SignersDocumentDetails;
 import it.iss.si.dto.happysign.response.GetDocumentDetailResponse;
 import it.iss.si.dto.happysign.response.GetDocumentResponse;
 import it.iss.si.service.HappySignURLCondition;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -35,193 +38,209 @@ public class CronHappySignService {
 
     @Autowired(required = false)
     private it.iss.si.service.HappySignService happySignService;
-
     @Autowired
     private FlowService flowService;
-
     @Autowired
     private OrdineMissioneService ordineMissioneService;
-
     @Autowired
     private RimborsoMissioneService rimborsoMissioneService;
-
     @Autowired
     private AnnullamentoOrdineMissioneService annullamentoOrdineMissioneService;
-
     @Autowired
     private CMISOrdineMissioneService cmisOrdineMissioneService;
-
     @Autowired
     private CMISRimborsoMissioneService cmisRimborsoMissioneService;
+    @Autowired(required = false)
+    private MailService mailService;
 
-    private boolean isTransientHappySignError(Throwable e) {
+    private boolean isTransientError(Throwable e) {
         Throwable current = e;
         while (current != null) {
-            if (current instanceof SocketTimeoutException || current instanceof ConnectException || current instanceof RetryableException) {
-                return true;
-            }
-            if (current instanceof FeignException feignEx) {
-                int status = feignEx.status();
-                if (status == 404 || status >= 500) {
-                    return true;
-                }
-            }
+            if (current instanceof SocketTimeoutException || current instanceof ConnectException || current instanceof RetryableException) return true;
+            if (current instanceof FeignException && (((FeignException) current).status() == 404 || ((FeignException) current).status() >= 500)) return true;
+            if (current instanceof org.springframework.dao.OptimisticLockingFailureException ||
+                    current instanceof jakarta.persistence.OptimisticLockException ||
+                    current instanceof org.springframework.dao.PessimisticLockingFailureException ||
+                    current instanceof jakarta.persistence.PessimisticLockException ||
+                    current instanceof org.springframework.dao.CannotAcquireLockException) return true;
+            if (current.getMessage() != null && current.getMessage().contains("in modifica. Ripetere l'operazione")) return true;
             current = current.getCause();
         }
         return false;
+    }
+
+    private void inviaMailErroreCron(String tipoDocumento, String identificativo, Exception e) {
+        if (mailService != null) {
+            String stackTrace = ExceptionUtils.getStackTrace(e);
+            String body = "<h3>Errore Elaborazione HappySign</h3><p><b>Documento:</b> " + tipoDocumento + " " + identificativo + "</p><p>L'aggiornamento automatico ha incontrato un errore grave non risolvibile automaticamente.</p><h4>Stack Trace:</h4><pre>" + stackTrace + "</pre>";
+            mailService.sendEmailError("Errore Cron HappySign - " + tipoDocumento, body, false, true);
+        }
     }
 
     private EnumEsitoFlowDocumentStatus safeGetDocumentStatus(String idFlusso) throws Exception {
         try {
             return happySignService.getDocumentStatus(idFlusso);
         } catch (Exception e) {
-            if (isTransientHappySignError(e)) {
-                log.debug("HappySign non raggiungibile, controllo rimandato. idFlusso={}", idFlusso);
+            if (isTransientError(e)) {
+                log.debug("API HappySign non raggiungibile o lock temporaneo. Controllo rimandato. idFlusso={}", idFlusso);
                 return null;
             }
             throw e;
         }
     }
 
-    public void aggiornaEsitiMissioni() {
+    // Unico metodo pubblico richiamato dal CronService che fa girare i 3 flussi all'interno della stessa transazione
+
+    public void aggiornaTuttiEsitiHappySign() {
+        log.info("Inizio aggiornamento massivo esiti HappySign...");
+        aggiornaOrdini();
+        aggiornaRimborsi();
+        aggiornaAnnullamenti();
+        log.info("Fine aggiornamento massivo esiti HappySign.");
+    }
+
+    @Transactional
+    private void aggiornaOrdini() {
         MissioneFilter filtro = new MissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
         filtro.setDaCron("S");
 
-        List<OrdineMissione> listaOrdiniMissione = ordineMissioneService.getOrdiniMissione(filtro, false, false);
-        if (listaOrdiniMissione == null) return;
+        List<OrdineMissione> lista = ordineMissioneService.getOrdiniMissione(filtro, false, false);
+        if (lista == null) return;
 
-        for (OrdineMissione ordineMissione : listaOrdiniMissione) {
+        for (OrdineMissione ordine : lista) {
             try {
-                if (ordineMissione.getIdFlusso() == null || ordineMissione.getIdFlusso().isEmpty() || happySignService == null) continue;
-
-                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(ordineMissione.getIdFlusso());
+                if (ordine.getIdFlusso() == null || ordine.getIdFlusso().isEmpty() || happySignService == null) continue;
+                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(ordine.getIdFlusso());
                 if (esito == null || EnumEsitoFlowDocumentStatus.TOSIGN == esito) continue;
 
                 if (EnumEsitoFlowDocumentStatus.SIGNED == esito) {
-                    GetDocumentResponse resp = safeGetDocument(ordineMissione.getIdFlusso());
+                    GetDocumentResponse resp = happySignService.getDocument(ordine.getIdFlusso());
                     if (resp != null && resp.getDocument() != null) {
-                        cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(resp.getDocument(), ordineMissione);
+                        cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(resp.getDocument(), ordine);
                     }
-                    FlowResult flowResult = new FlowResult();
-                    flowResult.setIdMissione(ordineMissione.getId().toString());
-                    flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
-                    flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
-                    flowService.aggiornaMissioneFlows(flowResult);
+                    FlowResult fr = new FlowResult();
+                    fr.setProcessInstanceId(ordine.getIdFlusso());
+                    fr.setIdMissione(ordine.getId().toString());
+                    fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
+                    fr.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
+                    fr.setCommento("");
+                    flowService.aggiornaMissioneFlows(fr);
                 } else if (EnumEsitoFlowDocumentStatus.REFUSED == esito) {
-                    GetDocumentDetailResponse details = safeGetDocumentDetails(ordineMissione.getIdFlusso());
+                    GetDocumentDetailResponse details = happySignService.getDocumentDetails(ordine.getIdFlusso());
                     if (details != null) {
-                        FlowResult flowResult = new FlowResult();
-                        flowResult.setIdMissione(ordineMissione.getId().toString());
-                        flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
-                        flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setUser("Utente Flusso Firma");
-                        setNoteMissioneRespinta(details, flowResult);
-                        flowService.aggiornaMissioneFlows(flowResult);
+                        FlowResult fr = new FlowResult();
+                        fr.setIdMissione(ordine.getId().toString());
+                        fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
+                        fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                        fr.setUser("Utente Flusso Firma");
+                        setNoteMissioneRespinta(details, fr);
+                        flowService.aggiornaMissioneFlows(fr);
                     }
                 }
             } catch (Exception e) {
-                if (isTransientHappySignError(e)) {
-                    log.debug("Elaborazione rimandata per ordineMissione id={}, HappySign non raggiungibile", ordineMissione.getId());
-                } else {
-                    log.error("Errore reale durante elaborazione ordineMissione id={}: {}", ordineMissione.getId(), e.getMessage());
+                if (!isTransientError(e)) {
+                    log.error("Errore elaborazione ordine id={}", ordine.getId(), e);
+                    inviaMailErroreCron("Ordine Missione",  ordine.getAnno() + "-" + ordine.getNumero(), e);
                 }
             }
         }
     }
 
-    public void aggiornaEsitiRimborsiMissioni() {
+    @Transactional
+    private void aggiornaRimborsi() {
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
         filtro.setDaCron("S");
 
-        List<RimborsoMissione> listaRimborsiMissione = rimborsoMissioneService.getRimborsiMissione(filtro, false, false);
-        if (listaRimborsiMissione == null) return;
+        List<RimborsoMissione> lista = rimborsoMissioneService.getRimborsiMissione(filtro, false, false);
+        if (lista == null) return;
 
-        for (RimborsoMissione rimborsoMissione : listaRimborsiMissione) {
+        for (RimborsoMissione rimborso : lista) {
             try {
-                if (rimborsoMissione.getIdFlusso() == null || rimborsoMissione.getIdFlusso().isEmpty() || happySignService == null) continue;
-
-                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(rimborsoMissione.getIdFlusso());
+                if (rimborso.getIdFlusso() == null || rimborso.getIdFlusso().isEmpty() || happySignService == null) continue;
+                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(rimborso.getIdFlusso());
                 if (esito == null || EnumEsitoFlowDocumentStatus.TOSIGN == esito) continue;
 
                 if (EnumEsitoFlowDocumentStatus.SIGNED == esito) {
-                    GetDocumentResponse resp = safeGetDocument(rimborsoMissione.getIdFlusso());
+                    GetDocumentResponse resp = happySignService.getDocument(rimborso.getIdFlusso());
                     if (resp != null && resp.getDocument() != null) {
-                        cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(resp.getDocument(), rimborsoMissione);
+                        cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(resp.getDocument(), rimborso);
                     }
-                    FlowResult flowResult = new FlowResult();
-                    flowResult.setIdMissione(rimborsoMissione.getId().toString());
-                    flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
-                    flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
-                    flowService.aggiornaMissioneFlows(flowResult);
+                    FlowResult fr = new FlowResult();
+                    fr.setProcessInstanceId(rimborso.getIdFlusso());
+                    fr.setIdMissione(rimborso.getId().toString());
+                    fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
+                    fr.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
+                    fr.setCommento("");
+                    flowService.aggiornaMissioneFlows(fr);
                 } else if (EnumEsitoFlowDocumentStatus.REFUSED == esito) {
-                    GetDocumentDetailResponse details = safeGetDocumentDetails(rimborsoMissione.getIdFlusso());
+                    GetDocumentDetailResponse details = happySignService.getDocumentDetails(rimborso.getIdFlusso());
                     if (details != null) {
-                        FlowResult flowResult = new FlowResult();
-                        flowResult.setIdMissione(rimborsoMissione.getId().toString());
-                        flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
-                        flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setUser("Utente Flusso Firma");
-                        setNoteMissioneRespinta(details, flowResult);
-                        flowService.aggiornaMissioneFlows(flowResult);
+                        FlowResult fr = new FlowResult();
+                        fr.setIdMissione(rimborso.getId().toString());
+                        fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
+                        fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                        fr.setUser("Utente Flusso Firma");
+                        setNoteMissioneRespinta(details, fr);
+                        flowService.aggiornaMissioneFlows(fr);
                     }
                 }
             } catch (Exception e) {
-                if (isTransientHappySignError(e)) {
-                    log.debug("Elaborazione rimandata per rimborsoMissione id={}, HappySign non raggiungibile", rimborsoMissione.getId());
-                } else {
-                    log.error("Errore reale durante elaborazione rimborsoMissione id={}: {}", rimborsoMissione.getId(), e.getMessage());
+                if (!isTransientError(e)) {
+                    log.error("Errore elaborazione rimborso id={}", rimborso.getId(), e);
+                    inviaMailErroreCron("Rimborso Missione", rimborso.getAnno() + "-" + rimborso.getNumero(), e);
                 }
             }
         }
     }
 
-    public void aggiornaEsitiAnnullamentiMissioni() {
+    @Transactional
+    private void aggiornaAnnullamenti() {
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
         filtro.setDaCron("S");
 
-        List<AnnullamentoOrdineMissione> listaAnnullamentiOrdini = annullamentoOrdineMissioneService.getAnnullamenti(filtro, false, false);
-        if (listaAnnullamentiOrdini == null) return;
+        List<AnnullamentoOrdineMissione> lista = annullamentoOrdineMissioneService.getAnnullamenti(filtro, false, false);
+        if (lista == null) return;
 
-        for (AnnullamentoOrdineMissione annullamentoOrdine : listaAnnullamentiOrdini) {
+        for (AnnullamentoOrdineMissione annullamento : lista) {
             try {
-                if (annullamentoOrdine.getIdFlusso() == null || annullamentoOrdine.getIdFlusso().isEmpty() || happySignService == null) continue;
-
-                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(annullamentoOrdine.getIdFlusso());
+                if (annullamento.getIdFlusso() == null || annullamento.getIdFlusso().isEmpty() || happySignService == null) continue;
+                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(annullamento.getIdFlusso());
                 if (esito == null || EnumEsitoFlowDocumentStatus.TOSIGN == esito) continue;
 
                 if (EnumEsitoFlowDocumentStatus.SIGNED == esito) {
-                    GetDocumentResponse resp = safeGetDocument(annullamentoOrdine.getIdFlusso());
+                    GetDocumentResponse resp = happySignService.getDocument(annullamento.getIdFlusso());
                     if (resp != null && resp.getDocument() != null) {
-                        cmisOrdineMissioneService.salvaStampaAnnullamentoOrdineMissioneSuCMIS(resp.getDocument(), annullamentoOrdine);
+                        cmisOrdineMissioneService.salvaStampaAnnullamentoOrdineMissioneSuCMIS(resp.getDocument(), annullamento);
                     }
-                    FlowResult flowResult = new FlowResult();
-                    flowResult.setIdMissione(annullamentoOrdine.getId().toString());
-                    flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
-                    flowResult.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
-                    flowService.aggiornaMissioneFlows(flowResult);
+                    FlowResult fr = new FlowResult();
+                    fr.setProcessInstanceId(annullamento.getIdFlusso());
+                    fr.setIdMissione(annullamento.getId().toString());
+                    fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
+                    fr.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
+                    fr.setCommento("");
+                    flowService.aggiornaMissioneFlows(fr);
                 } else if (EnumEsitoFlowDocumentStatus.REFUSED == esito) {
-                    GetDocumentDetailResponse details = safeGetDocumentDetails(annullamentoOrdine.getIdFlusso());
+                    GetDocumentDetailResponse details = happySignService.getDocumentDetails(annullamento.getIdFlusso());
                     if (details != null) {
-                        FlowResult flowResult = new FlowResult();
-                        flowResult.setIdMissione(annullamentoOrdine.getId().toString());
-                        flowResult.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
-                        flowResult.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        flowResult.setUser("Utente Flusso Firma");
-                        setNoteMissioneRespinta(details, flowResult);
-                        flowService.aggiornaMissioneFlows(flowResult);
+                        FlowResult fr = new FlowResult();
+                        fr.setIdMissione(annullamento.getId().toString());
+                        fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
+                        fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                        fr.setUser("Utente Flusso Firma");
+                        setNoteMissioneRespinta(details, fr);
+                        flowService.aggiornaMissioneFlows(fr);
                     }
                 }
             } catch (Exception e) {
-                if (isTransientHappySignError(e)) {
-                    log.debug("Elaborazione rimandata per annullamentoOrdine id={}, HappySign non raggiungibile", annullamentoOrdine.getId());
-                } else {
-                    log.error("Errore reale durante elaborazione annullamentoOrdine id={}: {}", annullamentoOrdine.getId(), e.getMessage());
+                if (!isTransientError(e)) {
+                    log.error("Errore elaborazione annullamento id={}", annullamento.getId(), e);
+                    inviaMailErroreCron("Annullamento Ordine", annullamento.getAnno() + "-" + annullamento.getNumero(), e);
                 }
             }
         }
@@ -239,23 +258,5 @@ public class CronHappySignService {
                 .findFirst()
                 .orElse("Respinta da firma su HappySign");
         flowResult.setCommento(noteRespinta);
-    }
-
-    private GetDocumentResponse safeGetDocument(String idFlusso) {
-        try {
-            return happySignService.getDocument(idFlusso);
-        } catch (Exception e) {
-            if (isTransientHappySignError(e)) return null;
-            throw e;
-        }
-    }
-
-    private GetDocumentDetailResponse safeGetDocumentDetails(String idFlusso) {
-        try {
-            return happySignService.getDocumentDetails(idFlusso);
-        } catch (Exception e) {
-            if (isTransientHappySignError(e)) return null;
-            throw e;
-        }
     }
 }

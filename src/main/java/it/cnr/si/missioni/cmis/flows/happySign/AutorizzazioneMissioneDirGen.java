@@ -19,10 +19,10 @@ import java.util.List;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.dirgen:}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.template:}')"
 )
 public class AutorizzazioneMissioneDirGen extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.dirgen:#{null}}")
+    @Value("${flows.autorizzazione.default.template:#{null}}")
     private String templateName;
 
     @Override

@@ -1,20 +1,5 @@
 /*
  *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
- *
- *      This program is free software: you can redistribute it and/or modify
- *      it under the terms of the GNU Affero General Public License as
- *      published by the Free Software Foundation, either version 3 of the
- *      License, or (at your option) any later version.
- *
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU Affero General Public License for more details.
- *
- *      You should have received a copy of the GNU Affero General Public License
- *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *
  */
 
 package it.cnr.si.missioni.service;
@@ -45,10 +30,7 @@ import it.cnr.si.missioni.web.filter.MissioneFilterMapper;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.OptimisticLockException;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.*;
 import jakarta.persistence.criteria.Subquery;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -73,9 +55,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-/**
- * Service class for managing users.
- */
 @Service
 public class OrdineMissioneService {
 
@@ -203,16 +182,12 @@ public class OrdineMissioneService {
     @Value("${spring.mail.messages.erroreGenerico.oggetto}")
     private String subjectGenericError;
 
-
     public Boolean isUserEnabledToViewMissione(OrdineMissione ordineMissione) {
         return ordineMissione.getUid().equals(securityService.getCurrentUserLogin()) || (ordineMissione.getResponsabileGruppo() != null && ordineMissione.getResponsabileGruppo().equals(securityService.getCurrentUserLogin()))
                 || accountService.isUserEnableToWorkUo(ordineMissione.getUoRich()) || accountService.isUserEnableToWorkUo(ordineMissione.getUoSpesa());
     }
 
-
-    //TODO capire gestione degli stati della missione per la visualizzazione degli stati delle autorizz. agg. (SI/NO)
-    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows)
-            throws AwesomeException {
+    public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail, Boolean retrieveDataFromFlows) throws AwesomeException {
         MissioneFilter filter = new MissioneFilter();
         filter.setDaId(idMissione);
         filter.setaId(idMissione);
@@ -253,11 +228,9 @@ public class OrdineMissioneService {
         return ordineMissione;
     }
 
-
     public OrdineMissione getOrdineMissione(Long idMissione, Boolean retrieveDetail) throws AwesomeException {
         return getOrdineMissione(idMissione, retrieveDetail, true);
     }
-
 
     public Map<String, byte[]> printOrdineMissione(Long idMissione) throws AwesomeException {
         String username = securityService.getCurrentUserLogin();
@@ -313,7 +286,6 @@ public class OrdineMissioneService {
             }
 
         } else {
-            // stampa locale
             fileName = "OrdineMissione" + idMissione + ".pdf";
             fileContent = printOrdineMissioneService.printOrdineMissione(ordineMissione, username);
 
@@ -341,11 +313,10 @@ public class OrdineMissioneService {
         return printOrdineMissioneService.createJsonPrintOrdineMissione(ordineMissione, securityService.getCurrentUserLogin());
     }
 
-    public List<OrdineMissione> getOrdiniMissioneForValidateFlows(MissioneFilter filter,
-                                                                  Boolean isServiceRest) throws AwesomeException {
+    public List<OrdineMissione> getOrdiniMissioneForValidateFlows(MissioneFilter filter, Boolean isServiceRest) throws AwesomeException {
         List<OrdineMissione> lista = getOrdiniMissione(filter, isServiceRest, true);
         if (lista != null) {
-            List<OrdineMissione> listaNew = new ArrayList<OrdineMissione>();
+            List<OrdineMissione> listaNew = new ArrayList<>();
             for (OrdineMissione ordineMissione : lista) {
                 if (ordineMissione.isStatoInviatoAlFlusso() && !ordineMissione.isMissioneDaValidare()) {
                     ordineMissione.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
@@ -368,8 +339,8 @@ public class OrdineMissioneService {
         return lista;
     }
 
-    public void aggiornaOrdineMissioneRespinto(FlowResult result,
-                                               OrdineMissione ordineMissioneDaAggiornare) throws AwesomeException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void aggiornaOrdineMissioneRespinto(FlowResult result, OrdineMissione ordineMissioneDaAggiornare) throws AwesomeException {
         aggiornaValidazione(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
         ordineMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
@@ -385,7 +356,6 @@ public class OrdineMissioneService {
             ordineMissioneAnticipoService.updateAnticipo(anticipo, false);
         }
         updateOrdineMissione(ordineMissioneDaAggiornare, true);
-
         missioneRespintaService.inserisciMissioneRespinta(result);
     }
 
@@ -399,33 +369,34 @@ public class OrdineMissioneService {
         updateOrdineMissione(ordineMissioneDaAggiornare, true);
     }
 
-    private String getTextErrorOrdine(OrdineMissione ordineMissione, FlowResult flow, String error) {
-        return textErrorFlowsOrdine + getTextErrorOrdineMissione(ordineMissione, flow, error);
-    }
-
-    private String getTextErrorOrdineMissione(OrdineMissione ordineMissione, FlowResult flow, String error) {
-        return " con id " + ordineMissione.getId() + " " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " di " + ordineMissione.getDatoreLavoroRich() + " collegato al flusso " + flow.getProcessInstanceId() + " con esito " + flow.getStato() + " è andata in errore per il seguente motivo: " + error;
-    }
-
     @Transactional(propagation = Propagation.REQUIRED)
     public void aggiornaOrdineMissione(OrdineMissione ordine, FlowResult flowResult) {
         if (ordine == null) return;
         try {
-            if (ordine.isStatoInviatoAlFlusso() && ordine.isMissioneConfermata() && !ordine.isMissioneDaValidare()) {
+            OrdineMissione ordineDB = ordineMissioneRepository.findById((Long) ordine.getId())
+                    .orElse(ordine);
+
+            if (ordineDB.isStatoFlussoApprovato()) {
+                log.debug("Ordine {} già DEFINITIVO. Skip.", ordineDB.getId());
+                return;
+            }
+
+            if (ordineDB.isStatoInviatoAlFlusso() && ordineDB.isMissioneConfermata() && !ordineDB.isMissioneDaValidare()) {
                 switch (flowResult.getStato()) {
                     case FlowResult.ESITO_FLUSSO_FIRMATO:
-                        aggiornaOrdineMissioneFirmato(ordine);
+                        aggiornaOrdineMissioneFirmato(ordineDB);
                         break;
                     case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                        aggiornaOrdineMissionePrimaFirma(ordine);
+                        aggiornaOrdineMissionePrimaFirma(ordineDB);
                         break;
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                        aggiornaOrdineMissioneRespinto(flowResult, ordine);
+                        aggiornaOrdineMissioneRespinto(flowResult, ordineDB);
                         break;
                 }
             } else {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "Esito flusso non corrispondente con lo stato dell'ordine. " + getTextErrorOrdine(ordine, flowResult, ""));
+                log.warn("Ordine {} stato anomalo: Stato={}, StatoFlusso={}, Esito={}. Skip.",
+                        ordineDB.getId(), ordineDB.getStato(), ordineDB.getStatoFlusso(), flowResult.getStato());
             }
         } catch (Exception e) {
             gestisciEccezioneFlusso(ordine, flowResult, e);
@@ -435,51 +406,53 @@ public class OrdineMissioneService {
     private void gestisciEccezioneFlusso(OrdineMissione ordine, FlowResult flowResult, Exception e) {
         String errore = Utility.getMessageException(e);
         if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && ordine.getId() != null) {
+            try {
+                OrdineMissione o = ordineMissioneRepository.findById((Long) ordine.getId()).orElseThrow();
+                o.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento non completato. Dettaglio: " + errore);
+                o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+                o.setStato(Costanti.STATO_INSERITO);
+                o.setDataInvioFirma(null);
+                o.setDataInvioAmministrativo(null);
+                o.setDataInvioRespGruppo(null);
+                o.setBypassAmministrativo(null);
+                o.setBypassRespGruppo(null);
+                o.setToBeUpdated();
+                ordineMissioneRepository.save(o);
 
-            OrdineMissione o = ordineMissioneRepository.findById((Long) ordine.getId()).orElseThrow();
-            o.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento non completato per incongruenze o dati mancanti.");
-            o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-            o.setStato(Costanti.STATO_INSERITO);
-            o.setDataInvioFirma(null);
-            o.setDataInvioAmministrativo(null);
-            o.setDataInvioRespGruppo(null);
-            o.setBypassAmministrativo(null);
-            o.setBypassRespGruppo(null);
-            o.setToBeUpdated();
-            ordineMissioneRepository.save(o);
-
-            String identificativo = o.getAnno() + "-" + o.getNumero();
-
-            mailService.inviaNotificheErroreFirma(
-                    o.getUid(),
-                    identificativo,
-                    "Ordine Missione",
-                    o.getDestinazione(),
-                    o.getDataInizioMissione(),
-                    o.getDataFineMissione(),
-                    e,
-                    subjectErrorFlowsOrdine
-            );
+                if (mailService != null) {
+                    String errorTrace = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);
+                    String body = "<h3>Errore Post-Firma HappySign</h3>" +
+                            "<p>L'ordine <b>" + o.getAnno() + "-" + o.getNumero() + "</b> è stato firmato ma l'aggiornamento a DEFINITIVO è fallito.</p>" +
+                            "<h4>Stack Trace:</h4><pre>" + errorTrace + "</pre>";
+                    mailService.sendEmailError(subjectErrorFlowsOrdine, body, false, true);
+                }
+            } catch (Exception ex) {
+                log.error("Errore durante il fallback di gestisciEccezioneFlusso per ordine " + ordine.getId(), ex);
+            }
         } else {
             throw new AwesomeException(CodiciErrore.ERRGEN, errore);
         }
     }
 
-    private void erroreOrdineMissione(OrdineMissione ordineMissioneDaAggiornare, FlowResult flowResult) {
-        String errore = "Esito flusso non corrispondente con lo stato dell'ordine.";
-        String testoErrore = getTextErrorOrdine(ordineMissioneDaAggiornare, flowResult, errore);
-        throw new AwesomeException(CodiciErrore.ERRGEN, errore + " " + testoErrore);
+    private String getTextErrorOrdine(OrdineMissione ordineMissione, FlowResult flow, String error) {
+        return textErrorFlowsOrdine + getTextErrorOrdineMissione(ordineMissione, flow, error);
     }
 
+    private String getTextErrorOrdineMissione(OrdineMissione ordineMissione, FlowResult flow, String error) {
+        return " con id " + ordineMissione.getId() + " " + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + " di " + ordineMissione.getDatoreLavoroRich() + " collegato al flusso " + flow.getProcessInstanceId() + " con esito " + flow.getStato() + " è andata in errore per il seguente motivo: " + error;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
     private void aggiornaOrdineMissioneFirmato(OrdineMissione ordineMissioneDaAggiornare) {
         retrieveDetails(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
-        updateOrdineMissione(ordineMissioneDaAggiornare, true);    // ← PRIMA: salva (può lanciare eccezione)
-        gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare); // ← POI: email (solo se salvataggio ok)
+        updateOrdineMissione(ordineMissioneDaAggiornare, true);
+        gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
         popolaCoda(ordineMissioneDaAggiornare);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     private void aggiornaOrdineMissionePrimaFirma(OrdineMissione ordineMissioneDaAggiornare) {
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
         updateOrdineMissione(ordineMissioneDaAggiornare, true);
@@ -494,9 +467,6 @@ public class OrdineMissioneService {
         Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
         String emailRich = ordineMissioneDaAggiornare.getUid();
 
-//        //todo x i test setto l'utente che crea l'ordine
-//        String emailRich = ordineMissioneDaAggiornare.getUidInsert();
-
         boolean missioneConAnticipo = false;
         OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissioneDaAggiornare);
         if (anticipo != null) {
@@ -504,26 +474,6 @@ public class OrdineMissioneService {
             ordineMissioneAnticipoService.updateAnticipo(anticipo, false);
             missioneConAnticipo = true;
         }
-//            DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
-//                    ordineMissioneDaAggiornare.getAnno());
-//            if (dati != null && dati.getMailNotifiche() != null) {
-//                if (!dati.getMailNotifiche().equals("N")) {
-//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
-//                            true, dati.getMailNotifiche());
-//                }
-//            } else {
-//                Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
-//                UsersSpecial richiedente = accountService.getUoForUsersSpecial(account.getUid());
-//                List<UsersSpecial> lista = accountService
-//                        .getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
-//                aggiuntaRichMailList(lista,richiedente);
-//                if (lista != null && lista.size() > 0) {
-//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo),
-//                            false, true, mailService.prepareTo(lista));
-//                }
-//            }
-//        }
-
 
         if (account != null && account.getCodice_sede() != null) {
             datiSede = datiSedeService.getDatiSede(account.getCodice_sede(), LocalDate.now());
@@ -539,7 +489,6 @@ public class OrdineMissioneService {
 
         Set<UsersSpecial> utentiUnici = new HashSet<>();
 
-        // Aggiungi utenti della UO richiedente
         if (Utility.nvl(datiIstituto.getTipoMailDopoOrdine(), "N").equals("U")) {
             utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), false));
         }
@@ -547,7 +496,6 @@ public class OrdineMissioneService {
             utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoRich(), true));
         }
 
-        // Aggiungi il richiedente direttamente
         if (emailRich != null) {
             UsersSpecial richiedente = accountService.findOrCreateUserSpecial(emailRich);
             if (richiedente != null) {
@@ -555,7 +503,6 @@ public class OrdineMissioneService {
             }
         }
 
-        // Aggiungi utenti della UO spesa
         if (datiIstitutoSpesa != null) {
             if (Utility.nvl(datiIstitutoSpesa.getTipoMailDopoOrdine(), "N").equals("V")) {
                 utentiUnici.addAll(accountService.getUserSpecialForUo(ordineMissioneDaAggiornare.getUoSpesa(), true));
@@ -565,12 +512,10 @@ public class OrdineMissioneService {
             }
         }
 
-
         String oggetto = isAnnullamento ? approvazioneAnnullamentoOrdineMissione : approvazioneOrdineMissione;
         String testo = isAnnullamento ? getTextMailApprovazioneAnnullamentoOrdine(ordineMissioneDaAggiornare)
                 : getTextMailApprovazioneOrdine(ordineMissioneDaAggiornare, missioneConAnticipo);
 
-        // Invia una singola email a tutti i destinatari
         if (utentiUnici.size() > 0) {
             List<UsersSpecial> listaUtenti = new ArrayList<>(utentiUnici);
             mailService.sendEmail(oggetto, testo, false, true, mailService.prepareTo(listaUtenti));
@@ -616,7 +561,7 @@ public class OrdineMissioneService {
 
             Missione missione = new Missione(
                     TypeMissione.ORDINE,
-                    (Long) ordineMissione.getId(), // Long già
+                    (Long) ordineMissione.getId(),
                     idSede,
                     ordineMissione.getMatricola(),
                     ordineMissione.getDataInizioMissione(),
@@ -642,34 +587,24 @@ public class OrdineMissioneService {
         return result.getState();
     }
 
-    public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter, Boolean isServiceRest)
-            throws AwesomeException {
+    public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter, Boolean isServiceRest) throws AwesomeException {
         return getOrdiniMissione(filter, isServiceRest, false);
     }
 
-    public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter,
-                                                  Boolean isServiceRest,
-                                                  Boolean isForValidateFlows) throws AwesomeException {
+    public List<OrdineMissione> getOrdiniMissione(MissioneFilter filter, Boolean isServiceRest, Boolean isForValidateFlows) throws AwesomeException {
 
         Specification<OrdineMissione> spec = MissioneFilterMapper.mapBaseFilters(filter);
 
         if (filter != null) {
-
-            // Se impostati sia user che uoRich, resetta uoRich
             if (filter.getUoRich() != null && filter.getUser() != null) {
                 filter.setUoRich(null);
             }
 
-            // --- Ramo daCron ---
             if ("S".equals(Utility.nvl(filter.getDaCron(), "N"))) {
                 // Nessun filtro utente aggiuntivo
-            }
-
-            // --- Ramo toFinal ---
-            else if ("S".equals(Utility.nvl(filter.getToFinal(), "N"))) {
+            } else if ("S".equals(Utility.nvl(filter.getToFinal(), "N"))) {
                 if (StringUtils.isEmpty(filter.getUoRich())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è stata selezionata la uo per rendere definitivi ordini di missione.");
                 }
                 UsersSpecial userSpecial = accountService.getUoForUsersSpecial(SecurityUtils.getCurrentUser().getName());
                 boolean uoAbilitata = false;
@@ -680,8 +615,7 @@ public class OrdineMissioneService {
                                 if (uoService.getUoSigla(uoUser).equals(filter.getUoRich())) {
                                     uoAbilitata = true;
                                     if (!"S".equals(Utility.nvl(uoUser.getRendi_definitivo(), "N"))) {
-                                        throw new AwesomeException(CodiciErrore.ERRGEN,
-                                                "L'utente non è abilitato a rendere definitivi ordini di missione.");
+                                        throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente non è abilitato a rendere definitivi ordini di missione.");
                                     }
                                 }
                             }
@@ -689,8 +623,7 @@ public class OrdineMissioneService {
                     }
                 }
                 if (!uoAbilitata) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "L'utente non è abilitato a rendere definitivi ordini di missione.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente non è abilitato a rendere definitivi ordini di missione.");
                 }
                 spec = new SpecificationBuilder<OrdineMissione>()
                         .and(spec)
@@ -698,10 +631,7 @@ public class OrdineMissioneService {
                         .and((root, query, cb) -> cb.equal(root.get("stato"), Costanti.STATO_CONFERMATO))
                         .and((root, query, cb) -> cb.equal(root.get("validato"), "S"))
                         .build();
-            }
-
-            // --- Ramo normale ---
-            else {
+            } else {
                 if (!isForValidateFlows) {
                     if (!StringUtils.isEmpty(filter.getUser())) {
                         spec = new SpecificationBuilder<OrdineMissione>()
@@ -711,7 +641,6 @@ public class OrdineMissioneService {
                     } else {
                         if (StringUtils.isEmpty(filter.getUoRich())) {
                             if ("S".equals(Utility.nvl(filter.getRespGruppo(), "N"))) {
-                                // Solo responsabile gruppo (stato != INS)
                                 String currentUser = SecurityUtils.getCurrentUser().getName();
                                 spec = new SpecificationBuilder<OrdineMissione>()
                                         .and(spec)
@@ -735,7 +664,6 @@ public class OrdineMissioneService {
 
                     if (userSpecial != null && !"S".equals(userSpecial.getAll())) {
                         if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
-                            // OR tra tutte le UO + responsabileGruppo
                             List<Specification<OrdineMissione>> uoSpecs = new ArrayList<>();
                             for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
                                 final String uoSigla = uoService.getUoSigla(uoUser);
@@ -743,7 +671,6 @@ public class OrdineMissioneService {
                                 uoSpecs.add((root, query, cb) -> cb.equal(root.get("uoSpesa"), uoSigla));
                                 uoSpecs.add((root, query, cb) -> cb.equal(root.get("uoCompetenza"), uoSigla));
                             }
-                            // Aggiunge responsabileGruppo alla disgiunzione (come in condizioneResponsabileGruppo)
                             uoSpecs.add(buildResponsabileGruppoSpec(filter, currentUser));
 
                             Specification<OrdineMissione> uoDisjunction = uoSpecs.stream()
@@ -761,7 +688,6 @@ public class OrdineMissioneService {
                     spec = sb.build();
                 }
 
-                // Escludi stati annullati (a meno che includiMissioniAnnullate o daId==aId)
                 if (!"S".equals(Utility.nvl(filter.getIncludiMissioniAnnullate()))
                         && !(filter.getDaId() != null && filter.getaId() != null
                         && filter.getDaId().compareTo(filter.getaId()) == 0)) {
@@ -775,7 +701,6 @@ public class OrdineMissioneService {
                     spec = sb.build();
                 }
 
-                // Filtro statoFlusso per REST + validateFlows
                 if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
                     List<String> listaStatiFlusso = Arrays.asList(
                             Costanti.STATO_INVIATO_FLUSSO,
@@ -794,7 +719,6 @@ public class OrdineMissioneService {
                 }
             }
 
-            // Filtro UO (comune, escluso daCron)
             if (filter.getUoRich() != null && !"S".equals(filter.getDaCron())) {
                 if (accountService.isUserEnableToWorkUo(filter.getUoRich())) {
                     Specification<OrdineMissione> s = (root, query, cb) -> cb.or(
@@ -810,7 +734,6 @@ public class OrdineMissioneService {
                 }
             }
 
-            // Solo missioni non gratuite
             if (Boolean.TRUE.equals(filter.getSoloMissioniNonGratuite())) {
                 spec = new SpecificationBuilder<OrdineMissione>()
                         .and(spec)
@@ -821,7 +744,6 @@ public class OrdineMissioneService {
                         .build();
             }
 
-            // Filtro giaRimborsato
             if ("N".equals(Utility.nvl(filter.getGiaRimborsato(), "A"))) {
                 spec = new SpecificationBuilder<OrdineMissione>()
                         .and(spec)
@@ -834,7 +756,6 @@ public class OrdineMissioneService {
                         .build();
             }
 
-            // Filtro daAnnullare
             if ("S".equals(Utility.nvl(filter.getDaAnnullare(), "N"))) {
                 spec = new SpecificationBuilder<OrdineMissione>()
                         .and(spec)
@@ -860,7 +781,6 @@ public class OrdineMissioneService {
 
         List<OrdineMissione> ordineMissioneList = ordineMissioneRepository.findAll(spec, sort);
 
-        // Recupero anticipo (solo isServiceRest senza validateFlows)
         if (Boolean.TRUE.equals(isServiceRest) && !Boolean.TRUE.equals(isForValidateFlows) && ordineMissioneList != null) {
             for (OrdineMissione ordineMissione : ordineMissioneList) {
                 OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
@@ -869,7 +789,6 @@ public class OrdineMissioneService {
             }
         }
 
-        // Recupero auto propria, taxi, noleggio
         if (ordineMissioneList != null && filter != null) {
             if ("S".equals(Utility.nvl(filter.getRecuperoAutoPropria()))) {
                 for (OrdineMissione o : ordineMissioneList) {
@@ -894,7 +813,6 @@ public class OrdineMissioneService {
         return ordineMissioneList;
     }
 
-    // Equivalente di condizioneResponsabileGruppo
     private Specification<OrdineMissione> buildResponsabileGruppoSpec(MissioneFilter filter, String currentUser) {
         if (filter.getDaId() != null && filter.getaId() != null
                 && filter.getDaId().compareTo(filter.getaId()) == 0) {
@@ -910,7 +828,6 @@ public class OrdineMissioneService {
         }
     }
 
-    // Equivalente di condizioneOrdineDellUtenteConResponsabileGruppo
     private Specification<OrdineMissione> buildUtenteConResponsabileGruppoSpec(MissioneFilter filter, String currentUser) {
         Specification<OrdineMissione> respGruppoSpec = buildResponsabileGruppoSpec(filter, currentUser);
         return respGruppoSpec.or((root, query, cb) -> cb.equal(root.get("uid"), currentUser));
@@ -929,24 +846,19 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione createOrdineMissione(OrdineMissione ordineMissione)
-            throws AwesomeException {
+    public OrdineMissione createOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException {
         controlloDatiObbligatoriDaGUI(ordineMissione);
         inizializzaCampiPerInserimento(ordineMissione);
-        boolean updateOrdineMissione = false;
         calcSpeseTotOrdine(ordineMissione, null);
-        validaCRUD(ordineMissione, updateOrdineMissione);
+        validaCRUD(ordineMissione, false);
         ordineMissione = ordineMissioneRepository.save(ordineMissione);
-        // autoPropriaRepository.save(autoPropria);
         log.debug("Created Information for User: {}", ordineMissione);
         return ordineMissione;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void verifyStepRespGruppo(OrdineMissione ordineMissione) throws AwesomeException {
-        log.info("Start 2 Resp gruppo");
-        DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
-                ordineMissione.getAnno());
+        DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
         ZonedDateTime oggi = ZonedDateTime.now();
         long minutiDifferenza = 10000;
         long minutiDifferenzaDaInizioMissione = 0;
@@ -954,28 +866,22 @@ public class OrdineMissioneService {
             minutiDifferenzaDaInizioMissione = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES),
                     ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
         }
-        log.info("Start 2.1 Resp gruppo");
         if (ordineMissione.getDataInvioRespGruppo() != null) {
             minutiDifferenza = ChronoUnit.MINUTES.between(
                     ordineMissione.getDataInvioRespGruppo().truncatedTo(ChronoUnit.MINUTES),
                     oggi.truncatedTo(ChronoUnit.MINUTES));
         }
-        log.info("Start 2.2 Resp gruppo");
-        if (istituto.getMinutiPrimaInizioResp() != null
-                && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioResp()) {
+        if (istituto.getMinutiPrimaInizioResp() != null && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioResp()) {
             if (istituto.getMinutiMinimiResp() != null && minutiDifferenza > istituto.getMinutiMinimiResp()) {
                 bypassRespGruppo(ordineMissione);
             }
         }
-        log.info("Start 2.3 Resp gruppo");
         if (istituto.getMinutiPassatiResp() != null && minutiDifferenza > istituto.getMinutiPassatiResp()) {
             bypassRespGruppo(ordineMissione);
         }
-
     }
 
     private void bypassRespGruppo(OrdineMissione ordineMissione) {
-        ZonedDateTime oggi = ZonedDateTime.now();
         ordineMissione.setBypassRespGruppo("S");
         ordineMissione.setDaChron("S");
         updateOrdineMissione(ordineMissione, false, true, null);
@@ -983,37 +889,28 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void verifyStepAmministrativo(OrdineMissione ordineMissione) throws AwesomeException {
-        log.info("Start 2 Amm");
-        DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
-                ordineMissione.getAnno());
+        DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
         ZonedDateTime oggi = ZonedDateTime.now();
         long minutiDifferenza = 10000;
         long minutiDifferenzaDaInizioMissione = 0;
-        log.info("Start 2.1 Amm");
         if (oggi.isBefore(ordineMissione.getDataInizioMissione())) {
             minutiDifferenzaDaInizioMissione = ChronoUnit.MINUTES.between(oggi.truncatedTo(ChronoUnit.MINUTES),
                     ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES));
         }
-        log.info("Start 2.2 Amm");
         if (ordineMissione.getDataInvioAmministrativo() != null) {
             minutiDifferenza = ChronoUnit.MINUTES.between(
                     ordineMissione.getDataInvioAmministrativo().truncatedTo(ChronoUnit.MINUTES),
                     oggi.truncatedTo(ChronoUnit.MINUTES));
         }
 
-        log.info("Start 2.3 Amm");
-        if (istituto.getMinutiPrimaInizioAmm() != null
-                && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioAmm()) {
+        if (istituto.getMinutiPrimaInizioAmm() != null && minutiDifferenzaDaInizioMissione < istituto.getMinutiPrimaInizioAmm()) {
             if (istituto.getMinutiMinimiAmm() != null && minutiDifferenza > istituto.getMinutiMinimiAmm()) {
                 bypassVerificaAmministrativo(ordineMissione);
             }
         }
-        log.info("Start 2.4 Amm");
         if (istituto.getMinutiPassatiAmm() != null && minutiDifferenza > istituto.getMinutiPassatiAmm()) {
             bypassVerificaAmministrativo(ordineMissione);
         }
-        log.info("Start 2.5 Amm");
-
     }
 
     private void bypassVerificaAmministrativo(OrdineMissione ordineMissione) {
@@ -1024,38 +921,20 @@ public class OrdineMissioneService {
         updateOrdineMissione(ordineMissione, false, true);
     }
 
-    private void inizializzaCampiPerInserimento(OrdineMissione ordineMissione)
-            throws AwesomeException {
+    private void inizializzaCampiPerInserimento(OrdineMissione ordineMissione) throws AwesomeException {
         ordineMissione.setUidInsert(securityService.getCurrentUserLogin());
         ordineMissione.setUser(securityService.getCurrentUserLogin());
         Integer anno = recuperoAnno(ordineMissione);
         ordineMissione.setAnno(anno);
-        ordineMissione.setNumero(datiIstitutoService.getNextPG(ordineMissione.getUoRich(), anno,
-                Costanti.TIPO_ORDINE_DI_MISSIONE));
-        if (StringUtils.isEmpty(ordineMissione.getTrattamento())) {
-            ordineMissione.setTrattamento("O");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())) {
-            ordineMissione.setObbligoRientro("S");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())) {
-            ordineMissione.setUtilizzoAutoNoleggio("N");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
-            ordineMissione.setUtilizzoTaxi("N");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
-            ordineMissione.setUtilizzoAutoServizio("N");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
-            ordineMissione.setPersonaleAlSeguito("N");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getRichiestaAnticipo())) {
-            ordineMissione.setRichiestaAnticipo("N");
-        }
-        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoPropria())) {
-            ordineMissione.setUtilizzoAutoPropria("N");
-        }
+        ordineMissione.setNumero(datiIstitutoService.getNextPG(ordineMissione.getUoRich(), anno, Costanti.TIPO_ORDINE_DI_MISSIONE));
+        if (StringUtils.isEmpty(ordineMissione.getTrattamento())) ordineMissione.setTrattamento("O");
+        if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())) ordineMissione.setObbligoRientro("S");
+        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())) ordineMissione.setUtilizzoAutoNoleggio("N");
+        if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) ordineMissione.setUtilizzoTaxi("N");
+        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) ordineMissione.setUtilizzoAutoServizio("N");
+        if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) ordineMissione.setPersonaleAlSeguito("N");
+        if (StringUtils.isEmpty(ordineMissione.getRichiestaAnticipo())) ordineMissione.setRichiestaAnticipo("N");
+        if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoPropria())) ordineMissione.setUtilizzoAutoPropria("N");
 
         aggiornaValidazione(ordineMissione);
 
@@ -1087,45 +966,34 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione)
-            throws AwesomeException {
+    public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione) throws AwesomeException {
         return updateOrdineMissione(ordineMissione, false);
     }
 
-    private OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows)
-            throws AwesomeException {
+    private OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows) throws AwesomeException {
         return updateOrdineMissione(ordineMissione, fromFlows, false);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows,
-                                               Boolean confirm) {
+    public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm) {
         return updateOrdineMissione(ordineMissione, fromFlows, confirm, null);
     }
 
-    //controlla che ci sia la Gae ,la voce di bilancio, l'impegno e l'importo presunto
     private void checkObbDatiContabili(OrdineMissione ordineMissione, boolean sendToSign) {
         if (sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getFondi()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Fondi");
-
             if (StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Anno Impegno");
-
             if (StringUtils.isEmpty(ordineMissione.getPgObbligazione()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero Impegno");
-
             if (StringUtils.isEmpty(ordineMissione.getVoce()))
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Voce Bilancio");
 
             String missioneGratuita = ordineMissione.getMissioneGratuita();
             if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !"S".equals(missioneGratuita)) {
-                throw new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto"
-                );
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
             }
-
         }
         if (!sendToSign) {
             if (StringUtils.isEmpty(ordineMissione.getGae()))
@@ -1134,12 +1002,10 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows,
-                                               Boolean confirm, String basePath) {
+    public OrdineMissione updateOrdineMissione(OrdineMissione ordineMissione, Boolean fromFlows, Boolean confirm, String basePath) {
         ZonedDateTime oggi = ZonedDateTime.now();
         if (!fromFlows && !isUserEnabledToViewMissione(ordineMissione) && Utility.nvl(ordineMissione.getDaChron(), "N").equals("N")) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Non Autorizzato");
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non Autorizzato");
         }
         OrdineMissione ordineMissioneDB = ordineMissioneRepository.findById((Long) ordineMissione.getId()).orElse(null);
 
@@ -1147,98 +1013,66 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
         }
 
-        try {
-            entityManager.lock(ordineMissioneDB, LockModeType.PESSIMISTIC_WRITE);
-        } catch (OptimisticLockException e) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Ordine in modifica. Ripetere l'operazione. ID: " + ordineMissioneDB.getId());
-        }
         boolean isCambioResponsabileGruppo = false;
         boolean isRitornoMissioneMittente = false;
         boolean emailToValidatorSent = false;
 
-        if (ordineMissioneDB == null) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
-        }
-
         boolean isValidatore = accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissioneDB.getUoSpesa()) && Utility.nvl(ordineMissione.getDaChron(), "N").equals("N");
 
         calcSpeseTotOrdine(ordineMissione, ordineMissioneDB);
-        // try {
-        // crudServiceBean.lockBulk(ordineMissioneDB);
-        // } catch (OptimisticLockException | PersistencyException |
-        // BusyResourceException e) {
-        // throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione
-        // in modifica. Ripetere l'operazione.");
-        // }
+
         if (ordineMissione.getResponsabileGruppo() != null && ordineMissioneDB.getResponsabileGruppo() != null
                 && !ordineMissione.getResponsabileGruppo().equals(ordineMissioneDB.getResponsabileGruppo())) {
             isCambioResponsabileGruppo = true;
             ordineMissioneDB.setNoteRespingi(null);
         }
+
         if (ordineMissioneDB.isMissioneConfermata() && !fromFlows
                 && !Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")) {
             if (ordineMissioneDB.isStatoFlussoApprovato()) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Non è possibile modificare l'ordine di missione. E' già stato approvato.");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare l'ordine di missione. E' già stato approvato.");
             }
             if (!ordineMissioneDB.isMissioneDaValidare()) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Non è possibile modificare l'ordine di missione. E' già stato avviato il flusso di approvazione.");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile modificare l'ordine di missione. E' già stato avviato il flusso di approvazione.");
             }
             ordineMissioneDB.setNoteRespingi(null);
         }
 
         if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("S")) {
-
             if (!ordineMissioneDB.getStato().equals(Costanti.STATO_CONFERMATO)) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione non confermato.");
             }
             if (!ordineMissioneDB.isMissioneDaValidare()) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già validato.");
             }
-
             if (!isValidatore) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Utente non abilitato a validare gli ordini di missione per la uo " + ordineMissioneDB.getUoSpesa() + ".");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo " + ordineMissioneDB.getUoSpesa() + ".");
             }
-
             validaCRUD(ordineMissione, true);
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
-
             if (confirm) {
                 checkObbDatiContabili(ordineMissione, true);
                 ordineMissioneDB.setValidato("S");
                 ordineMissioneDB.setNoteRespingi(null);
             }
-
         } else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("D")) {
-            if (ordineMissione.getEsercizioOriginaleObbligazione() == null
-                    || ordineMissione.getPgObbligazione() == null) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Per rendere definitivo l'ordine di missione è necessario valorizzare l'impegno.");
+            if (ordineMissione.getEsercizioOriginaleObbligazione() == null || ordineMissione.getPgObbligazione() == null) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Per rendere definitivo l'ordine di missione è necessario valorizzare l'impegno.");
             }
-            if (!StringUtils.isEmpty(ordineMissione.getGae())) {
-                ordineMissioneDB.setGae(ordineMissione.getGae());
-            }
-            if (!StringUtils.isEmpty(ordineMissione.getVoce())) {
-                ordineMissioneDB.setVoce(ordineMissione.getVoce());
-            }
+            if (!StringUtils.isEmpty(ordineMissione.getGae())) ordineMissioneDB.setGae(ordineMissione.getGae());
+            if (!StringUtils.isEmpty(ordineMissione.getVoce())) ordineMissioneDB.setVoce(ordineMissione.getVoce());
+
             ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
             ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
             ordineMissioneDB.setNoteRespingi(null);
             ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
         } else if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R")) {
-            if (!ordineMissione.isMissioneInviataResponsabile() && !accountService
-                    .isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissione.getUoSpesa())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Utente non abilitato a validare gli ordini di missione per la uo "
-                                + ordineMissione.getUoSpesa() + ".");
+            if (!ordineMissione.isMissioneInviataResponsabile() && !accountService.isUserSpecialEnableToValidateOrder(securityService.getCurrentUserLogin(), ordineMissione.getUoSpesa())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a validare gli ordini di missione per la uo " + ordineMissione.getUoSpesa() + ".");
             }
             if (ordineMissioneDB.isStatoNonInviatoAlFlusso() || ordineMissioneDB.isMissioneDaValidare()) {
                 if (StringUtils.isEmpty(ordineMissione.getNoteRespingi())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Non è possibile respingere un ordine di missione senza indicarne il motivo.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile respingere un ordine di missione senza indicarne il motivo.");
                 }
                 ordineMissioneDB.setDataInvioAmministrativo(null);
                 ordineMissioneDB.setDataInvioRespGruppo(null);
@@ -1247,8 +1081,7 @@ public class OrdineMissioneService {
                 ordineMissioneDB.setNoteRespingi(ordineMissione.getNoteRespingi());
                 isRitornoMissioneMittente = true;
             } else {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile sbloccare un ordine di missione se è stato già inviato al flusso.");
             }
         } else if (isInvioOrdineAlResponsabileGruppo(ordineMissione)) {
             if (ordineMissione.getResponsabileGruppo() != null) {
@@ -1258,43 +1091,27 @@ public class OrdineMissioneService {
                     ordineMissioneDB.setDataInvioRespGruppo(oggi);
                     ordineMissioneDB.setNoteRespingi(null);
                 } else {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Non è possibile inviare al responsabile una missione in stato diverso da 'Inserito'.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inviare al responsabile una missione in stato diverso da 'Inserito'.");
                 }
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "E' obbligatorio indicare il responsabile del gruppo.");
             }
-// CODICE DA TOGLIERE DA INIZIO ANNO FINO  AL RIBALTAMENTO EFFETTUATO
-            /*if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-            }*/
-
         } else {
             validaCRUD(ordineMissione, true);
             aggiornaDatiOrdineMissione(ordineMissione, confirm, ordineMissioneDB);
         }
 
         if (confirm) {
-            DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
-                    ordineMissione.getAnno());
-            if (istituto != null && istituto.isAttivaGestioneResponsabileModulo()
-                    && !ordineMissione.isMissioneGratuita()) {
+            DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+            if (istituto != null && istituto.isAttivaGestioneResponsabileModulo() && !ordineMissione.isMissioneGratuita()) {
                 if (StringUtils.isEmpty(ordineMissioneDB.getResponsabileGruppo())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma non è stato inserito il responsabile del gruppo.");
                 }
-                // CODICE DA TOGLIERE DA INIZIO ANNO FINO  AL RIBALTAMENTO EFFETTUATO
-                /*if (StringUtils.isEmpty(ordineMissioneDB.getPgProgetto())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "E' necessario indicare il Progetto.");
-                }*/
-                if (ordineMissioneDB.isMissioneInserita()
-                        && !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma l'ordine di missione non è stato inviato alla sua approvazione.");
+                if (ordineMissioneDB.isMissioneInserita() && !ordineMissioneDB.getResponsabileGruppo().equals(ordineMissione.getUid())) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Per il cds di spesa indicato è attiva la gestione del responsabile del gruppo ma l'ordine di missione non è stato inviato alla sua approvazione.");
                 }
             }
-            if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("N") && ordineMissione.isMissioneConfermata()
-                    && ordineMissione.isMissioneDaValidare()) {
+            if (Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("N") && ordineMissione.isMissioneConfermata() && ordineMissione.isMissioneDaValidare()) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di missione già confermato.");
             }
             ordineMissioneDB.setStato(Costanti.STATO_CONFERMATO);
@@ -1303,10 +1120,8 @@ public class OrdineMissioneService {
 
         ordineMissioneDB.setToBeUpdated();
 
-        // //effettuo controlli di validazione operazione CRUD
         if (!Utility.nvl(ordineMissione.getDaValidazione(), "N").equals("R") && !fromFlows) {
-            boolean updateOrdineMissione = true;
-            validaCRUD(ordineMissioneDB, updateOrdineMissione);
+            validaCRUD(ordineMissioneDB, true);
         }
 
         if (confirm) {
@@ -1318,76 +1133,52 @@ public class OrdineMissioneService {
                 ordineMissioneDB.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
                 ordineMissioneDB.setValidato("S");
                 ordineMissioneDB.setStato(Costanti.STATO_DEFINITIVO);
-
             } else if (!ordineMissioneDB.isMissioneDaValidare()) {
-                DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
-                        ordineMissione.getAnno());
-                //bosgna controllare Anno Impegno, numero Impegno Fondi
-                if (Utility.nvl(istituto.getCreaImpegnoAut(), "N").equals("S")) {
-
-                }
+                DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
                 checkObbDatiContabili(ordineMissione, true);
                 cmisOrdineMissioneService.avviaFlusso(ordineMissioneDB);
                 ordineMissioneDB.setStateFlows(Costanti.STATO_FLUSSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_FROM_CMIS));
                 ordineMissioneDB.setDataInvioFirma(oggi);
-                if (istituto.isAttivaGestioneResponsabileModulo()) {
-                    if (ordineMissioneDB.getDataInvioRespGruppo() == null) {
-                        ordineMissioneDB.setDataInvioRespGruppo(oggi);
-                    }
+                if (istituto.isAttivaGestioneResponsabileModulo() && ordineMissioneDB.getDataInvioRespGruppo() == null) {
+                    ordineMissioneDB.setDataInvioRespGruppo(oggi);
                 }
                 if (ordineMissioneDB.getDataInvioAmministrativo() == null) {
                     ordineMissioneDB.setDataInvioAmministrativo(oggi);
                 }
             } else if (ordineMissioneDB.isMissioneDaValidare()) {
-
                 checkObbDatiContabili(ordineMissione, false);
-                DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
-                        ordineMissione.getAnno());
-                if (istituto.isAttivaGestioneResponsabileModulo()) {
-                    if (ordineMissioneDB.getDataInvioRespGruppo() == null) {
-                        ordineMissioneDB.setDataInvioRespGruppo(oggi);
-                    }
+                DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
+                if (istituto.isAttivaGestioneResponsabileModulo() && ordineMissioneDB.getDataInvioRespGruppo() == null) {
+                    ordineMissioneDB.setDataInvioRespGruppo(oggi);
                 }
                 ordineMissioneDB.setDataInvioAmministrativo(oggi);
-                //invio email all'invio in validazione di un richiedente (aggiungi nel corpo anche ...per la verifica/completamento dei dati finanziari.)
                 sendMailToValidator(basePath, ordineMissioneDB);
                 emailToValidatorSent = true;
             }
-
         }
 
         ordineMissioneDB = ordineMissioneRepository.save(ordineMissioneDB);
-
-        // autoPropriaRepository.save(autoPropria);
         log.debug("Updated Information for Ordine di Missione: {}", ordineMissioneDB);
-        if (isInvioOrdineAlResponsabileGruppo(ordineMissione)
-                || (isCambioResponsabileGruppo && ordineMissioneDB.isMissioneInviataResponsabile())
-                && basePath != null) {
+
+        if (isInvioOrdineAlResponsabileGruppo(ordineMissione) || (isCambioResponsabileGruppo && ordineMissioneDB.isMissioneInviataResponsabile()) && basePath != null) {
             mailService.sendEmail(subjectSendToManagerOrdine + " " + getNominativo(ordineMissioneDB.getUid()),
-                    getTextMailSendToManager(basePath, ordineMissioneDB), false, true,
-                    accountService.getEmail(ordineMissione.getResponsabileGruppo()));
-            //controlla se non è stata già inviata l'email ai validatori, in tal caso non fare il reinvio
+                    getTextMailSendToManager(basePath, ordineMissioneDB), false, true, accountService.getEmail(ordineMissione.getResponsabileGruppo()));
         } else if (confirm && ordineMissioneDB.isMissioneDaValidare() && !emailToValidatorSent) {
             sendMailToAdministrative(basePath, ordineMissioneDB);
             emailToValidatorSent = true;
         }
+
         if (isRitornoMissioneMittente) {
             missioneRespintaService.inserisciOrdineMissioneRespinto(ordineMissioneDB, ordineMissione.isMissioneInviataResponsabile() ? MissioneRespinta.FASE_RESPINGI_RESP_GRUPPO : MissioneRespinta.FASE_RESPINGI_AMMINISTRATIVI);
-            mailService.sendEmail(subjectReturnToSenderOrdine,
-                    getTextMailReturnToSender(basePath, ordineMissioneDB), false, true,
-                    accountService.getEmail(ordineMissioneDB.getUidInsert()));
+            mailService.sendEmail(subjectReturnToSenderOrdine, getTextMailReturnToSender(basePath, ordineMissioneDB), false, true, accountService.getEmail(ordineMissioneDB.getUidInsert()));
         }
         return ordineMissioneDB;
     }
 
     private void calcSpeseTotOrdine(OrdineMissione ordineMissione, @Nullable OrdineMissione ordineMissioneDB) {
-        BigDecimal dbTotOrdine = ordineMissioneDB != null
-                ? Utility.nvl(ordineMissioneDB.getTotaleSpesePresComplessivo())
-                : BigDecimal.ZERO;
-
+        BigDecimal dbTotOrdine = ordineMissioneDB != null ? Utility.nvl(ordineMissioneDB.getTotaleSpesePresComplessivo()) : BigDecimal.ZERO;
         BigDecimal calcTotOrdine = Utility.nvl(ordineMissione.getTotaleSpeseOrdine());
         BigDecimal toUpdateTotOrdine = Utility.nvl(ordineMissione.getTotaleSpesePresComplessivo());
-
         BigDecimal totaleSpesaOrdine = calcolaTot(dbTotOrdine, calcTotOrdine, toUpdateTotOrdine);
 
         if (ordineMissioneDB != null) {
@@ -1397,9 +1188,7 @@ public class OrdineMissioneService {
         }
     }
 
-
-    private void aggiornaDatiOrdineMissione(OrdineMissione ordineMissione, Boolean confirm,
-                                            OrdineMissione ordineMissioneDB) {
+    private void aggiornaDatiOrdineMissione(OrdineMissione ordineMissione, Boolean confirm, OrdineMissione ordineMissioneDB) {
         ordineMissioneDB.setStato(ordineMissione.getStato());
         ordineMissioneDB.setStatoFlusso(ordineMissione.getStatoFlusso());
         ordineMissioneDB.setCdrSpesa(ordineMissione.getCdrSpesa());
@@ -1452,7 +1241,6 @@ public class OrdineMissioneService {
         ordineMissioneDB.setPersonaleAlSeguito(ordineMissione.getPersonaleAlSeguito());
         ordineMissioneDB.setUtilizzoAutoServizio(ordineMissione.getUtilizzoAutoServizio());
         ordineMissioneDB.setUtilizzoAutoPropria(ordineMissione.getUtilizzoAutoPropria());
-        //ordineMissioneDB.setPgProgetto(ordineMissione.getPgProgetto());
         ordineMissioneDB.setEsercizioOriginaleObbligazione(ordineMissione.getEsercizioOriginaleObbligazione());
         ordineMissioneDB.setPgObbligazione(ordineMissione.getPgObbligazione());
         ordineMissioneDB.setResponsabileGruppo(ordineMissione.getResponsabileGruppo());
@@ -1472,8 +1260,7 @@ public class OrdineMissioneService {
     }
 
     private void sendMailToAdministrative(String basePath, OrdineMissione ordineMissioneDB) {
-        DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDB.getUoSpesa(),
-                ordineMissioneDB.getAnno());
+        DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDB.getUoSpesa(), ordineMissioneDB.getAnno());
         String testoMail = getTextMailSendToAdministrative(basePath, ordineMissioneDB);
         String subjectMail = subjectSendToAdministrative + " " + getNominativo(ordineMissioneDB.getUid());
         if (dati != null && dati.getMailNotifiche() != null) {
@@ -1511,7 +1298,6 @@ public class OrdineMissioneService {
         sendMailToGroup(lista, testoMail, oggetto);
     }
 
-
     private String getNominativo(String user) {
         Account utente = accountService.loadAccountFromUsername(user);
         return utente.getCognome() + " " + utente.getNome();
@@ -1540,7 +1326,6 @@ public class OrdineMissioneService {
 
             ordineMissioneDettagliService.cancellaOrdineMissioneDettagli(ordineMissione, false);
 
-            // effettuo controlli di validazione operazione CRUD
             ordineMissione.setStato(Costanti.STATO_ANNULLATO);
             ordineMissione.setToBeUpdated();
             if (ordineMissione.isStatoRespintoFlusso() && !StringUtils.isEmpty(ordineMissione.getIdFlusso())) {
@@ -1573,16 +1358,13 @@ public class OrdineMissioneService {
             } else if (StringUtils.isEmpty(ordineMissione.getGae())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": GAE");
             } else if (StringUtils.isEmpty(ordineMissione.getDataInizioMissione())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Data Inizio Missione");
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Data Inizio Missione");
             } else if (StringUtils.isEmpty(ordineMissione.getDataFineMissione())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Data Fine Missione");
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Data Fine Missione");
             } else if (StringUtils.isEmpty(ordineMissione.getDataInserimento())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Data Inserimento");
             } else if (StringUtils.isEmpty(ordineMissione.getDatoreLavoroRich())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Datore di Lavoro Richiedente");
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Datore di Lavoro Richiedente");
             } else if (StringUtils.isEmpty(ordineMissione.getDestinazione())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Destinazione");
             } else if (StringUtils.isEmpty(ordineMissione.getOggetto())) {
@@ -1593,8 +1375,7 @@ public class OrdineMissioneService {
                 throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Tipo Missione");
             }
             if (ordineMissione.isMissioneEstera()) {
-                if (StringUtils.isEmpty(ordineMissione.getNazione())
-                        || Costanti.NAZIONE_ITALIA_SIGLA.compareTo(ordineMissione.getNazione()) == 0) {
+                if (StringUtils.isEmpty(ordineMissione.getNazione()) || Costanti.NAZIONE_ITALIA_SIGLA.compareTo(ordineMissione.getNazione()) == 0) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Nazione");
                 }
                 if (StringUtils.isEmpty(ordineMissione.getTrattamento())) {
@@ -1608,40 +1389,30 @@ public class OrdineMissioneService {
 
             if (Utility.nvl(ordineMissione.getPartenzaDa(), "N").equals("A")) {
                 if (StringUtils.isEmpty(ordineMissione.getPartenzaDaAltro())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            CodiciErrore.CAMPO_OBBLIGATORIO + ": Specificare il luogo di partenza");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Specificare il luogo di partenza");
                 }
             }
 
             if (ordineMissione.isMissioneConGiorniDivervi()) {
                 if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            CodiciErrore.CAMPO_OBBLIGATORIO + ": Obbligo di Rientro");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Obbligo di Rientro");
                 }
             }
             if (ordineMissione.isMissioneDipendente()) {
                 if (StringUtils.isEmpty(ordineMissione.getComuneResidenzaRich())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            CodiciErrore.CAMPO_OBBLIGATORIO + ": Comune di Residenza del Richiedente");
-                } /*else if (StringUtils.isEmpty(ordineMissione.getIndirizzoResidenzaRich())) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            CodiciErrore.CAMPO_OBBLIGATORIO + ": Indirizzo di Residenza del Richiedente");
-                }*/
+                    throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Comune di Residenza del Richiedente");
+                }
             }
 
             String missioneGratuita = ordineMissione.getMissioneGratuita();
             if (StringUtils.isEmpty(ordineMissione.getImportoPresunto()) && !"S".equals(missioneGratuita)) {
-                throw new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto"
-                );
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Importo Presunto");
             }
 
         }
     }
 
     private void controlloCongruenzaDatiInseriti(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
-
         if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
             if (!String.valueOf(ordineMissione.getEsercizioOriginaleObbligazione()).matches("\\d{4}")) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "L'anno dell' impegno deve essere composto da 4 cifre");
@@ -1649,102 +1420,45 @@ public class OrdineMissioneService {
         }
 
         if (ordineMissione.getDataFineMissione().isBefore(ordineMissione.getDataInizioMissione())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
-                    + ": La data di fine missione non può essere precedente alla data di inizio missione");
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI + ": La data di fine missione non può essere precedente alla data di inizio missione");
         }
-        if (DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC).equals(
-                DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC))) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
-                    + ": Le date di inizio e fine missione non possono essere uguali");
+        if (DateUtils.getDateAsString(ordineMissione.getDataFineMissione(), DateUtils.PATTERN_DATETIME_NO_SEC).equals(DateUtils.getDateAsString(ordineMissione.getDataInizioMissione(), DateUtils.PATTERN_DATETIME_NO_SEC))) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI + ": Le date di inizio e fine missione non possono essere uguali");
         }
 
         if (StringUtils.isEmpty(ordineMissione.getIdFlusso()) && ordineMissione.isStatoInviatoAlFlusso()) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile avere lo stato Inviato al flusso e non avere l'ID del flusso");
         }
         if (!ordineMissione.isMissioneEstera()) {
             ordineMissione.setNazione(Long.valueOf("1"));
         }
-        // if (ordineMissione.getUtilizzoAutoNoleggio() != null &&
-        // ordineMissione.getUtilizzoAutoNoleggio().equals("S") &&
-        // !ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) !=
-        // null ){
-        // throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile
-        // salvare una missione con la richiesta di utilizzo dell'auto a
-        // noleggio e dell'auto propria.");
-        // }
-        // if (ordineMissione.getUtilizzoTaxi() != null &&
-        // ordineMissione.getUtilizzoTaxi().equals("S") &&
-        // !ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) !=
-        // null ){
-        // throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile
-        // salvare una missione con la richiesta di utilizzo del taxi e
-        // dell'auto propria.");
-        // }
-        /*if (!StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
-            if (ordineMissione.getUtilizzoAutoNoleggio().equals("N")) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                        + ": Non è possibile indicare le note all'utilizzo dell'auto a noleggio se non si è scelto il suo utilizzo");
-            }
-        }*/
-        // if (ordineMissione.getUtilizzoAutoServizio() != null &&
-        // ordineMissione.getUtilizzoAutoServizio().equals("S") &&
-        // !ordineMissione.isToBeCreated() && getAutoPropria(ordineMissione) !=
-        // null ){
-        // throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile
-        // salvare una missione con la richiesta di utilizzo dell'auto di
-        // servizio e dell'auto propria.");
-        // }
-        /*if (Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
-                && StringUtils.isEmpty(ordineMissione.getNoteUtilizzoTaxiNoleggio())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                    + ": E' obbligatorio indicare le note all'utilizzo dell'auto a noleggio se si è scelto il suo utilizzo");
-        }*/
-        // if
-        // ((Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S")
-        // && Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S"))
-        // ||
-        // (Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") &&
-        // Utility.nvl(ordineMissione.getUtilizzoAutoServizio()).equals("S")) ||
-        // (Utility.nvl(ordineMissione.getUtilizzoTaxi()).equals("S") &&
-        // Utility.nvl(ordineMissione.getUtilizzoAutoNoleggio()).equals("S"))){
-        // throw new AwesomeException(CodiciErrore.ERRGEN,
-        // CodiciErrore.DATI_INCONGRUENTI+": Scegliere solo un utilizzo
-        // dell'auto ");
-        // }
+
         if (ordineMissione.isFondiCompetenza() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione())
                 && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())
-                && ordineMissione.getEsercizioObbligazione()
-                .compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) != 0) {
+                && ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) != 0) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Incongruenza tra fondi e esercizio obbligazione.");
         }
         if (ordineMissione.isFondiResiduo() && !StringUtils.isEmpty(ordineMissione.getEsercizioObbligazione())
                 && !StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())
-                && ordineMissione.getEsercizioObbligazione()
-                .compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) <= 0) {
+                && ordineMissione.getEsercizioObbligazione().compareTo(ordineMissione.getEsercizioOriginaleObbligazione()) <= 0) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Incongruenza tra fondi e esercizio obbligazione.");
         }
         if (ordineMissione.isTrattamentoAlternativoMissione()) {
-            long oreDifferenza = ChronoUnit.HOURS.between(
-                    ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES),
-                    ordineMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
+            long oreDifferenza = ChronoUnit.HOURS.between(ordineMissione.getDataInizioMissione().truncatedTo(ChronoUnit.MINUTES), ordineMissione.getDataFineMissione().truncatedTo(ChronoUnit.MINUTES));
             if (oreDifferenza < 24) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Per il trattamento alternativo di missione è necessario avere una durata non inferiore a 24 ore.");
             }
         }
         if (Utility.nvl(ordineMissione.getMissioneGratuita()).equals("S") && ordineMissione.getImportoPresunto() != null
                 && ordineMissione.getImportoPresunto().compareTo(BigDecimal.ZERO) != 0) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Non è possibile inserire una missione con spese a carico di altro ente e l'importo presunto");
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire una missione con spese a carico di altro ente e l'importo presunto");
         }
         if (!StringUtils.hasLength(ordineMissione.getMatricola())) {
             ordineMissione.setMatricola(null);
         }
         if (!updateOrdineMissione) {
             if (ordineMissione.getDataInizioMissione().isBefore(ZonedDateTime.now())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI
-                        + ": La data di inizio missione non può essere precedente alla data di oggi");
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.ERR_DATE_INCONGRUENTI + ": La data di inizio missione non può essere precedente alla data di oggi");
             }
         }
 
@@ -1752,109 +1466,87 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto non può essere negativo");
         }
 
-        if (ordineMissione.getImportoPresunto() != null) {
-            BigDecimal totaleSpesePresComp = ordineMissione.getTotaleSpesePresComplessivo();
+        if (updateOrdineMissione) {
+            BigDecimal totaleSpesePresComp = null;
+            if (ordineMissione.getImportoPresunto() != null) {
+                totaleSpesePresComp = ordineMissione.getTotaleSpesePresComplessivo();
 
-            if (totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.ITALY);
-                currencyFormatter.setMinimumFractionDigits(2);
-                currencyFormatter.setMaximumFractionDigits(2);
+                if (totaleSpesePresComp == null || totaleSpesePresComp.signum() == 0) {
+                    totaleSpesePresComp = BigDecimal.ZERO;
+                    if (ordineMissione.getOrdineMissioneDettagli() != null) {
+                        totaleSpesePresComp = ordineMissione.getOrdineMissioneDettagli()
+                                .stream()
+                                .map(OrdineMissioneDettagli::getImportoEuro)
+                                .filter(Objects::nonNull)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    }
+                    if (totaleSpesePresComp.equals(BigDecimal.ZERO)) {
+                        throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto è valorizzato, ma il totale delle spese presunte risulta 0.");
+                    }
+                    if (ordineMissione.getImportoPresunto().equals(BigDecimal.ZERO)) {
+                        throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto deve essere valorizzato e maggiore di 0.");
+                    }
+                    ordineMissione.setTotaleSpesePresComplessivo(totaleSpesePresComp);
+                }
 
-                String totaleSpeseFormattato = currencyFormatter.format(totaleSpesePresComp);
-                String importoPresuntoFormattato = currencyFormatter.format(ordineMissione.getImportoPresunto());
-
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Il totale delle spese (" + totaleSpeseFormattato + ") non può superare l'importo presunto ("
-                                + importoPresuntoFormattato + ").");
+                assert totaleSpesePresComp != null;
+                if (totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.ITALY);
+                    currencyFormatter.setMinimumFractionDigits(2);
+                    currencyFormatter.setMaximumFractionDigits(2);
+                    String totaleSpeseFormattato = currencyFormatter.format(totaleSpesePresComp);
+                    String importoPresuntoFormattato = currencyFormatter.format(ordineMissione.getImportoPresunto());
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Il totale delle spese (" + totaleSpeseFormattato + ") non può superare l'importo presunto (" + importoPresuntoFormattato + ").");
+                }
             }
         }
-
-
     }
 
     private void controlloDatiFinanziari(OrdineMissione ordineMissione) {
-        UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(ordineMissione.getUoSpesa(),
-                ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
+        UnitaOrganizzativa uo = unitaOrganizzativaService.loadUo(ordineMissione.getUoSpesa(), ordineMissione.getCdsSpesa(), ordineMissione.getAnno());
         if (uo == null) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": La UO "
-                    + ordineMissione.getUoSpesa() + " non è corretta rispetto al CDS " + ordineMissione.getCdsSpesa());
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": La UO " + ordineMissione.getUoSpesa() + " non è corretta rispetto al CDS " + ordineMissione.getCdsSpesa());
         }
         if (!StringUtils.isEmpty(ordineMissione.getCdrSpesa())) {
             Cdr cdr = cdrService.loadCdr(ordineMissione.getCdrSpesa(), ordineMissione.getUoSpesa());
             if (cdr == null) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        CodiciErrore.DATI_INCONGRUENTI + ": Il CDR " + ordineMissione.getCdrSpesa()
-                                + " non è corretto rispetto alla UO " + ordineMissione.getUoSpesa());
+                throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Il CDR " + ordineMissione.getCdrSpesa() + " non è corretto rispetto alla UO " + ordineMissione.getUoSpesa());
             }
         }
-        LocalDate data = LocalDate.now();
-        int anno = data.getYear();
-        /*if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())) {
-            Progetto progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), anno,
-                    ordineMissione.getUoSpesa());
-            if (progetto == null) {
-                progetto = progettoService.loadModulo(ordineMissione.getPgProgetto(), ordineMissione.getAnno(),
-                        ordineMissione.getUoSpesa());
-                if (progetto == null) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                            + ": Il modulo indicato non è corretto rispetto alla UO " + ordineMissione.getUoSpesa());
-                }
-            }
-        }*/
+
         if (!StringUtils.isEmpty(ordineMissione.getGae())) {
             if (StringUtils.isEmpty(ordineMissione.getCdrSpesa())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Non è possibile indicare la GAE senza il centro di responsabilità");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile indicare la GAE senza il centro di responsabilità");
             }
             Gae gae = gaeService.loadGae(ordineMissione);
             if (gae == null) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "La GAE " + ordineMissione.getGae() + " indicata non esiste");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "La GAE " + ordineMissione.getGae() + " indicata non esiste");
             } else {
                 boolean progettoCdrIndicato = false;
-                /*if (!StringUtils.isEmpty(ordineMissione.getPgProgetto())
-                        && !StringUtils.isEmpty(gae.getPg_progetto())) {
-                    progettoCdrIndicato = true;
-                    if (gae.getPg_progetto().compareTo(ordineMissione.getPgProgetto()) != 0) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN,
-                                CodiciErrore.DATI_INCONGRUENTI + ": La GAE indicata " + ordineMissione.getGae()
-                                        + " non corrisponde al modulo indicato.");
-                    }
-                }*/
                 if (!StringUtils.isEmpty(ordineMissione.getCdrSpesa())) {
                     progettoCdrIndicato = true;
                     if (!gae.getCd_centro_responsabilita().equals(ordineMissione.getCdrSpesa())) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN,
-                                CodiciErrore.DATI_INCONGRUENTI + ": La GAE indicata " + ordineMissione.getGae()
-                                        + " non corrisponde con il CDR " + ordineMissione.getCdrSpesa() + " indicato.");
+                        throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": La GAE indicata " + ordineMissione.getGae() + " non corrisponde con il CDR " + ordineMissione.getCdrSpesa() + " indicato.");
                     }
                 }
                 if (!progettoCdrIndicato) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                            + ": Non è possibile indicare solo La GAE senza il modulo o il CDR.");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": Non è possibile indicare solo La GAE senza il modulo o il CDR.");
                 }
             }
         }
 
         if (!StringUtils.isEmpty(ordineMissione.getPgObbligazione())) {
             if (StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Oltre al numero dell'impegno è necessario indicare anche l'anno dell'impegno");
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre al numero dell'impegno è necessario indicare anche l'anno dell'impegno");
             }
             if (!StringUtils.isEmpty(ordineMissione.getGae())) {
                 ImpegnoGae impegnoGae = impegnoGaeService.loadImpegno(ordineMissione);
                 if (impegnoGae == null) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-"
-                                    + ordineMissione.getPgObbligazione() + " non corrisponde con la GAE "
-                                    + ordineMissione.getGae() + " indicata oppure non esiste");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() + " non corrisponde con la GAE " + ordineMissione.getGae() + " indicata oppure non esiste");
                 } else {
                     if (!StringUtils.isEmpty(ordineMissione.getVoce())) {
                         if (!impegnoGae.getCdElementoVoce().equals(ordineMissione.getVoce())) {
-                            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                                    + ": L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-"
-                                    + ordineMissione.getPgObbligazione()
-                                    + " non corrisponde con la voce di Bilancio indicata." + ordineMissione.getVoce());
+                            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() + " non corrisponde con la voce di Bilancio indicata." + ordineMissione.getVoce());
                         }
                     } else {
                         ordineMissione.setVoce(impegnoGae.getCdElementoVoce());
@@ -1865,16 +1557,11 @@ public class OrdineMissioneService {
             } else {
                 Impegno impegno = impegnoService.loadImpegno(ordineMissione);
                 if (impegno == null) {
-                    throw new AwesomeException(CodiciErrore.ERRGEN,
-                            "L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-"
-                                    + ordineMissione.getPgObbligazione() + " non esiste");
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() + " non esiste");
                 } else {
                     if (!StringUtils.isEmpty(ordineMissione.getVoce())) {
                         if (!impegno.getCdElementoVoce().equals(ordineMissione.getVoce())) {
-                            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI
-                                    + ": L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-"
-                                    + ordineMissione.getPgObbligazione()
-                                    + " non corrisponde con la voce di Bilancio indicata." + ordineMissione.getVoce());
+                            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.DATI_INCONGRUENTI + ": L'impegno indicato " + ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione() + " non corrisponde con la voce di Bilancio indicata." + ordineMissione.getVoce());
                         }
                     } else {
                         ordineMissione.setVoce(impegno.getCdElementoVoce());
@@ -1884,52 +1571,34 @@ public class OrdineMissioneService {
                 }
             }
         } else {
-            if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione())
-                    && StringUtils.isEmpty(ordineMissione.getFondi())) {
-                throw new AwesomeException(CodiciErrore.ERRGEN,
-                        "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
+            if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) && StringUtils.isEmpty(ordineMissione.getFondi())) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
             }
             ordineMissione.setCdCdsObbligazione(null);
             ordineMissione.setEsercizioObbligazione(null);
         }
-
     }
 
     private void validaCRUD(OrdineMissione ordineMissione, boolean updateOrdineMissione) {
         if (ordineMissione != null) {
-
             controlloCampiObbligatori(ordineMissione);
             controlloCongruenzaDatiInseriti(ordineMissione, updateOrdineMissione);
             controlloDatiFinanziari(ordineMissione);
-            DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(),
-                    ordineMissione.getAnno());
+            DatiIstituto istituto = datiIstitutoService.getDatiIstituto(ordineMissione.getUoSpesa(), ordineMissione.getAnno());
             if (istituto == null) {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "Dati uo non presenti per il codice "
-                        + ordineMissione.getUoSpesa() + " nell'anno " + ordineMissione.getAnno());
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Dati uo non presenti per il codice " + ordineMissione.getUoSpesa() + " nell'anno " + ordineMissione.getAnno());
             }
         }
     }
 
     private void controlloCampiObbligatori(OrdineMissione ordineMissione) {
-        // if (!ordineMissione.isToBeCreated()){
         controlloDatiObbligatoriDaGUI(ordineMissione);
-        // }
         if (StringUtils.isEmpty(ordineMissione.getAnno())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Anno");
         } else if (StringUtils.isEmpty(ordineMissione.getObbligoRientro())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Obbligo di Rientro");
         } else if (StringUtils.isEmpty(ordineMissione.getUid())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utente");
-        /*} else if (StringUtils.isEmpty(ordineMissione.getUtilizzoTaxi())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo del Taxi");
-        } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoServizio())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo dell'auto di servizio");
-        } else if (StringUtils.isEmpty(ordineMissione.getPersonaleAlSeguito())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Personale al seguito");
-        } else if (StringUtils.isEmpty(ordineMissione.getUtilizzoAutoNoleggio())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    CodiciErrore.CAMPO_OBBLIGATORIO + ": Utilizzo auto a noleggio");*/
         } else if (StringUtils.isEmpty(ordineMissione.getStato())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Stato");
         } else if (StringUtils.isEmpty(ordineMissione.getValidato())) {
@@ -1937,38 +1606,24 @@ public class OrdineMissioneService {
         } else if (StringUtils.isEmpty(ordineMissione.getNumero())) {
             throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Numero");
         }
-
     }
 
     public List<CMISFileAttachment> getAttachments(Long idOrdineMissione) throws AwesomeException {
-
         if (idOrdineMissione == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Id Ordine Missione non può essere null");
         }
-
         OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione)
-                .orElseThrow(() -> new AwesomeException(
-                        CodiciErrore.ERRGEN,
-                        "Ordine Missione non trovato per id " + idOrdineMissione
-                ));
-
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non trovato per id " + idOrdineMissione));
         if (!isUserEnabledToViewMissione(ordineMissione)) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Non autorizzato a visualizzare la missione.");
         }
-
-        return cmisOrdineMissioneService.getAttachmentsOrdineMissione(
-                ordineMissione,
-                idOrdineMissione
-        );
+        return cmisOrdineMissioneService.getAttachmentsOrdineMissione(ordineMissione, idOrdineMissione);
     }
 
-
-    public CMISFileAttachment uploadAllegato(Long idOrdineMissione, InputStream inputStream,
-                                             String name, MimeTypes mimeTypes) throws AwesomeException {
+    public CMISFileAttachment uploadAllegato(Long idOrdineMissione, InputStream inputStream, String name, MimeTypes mimeTypes) throws AwesomeException {
         OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione).orElse(null);
         if (ordineMissione != null && isUserEnabledToViewMissione(ordineMissione)) {
-            return cmisOrdineMissioneService.uploadAttachmentOrdineMissione(ordineMissione, idOrdineMissione,
-                    inputStream, name, mimeTypes);
+            return cmisOrdineMissioneService.uploadAttachmentOrdineMissione(ordineMissione, idOrdineMissione, inputStream, name, mimeTypes);
         }
         return null;
     }
@@ -1994,29 +1649,6 @@ public class OrdineMissioneService {
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
         gestioneEmailDopoApprovazione(ordineMissioneDaAggiornare);
-//        OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissioneDaAggiornare);
-//        if (anticipo != null) {
-//            anticipo.setStato(Costanti.STATO_DEFINITIVO);
-//            ordineMissioneAnticipoService.updateAnticipo(anticipo, false);
-//            DatiIstituto dati = datiIstitutoService.getDatiIstituto(ordineMissioneDaAggiornare.getUoSpesa(),
-//                    ordineMissioneDaAggiornare.getAnno());
-//            if (dati != null && dati.getMailNotifiche() != null) {
-//                if (!dati.getMailNotifiche().equals("N")) {
-//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo), false,
-//                            true, dati.getMailNotifiche());
-//                }
-//            } else {
-//                Account account = accountService.loadAccountFromUsername(ordineMissioneDaAggiornare.getUid());
-//                UsersSpecial richiedente = accountService.getUoForUsersSpecial(account.getUid());
-//                List<UsersSpecial> lista = accountService
-//                        .getUserSpecialForUoPerValidazione(ordineMissioneDaAggiornare.getUoSpesa());
-//                aggiuntaRichMailList(lista,richiedente);
-//                if (lista != null && lista.size() > 0) {
-//                    mailService.sendEmail(subjectAnticipo, getTextMailAnticipo(ordineMissioneDaAggiornare, anticipo),
-//                            false, true, mailService.prepareTo(lista));
-//                }
-//            }
-//        }
         updateOrdineMissione(ordineMissioneDaAggiornare, true);
         popolaCoda(ordineMissioneDaAggiornare);
     }
@@ -2025,10 +1657,8 @@ public class OrdineMissioneService {
         return cmisOrdineMissioneService.getAllDocumentsOrdineMissione(missione);
     }
 
-
     private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {
         String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
-
         return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> della UO "
                 + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
                 + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
@@ -2040,7 +1670,6 @@ public class OrdineMissioneService {
 
     private String getTextMailSendToManager(String basePath, OrdineMissione ordineMissione) {
         String url = basePath + "/#/ordine-missione/" + ordineMissione.getId();
-
         return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
                 + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
                 + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
@@ -2053,7 +1682,6 @@ public class OrdineMissioneService {
     private String getTextMailApprovazioneOrdine(OrdineMissione ordineMissione, boolean missioneConAnticipo) {
         OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService.getAnticipo((Long) ordineMissione.getId());
         StringBuilder testoMail = new StringBuilder();
-
         testoMail.append("<p>L'ordine di missione ")
                 .append("<b>").append(ordineMissione.getAnno()).append("-").append(ordineMissione.getNumero()).append("</b>")
                 .append(" di ").append(getNominativo(ordineMissione.getUid()))
@@ -2079,19 +1707,8 @@ public class OrdineMissioneService {
                 + ordineMissione.getOggetto() + "</u> è stato annullato.</p>";
     }
 
-// private String getTextMailAnticipo(OrdineMissione ordineMissione, OrdineMissioneAnticipo anticipo) {
-//     return "<p>È stata approvata la richiesta di anticipo di € " + Utility.numberFormat(anticipo.getImporto())
-//             + " relativa all'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero()
-//             + "</b> di " + getNominativo(ordineMissione.getUid()) + " per la missione a <b>"
-//             + ordineMissione.getDestinazione() + "</b> dal "
-//             + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
-//             + DateUtils.getDefaultDateAsString(ordineMissione.getDataFineMissione()) + " avente per oggetto <i>"
-//             + ordineMissione.getOggetto() + "</i>.</p>";
-// }
-
     private String getTextMailSendToAdministrative(String basePath, OrdineMissione ordineMissione) {
         String url = basePath + "/#/ordine-missione/" + ordineMissione.getId() + "/S";
-
         return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> della UO "
                 + ordineMissione.getUoRich() + " " + ordineMissione.getDatoreLavoroRich() + " di "
                 + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
@@ -2103,7 +1720,6 @@ public class OrdineMissioneService {
 
     private String getTextMailReturnToSender(String basePath, OrdineMissione ordineMissione) {
         String url = basePath + "/#/ordine-missione/" + ordineMissione.getId();
-
         return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
                 + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
                 + "</b> dal " + DateUtils.getDefaultDateAsString(ordineMissione.getDataInizioMissione()) + " al "
@@ -2113,9 +1729,7 @@ public class OrdineMissioneService {
                 + "<p>Si prega di effettuare le opportune correzioni attraverso il link: <a href='" + url + "'>Clicca qui per aprire</a></p>";
     }
 
-    // Se il valore attuale è zero, prova con i valori aggiornati; altrimenti mantiene o aggiorna se disponibile.
     private BigDecimal calcolaTot(BigDecimal dbTotOrdine, BigDecimal calcTotOrdine, BigDecimal toUpdateTotOrdine) {
-
         if (dbTotOrdine.compareTo(BigDecimal.ZERO) == 0) {
             return calcTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? calcTotOrdine :
                     toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine :
@@ -2124,21 +1738,4 @@ public class OrdineMissioneService {
             return toUpdateTotOrdine.compareTo(BigDecimal.ZERO) > 0 ? toUpdateTotOrdine : dbTotOrdine;
         }
     }
-
-    private void logOrdineUpdate(String fase, OrdineMissione ordine) {
-        if (ordine == null) {
-            log.info("[DIAG][ORDINE] {} - ordine null", fase);
-            return;
-        }
-
-        log.info(
-                "[DIAG][ORDINE] {} - id={}, pgVerRec={}, stato={}, statoFlusso={}",
-                fase,
-                ordine.getId(),
-                ordine.getPgVerRec(),
-                ordine.getStato(),
-                ordine.getStatoFlusso()
-        );
-    }
-
 }

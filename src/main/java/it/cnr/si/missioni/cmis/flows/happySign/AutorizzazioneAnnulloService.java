@@ -46,7 +46,6 @@ public class AutorizzazioneAnnulloService {
         StartWorflowDto startWorflowDto = autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo, allegati);
         List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
         startWorflowDto.setSigners(signersDef);
-        UtilHappySign.setTemplateFirme(startWorflowDto);
 
         if (Optional.ofNullable(utilTestAnnullamentoService).isPresent()) {
             UtilTestService.showSigned(startWorflowDto);

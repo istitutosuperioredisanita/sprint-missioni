@@ -20,10 +20,10 @@ import java.util.Optional;
 @Component
 @Conditional(HappySignURLCondition.class)
 @ConditionalOnExpression(
-        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.nocaricoente:}')"
+        "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.template:}')"
 )
 public class AutorizzazioneMissioneNoCaricoEnte extends AbstractHappySign implements AutorizzazioneMissione {
-    @Value("${flows.autorizzazione.nocaricoente:#{null}}")
+    @Value("${flows.autorizzazione.default.template:#{null}}")
     private String templateName;
 
     @Override

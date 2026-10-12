@@ -24,9 +24,6 @@ public class AutorizzazioneAnnulloMissioneDefault extends AbstractHappySign impl
     @Value("${flows.annullo.default.template:#{null}}")
     private String templateName;
 
-    @Value("${flows.annullo.default.signSiglaUo:#{null}}")
-    private String signSiglaUo;
-
     public StartWorflowDto createStartWorkflowDto(AnnullamentoOrdineMissione annullamentoOrdineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException{
         StartWorflowDto startInfo= new StartWorflowDto();
         startInfo.setTemplateName(templateName);

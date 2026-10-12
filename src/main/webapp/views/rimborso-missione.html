@@ -83,15 +83,15 @@
             <div class="row" ng-hide="rimborsoMissioneModel.id">
                 <div class="panel panel-success" >
                     <form class="form-inline" role="form" id="missioni">
-                        <p class="col-md-2">
-                     <span class="input-group">
+                        <p class="col-md-2" ng-if="false">
+                            <span class="input-group">
                      <span class="input-group-addon" translate="rimborso-missione.form.ordini-con-rimborsi-diversi">Più rimborsi</span>
                      <label class="checkbox">
                      <input ng-disabled="!modalitaPagamentos || !inquadramento" type="checkbox" ng-model="giaRimborsato" ng-true-value="S" ng-false-value="N" ng-change="onChangeGiaRimborsato(giaRimborsato)">
                      </label>
                      </span>
                         </p>
-                        <div class="col-md-8">
+                        <div class="col-md-8" ng-if="false">
                             <h4 ng-show="listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"></h4>
                             <table ng-show="listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
                                 <thead>
@@ -148,10 +148,10 @@
                         <b> - Al </b>
                         {{rimborsoMissioneModel.ordineMissione.dataFineMissione | date:'dd/MM/yyyy'}} - {{rimborsoMissioneModel.ordineMissione.destinazione}}
                     </div>
-                    <h4 class="panel-heading small-padding" align="center" ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
-                    <div class="col-md-2">
+                    <h4 class="panel-heading small-padding" align="center" ng-if="false" ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="text-center" translate="rimborso-missione.form.subtitle-esistono-altri-rimborsi"> </h4>
+                    <div class="col-md-2" ng-if="false">
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-8" ng-if="false">
                         <table ng-show="rimborsoMissioneModel.id && listaAltriRimborsi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
                             <thead>
                             <tr>

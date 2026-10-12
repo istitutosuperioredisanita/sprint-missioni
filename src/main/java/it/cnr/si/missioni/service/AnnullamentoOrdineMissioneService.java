@@ -1,24 +1,8 @@
 /*
  *  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
- *
- *      This program is free software: you can redistribute it and/or modify
- *      it under the terms of the GNU Affero General Public License as
- *      published by the Free Software Foundation, either version 3 of the
- *      License, or (at your option) any later version.
- *
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU Affero General Public License for more details.
- *
- *      You should have received a copy of the GNU Affero General Public License
- *      along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *
  */
 
 package it.cnr.si.missioni.service;
-
 
 import it.cnr.si.missioni.amq.domain.Missione;
 import it.cnr.si.missioni.amq.domain.TypeMissione;
@@ -65,10 +49,6 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.util.*;
 
-
-/**
- * Service class for managing users.
- */
 @Service
 public class AnnullamentoOrdineMissioneService {
 
@@ -127,7 +107,6 @@ public class AnnullamentoOrdineMissioneService {
     @PersistenceContext
     private EntityManager entityManager;
 
-
     @Transactional(readOnly = true)
     public AnnullamentoOrdineMissione getAnnullamentoOrdineMissione(Long idAnnullamento, Boolean retrieveDataFromFlows) throws AwesomeException {
         RimborsoMissioneFilter filter = new RimborsoMissioneFilter();
@@ -148,7 +127,7 @@ public class AnnullamentoOrdineMissioneService {
     public List<AnnullamentoOrdineMissione> getAnnullamentiForValidateFlows(RimborsoMissioneFilter filter, Boolean isServiceRest) throws AwesomeException {
         List<AnnullamentoOrdineMissione> lista = getAnnullamenti(filter, isServiceRest, true);
         if (lista != null) {
-            List<AnnullamentoOrdineMissione> listaNew = new ArrayList<AnnullamentoOrdineMissione>();
+            List<AnnullamentoOrdineMissione> listaNew = new ArrayList<>();
             for (AnnullamentoOrdineMissione annullamento : lista) {
                 if (annullamento.isStatoInviatoAlFlusso() && !annullamento.isMissioneDaValidare()) {
                     annullamento.setStatoFlussoRitornoHome(Costanti.STATO_DA_AUTORIZZARE_PER_HOME);
@@ -168,8 +147,8 @@ public class AnnullamentoOrdineMissioneService {
         return lista;
     }
 
-    public void aggiornaAnnullamentoOrdineMissioneRespinto(FlowResult result,
-                                                           AnnullamentoOrdineMissione annullamentoDaAggiornare) throws AwesomeException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void aggiornaAnnullamentoOrdineMissioneRespinto(FlowResult result, AnnullamentoOrdineMissione annullamentoDaAggiornare) throws AwesomeException {
         aggiornaValidazione(annullamentoDaAggiornare);
         annullamentoDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
         annullamentoDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
@@ -178,8 +157,7 @@ public class AnnullamentoOrdineMissioneService {
         missioneRespintaService.inserisciMissioneRespinta(result);
     }
 
-    public void aggiornaAnnullamentoOrdineMissioneAnnullato(ResultFlows result,
-                                                            AnnullamentoOrdineMissione annullamentoDaAggiornare) throws AwesomeException {
+    public void aggiornaAnnullamentoOrdineMissioneAnnullato(ResultFlows result, AnnullamentoOrdineMissione annullamentoDaAggiornare) throws AwesomeException {
         annullamentoDaAggiornare.setCommentoFlusso(result.getComment() == null ? null : (result.getComment().length() > 1000 ? result.getComment().substring(0, 1000) : result.getComment()));
         annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
         annullamentoDaAggiornare.setStato(Costanti.STATO_ANNULLATO);
@@ -190,21 +168,30 @@ public class AnnullamentoOrdineMissioneService {
     public void aggiornaAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamento, FlowResult flowResult) {
         if (annullamento == null) return;
         try {
-            if (annullamento.isStatoInviatoAlFlusso() && annullamento.isMissioneConfermata() && !annullamento.isMissioneDaValidare()) {
+            AnnullamentoOrdineMissione annullamentoDb = annOrdMissioneRepository.findById((Long) annullamento.getId())
+                    .orElse(annullamento);
+
+            if (annullamentoDb.isStatoFlussoApprovato()) {
+                log.debug("Annullamento {} già DEFINITIVO. Skip.", annullamentoDb.getId());
+                return;
+            }
+
+            if (annullamentoDb.isStatoInviatoAlFlusso() && annullamentoDb.isMissioneConfermata() && !annullamentoDb.isMissioneDaValidare()) {
                 switch (flowResult.getStato()) {
                     case FlowResult.ESITO_FLUSSO_FIRMATO:
-                        aggiornaAnnullamentoOrdineMissioneFirmato(annullamento);
+                        aggiornaAnnullamentoOrdineMissioneFirmato(annullamentoDb);
                         break;
                     case FlowResult.ESITO_FLUSSO_FIRMA_UO:
-                        aggiornaAnnullamentoOrdineMissionePrimaFirma(annullamento);
+                        aggiornaAnnullamentoOrdineMissionePrimaFirma(annullamentoDb);
                         break;
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO:
                     case FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA:
-                        aggiornaAnnullamentoOrdineMissioneRespinto(flowResult, annullamento);
+                        aggiornaAnnullamentoOrdineMissioneRespinto(flowResult, annullamentoDb);
                         break;
                 }
             } else {
-                throw new AwesomeException(CodiciErrore.ERRGEN, "Esito flusso non corrispondente con lo stato dell'annullamento.");
+                log.warn("Annullamento {} stato anomalo: Stato={}, StatoFlusso={}, Esito={}. Skip.",
+                        annullamentoDb.getId(), annullamentoDb.getStato(), annullamentoDb.getStatoFlusso(), flowResult.getStato());
             }
         } catch (Exception e) {
             gestisciEccezioneFlusso(annullamento, flowResult, e);
@@ -214,60 +201,73 @@ public class AnnullamentoOrdineMissioneService {
     private void gestisciEccezioneFlusso(AnnullamentoOrdineMissione annullamento, FlowResult flowResult, Exception e) {
         String errore = Utility.getMessageException(e);
         if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && annullamento.getId() != null) {
+            try {
+                AnnullamentoOrdineMissione a = annOrdMissioneRepository.findById((Long) annullamento.getId()).orElseThrow();
+                a.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento non completato. Dettaglio: " + errore);
+                a.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+                a.setStato(Costanti.STATO_INSERITO);
+                a.setValidato("N");
+                a.setToBeUpdated();
+                annOrdMissioneRepository.save(a);
 
-            AnnullamentoOrdineMissione a = annOrdMissioneRepository.findById((Long) annullamento.getId()).orElseThrow();
-            a.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento annullamento non completato per incongruenze o dati mancanti.");
-            a.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-            a.setStato(Costanti.STATO_INSERITO);
-            a.setValidato("N");
-            a.setToBeUpdated();
-            annOrdMissioneRepository.save(a);
-
-            String identificativo = a.getAnno() + "-" + a.getNumero();
-
-            mailService.inviaNotificheErroreFirma(
-                    a.getUid(),
-                    identificativo,
-                    "Annullamento Ordine Missione",
-                    a.getOrdineMissione().getDestinazione(),
-                    a.getOrdineMissione().getDataInizioMissione(),
-                    a.getOrdineMissione().getDataFineMissione(),
-                    e,
-                    subjectErrorFlowsAnnullamento
-            );
+                if (mailService != null) {
+                    String errorTrace = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);
+                    String body = "<h3>Errore Post-Firma HappySign</h3>" +
+                            "<p>L'annullamento <b>" + a.getAnno() + "-" + a.getNumero() + "</b> è stato firmato ma l'aggiornamento è fallito.</p>" +
+                            "<h4>Stack Trace:</h4><pre>" + errorTrace + "</pre>";
+                    mailService.sendEmailError(subjectErrorFlowsAnnullamento, body, false, true);
+                }
+            } catch (Exception ex) {
+                log.error("Errore durante il fallback di gestisciEccezioneFlusso per annullamento " + annullamento.getId(), ex);
+            }
         } else {
             throw new AwesomeException(CodiciErrore.ERRGEN, errore);
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     private void aggiornaAnnullamentoOrdineMissionePrimaFirma(AnnullamentoOrdineMissione annullamentoOrdineMissione) {
         annullamentoOrdineMissione.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
-        AnnullamentoOrdineMissione annullamento = updateAnnullamentoOrdineMissione(annullamentoOrdineMissione, true, null);
+        updateAnnullamentoOrdineMissione(annullamentoOrdineMissione, true, null);
     }
 
-    public AnnullamentoOrdineMissione aggiornaAnnullamentoOrdineMissioneFirmato(AnnullamentoOrdineMissione annullamentoDaAggiornare)
-            throws AwesomeException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public AnnullamentoOrdineMissione aggiornaAnnullamentoOrdineMissioneFirmato(
+            AnnullamentoOrdineMissione annullamentoDaAggiornare) throws AwesomeException {
+
         OrdineMissione ordineMissione = ordineMissioneRepository
                 .findById((Long) annullamentoDaAggiornare.getOrdineMissione().getId())
                 .orElseThrow(() -> new AwesomeException(
                         CodiciErrore.ERRGEN,
                         "Ordine di Missione non trovato. ID: " + annullamentoDaAggiornare.getOrdineMissione().getId()
                 ));
-        log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} approvato.", annullamentoDaAggiornare.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+
+        log.info("Trovato in Scrivania Digitale un annullamento ordine di missione con id {} della uo {}, anno {}, numero {} approvato.",
+                annullamentoDaAggiornare.getId(), ordineMissione.getUoRich(), ordineMissione.getAnno(), ordineMissione.getNumero());
+
         annullamentoDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         annullamentoDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
         AnnullamentoOrdineMissione annullamento = updateAnnullamentoOrdineMissione(annullamentoDaAggiornare, true, null);
+
         if (annullamento.isConsentitoRimborso()) {
             ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE_CONSENTITO_RIMBORSO);
         } else {
             ordineMissione.setStato(Costanti.STATO_ANNULLATO_DOPO_APPROVAZIONE);
         }
-        ordineMissione = ordineMissioneService.updateOrdineMissione(ordineMissione, true, false);
+
+        try {
+            ordineMissione.setToBeUpdated();
+            ordineMissione = ordineMissioneRepository.save(ordineMissione);
+            log.info("Ordine {} aggiornato a stato DEFINITIVO post-firma", ordineMissione.getId());
+        } catch (Exception e) {
+            log.warn("Errore salvataggio ordine {} post-firma HappySign: {}. Continuo comunque.",
+                    ordineMissione.getId(), e.getMessage());
+        }
+
         popolaCoda(annullamento);
         ordineMissioneService.gestioneEmailDopoApprovazione(ordineMissione, true);
         return annullamento;
     }
-
 
     public void popolaCoda(AnnullamentoOrdineMissione annullamento) {
         if (Optional.ofNullable(rabbitMQService).isPresent()) {
@@ -308,12 +308,6 @@ public class AnnullamentoOrdineMissioneService {
                         "Annullamento Ordine Missione da aggiornare inesistente."
                 ));
 
-        try {
-            entityManager.lock(annullamentoDB, LockModeType.PESSIMISTIC_WRITE);
-        } catch (OptimisticLockException e) {
-            throw new AwesomeException(CodiciErrore.ERRGEN,
-                    "Annullamento in modifica. Ripetere l'operazione. ID: " + annullamentoDB.getId());
-        }
         boolean isRitornoMissioneMittente = false;
 
         if (annullamentoDB.getOrdineMissione() != null) {
@@ -362,13 +356,12 @@ public class AnnullamentoOrdineMissioneService {
         }
 
         annullamentoDB.setToBeUpdated();
-//		//effettuo controlli di validazione operazione CRUD
+
         if (confirm && !annullamentoDB.isMissioneDaValidare()) {
             cmisOrdineMissioneService.avviaFlusso(annullamentoDB);
             annullamentoDB.setStateFlows(Costanti.STATO_FLUSSO_RIMBORSO_FROM_CMIS.get(Costanti.STATO_FIRMA_UO_RIMBORSO_FROM_CMIS));
         }
         annullamentoDB = annOrdMissioneRepository.save(annullamentoDB);
-
 
         if (confirm && annullamentoDB.isMissioneDaValidare()) {
             sendMailToAdministrative(basePath, annullamentoDB);
@@ -462,14 +455,9 @@ public class AnnullamentoOrdineMissioneService {
         Specification<AnnullamentoOrdineMissione> spec = MissioneFilterMapper.mapBaseFilters(filter);
 
         if (filter != null) {
-
-            // --- Ramo daCron ---
             if ("S".equals(filter.getDaCron())) {
-                // Nessun filtro utente, spec già costruita da mapBaseFilters
-            }
-
-            // --- Ramo toFinal ---
-            else if ("S".equals(filter.getToFinal())) {
+                // Nessun filtro utente, spec già costruita
+            } else if ("S".equals(filter.getToFinal())) {
                 if (StringUtils.isEmpty(filter.getUoRich())) {
                     throw new AwesomeException(CodiciErrore.ERRGEN,
                             "Non è stata selezionata la uo per rendere definitivo l'annullamento dell'ordine di missione.");
@@ -503,10 +491,7 @@ public class AnnullamentoOrdineMissioneService {
                         .and((root, query, cb) -> cb.equal(root.get("stato"), Costanti.STATO_CONFERMATO))
                         .and((root, query, cb) -> cb.equal(root.get("validato"), "S"))
                         .build();
-            }
-
-            // --- Ramo normale ---
-            else {
+            } else {
                 if (!isForValidateFlows) {
                     if (!StringUtils.isEmpty(filter.getUser())) {
                         spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
@@ -569,7 +554,6 @@ public class AnnullamentoOrdineMissioneService {
                     spec = sb.build();
                 }
 
-                // Escludi annullati
                 if (!"S".equals(Utility.nvl(filter.getIncludiMissioniAnnullate()))
                         && !(filter.getDaId() != null && filter.getaId() != null
                         && filter.getDaId().compareTo(filter.getaId()) == 0)) {
@@ -579,7 +563,6 @@ public class AnnullamentoOrdineMissioneService {
                             .build();
                 }
 
-                // Filtro statoFlusso per REST + validateFlows
                 if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
                     List<String> listaStatiFlusso = Arrays.asList(
                             Costanti.STATO_INVIATO_FLUSSO,
@@ -599,7 +582,6 @@ public class AnnullamentoOrdineMissioneService {
                 }
             }
 
-            // Filtro per UO
             if (filter.getUoRich() != null && !"S".equals(filter.getDaCron())) {
                 if (accountService.isUserEnableToWorkUo(filter.getUoRich())) {
                     Specification<AnnullamentoOrdineMissione> s = (root, query, cb) -> cb.or(
@@ -618,7 +600,6 @@ public class AnnullamentoOrdineMissioneService {
                 }
             }
 
-            // Solo missioni non gratuite
             if (Boolean.TRUE.equals(filter.getSoloMissioniNonGratuite())) {
                 spec = new SpecificationBuilder<AnnullamentoOrdineMissione>()
                         .and(spec)
@@ -648,8 +629,7 @@ public class AnnullamentoOrdineMissioneService {
         return annullamento;
     }
 
-    private void inizializzaCampiPerInserimento(
-            AnnullamentoOrdineMissione annullamento) throws AwesomeException {
+    private void inizializzaCampiPerInserimento(AnnullamentoOrdineMissione annullamento) throws AwesomeException {
         annullamento.setUidInsert(securityService.getCurrentUserLogin());
         annullamento.setUser(securityService.getCurrentUserLogin());
         Integer anno = recuperoAnno(annullamento);
@@ -745,8 +725,7 @@ public class AnnullamentoOrdineMissioneService {
         }
     }
 
-    public Map<String, byte[]> stampaAnnullamento(AnnullamentoOrdineMissione annullamento)
-            throws AwesomeException {
+    public Map<String, byte[]> stampaAnnullamento(AnnullamentoOrdineMissione annullamento) throws AwesomeException {
         byte[] printAnnullamento;
         String fileName;
         fileName = "Annullamento" + annullamento.getId() + ".pdf";
@@ -780,15 +759,7 @@ public class AnnullamentoOrdineMissioneService {
         popolaCoda(missione);
     }
 
-    private void erroreAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flowResult) {
-        String errore = "Esito flusso non corrispondente con lo stato dell'annullamento.";
-        String testoErrore = getTextErrorAnnullamentoOrdineMissione(annullamentoOrdineMissione, flowResult, errore);
-        throw new AwesomeException(CodiciErrore.ERRGEN, errore + " " + testoErrore);
-    }
-
-    private String getTextErrorAnnullamentoOrdineMissione(
-            AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flow, String error) {
-
+    private String getTextErrorAnnullamentoOrdineMissione(AnnullamentoOrdineMissione annullamentoOrdineMissione, FlowResult flow, String error) {
         OrdineMissione ordineMissione = ordineMissioneRepository.findById(
                         (Long) annullamentoOrdineMissione.getOrdineMissione().getId())
                 .orElse(null);
@@ -828,4 +799,3 @@ public class AnnullamentoOrdineMissioneService {
     }
 
 }
-

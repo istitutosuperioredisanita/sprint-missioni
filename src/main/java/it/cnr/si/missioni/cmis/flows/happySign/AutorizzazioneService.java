@@ -46,7 +46,6 @@ public class AutorizzazioneService {
         StartWorflowDto startWorflowDto = autorizzazione.createStartWorkflowDto(ordineMissione, modulo, allegati);
         List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
         startWorflowDto.setSigners(signersDef);
-        UtilHappySign.setTemplateFirme(startWorflowDto);
 
         if (Optional.ofNullable(utilTestService).isPresent()) {
             UtilTestService.showSigned(startWorflowDto);

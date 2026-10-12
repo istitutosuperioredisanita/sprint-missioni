@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -73,7 +75,7 @@ public class FlowService {
     @Value("${spring.mail.messages.erroreGenerico.oggetto}")
     private String subjectGenericError;
 
-
+    @Transactional(propagation = Propagation.REQUIRED)
     public void aggiornaMissioneFlows(FlowResult flowResult) {
 
         log.info(flowResult.toString());
