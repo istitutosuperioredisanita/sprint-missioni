@@ -341,6 +341,7 @@ public class OrdineMissioneService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void aggiornaOrdineMissioneRespinto(FlowResult result, OrdineMissione ordineMissioneDaAggiornare) throws AwesomeException {
+        retrieveDetails(ordineMissioneDaAggiornare);
         aggiornaValidazione(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
         ordineMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
@@ -1473,6 +1474,14 @@ public class OrdineMissioneService {
 
                 if (totaleSpesePresComp == null || totaleSpesePresComp.signum() == 0) {
                     totaleSpesePresComp = BigDecimal.ZERO;
+
+                    // Carica le righe di spesa se il chiamante non le ha già caricate
+                    if (ordineMissione.getOrdineMissioneDettagli() == null && ordineMissione.getId() != null) {
+                        ordineMissione.setOrdineMissioneDettagli(
+                                ordineMissioneDettagliService.getOrdineMissioneDettagli(
+                                        Long.valueOf(ordineMissione.getId().toString())));
+                    }
+
                     if (ordineMissione.getOrdineMissioneDettagli() != null) {
                         totaleSpesePresComp = ordineMissione.getOrdineMissioneDettagli()
                                 .stream()
@@ -1480,23 +1489,13 @@ public class OrdineMissioneService {
                                 .filter(Objects::nonNull)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
                     }
-                    if (totaleSpesePresComp.equals(BigDecimal.ZERO)) {
+                    if (totaleSpesePresComp.signum() == 0) {
                         throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto è valorizzato, ma il totale delle spese presunte risulta 0.");
                     }
-                    if (ordineMissione.getImportoPresunto().equals(BigDecimal.ZERO)) {
+                    if (ordineMissione.getImportoPresunto().signum() == 0) {
                         throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto deve essere valorizzato e maggiore di 0.");
                     }
                     ordineMissione.setTotaleSpesePresComplessivo(totaleSpesePresComp);
-                }
-
-                assert totaleSpesePresComp != null;
-                if (totaleSpesePresComp.compareTo(ordineMissione.getImportoPresunto()) > 0) {
-                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.ITALY);
-                    currencyFormatter.setMinimumFractionDigits(2);
-                    currencyFormatter.setMaximumFractionDigits(2);
-                    String totaleSpeseFormattato = currencyFormatter.format(totaleSpesePresComp);
-                    String importoPresuntoFormattato = currencyFormatter.format(ordineMissione.getImportoPresunto());
-                    throw new AwesomeException(CodiciErrore.ERRGEN, "Il totale delle spese (" + totaleSpeseFormattato + ") non può superare l'importo presunto (" + importoPresuntoFormattato + ").");
                 }
             }
         }

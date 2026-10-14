@@ -29,12 +29,21 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Conditional(HappySignURLCondition.class)
 public class CronHappySignService {
     private static final Logger log = LoggerFactory.getLogger(CronHappySignService.class);
+
+    /**
+     * Ultimo errore notificato per ogni documento (chiave: tipo-identificativo).
+     * Serve a non reinviare la mail di errore ad ogni esecuzione del cron.
+     * Stato in memoria: al riavvio dell'applicazione le notifiche vengono reinviate una volta.
+     */
+    private final Map<String, String> ultimoErroreNotificato = new ConcurrentHashMap<>();
 
     @Autowired(required = false)
     private it.iss.si.service.HappySignService happySignService;
@@ -77,6 +86,20 @@ public class CronHappySignService {
         }
     }
 
+    /**
+     * Invia la mail di errore solo se l'errore è nuovo per quel documento.
+     * Se lo stesso errore si ripresenta ad ogni esecuzione del cron, la mail non viene ripetuta.
+     */
+    private void notificaErroreUnaSola(String tipoDocumento, String identificativo, Exception e) {
+        String chiave = tipoDocumento + "-" + identificativo;
+        String firma = e.getMessage() == null ? e.getClass().getName() : e.getMessage();
+        if (firma.equals(ultimoErroreNotificato.put(chiave, firma))) {
+            log.debug("Errore già notificato per {}, mail non reinviata", chiave);
+            return;
+        }
+        inviaMailErroreCron(tipoDocumento, identificativo, e);
+    }
+
     private EnumEsitoFlowDocumentStatus safeGetDocumentStatus(String idFlusso) throws Exception {
         try {
             return happySignService.getDocumentStatus(idFlusso);
@@ -110,6 +133,7 @@ public class CronHappySignService {
         if (lista == null) return;
 
         for (OrdineMissione ordine : lista) {
+            String identificativo = ordine.getAnno() + "-" + ordine.getNumero();
             try {
                 if (ordine.getIdFlusso() == null || ordine.getIdFlusso().isEmpty() || happySignService == null) continue;
                 EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(ordine.getIdFlusso());
@@ -139,10 +163,12 @@ public class CronHappySignService {
                         flowService.aggiornaMissioneFlows(fr);
                     }
                 }
+                // Elaborazione riuscita: l'eventuale errore precedente non è più attivo
+                ultimoErroreNotificato.remove("Ordine Missione-" + identificativo);
             } catch (Exception e) {
                 if (!isTransientError(e)) {
                     log.error("Errore elaborazione ordine id={}", ordine.getId(), e);
-                    inviaMailErroreCron("Ordine Missione",  ordine.getAnno() + "-" + ordine.getNumero(), e);
+                    notificaErroreUnaSola("Ordine Missione", identificativo, e);
                 }
             }
         }
@@ -159,6 +185,7 @@ public class CronHappySignService {
         if (lista == null) return;
 
         for (RimborsoMissione rimborso : lista) {
+            String identificativo = rimborso.getAnno() + "-" + rimborso.getNumero();
             try {
                 if (rimborso.getIdFlusso() == null || rimborso.getIdFlusso().isEmpty() || happySignService == null) continue;
                 EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(rimborso.getIdFlusso());
@@ -188,10 +215,11 @@ public class CronHappySignService {
                         flowService.aggiornaMissioneFlows(fr);
                     }
                 }
+                ultimoErroreNotificato.remove("Rimborso Missione-" + identificativo);
             } catch (Exception e) {
                 if (!isTransientError(e)) {
                     log.error("Errore elaborazione rimborso id={}", rimborso.getId(), e);
-                    inviaMailErroreCron("Rimborso Missione", rimborso.getAnno() + "-" + rimborso.getNumero(), e);
+                    notificaErroreUnaSola("Rimborso Missione", identificativo, e);
                 }
             }
         }
@@ -208,6 +236,7 @@ public class CronHappySignService {
         if (lista == null) return;
 
         for (AnnullamentoOrdineMissione annullamento : lista) {
+            String identificativo = annullamento.getAnno() + "-" + annullamento.getNumero();
             try {
                 if (annullamento.getIdFlusso() == null || annullamento.getIdFlusso().isEmpty() || happySignService == null) continue;
                 EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(annullamento.getIdFlusso());
@@ -237,10 +266,11 @@ public class CronHappySignService {
                         flowService.aggiornaMissioneFlows(fr);
                     }
                 }
+                ultimoErroreNotificato.remove("Annullamento Ordine-" + identificativo);
             } catch (Exception e) {
                 if (!isTransientError(e)) {
                     log.error("Errore elaborazione annullamento id={}", annullamento.getId(), e);
-                    inviaMailErroreCron("Annullamento Ordine", annullamento.getAnno() + "-" + annullamento.getNumero(), e);
+                    notificaErroreUnaSola("Annullamento Ordine", identificativo, e);
                 }
             }
         }
