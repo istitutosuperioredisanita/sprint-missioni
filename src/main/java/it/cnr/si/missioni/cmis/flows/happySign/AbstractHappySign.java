@@ -1,8 +1,9 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
 import feign.FeignException;
+import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartSignatureFlowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.FlussiToHappySign;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.DatiIstitutoService;
@@ -16,11 +17,12 @@ import it.cnr.si.missioni.util.proxy.json.service.*;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import it.iss.si.dto.anagrafica.EmployeeDetails;
-import it.iss.si.dto.happysign.base.AttachedFile;
-import it.iss.si.dto.happysign.base.File;
 import it.iss.si.service.AceService;
 import it.iss.si.service.HappySignService;
 import it.iss.si.service.UtilAce;
+import it.iss.si.signature.flow.flow.model.SignatureDocument;
+import it.iss.si.signature.flow.flow.model.SignatureRequest;
+import it.iss.si.signature.flow.flow.service.SignatureService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
@@ -89,6 +92,9 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     AccountService accountService;
     @Autowired
     private MissioniAceService missioniAceService;
+
+    @Autowired
+    protected SignatureService signatureService;
 
     /**
      * Ottiene il progetto associato all'ordine missione
@@ -190,25 +196,34 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     }
 
     /**
-     * Crea un oggetto File dal modulo e dagli allegati
+     * Imposta sul DTO il modulo da firmare e gli allegati non firmabili
      */
-    public File getFile(StorageObject modulo, List<StorageObject> allegati) throws IOException {
-        File f = new File();
+    protected void setDocumenti(StartSignatureFlowDto startInfo, StorageObject modulo, List<StorageObject> allegati) throws IOException {
+        startInfo.setFilesToSign(List.of(getDocumentoFirmabile(modulo)));
+        startInfo.setAttachments(getAllegati(allegati));
+    }
+
+    /**
+     * Crea il documento da firmare a partire dal modulo
+     */
+    public SignatureDocument getDocumentoFirmabile(StorageObject modulo) throws IOException {
         String fileName = modulo.getPropertyValue(StoragePropertyNames.NAME.value());
-        f.setFilename(fileName);
-        f.setPdf(getDocumento(modulo));
+        return new SignatureDocument(fileName, MimeTypes.PDF.mimetype(), new ByteArrayInputStream(getDocumento(modulo)));
+    }
 
-        if (allegati != null && !allegati.isEmpty()) {
-            for (StorageObject so : allegati) {
-                AttachedFile attachedFile = new AttachedFile();
-                attachedFile.setAttached(false);
-                attachedFile.setContent(getDocumento(so));
-                attachedFile.setFilename(so.getPropertyValue(StoragePropertyNames.NAME.value()));
-                f.addAttachedFile(attachedFile);
-            }
+    /**
+     * Crea gli allegati non firmabili a partire dagli storage object
+     */
+    public List<SignatureDocument> getAllegati(List<StorageObject> allegati) throws IOException {
+        List<SignatureDocument> result = new ArrayList<>();
+        if (allegati == null) {
+            return result;
         }
-
-        return f;
+        for (StorageObject so : allegati) {
+            String fileName = so.getPropertyValue(StoragePropertyNames.NAME.value());
+            result.add(new SignatureDocument(fileName, UtilHappySign.mimeTypeOf(fileName), new ByteArrayInputStream(getDocumento(so))));
+        }
+        return result;
     }
 
     /**
@@ -266,7 +281,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     /**
      * Imposta il direttore dell'ufficio economico giuridico come firmatario
      */
-    public void setDirUffEcoGiur(OrdineMissione ordineMissione, StartWorflowDto startInfo) {
+    public void setDirUffEcoGiur(OrdineMissione ordineMissione, StartSignatureFlowDto startInfo) {
         String dirUffEcoEmail = getDirUffEcoEGiud();
         if (!ordineMissione.getUid().equalsIgnoreCase(dirUffEcoEmail)) {
             startInfo.addSigner(dirUffEcoEmail);
@@ -274,12 +289,24 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     }
 
     /**
-     * Invia il documento per la firma
+     * Invia la richiesta di firma tramite signature-flow
      */
     @Override
-    public String send(String templateName, List<String> signerList, List<String> approvedList, File fileToSign) throws Exception {
-        logger.info("UploadToComplexResponse send(UploadToComplexRequest request)");
-        return happySignService.startFlowToSignSingleDocument(templateName, signerList, approvedList, fileToSign);
+    public String send(StartSignatureFlowDto startInfo) {
+        List<SignatureDocument> filesToSign = startInfo.getFilesToSign();
+        String subject = filesToSign.isEmpty() ? null : filesToSign.get(0).fileName();
+        SignatureRequest request = new SignatureRequest(
+                filesToSign,
+                subject,
+                null,
+                startInfo.getSigners(),
+                startInfo.getApprovers(),
+                startInfo.getAttachments(),
+                null,
+                List.of(),
+                startInfo.getTemplateName());
+        logger.info("Invio richiesta di firma: template=" + startInfo.getTemplateName() + ", firmatari=" + startInfo.getSigners().size());
+        return signatureService.sendToSign(request);
     }
 
     /**
@@ -338,7 +365,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     /**
      * Imposta il responsabile scientifico come firmatario
      */
-    public void setRepScientificoToSign(StartWorflowDto startInfo, OrdineMissione ordineMissione) {
+    public void setRepScientificoToSign(StartSignatureFlowDto startInfo, OrdineMissione ordineMissione) {
         EmployeeDetails richiedente = getPersonaByUsmFromAce(ordineMissione.getUid());
         EmployeeDetails respScientifico = getRespScientifico(ordineMissione);
 
@@ -350,7 +377,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     /**
      * Imposta il direttore del dipartimento come firmatario
      */
-    public void setDirDipToSign(StartWorflowDto startInfo, OrdineMissione ordineMissione) {
+    public void setDirDipToSign(StartSignatureFlowDto startInfo, OrdineMissione ordineMissione) {
         EmployeeDetails richiedente = getPersonaByUsmFromAce(ordineMissione.getUid());
         EmployeeDetails dirUoRich = getResponsabile(ordineMissione.getUoSpesa());
 

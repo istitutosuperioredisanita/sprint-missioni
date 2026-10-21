@@ -1,11 +1,10 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartSignatureFlowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
-import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.service.HappySignURLCondition;
+import it.iss.si.signature.flow.condition.SignatureDriverIsHappySign;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Conditional;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-@Conditional(HappySignURLCondition.class)
+@Conditional(SignatureDriverIsHappySign.class)
 @ConditionalOnExpression(
         "!T(org.springframework.util.StringUtils).isEmpty('${flows.autorizzazione.default.template:}')"
 )
@@ -24,14 +23,13 @@ public class AutorizzazioneMissioneCNS_CNT extends AbstractHappySign implements 
     private String templateName;
 
     @Override
-    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
-        StartWorflowDto startInfo = new StartWorflowDto();
+    public StartSignatureFlowDto createStartSignatureFlowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
+        StartSignatureFlowDto startInfo = new StartSignatureFlowDto();
         startInfo.setTemplateName(templateName);
 
         startInfo.addSigner(ordineMissione.getUid());
         setDirDipToSign(startInfo,ordineMissione);
-        startInfo.setFileToSign(getFile(modulo, allegati));
-
+        setDocumenti(startInfo, modulo, allegati);
         return startInfo;
     }
 

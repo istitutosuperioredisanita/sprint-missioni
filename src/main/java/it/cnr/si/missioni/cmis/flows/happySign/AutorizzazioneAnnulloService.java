@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartSignatureFlowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneAnnullamentoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,19 +18,20 @@ public class AutorizzazioneAnnulloService {
 
     private static final Log logger = LogFactory.getLog(AutorizzazioneAnnulloService.class);
 
-    @Autowired
+    @Autowired(required = false)
     UtilTestAnnullamentoService utilTestAnnullamentoService;
-    UtilHappySign utilHappySign;
+
     private final List<AutorizzazioneAnnullamentoMissione> autorizzazioneAnnullamentoMissione;
+
     @Autowired
     public AutorizzazioneAnnulloService(List<AutorizzazioneAnnullamentoMissione> autorizzazioneAnnullamentoMissione) {
         this.autorizzazioneAnnullamentoMissione = autorizzazioneAnnullamentoMissione;
     }
 
-    public List<AutorizzazioneAnnullamentoMissione> getFlowAutorizzazione(AnnullamentoOrdineMissione annullamentoOrdineMissione){
+    public List<AutorizzazioneAnnullamentoMissione> getFlowAutorizzazione(AnnullamentoOrdineMissione annullamentoOrdineMissione) {
         return Optional.ofNullable(autorizzazioneAnnullamentoMissione).orElse(null).
                 stream().
-                filter(autorizzazione->autorizzazione.isFlowToSend(annullamentoOrdineMissione)).
+                filter(autorizzazione -> autorizzazione.isFlowToSend(annullamentoOrdineMissione)).
                 collect(Collectors.toList());
     }
 
@@ -43,19 +43,16 @@ public class AutorizzazioneAnnulloService {
             logger.info(autorizzazioneAnnullamentoMissione);
         }
 
-        StartWorflowDto startWorflowDto = autorizzazioneAnnullamentoMissione.createStartWorkflowDto(annullamentoOrdineMissione, modulo, allegati);
-        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
-        startWorflowDto.setSigners(signersDef);
+        StartSignatureFlowDto startSignatureFlowDto = autorizzazioneAnnullamentoMissione.createStartSignatureFlowDto(annullamentoOrdineMissione, modulo, allegati);
+        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startSignatureFlowDto.getSigners());
+        startSignatureFlowDto.setSigners(signersDef);
 
         if (Optional.ofNullable(utilTestAnnullamentoService).isPresent()) {
-            UtilTestService.showSigned(startWorflowDto);
-            startWorflowDto = utilTestAnnullamentoService.createUStartWorkflowDto(annullamentoOrdineMissione, modulo, allegati);
+            UtilTestService.showSigned(startSignatureFlowDto);
+            startSignatureFlowDto = utilTestAnnullamentoService.createStartWorkflowDto(annullamentoOrdineMissione, modulo, allegati);
         }
 
-        String result = autorizzazioneAnnullamentoMissione.send(startWorflowDto.getTemplateName(),
-                startWorflowDto.getSigners(),
-                startWorflowDto.getApprovers(),
-                startWorflowDto.getFileToSign());
+        String result = autorizzazioneAnnullamentoMissione.send(startSignatureFlowDto);
 
         if (Optional.ofNullable(utilTestAnnullamentoService).isPresent()) {
             utilTestAnnullamentoService.sendMailForAnnullamentoOrdineMissione(annullamentoOrdineMissione, signersDef);

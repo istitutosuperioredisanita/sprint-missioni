@@ -1,7 +1,7 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
 import it.cnr.si.missioni.service.MailService;
+import it.cnr.si.spring.storage.MimeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -14,6 +14,8 @@ public class UtilHappySign {
     private MailService mailService;
     @Value("${spring.mail.messages.firmatariMissioneInProd.oggetto}")
     private String firmatariMissioneInProd;
+
+    private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
 
     protected static String formatUoCode(String uoCode) {
@@ -48,5 +50,20 @@ public class UtilHappySign {
 
     protected static List<String> getNoDoubleSigners(List<String> signers) {
         return new ArrayList<>(new LinkedHashSet<>(signers));
+    }
+
+    /**
+     * Ricava il content type dall'estensione del file, con fallback su application/octet-stream
+     */
+    public static String mimeTypeOf(String fileName) {
+        int dot = fileName == null ? -1 : fileName.lastIndexOf('.');
+        if (dot < 0) {
+            return DEFAULT_MIME_TYPE;
+        }
+        try {
+            return MimeTypes.valueOf(fileName.substring(dot + 1).toUpperCase()).mimetype();
+        } catch (IllegalArgumentException e) {
+            return DEFAULT_MIME_TYPE;
+        }
     }
 }

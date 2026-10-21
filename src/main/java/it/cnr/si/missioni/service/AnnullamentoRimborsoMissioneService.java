@@ -162,6 +162,13 @@ public class AnnullamentoRimborsoMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Annullamento Rimborso Missione da aggiornare inesistente.");
         }
 
+        try {
+            entityManager.lock(annullamentoDB, LockModeType.PESSIMISTIC_WRITE);
+        } catch (OptimisticLockException e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "Annullamento rimborso in modifica. Ripetere l'operazione. ID: " + annullamentoDB.getId());
+        }
+
         if (annullamentoDB.getRimborsoMissione() != null) {
             RimborsoMissione rimborsoMissione = rimborsoMissioneRepository.findById((Long) annullamentoDB.getRimborsoMissione().getId()).orElse(null);
             if (rimborsoMissione != null) {

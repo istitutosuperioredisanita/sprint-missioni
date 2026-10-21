@@ -308,6 +308,13 @@ public class AnnullamentoOrdineMissioneService {
                         "Annullamento Ordine Missione da aggiornare inesistente."
                 ));
 
+        try {
+            entityManager.lock(annullamentoDB, LockModeType.PESSIMISTIC_WRITE);
+        } catch (OptimisticLockException e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "Annullamento in modifica. Ripetere l'operazione. ID: " + annullamentoDB.getId());
+        }
+
         boolean isRitornoMissioneMittente = false;
 
         if (annullamentoDB.getOrdineMissione() != null) {

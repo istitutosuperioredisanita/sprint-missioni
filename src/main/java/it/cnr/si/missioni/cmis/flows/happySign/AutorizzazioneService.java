@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartSignatureFlowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.spring.storage.StorageObject;
@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ public class AutorizzazioneService {
 
     private static final Log logger = LogFactory.getLog(AutorizzazioneService.class);
 
-    @Autowired
+    @Autowired(required = false)
     UtilTestService utilTestService;
 
     private final List<AutorizzazioneMissione> autorizzazioneMissione;
@@ -43,19 +42,16 @@ public class AutorizzazioneService {
             logger.info(autorizzazione);
         }
 
-        StartWorflowDto startWorflowDto = autorizzazione.createStartWorkflowDto(ordineMissione, modulo, allegati);
-        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
-        startWorflowDto.setSigners(signersDef);
+        StartSignatureFlowDto startSignatureFlowDto = autorizzazione.createStartSignatureFlowDto(ordineMissione, modulo, allegati);
+        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startSignatureFlowDto.getSigners());
+        startSignatureFlowDto.setSigners(signersDef);
 
         if (Optional.ofNullable(utilTestService).isPresent()) {
-            UtilTestService.showSigned(startWorflowDto);
-            startWorflowDto = utilTestService.createStartWorkflowDto(ordineMissione, modulo, allegati);
+            UtilTestService.showSigned(startSignatureFlowDto);
+            startSignatureFlowDto = utilTestService.createStartWorkflowDto(ordineMissione, modulo, allegati);
         }
 
-        String result = autorizzazione.send(startWorflowDto.getTemplateName(),
-                startWorflowDto.getSigners(),
-                startWorflowDto.getApprovers(),
-                startWorflowDto.getFileToSign());
+        String result = autorizzazione.send(startSignatureFlowDto);
 
         if (Optional.ofNullable(utilTestService).isPresent()) {
             utilTestService.sendMailForOrdineMissione(ordineMissione, signersDef, autorizzazione);

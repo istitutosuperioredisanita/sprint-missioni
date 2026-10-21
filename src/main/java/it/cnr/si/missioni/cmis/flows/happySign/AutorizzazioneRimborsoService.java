@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartSignatureFlowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneRimborsoMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.spring.storage.StorageObject;
@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,9 +18,10 @@ public class AutorizzazioneRimborsoService {
 
     private static final Log logger = LogFactory.getLog(AutorizzazioneRimborsoService.class);
 
-    @Autowired
+    @Autowired (required = false)
     UtilTestRimborsoService utilTestRimborsoService;
     private final List<AutorizzazioneRimborsoMissione> autorizzazioneRimborsoMissione;
+
     @Autowired
     public AutorizzazioneRimborsoService(List<AutorizzazioneRimborsoMissione> autorizzazioneRimborsoMissione) {
         this.autorizzazioneRimborsoMissione = autorizzazioneRimborsoMissione;
@@ -42,19 +42,16 @@ public class AutorizzazioneRimborsoService {
             logger.info(autorizzazioneRimborso);
         }
 
-        StartWorflowDto startWorflowDto = autorizzazioneRimborso.createStartWorkflowDto(rimborsoMissione, modulo, allegati);
-        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startWorflowDto.getSigners());
-        startWorflowDto.setSigners(signersDef);
+        StartSignatureFlowDto startSignatureFlowDto = autorizzazioneRimborso.createStartSignatureFlowDto(rimborsoMissione, modulo, allegati);
+        List<String> signersDef = UtilHappySign.getNoDoubleSigners(startSignatureFlowDto.getSigners());
+        startSignatureFlowDto.setSigners(signersDef);
 
         if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
-            UtilTestService.showSigned(startWorflowDto);
-            startWorflowDto = utilTestRimborsoService.createUStartWorfloDto(rimborsoMissione, modulo, allegati);
+            UtilTestService.showSigned(startSignatureFlowDto);
+            startSignatureFlowDto = utilTestRimborsoService.createStartWorkflowDto(rimborsoMissione, modulo, allegati);
         }
 
-        String result = autorizzazioneRimborso.send(startWorflowDto.getTemplateName(),
-                startWorflowDto.getSigners(),
-                startWorflowDto.getApprovers(),
-                startWorflowDto.getFileToSign());
+        String result = autorizzazioneRimborso.send(startSignatureFlowDto);
 
         if (Optional.ofNullable(utilTestRimborsoService).isPresent()) {
             utilTestRimborsoService.sendMailForRimborsoMissione(rimborsoMissione, signersDef);

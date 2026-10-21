@@ -468,15 +468,14 @@ public class RimborsoMissioneService {
         if (rimborsoMissioneDB == null) {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso Missione da aggiornare inesistente.");
         }
-        // 1. Ripristina il lock ottimistico in updateRimborsoMissione
-        /*
+
         try {
-            em.lock(rimborsoMissioneDB, LockModeType.OPTIMISTIC);
+            em.lock(rimborsoMissioneDB, LockModeType.PESSIMISTIC_WRITE);
         } catch (OptimisticLockException e) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "Rimborso missione in modifica. Ripetere l'operazione. Id " + rimborsoMissioneDB.getId());
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "Rimborso missione in modifica. Ripetere l'operazione. Id " + rimborsoMissioneDB.getId());
         }
 
-         */
         retrieveDetails(rimborsoMissioneDB);
         if (rimborsoMissioneDB.isMissioneConfermata() && !fromFlows && !Utility.nvl(rimborsoMissione.getDaValidazione(), "N").equals("D")) {
             rimborsoMissioneDB.setNoteRespingi(null);

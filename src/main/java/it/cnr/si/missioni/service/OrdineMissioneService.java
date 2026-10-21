@@ -1014,6 +1014,13 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione da aggiornare inesistente.");
         }
 
+        try {
+            entityManager.lock(ordineMissioneDB, LockModeType.PESSIMISTIC_WRITE);
+        } catch (OptimisticLockException e) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "Ordine in modifica. Ripetere l'operazione. ID: " + ordineMissioneDB.getId());
+        }
+
         boolean isCambioResponsabileGruppo = false;
         boolean isRitornoMissioneMittente = false;
         boolean emailToValidatorSent = false;

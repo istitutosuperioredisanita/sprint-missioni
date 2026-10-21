@@ -11,32 +11,33 @@ import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.iss.si.dto.happysign.base.EnumEsitoFlowDocumentStatus;
-import it.iss.si.dto.happysign.base.SignersDocumentDetails;
-import it.iss.si.dto.happysign.response.GetDocumentDetailResponse;
-import it.iss.si.dto.happysign.response.GetDocumentResponse;
-import it.iss.si.service.HappySignURLCondition;
+import it.iss.si.signature.flow.condition.SignatureDriverIsHappySign;
+import it.iss.si.signature.flow.flow.model.SignatureStatus;
+import it.iss.si.signature.flow.flow.model.SignatureStatusDetail;
+import it.iss.si.signature.flow.flow.service.SignatureService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Conditional(HappySignURLCondition.class)
+@Conditional(SignatureDriverIsHappySign.class)
 public class CronHappySignService {
     private static final Logger log = LoggerFactory.getLogger(CronHappySignService.class);
+
+    /**
+     * Motivo di respinta usato quando signature-flow non espone la nota dei firmatari.
+     */
+    private static final String MOTIVO_RESPINTA_DEFAULT = "Respinta da firma su HappySign";
 
     /**
      * Ultimo errore notificato per ogni documento (chiave: tipo-identificativo).
@@ -46,7 +47,7 @@ public class CronHappySignService {
     private final Map<String, String> ultimoErroreNotificato = new ConcurrentHashMap<>();
 
     @Autowired(required = false)
-    private it.iss.si.service.HappySignService happySignService;
+    private SignatureService signatureService;
     @Autowired
     private FlowService flowService;
     @Autowired
@@ -100,9 +101,13 @@ public class CronHappySignService {
         inviaMailErroreCron(tipoDocumento, identificativo, e);
     }
 
-    private EnumEsitoFlowDocumentStatus safeGetDocumentStatus(String idFlusso) throws Exception {
+    /**
+     * Stato e nota in un'unica chiamata a signature-flow.
+     * Restituisce null se HappySign non è raggiungibile o c'è un lock temporaneo: il controllo viene rimandato.
+     */
+    private SignatureStatusDetail safeGetSignatureStatusDetail(String idFlusso) throws Exception {
         try {
-            return happySignService.getDocumentStatus(idFlusso);
+            return signatureService.getSignatureStatusDetail(idFlusso);
         } catch (Exception e) {
             if (isTransientError(e)) {
                 log.debug("API HappySign non raggiungibile o lock temporaneo. Controllo rimandato. idFlusso={}", idFlusso);
@@ -135,15 +140,13 @@ public class CronHappySignService {
         for (OrdineMissione ordine : lista) {
             String identificativo = ordine.getAnno() + "-" + ordine.getNumero();
             try {
-                if (ordine.getIdFlusso() == null || ordine.getIdFlusso().isEmpty() || happySignService == null) continue;
-                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(ordine.getIdFlusso());
-                if (esito == null || EnumEsitoFlowDocumentStatus.TOSIGN == esito) continue;
+                if (ordine.getIdFlusso() == null || ordine.getIdFlusso().isEmpty() || signatureService == null) continue;
+                SignatureStatusDetail dettaglio = safeGetSignatureStatusDetail(ordine.getIdFlusso());
+                if (dettaglio == null || SignatureStatus.INVIATO == dettaglio.status()) continue;
 
-                if (EnumEsitoFlowDocumentStatus.SIGNED == esito) {
-                    GetDocumentResponse resp = happySignService.getDocument(ordine.getIdFlusso());
-                    if (resp != null && resp.getDocument() != null) {
-                        cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(resp.getDocument(), ordine);
-                    }
+                if (SignatureStatus.FIRMATO == dettaglio.status()) {
+                    byte[] documento = signatureService.getSignedDocument(ordine.getIdFlusso());
+                    cmisOrdineMissioneService.salvaStampaOrdineMissioneSuCMIS(documento, ordine);
                     FlowResult fr = new FlowResult();
                     fr.setProcessInstanceId(ordine.getIdFlusso());
                     fr.setIdMissione(ordine.getId().toString());
@@ -151,17 +154,14 @@ public class CronHappySignService {
                     fr.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
                     fr.setCommento("");
                     flowService.aggiornaMissioneFlows(fr);
-                } else if (EnumEsitoFlowDocumentStatus.REFUSED == esito) {
-                    GetDocumentDetailResponse details = happySignService.getDocumentDetails(ordine.getIdFlusso());
-                    if (details != null) {
-                        FlowResult fr = new FlowResult();
-                        fr.setIdMissione(ordine.getId().toString());
-                        fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
-                        fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        fr.setUser("Utente Flusso Firma");
-                        setNoteMissioneRespinta(details, fr);
-                        flowService.aggiornaMissioneFlows(fr);
-                    }
+                } else if (SignatureStatus.RIFIUTATO == dettaglio.status()) {
+                    FlowResult fr = new FlowResult();
+                    fr.setIdMissione(ordine.getId().toString());
+                    fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
+                    fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                    fr.setUser("Utente Flusso Firma");
+                    fr.setCommento(motivoRespinta(dettaglio));
+                    flowService.aggiornaMissioneFlows(fr);
                 }
                 // Elaborazione riuscita: l'eventuale errore precedente non è più attivo
                 ultimoErroreNotificato.remove("Ordine Missione-" + identificativo);
@@ -187,15 +187,13 @@ public class CronHappySignService {
         for (RimborsoMissione rimborso : lista) {
             String identificativo = rimborso.getAnno() + "-" + rimborso.getNumero();
             try {
-                if (rimborso.getIdFlusso() == null || rimborso.getIdFlusso().isEmpty() || happySignService == null) continue;
-                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(rimborso.getIdFlusso());
-                if (esito == null || EnumEsitoFlowDocumentStatus.TOSIGN == esito) continue;
+                if (rimborso.getIdFlusso() == null || rimborso.getIdFlusso().isEmpty() || signatureService == null) continue;
+                SignatureStatusDetail dettaglio = safeGetSignatureStatusDetail(rimborso.getIdFlusso());
+                if (dettaglio == null || SignatureStatus.INVIATO == dettaglio.status()) continue;
 
-                if (EnumEsitoFlowDocumentStatus.SIGNED == esito) {
-                    GetDocumentResponse resp = happySignService.getDocument(rimborso.getIdFlusso());
-                    if (resp != null && resp.getDocument() != null) {
-                        cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(resp.getDocument(), rimborso);
-                    }
+                if (SignatureStatus.FIRMATO == dettaglio.status()) {
+                    byte[] documento = signatureService.getSignedDocument(rimborso.getIdFlusso());
+                    cmisRimborsoMissioneService.salvaStampaRimborsoMissioneSuCMIS(documento, rimborso);
                     FlowResult fr = new FlowResult();
                     fr.setProcessInstanceId(rimborso.getIdFlusso());
                     fr.setIdMissione(rimborso.getId().toString());
@@ -203,17 +201,14 @@ public class CronHappySignService {
                     fr.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
                     fr.setCommento("");
                     flowService.aggiornaMissioneFlows(fr);
-                } else if (EnumEsitoFlowDocumentStatus.REFUSED == esito) {
-                    GetDocumentDetailResponse details = happySignService.getDocumentDetails(rimborso.getIdFlusso());
-                    if (details != null) {
-                        FlowResult fr = new FlowResult();
-                        fr.setIdMissione(rimborso.getId().toString());
-                        fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
-                        fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        fr.setUser("Utente Flusso Firma");
-                        setNoteMissioneRespinta(details, fr);
-                        flowService.aggiornaMissioneFlows(fr);
-                    }
+                } else if (SignatureStatus.RIFIUTATO == dettaglio.status()) {
+                    FlowResult fr = new FlowResult();
+                    fr.setIdMissione(rimborso.getId().toString());
+                    fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_RIMBORSO);
+                    fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                    fr.setUser("Utente Flusso Firma");
+                    fr.setCommento(motivoRespinta(dettaglio));
+                    flowService.aggiornaMissioneFlows(fr);
                 }
                 ultimoErroreNotificato.remove("Rimborso Missione-" + identificativo);
             } catch (Exception e) {
@@ -238,15 +233,13 @@ public class CronHappySignService {
         for (AnnullamentoOrdineMissione annullamento : lista) {
             String identificativo = annullamento.getAnno() + "-" + annullamento.getNumero();
             try {
-                if (annullamento.getIdFlusso() == null || annullamento.getIdFlusso().isEmpty() || happySignService == null) continue;
-                EnumEsitoFlowDocumentStatus esito = safeGetDocumentStatus(annullamento.getIdFlusso());
-                if (esito == null || EnumEsitoFlowDocumentStatus.TOSIGN == esito) continue;
+                if (annullamento.getIdFlusso() == null || annullamento.getIdFlusso().isEmpty() || signatureService == null) continue;
+                SignatureStatusDetail dettaglio = safeGetSignatureStatusDetail(annullamento.getIdFlusso());
+                if (dettaglio == null || SignatureStatus.INVIATO == dettaglio.status()) continue;
 
-                if (EnumEsitoFlowDocumentStatus.SIGNED == esito) {
-                    GetDocumentResponse resp = happySignService.getDocument(annullamento.getIdFlusso());
-                    if (resp != null && resp.getDocument() != null) {
-                        cmisOrdineMissioneService.salvaStampaAnnullamentoOrdineMissioneSuCMIS(resp.getDocument(), annullamento);
-                    }
+                if (SignatureStatus.FIRMATO == dettaglio.status()) {
+                    byte[] documento = signatureService.getSignedDocument(annullamento.getIdFlusso());
+                    cmisOrdineMissioneService.salvaStampaAnnullamentoOrdineMissioneSuCMIS(documento, annullamento);
                     FlowResult fr = new FlowResult();
                     fr.setProcessInstanceId(annullamento.getIdFlusso());
                     fr.setIdMissione(annullamento.getId().toString());
@@ -254,17 +247,14 @@ public class CronHappySignService {
                     fr.setStato(FlowResult.ESITO_FLUSSO_FIRMATO);
                     fr.setCommento("");
                     flowService.aggiornaMissioneFlows(fr);
-                } else if (EnumEsitoFlowDocumentStatus.REFUSED == esito) {
-                    GetDocumentDetailResponse details = happySignService.getDocumentDetails(annullamento.getIdFlusso());
-                    if (details != null) {
-                        FlowResult fr = new FlowResult();
-                        fr.setIdMissione(annullamento.getId().toString());
-                        fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
-                        fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
-                        fr.setUser("Utente Flusso Firma");
-                        setNoteMissioneRespinta(details, fr);
-                        flowService.aggiornaMissioneFlows(fr);
-                    }
+                } else if (SignatureStatus.RIFIUTATO == dettaglio.status()) {
+                    FlowResult fr = new FlowResult();
+                    fr.setIdMissione(annullamento.getId().toString());
+                    fr.setTipologiaMissione(FlowResult.TIPO_FLUSSO_REVOCA);
+                    fr.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+                    fr.setUser("Utente Flusso Firma");
+                    fr.setCommento(motivoRespinta(dettaglio));
+                    flowService.aggiornaMissioneFlows(fr);
                 }
                 ultimoErroreNotificato.remove("Annullamento Ordine-" + identificativo);
             } catch (Exception e) {
@@ -276,17 +266,7 @@ public class CronHappySignService {
         }
     }
 
-    private void setNoteMissioneRespinta(GetDocumentDetailResponse documentDetails, FlowResult flowResult) {
-        String noteRespinta = Arrays.stream(documentDetails.getSigners())
-                .filter(signer -> {
-                    String op = signer.getOperation();
-                    return op != null && (op.equalsIgnoreCase(EnumEsitoFlowDocumentStatus.REFUSED.name()) || op.toLowerCase().contains("ha rifiutato in firma"));
-                })
-                .map(SignersDocumentDetails::getNote)
-                .filter(Objects::nonNull)
-                .filter(note -> !note.isEmpty())
-                .findFirst()
-                .orElse("Respinta da firma su HappySign");
-        flowResult.setCommento(noteRespinta);
+    private String motivoRespinta(SignatureStatusDetail dettaglio) {
+        return dettaglio.note() != null && !dettaglio.note().isEmpty() ? dettaglio.note() : MOTIVO_RESPINTA_DEFAULT;
     }
 }

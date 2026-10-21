@@ -19,11 +19,7 @@
 
 package it.cnr.si.missioni.config;
 
-import it.cnr.si.missioni.service.CronHappySignService;
 import it.cnr.si.missioni.service.CronService;
-import it.iss.si.service.HappySignService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -31,14 +27,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @Profile("!showcase")
 @Configuration
 @EnableScheduling
 public class CronConfigurationMissioni {
-
-    //private final Logger log = LoggerFactory.getLogger(CronConfigurationMissioni.class);
 
     @Value("${cron.comunicaDati.active}")
     private boolean cronComunicaDatiActive;
@@ -58,17 +50,9 @@ public class CronConfigurationMissioni {
     @Value("${cron.happysign.active}")
     private boolean cronHappySignActive;
 
-//    @Value("${cron.happysignGC.active}")
-//    private boolean cronHappySignGCActive;
-
     @Autowired(required = false)
     private CronService cronService;
 
-//    @Autowired
-//    private CronHappySignService cronHappySignService;
-//
-//    private final AtomicInteger errorCount = new AtomicInteger(0);
-//
 
     @Scheduled(cron = "${cron.comunicaDati.cronExpression}")
     public void cronComunicaDati() throws Exception {

@@ -12,7 +12,7 @@ import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.spring.storage.StorageObject;
-import it.iss.si.service.HappySignURLCondition;
+import it.iss.si.signature.flow.condition.SignatureDriverIsHappySign;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Conditional(HappySignURLCondition.class)
+@Conditional(SignatureDriverIsHappySign.class)
 public class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissioneService {
 
     @Autowired
@@ -108,10 +108,7 @@ public class CMISOrdineMissioneServiceHappySign extends AbstractCMISOrdineMissio
     private void handleHappySignException(Exception e, String contesto, String documentId, String subjectEmail) {
         logger.error("Errore durante l'invio " + contesto + " ad HappySign", e);
 
-        String msgErrore = (e instanceof FeignException)
-                ? "Servizio HappySign temporaneamente non raggiungibile."
-                : "Impossibile contattare il servizio di firma.";
-
+        String msgErrore = String.valueOf((ExceptionUtils.indexOfThrowable(e, FeignException.class) != -1));
         String messaggioUtente = "Errore in fase di preparazione del flusso documentale. " + msgErrore;
 
         if (mailService != null) {

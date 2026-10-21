@@ -1,16 +1,15 @@
 package it.cnr.si.missioni.cmis.flows.happySign;
 
 import it.cnr.si.missioni.cmis.MissioniCMISService;
-import it.cnr.si.missioni.cmis.flows.happySign.dto.StartWorflowDto;
+import it.cnr.si.missioni.cmis.flows.happySign.dto.StartSignatureFlowDto;
 import it.cnr.si.missioni.cmis.flows.happySign.interfaces.AutorizzazioneMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.MailService;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.spring.storage.MimeTypes;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
-import it.iss.si.dto.happysign.base.AttachedFile;
-import it.iss.si.dto.happysign.base.File;
-import it.iss.si.service.HappySignService;
+import it.iss.si.signature.flow.flow.model.SignatureDocument;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,6 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "flows", name = "test", havingValue = "true")
 public class UtilTestService {
     private static final Log logger = LogFactory.getLog(UtilTestService.class);
-    @Autowired
-    protected HappySignService happySignService;
 
     @Autowired
     protected MissioniCMISService missioniCMISService;
@@ -42,35 +40,34 @@ public class UtilTestService {
         return IOUtils.toByteArray(missioniCMISService.getResource(storageObject));
     }
 
-    public StartWorflowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
-        StartWorflowDto startInfo = new StartWorflowDto();
+    public StartSignatureFlowDto createStartWorkflowDto(OrdineMissione ordineMissione, StorageObject modulo, List<StorageObject> allegati) throws IOException {
+        StartSignatureFlowDto startInfo = new StartSignatureFlowDto();
         startInfo.setTemplateName("Missioni_doppia_firma_sequenziale");
 
         //TODO aspettare conferma per impostare 1 sola firma per chi inserisce l'ordine
         startInfo.addSigner(ordineMissione.getUidInsert());
         startInfo.addSigner(ordineMissione.getUidInsert());
 
-        File f = new File();
-        f.setFilename(missioniCMISService.parseFilename(modulo.getKey()));
-        f.setPdf(getDocumento(modulo));
-        if (allegati != null && allegati.size() > 0) {
+        startInfo.setFilesToSign(List.of(new SignatureDocument(
+                missioniCMISService.parseFilename(modulo.getKey()),
+                MimeTypes.PDF.mimetype(),
+                new ByteArrayInputStream(getDocumento(modulo)))));
+
+        List<SignatureDocument> attachments = new ArrayList<>();
+        if (allegati != null) {
             for (StorageObject so : allegati) {
-                AttachedFile attachedFile = new AttachedFile();
-                attachedFile.setAttached(false);
-                attachedFile.setContent(getDocumento(so));
-                attachedFile.setFilename(so.getPropertyValue(StoragePropertyNames.NAME.value()));
-                f.addAttachedFile(attachedFile);
+                String fileName = so.getPropertyValue(StoragePropertyNames.NAME.value());
+                attachments.add(new SignatureDocument(fileName, UtilHappySign.mimeTypeOf(fileName), new ByteArrayInputStream(getDocumento(so))));
             }
         }
-
-        startInfo.setFileToSign(f);
+        startInfo.setAttachments(attachments);
 
         return startInfo;
     }
 
-    public static void showSigned(StartWorflowDto startWorflowDto) {
+    public static void showSigned(StartSignatureFlowDto startSignatureFlowDto) {
         logger.info("firmatari missione in produzione");
-        List<String> signers = startWorflowDto.getSigners();
+        List<String> signers = startSignatureFlowDto.getSigners();
         if (signers == null || signers.isEmpty()) {
             logger.error("non ci sono firmatari");
         } else {
