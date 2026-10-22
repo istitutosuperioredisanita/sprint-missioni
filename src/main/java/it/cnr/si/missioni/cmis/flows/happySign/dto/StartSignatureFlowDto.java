@@ -1,6 +1,6 @@
 package it.cnr.si.missioni.cmis.flows.happySign.dto;
 
-import it.iss.si.signature.flow.flow.model.SignatureDocument;
+import it.iss.si.signature.flow.model.SignatureDocument;
 
 import java.util.ArrayList;
 import java.util.List;

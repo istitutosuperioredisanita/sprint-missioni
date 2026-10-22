@@ -288,9 +288,10 @@
             <version>${happysign.version}</version>
         </dependency>
 
+        <!-- Signature Flow API: necessaria SEMPRE per compilare anche senza profilo iss -->
         <dependency>
             <groupId>it.iss.si.signature</groupId>
-            <artifactId>signature-flow-happysign</artifactId>
+            <artifactId>signature-flow-core</artifactId>
             <version>${signature-flow.version}</version>
         </dependency>
 
@@ -830,6 +831,13 @@
             <properties>
                 <profile.iss>,iss</profile.iss>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>it.iss.si.signature</groupId>
+                    <artifactId>signature-flow-happysign</artifactId>
+                    <version>${signature-flow.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>

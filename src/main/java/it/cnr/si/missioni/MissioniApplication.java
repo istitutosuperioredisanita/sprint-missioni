@@ -3,6 +3,7 @@ package it.cnr.si.missioni;
 import it.cnr.si.missioni.config.Constants;
 import it.cnr.si.missioni.config.DefaultProfileUtil;
 import it.cnr.si.missioni.config.JHipsterProperties;
+import it.iss.si.signature.flow.config.SignatureFlowConfiguration;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 import java.net.InetAddress;
@@ -25,6 +27,7 @@ import java.util.Collection;
         }
 )
 @EnableConfigurationProperties({JHipsterProperties.class, LiquibaseProperties.class})
+@Import(SignatureFlowConfiguration.class)
 public class MissioniApplication {
 
     private static final Logger log = LoggerFactory.getLogger(MissioniApplication.class);

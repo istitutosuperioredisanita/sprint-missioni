@@ -7,7 +7,7 @@ import it.cnr.si.missioni.service.MailService;
 import it.cnr.si.spring.storage.MimeTypes;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
-import it.iss.si.signature.flow.flow.model.SignatureDocument;
+import it.iss.si.signature.flow.model.SignatureDocument;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
