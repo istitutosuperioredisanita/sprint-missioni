@@ -49,6 +49,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1037,6 +1039,18 @@ public class RimborsoMissioneService {
                 }
 
                 spec = sb.build();
+            }
+
+            // Rimborsi annullabili: esclusi quelli che hanno già un annullamento in fase di inserimento
+            if ("S".equals(Utility.nvl(filter.getDaAnnullare(), "N"))) {
+                spec = spec.and((root, query, cb) -> {
+                    Subquery<Long> sub = query.subquery(Long.class);
+                    Root<AnnullamentoRimborsoMissione> ann = sub.from(AnnullamentoRimborsoMissione.class);
+                    sub.select(ann.get("id"))
+                            .where(cb.equal(ann.get("rimborsoMissione").get("id"), root.get("id")),
+                                    cb.notEqual(ann.get("stato"), Costanti.STATO_ANNULLATO));
+                    return cb.not(cb.exists(sub));
+                });
             }
         }
 

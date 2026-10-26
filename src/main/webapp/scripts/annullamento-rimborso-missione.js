@@ -714,6 +714,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                         $scope.idMissione = null;
                         $scope.annullamentoModel = {}
                         $scope.inizializzaFormPerInserimento($sessionStorage.account);
+                        $location.path('/');
                     },
                     function (httpResponse) {
                         $rootScope.salvataggio = false;

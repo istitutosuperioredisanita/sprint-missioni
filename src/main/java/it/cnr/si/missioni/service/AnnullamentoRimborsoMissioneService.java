@@ -28,13 +28,11 @@ import it.cnr.si.missioni.util.proxy.json.object.Account;
 import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.missioni.util.proxy.json.service.CommonService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.missioni.web.filter.RimborsoMissioneFilterMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -293,66 +291,109 @@ public class AnnullamentoRimborsoMissioneService {
                                                               Boolean isForValidateFlows) throws AwesomeException {
 
         Specification<AnnullamentoRimborsoMissione> spec = Specification.where(null);
+        Sort sort = Sort.by(Sort.Order.asc("dataInserimento"))
+                .and(Sort.by(Sort.Order.asc("anno")))
+                .and(Sort.by(Sort.Order.asc("numero")));
 
         if (filter != null) {
-            Specification<RimborsoMissione> rimSpec = RimborsoMissioneFilterMapper.mapBaseFilters(filter);
+            // Filtri sull'annullamento
+            spec = spec.and(BaseSpecification.eq("anno", filter.getAnno()));
+            spec = spec.and(BaseSpecification.ge("id", filter.getDaId()));
+            spec = spec.and(BaseSpecification.le("id", filter.getaId()));
+            spec = spec.and(BaseSpecification.eq("stato", filter.getStato()));
+            if (filter.getListaStatiMissione() != null && !filter.getListaStatiMissione().isEmpty()) {
+                spec = spec.and(BaseSpecification.in("stato", filter.getListaStatiMissione()));
+            }
+            spec = spec.and(BaseSpecification.ge("numero", filter.getDaNumero()));
+            if (filter.getDaData() != null) {
+                LocalDate daData = DateUtils.parseLocalDate(filter.getDaData(), DateUtils.PATTERN_DATE);
+                spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("dataInserimento"), daData));
+            }
+            if (filter.getaData() != null) {
+                LocalDate aData = DateUtils.parseLocalDate(filter.getaData(), DateUtils.PATTERN_DATE);
+                spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("dataInserimento"), aData));
+            }
 
-            spec = spec.and((root, query, cb) -> {
-                Subquery<Long> sub = query.subquery(Long.class);
-                Root<RimborsoMissione> rim = sub.from(RimborsoMissione.class);
-                sub.select(rim.get("id"))
-                        .where(cb.and(
-                                cb.equal(rim.get("id"), root.get("rimborsoMissione").get("id")),
-                                rimSpec.toPredicate(rim, query, cb)
-                        ));
-                return cb.exists(sub);
-            });
-
-            spec = spec.and(BaseSpecification.eq("statoInvioSigla", filter.getStatoInvioSigla()));
-
-            String currentUser = securityService.getCurrentUserLogin();
-
-            if ("S".equals(Utility.nvl(filter.getDaCron(), "N"))) {
-                // Nessun filtro utente aggiuntivo
-            } else {
-                if (!isForValidateFlows) {
-                    if (!StringUtils.isEmpty(filter.getUser())) {
-                        spec = spec.and(BaseSpecification.eq("uid", filter.getUser()));
-                    } else if (StringUtils.isEmpty(filter.getUoRich())) {
-                        spec = spec.and(BaseSpecification.eq("uid", currentUser));
-                    }
+            // Filtri sul rimborso collegato
+            if (filter.getUoRich() != null) {
+                if (accountService.isUserEnableToWorkUo(filter.getUoRich()) && !filter.isDaCron()) {
+                    String uoRich = filter.getUoRich();
+                    spec = spec.and((root, query, cb) -> cb.or(
+                            cb.equal(root.get("rimborsoMissione").get("uoRich"), uoRich),
+                            cb.equal(root.get("rimborsoMissione").get("uoSpesa"), uoRich)));
                 } else {
-                    UsersSpecial userSpecial = accountService.getUoForUsersSpecial(currentUser);
-                    Specification<AnnullamentoRimborsoMissione> uoSpec = Specification.where(null);
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "L'utente " + securityService.getCurrentUserLogin() + "  non è abilitato a vedere i dati della uo " + filter.getUoRich());
+                }
+            }
+            if (filter.getAnnoOrdine() != null) {
+                Integer annoOrdine = filter.getAnnoOrdine();
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("rimborsoMissione").get("anno"), annoOrdine));
+            }
+            if (filter.getDaNumeroOrdine() != null) {
+                Long daNumeroOrdine = filter.getDaNumeroOrdine();
+                spec = spec.and((root, query, cb) -> cb.ge(root.get("rimborsoMissione").get("numero"), daNumeroOrdine));
+            }
+            if (filter.getaNumeroOrdine() != null) {
+                Long aNumeroOrdine = filter.getaNumeroOrdine();
+                spec = spec.and((root, query, cb) -> cb.le(root.get("rimborsoMissione").get("numero"), aNumeroOrdine));
+            }
+            spec = spec.and(BaseSpecification.eq("statoInvioSigla", filter.getStatoInvioSigla()));
+        }
 
-                    if (userSpecial != null && !"S".equals(userSpecial.getAll()) &&
-                            userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
+        if (filter != null && filter.isDaCron()) {
+            return annullamentoRimborsoMissioneRepository.findAll(spec, sort);
+        }
 
+        String currentUser = securityService.getCurrentUserLogin();
+        if (!isForValidateFlows) {
+            if (filter != null && !StringUtils.isEmpty(filter.getUser())) {
+                spec = spec.and(BaseSpecification.eq("uid", filter.getUser()));
+            } else if (filter == null || StringUtils.isEmpty(filter.getUoRich())) {
+                spec = spec.and(BaseSpecification.eq("uid", currentUser));
+            }
+        } else {
+            UsersSpecial userSpecial = accountService.getUoForUsersSpecial(currentUser);
+            if (userSpecial != null) {
+                if (!"S".equals(userSpecial.getAll())) {
+                    if (userSpecial.getUoForUsersSpecials() != null && !userSpecial.getUoForUsersSpecials().isEmpty()) {
+                        // uoRich sempre; uoSpesa solo se la uo e l'utente prevedono la validazione
+                        List<String> uoRichiedenti = new ArrayList<>();
+                        List<String> uoSpesa = new ArrayList<>();
                         for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
-                            String uoSigla = uoService.getUoSigla(uoUser);
-                            uoSpec = uoSpec.or((root, query, cb) -> cb.equal(root.join("rimborsoMissione").get("uoRich"), uoSigla));
-                            uoSpec = uoSpec.or((root, query, cb) -> cb.equal(root.join("rimborsoMissione").get("uoSpesa"), uoSigla));
+                            Uo uo = uoService.recuperoUo(uoUser.getCodice_uo());
+                            if (uo != null) {
+                                String uoFilter = uoService.getUoSigla(uoUser);
+                                uoRichiedenti.add(uoFilter);
+                                if (Utility.nvl(uo.getOrdineDaValidare(), "N").equals("S")
+                                        && Utility.nvl(uoUser.getOrdine_da_validare(), "N").equals("S")) {
+                                    uoSpesa.add(uoFilter);
+                                }
+                            }
                         }
-                        spec = spec.and(uoSpec);
+                        if (!uoRichiedenti.isEmpty()) {
+                            spec = spec.and((root, query, cb) -> {
+                                Predicate perUoRich = root.get("rimborsoMissione").get("uoRich").in(uoRichiedenti);
+                                return uoSpesa.isEmpty() ? perUoRich
+                                        : cb.or(perUoRich, root.get("rimborsoMissione").get("uoSpesa").in(uoSpesa));
+                            });
+                        }
                     } else {
                         spec = spec.and(BaseSpecification.eq("uid", currentUser));
                     }
                 }
-            }
-
-            if (!"S".equals(Utility.nvl(filter.getIncludiMissioniAnnullate())) &&
-                    !(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0)) {
-                spec = spec.and((root, query, cb) -> cb.notEqual(root.get("stato"), Costanti.STATO_ANNULLATO));
-            }
-
-            if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
-                spec = spec.and((root, query, cb) -> cb.equal(root.get("stato"), Costanti.STATO_INSERITO));
+            } else {
+                spec = spec.and(BaseSpecification.eq("uid", currentUser));
             }
         }
 
-        Sort sort = Sort.by(Sort.Order.asc("dataInserimento"))
-                .and(Sort.by(Sort.Order.asc("anno")))
-                .and(Sort.by(Sort.Order.asc("numero")));
+        if (filter == null || (!Utility.nvl(filter.getIncludiMissioniAnnullate()).equals("S")
+                && !(filter.getDaId() != null && filter.getaId() != null && filter.getDaId().compareTo(filter.getaId()) == 0))) {
+            spec = spec.and((root, query, cb) -> cb.notEqual(root.get("stato"), Costanti.STATO_ANNULLATO));
+        }
+
+        if (Boolean.TRUE.equals(isServiceRest) && Boolean.TRUE.equals(isForValidateFlows)) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("stato"), Costanti.STATO_INSERITO));
+        }
 
         return annullamentoRimborsoMissioneRepository.findAll(spec, sort);
     }

@@ -1474,37 +1474,42 @@ public class OrdineMissioneService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto non può essere negativo");
         }
 
-        if (updateOrdineMissione) {
-            BigDecimal totaleSpesePresComp = null;
-            if (ordineMissione.getImportoPresunto() != null) {
-                totaleSpesePresComp = ordineMissione.getTotaleSpesePresComplessivo();
+        if (ordineMissione.getImportoPresunto() != null && !"S".equals(ordineMissione.getMissioneGratuita())
+                && ordineMissione.getImportoPresunto().signum() <= 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto deve essere valorizzato e maggiore di 0.");
+        }
 
-                if (totaleSpesePresComp == null || totaleSpesePresComp.signum() == 0) {
-                    totaleSpesePresComp = BigDecimal.ZERO;
+        if (updateOrdineMissione && ordineMissione.getImportoPresunto() != null && !"S".equals(ordineMissione.getMissioneGratuita())) {
+            BigDecimal totaleSpesePresComp = ordineMissione.getTotaleSpesePresComplessivo();
 
-                    // Carica le righe di spesa se il chiamante non le ha già caricate
-                    if (ordineMissione.getOrdineMissioneDettagli() == null && ordineMissione.getId() != null) {
-                        ordineMissione.setOrdineMissioneDettagli(
-                                ordineMissioneDettagliService.getOrdineMissioneDettagli(
-                                        Long.valueOf(ordineMissione.getId().toString())));
-                    }
+            if (totaleSpesePresComp == null || totaleSpesePresComp.signum() == 0) {
+                totaleSpesePresComp = BigDecimal.ZERO;
 
-                    if (ordineMissione.getOrdineMissioneDettagli() != null) {
-                        totaleSpesePresComp = ordineMissione.getOrdineMissioneDettagli()
-                                .stream()
-                                .map(OrdineMissioneDettagli::getImportoEuro)
-                                .filter(Objects::nonNull)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-                    }
-                    if (totaleSpesePresComp.signum() == 0) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto è valorizzato, ma il totale delle spese presunte risulta 0.");
-                    }
-                    if (ordineMissione.getImportoPresunto().signum() == 0) {
-                        throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto deve essere valorizzato e maggiore di 0.");
-                    }
-                    ordineMissione.setTotaleSpesePresComplessivo(totaleSpesePresComp);
+                if (ordineMissione.getOrdineMissioneDettagli() == null && ordineMissione.getId() != null) {
+                    ordineMissione.setOrdineMissioneDettagli(
+                            ordineMissioneDettagliService.getOrdineMissioneDettagli(
+                                    Long.valueOf(ordineMissione.getId().toString())));
                 }
+
+                if (ordineMissione.getOrdineMissioneDettagli() != null) {
+                    totaleSpesePresComp = ordineMissione.getOrdineMissioneDettagli()
+                            .stream()
+                            .map(OrdineMissioneDettagli::getImportoEuro)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                }
+                ordineMissione.setTotaleSpesePresComplessivo(totaleSpesePresComp);
             }
+
+            if (totaleSpesePresComp.signum() <= 0) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "L'importo presunto è valorizzato, ma il totale delle spese presunte risulta 0.");
+            }
+        }
+
+        BigDecimal totaleDaVerificare = ordineMissione.getTotaleSpesePresComplessivo();
+        if (ordineMissione.getImportoPresunto() != null && !"S".equals(ordineMissione.getMissioneGratuita())
+                && totaleDaVerificare != null && totaleDaVerificare.compareTo(ordineMissione.getImportoPresunto()) > 0) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Il totale delle spese presunte non può essere superiore all'importo presunto.");
         }
     }
 

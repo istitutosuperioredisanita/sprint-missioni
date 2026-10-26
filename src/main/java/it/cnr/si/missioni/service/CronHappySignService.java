@@ -74,6 +74,8 @@ public class CronHappySignService {
                     current instanceof jakarta.persistence.PessimisticLockException ||
                     current instanceof org.springframework.dao.CannotAcquireLockException) return true;
             if (current.getMessage() != null && current.getMessage().contains("in modifica. Ripetere l'operazione")) return true;
+            // Documento firmato non ancora visibile sul documentale (indicizzazione/caricamento in corso): riprova al giro successivo
+            if (current.getMessage() != null && current.getMessage().contains("Non esistono documenti collegati")) return true;
             current = current.getCause();
         }
         return false;
@@ -169,6 +171,8 @@ public class CronHappySignService {
                 if (!isTransientError(e)) {
                     log.error("Errore elaborazione ordine id={}", ordine.getId(), e);
                     notificaErroreUnaSola("Ordine Missione", identificativo, e);
+                } else {
+                    log.debug("Ordine {} rimandato al prossimo giro: {}", identificativo, e.getMessage());
                 }
             }
         }
@@ -215,6 +219,8 @@ public class CronHappySignService {
                 if (!isTransientError(e)) {
                     log.error("Errore elaborazione rimborso id={}", rimborso.getId(), e);
                     notificaErroreUnaSola("Rimborso Missione", identificativo, e);
+                } else {
+                    log.debug("Rimborso {} rimandato al prossimo giro: {}", identificativo, e.getMessage());
                 }
             }
         }
@@ -261,6 +267,8 @@ public class CronHappySignService {
                 if (!isTransientError(e)) {
                     log.error("Errore elaborazione annullamento id={}", annullamento.getId(), e);
                     notificaErroreUnaSola("Annullamento Ordine", identificativo, e);
+                } else {
+                    log.debug("Annullamento {} rimandato al prossimo giro: {}", identificativo, e.getMessage());
                 }
             }
         }
