@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -93,7 +94,7 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
     @Autowired
     private MissioniAceService missioniAceService;
 
-    @Autowired
+    @Autowired(required = false)
     protected SignatureService signatureService;
 
     /**
@@ -305,6 +306,9 @@ public abstract class AbstractHappySign implements FlussiToHappySign {
                 null,
                 List.of(),
                 startInfo.getTemplateName());
+        if (signatureService == null) {
+            throw new ApplicationContextException("Servizio di firma HappySign non disponibile.");
+        }
         logger.info("Invio richiesta di firma: template=" + startInfo.getTemplateName() + ", firmatari=" + startInfo.getSigners().size());
         return signatureService.sendToSign(request);
     }

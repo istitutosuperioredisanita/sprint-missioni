@@ -22,12 +22,12 @@ jobs:
         run: |
           mvn clean deploy \
             -s .m2/settings.xml \
-            -P AZURE,prod \
+            -P AZURE,prod,iss \
             -DskipTests \
             --batch-mode --errors --fail-at-end --show-version
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAVEN_TOKEN_PCKG: ${{ secrets.MAVEN_TOKEN_PCKG }}
 
       - name: Log in to GitHub Container Registry
