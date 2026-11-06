@@ -69,6 +69,7 @@
             "close": "Chiudi",
             "print": "Stampa",
             "download": "Scarica",
+            "export-excel": "Esporta Excel",
             "indietro": "Indietro",
             "inizio": "Inizio",
             "avanti": "Avanti",
@@ -376,6 +377,7 @@
             "sendToFinal": "Rendi Definitivo l'Ordine di Missione",
             "confirm": "Invia l'Ordine di Missione",
             "print": "Stampa Ordine di Missione",
+            "download": "Scarica ZIP Documenti",
             "auto-propria-si": "Richiesta Utilizzo Auto Propria: Sì",
             "auto-propria-no": "Richiesta Utilizzo Auto Propria: No",
             "taxi-si": "Richiesta Utilizzo Taxi: Sì",
@@ -546,12 +548,15 @@
             "a-data-missione": "A Data Missione",
             "anno": "Anno",
             "annullati": "Includi Annullati",
+            "richiesta-anticipo": "Richiesta Anticipo",
+            "anticipo-da-effettuare": "Anticipo da Effettuare",
             "ordini-missione": "Ordini di Missione",
             "stati": "Stati",
             "stati-placeholder": "Seleziona Stato"
         },
         "form": {
-            "anticipo": "Anticipo",
+            "richiesta-anticipo": "Richiesta Anticipo",
+            "anticipo-effettuato": "Anticipo Effettuato",
             "modulo": "Progetto",
             "modulo.placeholder": "Progetto"
         }

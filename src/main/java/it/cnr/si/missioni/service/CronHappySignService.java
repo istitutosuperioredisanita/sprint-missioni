@@ -1,7 +1,5 @@
 package it.cnr.si.missioni.service;
 
-import feign.FeignException;
-import feign.RetryableException;
 import it.cnr.si.missioni.cmis.CMISOrdineMissioneService;
 import it.cnr.si.missioni.cmis.CMISRimborsoMissioneService;
 import it.cnr.si.missioni.domain.custom.FlowResult;
@@ -9,6 +7,7 @@ import it.cnr.si.missioni.domain.custom.persistence.AnnullamentoOrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.domain.custom.persistence.RimborsoMissione;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.ErroriTemporanei;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
 import it.iss.si.signature.flow.condition.SignatureDriverIsHappySign;
@@ -23,8 +22,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,21 +61,7 @@ public class CronHappySignService {
     private MailService mailService;
 
     private boolean isTransientError(Throwable e) {
-        Throwable current = e;
-        while (current != null) {
-            if (current instanceof SocketTimeoutException || current instanceof ConnectException || current instanceof RetryableException) return true;
-            if (current instanceof FeignException && (((FeignException) current).status() == 404 || ((FeignException) current).status() >= 500)) return true;
-            if (current instanceof org.springframework.dao.OptimisticLockingFailureException ||
-                    current instanceof jakarta.persistence.OptimisticLockException ||
-                    current instanceof org.springframework.dao.PessimisticLockingFailureException ||
-                    current instanceof jakarta.persistence.PessimisticLockException ||
-                    current instanceof org.springframework.dao.CannotAcquireLockException) return true;
-            if (current.getMessage() != null && current.getMessage().contains("in modifica. Ripetere l'operazione")) return true;
-            // Documento firmato non ancora visibile sul documentale (indicizzazione/caricamento in corso): riprova al giro successivo
-            if (current.getMessage() != null && current.getMessage().contains("Non esistono documenti collegati")) return true;
-            current = current.getCause();
-        }
-        return false;
+        return ErroriTemporanei.isTemporaneo(e);
     }
 
     private void inviaMailErroreCron(String tipoDocumento, String identificativo, Exception e) {
@@ -130,7 +113,7 @@ public class CronHappySignService {
     }
 
     @Transactional
-    private void aggiornaOrdini() {
+    protected void aggiornaOrdini() {
         MissioneFilter filtro = new MissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
@@ -179,7 +162,7 @@ public class CronHappySignService {
     }
 
     @Transactional
-    private void aggiornaRimborsi() {
+    protected void aggiornaRimborsi() {
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);
@@ -227,7 +210,7 @@ public class CronHappySignService {
     }
 
     @Transactional
-    private void aggiornaAnnullamenti() {
+    protected void aggiornaAnnullamenti() {
         RimborsoMissioneFilter filtro = new RimborsoMissioneFilter();
         filtro.setStatoFlusso(Costanti.STATO_INVIATO_FLUSSO);
         filtro.setStato(Costanti.STATO_CONFERMATO);

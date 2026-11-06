@@ -12,40 +12,44 @@ missioniApp.factory('ElencoOrdiniMissioneService', function($http, ui, DateUtils
             });
             return promise;
         },
-        findMissioniDaAnnullare: function(user) {
+        findMissioniDaAnnullare: function(user, filtroAnticipo) {
             var promise = $http.get('api/rest/ordiniMissione/listDaAnnullare', {
                 params: {
-                    user: user
+                    user: user,
+                    filtroAnticipo: filtroAnticipo
                 }
             }).then(function(response) {
                 return response.data;
             });
             return promise;
         },
-        findMissioniDaInviareAllaFirma: function(user) {
+        findMissioniDaInviareAllaFirma: function(user, filtroAnticipo) {
             var promise = $http.get('api/rest/ordiniMissione/listDaInviareAllaFirma', {
                 params: {
-                    user: user
+                    user: user,
+                    filtroAnticipo: filtroAnticipo
                 }
             }).then(function(response) {
                 return response.data;
             });
             return promise;
         },
-        findMissioniDaApprovare: function(user) {
+        findMissioniDaApprovare: function(user, filtroAnticipo) {
             var promise = $http.get('api/rest/ordiniMissione/listDaApprovare', {
                 params: {
-                    user: user
+                    user: user,
+                    filtroAnticipo: filtroAnticipo
                 }
             }).then(function(response) {
                 return response.data;
             });
             return promise;
         },
-        findMissioniDaConfermare: function(user) {
+        findMissioniDaConfermare: function(user, filtroAnticipo) {
             var promise = $http.get('api/rest/ordiniMissione/listDaConfermare', {
                 params: {
-                    user: user
+                    user: user,
+                    filtroAnticipo: filtroAnticipo
                 }
             }).then(function(response) {
                 return response.data;
@@ -63,7 +67,7 @@ missioniApp.factory('ElencoOrdiniMissioneService', function($http, ui, DateUtils
             });
             return promise;
         },
-        findMissioni: function(user, anno, uoRich, daNumero, aNumero, daData, aData, includiMissioniAnnullate, respGruppo, cup, daDataMissione, aDataMissione, statoOrdineMissione) {
+        findMissioni: function(user, anno, uoRich, daNumero, aNumero, daData, aData, includiMissioniAnnullate, respGruppo, cup, daDataMissione, aDataMissione, statoOrdineMissione, filtroAnticipo) {
             var promise = $http.get('api/rest/ordiniMissione/list', {
                 params: {
                     user: user,
@@ -78,7 +82,8 @@ missioniApp.factory('ElencoOrdiniMissioneService', function($http, ui, DateUtils
                     cup: cup,
                     daDataMissione: daDataMissione,
                     aDataMissione: aDataMissione,
-                    giaRimborsato: statoOrdineMissione
+                    giaRimborsato: statoOrdineMissione,
+                    filtroAnticipo: filtroAnticipo
                 }
             }).then(function(response) {
                 return response.data;
@@ -170,13 +175,27 @@ missioniApp.factory('ElencoOrdiniMissioneService', function($http, ui, DateUtils
     }
 });
 
-missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
+missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService, ExcelExportService, StatoElencoService) {
 
     $scope.statoOrdineMissione = '';
     $scope.statoSecondoFiltroSelezionato = '';
 
     $scope.valoriStatoOrdineMissione = ProxyService.valueStatoOrdineMissione;
     $scope.valoriFiltroStati = ProxyService.valueFiltroStati;
+
+    // TODO filtro "Anticipo da Effettuare"
+    $scope.filtri = { richiestaAnticipo: false, anticipoDaEffettuare: false };
+    $scope.mostraColonnaAnticipoEffettuato = false;
+
+    $scope.onChangeRichiestaAnticipo = function() {
+        if (!$scope.filtri.richiestaAnticipo) {
+            $scope.filtri.anticipoDaEffettuare = false;
+        }
+    };
+
+    function getFiltroAnticipo() {
+        return $scope.filtri && $scope.filtri.richiestaAnticipo ? 'RICHIESTA' : null;
+    }
 
     $scope.tipiMissione = {
         'Italia': 'I',
@@ -213,6 +232,9 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
 
 
 
+
+    var paginaRicercaDaRipristinare = null;
+    var ignoraWatchStatoFiltro = false;
 
     $scope.currentPage = 1;
     $sessionStorage.rowsPerPage = $scope.rowsPerPage;
@@ -260,7 +282,10 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
 
 
 
-    $scope.ricerca = function() {
+    $scope.ricerca = function(paginaDaRipristinare) {
+        paginaRicercaDaRipristinare = paginaDaRipristinare || null;
+        $scope.mostraColonnaAnticipoEffettuato = !!($scope.filtri && $scope.filtri.richiestaAnticipo);
+        var filtroAnticipo = getFiltroAnticipo();
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.ordiniMissione = null;
@@ -285,26 +310,26 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
         // Gestione dello switch in base al filtro selezionato
         switch (filtroStatiSelezionato) {
             case 'T':
-                ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annullati, $scope.respGruppo, $scope.cup, daDataMissioneFormatted, aDataMissioneFormatted, $scope.statoOrdineMissione).then(handleResponse);
+                ElencoOrdiniMissioneService.findMissioni($scope.userWork, $scope.anno, $scope.uoWorkForSpecialUser, $scope.daNumero, $scope.aNumero, daDataFormatted, aDataFormatted, $scope.annullati, $scope.respGruppo, $scope.cup, daDataMissioneFormatted, aDataMissioneFormatted, $scope.statoOrdineMissione, filtroAnticipo).then(handleResponse);
                 break;
 //            case 'N':
 //                ElencoOrdiniMissioneService.findMissioniDaRimborsare($scope.userWork,false).then(handleResponse);
 //                break;
 
             case 'DA ANN':
-                ElencoOrdiniMissioneService.findMissioniDaAnnullare($scope.userWork).then(handleResponse);
+                ElencoOrdiniMissioneService.findMissioniDaAnnullare($scope.userWork, filtroAnticipo).then(handleResponse);
                 break;
 
             case 'DA INV':
-                ElencoOrdiniMissioneService.findMissioniDaInviareAllaFirma($scope.userWork).then(handleResponse);
+                ElencoOrdiniMissioneService.findMissioniDaInviareAllaFirma($scope.userWork, filtroAnticipo).then(handleResponse);
                 break;
 
             case 'DA CONF':
-                ElencoOrdiniMissioneService.findMissioniDaConfermare($scope.userWork).then(handleResponse);
+                ElencoOrdiniMissioneService.findMissioniDaConfermare($scope.userWork, filtroAnticipo).then(handleResponse);
                 break;
 
             case 'DA APP':
-                ElencoOrdiniMissioneService.findMissioniDaApprovare($scope.userWork).then(handleResponse);
+                ElencoOrdiniMissioneService.findMissioniDaApprovare($scope.userWork, filtroAnticipo).then(handleResponse);
                 break;
 
             default:
@@ -321,6 +346,10 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
             $scope.ordiniMissione = data || [];
             $scope.totalItems = $scope.ordiniMissione.length;
             $scope.currentPage = 1;
+            if (paginaRicercaDaRipristinare && paginaRicercaDaRipristinare <= $scope.getTotalPages()) {
+                $scope.currentPage = paginaRicercaDaRipristinare;
+            }
+            paginaRicercaDaRipristinare = null;
             $scope.loadPaginatedData();
             $scope.messageOrdiniNonEsistenti = false;
             console.log('Tutti gli elementi:', $scope.ordiniMissione);
@@ -339,6 +368,7 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
 
 
     $scope.doSelectOrdineMissione = function(ordineMissione) {
+        salvaStatoElenco();
         $location.path('/ordine-missione/' + ordineMissione.id);
     };
 
@@ -359,6 +389,51 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
 
     $scope.stampa = function() {
         window.print();
+    };
+
+    $scope.esportaExcel = function() {
+        if (!$scope.ordiniMissione || $scope.ordiniMissione.length === 0) {
+            return;
+        }
+        var ordini = $scope.ordiniMissione;
+        var t = function(key) { return $filter('translate')(key); };
+        var toDate = ExcelExportService.toDate;
+        var conUtente = !($scope.accountModel && $scope.respGruppo != 'S');
+        var conAnticipoEffettuato = $scope.mostraColonnaAnticipoEffettuato;
+
+        var uids = conUtente ? ordini.map(function(o) { return o.uid; }) : [];
+        ExcelExportService.nominativi(uids, $scope.elencoPersone).then(function(nominativi) {
+            var columns = [
+                { header: t('missione.form.anno'), value: function(o) { return o.anno; } },
+                { header: t('missione.form.numero'), value: function(o) { return o.numero; } }
+            ];
+            if (conUtente) {
+                columns.push({ header: 'Cognome Nome', value: function(o) { return nominativi[o.uid] || o.uid; }, maxWidth: 35 });
+                columns.push({ header: t('missione.form.uo'), value: function(o) { return o.uoRich; }, align: 'center' });
+            }
+            columns.push(
+                { header: t('missione.form.stato'), value: function(o) { return o.decodeStato; }, align: 'center' },
+                { header: t('missione.form.destinazione'), value: function(o) { return o.destinazione; }, maxWidth: 35 },
+                { header: t('missione.form.oggetto'), value: function(o) { return o.oggetto; }, maxWidth: 60 },
+                { header: t('elenco-ordini-missione.form.richiesta-anticipo'), value: function(o) { return o.richiestaAnticipo; }, align: 'center' }
+            );
+            if (conAnticipoEffettuato) {
+                columns.push({ header: t('elenco-ordini-missione.form.anticipo-effettuato'), value: function(o) { return o.anticipoEffettuato; }, align: 'center' });
+            }
+            columns.push(
+                { header: t('ordine-missione.form.data-inizio'), value: function(o) { return toDate(o.dataInizioMissione); } },
+                { header: t('ordine-missione.form.data-fine'), value: function(o) { return toDate(o.dataFineMissione); } }
+            );
+            var nomeFile = 'ElencoOrdiniMissione_' + $filter('date')(new Date(), 'yyyyMMdd');
+            var opzioni = {
+                title: 'Elenco Ordini di Missione',
+                subtitle: 'Estratto il ' + $filter('date')(new Date(), 'dd/MM/yyyy HH:mm') +
+                    ' - ' + ordini.length + (ordini.length === 1 ? ' ordine' : ' ordini')
+            };
+            return ExcelExportService.export(nomeFile, 'Ordini Missione', columns, ordini, opzioni);
+        }).catch(function () {
+            ui.error("Errore durante l'esportazione in Excel degli Ordini di Missione");
+        });
     };
 
     $scope.reloadUserWork = function(uid) {
@@ -400,6 +475,48 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
     $scope.predicate = 'ordineMissione.dataInserimento';
     $scope.reverse = true;
 
+    // filtri ripristinati solo tornando con "Chiudi"
+    var CHIAVE_STATO_ELENCO = 'statoElencoOrdiniMissione';
+    var CAMPI_STATO_ELENCO = ['uoWorkForSpecialUser', 'elencoPersone', 'userWork', 'accountModel',
+        'anno', 'daNumero', 'aNumero', 'daData', 'aData', 'daDataMissione', 'aDataMissione',
+        'statoOrdineMissione', 'statoFiltroSelezionato', 'statoSecondoFiltroSelezionato',
+        'annullati', 'respGruppo', 'cup', 'filtri', 'rowsPerPage'];
+    var CAMPI_DATA_ELENCO = ['daData', 'aData', 'daDataMissione', 'aDataMissione'];
+
+    function salvaStatoElenco() {
+        var stato = {};
+        CAMPI_STATO_ELENCO.forEach(function(campo) {
+            stato[campo] = angular.copy($scope[campo]);
+        });
+        stato.ricercaEffettuata = $scope.endSearching === true;
+        stato.currentPage = $scope.currentPage;
+        StatoElencoService.salva(CHIAVE_STATO_ELENCO, stato);
+    }
+
+    function ripristinaStatoElenco(stato) {
+        if (stato.statoFiltroSelezionato) {
+            ignoraWatchStatoFiltro = true;
+        }
+        CAMPI_STATO_ELENCO.forEach(function(campo) {
+            if (stato[campo] !== undefined) {
+                $scope[campo] = stato[campo];
+            }
+        });
+        CAMPI_DATA_ELENCO.forEach(function(campo) {
+            if ($scope[campo] && !($scope[campo] instanceof Date)) {
+                $scope[campo] = new Date($scope[campo]);
+            }
+        });
+        if (!$scope.filtri) {
+            $scope.filtri = { richiestaAnticipo: false, anticipoDaEffettuare: false };
+        }
+        if (stato.ricercaEffettuata) {
+            $scope.ricerca(stato.currentPage);
+        }
+    }
+
+    var statoElencoSalvato = StatoElencoService.leggi(CHIAVE_STATO_ELENCO);
+
     var accountLog = $sessionStorage.account;
     var uoForUsersSpecial = accountLog.uoForUsersSpecial;
     if (uoForUsersSpecial) {
@@ -419,18 +536,26 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
                                 }
                             }
                         }
-                        if ($scope.uoForUsersSpecial.length === 1) {
+                        if (statoElencoSalvato) {
+                            ripristinaStatoElenco(statoElencoSalvato);
+                        } else if ($scope.uoForUsersSpecial.length === 1) {
                             $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
                             $scope.reloadUoWork($scope.uoWorkForSpecialUser.cd_unita_organizzativa);
                         }
                     } else {
                         $scope.accountModel = accountLog;
+                        if (statoElencoSalvato) {
+                            ripristinaStatoElenco(statoElencoSalvato);
+                        }
                     }
                 });
             }
         });
     } else {
         $scope.accountModel = accountLog;
+        if (statoElencoSalvato) {
+            ripristinaStatoElenco(statoElencoSalvato);
+        }
     }
 
     $scope.onChangeStatoOrdineMissione = function(stato) {
@@ -448,6 +573,10 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
     };
 
         $scope.$watch('statoFiltroSelezionato', function(newValue) {
+            if (ignoraWatchStatoFiltro && newValue) {
+                ignoraWatchStatoFiltro = false;
+                return;
+            }
             if (newValue && newValue !== 'T') {
                 $scope.statoOrdineMissione = { value: 'T', stato: 'Tutti' }; // Imposta il valore del filtro Stati su 'T'
             }

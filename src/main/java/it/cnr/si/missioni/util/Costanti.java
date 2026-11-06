@@ -119,6 +119,8 @@ public class Costanti {
     public final static String STATO_INVIATO_FLUSSO = "INV";
     public final static String STATO_FIRMATO_PRIMA_FIRMA_FLUSSO = "FPF";
     public final static String STATO_APPROVATO_FLUSSO = "APP";
+    public final static String FILTRO_ANTICIPO_RICHIESTA = "RICHIESTA";
+    public final static String FILTRO_ANTICIPO_EFFETTUATO = "EFFETTUATO";
     public final static String STATO_RESPINTO_UO_SPESA_FLUSSO = "RUS";
     public final static String STATO_RESPINTO_UO_FLUSSO = "RUO";
     public final static String STATO_CONFERMATO = "CON";

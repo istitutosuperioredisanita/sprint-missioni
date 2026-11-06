@@ -28,14 +28,12 @@ import it.cnr.si.missioni.service.RimborsoMissioneService;
 import it.cnr.si.missioni.service.security.AuthoritiesConstants;
 import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DocumentiZip;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.proxy.json.object.rimborso.MissioneBulk;
 import it.cnr.si.missioni.util.proxy.json.service.ComunicaRimborsoSiglaService;
 import it.cnr.si.missioni.web.filter.RimborsoMissioneFilter;
-import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
@@ -51,14 +49,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipOutputStream;
 
 /**
  * REST controller for managing the current user's account.
@@ -527,29 +521,13 @@ public class RimborsoMissioneResource {
                                 + ".zip"
                 );
 
-                List<StorageObject> documenti = rimborsoMissioneService.getAllDocumentsMissione(rimborsoMissione);
-
-                try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
-                    documenti.stream()
-                            .filter(storageObject -> !Optional.ofNullable(storageObject.getPropertyValue(StoragePropertyNames.BASE_TYPE_ID.value()))
-                                    .map(String.class::cast)
-                                    .filter(s -> s.equals(StoragePropertyNames.CMIS_FOLDER.value()))
-                                    .isPresent())
-                            .forEach(documento -> {
-                                try {
-                                    ZipEntry zipEntryFile = new ZipEntry((String) documento.getPropertyValue(StoragePropertyNames.NAME.value()));
-                                    zos.putNextEntry(zipEntryFile);
-                                    IOUtils.copyLarge(rimborsoMissioneService.getResource(documento), zos);
-                                    zos.closeEntry();
-                                } catch (ZipException e) {
-                                    log.warn("Cannot add entry to zip file", e);
-                                } catch (IOException e) {
-                                    throw new AwesomeException(Utility.getMessageException(e));
-                                }
-                            });
-
-                    zos.flush();
-                }
+                DocumentiZip zip = new DocumentiZip();
+                Optional.ofNullable(rimborsoMissioneService.getAllDocumentsMissione(rimborsoMissione))
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .filter(documento -> !DocumentiZip.isCartella(documento))
+                        .forEach(documento -> zip.aggiungi("", documento));
+                zip.scrivi(response.getOutputStream(), rimborsoMissioneService::getResource);
             }
         } catch (Exception e) {
             log.error("ERRORE scaricaZip", e);

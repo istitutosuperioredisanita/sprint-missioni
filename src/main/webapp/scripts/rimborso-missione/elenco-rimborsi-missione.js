@@ -160,7 +160,7 @@ missioniApp.factory('ElencoRimborsiMissioneService', function($http, ui) {
     }
 });
 
-missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoRimborsiMissioneService,ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService) {
+missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, $scope, AccessToken, $location, $sessionStorage, ElencoRimborsiMissioneService,ElencoOrdiniMissioneService, $filter, ui, ProxyService, DateService, ExcelExportService, StatoElencoService) {
 
     $scope.statoSecondoFiltroSelezionato = '';
     $scope.valoriFiltroStatiRimb = ProxyService.valueFiltroStatiRimb;
@@ -204,6 +204,8 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
             });
     };
 
+
+        var paginaRicercaDaRipristinare = null;
 
         $scope.currentPage = 1;
         $sessionStorage.rowsPerPage = $scope.rowsPerPage;
@@ -250,7 +252,8 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
     };
 
 
-    $scope.ricerca = function() {
+    $scope.ricerca = function(paginaDaRipristinare) {
+        paginaRicercaDaRipristinare = paginaDaRipristinare || null;
         $scope.endSearching = false;
         $rootScope.salvataggio = true;
         $scope.rimborsiMissione = null;
@@ -307,6 +310,10 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
             $scope.rimborsiMissione = data || [];
             $scope.totalItems = $scope.rimborsiMissione.length;
             $scope.currentPage = 1;
+            if (paginaRicercaDaRipristinare && paginaRicercaDaRipristinare <= $scope.getTotalPages()) {
+                $scope.currentPage = paginaRicercaDaRipristinare;
+            }
+            paginaRicercaDaRipristinare = null;
             $scope.loadPaginatedData();
             $scope.messageRimborsiNonEsistenti = false;
         } else {
@@ -322,6 +329,7 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
 
 
     $scope.doSelectRimborsoMissione = function(rimborsoMissione) {
+        salvaStatoElenco();
         $location.path('/rimborso-missione/' + rimborsoMissione.id);
     };
 
@@ -357,6 +365,46 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
         window.print();
     };
 
+    $scope.esportaExcel = function() {
+        if (!$scope.rimborsiMissione || $scope.rimborsiMissione.length === 0) {
+            return;
+        }
+        var rimborsi = $scope.rimborsiMissione;
+        var t = function(key) { return $filter('translate')(key); };
+        var toDate = ExcelExportService.toDate;
+        var conUtente = !$scope.accountModel;
+
+        var uids = conUtente ? rimborsi.map(function(r) { return r.uid; }) : [];
+        ExcelExportService.nominativi(uids, $scope.elencoPersone).then(function(nominativi) {
+            var columns = [
+                { header: t('missione.form.anno'), value: function(r) { return r.anno; } },
+                { header: t('missione.form.numero'), value: function(r) { return r.numero; } }
+            ];
+            if (conUtente) {
+                columns.push({ header: 'Cognome Nome', value: function(r) { return nominativi[r.uid] || r.uid; }, maxWidth: 35 });
+                columns.push({ header: t('missione.form.uo'), value: function(r) { return r.uoRich; }, align: 'center' });
+            }
+            columns.push(
+                { header: t('missione.form.stato'), value: function(r) { return r.decodeStato; }, align: 'center' },
+                { header: t('missione.form.destinazione'), value: function(r) { return r.destinazione; }, maxWidth: 35 },
+                { header: t('missione.form.oggetto'), value: function(r) { return r.oggetto; }, maxWidth: 60 },
+                { header: t('rimborso-missione.form.data-inizio'), value: function(r) { return toDate(r.dataInizioMissione); } },
+                { header: t('rimborso-missione.form.data-fine'), value: function(r) { return toDate(r.dataFineMissione); } },
+                { header: t('elenco-rimborsi-missione.filter.anno-ordine'), value: function(r) { return r.ordineMissione ? r.ordineMissione.anno : null; }, align: 'center' },
+                { header: 'Numero Ordine', value: function(r) { return r.ordineMissione ? r.ordineMissione.numero : null; }, align: 'center' }
+            );
+            var nomeFile = 'ElencoRimborsiMissione_' + $filter('date')(new Date(), 'yyyyMMdd');
+            var opzioni = {
+                title: 'Elenco Rimborsi di Missione',
+                subtitle: 'Estratto il ' + $filter('date')(new Date(), 'dd/MM/yyyy HH:mm') +
+                    ' - ' + rimborsi.length + (rimborsi.length === 1 ? ' rimborso' : ' rimborsi')
+            };
+            return ExcelExportService.export(nomeFile, 'Rimborsi Missione', columns, rimborsi, opzioni);
+        }).catch(function () {
+            ui.error("Errore durante l'esportazione in Excel dei Rimborsi di Missione");
+        });
+    };
+
     $scope.reloadUoWork = function(uo) {
         if (uo) {
             $scope.uoWorkForSpecialUser = uo;
@@ -378,6 +426,42 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
     }
 
     $scope.accessToken = AccessToken.get();
+    // filtri ripristinati solo tornando con "Chiudi"
+    var CHIAVE_STATO_ELENCO = 'statoElencoRimborsiMissione';
+    var CAMPI_STATO_ELENCO = ['uoWorkForSpecialUser', 'elencoPersone', 'userWork', 'accountModel',
+        'anno', 'daNumero', 'aNumero', 'daData', 'aData', 'daDataMissione', 'aDataMissione',
+        'annoOrdine', 'daNumeroOrdine', 'aNumeroOrdine',
+        'statoFiltroSelezionato', 'statoSecondoFiltroSelezionato', 'annullati', 'cup', 'rowsPerPage'];
+    var CAMPI_DATA_ELENCO = ['daData', 'aData', 'daDataMissione', 'aDataMissione'];
+
+    function salvaStatoElenco() {
+        var stato = {};
+        CAMPI_STATO_ELENCO.forEach(function(campo) {
+            stato[campo] = angular.copy($scope[campo]);
+        });
+        stato.ricercaEffettuata = $scope.endSearching === true;
+        stato.currentPage = $scope.currentPage;
+        StatoElencoService.salva(CHIAVE_STATO_ELENCO, stato);
+    }
+
+    function ripristinaStatoElenco(stato) {
+        CAMPI_STATO_ELENCO.forEach(function(campo) {
+            if (stato[campo] !== undefined) {
+                $scope[campo] = stato[campo];
+            }
+        });
+        CAMPI_DATA_ELENCO.forEach(function(campo) {
+            if ($scope[campo] && !($scope[campo] instanceof Date)) {
+                $scope[campo] = new Date($scope[campo]);
+            }
+        });
+        if (stato.ricercaEffettuata) {
+            $scope.ricerca(stato.currentPage);
+        }
+    }
+
+    var statoElencoSalvato = StatoElencoService.leggi(CHIAVE_STATO_ELENCO);
+
     var accountLog = $sessionStorage.account;
     var uoForUsersSpecial = accountLog.uoForUsersSpecial;
     if (uoForUsersSpecial) {
@@ -397,17 +481,25 @@ missioniApp.controller('ElencoRimborsiMissioneController', function($rootScope, 
                                 }
                             }
                         }
-                        if ($scope.uoForUsersSpecial.length === 1) {
+                        if (statoElencoSalvato) {
+                            ripristinaStatoElenco(statoElencoSalvato);
+                        } else if ($scope.uoForUsersSpecial.length === 1) {
                             $scope.uoWorkForSpecialUser = $scope.uoForUsersSpecial[0];
                             $scope.reloadUoWork($scope.uoWorkForSpecialUser.cd_unita_organizzativa);
                         }
                     } else {
                         $scope.accountModel = accountLog;
+                        if (statoElencoSalvato) {
+                            ripristinaStatoElenco(statoElencoSalvato);
+                        }
                     }
                 });
             }
         });
     } else {
         $scope.accountModel = accountLog;
+        if (statoElencoSalvato) {
+            ripristinaStatoElenco(statoElencoSalvato);
+        }
     }
 });

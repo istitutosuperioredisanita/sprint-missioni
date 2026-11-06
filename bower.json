@@ -31,7 +31,8 @@
     "blueimp-file-upload": "jquery-file-upload#^9.14.1",
     "selectize": "0.12.4",
     "markdown": "~0.5.0",
-    "angular-ui-select": "~0.19.8"
+    "angular-ui-select": "~0.19.8",
+    "exceljs": "https://registry.npmjs.org/exceljs/-/exceljs-4.4.0.tgz"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.26",

@@ -37,6 +37,7 @@ public class MissioneFilter {
     private Long aId;
     private Boolean soloMissioniNonGratuite = false;
     private String includiMissioniAnnullate;
+    private String filtroAnticipo;
     private String recuperoAutoPropria;
     private String recuperoTaxi;
     private String recuperoAutoNoleggio;
@@ -206,6 +207,14 @@ public class MissioneFilter {
         this.includiMissioniAnnullate = includiMissioniAnnullate;
     }
 
+    public String getFiltroAnticipo() {
+        return filtroAnticipo;
+    }
+
+    public void setFiltroAnticipo(String filtroAnticipo) {
+        this.filtroAnticipo = filtroAnticipo;
+    }
+
     public String getGiaRimborsato() {
         return giaRimborsato;
     }
@@ -306,6 +315,7 @@ public class MissioneFilter {
                 ", aId=" + aId +
                 ", soloMissioniNonGratuite=" + soloMissioniNonGratuite +
                 ", includiMissioniAnnullate='" + includiMissioniAnnullate + '\'' +
+                ", filtroAnticipo='" + filtroAnticipo + '\'' +
                 ", recuperoAutoPropria='" + recuperoAutoPropria + '\'' +
                 ", recuperoTaxi='" + recuperoTaxi + '\'' +
                 ", recuperoAutoNoleggio='" + recuperoAutoNoleggio + '\'' +

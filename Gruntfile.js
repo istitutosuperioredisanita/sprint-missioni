@@ -301,6 +301,7 @@ module.exports = function(grunt) {
                     src: [
                         'bower_components/angular-i18n/**',
                         'bower_components/swagger-ui/**',
+                        'bower_components/exceljs/dist/exceljs.min.js',
                     ]
                 }]
             },

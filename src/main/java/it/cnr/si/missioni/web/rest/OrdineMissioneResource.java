@@ -25,9 +25,9 @@ import it.cnr.si.missioni.cmis.CMISFileAttachment;
 import it.cnr.si.missioni.cmis.MimeTypes;
 import it.cnr.si.missioni.domain.custom.persistence.OrdineMissione;
 import it.cnr.si.missioni.service.OrdineMissioneService;
-import it.cnr.si.missioni.service.security.AuthoritiesConstants;
 import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DocumentiZip;
 import it.cnr.si.missioni.util.JSONResponseEntity;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.web.filter.MissioneFilter;
@@ -150,6 +150,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
+            ordineMissioneService.valorizzaRichiestaAnticipo(ordiniMissione);
         } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaAnnullare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -175,6 +176,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
+            ordineMissioneService.valorizzaRichiestaAnticipo(ordiniMissione);
         } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaConfermare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -204,6 +206,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
+            ordineMissioneService.valorizzaRichiestaAnticipo(ordiniMissione);
         } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaInviareAllaFirma", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -233,6 +236,7 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissioneForValidateFlows(filter, true);
+            ordineMissioneService.valorizzaRichiestaAnticipo(ordiniMissione);
         } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaApprovare", e);
             return JSONResponseEntity.badRequest(Utility.getMessageException(e));
@@ -460,6 +464,42 @@ public class OrdineMissioneResource {
                 log.error("ERRORE printOrdineMissione", exc);
                 throw new AwesomeException(Utility.getMessageException(e));
             }
+        }
+    }
+
+    @RequestMapping(value = "/rest/public/zipDocumentiOrdineMissione",
+            method = RequestMethod.GET)
+    @Timed
+    public @ResponseBody void scaricaZipOrdineMissione(HttpServletRequest request,
+                                                       @RequestParam(value = "idMissione") String idMissione,
+                                                       @RequestParam(value = "token") String token,
+                                                       HttpServletResponse response) {
+        log.debug("REST request per lo scarico dello zip dei documenti dell'Ordine di Missione ");
+        String user = securityService.getCurrentUserLogin();
+        if (user == null || StringUtils.isEmpty(idMissione)) {
+            return;
+        }
+        try {
+            OrdineMissione ordineMissione = ordineMissioneService.getOrdineMissioneFirmatoPerDownload(Long.valueOf(idMissione));
+            response.setContentType("application/zip");
+            response.setDateHeader("Expires", 0);
+            response.setHeader(
+                    "Content-disposition",
+                    "attachment; filename=DocumentiOrdineMissione"
+                            + Utility.getUoSiper(ordineMissione.getUoSpesa())
+                            + "_"
+                            + ordineMissione.getAnno()
+                            + "_"
+                            + ordineMissione.getNumero()
+                            + ".zip"
+            );
+
+            DocumentiZip documenti = new DocumentiZip();
+            ordineMissioneService.aggiungiDocumentiOrdineAlloZip(ordineMissione, documenti);
+            documenti.scrivi(response.getOutputStream(), ordineMissioneService::getResource);
+        } catch (Exception e) {
+            log.error("ERRORE scaricaZipOrdineMissione", e);
+            throw new AwesomeException(Utility.getMessageException(e));
         }
     }
 

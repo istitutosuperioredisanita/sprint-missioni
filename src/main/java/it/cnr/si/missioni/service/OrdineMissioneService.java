@@ -49,11 +49,11 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdineMissioneService {
@@ -364,6 +364,17 @@ public class OrdineMissioneService {
         return ordineMissioneAnticipoService.getAnticipo(ordineMissioneDaAggiornare, false);
     }
 
+    public void valorizzaRichiestaAnticipo(List<OrdineMissione> listaOrdini) {
+        if (listaOrdini == null) {
+            return;
+        }
+        for (OrdineMissione ordineMissione : listaOrdini) {
+            OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
+                    .getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
+            ordineMissione.setRichiestaAnticipo(anticipo != null ? Costanti.SI_NO.get("S") : Costanti.SI_NO.get("N"));
+        }
+    }
+
     public void aggiornaOrdineMissioneAnnullato(OrdineMissione ordineMissioneDaAggiornare) {
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_ANNULLATO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_ANNULLATO);
@@ -404,33 +415,67 @@ public class OrdineMissioneService {
         }
     }
 
+    // errore non temporaneo: ordine Inserito e respinto con l'errore come motivo
     private void gestisciEccezioneFlusso(OrdineMissione ordine, FlowResult flowResult, Exception e) {
         String errore = Utility.getMessageException(e);
-        if (flowResult != null && FlowResult.ESITO_FLUSSO_FIRMATO.equals(flowResult.getStato()) && ordine.getId() != null) {
-            try {
-                OrdineMissione o = ordineMissioneRepository.findById((Long) ordine.getId()).orElseThrow();
-                o.setCommentoFlusso("Firma HappySign acquisita, ma aggiornamento non completato. Dettaglio: " + errore);
-                o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
-                o.setStato(Costanti.STATO_INSERITO);
-                o.setDataInvioFirma(null);
-                o.setDataInvioAmministrativo(null);
-                o.setDataInvioRespGruppo(null);
-                o.setBypassAmministrativo(null);
-                o.setBypassRespGruppo(null);
-                o.setToBeUpdated();
-                ordineMissioneRepository.save(o);
-
-                if (mailService != null) {
-                    String errorTrace = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);
-                    String body = "<h3>Errore Post-Firma HappySign</h3>" +
-                            "<p>L'ordine <b>" + o.getAnno() + "-" + o.getNumero() + "</b> è stato firmato ma l'aggiornamento a DEFINITIVO è fallito.</p>" +
-                            "<h4>Stack Trace:</h4><pre>" + errorTrace + "</pre>";
-                    mailService.sendEmailError(subjectErrorFlowsOrdine, body, false, true);
-                }
-            } catch (Exception ex) {
-                log.error("Errore durante il fallback di gestisciEccezioneFlusso per ordine " + ordine.getId(), ex);
+        if (ordine.getId() == null || ErroriTemporanei.isTemporaneo(e)) {
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
             }
-        } else {
+            throw new AwesomeException(CodiciErrore.ERRGEN, errore);
+        }
+        String motivo = errore == null ? "Errore durante l'aggiornamento dell'ordine di missione" : errore;
+        if (motivo.length() > 1000) {
+            motivo = motivo.substring(0, 1000);
+        }
+        try {
+            OrdineMissione o = ordineMissioneRepository.findById((Long) ordine.getId()).orElseThrow();
+            o.setCommentoFlusso(motivo);
+            o.setStatoFlusso(Costanti.STATO_RESPINTO_UO_SPESA_FLUSSO);
+            o.setStato(Costanti.STATO_INSERITO);
+            o.setDataInvioFirma(null);
+            o.setDataInvioAmministrativo(null);
+            o.setDataInvioRespGruppo(null);
+            o.setBypassAmministrativo(null);
+            o.setBypassRespGruppo(null);
+            o.setToBeUpdated();
+            ordineMissioneRepository.save(o);
+
+            // l'eventuale anticipo torna Inserito
+            try {
+                OrdineMissioneAnticipo anticipo = getAnticipo(o);
+                if (anticipo != null) {
+                    anticipo.setStato(Costanti.STATO_INSERITO);
+                    ordineMissioneAnticipoService.updateAnticipo(anticipo, false);
+                }
+            } catch (Exception exAnticipo) {
+                log.error("Ordine " + o.getId() + " respinto per errore, ma anticipo non riportato a Inserito", exAnticipo);
+            }
+
+            // registrazione tra le missioni respinte
+            FlowResult respinta = new FlowResult();
+            respinta.setIdMissione(o.getId().toString());
+            respinta.setTipologiaMissione(FlowResult.TIPO_FLUSSO_ORDINE);
+            respinta.setStato(FlowResult.ESITO_FLUSSO_RESPINTO_UO_SPESA);
+            respinta.setUser("Utente Flusso Firma");
+            respinta.setCommento(motivo);
+            missioneRespintaService.inserisciMissioneRespinta(respinta);
+
+            if (mailService != null) {
+                String errorTrace = org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(e);
+                String body = "<h3>Errore aggiornamento HappySign</h3>" +
+                        "<p>L'ordine <b>" + o.getAnno() + "-" + o.getNumero() + "</b> non è stato aggiornato " +
+                        (flowResult != null ? "(esito " + flowResult.getStato() + ") " : "") +
+                        "ed è stato riportato a <b>Inserito</b> e <b>Respinto</b> in firma con motivo:</p>" +
+                        "<p><b>" + motivo + "</b></p>" +
+                        "<h4>Stack Trace:</h4><pre>" + errorTrace + "</pre>";
+                mailService.sendEmailError(subjectErrorFlowsOrdine, body, false, true);
+            }
+        } catch (Exception ex) {
+            log.error("Errore durante il fallback di gestisciEccezioneFlusso per ordine " + ordine.getId(), ex);
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
             throw new AwesomeException(CodiciErrore.ERRGEN, errore);
         }
     }
@@ -444,7 +489,7 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private void aggiornaOrdineMissioneFirmato(OrdineMissione ordineMissioneDaAggiornare) {
+    protected void aggiornaOrdineMissioneFirmato(OrdineMissione ordineMissioneDaAggiornare) {
         retrieveDetails(ordineMissioneDaAggiornare);
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_APPROVATO_FLUSSO);
         ordineMissioneDaAggiornare.setStato(Costanti.STATO_DEFINITIVO);
@@ -454,7 +499,7 @@ public class OrdineMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private void aggiornaOrdineMissionePrimaFirma(OrdineMissione ordineMissioneDaAggiornare) {
+    protected void aggiornaOrdineMissionePrimaFirma(OrdineMissione ordineMissioneDaAggiornare) {
         ordineMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
         updateOrdineMissione(ordineMissioneDaAggiornare, true);
     }
@@ -754,6 +799,22 @@ public class OrdineMissioneService {
                 spec = new SpecificationBuilder<OrdineMissione>()
                         .and(spec)
                         .and(RimborsoSpecification.giaRimborsato())
+                        .build();
+            }
+
+            if (Costanti.FILTRO_ANTICIPO_RICHIESTA.equals(filter.getFiltroAnticipo())) {
+                spec = new SpecificationBuilder<OrdineMissione>()
+                        .and(spec)
+                        .and((root, query, cb) -> {
+                            Subquery<Long> sub = query.subquery(Long.class);
+                            var ant = sub.from(OrdineMissioneAnticipo.class);
+                            sub.select(ant.get("id"))
+                                    .where(
+                                            cb.equal(ant.get("ordineMissione").get("id"), root.get("id")),
+                                            cb.notEqual(ant.get("stato"), Costanti.STATO_ANNULLATO)
+                                    );
+                            return cb.exists(sub);
+                        })
                         .build();
             }
 
@@ -1666,6 +1727,97 @@ public class OrdineMissioneService {
 
     public List<StorageObject> getDocumentsOrdineMissione(OrdineMissione missione) throws AwesomeException {
         return cmisOrdineMissioneService.getAllDocumentsOrdineMissione(missione);
+    }
+
+    public OrdineMissione getOrdineMissioneFirmatoPerDownload(Long idOrdineMissione) throws AwesomeException {
+        if (idOrdineMissione == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Id Ordine Missione non può essere null");
+        }
+        OrdineMissione ordineMissione = ordineMissioneRepository.findById(idOrdineMissione)
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN, "Ordine Missione non trovato per id " + idOrdineMissione));
+        if (!isUserEnabledToViewMissione(ordineMissione)) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Non autorizzato a visualizzare la missione.");
+        }
+        if (!Boolean.TRUE.equals(ordineMissione.isStatoFlussoApprovato())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione non risulta ancora firmato.");
+        }
+        return ordineMissione;
+    }
+
+    public InputStream getResource(StorageObject storageObject) {
+        return missioniCMISService.getResource(storageObject);
+    }
+
+    // PDF uniti nello zip, in quest'ordine
+    private static final List<String> PDF_DA_UNIRE = Arrays.asList(
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ORDINE.value(),
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_ANTICIPO.value(),
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_PROPRIA.value(),
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_TAXI.value(),
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_TAXI.value(),
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_RICHIESTA_AUTO_NOLEGGIO.value(),
+            CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_USO_AUTO_NOLEGGIO.value());
+
+    private static final String ALL_ANTICIPO = "All. Anticipo";
+    private static final String ALL_AUTO_PROPRIA = "All. Auto Propria";
+    private static final String ALL_TAXI = "All. Taxi";
+    private static final String ALL_AUTO_NOLEGGIO = "All. Auto a Noleggio";
+
+    public void aggiungiDocumentiOrdineAlloZip(OrdineMissione ordineMissione, DocumentiZip zip) {
+        Long idOrdine = Long.valueOf(ordineMissione.getId().toString());
+        if (ordineMissioneAnticipoService.getAnticipo(idOrdine) != null) {
+            zip.aggiungiCartella(ALL_ANTICIPO);
+        }
+        if (ordineMissioneAutoPropriaService.getAutoPropria(idOrdine) != null) {
+            zip.aggiungiCartella(ALL_AUTO_PROPRIA);
+        }
+        if (ordineMissioneTaxiService.getTaxi(idOrdine) != null) {
+            zip.aggiungiCartella(ALL_TAXI);
+        }
+        if (ordineMissioneAutoNoleggioService.getAutoNoleggio(idOrdine) != null) {
+            zip.aggiungiCartella(ALL_AUTO_NOLEGGIO);
+        }
+
+        List<StorageObject> pdf = new ArrayList<>();
+        Optional.ofNullable(cmisOrdineMissioneService.getAllDocumentsOrdineMissione(ordineMissione))
+                .orElse(Collections.emptyList()).stream()
+                .filter(so -> !DocumentiZip.isCartella(so))
+                .filter(so -> !DocumentiZip.isEliminato(so))
+                .forEach(so -> {
+                    if (DocumentiZip.haUnoDegliAspetti(so, PDF_DA_UNIRE)) {
+                        pdf.add(so);
+                    } else {
+                        zip.aggiungi(cartellaAllegato(so), so);
+                    }
+                });
+        pdf.sort(Comparator.comparingInt(so -> PDF_DA_UNIRE.indexOf(PDF_DA_UNIRE.stream()
+                .filter(aspetto -> DocumentiZip.haAspetto(so, aspetto)).findFirst().orElse(""))));
+
+        try {
+            List<InputStream> contenuti = new ArrayList<>();
+            for (StorageObject so : pdf) {
+                contenuti.add(getResource(so));
+            }
+            if (!pdf.isEmpty()) {
+                zip.aggiungiFile("", pdf.get(0).getPropertyValue(StoragePropertyNames.NAME.value()), DocumentiZip.unisciPdf(contenuti));
+            }
+        } catch (Exception e) {
+            log.error("PDF dell'ordine " + ordineMissione.getId() + " non uniti", e);
+            pdf.forEach(so -> zip.aggiungi("", so));
+        }
+    }
+
+    private static String cartellaAllegato(StorageObject so) {
+        if (DocumentiZip.haAspetto(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value())) {
+            return ALL_ANTICIPO;
+        }
+        if (DocumentiZip.haAspetto(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value())) {
+            return ALL_TAXI;
+        }
+        if (DocumentiZip.haAspetto(so, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO.value())) {
+            return ALL_AUTO_NOLEGGIO;
+        }
+        return "";
     }
 
     private String getTextMailToSendToValidator(String basePath, OrdineMissione ordineMissione) {

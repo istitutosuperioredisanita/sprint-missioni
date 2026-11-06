@@ -27,6 +27,7 @@ import it.cnr.si.missioni.service.*;
 import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
+import it.cnr.si.missioni.util.DocumentiZip;
 import it.cnr.si.missioni.util.DateUtils;
 import it.cnr.si.missioni.util.Utility;
 import it.cnr.si.missioni.util.data.Uo;
@@ -714,11 +715,19 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         if (taxi != null) {
             taxi.setOrdineMissione(ordineMissione);
             documentoTaxi = creaDocumentoTaxi(username, taxi);
+            List<StorageObject> allegatiTaxi = getAttachmentsTaxi(ordineMissione);
+            if (allegatiTaxi != null && !allegatiTaxi.isEmpty()) {
+                allegati.addAll(allegatiTaxi);
+            }
         }
         StorageObject documentoAutoNoleggio = null;
         if (autoNoleggio != null) {
             autoNoleggio.setOrdineMissione(ordineMissione);
             documentoAutoNoleggio = creaDocumentoAutoNoleggio(username, autoNoleggio);
+            List<StorageObject> allegatiAutoNoleggio = getAttachmentsAutoNoleggio(ordineMissione);
+            if (allegatiAutoNoleggio != null && !allegatiAutoNoleggio.isEmpty()) {
+                allegati.addAll(allegatiAutoNoleggio);
+            }
         }
 
 
@@ -1370,6 +1379,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {
 
         StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
+        fileName = nomeFileAllegatoUnivoco(cmisPath, fileName, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_ANTICIPO.value());
 
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_ANTICIPO);
         try {
@@ -1393,6 +1403,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {
 
         StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
+        fileName = nomeFileAllegatoUnivoco(cmisPath, fileName, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_TAXI.value());
 
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_TAXI);
         try {
@@ -1415,6 +1426,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {
 
         StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
+        fileName = nomeFileAllegatoUnivoco(cmisPath, fileName, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI_AUTO_NOLEGGIO.value());
 
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO_AUTO_NOLEGGIO);
         try {
@@ -1434,6 +1446,22 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
     }
 
 
+    // se esiste un file con lo stesso nome ma di altro tipo aggiunge un progressivo
+    private String nomeFileAllegatoUnivoco(StoragePath cmisPath, String fileName, String aspettoAllegato) {
+        String nome = missioniCMISService.sanitizeFilename(fileName);
+        int punto = nome.lastIndexOf('.');
+        String base = punto > 0 ? nome.substring(0, punto) : nome;
+        String estensione = punto > 0 ? nome.substring(punto) : "";
+        String candidato = nome;
+        int progressivo = 2;
+        StorageObject esistente;
+        while ((esistente = missioniCMISService.getStorageObjectByPath(cmisPath.getPath() + StorageDriver.SUFFIX + candidato)) != null
+                && !DocumentiZip.haAspetto(esistente, aspettoAllegato)) {
+            candidato = missioniCMISService.sanitizeFilename(base + " (" + progressivo++ + ")" + estensione);
+        }
+        return candidato;
+    }
+
     private StoragePath buildFolderOrdineMissione(OrdineMissione ordineMissione) {
         StorageObject folder = recuperoFolderOrdineMissione(ordineMissione);
         String path = null;
@@ -1450,7 +1478,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
         if (so != null) {
             CMISFileAttachment cmisFileAttachment = new CMISFileAttachment();
             cmisFileAttachment.setId(so.getKey());
-            cmisFileAttachment.setNomeFile(name);
+            cmisFileAttachment.setNomeFile(Optional.ofNullable((String) so.getPropertyValue(StoragePropertyNames.NAME.value())).orElse(name));
             cmisFileAttachment.setIdMissione(idOrdineMissione);
             return cmisFileAttachment;
         }
@@ -1461,6 +1489,7 @@ public abstract class AbstractCMISOrdineMissioneService implements CMISOrdineMis
             OrdineMissione ordineMissione, InputStream stream, String fileName, MimeTypes mimeTypes) {
 
         StoragePath cmisPath = buildFolderOrdineMissione(ordineMissione);
+        fileName = nomeFileAllegatoUnivoco(cmisPath, fileName, CMISOrdineMissioneAspect.ORDINE_MISSIONE_ATTACHMENT_ALLEGATI.value());
 
         Map<String, Object> metadataProperties = createMetadataForFileOrdineMissioneAllegati(securityService.getCurrentUserLogin(), fileName, OrdineMissione.CMIS_PROPERTY_NAME_TIPODOC_ALLEGATO);
         try {

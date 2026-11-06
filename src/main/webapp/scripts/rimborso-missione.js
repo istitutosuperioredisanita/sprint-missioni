@@ -52,7 +52,7 @@ missioniApp.factory('RimborsoMissioneService', function($resource, DateUtils) {
 });
 
 missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope, $routeParams, $sessionStorage, RimborsoMissioneService, OrdineMissioneService, ProxyService, ElencoOrdiniMissioneService, ElencoRimborsiMissioneService, AccessToken,
-    ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session, DateService) {
+    ui, $location, $filter, $http, COSTANTI, APP_FOR_REST, SIGLA_REST, URL_REST, TIPO_PAGAMENTO, Session, DateService, StatoElencoService) {
 
     $scope.altriPulsantiPresenti = !!document.querySelectorAll('form button').length > 1;
 
@@ -1734,6 +1734,7 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     }
 
     $scope.previousPage = function() {
+        StatoElencoService.richiediRipristino('statoElencoRimborsiMissione');
         parent.history.back();
     }
 

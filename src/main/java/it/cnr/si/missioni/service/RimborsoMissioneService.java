@@ -226,8 +226,8 @@ public class RimborsoMissioneService {
         return lista;
     }
     @Transactional(propagation = Propagation.REQUIRED)
-    private void aggiornaRimborsoMissioneRespinto(FlowResult result,
-                                                  RimborsoMissione rimborsoMissioneDaAggiornare) throws AwesomeException {
+    protected void aggiornaRimborsoMissioneRespinto(FlowResult result,
+                                                    RimborsoMissione rimborsoMissioneDaAggiornare) throws AwesomeException {
         aggiornaValidazione(rimborsoMissioneDaAggiornare);
         rimborsoMissioneDaAggiornare.setCommentoFlusso(result.getCommento() == null ? null : (result.getCommento().length() > 1000 ? result.getCommento().substring(0, 1000) : result.getCommento()));
         rimborsoMissioneDaAggiornare.setStatoFlusso(FlowResult.STATO_FLUSSO_SCRIVANIA_MISSIONI.get(result.getStato()));
@@ -412,7 +412,7 @@ public class RimborsoMissioneService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    private RimborsoMissione aggiornaRimborsoMissionePrimaFirma(RimborsoMissione rimborsoMissioneDaAggiornare)
+    protected RimborsoMissione aggiornaRimborsoMissionePrimaFirma(RimborsoMissione rimborsoMissioneDaAggiornare)
             throws AwesomeException {
         rimborsoMissioneDaAggiornare.setStatoFlusso(Costanti.STATO_FIRMATO_PRIMA_FIRMA_FLUSSO);
         RimborsoMissione rimborso = updateRimborsoMissione(rimborsoMissioneDaAggiornare, true, null);
@@ -2072,7 +2072,8 @@ public class RimborsoMissioneService {
         if (rimborsoMissione.getOrdineMissione() != null) {
             Optional<OrdineMissione> ordineOpt = ordineMissioneRepository.findById((Long) rimborsoMissione.getOrdineMissione().getId());
             List<StorageObject> finalListaDocumentiRimborso = listaDocumentiRimborso;
-            ordineOpt.ifPresent(ordine -> finalListaDocumentiRimborso.addAll(ordineMissioneService.getDocumentsOrdineMissione(ordine)));
+            ordineOpt.map(ordine -> ordineMissioneService.getDocumentsOrdineMissione(ordine))
+                    .ifPresent(finalListaDocumentiRimborso::addAll);
         }
 
         return listaDocumentiRimborso.isEmpty() ? null : listaDocumentiRimborso;
