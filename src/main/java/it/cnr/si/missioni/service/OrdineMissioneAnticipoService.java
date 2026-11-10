@@ -31,6 +31,10 @@ import it.cnr.si.missioni.service.security.SecurityService;
 import it.cnr.si.missioni.util.CodiciErrore;
 import it.cnr.si.missioni.util.Costanti;
 import it.cnr.si.missioni.util.DateUtils;
+import it.cnr.si.missioni.util.Utility;
+import it.cnr.si.missioni.util.data.UoForUsersSpecial;
+import it.cnr.si.missioni.util.data.UsersSpecial;
+import it.cnr.si.missioni.util.proxy.json.service.AccountService;
 import it.cnr.si.spring.storage.StorageObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +78,12 @@ public class OrdineMissioneAnticipoService {
 
     @Autowired
     private OrdineMissioneRepository ordineMissioneRepository;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private UoService uoService;
 
     @Transactional(readOnly = true)
     public OrdineMissioneAnticipo getAnticipo(Long idMissione, Boolean valorizzaOrdineMissione)
@@ -178,6 +188,104 @@ public class OrdineMissioneAnticipoService {
         log.debug("Updated Information for Anticipo Ordine di Missione: {}", ordineMissioneAnticipoDB);
 
         return ordineMissioneAnticipoDB;
+    }
+
+    /**
+     * Salvataggio dei dati del mandato dell'anticipo, consentito solo ai validatori della uo spesa
+     * sull'ordine firmato e definitivo. In bozza resta modificabile, in definitivo no.
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public OrdineMissioneAnticipo salvaMandato(OrdineMissioneAnticipo datiMandato, Boolean definitivo) throws AwesomeException {
+        if (datiMandato == null || datiMandato.getId() == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Anticipo dell'Ordine di Missione non indicato.");
+        }
+        OrdineMissioneAnticipo anticipoDB = ordineMissioneAnticipoRepository
+                .findById((Long) datiMandato.getId())
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN, "Anticipo dell'Ordine di Missione inesistente."));
+        if (Costanti.STATO_ANNULLATO.equals(anticipoDB.getStato())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "La richiesta di anticipo risulta annullata.");
+        }
+        OrdineMissione ordineMissione = ordineMissioneRepository
+                .findById((Long) anticipoDB.getOrdineMissione().getId())
+                .orElseThrow(() -> new AwesomeException(CodiciErrore.ERRGEN, "Ordine di Missione non trovato."));
+        if (!Boolean.TRUE.equals(ordineMissione.isStatoFlussoApprovato())
+                || !Costanti.STATO_DEFINITIVO.equals(ordineMissione.getStato())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "I dati del mandato possono essere inseriti solo sull'ordine di missione firmato e definitivo.");
+        }
+        if (!isUtenteValidatore(securityService.getCurrentUserLogin(), ordineMissione.getUoSpesa())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a inserire i dati del mandato.");
+        }
+        if (Boolean.TRUE.equals(anticipoDB.isMandatoDefinitivo())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "I dati del mandato sono già stati salvati in definitivo.");
+        }
+
+        anticipoDB.setModpag(datiMandato.getModpag());
+        anticipoDB.setTipoPagamento(datiMandato.getTipoPagamento());
+        anticipoDB.setPgBanca(datiMandato.getPgBanca());
+        anticipoDB.setIban(datiMandato.getIban());
+        anticipoDB.setAnticipoRicevuto(Utility.nvl(datiMandato.getAnticipoRicevuto(), "N"));
+        anticipoDB.setAnticipoAnnoMandato(datiMandato.getAnticipoAnnoMandato());
+        anticipoDB.setAnticipoNumeroMandato(datiMandato.getAnticipoNumeroMandato());
+        anticipoDB.setAnticipoImporto(datiMandato.getAnticipoImporto());
+
+        if (Boolean.TRUE.equals(definitivo)) {
+            controlloDatiMandato(anticipoDB);
+            anticipoDB.setStatoMandato(Costanti.STATO_DEFINITIVO);
+        } else {
+            anticipoDB.setStatoMandato(Costanti.STATO_INSERITO);
+        }
+        anticipoDB.setUidMandato(securityService.getCurrentUserLogin());
+        anticipoDB.setDataMandato(DateUtils.getCurrentLocalDateTime());
+        anticipoDB.setToBeUpdated();
+        anticipoDB = ordineMissioneAnticipoRepository.save(anticipoDB);
+        log.info("Salvati in {} i dati del mandato dell'anticipo {}",
+                Boolean.TRUE.equals(definitivo) ? "definitivo" : "bozza", anticipoDB.getId());
+        return anticipoDB;
+    }
+
+    private void controlloDatiMandato(OrdineMissioneAnticipo anticipo) throws AwesomeException {
+        if (!StringUtils.hasLength(anticipo.getModpag())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Modalità di Pagamento");
+        }
+        if (anticipo.getPgBanca() == null) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Dati Modalità di Pagamento");
+        }
+        if (Costanti.TIPO_PAGAMENTO_BONIFICO.equals(anticipo.getModpag()) && !StringUtils.hasLength(anticipo.getIban())) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, CodiciErrore.CAMPO_OBBLIGATORIO + ": Codice IBAN");
+        }
+        boolean qualcheDato = "S".equals(anticipo.getAnticipoRicevuto()) || anticipo.getAnticipoAnnoMandato() != null
+                || anticipo.getAnticipoNumeroMandato() != null || anticipo.getAnticipoImporto() != null;
+        boolean tuttiIDati = "S".equals(anticipo.getAnticipoRicevuto()) && anticipo.getAnticipoAnnoMandato() != null
+                && anticipo.getAnticipoNumeroMandato() != null && anticipo.getAnticipoImporto() != null;
+        if (qualcheDato && !tuttiIDati) {
+            throw new AwesomeException(CodiciErrore.ERRGEN,
+                    "E' necessario indicare tutti i campi dell'anticipo ricevuto e del mandato, oppure nessuno.");
+        }
+    }
+
+    /**
+     * Validatore: utente con abilitazione alla validazione degli ordini sulla uo (o su tutte le uo).
+     */
+    public boolean isUtenteValidatore(String user, String uo) {
+        if (!StringUtils.hasLength(user) || !StringUtils.hasLength(uo)) {
+            return false;
+        }
+        UsersSpecial userSpecial = accountService.getUoForUsersSpecial(user);
+        if (userSpecial == null) {
+            return false;
+        }
+        if ("S".equals(userSpecial.getAll())) {
+            return true;
+        }
+        if (userSpecial.getUoForUsersSpecials() != null) {
+            for (UoForUsersSpecial uoUser : userSpecial.getUoForUsersSpecials()) {
+                if (uo.equals(uoService.getUoSigla(uoUser)) && "S".equals(Utility.nvl(uoUser.getOrdine_da_validare()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

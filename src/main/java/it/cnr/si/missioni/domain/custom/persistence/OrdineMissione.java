@@ -327,6 +327,8 @@ public class OrdineMissione extends BaseEntity {
     @Transient
     private String richiestaAnticipo;
     @Transient
+    private String anticipoEffettuato;
+    @Transient
     private String stringBasePath;
     @Transient
     private Cds objCdsSpesa;
@@ -506,6 +508,14 @@ public class OrdineMissione extends BaseEntity {
 
     public void setUtilizzoTaxi(String utilizzoTaxi) {
         this.utilizzoTaxi = utilizzoTaxi;
+    }
+
+    public String getAnticipoEffettuato() {
+        return anticipoEffettuato;
+    }
+
+    public void setAnticipoEffettuato(String anticipoEffettuato) {
+        this.anticipoEffettuato = anticipoEffettuato;
     }
 
     public String getRichiestaAnticipo() {

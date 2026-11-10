@@ -1761,6 +1761,196 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             }
         }
 
+    // ===== Dati del mandato dell'anticipo =====
+    // visibili sull'ordine firmato e definitivo con richiesta di anticipo; compilabili solo dai validatori
+    // della uo spesa. "Salva in bozza" consente ulteriori modifiche, "Salva definitivo" no.
+    $scope.anticipoMandato = null;
+    $scope.mandatoVerificato = false;
+
+    var isOrdineFirmatoDefinitivo = function() {
+        return !!($scope.ordineMissioneModel && $scope.ordineMissioneModel.statoFlusso === 'APP' && $scope.ordineMissioneModel.stato === 'DEF');
+    };
+
+    $scope.mostraSezioneMandato = function() {
+        return !!$scope.anticipoMandato && isOrdineFirmatoDefinitivo();
+    };
+
+    $scope.mandatoModificabile = function() {
+        return $scope.mostraSezioneMandato() && $scope.utenteAbilitatoValidareUo === 'S' && $scope.anticipoMandato.statoMandato !== 'DEF';
+    };
+
+    var pulisciAnticipoMandato = function(anticipo) {
+        var copia = angular.copy(anticipo);
+        delete copia.ordineMissione;
+        delete copia.dataRichiesta;
+        delete copia.dataMandato;
+        return copia;
+    };
+
+    var recuperoBancheMandato = function(tipoPagamento) {
+        $scope.bancheMandato = [];
+        if (!$scope.terzoSiglaMandato || !tipoPagamento) {
+            return;
+        }
+        ProxyService.getTerzoModalitaPagamento($scope.terzoSiglaMandato.cd_terzo, tipoPagamento).then(function(ret) {
+            if (ret && ret.data) {
+                $scope.bancheMandato = ret.data.elements;
+                if ($scope.mandatoModificabile() && !$scope.anticipoMandato.pgBanca && $scope.bancheMandato && $scope.bancheMandato.length == 1) {
+                    $scope.anticipoMandato.pgBanca = $scope.bancheMandato[0].pg_banca;
+                    $scope.anticipoMandato.iban = $scope.bancheMandato[0].codice_iban;
+                }
+            }
+        });
+    };
+
+    var caricaTerzoMandato = function() {
+        if (!$scope.anticipoMandato || $scope.terzoSiglaMandato || !$scope.accountModel || !$scope.accountModel.codice_fiscale) {
+            return;
+        }
+        ProxyService.getTerzo($scope.accountModel.codice_fiscale).then(function(ret) {
+            if (ret && ret.data && ret.data.elements && ret.data.elements[0]) {
+                $scope.terzoSiglaMandato = ret.data.elements[0];
+                ProxyService.getModalitaPagamento($scope.terzoSiglaMandato.cd_terzo).then(function(retModPag) {
+                    if (retModPag && retModPag.data) {
+                        $scope.modalitaPagamentosMandato = retModPag.data.elements;
+                    }
+                });
+                recuperoBancheMandato($scope.anticipoMandato.tipoPagamento);
+            } else {
+                ui.error("Errore recupero dati SIGLA per il codice fiscale " + $scope.accountModel.codice_fiscale);
+            }
+        });
+    };
+
+    var caricaMandatoAnticipo = function() {
+        $scope.anticipoMandato = null;
+        $scope.terzoSiglaMandato = null;
+        if (!isOrdineFirmatoDefinitivo() || !$scope.ordineMissioneModel.id) {
+            return;
+        }
+        $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: $scope.ordineMissioneModel.id}}).then(function(response) {
+            var anticipo = response.data;
+            if (!anticipo || !anticipo.id) {
+                return;
+            }
+            $scope.anticipoMandato = pulisciAnticipoMandato(anticipo);
+            if (!$scope.anticipoMandato.anticipoRicevuto) {
+                $scope.anticipoMandato.anticipoRicevuto = 'N';
+            }
+            // estremi già salvati con importo: mandato già verificato
+            $scope.mandatoVerificato = !!($scope.anticipoMandato.anticipoAnnoMandato && $scope.anticipoMandato.anticipoNumeroMandato &&
+                $scope.anticipoMandato.anticipoImporto !== null && $scope.anticipoMandato.anticipoImporto !== undefined);
+            caricaTerzoMandato();
+        });
+    };
+
+    $scope.$watch('accountModel', function() {
+        caricaTerzoMandato();
+    });
+
+    $scope.onChangeModpagMandato = function() {
+        var modpag = $scope.anticipoMandato.modpag;
+        $scope.anticipoMandato.pgBanca = null;
+        $scope.anticipoMandato.iban = null;
+        $scope.anticipoMandato.tipoPagamento = null;
+        if (modpag && $scope.modalitaPagamentosMandato) {
+            for (var i = 0; i < $scope.modalitaPagamentosMandato.length; i++) {
+                if ($scope.modalitaPagamentosMandato[i].cd_modalita_pag === modpag) {
+                    $scope.anticipoMandato.tipoPagamento = $scope.modalitaPagamentosMandato[i].ti_pagamento;
+                    recuperoBancheMandato($scope.anticipoMandato.tipoPagamento);
+                    break;
+                }
+            }
+        }
+    };
+
+    $scope.onChangeBancaMandato = function() {
+        var pgBanca = $scope.anticipoMandato.pgBanca;
+        $scope.anticipoMandato.iban = null;
+        if (pgBanca && $scope.bancheMandato) {
+            for (var i = 0; i < $scope.bancheMandato.length; i++) {
+                if ($scope.bancheMandato[i].pg_banca === pgBanca) {
+                    $scope.anticipoMandato.iban = $scope.bancheMandato[i].codice_iban;
+                    break;
+                }
+            }
+        }
+    };
+
+    // cambiando anno o numero il mandato va verificato di nuovo
+    $scope.onChangeEstremiMandato = function() {
+        $scope.mandatoVerificato = false;
+        $scope.anticipoMandato.anticipoImporto = null;
+    };
+
+    $scope.verificaMandatoAnticipo = function() {
+        var m = $scope.anticipoMandato;
+        if (!m.anticipoAnnoMandato || !m.anticipoNumeroMandato) {
+            ui.error("Indicare l'anno e il numero del mandato");
+            return;
+        }
+        if (!$scope.terzoSiglaMandato) {
+            ui.error("Dati SIGLA del richiedente non ancora disponibili. Riprovare.");
+            return;
+        }
+        $scope.mandatoVerificato = false;
+        ProxyService.getMandato($scope.terzoSiglaMandato.cd_terzo, m.anticipoAnnoMandato, m.anticipoNumeroMandato).then(function(ret) {
+            var datiMandato = ret && ret.data && ret.data.elements ? ret.data.elements[0] : null;
+            if (datiMandato) {
+                m.anticipoImporto = datiMandato.im_pagato_incassato;
+                $scope.mandatoVerificato = true;
+            } else {
+                m.anticipoImporto = null;
+                ui.error("Il mandato specificato non esiste oppure è stato EMESSO ma non ancora PAGATO. Si prega di verificare.");
+            }
+        });
+    };
+
+    var salvaMandato = function(definitivo) {
+        $rootScope.salvataggio = true;
+        $http.put('api/rest/ordineMissione/anticipo/mandato', pulisciAnticipoMandato($scope.anticipoMandato), {params: {definitivo: definitivo}}).then(function(response) {
+            $rootScope.salvataggio = false;
+            $scope.anticipoMandato = pulisciAnticipoMandato(response.data);
+            ui.ok_message(definitivo ? "Dati del mandato salvati in definitivo." : "Dati del mandato salvati in bozza.");
+        }, function() {
+            $rootScope.salvataggio = false;
+        });
+    };
+
+    $scope.salvaMandatoBozza = function() {
+        var m = $scope.anticipoMandato;
+        if ((m.anticipoAnnoMandato || m.anticipoNumeroMandato) && !$scope.mandatoVerificato) {
+            ui.error("Verificare l'esistenza del mandato cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
+            return;
+        }
+        salvaMandato(false);
+    };
+
+    $scope.salvaMandatoDefinitivo = function() {
+        var m = $scope.anticipoMandato;
+        if (!m.modpag) {
+            ui.error("Indicare la Modalità di Pagamento");
+            return;
+        }
+        if (!m.pgBanca) {
+            ui.error("Indicare i Dati della Modalità di Pagamento");
+            return;
+        }
+        var datiMandatoIndicati = m.anticipoRicevuto === 'S' || m.anticipoAnnoMandato || m.anticipoNumeroMandato;
+        if (datiMandatoIndicati && !(m.anticipoRicevuto === 'S' && m.anticipoAnnoMandato && m.anticipoNumeroMandato)) {
+            ui.error("E' necessario indicare tutti i campi dell'anticipo ricevuto e del mandato, oppure nessuno.");
+            return;
+        }
+        if (datiMandatoIndicati && !$scope.mandatoVerificato) {
+            ui.error("Verificare l'esistenza del mandato cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
+            return;
+        }
+        ui.confirmCRUD("Si stanno salvando in definitivo i dati del mandato dell'Ordine di Missione Numero: " + $scope.ordineMissioneModel.numero +
+            ". Dopo il salvataggio non saranno più modificabili e verranno riportati nel rimborso. Si desidera continuare?", function() {
+            salvaMandato(true);
+        });
+    };
+
     $scope.histories = [];
     $scope.idMissione = $routeParams.idMissione;
     $scope.validazione = $routeParams.validazione;
@@ -1797,6 +1987,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.inizializzaFormPerModifica();
                 $scope.gestioneUtenteAbilitatoValidare($scope.ordineMissioneModel.uoSpesa);
                 $scope.getDatiUo($scope.ordineMissioneModel.uoSpesa);
+                caricaMandatoAnticipo();
             }
         });
     } else {

@@ -391,7 +391,15 @@
             "savedraft" : "Salva in Bozza",
             "invia" : "Invia",
             "sendToValidate" : "Invia per la Validazione",
-            "dettagli-presunti": "Dettagli Spese Presunte"
+            "dettagli-presunti": "Dettagli Spese Presunte",
+            "mandato-bozza": "Salva Mandato in Bozza",
+            "mandato-definitivo": "Salva Mandato Definitivo"
+        },
+        "mandato": {
+            "titolo": "Dati Anticipo e Mandato",
+            "stato-da-compilare": "Da compilare",
+            "stato-bozza": "Salvato in bozza",
+            "stato-definitivo": "Salvato in definitivo"
         },
         "messages": {
             "error": {
@@ -549,7 +557,7 @@
             "anno": "Anno",
             "annullati": "Includi Annullati",
             "richiesta-anticipo": "Richiesta Anticipo",
-            "anticipo-da-effettuare": "Anticipo da Effettuare",
+            "anticipo-effettuato": "Anticipo Effettuato",
             "ordini-missione": "Ordini di Missione",
             "stati": "Stati",
             "stati-placeholder": "Seleziona Stato"

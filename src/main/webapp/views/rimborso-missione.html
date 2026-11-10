@@ -258,7 +258,7 @@
                         <p class="col-md-12">
                      <span class="input-group">
                         <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.modalita-pagamento">Modalita di Pagamento</span>
-                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.modpag" on-select="onChangeModpag()"/>
+                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione || datiPagamentoDaOrdine" ng-model="rimborsoMissioneModel.modpag" on-select="onChangeModpag()"/>
                         <ui-select-match allow-clear="true" placeholder="{{'rimborso-missione.form.modalita-pagamento' | translate}}" >
                            <span ng-bind="$select.selected.ds_modalita_pag"></span>
                         </ui-select-match>
@@ -274,7 +274,7 @@
                             <p class="col-md-12">
                         <span class="input-group">
                            <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
-                           <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione" ng-model="rimborsoMissioneModel.pgBanca" on-select="onChangeTerzoModpag()"/>
+                           <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaRimborsoMissione || datiPagamentoDaOrdine" ng-model="rimborsoMissioneModel.pgBanca" on-select="onChangeTerzoModpag()"/>
                            <ui-select-match allow-clear="true" placeholder="{{'rimborso-missione.form.modalita-pagamento' | translate}}" >
                               <span ng-bind="$select.selected.ds_abicab + ' ' + $select.selected.numero_conto + ' ' + $select.selected.codice_iban"></span>
                            </ui-select-match>
@@ -286,13 +286,14 @@
                             </p>
                         </form>
                     </div>
-                    <div class="row" id="missioni">
+                    <!-- dati del mandato: compilati dai validatori sull'ordine firmato, qui in sola lettura -->
+                    <div class="row" id="missioni" ng-show="datiPagamentoDaOrdine || rimborsoMissioneModel.anticipoRicevuto == 'S'">
                         <form class="form-inline" role="form" id="missioni">
                             <p class="col-md-2">
                         <span class="input-group">
                         <span class="input-group-addon" translate="rimborso-missione.form.anticipo-ricevuto">Anticipi Ricevuti</span>
                         <label class="checkbox">
-                        <input ng-disabled="utenteAbilitatoValidareUo == 'N' || (utenteAbilitatoValidareUo == 'N' && valida) || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
+                        <input ng-disabled="true" type="checkbox" ng-model="rimborsoMissioneModel.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
                         </label>
                         </span>
                             </p>
@@ -301,7 +302,7 @@
                             <p class="col-md-3">
                         <span class="input-group">
                         <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
-                        <input ng-disabled="utenteAbilitatoValidareUo == 'N' || (utenteAbilitatoValidareUo == 'N' && valida) || disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
+                        <input ng-disabled="true" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
                         </span>
                             </p>
                         </form>
@@ -309,20 +310,15 @@
                             <p class="col-md-3">
                         <span class="input-group">
                         <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
-                        <input ng-disabled="utenteAbilitatoValidareUo == 'N' || (utenteAbilitatoValidareUo == 'N' && valida) || disabilitaRimborsoMissione" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
+                        <input ng-disabled="true" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
                         </span>
                             </p>
                         </form>
                         <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-1">
-                                <button type="button" ng-disabled="!rimborsoMissioneModel.anticipoAnnoMandato || !rimborsoMissioneModel.anticipoNumeroMandato" class="btn-sm glyphicon glyphicon-search" ng-click="validateMandato()" title="{{'rimborso-missione.form.valida-mandato' | translate}}"></button>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-3">
+                            <p class="col-md-4">
                         <span class="input-group">
                         <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
-                        <input ng-disabled="utenteAbilitatoValidareUo == 'N' || (utenteAbilitatoValidareUo == 'N' && valida) || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
+                        <input ng-disabled="true" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
                         </span>
                             </p>
                         </form>

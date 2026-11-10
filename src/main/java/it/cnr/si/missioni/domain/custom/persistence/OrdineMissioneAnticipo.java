@@ -79,6 +79,47 @@ public class OrdineMissioneAnticipo extends BaseEntity {
     @Column(name = "STATO_FLUSSO", length = 3, nullable = false)
     private String statoFlusso;
 
+    // Dati del mandato: compilati dai validatori sull'ordine firmato e riportati nel rimborso
+    @Size(min = 0, max = 5)
+    @Column(name = "MODPAG", length = 5, nullable = true)
+    private String modpag;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "TIPO_PAGAMENTO", length = 1, nullable = true)
+    private String tipoPagamento;
+
+    @Column(name = "PG_BANCA", length = 4, nullable = true)
+    private Integer pgBanca;
+
+    @Size(min = 0, max = 34)
+    @Column(name = "IBAN", length = 34, nullable = true)
+    private String iban;
+
+    @Size(min = 0, max = 1)
+    @Column(name = "ANTICIPO_RICEVUTO", length = 1, nullable = true)
+    private String anticipoRicevuto;
+
+    @Column(name = "ANTICIPO_ANNO_MANDATO", length = 4, nullable = true)
+    private Integer anticipoAnnoMandato;
+
+    @Column(name = "ANTICIPO_NUMERO_MANDATO", length = 50, nullable = true)
+    private Long anticipoNumeroMandato;
+
+    @Column(name = "ANTICIPO_IMPORTO", length = 28, nullable = true)
+    private BigDecimal anticipoImporto;
+
+    // null: da compilare, INS: salvato in bozza, DEF: salvato in definitivo
+    @Size(min = 0, max = 3)
+    @Column(name = "STATO_MANDATO", length = 3, nullable = true)
+    private String statoMandato;
+
+    @Size(min = 0, max = 256)
+    @Column(name = "UID_MANDATO", length = 256, nullable = true)
+    private String uidMandato;
+
+    @Column(name = "DATA_MANDATO", nullable = true)
+    private LocalDateTime dataMandato;
+
     //	@Override
 //	public int hashCode() {
 //		final int prime = 31;
@@ -211,6 +252,50 @@ public class OrdineMissioneAnticipo extends BaseEntity {
         return !StringUtils.isEmpty(getStatoFlusso()) && getStatoFlusso().equals(Costanti.STATO_INSERITO);
     }
 
+    public String getModpag() { return modpag; }
+    public void setModpag(String modpag) { this.modpag = modpag; }
+
+    public String getTipoPagamento() { return tipoPagamento; }
+    public void setTipoPagamento(String tipoPagamento) { this.tipoPagamento = tipoPagamento; }
+
+    public Integer getPgBanca() { return pgBanca; }
+    public void setPgBanca(Integer pgBanca) { this.pgBanca = pgBanca; }
+
+    public String getIban() { return iban; }
+    public void setIban(String iban) { this.iban = iban; }
+
+    public String getAnticipoRicevuto() { return anticipoRicevuto; }
+    public void setAnticipoRicevuto(String anticipoRicevuto) { this.anticipoRicevuto = anticipoRicevuto; }
+
+    public Integer getAnticipoAnnoMandato() { return anticipoAnnoMandato; }
+    public void setAnticipoAnnoMandato(Integer anticipoAnnoMandato) { this.anticipoAnnoMandato = anticipoAnnoMandato; }
+
+    public Long getAnticipoNumeroMandato() { return anticipoNumeroMandato; }
+    public void setAnticipoNumeroMandato(Long anticipoNumeroMandato) { this.anticipoNumeroMandato = anticipoNumeroMandato; }
+
+    public BigDecimal getAnticipoImporto() { return anticipoImporto; }
+    public void setAnticipoImporto(BigDecimal anticipoImporto) { this.anticipoImporto = anticipoImporto; }
+
+    public String getStatoMandato() { return statoMandato; }
+    public void setStatoMandato(String statoMandato) { this.statoMandato = statoMandato; }
+
+    public String getUidMandato() { return uidMandato; }
+    public void setUidMandato(String uidMandato) { this.uidMandato = uidMandato; }
+
+    public LocalDateTime getDataMandato() { return dataMandato; }
+    public void setDataMandato(LocalDateTime dataMandato) { this.dataMandato = dataMandato; }
+
+    @Transient
+    public Boolean isMandatoDefinitivo() {
+        return Costanti.STATO_DEFINITIVO.equals(getStatoMandato());
+    }
+
+    // anticipo effettuato: mandato salvato in definitivo con anticipo ricevuto
+    @Transient
+    public Boolean isAnticipoEffettuato() {
+        return isMandatoDefinitivo() && "S".equals(getAnticipoRicevuto());
+    }
+
     @Override
     public String toString() {
         return "OrdineMissioneAnticipo{" +
@@ -222,6 +307,7 @@ public class OrdineMissioneAnticipo extends BaseEntity {
                 ", stato='" + stato + '\'' +
                 ", idFlusso='" + idFlusso + '\'' +
                 ", statoFlusso='" + statoFlusso + '\'' +
+                ", statoMandato='" + statoMandato + '\'' +
                 '}';
     }
 }

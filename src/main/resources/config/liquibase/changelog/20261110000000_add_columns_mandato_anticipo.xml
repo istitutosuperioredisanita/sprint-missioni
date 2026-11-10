@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~  Copyright (C) 2023  Consiglio Nazionale delle Ricerche
+  ~
+  ~      This program is free software: you can redistribute it and/or modify
+  ~      it under the terms of the GNU Affero General Public License as
+  ~      published by the Free Software Foundation, either version 3 of the
+  ~      License, or (at your option) any later version.
+  ~
+  ~      This program is distributed in the hope that it will be useful,
+  ~      but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~      GNU Affero General Public License for more details.
+  ~
+  ~      You should have received a copy of the GNU Affero General Public License
+  ~      along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~
+  -->
+
+<!-- Dati del mandato dell'anticipo, compilati dai validatori sull'ordine firmato -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+	<changeSet author="missioni" id="20261110000000">
+		<addColumn tableName="ORDINE_MISSIONE_ANTICIPO">
+			<column name="MODPAG" type="character varying(5)"/>
+			<column name="TIPO_PAGAMENTO" type="character varying(1)"/>
+			<column name="PG_BANCA" type="integer"/>
+			<column name="IBAN" type="character varying(34)"/>
+			<column name="ANTICIPO_RICEVUTO" type="character varying(1)"/>
+			<column name="ANTICIPO_ANNO_MANDATO" type="integer"/>
+			<column name="ANTICIPO_NUMERO_MANDATO" type="bigint"/>
+			<column name="ANTICIPO_IMPORTO" type="numeric(17,2)"/>
+			<column name="STATO_MANDATO" type="character varying(3)"/>
+			<column name="UID_MANDATO" type="character varying(256)"/>
+			<column name="DATA_MANDATO" type="timestamp"/>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

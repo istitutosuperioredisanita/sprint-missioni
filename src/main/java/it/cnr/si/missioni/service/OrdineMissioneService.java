@@ -369,10 +369,16 @@ public class OrdineMissioneService {
             return;
         }
         for (OrdineMissione ordineMissione : listaOrdini) {
-            OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
-                    .getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
-            ordineMissione.setRichiestaAnticipo(anticipo != null ? Costanti.SI_NO.get("S") : Costanti.SI_NO.get("N"));
+            valorizzaDatiAnticipo(ordineMissione);
         }
+    }
+
+    private void valorizzaDatiAnticipo(OrdineMissione ordineMissione) {
+        OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
+                .getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
+        ordineMissione.setRichiestaAnticipo(anticipo != null ? Costanti.SI_NO.get("S") : Costanti.SI_NO.get("N"));
+        ordineMissione.setAnticipoEffettuato(anticipo != null && Boolean.TRUE.equals(anticipo.isAnticipoEffettuato())
+                ? Costanti.SI_NO.get("S") : Costanti.SI_NO.get("N"));
     }
 
     public void aggiornaOrdineMissioneAnnullato(OrdineMissione ordineMissioneDaAggiornare) {
@@ -802,7 +808,10 @@ public class OrdineMissioneService {
                         .build();
             }
 
-            if (Costanti.FILTRO_ANTICIPO_RICHIESTA.equals(filter.getFiltroAnticipo())) {
+            final String filtroAnticipo = filter.getFiltroAnticipo();
+            if (Costanti.FILTRO_ANTICIPO_RICHIESTA.equals(filtroAnticipo)
+                    || Costanti.FILTRO_ANTICIPO_EFFETTUATO.equals(filtroAnticipo)
+                    || Costanti.FILTRO_ANTICIPO_NON_EFFETTUATO.equals(filtroAnticipo)) {
                 spec = new SpecificationBuilder<OrdineMissione>()
                         .and(spec)
                         .and((root, query, cb) -> {
@@ -816,6 +825,25 @@ public class OrdineMissioneService {
                             return cb.exists(sub);
                         })
                         .build();
+                if (!Costanti.FILTRO_ANTICIPO_RICHIESTA.equals(filtroAnticipo)) {
+                    // anticipo effettuato: mandato salvato in definitivo con anticipo ricevuto
+                    Specification<OrdineMissione> effettuato = (root, query, cb) -> {
+                        Subquery<Long> sub = query.subquery(Long.class);
+                        var ant = sub.from(OrdineMissioneAnticipo.class);
+                        sub.select(ant.get("id"))
+                                .where(
+                                        cb.equal(ant.get("ordineMissione").get("id"), root.get("id")),
+                                        cb.notEqual(ant.get("stato"), Costanti.STATO_ANNULLATO),
+                                        cb.equal(ant.get("statoMandato"), Costanti.STATO_DEFINITIVO),
+                                        cb.equal(ant.get("anticipoRicevuto"), "S")
+                                );
+                        return cb.exists(sub);
+                    };
+                    spec = new SpecificationBuilder<OrdineMissione>()
+                            .and(spec)
+                            .and(Costanti.FILTRO_ANTICIPO_EFFETTUATO.equals(filtroAnticipo) ? effettuato : Specification.not(effettuato))
+                            .build();
+                }
             }
 
             if ("S".equals(Utility.nvl(filter.getDaAnnullare(), "N"))) {
@@ -845,9 +873,7 @@ public class OrdineMissioneService {
 
         if (Boolean.TRUE.equals(isServiceRest) && !Boolean.TRUE.equals(isForValidateFlows) && ordineMissioneList != null) {
             for (OrdineMissione ordineMissione : ordineMissioneList) {
-                OrdineMissioneAnticipo anticipo = ordineMissioneAnticipoService
-                        .getAnticipo(Long.valueOf(ordineMissione.getId().toString()));
-                ordineMissione.setRichiestaAnticipo(anticipo != null ? Costanti.SI_NO.get("S") : Costanti.SI_NO.get("N"));
+                valorizzaDatiAnticipo(ordineMissione);
             }
         }
 

@@ -183,18 +183,22 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
     $scope.valoriStatoOrdineMissione = ProxyService.valueStatoOrdineMissione;
     $scope.valoriFiltroStati = ProxyService.valueFiltroStati;
 
-    // TODO filtro "Anticipo da Effettuare"
-    $scope.filtri = { richiestaAnticipo: false, anticipoDaEffettuare: false };
+    // "Richiesta Anticipo" mostra il flag "Anticipo Effettuato": se flaggato filtra gli ordini con anticipo
+    // effettuato (mandato salvato in definitivo con anticipo ricevuto), altrimenti quelli senza
+    $scope.filtri = { richiestaAnticipo: false, anticipoEffettuato: false };
     $scope.mostraColonnaAnticipoEffettuato = false;
 
     $scope.onChangeRichiestaAnticipo = function() {
         if (!$scope.filtri.richiestaAnticipo) {
-            $scope.filtri.anticipoDaEffettuare = false;
+            $scope.filtri.anticipoEffettuato = false;
         }
     };
 
     function getFiltroAnticipo() {
-        return $scope.filtri && $scope.filtri.richiestaAnticipo ? 'RICHIESTA' : null;
+        if (!$scope.filtri || !$scope.filtri.richiestaAnticipo) {
+            return null;
+        }
+        return $scope.filtri.anticipoEffettuato ? 'EFFETTUATO' : 'NON_EFFETTUATO';
     }
 
     $scope.tipiMissione = {
@@ -508,8 +512,12 @@ missioniApp.controller('ElencoOrdiniMissioneController', function($rootScope, $s
             }
         });
         if (!$scope.filtri) {
-            $scope.filtri = { richiestaAnticipo: false, anticipoDaEffettuare: false };
+            $scope.filtri = { richiestaAnticipo: false, anticipoEffettuato: false };
         }
+        if ($scope.filtri.anticipoEffettuato === undefined) {
+            $scope.filtri.anticipoEffettuato = false;
+        }
+        delete $scope.filtri.anticipoDaEffettuare;
         if (stato.ricercaEffettuata) {
             $scope.ricerca(stato.currentPage);
         }

@@ -131,6 +131,25 @@ public class OrdineMissioneAnticipoResource {
     }
 
 
+    /**
+     * PUT /rest/ordineMissione/anticipo/mandato -> salva i dati del mandato (bozza o definitivo)
+     */
+    @RequestMapping(value = "/rest/ordineMissione/anticipo/mandato",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> salvaMandatoAnticipo(@RequestBody OrdineMissioneAnticipo ordineMissioneAnticipo,
+                                                  @RequestParam(value = "definitivo", defaultValue = "false") Boolean definitivo,
+                                                  HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ordineMissioneAnticipo = ordineMissioneAnticipoService.salvaMandato(ordineMissioneAnticipo, definitivo);
+        } catch (Exception e) {
+            log.error("ERRORE salvaMandatoAnticipo", e);
+            return JSONResponseEntity.badRequest(Utility.getMessageException(e));
+        }
+        return JSONResponseEntity.ok(ordineMissioneAnticipo);
+    }
+
     @RequestMapping(value = "/rest/ordineMissione/anticipo/{ids}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)

@@ -814,6 +814,43 @@ public class RimborsoMissioneService {
 //			rimborsoMissioneDB.setNoteDifferenzeOrdine(rimborsoMissione.getNoteDifferenzeOrdine());
         rimborsoMissioneDB.setLivelloRich(rimborsoMissione.getLivelloRich());
         rimborsoMissioneDB.setQualificaRich(rimborsoMissione.getQualificaRich());
+        applicaDatiMandatoOrdine(rimborsoMissioneDB, false);
+    }
+
+    /**
+     * Se l'ordine ha la richiesta di anticipo, i dati di pagamento e del mandato sono quelli salvati
+     * in definitivo dai validatori sull'ordine firmato. Senza mandato definitivo il rimborso non può
+     * essere inserito (controlloDefinitivo); i rimborsi già esistenti mantengono i propri dati.
+     */
+    private void applicaDatiMandatoOrdine(RimborsoMissione rimborsoMissione, boolean controlloDefinitivo) throws AwesomeException {
+        if (rimborsoMissione.getOrdineMissione() == null || rimborsoMissione.getOrdineMissione().getId() == null) {
+            return;
+        }
+        OrdineMissione ordineMissione = ordineMissioneRepository
+                .findById((Long) rimborsoMissione.getOrdineMissione().getId()).orElse(null);
+        if (ordineMissione == null) {
+            return;
+        }
+        OrdineMissioneAnticipo anticipo = ordineMissioneService.getAnticipo(ordineMissione);
+        if (anticipo == null) {
+            return;
+        }
+        if (!Boolean.TRUE.equals(anticipo.isMandatoDefinitivo())) {
+            if (controlloDefinitivo) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire il rimborso: per l'ordine di missione "
+                        + ordineMissione.getAnno() + "/" + ordineMissione.getNumero()
+                        + " è stato richiesto l'anticipo e i dati del mandato non sono ancora stati salvati in definitivo.");
+            }
+            return;
+        }
+        rimborsoMissione.setModpag(anticipo.getModpag());
+        rimborsoMissione.setTipoPagamento(anticipo.getTipoPagamento());
+        rimborsoMissione.setPgBanca(anticipo.getPgBanca());
+        rimborsoMissione.setIban(anticipo.getIban());
+        rimborsoMissione.setAnticipoRicevuto(Utility.nvl(anticipo.getAnticipoRicevuto(), "N"));
+        rimborsoMissione.setAnticipoAnnoMandato(anticipo.getAnticipoAnnoMandato());
+        rimborsoMissione.setAnticipoNumeroMandato(anticipo.getAnticipoNumeroMandato());
+        rimborsoMissione.setAnticipoImporto(anticipo.getAnticipoImporto());
     }
 
     private String getEmail(String user) {
@@ -1065,6 +1102,7 @@ public class RimborsoMissioneService {
     public RimborsoMissione createRimborsoMissione(RimborsoMissione rimborsoMissione)
             throws AwesomeException {
 
+        applicaDatiMandatoOrdine(rimborsoMissione, true);
         controlloDatiObbligatoriDaGUI(rimborsoMissione);
         inizializzaCampiPerInserimento(rimborsoMissione);
         validaCRUD(rimborsoMissione);

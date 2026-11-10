@@ -56,35 +56,6 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
 
     $scope.altriPulsantiPresenti = !!document.querySelectorAll('form button').length > 1;
 
-    //listners che rileva le modifiche ai campi del mandato
-    $scope.$watch('rimborsoMissioneModel.anticipoAnnoMandato', function() {
-        if ($scope.mandatoExist) {
-            $scope.mandatoExist = false;
-        }
-    });
-
-    $scope.$watch('rimborsoMissioneModel.anticipoNumeroMandato', function() {
-        if ($scope.mandatoExist) {
-            $scope.mandatoExist = false;
-        }
-    });
-
-
-    $scope.$watch('rimborsoMissioneModel.anticipoImporto', function(newVal, oldVal) {
-        // Verifica se il nuovo valore esiste ed è diverso dal valore salvato nel mandato
-        if (newVal && $scope.mandatoExist && $scope.datiMandato &&
-            newVal !== $scope.datiMandato.im_pagato_incassato) {
-            // Mostra messaggio di errore
-            ui.error("ATTENZIONE! L'importo dell'anticipo è stato modificato manualmente. Verifica cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
-
-            // Resetta il campo dell'importo a null
-            $scope.rimborsoMissioneModel.anticipoImporto = null;
-
-            // Segna che il mandato deve essere verificato nuovamente
-            $scope.mandatoExist = null;
-        }
-    });
-
     $scope.giaRimborsato = "N";
     var urlRestProxy = URL_REST.STANDARD;
     $scope.today = function() {
@@ -189,6 +160,7 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
                 $scope.rimborsoMissioneModel.anticipoRicevuto = "N";
                 $scope.rimborsoMissioneModel.speseTerziRicevute = "N";
                 $scope.rimborsoMissioneModel.rimborso0 = "N";
+                verificaMandatoOrdinePerNuovoRimborso(idOrdineMissione);
                 inizializzaForm();
                 $scope.recuperoDatiDivisa();
                 $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.idOrdineMissione, $scope.rimborsoMissioneModel.uid);
@@ -304,37 +276,54 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
         });
     }
 
-    // flag che controlla l'esistenza del mandato
-    $scope.mandatoExist = false;
+    // Dati di pagamento e del mandato: se l'ordine ha la richiesta di anticipo sono quelli salvati
+    // in definitivo dai validatori sull'ordine firmato e non sono modificabili nel rimborso.
+    $scope.datiPagamentoDaOrdine = false;
 
-    $scope.recuperoDatiMandato = function(terzoSigla, annoMandato, numeroMandato) {
-        if ($scope.rimborsoMissioneModel.anticipoAnnoMandato && $scope.rimborsoMissioneModel.anticipoNumeroMandato) {
-            $scope.datiMandato = null; // Reset
-            $scope.mandatoExist = false; // Reset
-
-            ProxyService.getMandato(terzoSigla.cd_terzo, annoMandato, numeroMandato).then(function(ret) {
-                if (ret && ret.data && ret.data.elements) {
-                    $scope.datiMandato = ret.data.elements[0];
-                    if ($scope.datiMandato) {
-                        $scope.rimborsoMissioneModel.anticipoImporto = $scope.datiMandato.im_pagato_incassato;
-                        $scope.mandatoExist = true; // Setta a true se lo trova e quindi ha impostato l'importo
-                    } else {
-                        ui.error("Il mandato specificato non esiste oppure è stato EMESSO ma non ancora PAGATO. Si prega di verificare.");
-                    }
-                }
-            });
-        } else {
-            ui.error("Indicare l'anno e il numero del mandato");
+    var applicaDatiMandatoOrdine = function(anticipo) {
+        var model = $scope.rimborsoMissioneModel;
+        model.modpag = anticipo.modpag;
+        model.tipoPagamento = anticipo.tipoPagamento;
+        model.pgBanca = anticipo.pgBanca;
+        model.iban = anticipo.iban;
+        model.anticipoRicevuto = anticipo.anticipoRicevuto || 'N';
+        model.anticipoAnnoMandato = anticipo.anticipoAnnoMandato;
+        model.anticipoNumeroMandato = anticipo.anticipoNumeroMandato;
+        model.anticipoImporto = anticipo.anticipoImporto;
+        if (model.tipoPagamento && $scope.terzoSigla) {
+            $scope.recuperoDatiTerzoModalitaPagamento($scope.terzoSigla.cd_terzo, model.tipoPagamento);
         }
-    }
+    };
 
-    $scope.validateMandato = function() {
-        if ($scope.rimborsoMissioneModel.anticipoAnnoMandato && $scope.rimborsoMissioneModel.anticipoNumeroMandato) {
-            $scope.datiMandato = $scope.recuperoDatiMandato($scope.terzoSigla, $scope.rimborsoMissioneModel.anticipoAnnoMandato, $scope.rimborsoMissioneModel.anticipoNumeroMandato);
-        } else {
-            ui.error("Indicare l'anno e il numero del mandato");
+    // nuovo rimborso: con richiesta di anticipo è consentito solo se il mandato è salvato in definitivo
+    var verificaMandatoOrdinePerNuovoRimborso = function(idOrdineMissione) {
+        $scope.datiPagamentoDaOrdine = false;
+        $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: idOrdineMissione}}).then(function(response) {
+            var anticipo = response.data;
+            if (!anticipo || !anticipo.id || !$scope.rimborsoMissioneModel || $scope.rimborsoMissioneModel.idOrdineMissione !== idOrdineMissione) {
+                return;
+            }
+            if (anticipo.statoMandato !== 'DEF') {
+                ui.error("Per l'ordine di missione selezionato è stato richiesto l'anticipo: il rimborso potrà essere inserito solo dopo che il validatore avrà salvato in definitivo i dati del mandato sull'ordine.");
+                $scope.rimborsoMissioneModel = {};
+                return;
+            }
+            $scope.datiPagamentoDaOrdine = true;
+            applicaDatiMandatoOrdine(anticipo);
+        });
+    };
+
+    // rimborso esistente: i dati restano quelli del rimborso, non modificabili se l'ordine ha il mandato definitivo
+    var impostaDatiPagamentoDaOrdine = function(idOrdineMissione) {
+        $scope.datiPagamentoDaOrdine = false;
+        if (!idOrdineMissione) {
+            return;
         }
-    }
+        $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: idOrdineMissione}}).then(function(response) {
+            var anticipo = response.data;
+            $scope.datiPagamentoDaOrdine = !!(anticipo && anticipo.id && anticipo.statoMandato === 'DEF');
+        });
+    };
 
     var controlliPrimaDelSalvataggio = function() {
         if ($scope.impegnoSelected) {
@@ -1541,17 +1530,6 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     }
 
     $scope.confirm = function() {
-        // Controllo se ha tutti i campi del mandato compilati e il mandato esiste
-        if ($scope.rimborsoMissioneModel.anticipoRicevuto === 'S' &&
-            $scope.rimborsoMissioneModel.anticipoAnnoMandato &&
-            $scope.rimborsoMissioneModel.anticipoNumeroMandato) {
-
-            if (!$scope.mandatoExist) {
-                ui.error("Per inviare il rimborso, verificare l'esistenza del mandato cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
-                return;
-            }
-        }
-
         ui.confirmCRUD("Si sta per confermare il Rimborso Missione Numero: " + $scope.rimborsoMissioneModel.numero + " del " + $filter('date')($scope.rimborsoMissioneModel.dataInserimento, COSTANTI.FORMATO_DATA) + ". L'operazione avvierà il processo di autorizzazione e il rimborso non sarà più modificabile. Si desidera Continuare?", confirmOrdineMissione);
     }
 
@@ -1878,58 +1856,13 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     }
 
     $scope.save = function() {
-    // Controllo se ha tutti i campi del mandato compilati e il mandato esiste
-    if ($scope.rimborsoMissioneModel.anticipoRicevuto === 'S' &&
-        $scope.rimborsoMissioneModel.anticipoAnnoMandato &&
-        $scope.rimborsoMissioneModel.anticipoNumeroMandato) {
-
-        if (!$scope.mandatoExist) {
-            ui.error("Per salvare il rimborso, verificare l'esistenza del mandato cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
-            return;
-        }
-    }
-
         var ret = controlliPrimaDelSalvataggio();
         if (ret) {
-            // Salva i dati del mandato prima di inviare la richiesta di salvataggio
-            var mandatoData = null;
-            if ($scope.rimborsoMissioneModel.anticipoRicevuto === 'S') {
-                mandatoData = {
-                    anticipoRicevuto: $scope.rimborsoMissioneModel.anticipoRicevuto,
-                    anticipoAnnoMandato: $scope.rimborsoMissioneModel.anticipoAnnoMandato,
-                    anticipoNumeroMandato: $scope.rimborsoMissioneModel.anticipoNumeroMandato,
-                    anticipoImporto: $scope.rimborsoMissioneModel.anticipoImporto || ($scope.datiMandato ? $scope.datiMandato.im_pagato_incassato : null)
-                };
-            }
-
             if ($scope.esisteRimborsoMissione()) {
                 $rootScope.salvataggio = true;
                 RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
                     function(value, responseHeaders) {
                         $scope.rimborsoMissioneModel = value;
-
-                        // Ripristina i dati del mandato dopo il salvataggio
-                        if (mandatoData) {
-                            $scope.rimborsoMissioneModel.anticipoRicevuto = mandatoData.anticipoRicevuto;
-                            $scope.rimborsoMissioneModel.anticipoAnnoMandato = mandatoData.anticipoAnnoMandato;
-                            $scope.rimborsoMissioneModel.anticipoNumeroMandato = mandatoData.anticipoNumeroMandato;
-                            $scope.rimborsoMissioneModel.anticipoImporto = mandatoData.anticipoImporto;
-
-                            // Esegui un secondo salvataggio per garantire la persistenza dei dati del mandato
-                            RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
-                                function(updatedValue) {
-                                    $scope.rimborsoMissioneModel = updatedValue;
-                                    // Ripristina ancora una volta i valori se necessario
-                                    if ($scope.rimborsoMissioneModel.anticipoRicevuto !== 'S') {
-                                        $scope.rimborsoMissioneModel.anticipoRicevuto = mandatoData.anticipoRicevuto;
-                                        $scope.rimborsoMissioneModel.anticipoAnnoMandato = mandatoData.anticipoAnnoMandato;
-                                        $scope.rimborsoMissioneModel.anticipoNumeroMandato = mandatoData.anticipoNumeroMandato;
-                                        $scope.rimborsoMissioneModel.anticipoImporto = mandatoData.anticipoImporto;
-                                    }
-                                }
-                            );
-                        }
-
                         $scope.viewAttachments($scope.rimborsoMissioneModel.id);
                         $rootScope.salvataggio = false;
                         $scope.disabilitaRimborsoMissione = impostadisabilitaRimborsoMissione();
@@ -1945,29 +1878,6 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
                     function(value, responseHeaders) {
                         $rootScope.salvataggio = false;
                         $scope.rimborsoMissioneModel = value;
-
-                        // Ripristina i dati del mandato dopo il salvataggio
-                        if (mandatoData) {
-                            $scope.rimborsoMissioneModel.anticipoRicevuto = mandatoData.anticipoRicevuto;
-                            $scope.rimborsoMissioneModel.anticipoAnnoMandato = mandatoData.anticipoAnnoMandato;
-                            $scope.rimborsoMissioneModel.anticipoNumeroMandato = mandatoData.anticipoNumeroMandato;
-                            $scope.rimborsoMissioneModel.anticipoImporto = mandatoData.anticipoImporto;
-
-                            // Esegui un secondo salvataggio per garantire la persistenza dei dati del mandato
-                            RimborsoMissioneService.modify($scope.rimborsoMissioneModel,
-                                function(updatedValue) {
-                                    $scope.rimborsoMissioneModel = updatedValue;
-                                    // Ripristina ancora una volta i valori se necessario
-                                    if ($scope.rimborsoMissioneModel.anticipoRicevuto !== 'S') {
-                                        $scope.rimborsoMissioneModel.anticipoRicevuto = mandatoData.anticipoRicevuto;
-                                        $scope.rimborsoMissioneModel.anticipoAnnoMandato = mandatoData.anticipoAnnoMandato;
-                                        $scope.rimborsoMissioneModel.anticipoNumeroMandato = mandatoData.anticipoNumeroMandato;
-                                        $scope.rimborsoMissioneModel.anticipoImporto = mandatoData.anticipoImporto;
-                                    }
-                                }
-                            );
-                        }
-
                         $scope.elencoPersone = null;
                         $scope.uoForUsersSpecial = null;
                         $scope.inizializzaFormPerModifica();
@@ -2024,6 +1934,7 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
                 $scope.rimborsoMissioneModel = model;
                 $scope.viewAttachments($scope.rimborsoMissioneModel.id);
                 $scope.recuperoDatiAltriRimborsi($scope.rimborsoMissioneModel.ordineMissione.id, $scope.rimborsoMissioneModel.ordineMissione.uid);
+                impostaDatiPagamentoDaOrdine($scope.rimborsoMissioneModel.ordineMissione.id);
                 if ($scope.rimborsoMissioneModel.stato == 'ANA') {
                     $scope.viewAttachmentsUndo();
                 }

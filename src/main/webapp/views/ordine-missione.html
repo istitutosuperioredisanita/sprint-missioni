@@ -436,6 +436,89 @@
                      </span>
                             </p>
                         </form>
+                        <!-- Dati del mandato dell'anticipo: ordine firmato e definitivo, compilati dai validatori -->
+                        <div class="col-md-12" ng-if="mostraSezioneMandato()">
+                            <h4 class="text-center">
+                                {{'ordine-missione.mandato.titolo' | translate}}
+                                <span ng-show="!anticipoMandato.statoMandato" class="label label-default">{{'ordine-missione.mandato.stato-da-compilare' | translate}}</span>
+                                <span ng-show="anticipoMandato.statoMandato == 'INS'" class="label label-warning">{{'ordine-missione.mandato.stato-bozza' | translate}}</span>
+                                <span ng-show="anticipoMandato.statoMandato == 'DEF'" class="label label-success">{{'ordine-missione.mandato.stato-definitivo' | translate}}</span>
+                            </h4>
+                            <div class="row">
+                                <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-12">
+                     <span class="input-group">
+                        <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.modalita-pagamento">Modalita di Pagamento</span>
+                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!mandatoModificabile()" ng-model="anticipoMandato.modpag" on-select="onChangeModpagMandato()"/>
+                        <ui-select-match allow-clear="true" placeholder="{{'rimborso-missione.form.modalita-pagamento' | translate}}" >
+                           <span ng-bind="$select.selected.ds_modalita_pag"></span>
+                        </ui-select-match>
+                        <ui-select-choices repeat="modalitaPagamento.cd_modalita_pag as modalitaPagamento in modalitaPagamentosMandato | filter: $select.search">
+                           <span ng-bind="modalitaPagamento.ds_modalita_pag"></span>
+                        </ui-select-choices>
+                         </ui-select>
+                     </span>
+                                    </p>
+                                </form>
+                            </div>
+                            <div class="row" ng-show="anticipoMandato.modpag">
+                                <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-12">
+                     <span class="input-group">
+                        <span class="input-group-addon label-input-group-for-select" translate="rimborso-missione.form.dati-modalita-pagamento">Dati Modalita di Pagamento</span>
+                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="!mandatoModificabile()" ng-model="anticipoMandato.pgBanca" on-select="onChangeBancaMandato()"/>
+                        <ui-select-match allow-clear="true" placeholder="{{'rimborso-missione.form.dati-modalita-pagamento' | translate}}" >
+                           <span ng-bind="$select.selected.ds_abicab + ' ' + $select.selected.numero_conto + ' ' + $select.selected.codice_iban"></span>
+                        </ui-select-match>
+                        <ui-select-choices repeat="banca.pg_banca as banca in bancheMandato | filter: $select.search">
+                           <span ng-bind="banca.ds_abicab + ' ' + banca.numero_conto + ' ' + banca.codice_iban"></span>
+                        </ui-select-choices>
+                         </ui-select>
+                     </span>
+                                    </p>
+                                </form>
+                            </div>
+                            <div class="row">
+                                <form class="form-inline" role="form" id="missioni">
+                                    <p class="col-md-2">
+                     <span class="input-group">
+                     <span class="input-group-addon" translate="rimborso-missione.form.anticipo-ricevuto">Anticipo Ricevuto</span>
+                     <label class="checkbox">
+                     <input ng-disabled="!mandatoModificabile()" type="checkbox" ng-model="anticipoMandato.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
+                     </label>
+                     </span>
+                                    </p>
+                                    <p class="col-md-3">
+                     <span class="input-group">
+                     <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
+                     <input ng-disabled="!mandatoModificabile()" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="anticipoMandato.anticipoAnnoMandato" ng-change="onChangeEstremiMandato()"/>
+                     </span>
+                                    </p>
+                                    <p class="col-md-3">
+                     <span class="input-group">
+                     <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
+                     <input ng-disabled="!mandatoModificabile()" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="anticipoMandato.anticipoNumeroMandato" ng-change="onChangeEstremiMandato()"/>
+                     </span>
+                                    </p>
+                                    <p class="col-md-1">
+                                        <button type="button" ng-show="mandatoModificabile()" ng-disabled="!anticipoMandato.anticipoAnnoMandato || !anticipoMandato.anticipoNumeroMandato" class="btn-sm glyphicon glyphicon-search" ng-click="verificaMandatoAnticipo()" title="{{'rimborso-missione.form.valida-mandato' | translate}}"></button>
+                                    </p>
+                                    <p class="col-md-3">
+                     <span class="input-group">
+                     <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
+                     <input ng-disabled="true" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="anticipoMandato.anticipoImporto" currency-symbol="">
+                     </span>
+                                    </p>
+                                </form>
+                            </div>
+                            <div class="row" ng-show="mandatoModificabile()">
+                                <p class="col-md-12">
+                                    <button type="button" class="btn btn-info" ng-click="salvaMandatoBozza()" data-toggle="tooltip" title="{{'ordine-missione.button.mandato-bozza' | translate}}"><span class="glyphicon glyphicon-floppy-disk" style="color:white"></span>&nbsp;{{'ordine-missione.button.mandato-bozza' | translate}}</button>
+                                    &nbsp;
+                                    <button type="button" class="btn btn-success" ng-click="salvaMandatoDefinitivo()" data-toggle="tooltip" title="{{'ordine-missione.button.mandato-definitivo' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'ordine-missione.button.mandato-definitivo' | translate}}</button>
+                                </p>
+                            </div>
+                        </div>
                         <form class="form-inline" role="form" id="missioni">
                             <div class="col-md-12">
                                 <div class="row">
