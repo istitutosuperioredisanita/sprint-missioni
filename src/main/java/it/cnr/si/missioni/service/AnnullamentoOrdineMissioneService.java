@@ -650,6 +650,11 @@ public class AnnullamentoOrdineMissioneService {
         if (annullamento.getOrdineMissione() != null) {
             OrdineMissione ordineMissione = ordineMissioneRepository.findById((Long) annullamento.getOrdineMissione().getId()).orElse(null);
             if (ordineMissione != null) {
+                if (!ordineMissioneService.isOrdineDefinitivoConMandato(ordineMissione)) {
+                    throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile annullare l'ordine di missione "
+                            + ordineMissione.getAnno() + "/" + ordineMissione.getNumero()
+                            + ": è stato richiesto l'anticipo e i dati del mandato non sono ancora stati salvati in definitivo dal validatore.");
+                }
                 annullamento.setOrdineMissione(ordineMissione);
             } else {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "L'ordine di missione con ID: " + annullamento.getOrdineMissione().getId() + " non esiste");

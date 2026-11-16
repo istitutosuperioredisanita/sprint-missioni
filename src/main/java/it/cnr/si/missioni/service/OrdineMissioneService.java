@@ -364,6 +364,15 @@ public class OrdineMissioneService {
         return ordineMissioneAnticipoService.getAnticipo(ordineMissioneDaAggiornare, false);
     }
 
+    /**
+     * Ordine definitivo a tutti gli effetti: senza richiesta di anticipo lo è subito dopo la firma,
+     * con richiesta di anticipo solo quando il validatore ha salvato in definitivo i dati del mandato.
+     */
+    public boolean isOrdineDefinitivoConMandato(OrdineMissione ordineMissione) throws AwesomeException {
+        OrdineMissioneAnticipo anticipo = getAnticipo(ordineMissione);
+        return anticipo == null || Boolean.TRUE.equals(anticipo.isMandatoDefinitivo());
+    }
+
     public void valorizzaRichiestaAnticipo(List<OrdineMissione> listaOrdini) {
         if (listaOrdini == null) {
             return;

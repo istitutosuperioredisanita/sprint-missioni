@@ -150,6 +150,11 @@ public class OrdineMissioneResource {
         List<OrdineMissione> ordiniMissione;
         try {
             ordiniMissione = ordineMissioneService.getOrdiniMissione(filter, false);
+            // con richiesta di anticipo l'ordine è annullabile solo dopo il salvataggio in definitivo del mandato
+            if (ordiniMissione != null) {
+                ordiniMissione = new ArrayList<>(ordiniMissione);
+                ordiniMissione.removeIf(ordine -> !ordineMissioneService.isOrdineDefinitivoConMandato(ordine));
+            }
             ordineMissioneService.valorizzaRichiestaAnticipo(ordiniMissione);
         } catch (AwesomeException e) {
             log.error("ERRORE getOrdiniMissioneDaAnnullare", e);
