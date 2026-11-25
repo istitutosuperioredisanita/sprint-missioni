@@ -75,6 +75,39 @@ missioniApp.controller('AnnullamentoOrdineMissioneController', function($rootSco
         }
     }
 
+    // Info del mandato dell'anticipo dell'ordine da annullare (sola lettura)
+    $scope.anticipoMandato = null;
+
+    var caricaMandatoAnticipo = function(idOrdineMissione) {
+        $scope.anticipoMandato = null;
+        if (!idOrdineMissione) {
+            return;
+        }
+        $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: idOrdineMissione}}).then(function(response) {
+            var anticipo = response.data;
+            if (!anticipo || !anticipo.id) {
+                return;
+            }
+            $scope.anticipoMandato = {
+                modpag: anticipo.modpag,
+                iban: anticipo.iban,
+                anticipoRicevuto: anticipo.anticipoRicevuto || 'N',
+                anticipoAnnoMandato: anticipo.anticipoAnnoMandato,
+                anticipoNumeroMandato: anticipo.anticipoNumeroMandato,
+                anticipoImporto: anticipo.anticipoImporto,
+                statoMandato: anticipo.statoMandato
+            };
+        });
+    };
+
+    // carica il mandato in ogni stato dell'annullamento (nuovo, esistente, respinto...) appena è noto l'ordine
+    $scope.$watch(function() {
+        var m = $scope.annullamentoModel;
+        return m ? (m.idOrdineMissione || (m.ordineMissione && m.ordineMissione.id)) : null;
+    }, function(idOrdine) {
+        caricaMandatoAnticipo(idOrdine);
+    });
+
     $scope.reloadOrdineMissione = function(idOrdineMissione) {
         $scope.annullamentoModel = {};
 
@@ -1137,6 +1170,8 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
                     $scope.annullamentoModel = value;
                     $scope.annullamentoModel.idOrdineMissione = $scope.annullamentoModel.ordineMissione.id;
                     $rootScope.salvataggio = false;
+                    $scope.disabilitaAnnullamento = impostaDisabilitaAnnullamento();
+                    ui.ok_message("Annullamento Ordine di Missione modificato in bozza con successo");
                 },
                 function(httpResponse) {
                     $rootScope.salvataggio = false;
@@ -1152,6 +1187,7 @@ $scope.restGae = function(anno, modulo, cdr, uo) {
                     $scope.uoForUsersSpecial = null;
                     $scope.inizializzaFormPerModifica();
                     $scope.annullamentoModel.isFireSearchAttachments = false;
+                    ui.ok_message("Annullamento Ordine di Missione salvato in bozza con successo");
                     var path = $location.path();
                     $location.path(path + '/' + $scope.annullamentoModel.id);
                 },

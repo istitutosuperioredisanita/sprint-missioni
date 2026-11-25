@@ -217,7 +217,7 @@ public class OrdineMissioneAnticipoService {
             throw new AwesomeException(CodiciErrore.ERRGEN, "Utente non abilitato a inserire i dati del mandato.");
         }
         if (Boolean.TRUE.equals(anticipoDB.isMandatoDefinitivo())) {
-            throw new AwesomeException(CodiciErrore.ERRGEN, "I dati del mandato sono già stati salvati in definitivo.");
+            throw new AwesomeException(CodiciErrore.ERRGEN, "I dati del mandato sono già stati salvati.");
         }
 
         anticipoDB.setModpag(datiMandato.getModpag());

@@ -13,10 +13,11 @@ in Italia che all’Estero.
 La procedura prevede la gestione di:
 - Acquisizione dati Personale CNR e Strutture CNR (SIPER-SIGLA)
 - Richiesta dell’Ordine di Missione (Missioni);
-- Eventuale Richiesta dell’Anticipo relativo (Missioni);
+- Eventuale Richiesta dell’Anticipo relativo e inserimento dei dati del mandato da parte del validatore (Missioni);
 - Processo autorizzativo previsto per l’Ordine di Missione (Scrivania Digitale);
 - Richiesta del conseguente Rimborso della Missione (Missioni);
 - Processo autorizzativo del Rimborso Missione (Scrivania Digitale);
+- Annullamento di un Ordine di Missione approvato e di un Rimborso Missione approvato, con relativo processo autorizzativo (Missioni);
 - Invio automatico dei dati alla procedura Contabile per la liquidazione del rimborso (Sigla);
 - Invio automatico dei dati verso la procedura di Rilevazione presenze;
 
@@ -60,6 +61,9 @@ Nella figura precedente si individuano:
    Direttore controllando la documentazione, sia dell’ordine che del rimborso, prima
    dell’invio alla firma (Segreterie) e poi successivamente degli aspetti contabili ai fini della
    liquidazione del rimborso missione.
+6. Il validatore della Uo di spesa, che sull’ordine di missione approvato con richiesta di anticipo
+   inserisce i dati del mandato; il rimborso (e l’annullamento dell’ordine) potrà essere inserito
+   solo dopo tale operazione.
 
 Lo schema seguente chiarisce, rispetto al processo **Proposta di Ordine** di Missione ed eventuali
 **Anticipo**, quali azioni sono previste:

@@ -1906,27 +1906,19 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
         });
     };
 
-    var salvaMandato = function(definitivo) {
+    // salvataggio unico (definitivo): dopo il salvataggio i dati del mandato non sono più modificabili
+    var eseguiSalvataggioMandato = function() {
         $rootScope.salvataggio = true;
-        $http.put('api/rest/ordineMissione/anticipo/mandato', pulisciAnticipoMandato($scope.anticipoMandato), {params: {definitivo: definitivo}}).then(function(response) {
+        $http.put('api/rest/ordineMissione/anticipo/mandato', pulisciAnticipoMandato($scope.anticipoMandato), {params: {definitivo: true}}).then(function(response) {
             $rootScope.salvataggio = false;
             $scope.anticipoMandato = pulisciAnticipoMandato(response.data);
-            ui.ok_message(definitivo ? "Dati del mandato salvati in definitivo." : "Dati del mandato salvati in bozza.");
+            ui.ok_message("Dati del mandato salvati.");
         }, function() {
             $rootScope.salvataggio = false;
         });
     };
 
-    $scope.salvaMandatoBozza = function() {
-        var m = $scope.anticipoMandato;
-        if ((m.anticipoAnnoMandato || m.anticipoNumeroMandato) && !$scope.mandatoVerificato) {
-            ui.error("Verificare l'esistenza del mandato cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
-            return;
-        }
-        salvaMandato(false);
-    };
-
-    $scope.salvaMandatoDefinitivo = function() {
+    $scope.salvaMandato = function() {
         var m = $scope.anticipoMandato;
         if (!m.modpag) {
             ui.error("Indicare la Modalità di Pagamento");
@@ -1945,10 +1937,8 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             ui.error("Verificare l'esistenza del mandato cliccando sull'icona <span class=\"glyphicon glyphicon-search\"></span>");
             return;
         }
-        ui.confirmCRUD("Si stanno salvando in definitivo i dati del mandato dell'Ordine di Missione Numero: " + $scope.ordineMissioneModel.numero +
-            ". Dopo il salvataggio non saranno più modificabili e verranno riportati nel rimborso. Si desidera continuare?", function() {
-            salvaMandato(true);
-        });
+        ui.confirmCRUD("Si stanno salvando i dati del mandato dell'Ordine di Missione Numero: " + $scope.ordineMissioneModel.numero +
+            ". Dopo il salvataggio non saranno più modificabili e verranno riportati nel rimborso. Si desidera continuare?", eseguiSalvataggioMandato);
     };
 
     $scope.histories = [];

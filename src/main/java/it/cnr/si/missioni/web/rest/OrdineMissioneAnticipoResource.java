@@ -139,7 +139,7 @@ public class OrdineMissioneAnticipoResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> salvaMandatoAnticipo(@RequestBody OrdineMissioneAnticipo ordineMissioneAnticipo,
-                                                  @RequestParam(value = "definitivo", defaultValue = "false") Boolean definitivo,
+                                                  @RequestParam(value = "definitivo", defaultValue = "true") Boolean definitivo,
                                                   HttpServletRequest request, HttpServletResponse response) {
         try {
             ordineMissioneAnticipo = ordineMissioneAnticipoService.salvaMandato(ordineMissioneAnticipo, definitivo);

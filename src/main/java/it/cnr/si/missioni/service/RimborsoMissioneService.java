@@ -839,7 +839,7 @@ public class RimborsoMissioneService {
             if (controlloDefinitivo) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile inserire il rimborso: per l'ordine di missione "
                         + ordineMissione.getAnno() + "/" + ordineMissione.getNumero()
-                        + " è stato richiesto l'anticipo e i dati del mandato non sono ancora stati salvati in definitivo.");
+                        + " è stato richiesto l'anticipo e i dati del mandato non sono ancora stati salvati.");
             }
             return;
         }

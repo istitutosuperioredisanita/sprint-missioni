@@ -392,14 +392,10 @@
             "invia" : "Invia",
             "sendToValidate" : "Invia per la Validazione",
             "dettagli-presunti": "Dettagli Spese Presunte",
-            "mandato-bozza": "Salva Mandato in Bozza",
-            "mandato-definitivo": "Salva Mandato Definitivo"
+            "mandato-salva": "Salva Mandato"
         },
         "mandato": {
-            "titolo": "Dati Anticipo e Mandato",
-            "stato-da-compilare": "Da compilare",
-            "stato-bozza": "Salvato in bozza",
-            "stato-definitivo": "Salvato in definitivo"
+            "titolo-mandato-anticipo": "Dati Mandato Anticipo"
         },
         "messages": {
             "error": {
@@ -581,6 +577,7 @@
             "consenti-rimborso": "Consentire la richiesta di rimborso delle spese di missione già sostenute"
         },
         "button": {
+            "savedraft": "Salva in Bozza",
             "print": "Stampa Annullamento",
             "confirm": "Conferma l'Annullamento dell'Ordine di Missione"
         }
@@ -593,6 +590,7 @@
             "motivo-annullamento": "Motivo di Annullamento"
         },
         "button": {
+            "savedraft": "Salva in Bozza",
             "print": "Stampa Annullamento",
             "confirm": "Conferma l'Annullamento del Rimborso Missione"
         }

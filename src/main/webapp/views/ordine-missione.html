@@ -436,14 +436,50 @@
                      </span>
                             </p>
                         </form>
-                        <!-- Dati del mandato dell'anticipo: ordine firmato e definitivo, compilati dai validatori -->
-                        <div class="col-md-12" ng-if="mostraSezioneMandato()">
-                            <h4 class="text-center">
-                                {{'ordine-missione.mandato.titolo' | translate}}
-                                <span ng-show="!anticipoMandato.statoMandato" class="label label-default">{{'ordine-missione.mandato.stato-da-compilare' | translate}}</span>
-                                <span ng-show="anticipoMandato.statoMandato == 'INS'" class="label label-warning">{{'ordine-missione.mandato.stato-bozza' | translate}}</span>
-                                <span ng-show="anticipoMandato.statoMandato == 'DEF'" class="label label-success">{{'ordine-missione.mandato.stato-definitivo' | translate}}</span>
-                            </h4>
+                        <form class="form-inline" role="form" id="missioni">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-auto">
+                                        <ul class="pager" ng-show="showEsisteOrdineMissione">
+                                            <li><a ng-click="goDettagliSpesaPresunta()" translate="ordine-missione.button.dettagli-presunti"></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
+                            <p class="col-md-12">
+                     <span class="input-group">
+                        <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
+                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.uoCompetenza"/>
+                        <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-competenza' | translate}}" >
+                           <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
+                        </ui-select-match>
+                        <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUoCompetenza | filter: $select.search">
+                           <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
+                        </ui-select-choices>
+                         </ui-select>
+                     </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-12">
+                     <span class="input-group" ng-show="validazione === 'S'">
+                     <span class="input-group-addon" translate="ordine-missione.form.note-segreteria">Note Segreteria</span>
+                     <textarea
+                             class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="ordineMissioneModel.noteSegreteria" rows = "2">
+                     </textarea>
+                     </span>
+                            </p>
+                        </form>
+                </div>
+            </div>
+            <!-- Sezione Dati Mandato Anticipo -->
+            <div class="panel panel-default border-color-ocra" ng-if="mostraSezioneMandato()">
+                <div class="panel-heading color-ocra text-center">
+                    <h3 class="panel-title color-ocra">{{'ordine-missione.mandato.titolo-mandato-anticipo' | translate}}</h3>
+                </div>
+                <div class="panel-body my-panel-body">
                             <div class="row">
                                 <form class="form-inline" role="form" id="missioni">
                                     <p class="col-md-12">
@@ -513,53 +549,14 @@
                             </div>
                             <div class="row" ng-show="mandatoModificabile()">
                                 <p class="col-md-12">
-                                    <button type="button" class="btn btn-info" ng-click="salvaMandatoBozza()" data-toggle="tooltip" title="{{'ordine-missione.button.mandato-bozza' | translate}}"><span class="glyphicon glyphicon-floppy-disk" style="color:white"></span>&nbsp;{{'ordine-missione.button.mandato-bozza' | translate}}</button>
-                                    &nbsp;
-                                    <button type="button" class="btn btn-success" ng-click="salvaMandatoDefinitivo()" data-toggle="tooltip" title="{{'ordine-missione.button.mandato-definitivo' | translate}}"><span class="glyphicon glyphicon-lock" style="color:white"></span>&nbsp;{{'ordine-missione.button.mandato-definitivo' | translate}}</button>
+                                    <button type="button" class="btn btn-success" ng-click="salvaMandato()" data-toggle="tooltip" title="{{'ordine-missione.button.mandato-salva' | translate}}"><span class="glyphicon glyphicon-floppy-disk" style="color:white"></span>&nbsp;{{'ordine-missione.button.mandato-salva' | translate}}</button>
                                 </p>
                             </div>
-                        </div>
-                        <form class="form-inline" role="form" id="missioni">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-auto">
-                                        <ul class="pager" ng-show="showEsisteOrdineMissione">
-                                            <li><a ng-click="goDettagliSpesaPresunta()" translate="ordine-missione.button.dettagli-presunti"></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni" ng-show="elencoUoCompetenza">
-                            <p class="col-md-12">
-                     <span class="input-group">
-                        <span class="input-group-addon label-input-group-for-select" translate="missione.form.uo-competenza">uo</span>
-                        <ui-select id="missioni-ui-select" theme="select2" ng-disabled="validazione || disabilitaOrdineMissione" ng-model="ordineMissioneModel.uoCompetenza"/>
-                        <ui-select-match id="missioni" allow-clear="true" placeholder="{{'missione.form.uo-competenza' | translate}}" >
-                           <span ng-bind="$select.selected.cd_unita_organizzativa+' '+$select.selected.ds_unita_organizzativa"></span>
-                        </ui-select-match>
-                        <ui-select-choices repeat="uo.cd_unita_organizzativa as uo in elencoUoCompetenza | filter: $select.search">
-                           <span ng-bind="uo.cd_unita_organizzativa+' '+uo.ds_unita_organizzativa"></span>
-                        </ui-select-choices>
-                         </ui-select>
-                     </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-12">
-                     <span class="input-group" ng-show="validazione === 'S'">
-                     <span class="input-group-addon" translate="ordine-missione.form.note-segreteria">Note Segreteria</span>
-                     <textarea
-                             class="input-sm form-control" placeholder="{{'ordine-missione.form.note-segreteria.placeholder' | translate}}" name="noteSegreteria" ng-model="ordineMissioneModel.noteSegreteria" rows = "2">
-                     </textarea>
-                     </span>
-                            </p>
-                        </form>
                 </div>
             </div>
             <div class="panel panel-info" ng-show="showEsisteOrdineMissione">
-                <div class="panel-heading color-verde-scuro text-center">
-                    <h3 class="panel-title color-verde-scuro" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
+                <div class="panel-heading color-grigio-ardesia text-center">
+                    <h3 class="panel-title color-grigio-ardesia" translate="missione.form.box-add-auth">Informazioni aggiuntive</h3>
                 </div>
                 <div class="panel-body my-panel-body">
                     <form class="form-inline" role="form" id="missioni" ng-show="showResponsabile && ordineMissioneModel.missioneGratuita != 'S'">
@@ -612,7 +609,7 @@
             </div>
             <form class="form-inline col-md-12" role="form" id="missioni" >
                 <div class="panel panel-default" ng-if="ordineMissioneModel.id && (ordineMissioneModel.isFireSearchAttachments == true || ordineMissioneModel.isFireSearchAttachments == false )">
-                    <div class="panel-heading color-verde-chiaro text-center">
+                    <div class="panel-heading color-malva text-center">
                         <h1 class="panel-title">Allegati</h1>
                     </div>
                     <div class="panel-body my-panel-body">

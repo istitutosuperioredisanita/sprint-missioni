@@ -286,43 +286,6 @@
                             </p>
                         </form>
                     </div>
-                    <!-- dati del mandato: compilati dai validatori sull'ordine firmato, qui in sola lettura -->
-                    <div class="row" id="missioni" ng-show="datiPagamentoDaOrdine || rimborsoMissioneModel.anticipoRicevuto == 'S'">
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-2">
-                        <span class="input-group">
-                        <span class="input-group-addon" translate="rimborso-missione.form.anticipo-ricevuto">Anticipi Ricevuti</span>
-                        <label class="checkbox">
-                        <input ng-disabled="true" type="checkbox" ng-model="rimborsoMissioneModel.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
-                        </label>
-                        </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-3">
-                        <span class="input-group">
-                        <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
-                        <input ng-disabled="true" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
-                        </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-3">
-                        <span class="input-group">
-                        <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
-                        <input ng-disabled="true" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
-                        </span>
-                            </p>
-                        </form>
-                        <form class="form-inline" role="form" id="missioni">
-                            <p class="col-md-4">
-                        <span class="input-group">
-                        <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
-                        <input ng-disabled="true" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
-                        </span>
-                            </p>
-                        </form>
-                    </div>
                     <div class="row" id="missioni">
                         <!--<p class="col-md-9">
                            <span class="input-group">
@@ -333,13 +296,13 @@
                         <p class="col-md-3">
                      <span class="input-group">
                      <span class="input-group-addon" translate="rimborso-missione.form.altre-spese-importo">altri anticipi importo</span>
-                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-altri-anticipi" ng-model="rimborsoMissioneModel.altreSpeseAntImporto" currency-symbol="">
+                     <input ng-disabled="validazione || disabilitaRimborsoMissione || !rimborsoMissioneModel.idOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-altri-anticipi" ng-model="rimborsoMissioneModel.altreSpeseAntImporto" currency-symbol="">
                      </span>
                         </p>
                         <p class="col-md-3">
                      <span class="input-group">
                      <span class="input-group-addon" translate="rimborso-missione.form.rimborso-spese-terzi-importo">Rimborso da terzi importo</span>
-                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-rimborso-terzi" ng-model="rimborsoMissioneModel.speseTerziImporto" currency-symbol="">
+                     <input ng-disabled="validazione || disabilitaRimborsoMissione || !rimborsoMissioneModel.idOrdineMissione" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-rimborso-terzi" ng-model="rimborsoMissioneModel.speseTerziImporto" currency-symbol="">
                      </span>
                         </p>
                     </div>
@@ -349,7 +312,7 @@
                         <span class="input-group">
                         <span class="input-group-addon" translate="rimborso-missione.form.rimborso-spese-terzi">Rimborso da terzi</span>
                         <label class="checkbox">
-                        <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.speseTerziRicevute" ng-true-value="S" ng-false-value="N">
+                        <input ng-disabled="validazione || disabilitaRimborsoMissione || !rimborsoMissioneModel.idOrdineMissione" type="checkbox" ng-model="rimborsoMissioneModel.speseTerziRicevute" ng-true-value="S" ng-false-value="N">
                         </label>
                         </span>
                             </p>
@@ -611,9 +574,53 @@
                     </form>
                 </div>
             </div>
+            <!-- Sezione Dati Mandato Anticipo: presente solo se l'ordine ha una richiesta di anticipo -->
+            <div class="panel panel-default border-color-ocra" ng-if="ordineConAnticipo">
+                <div class="panel-heading color-ocra text-center">
+                    <h3 class="panel-title color-ocra">{{'ordine-missione.mandato.titolo-mandato-anticipo' | translate}}</h3>
+                </div>
+                <div class="panel-body my-panel-body">
+                        <div class="row" id="missioni">
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-2">
+                        <span class="input-group">
+                        <span class="input-group-addon" translate="rimborso-missione.form.anticipo-ricevuto">Anticipi Ricevuti</span>
+                        <label class="checkbox">
+                        <input ng-disabled="true" type="checkbox" ng-model="rimborsoMissioneModel.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
+                        </label>
+                        </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-3">
+                        <span class="input-group">
+                        <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
+                        <input ng-disabled="true" type="number" style="text-align:center" class="input-sm form-control" name="anno-mandato" ng-model="rimborsoMissioneModel.anticipoAnnoMandato"/>
+                        </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-3">
+                        <span class="input-group">
+                        <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
+                        <input ng-disabled="true" type="number" style="text-align:center" class="input-sm form-control" name="numero-mandato" ng-model="rimborsoMissioneModel.anticipoNumeroMandato"/>
+                        </span>
+                            </p>
+                        </form>
+                        <form class="form-inline" role="form" id="missioni">
+                            <p class="col-md-4">
+                        <span class="input-group">
+                        <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
+                        <input ng-disabled="true" type="text" class="input-sm form-control" style="text-align:right" ng-currency name="importo-mandato" ng-model="rimborsoMissioneModel.anticipoImporto" currency-symbol="">
+                        </span>
+                            </p>
+                        </form>
+                        </div>
+                </div>
+            </div>
             <div class="panel panel-info">
-                <div class="panel-heading color-verde-giada text-center">
-                    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
+                <div class="panel-heading color-grigio-ardesia text-center">
+                    <h3 class="panel-title color-grigio-ardesia" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
                 </div>
                 <div class="panel-body my-panel-body">
                     <form class="form-inline" role="form" id="missioni">
@@ -705,7 +712,7 @@
             </div>
             <form class="form-inline col-md-12" role="form" id="missioni">
                 <div class="panel panel-default" ng-if="rimborsoMissioneModel.id && (rimborsoMissioneModel.isFireSearchAttachments == true || rimborsoMissioneModel.isFireSearchAttachments == false )">
-                    <div class="panel-heading color-verde-chiaro text-center">
+                    <div class="panel-heading color-malva text-center">
                         <h1 class="panel-title">Allegati della missione (non allegare in questa sezione scontrini/ricevute che riguardano i dettagli spesa)</h1>
                     </div>
                     <div class="panel-body my-panel-body">
@@ -805,7 +812,7 @@
             </form>
             <form class="form-inline col-md-12" role="form" id="missioni" ng-show="rimborsoMissioneModel.stato == 'ANA'">
                 <div class="panel panel-default" >
-                    <div class="panel-heading color-verde-chiaro text-center">
+                    <div class="panel-heading color-azzurro-polvere text-center">
                         <h1 class="panel-title" >Allegati dell'annullamento del rimborso missione</h1>
                     </div>
                     <div class="panel-body my-panel-body">

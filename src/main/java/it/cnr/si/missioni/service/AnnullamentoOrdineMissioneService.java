@@ -653,7 +653,7 @@ public class AnnullamentoOrdineMissioneService {
                 if (!ordineMissioneService.isOrdineDefinitivoConMandato(ordineMissione)) {
                     throw new AwesomeException(CodiciErrore.ERRGEN, "Non è possibile annullare l'ordine di missione "
                             + ordineMissione.getAnno() + "/" + ordineMissione.getNumero()
-                            + ": è stato richiesto l'anticipo e i dati del mandato non sono ancora stati salvati in definitivo dal validatore.");
+                            + ": è stato richiesto l'anticipo e i dati del mandato non sono ancora stati salvati dal validatore.");
                 }
                 annullamento.setOrdineMissione(ordineMissione);
             } else {

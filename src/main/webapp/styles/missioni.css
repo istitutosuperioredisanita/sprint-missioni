@@ -26,40 +26,71 @@
 }
 
 .color-rosso-bruno {
-  background-color: #b27b60 !important;
-  border-color: #b27b60 !important;
-  color: #fff;
+  background-color: #d1b39f !important;
+  border-color: #d1b39f !important;
+  color: #3a3a3a;
 }
 
 .color-verde-scuro {
-  background-color: #6ca25a !important;
-  border-color: #6ca25a !important;
-  color: #fff;
+  background-color: #a5d4a9 !important;
+  border-color: #a5d4a9 !important;
+  color: #3a3a3a;
 }
 
 .color-verde-chiaro {
-  background-color: #5cb85c !important;
-  border-color: #5cb85c !important;
-  color: #fff !important;
+  background-color: #afdebb !important;
+  border-color: #afdebb !important;
+  color: #3a3a3a !important;
   padding: 5px 10px;
 }
 
 .color-rosso-mattone {
-  background-color: #cc8664 !important;
-  border-color: #cc8664 !important;
-  color: #fff;
+  background-color: #e6b4a8 !important;
+  border-color: #e6b4a8 !important;
+  color: #3a3a3a;
 }
 
 .color-verde-giada {
-  background-color: #77a863 !important;
-  border-color: #77a863 !important;
-  color: #fff;
+  background-color: #acd6a4 !important;
+  border-color: #acd6a4 !important;
+  color: #3a3a3a;
 }
 
 .color-celeste-avion {
-  background-color: #b0b2ff !important;
-  border-color: #b0b2ff !important;
-  color: #fff !important;
+  background-color: #b6bded !important;
+  border-color: #b6bded !important;
+  color: #3a3a3a !important;
+}
+
+/* colori delle sezioni */
+.color-ocra {
+  background-color: #e4d195 !important;
+  border-color: #e4d195 !important;
+  color: #3a3a3a !important;
+}
+
+.border-color-ocra {
+  border-color: #e4d195 !important;
+}
+
+.color-grigio-ardesia {
+  background-color: #b2bdc7 !important;
+  border-color: #b2bdc7 !important;
+  color: #3a3a3a !important;
+}
+
+.color-malva {
+  background-color: #d8b6d8 !important;
+  border-color: #d8b6d8 !important;
+  color: #3a3a3a !important;
+  padding: 5px 10px;
+}
+
+.color-azzurro-polvere {
+  background-color: #9ccdde !important;
+  border-color: #9ccdde !important;
+  color: #3a3a3a !important;
+  padding: 5px 10px;
 }
 
 .align-left {
@@ -311,3 +342,15 @@ iframe {
 }
 
 
+
+/* home: colori per tipo di documento il titolo e' evidenziato solo dietro al testo */
+.color-tipo-ordine { background-color: #9ad6c7 !important; border-color: #9ad6c7 !important; color: #3a3a3a !important; }
+.color-tipo-rimborso { background-color: #c8b3e6 !important; border-color: #c8b3e6 !important; color: #3a3a3a !important; }
+.color-tipo-annullamento-ordine { background-color: #eab8c9 !important; border-color: #eab8c9 !important; color: #3a3a3a !important; }
+.color-tipo-annullamento-rimborso { background-color: #d0da8b !important; border-color: #d0da8b !important; color: #3a3a3a !important; }
+h2[class*="color-tipo-"] { display: table; margin-left: auto; margin-right: auto; padding: 0 4px; }
+
+.tabella-tipo-ordine > thead > tr > th { background-color: #9ad6c7; color: #3a3a3a; }
+.tabella-tipo-rimborso > thead > tr > th { background-color: #c8b3e6; color: #3a3a3a; }
+.tabella-tipo-annullamento-ordine > thead > tr > th { background-color: #eab8c9; color: #3a3a3a; }
+.tabella-tipo-annullamento-rimborso > thead > tr > th { background-color: #d0da8b; color: #3a3a3a; }

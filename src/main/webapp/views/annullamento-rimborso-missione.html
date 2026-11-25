@@ -273,9 +273,48 @@
   </div>
 </div>
 
+<!-- Sezione Dati Mandato Anticipo: presente solo se l'ordine ha una richiesta di anticipo -->
+<div class="panel panel-default border-color-ocra" ng-if="ordineConAnticipo">
+    <div class="panel-heading color-ocra text-center">
+        <h3 class="panel-title color-ocra">{{'ordine-missione.mandato.titolo-mandato-anticipo' | translate}}</h3>
+    </div>
+    <div class="panel-body my-panel-body">
+            <div class="row">
+                <form class="form-inline" role="form" id="missioni">
+                    <p class="col-md-3">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.anticipo-ricevuto">Anticipo Ricevuto</span>
+                            <label class="checkbox">
+                                <input ng-disabled="true" type="checkbox" ng-model="annullamentoModel.rimborsoMissione.anticipoRicevuto" ng-true-value="S" ng-false-value="N">
+                            </label>
+                        </span>
+                    </p>
+                    <p class="col-md-3">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.anno-mandato">anno</span>
+                            <input ng-disabled="true" type="text" style="text-align:center" class="input-sm form-control" ng-model="annullamentoModel.rimborsoMissione.anticipoAnnoMandato">
+                        </span>
+                    </p>
+                    <p class="col-md-3">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.numero-mandato">numero</span>
+                            <input ng-disabled="true" type="text" style="text-align:center" class="input-sm form-control" ng-model="annullamentoModel.rimborsoMissione.anticipoNumeroMandato">
+                        </span>
+                    </p>
+                    <p class="col-md-3">
+                        <span class="input-group">
+                            <span class="input-group-addon" translate="rimborso-missione.form.importo-mandato">importo mandato</span>
+                            <input ng-disabled="true" type="text" class="input-sm form-control" style="text-align:right" ng-currency ng-model="annullamentoModel.rimborsoMissione.anticipoImporto" currency-symbol="">
+                        </span>
+                    </p>
+                </form>
+            </div>
+    </div>
+</div>
+
 <div class="panel panel-info" ng-hide="!annullamentoModel.idRimborsoMissione">
-  <div class="panel-heading color-verde-giada text-center">
-    <h3 class="panel-title color-verde-giada" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
+  <div class="panel-heading color-grigio-ardesia text-center">
+    <h3 class="panel-title color-grigio-ardesia" translate="missione.form.box-add-auth">Informazioni anagrafiche</h3>
   </div>
      <div class="panel-body my-panel-body">
             <form class="form-inline" role="form" id="missioni">
@@ -318,7 +357,7 @@
     </div>
 <form class="form-inline col-md-12" role="form" id="missioni">
 <div class="panel panel-default" ng-if="annullamentoModel.id && (annullamentoModel.isFireSearchAttachments == true || annullamentoModel.isFireSearchAttachments == false )">
-  <div class="panel-heading color-verde-chiaro text-center">
+  <div class="panel-heading color-malva text-center">
     <h1 class="panel-title">Allegati dell'annullamento del rimborso missione*</h1>
   </div>
   <div class="panel-body my-panel-body">
@@ -341,8 +380,8 @@
 </div>
 </form>
             <form name="form-inline" role="form" novalidate ng-submit="save()" show-validation id="missioni">
-                    <div class="col-xs-4" >
-                            <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="{{'global.button.save' | translate}}"><span class="glyphicon glyphicon-ok" style="color:white"></span>&nbsp;{{'global.button.save' | translate}}</button>
+                    <div class="col-xs-4" ng-show="!validazione && !disabilitaAnnullamento && ((annullamentoModel.stato == 'CON' && utenteAbilitatoValidareUo == 'S') || annullamentoModel.stato == 'INS' || !showEsisteAnnullamento)">
+                            <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary" data-toggle="tooltip" title="{{'annullamento-rimborso-missione.button.savedraft' | translate}}"><span class="glyphicon glyphicon-list-alt" style="color:white"></span>&nbsp;{{'annullamento-rimborso-missione.button.savedraft' | translate}}</button>
                     </div>
             </form>
             <form name="form-inline" role="form" ng-submit="confirm()" ng-show="annullamentoModel.id && (uoForUsersSpecial || accountModel.uoForUsersSpecial || utenteAbilitatoValidareUo == 'S')">

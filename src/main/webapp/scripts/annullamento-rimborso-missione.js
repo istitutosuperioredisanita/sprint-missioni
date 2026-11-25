@@ -41,6 +41,18 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
         }
     }
     
+    // Dati Mandato Anticipo: visibili in ogni stato quando l'ordine ha una richiesta di anticipo
+    $scope.ordineConAnticipo = false;
+    $scope.$watch('annullamentoModel.rimborsoMissione.ordineMissione.id', function(idOrdine) {
+        $scope.ordineConAnticipo = false;
+        if (!idOrdine) {
+            return;
+        }
+        $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: idOrdine}}).then(function(response) {
+            $scope.ordineConAnticipo = !!(response.data && response.data.id);
+        });
+    });
+
     $scope.reloadRimborsoMissione = function(idRimborsoMissione){
         $scope.annullamentoModel = {};
 
@@ -826,6 +838,8 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                             $scope.viewAttachments($scope.annullamentoModel.id);
                             $scope.annullamentoModel.idRimborsoMissione = $scope.annullamentoModel.rimborsoMissione.id;
                             $rootScope.salvataggio = false;
+                            $scope.disabilitaAnnullamento = impostaDisabilitaAnnullamento();
+                            ui.ok_message("Annullamento Rimborso Missione modificato in bozza con successo");
                         },
                         function (httpResponse) {
                                 $rootScope.salvataggio = false;
@@ -842,6 +856,7 @@ missioniApp.controller('AnnullamentoRimborsoMissioneController', function ($root
                             $scope.inizializzaFormPerModifica();
                             $scope.viewAttachments($scope.annullamentoModel.id);
                             $scope.annullamentoModel.isFireSearchAttachments = false;
+                            ui.ok_message("Annullamento Rimborso Missione salvato in bozza con successo");
                             var path = $location.path();
                             $location.path(path+'/'+$scope.annullamentoModel.id);
                         },

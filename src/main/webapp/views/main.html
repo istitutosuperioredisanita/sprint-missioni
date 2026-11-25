@@ -53,7 +53,7 @@
     </div>
 
   <div ng-show="ricercaFinita">
-    <table ng-show="esistonoAnnullamentiRespinti" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoAnnullamentiRespinti" class="tabella-tipo-annullamento-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -86,7 +86,7 @@
         </tr>
       </tbody>  
     </table>
-    <table ng-show="esistonoOrdiniRespinti" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniRespinti" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -121,9 +121,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoRimborsiRespinti" class="text-center color-rosso-mattone" translate="main.subtitle_ko_rimborso"></h2>
+        <h2 ng-show="esistonoRimborsiRespinti" class="text-center color-tipo-rimborso" translate="main.subtitle_ko_rimborso"></h2>
     </div>
-    <table ng-show="esistonoRimborsiRespinti" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiRespinti" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -158,9 +158,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoOrdiniResponsabileGruppo" class="text-center color-rosso-mattone" translate="main.subtitle_resp_gruppo"></h2>
+        <h2 ng-show="esistonoOrdiniResponsabileGruppo" class="text-center color-tipo-ordine" translate="main.subtitle_resp_gruppo"></h2>
     </div>
-    <table ng-show="esistonoOrdiniResponsabileGruppo" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniResponsabileGruppo" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -193,9 +193,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoAnnullamentiApprovati" class="text-center" translate="main.subtitle_approvato_annullamento"></h2>
+        <h2 ng-show="esistonoAnnullamentiApprovati" class="text-center color-tipo-annullamento-ordine" translate="main.subtitle_approvato_annullamento"></h2>
     </div>
-    <table ng-show="esistonoAnnullamentiApprovati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoAnnullamentiApprovati" class="tabella-tipo-annullamento-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -227,9 +227,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoOrdiniApprovati" class="text-center" translate="main.subtitle_approvato"></h2>
+        <h2 ng-show="esistonoOrdiniApprovati" class="text-center color-tipo-ordine" translate="main.subtitle_approvato"></h2>
     </div>
-    <table ng-show="esistonoOrdiniApprovati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniApprovati" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -262,9 +262,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoRimborsiApprovati" class="text-center" translate="main.subtitle_approvato_rimborso"></h2>
+        <h2 ng-show="esistonoRimborsiApprovati" class="text-center color-tipo-rimborso" translate="main.subtitle_approvato_rimborso"></h2>
     </div>
-    <table ng-show="esistonoRimborsiApprovati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiApprovati" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'rimborsoMissione.form.anno' | translate}}</th>
@@ -297,9 +297,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoOrdiniAnnullati" class="text-center" translate="main.subtitle_annullato"></h2>
+        <h2 ng-show="esistonoOrdiniAnnullati" class="text-center color-tipo-ordine" translate="main.subtitle_annullato"></h2>
     </div>
-    <table ng-show="esistonoOrdiniAnnullati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniAnnullati" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -332,9 +332,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoRimborsiAnnullati" class="text-center" translate="main.subtitle_annullato_rimborso"></h2>
+        <h2 ng-show="esistonoRimborsiAnnullati" class="text-center color-tipo-rimborso" translate="main.subtitle_annullato_rimborso"></h2>
     </div>
-    <table ng-show="esistonoRimborsiAnnullati" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiAnnullati" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -367,9 +367,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoOrdiniDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare"></h2>
+        <h2 ng-show="esistonoOrdiniDaValidare" class="text-center color-tipo-ordine" translate="main.subtitle_da_validare"></h2>
     </div>
-    <table ng-show="esistonoOrdiniDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniDaValidare" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -400,9 +400,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoAnnullamentiDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare_annullamenti"></h2>
+        <h2 ng-show="esistonoAnnullamentiDaValidare" class="text-center color-tipo-annullamento-ordine" translate="main.subtitle_da_validare_annullamenti"></h2>
     </div>
-    <table ng-show="esistonoAnnullamentiDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoAnnullamentiDaValidare" class="tabella-tipo-annullamento-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -432,9 +432,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoRimborsiDaValidare" class="text-center color-celeste-avion" translate="main.subtitle_da_validare_rimborso"></h2>
+        <h2 ng-show="esistonoRimborsiDaValidare" class="text-center color-tipo-rimborso" translate="main.subtitle_da_validare_rimborso"></h2>
     </div>
-    <table ng-show="esistonoRimborsiDaValidare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiDaValidare" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -465,9 +465,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoRimborsiAllaValidazioneAmm" class="text-center" translate="main.subtitle_da_validare_rimborso_amm"></h2>
+        <h2 ng-show="esistonoRimborsiAllaValidazioneAmm" class="text-center color-tipo-rimborso" translate="main.subtitle_da_validare_rimborso_amm"></h2>
     </div>
-    <table ng-show="esistonoRimborsiAllaValidazioneAmm" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiAllaValidazioneAmm" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -498,9 +498,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoAnnullamentiDaConfermare" class="text-center" translate="main.subtitle_da_confermare_annullamenti"></h2>
+        <h2 ng-show="esistonoAnnullamentiDaConfermare" class="text-center color-tipo-annullamento-ordine" translate="main.subtitle_da_confermare_annullamenti"></h2>
     </div>
-    <table ng-show="esistonoAnnullamentiDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoAnnullamentiDaConfermare" class="tabella-tipo-annullamento-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -532,9 +532,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoAnnullamentiRimborsiDaConfermare" class="text-center" translate="main.subtitle_da_confermare_annullamenti_rimborsi"></h2>
+        <h2 ng-show="esistonoAnnullamentiRimborsiDaConfermare" class="text-center color-tipo-annullamento-rimborso" translate="main.subtitle_da_confermare_annullamenti_rimborsi"></h2>
     </div>
-    <table ng-show="esistonoAnnullamentiRimborsiDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoAnnullamentiRimborsiDaConfermare" class="tabella-tipo-annullamento-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -564,9 +564,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoOrdiniDaConfermare" class="text-center" translate="main.subtitle_da_confermare"></h2>
+        <h2 ng-show="esistonoOrdiniDaConfermare" class="text-center color-tipo-ordine" translate="main.subtitle_da_confermare"></h2>
     </div>
-    <table ng-show="esistonoOrdiniDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniDaConfermare" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -599,9 +599,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoRimborsiDaConfermare" class="text-center" translate="main.subtitle_da_confermare_rimborso"></h2>
+        <h2 ng-show="esistonoRimborsiDaConfermare" class="text-center color-tipo-rimborso" translate="main.subtitle_da_confermare_rimborso"></h2>
     </div>
-    <table ng-show="esistonoRimborsiDaConfermare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiDaConfermare" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -634,9 +634,9 @@
     </table>
 
     <div class="row">
-        <h2 ng-show="esistonoAnnullamentiDaApprovare" class="text-center" translate="main.subtitle_da_approvare_annullamenti"></h2>
+        <h2 ng-show="esistonoAnnullamentiDaApprovare" class="text-center color-tipo-annullamento-ordine" translate="main.subtitle_da_approvare_annullamenti"></h2>
     </div>
-    <table ng-show="esistonoAnnullamentiDaApprovare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoAnnullamentiDaApprovare" class="tabella-tipo-annullamento-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -668,9 +668,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoOrdiniDaApprovare" class="text-center" translate="main.subtitle_da_approvare"></h2>
+        <h2 ng-show="esistonoOrdiniDaApprovare" class="text-center color-tipo-ordine" translate="main.subtitle_da_approvare"></h2>
     </div>
-    <table ng-show="esistonoOrdiniDaApprovare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniDaApprovare" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -702,9 +702,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoRimborsiDaApprovare" class="text-center" translate="main.subtitle_da_approvare_rimborso"></h2>
+        <h2 ng-show="esistonoRimborsiDaApprovare" class="text-center color-tipo-rimborso" translate="main.subtitle_da_approvare_rimborso"></h2>
     </div>
-    <table ng-show="esistonoRimborsiDaApprovare" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoRimborsiDaApprovare" class="tabella-tipo-rimborso table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>
@@ -736,9 +736,9 @@
       </tbody>  
     </table>
     <div class="row">
-        <h2 ng-show="esistonoOrdiniDaRendereDefinitivi" class="text-center" translate="main.subtitle_da_rendere_definitivi"></h2>
+        <h2 ng-show="esistonoOrdiniDaRendereDefinitivi" class="text-center color-tipo-ordine" translate="main.subtitle_da_rendere_definitivi"></h2>
     </div>
-    <table ng-show="esistonoOrdiniDaRendereDefinitivi" class="table table-condensed table-striped table-bordered table-responsive table-selected">
+    <table ng-show="esistonoOrdiniDaRendereDefinitivi" class="tabella-tipo-ordine table table-condensed table-striped table-bordered table-responsive table-selected">
       <thead>
         <tr>
             <th style="text-align: center">{{'missione.form.anno' | translate}}</th>

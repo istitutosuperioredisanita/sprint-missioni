@@ -298,13 +298,18 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     // nuovo rimborso: con richiesta di anticipo è consentito solo se il mandato è salvato in definitivo
     var verificaMandatoOrdinePerNuovoRimborso = function(idOrdineMissione) {
         $scope.datiPagamentoDaOrdine = false;
+        $scope.ordineConAnticipo = false;
         $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: idOrdineMissione}}).then(function(response) {
             var anticipo = response.data;
+            $scope.ordineConAnticipo = !!(anticipo && anticipo.id);
             if (!anticipo || !anticipo.id || !$scope.rimborsoMissioneModel || $scope.rimborsoMissioneModel.idOrdineMissione !== idOrdineMissione) {
                 return;
             }
             if (anticipo.statoMandato !== 'DEF') {
-                ui.error("Per l'ordine di missione selezionato è stato richiesto l'anticipo: il rimborso potrà essere inserito solo dopo che il validatore avrà salvato in definitivo i dati del mandato sull'ordine.");
+                ui.error("Per l'ordine di missione selezionato è stato richiesto l'anticipo: il rimborso potrà essere inserito solo dopo che il validatore avrà salvato i dati del mandato sull'ordine.");
+                // rimborso non inseribile: la sezione Dati Mandato Anticipo non deve comparire
+                $scope.ordineConAnticipo = false;
+                $scope.datiPagamentoDaOrdine = false;
                 $scope.rimborsoMissioneModel = {};
                 return;
             }
@@ -316,11 +321,13 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
     // rimborso esistente: i dati restano quelli del rimborso, non modificabili se l'ordine ha il mandato definitivo
     var impostaDatiPagamentoDaOrdine = function(idOrdineMissione) {
         $scope.datiPagamentoDaOrdine = false;
+        $scope.ordineConAnticipo = false;
         if (!idOrdineMissione) {
             return;
         }
         $http.get('api/rest/ordineMissione/anticipo/get', {params: {idMissione: idOrdineMissione}}).then(function(response) {
             var anticipo = response.data;
+            $scope.ordineConAnticipo = !!(anticipo && anticipo.id);
             $scope.datiPagamentoDaOrdine = !!(anticipo && anticipo.id && anticipo.statoMandato === 'DEF');
         });
     };
