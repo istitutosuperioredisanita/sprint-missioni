@@ -1733,19 +1733,13 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
             if ($scope.ordineMissioneModel.id) {
                 var dataInizio = null;
                 var dataFine = null;
-                if ($scope.ordineMissioneModel.tipoMissione === 'E' && $scope.ordineMissioneModel.trattamento === 'T') {
-                    if (!$scope.ordineMissioneModel.dataInizioEstero || !$scope.ordineMissioneModel.dataFineEstero) {
-                        ui.error("Valorizzare la data di imbarco in partenza e la data di sbarco del ritorno.");
-                    }
-                    dataInizio = $scope.ordineMissioneModel.dataInizioEstero;
-                    dataFine = $scope.ordineMissioneModel.dataFineEstero;
-                } else {
-                    if (!$scope.ordineMissioneModel.dataInizioMissione || !$scope.ordineMissioneModel.dataFineMissione) {
-                        ui.error("Valorizzare le date inizio e fine missione.");
-                    }
-                    dataInizio = $scope.ordineMissioneModel.dataInizioMissione;
-                    dataFine = $scope.ordineMissioneModel.dataFineMissione;
+                // nell'ordine non esistono le date di imbarco/sbarco (solo nel rimborso): si usano sempre le date della missione
+                if (!$scope.ordineMissioneModel.dataInizioMissione || !$scope.ordineMissioneModel.dataFineMissione) {
+                    ui.error("Valorizzare le date inizio e fine missione.");
+                    return;
                 }
+                dataInizio = $scope.ordineMissioneModel.dataInizioMissione;
+                dataFine = $scope.ordineMissioneModel.dataFineMissione;
     
                 if ($scope.validazione) {
                     $location.path('/ordine-missione/ordine-missione-dettagli/' + $scope.ordineMissioneModel.id + '/' + $scope.validazione + '/' + dataInizio + '/' + dataFine);

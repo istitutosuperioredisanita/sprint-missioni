@@ -1676,12 +1676,14 @@ missioniApp.controller('RimborsoMissioneController', function($rootScope, $scope
             if ($scope.rimborsoMissioneModel.tipoMissione === 'E' && $scope.rimborsoMissioneModel.trattamento === 'T') {
                 if (!$scope.rimborsoMissioneModel.dataInizioEstero || !$scope.rimborsoMissioneModel.dataFineEstero) {
                     ui.error("Valorizzare la data di imbarco in partenza e la data di sbarco del ritorno.");
+                    return;
                 }
                 dataInizio = $scope.rimborsoMissioneModel.dataInizioEstero;
                 dataFine = $scope.rimborsoMissioneModel.dataFineEstero;
             } else {
                 if (!$scope.rimborsoMissioneModel.dataInizioMissione || !$scope.rimborsoMissioneModel.dataFineMissione) {
                     ui.error("Valorizzare le date inizio e fine missione.");
+                    return;
                 }
                 dataInizio = $scope.rimborsoMissioneModel.dataInizioMissione;
                 dataFine = $scope.rimborsoMissioneModel.dataFineMissione;
