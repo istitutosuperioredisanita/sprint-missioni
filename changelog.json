@@ -1,5 +1,8 @@
 {
   "fromRevision": "96db9feb2f",
   "dateFormat": "dd/MM/yyyy",
-  "ignoreCommitsIfMessageMatches": "^Merge.*|^Bumped version to.*|^ci(\\(.*\\))?:.*|^chore(\\(.*\\))?:.*"
+  "ignoreCommitsWithoutIssue": true,
+  "customIssues": [
+    { "name": "Note", "pattern": "releaseNotes:[ ]*([^\\n]+)", "link": "", "title": "${PATTERN_GROUP_1}" }
+  ]
 }
