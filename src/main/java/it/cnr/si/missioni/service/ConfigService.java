@@ -51,6 +51,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,7 +173,10 @@ public class ConfigService {
 
     public String getReleaseNotes() {
         try {
-            return IOUtils.toString(this.getClass().getResourceAsStream("/releaseNotes/releaseNotes.md"), StandardCharsets.UTF_8);
+            // solo l'ultima release (la piu' recente e' la prima)
+            String note = IOUtils.toString(Objects.requireNonNull(this.getClass().getResourceAsStream("/releaseNotes/releaseNotes.md")), StandardCharsets.UTF_8);
+            int prossima = note.indexOf("\n## VERSIONE", note.indexOf("## VERSIONE") + 1);
+            return prossima < 0 ? note : note.substring(0, prossima);
         } catch (IOException e) {
             throw new AwesomeException(CodiciErrore.ERRGEN,
                     "File degli aggiornamenti di versione non trovato");

@@ -12,11 +12,18 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Generate CHANGELOG.md
+        run: mvn -B se.bjurr.gitchangelog:git-changelog-maven-plugin:git-changelog
+        env:
+          MAVEN_OPTS: "--add-opens java.base/sun.security.ssl=ALL-UNNAMED"
 
       - name: Build and deploy SNAPSHOT
         run: |

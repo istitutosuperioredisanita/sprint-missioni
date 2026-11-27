@@ -748,6 +748,15 @@
                 <artifactId>git-commit-id-plugin</artifactId>
                 <version>4.9.10</version>
             </plugin>
+            <plugin>
+                <groupId>se.bjurr.gitchangelog</groupId>
+                <artifactId>git-changelog-maven-plugin</artifactId>
+                <version>2.3.0</version>
+                <configuration>
+                    <settingsFile>changelog.json</settingsFile>
+                    <file>src/main/resources/releaseNotes/releaseNotes.md</file>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

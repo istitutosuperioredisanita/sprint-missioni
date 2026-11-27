@@ -1,0 +1,5 @@
+{
+  "fromRevision": "96db9feb2f",
+  "dateFormat": "dd/MM/yyyy",
+  "ignoreCommitsIfMessageMatches": "^Merge.*|^Bumped version to.*|^ci(\\(.*\\))?:.*|^chore(\\(.*\\))?:.*"
+}

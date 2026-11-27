@@ -158,6 +158,10 @@ missioniApp.controller('HomeController', function ($scope, $sessionStorage, $loc
     } else {
         $scope.account = $sessionStorage.account;
         recuperoMessaggio();
+        // data dell'ultima release: prima intestazione "## VERSIONE x del gg/mm/aaaa" delle news
+        ConfigService.getReleaseNotes().then(function (note) {
+            $scope.dataRelease = (/## VERSIONE \S+ del (\d{2}\/\d{2}\/\d{4})/.exec(note) || [])[1];
+        });
         var uoForUsersSpecial = $scope.account.uoForUsersSpecial;
         if (uoForUsersSpecial){
             $scope.userSpecial = true;
