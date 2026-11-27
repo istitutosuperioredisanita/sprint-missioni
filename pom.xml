@@ -28,7 +28,7 @@
 
     <groupId>it.cnr.si.sprint</groupId>
     <artifactId>sprint-missioni</artifactId>
-    <version>0.0.1-test-SNAPSHOT</version>
+    <version>0.0.2-test-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <scm>
