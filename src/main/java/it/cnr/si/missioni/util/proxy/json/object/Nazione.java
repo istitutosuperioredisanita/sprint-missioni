@@ -56,7 +56,7 @@ public class Nazione extends RestServiceBean implements Serializable {
     }
 
     /**
-     * @param pgNazione The pg_nazione
+     * @param pg_nazione The pg_nazione
      */
     @JsonProperty("pg_nazione")
     public void setPg_nazione(Long pg_nazione) {
@@ -72,7 +72,7 @@ public class Nazione extends RestServiceBean implements Serializable {
     }
 
     /**
-     * @param dsNazione The ds_nazione
+     * @param ds_nazione The ds_nazione
      */
     @JsonProperty("ds_nazione")
     public void setDs_nazione(String ds_nazione) {
@@ -88,7 +88,7 @@ public class Nazione extends RestServiceBean implements Serializable {
     }
 
     /**
-     * @param cdAreaEstera The cd_area_estera
+     * @param cd_area_estera The cd_area_estera
      */
     @JsonProperty("cd_area_estera")
     public void setCd_area_estera(String cd_area_estera) {
@@ -104,7 +104,7 @@ public class Nazione extends RestServiceBean implements Serializable {
     }
 
     /**
-     * @param tiNazione The ti_nazione
+     * @param ti_nazione The ti_nazione
      */
     @JsonProperty("ti_nazione")
     public void setTi_nazione(String ti_nazione) {

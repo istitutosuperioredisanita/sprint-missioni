@@ -20,6 +20,7 @@
 package it.cnr.si.missioni.util;
 
 import org.springframework.core.io.ByteArrayResource;
+import jakarta.mail.internet.MimeMessage;
 
 public class FileMessageResource extends ByteArrayResource {
 
