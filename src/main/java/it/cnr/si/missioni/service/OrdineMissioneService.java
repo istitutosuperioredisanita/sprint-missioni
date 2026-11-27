@@ -358,6 +358,11 @@ public class OrdineMissioneService {
         }
         updateOrdineMissione(ordineMissioneDaAggiornare, true);
         missioneRespintaService.inserisciMissioneRespinta(result);
+        try {
+            mailService.sendEmail("Ordine di missione respinto", getTextMailRifiutoOrdine(ordineMissioneDaAggiornare), false, true, accountService.getEmail(ordineMissioneDaAggiornare.getUidInsert()));
+        } catch (Exception e) {
+            log.warn("Email di rifiuto non inviata per l'ordine {}: {}", ordineMissioneDaAggiornare.getId(), e.getMessage());
+        }
     }
 
     public OrdineMissioneAnticipo getAnticipo(OrdineMissione ordineMissioneDaAggiornare) throws AwesomeException {
@@ -1677,6 +1682,13 @@ public class OrdineMissioneService {
                     ordineMissione.setEsercizioObbligazione(impegno.getEsercizio());
                 }
             }
+            // nell'ordine di missione l'impegno deve essere provvisorio: viene reso definitivo in SIGLA con anticipo o missione
+            if (!Costanti.STATO_DEFINITIVO.equals(ordineMissione.getStato()) && !ordineMissione.isStatoFlussoApprovato()
+                    && "DEFINITIVO".equals(impegnoService.getStato(ordineMissione.getCdCdsObbligazione(), ordineMissione.getEsercizioObbligazione(),
+                    ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione()))) {
+                throw new AwesomeException(CodiciErrore.ERRGEN, "L'impegno " + ordineMissione.getEsercizioOriginaleObbligazione() + "-" + ordineMissione.getPgObbligazione()
+                        + " risulta definitivo: nell'ordine di missione l'impegno deve essere salvato in provvisorio.");
+            }
         } else {
             if (!StringUtils.isEmpty(ordineMissione.getEsercizioOriginaleObbligazione()) && StringUtils.isEmpty(ordineMissione.getFondi())) {
                 throw new AwesomeException(CodiciErrore.ERRGEN, "Oltre all'anno dell'impegno è necessario indicare anche il numero dell'impegno");
@@ -1895,6 +1907,13 @@ public class OrdineMissioneService {
             testoMail.append(" è stata approvata.</p>");
         }
         return testoMail.toString();
+    }
+
+    private String getTextMailRifiutoOrdine(OrdineMissione ordineMissione) {
+        return "<p>L'ordine di missione <b>" + ordineMissione.getAnno() + "-" + ordineMissione.getNumero() + "</b> di "
+                + getNominativo(ordineMissione.getUid()) + " per la missione a <b>" + ordineMissione.getDestinazione()
+                + "</b> avente per oggetto: <u>" + ordineMissione.getOggetto() + "</u> è stato respinto"
+                + (ordineMissione.getCommentoFlusso() == null ? "" : " per il seguente motivo: <i>" + ordineMissione.getCommentoFlusso() + "</i>") + ".</p>";
     }
 
     private String getTextMailApprovazioneAnnullamentoOrdine(OrdineMissione ordineMissione) {

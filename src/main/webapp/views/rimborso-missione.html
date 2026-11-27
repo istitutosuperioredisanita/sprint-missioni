@@ -511,7 +511,7 @@
                      <span class="input-group">
                      <span class="input-group-addon" translate="rimborso-missione.form.rimborso-importo-0">Rimborso a 0</span>
                      <label class="checkbox">
-                     <input ng-disabled="validazione || disabilitaRimborsoMissione" type="checkbox" ng-model="rimborsoMissioneModel.rimborso0" ng-true-value="S" ng-false-value="N">
+                     <input ng-disabled="validazione || disabilitaRimborsoMissione || (!rimborsoMissioneModel.idOrdineMissione && !rimborsoMissioneModel.ordineMissione.id)" type="checkbox" ng-model="rimborsoMissioneModel.rimborso0" ng-true-value="S" ng-false-value="N">
                      </label>
                      </span>
                         </p>
@@ -798,6 +798,8 @@
                    <a target="_blank" href="javascript:;" class="btn btn-default" ng-click="doPrintOrdineMissione(rimborsoMissioneModel.id)" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span></a>
                    -->
             </form>
+            <!-- riga vuota: distanzia "Scarica" da "Invio in firma" per il validatore -->
+            <div class="col-xs-12" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato != 'INS' && rimborsoMissioneModel.stato != 'ANN' && (utenteAbilitatoValidareUoContrAmm == 'S' || utenteAbilitatoValidareUo == 'S') && !disabilitaRimborsoMissione"><br></div>
             <form name="form-inline" role="form" ng-submit="confirm()" ng-style="{'padding-top': (altriPulsantiPresenti ? '18%' : '0')}">
                 <div class="col-xs-3" ng-show="showEsisteRimborsoMissione && rimborsoMissioneModel.stato != 'INS' && rimborsoMissioneModel.stato != 'ANN'">
                     <a target="_blank" href="api/rest/public/zipDocumentiRimborsoMissione?idMissione={{rimborsoMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'rimborso-missione.button.download' | translate}}">

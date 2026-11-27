@@ -59,6 +59,8 @@ missioniApp.constant('SIGLA_REST', {
         'TERZO_PER_COMPENSO': 'ConsTerzoPerCompensoAction.json',
         'RIMBORSO_KM': 'ConsMissioneRimborsoKmAction.json',
         'VALIDA_RIGA_RIMBORSO': 'restapi/missioni/validaMassimaleSpesa',
+        'STATO_IMPEGNO': 'restapi/missioni/impegno/',
+        'CUP_GAE': 'restapi/missioni/gae/',
         'MOD_PAGAMENTO': 'ConsModalitaPagamentoAction.json',
         'MANDATO_MISSIONE_SIGLA': 'ConsRiepilogoSiopeMandatiRestAction.json'
     });

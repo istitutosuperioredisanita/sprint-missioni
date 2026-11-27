@@ -236,6 +236,11 @@ public class RimborsoMissioneService {
         rimborsoMissioneDaAggiornare.setValidato("N");
         updateRimborsoMissione(rimborsoMissioneDaAggiornare, true, null);
         missioneRespintaService.inserisciMissioneRespinta(result);
+        try {
+            mailService.sendEmail("Rimborso missione respinto", getTextMailRifiutoRimborso(rimborsoMissioneDaAggiornare), false, true, accountService.getEmail(rimborsoMissioneDaAggiornare.getUidInsert()));
+        } catch (Exception e) {
+            log.warn("Email di rifiuto non inviata per il rimborso {}: {}", rimborsoMissioneDaAggiornare.getId(), e.getMessage());
+        }
     }
 
     public void aggiornaRimborsoMissioneAnnullato(RimborsoMissione rimborsoMissioneDaAggiornare)
@@ -2139,6 +2144,13 @@ public class RimborsoMissioneService {
                 + "</b> dal " + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataInizioMissione()) + " al "
                 + DateUtils.getDefaultDateAsString(rimborsoMissione.getDataFineMissione()) + " avente per oggetto: <u>"
                 + rimborsoMissione.getOggetto() + "</u> è stata approvato.</p>";
+    }
+
+    private String getTextMailRifiutoRimborso(RimborsoMissione rimborsoMissione) {
+        return "<p>Il rimborso missione <b>" + rimborsoMissione.getAnno() + "-" + rimborsoMissione.getNumero() + "</b> di "
+                + getNominativo(rimborsoMissione.getUid()) + " per la missione a <b>" + rimborsoMissione.getDestinazione()
+                + "</b> avente per oggetto: <u>" + rimborsoMissione.getOggetto() + "</u> è stato respinto"
+                + (rimborsoMissione.getCommentoFlusso() == null ? "" : " per il seguente motivo: <i>" + rimborsoMissione.getCommentoFlusso() + "</i>") + ".</p>";
     }
 
     private String getTextMailReturnToSender(String basePath, RimborsoMissione rimborsoMissione) {

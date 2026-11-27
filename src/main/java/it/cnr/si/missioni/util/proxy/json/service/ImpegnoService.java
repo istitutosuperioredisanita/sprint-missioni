@@ -30,6 +30,7 @@ import it.cnr.si.missioni.util.proxy.json.JSONClause;
 import it.cnr.si.missioni.util.proxy.json.object.Impegno;
 import it.cnr.si.missioni.util.proxy.json.object.ImpegnoJson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,6 +41,27 @@ import java.util.List;
 public class ImpegnoService {
     @Autowired
     private CommonService commonService;
+
+    // stato dell'impegno in SIGLA (PROVVISORIO, DEFINITIVO, STORNATO)
+    public String getStato(String cds, Integer esercizio, Integer esercizioOriginale, Long pgObbligazione) {
+        String app = Costanti.APP_SIGLA;
+        String url = Costanti.REST_IMPEGNO_STATO + cds + "/" + esercizio + "/" + pgObbligazione + "/" + esercizioOriginale + "/stato";
+        ObjectMapper mapper = new ObjectMapper();
+        String risposta = commonService.process((String) null, app, url, true, HttpMethod.GET);
+
+        try {
+            ImpegnoJson impegnoJson = mapper.readValue(risposta, ImpegnoJson.class);
+            if (impegnoJson != null) {
+                List<Impegno> lista = impegnoJson.getElements();
+                if (lista != null && !lista.isEmpty()) {
+                    return lista.get(0).getStatoObbligazione();
+                }
+            }
+        } catch (Exception ex) {
+            throw new AwesomeException(CodiciErrore.ERRGEN, "Errore nella lettura dello stato dell'impegno (" + Utility.getMessageException(ex) + ").");
+        }
+        return null;
+    }
 
     public Impegno loadImpegno(OrdineMissione ordineMissione) throws AwesomeException {
         return loadImpegno(ordineMissione.getCdsSpesa(), ordineMissione.getUoSpesa(), ordineMissione.getEsercizioOriginaleObbligazione(), ordineMissione.getPgObbligazione());

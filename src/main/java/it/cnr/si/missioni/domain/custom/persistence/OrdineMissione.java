@@ -289,8 +289,8 @@ public class OrdineMissione extends BaseEntity {
     private String obbligoRientro;
     @Column(name = "DISTANZA_DALLA_SEDE", length = 5, nullable = true)
     private Long distanzaDallaSede;
-    @Size(min = 0, max = 28)
-    @Column(name = "MODULO", length = 28, nullable = true)
+    @Size(min = 0, max = 500)
+    @Column(name = "MODULO", length = 500, nullable = true)
     private String modulo;
     @Size(min = 0, max = 3)
     @Column(name = "PRIORITA", length = 3, nullable = false)

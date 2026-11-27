@@ -43,6 +43,7 @@ public class Costanti {
     public final static String REST_INQUADRAMENTI = "ConsInquadramentoAction.json";
     public final static String REST_TIPO_PASTO = "ConsMissioneTipoPastoAction.json";
     public final static String REST_IMPEGNO = "ConsImpegnoAction.json";
+    public final static String REST_IMPEGNO_STATO = "restapi/missioni/impegno/";
     public final static String REST_IMPEGNO_GAE = "ConsImpegnoGaeAction.json";
     public final static String REST_TIPI_SPESA = "ConsTipiSpesaAction.json";
     public final static String REST_VALIDA_MASSIMALE_SPESA = "restapi/missioni/validaMassimaleSpesa";

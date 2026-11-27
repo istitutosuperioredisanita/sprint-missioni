@@ -277,6 +277,7 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
 
     $scope.onChangeTipoSpesa = function (cdTipoSpesa) {
         if (cdTipoSpesa){
+            var eraIndennitaKm = $scope.rimborso;
             if ($scope.tipi_spesa && $scope.tipi_spesa.length > 0){
                 for (var i=0; i<$scope.tipi_spesa.length; i++) {
                     var tipo_spesa = $scope.tipi_spesa[i];
@@ -290,6 +291,14 @@ missioniApp.controller('RimborsoMissioneDettagliController', function ($scope, $
                         $scope.giustificativo = tipo_spesa.fl_giustificativo_richiesto;
                         $scope.pasto = tipo_spesa.fl_pasto;
                         $scope.rimborso = tipo_spesa.fl_rimborso_km;
+                        // i campi dell'indennita' km valgono solo per quella spesa: cambiando spesa si azzerano
+                        var d = $scope.newDettaglioSpesa;
+                        if (tipo_spesa.fl_rimborso_km) {
+                            d.flSpesaAnticipata = d.flSpesaTracciata = 'N';
+                        } else {
+                            if (eraIndennitaKm) d.importoEuro = null;
+                            d.kmPercorsi = d.localitaSpostamento = null;
+                        }
                         $scope.trasporto = tipo_spesa.fl_trasporto;
                         $scope.alloggio = tipo_spesa.fl_alloggio;
                         $scope.ammissibileRimborso = tipo_spesa.fl_ammissibile_con_rimborso;

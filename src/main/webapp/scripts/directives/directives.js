@@ -315,7 +315,8 @@ angular.module('missioniApp')
         uo: '=',
         gae: '=',
         annoImpegno: '=',
-        numero: '='
+        numero: '=',
+        soloProvvisorio: '@'
       },
       templateUrl: 'views/cnr-modal-info-impegno.html',
       link: function (scope) {
@@ -357,6 +358,9 @@ angular.module('missioniApp')
                           if (impegnoSelected){
                       scope.pgObbligazione = impegnoSelected.pgObbligazione;
                       scope.descrizione = impegnoSelected.dsObbligazione;
+                      scope.statoImpegno = null;
+                      $http.get(urlRestProxy + app + '/', {params: {proxyURL: SIGLA_REST.STATO_IMPEGNO + impegnoSelected.cdCds + '/' + impegnoSelected.esercizio + '/' + impegnoSelected.pgObbligazione + '/' + impegnoSelected.esercizioOriginale + '/stato'}})
+                          .success(function (r) { scope.statoImpegno = r.elements && r.elements[0] ? r.elements[0].statoObbligazione : null; });
                       $('#exampleModal').modal('toggle');
                       if (impegnoSelected.esercizio === impegnoSelected.esercizioOriginale){
                         scope.disponibilita = impegnoSelected.imScadenzaComp - impegnoSelected.imAssociatoDocAmmComp;

@@ -37,6 +37,8 @@
 		    <p><strong>{{'modal-dettagli-impegno.gae' | translate}}</strong>: {{gae}}</p>
 		</div>
 	    <p><strong>{{'modal-dettagli-impegno.disponibilita' | translate}}</strong>: {{disponibilita}}</p>
+	    <p ng-show="statoImpegno"><strong>{{'modal-dettagli-impegno.stato' | translate}}</strong>: <span style="text-transform: capitalize">{{statoImpegno | lowercase}}</span></p>
+	    <div class="alert alert-warning" ng-show="soloProvvisorio == 'true' && statoImpegno == 'DEFINITIVO'">{{'modal-dettagli-impegno.avviso-definitivo' | translate}}</div>
     	<br>
 
       </div>

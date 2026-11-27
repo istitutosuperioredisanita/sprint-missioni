@@ -1009,7 +1009,9 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                     $scope.missioneEstera = null;
                 }
 
-                $scope.ordineMissioneModel.voce = ordineMissioneSelected.voce;
+                // richiedenti e delegati: voce di bilancio vuota (flag di validazione ricalcolati per la UO copiata)
+                $scope.gestioneUtenteAbilitatoValidare(ordineMissioneSelected.uoSpesa);
+                $scope.ordineMissioneModel.voce = $scope.utenteAbilitatoValidareUo == 'S' ? ordineMissioneSelected.voce : null;
                 $scope.ordineMissioneModel.gae = ordineMissioneSelected.gae;
                 $scope.ordineMissioneModel.cdsSpesa = ordineMissioneSelected.cdsSpesa;
                 $scope.ordineMissioneModel.uoSpesa = ordineMissioneSelected.uoSpesa;
@@ -1031,6 +1033,7 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
                 $scope.ordineMissioneModel.presidente = ordineMissioneSelected.presidente;
                 if ($scope.ordineMissioneModel.uoSpesa) {
 
+                    $scope.getDatiUo($scope.ordineMissioneModel.uoSpesa);
                     $scope.restUo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.cdsSpesa, $scope.ordineMissioneModel.uoSpesa);
                     $scope.restGae($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.pgProgetto, $scope.ordineMissioneModel.cdrSpesa, $scope.ordineMissioneModel.uoSpesa);
                     $scope.restModulo($scope.ordineMissioneModel.anno, $scope.ordineMissioneModel.uoSpesa, $scope.ordineMissioneModel.pgProgetto);
@@ -1069,6 +1072,27 @@ missioniApp.controller('OrdineMissioneController', function($rootScope, $scope, 
     };
 
 
+
+    // CUP da SIGLA: se la GAE ne ha uno solo si imposta e il campo si disabilita, altrimenti resta modificabile
+    $scope.cupDaSigla = false;
+    $scope.$watch('ordineMissioneModel.gae', function(gae) {
+        var m = $scope.ordineMissioneModel;
+        if (!m) return;
+        if ($scope.cupDaSigla) {
+            m.cup = null;
+            $scope.cupDaSigla = false;
+        }
+        if (!gae || !m.cdrSpesa) return;
+        $http.get(urlRestProxy + APP_FOR_REST.SIGLA + '/', {params: {proxyURL: SIGLA_REST.CUP_GAE + m.cdrSpesa + '/' + encodeURIComponent(gae) + '/cup'}})
+            .success(function(data) {
+                var cup = (data && data.cup) || [];
+                // CUP trovato (uno solo): sostituisce anche uno scritto a mano; con piu' CUP non se ne sceglie uno a caso
+                if ($scope.ordineMissioneModel === m && m.gae === gae && cup.length === 1) {
+                    m.cup = cup[0];
+                    $scope.cupDaSigla = true;
+                }
+            });
+    });
 
     $scope.annullaGae = function() {
         $scope.ordineMissioneModel.gae = null;

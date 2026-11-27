@@ -112,7 +112,9 @@
         "numero": "Numero",
         "descrizione":"Descrizione",
         "disponibilita":"Disponibilità",
-        "gae":"Codice GAE"
+        "gae":"Codice GAE",
+        "stato":"Stato impegno",
+        "avviso-definitivo":"L'impegno dell'ordine deve essere provvisorio: sarà reso definitivo in SIGLA con anticipo o missione."
     },
     "main": {
         "release": "Aggiornamento versione {{data}}. Clicca per le News di versione",

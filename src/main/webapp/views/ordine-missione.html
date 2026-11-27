@@ -379,7 +379,7 @@
                             </p>
                         </form>
                         <p class="col-md-1">
-                            <cnr-modal-info-impegno fondi="ordineMissioneModel.fondi" anno="ordineMissioneModel.anno" cds="ordineMissioneModel.cdsSpesa" uo="ordineMissioneModel.uoSpesa" gae="ordineMissioneModel.gae" anno-impegno="ordineMissioneModel.esercizioOriginaleObbligazione" numero="ordineMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
+                            <cnr-modal-info-impegno solo-provvisorio="true" fondi="ordineMissioneModel.fondi" anno="ordineMissioneModel.anno" cds="ordineMissioneModel.cdsSpesa" uo="ordineMissioneModel.uoSpesa" gae="ordineMissioneModel.gae" anno-impegno="ordineMissioneModel.esercizioOriginaleObbligazione" numero="ordineMissioneModel.pgObbligazione"> </cnr-modal-info-impegno>
                         </p>
                         <form class="form-inline" role="form" id="missioni">
                             <p class="col-md-3">
@@ -401,7 +401,7 @@
                             <p class="col-md-5">
                      <span class="input-group">
                      <span class="input-group-addon" translate="missione.form.cup">cup</span>
-                     <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D'))" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="ordineMissioneModel.cup"/>
+                     <input ng-disabled="((disabilitaOrdineMissione && validazione != 'D') || (ordineMissioneModel.statoFlussoApprovato && validazione != 'D')) || cupDaSigla" type="text" style="text-align:left" class="input-sm form-control" name="cup" ng-model="ordineMissioneModel.cup"/>
                      </span>
                             </p>
                             <!--<p class="col-md-2">
@@ -681,6 +681,8 @@
                     <a target="_blank" href="api/rest/public/printOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.print' | translate}}"><span class="glyphicon glyphicon-print" style="color:black"></span>&nbsp;{{'global.button.print' | translate}}</a>
                 </div>
             </form>
+            <!-- riga vuota: distanzia "Scarica" da "Invio in firma" per il validatore -->
+            <div class="col-xs-12" ng-show="showEsisteOrdineMissione && ordineMissioneModel.statoFlusso === 'APP' && utenteAbilitatoValidareUo == 'S' && !disabilitaOrdineMissione"><br></div>
             <form name="form-inline" role="form">
                 <div class="col-xs-3" ng-show="showEsisteOrdineMissione && ordineMissioneModel.statoFlusso === 'APP'">
                     <a target="_blank" href="api/rest/public/zipDocumentiOrdineMissione?idMissione={{ordineMissioneModel.id}}&token={{accessToken}}" class="btn btn-default" data-toggle="tooltip" title="{{'ordine-missione.button.download' | translate}}">

@@ -48,7 +48,8 @@ import java.util.Map;
         "imAssociatoDocAmmComp",
         "imAssociatoDocAmmRes",
         "imPagatoComp",
-        "imPagatoRes"
+        "imPagatoRes",
+        "statoObbligazione"
 })
 public class Impegno extends RestServiceBean implements Serializable {
 
@@ -88,6 +89,8 @@ public class Impegno extends RestServiceBean implements Serializable {
     private BigDecimal imPagatoComp;
     @JsonProperty("imPagatoRes")
     private BigDecimal imPagatoRes;
+    @JsonProperty("statoObbligazione")
+    private String statoObbligazione;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -377,6 +380,22 @@ public class Impegno extends RestServiceBean implements Serializable {
     @JsonProperty("imPagatoRes")
     public void setImPagatoRes(BigDecimal imPagatoRes) {
         this.imPagatoRes = imPagatoRes;
+    }
+
+    /**
+     * @return The statoObbligazione
+     */
+    @JsonProperty("statoObbligazione")
+    public String getStatoObbligazione() {
+        return statoObbligazione;
+    }
+
+    /**
+     * @param statoObbligazione The statoObbligazione
+     */
+    @JsonProperty("statoObbligazione")
+    public void setStatoObbligazione(String statoObbligazione) {
+        this.statoObbligazione = statoObbligazione;
     }
 
     @JsonAnyGetter

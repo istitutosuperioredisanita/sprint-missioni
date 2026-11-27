@@ -155,6 +155,11 @@ public class AnnullamentoOrdineMissioneService {
         annullamentoDaAggiornare.setStato(Costanti.STATO_INSERITO);
         updateAnnullamentoOrdineMissione(annullamentoDaAggiornare, true, null);
         missioneRespintaService.inserisciMissioneRespinta(result);
+        try {
+            mailService.sendEmail("Annullamento ordine di missione respinto", getTextMailRifiutoAnnullamento(annullamentoDaAggiornare), false, true, accountService.getEmail(annullamentoDaAggiornare.getUidInsert()));
+        } catch (Exception e) {
+            log.warn("Email di rifiuto non inviata per l'annullamento {}: {}", annullamentoDaAggiornare.getId(), e.getMessage());
+        }
     }
 
     public void aggiornaAnnullamentoOrdineMissioneAnnullato(ResultFlows result, AnnullamentoOrdineMissione annullamentoDaAggiornare) throws AwesomeException {
@@ -785,6 +790,13 @@ public class AnnullamentoOrdineMissioneService {
                 " collegato al flusso " + flow.getProcessInstanceId() +
                 " con esito " + flow.getStato() +
                 " è andato in errore per il seguente motivo: " + error;
+    }
+
+    private String getTextMailRifiutoAnnullamento(AnnullamentoOrdineMissione annullamento) {
+        return "<p>L'annullamento dell'ordine di missione <b>" + annullamento.getAnno() + "-" + annullamento.getNumero() + "</b> di "
+                + getNominativo(annullamento.getUid()) + " per la missione a <b>" + annullamento.getOrdineMissione().getDestinazione()
+                + "</b> avente per oggetto: <u>" + annullamento.getOrdineMissione().getOggetto() + "</u> è stato respinto"
+                + (annullamento.getCommentoFlusso() == null ? "" : " per il seguente motivo: <i>" + annullamento.getCommentoFlusso() + "</i>") + ".</p>";
     }
 
     private String getTextMailReturnToSender(String basePath, AnnullamentoOrdineMissione annullamento) {
